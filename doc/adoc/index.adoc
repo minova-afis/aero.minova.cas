@@ -1,0 +1,27 @@
+////
+Für die Administratoransicht die folgende Zeile aus dem Kommentar nach unten kopieren.
+:admin: ja
+Für die Entwickleransicht (Developer) die folgende Zeile aus dem Kommentar nach unten kopieren.
+:dev: ja
+////
+:dev: ja
+
+= Core Application Server (CAS)
+Martins Avots <avots@minova.de>
+v1.0, {docdate}
+
+== Links
+
+* Zurück zur link:..[Übersicht]
+
+* link:requirements.html[Anforderungen]
+* link:architecture.html[Architektur]
+* link:versions.html[Versionen]
+* link:development.html[Entwicklung]
+
+== Beschreibung
+
+Dieser Dienst soll in Zukunft die erste Anlaufstelle für andere Dienste sein.
+Der Dienst wurde mit dem Ticket #42940 ins leben gerufen.
+
+//  Das Dokument sollte mit einer leeren Zeile enden.

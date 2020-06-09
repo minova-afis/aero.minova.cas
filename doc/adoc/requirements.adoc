@@ -1,0 +1,52 @@
+////
+Für die Administratoransicht die folgende Zeile aus dem Kommentar nach unten kopieren.:admin:
+Für die Entwickleransicht (Developer) die folgende Zeile aus dem Kommentar nach unten kopieren.
+:dev:
+////
+:dev: ja
+
+= Anforderungen an den Core Application Server
+Martins Avots <avots@minova.de>
+v1.0, {docdate}
+
+
+== Links
+
+* link:index.html[übergreifendes Modul]
+* link:..[Übersicht]
+
+== Anforderungen und deren Lösung
+
+=== Hauptaufgabe
+In Zukunft sollen alle Minova Dienst über das Access System auf die Datenbank zugreifen.
+Auch Events und Nachrichten an andere Dienste und Programme sollten über diesen Dienst verschickt werden.
+
+=== Der Dienst stellt einen Webservice bereit.
+Anfragen werden nur über HTTPS gemacht und SQL-Queries werden direkt nicht mehr von aussen aufgerufen.
+
+=== Sicherheit
+* Der Dienst muss alle Anfragen authentifizieren und authorisieren.
+  Die einzige Ausnahme gilt für die Front Page und den Login.
+* Active-Directory muss unterstützt werden.
+* Für Verbindungen sollte HTTPS verwendet werden.
+
+=== Tests
+Jede fachliche Funktionalität braucht Unittests.
+
+=== Logging
+Jede eingehende und ausgehende Event/Nachricht/Datenbankaufruf sollte geloggt werden.
+
+=== Update Prozess
+
+Ein Update des Access Systems sollte möglichst im laufenden Betrieb möglich sein.
+
+Alle Dienste, die mit dem Access System kommunizieren, versuchen die Verbindung immer neue aufzubauen, wenn diese nicht vorhanden ist.
+Die Diesnte speichern ausgehende Nachrichten in eine Warteschleife, wenn das System nicht erreichbar ist.
+Diese Warteschleife wird abgearbeitet, wenn das Access System wieder erreichbar ist.
+
+Es sollte für jede Art von Update einen automatisierten Integrationstesten geben, da diese Komponente eine sehr zentrale Rolle spielt.
+
+=== Anforderungen Implementierung
+* Der Dienst wird als Spring Boot Anwendung und als Minova NService implementiert und soll als normales Modul installiert werden.
+* Das Access System selber sollte selber kein Produkt spezifischen Code haben.
+  Es ist Teil des Cores.

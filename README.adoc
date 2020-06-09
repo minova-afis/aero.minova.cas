@@ -1,3 +1,3 @@
-# Core Application System aero.minova.cas
+# Core Application System
 
 Siehe auch link:http://nexus.minova.com:8000/Module/de.minova.afis/afis.structure.future.html[hier].

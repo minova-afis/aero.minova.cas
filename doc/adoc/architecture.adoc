@@ -1,0 +1,57 @@
+////
+Für die Administratoransicht die folgende Zeile aus dem Kommentar nach unten kopieren.:admin:
+Für die Entwickleransicht (Developer) die folgende Zeile aus dem Kommentar nach unten kopieren.
+:dev:
+////
+:dev: ja
+
+= Architektur des Core Application Server
+Martins Avots <avots@minova.de>
+v1.0, {docdate}
+
+
+== Links
+
+* link:index.html[übergreifendes Modul]
+* link:..[Übersicht]
+
+== Struktur
+
+[plantuml, afis-program-structure-future-access-system, svg]     
+....
+@startuml
+[database] <-down-> JPA
+JPA <-down-> [SQL/Data/Event/EventHandler plugins]
+[access.system.service] <-up-> [SQL/Data/Event/EventHandler plugins]
+[access.system.service] <-down-> [REST interface]
+[access.system.service] <-down-> [Website]
+[access.system.client] <-down-> [nservice.managed]
+[nservice.managed] <-down-> [Dienste]
+[REST interface] <-down-> [access.system.client]
+[access.system.client] <-down-> [RCP Anwendung]
+[Website] <.down.> Admin_Web_Browser
+database "database" {
+}
+@enduml
+....
+
+=== Website
+
+Die Website Dient als Webschnittstelle für den Support/Admin.
+Sie gibt Zugriff frei auf die Konsolen, Dashboards und REST-Schnittstellen des Dienstes.
+Zudem verlinkt sie auf andere Dienste.
+
+=== Plugins
+
+Plugins sind ganz normale Bibliotheken, die Spring Boot Components und Services enthalten.
+In diesem Fall muss man für jedes Update das Access System neustarten.
+
+Siehe link:https://github.com/dve/spring-boot-plugins-example[dieses Beispielprojekt].
+
+Der Vorteil ist, dass man keine Zwischen-Schicht hat und es deshalb leichter verständlich ist.
+
+Man sollte auch beachten, dass ein Fehler in einem Plugin nicht zwangsläufig andere Plugins behindert.
+Vor allem wenn die Plugins nicht voneinander abhängig sind.
+Bsp.: man hat einen REST service unter `localhost/rest/`:
+Wenn man mit den Browser `localhost/rest/1` anspricht und es gibt einen Fehler, kann `localhost/rest/2` immernoch funktionieren, außer es ist was fundamentales kaputt gegangen.
+

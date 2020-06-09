@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<head>
+	<div th:replace="layout :: head" />
+	<title>Root Access for Core Application System</title>
+</head>
+
+<body class="bg-light" style="min-height: 100vh !important;">
+	<header th:replace="layout :: header"></header>
+	<main>
+		<ul class="list-group">
+			<li class="list-group-item"><a class="nav-link" href="/">Front
+					Page</a></li>
+			<li class="list-group-item"><a class="nav-link" href="/root/database/console">DB Konsole</a></li>
+			<li class="list-group-item"><a class="nav-link"
+					href="/files/read?path=program files/AFIS/AFIS.xbs">AFIS.xbs</a></li>
+			<li class="list-group-item"><a class="nav-link" href="/webstorage/json/Item.xml?user=avots">Webstorage</a>
+			</li>
+			<li class="list-group-item"><a class="nav-link" href="/actuator">Spring
+					Boot Actuator REST API</a></li>
+			<li class="list-group-item"><a class="nav-link" href="/root/actuator/dashboard">Actuator Dashboard</a></li>
+		</ul>
+	</main>
+	<footer th:replace="layout :: footer"></footer>
+</body>
+
+</html>

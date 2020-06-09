@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<head>
+	<div th:replace="layout :: head" />
+	<title>Core Application System</title>
+</head>
+
+<body class="bg-light" style="min-height: 100vh !important;">
+	<nav class="navbar navbar-dark bg-primary">
+		<a class="navbar-brand" href="/">CAS - Core Application System</a> <a
+			th:if="${@environment.getActiveProfiles()[0] == 'production'}" class="navbar-text" href="#">on
+			Production </a> <a th:if="${@environment.getActiveProfiles()[0] == 'development'}" class="navbar-text"
+			href="#">on Development</a>
+		<div class="mr-auto"></div>
+		<div sec:authorize="isAnonymous()">
+			<a role="button" href="/root/login.html" class="btn btn-primary">Login</a>
+		</div>
+		<div sec:authorize="isAuthenticated()">
+			<a role="button" href="/root/logout" class="btn btn-primary">Logout</a>
+		</div>
+	</nav>
+	<main> </main>
+	<footer th:replace="layout :: footer"></footer>
+</body>
+
+</html>

@@ -1,0 +1,149 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.minova</groupId>
+	<artifactId>ch.minova.service.core.application.system</artifactId>
+	<version>12.4.0-SNAPSHOT</version>
+	<parent>
+		<groupId>ch.minova</groupId>
+		<artifactId>ch.minova.parent.spring</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+		<relativePath>../../core/releng/ch.minova.parent.spring</relativePath>
+	</parent>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+	<scm>
+		<developerConnection>scm:git:ssh://trac.minova.com/var/git/minova.git/modules/ch.minova.service.core.application.system</developerConnection>
+	</scm>
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Abhänigkeiten für die Definition von Minova Diensten << -->
+		<dependency>
+			<groupId>ch.minova</groupId>
+			<artifactId>ch.minova.install</artifactId>
+			<version>10.25.2</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.minova</groupId>
+			<artifactId>ch.minova.nservice.managed</artifactId>
+			<version>10.22.0</version>
+		</dependency>
+		<!-- >> Abhänigkeiten für die Definition von Minova Diensten -->
+		<dependency>
+			<!-- https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html -->
+			<!-- https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-enabling.html -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Abhängikeiten für die Authorisierung und Authentifizierung << -->
+		<dependency>
+			<!-- Blockiert ohne zusätzlichen Einstellungen standardmäßig alles. -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ldap</groupId>
+			<artifactId>spring-ldap-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-ldap</artifactId>
+		</dependency>
+		<!-- >> Abhängikeiten für die Authorisierung und Authentifizierung -->
+		<!-- Rendering << -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
+			<version>3.0.4.RELEASE</version>
+		</dependency>
+		<!-- >> Rendering -->
+		<!-- Datenbank Verbindungen << -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<!-- http://localhost:8080/h2-console -->
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+		</dependency>
+		<!-- >> Datenbank Verbindungen -->
+		<!-- Srping Boot Admin << -->
+		<dependency>
+			<groupId>de.codecentric</groupId>
+			<artifactId>spring-boot-admin-starter-server</artifactId>
+			<version>2.1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>de.codecentric</groupId>
+			<artifactId>spring-boot-admin-starter-client</artifactId>
+			<version>2.1.6</version>
+		</dependency>
+		<!-- >> Srping Boot Admin -->
+		<!-- Eingebetteter LDAP-Server fürs testen << -->
+		<!-- Damit stellen wir sicher, dass es immer einen LDAP Server gibt. Sonst 
+			gibt es während der Entwickler Fehler bei der Ausführung. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-ldap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.unboundid</groupId>
+			<artifactId>unboundid-ldapsdk</artifactId>
+		</dependency>
+		<!-- >> Eingebetteter LDAP-Server fürs testen -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!-- Properties Launcher in der Jar verwenden damit man mit "-D*" JVM-Parameter 
+						bspw. die loader.path Property setzen kann. -->
+					<layout>ZIP</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<div th:replace="layout :: head" />
+<title>Login for Core Application System</title>
+</head>
+<body class="d-flex flex-column h-100 bg-light">
+	<header th:replace="layout :: header"></header>
+	<main role="main" class="flex-shrink-0">
+	<div class="container">
+		<!-- Ohne th:action="@{/index.html}" funktioniert der login nicht. -->
+		<form name="f" class="form-signin" action="/root/login.html" method="post"
+			style="max-width: 330px; margin: auto; text-align: center !important;">
+			<p class="mt-5 mb-3"></p>
+			<img class="mb-4"
+				src="https://getbootstrap.com/docs/4.3/assets/brand/bootstrap-solid.svg"
+				alt="" width="72" height="72">
+			<h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+			<label for="inputEmail" class="sr-only">Username</label> <input
+				type="text" id="username" name="username" class="form-control"
+				autofocus="autofocus" placeholder="Username"> <label
+				for="inputPassword" class="sr-only">Password</label> <input
+				style="margin-bottom: 10px;" type="password" id="password"
+				name="password" class="form-control" placeholder="Password">
+			<div class="checkbox mb-3">
+				<label> <input type="checkbox" value="remember-me">
+					Remember me
+				</label>
+			</div>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign
+				in</button>
+			<p class="mt-5 mb-3"></p>
+		</form>
+	</div>
+	</main>
+	<footer th:replace="layout :: footer"></footer>
+</body>
+</html>

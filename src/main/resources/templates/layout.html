@@ -25,6 +25,7 @@
 			<a class="navbar-brand" href="/"
 				th:text="${@environment.getProperty('spring.application.name')}"></a>
 			<div class="mr-auto"></div>
+			<a role="button" th:href="${@environment.getProperty('aero.afis.host.url.http')}" class="btn btn-primary">Root</a>
 			<div sec:authorize="isAnonymous()">
 				<a role="button" href="/login" class="btn btn-primary">Login</a>
 			</div>

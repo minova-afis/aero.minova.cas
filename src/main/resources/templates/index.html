@@ -1,27 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html class="h-100" lang="en" xmlns:th="http://www.thymeleaf.org"
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 
 <head>
-	<div th:replace="layout :: head" />
-	<title>Core Application System</title>
+<div th:replace="layout :: head" />
+<title th:value="${@environment.getProperty('spring.application.name')}"></title>
 </head>
 
-<body class="bg-light" style="min-height: 100vh !important;">
-	<nav class="navbar navbar-dark bg-primary">
-		<a class="navbar-brand" href="/">CAS - Core Application System</a> <a
-			th:if="${@environment.getActiveProfiles()[0] == 'production'}" class="navbar-text" href="#">on
-			Production </a> <a th:if="${@environment.getActiveProfiles()[0] == 'development'}" class="navbar-text"
-			href="#">on Development</a>
-		<div class="mr-auto"></div>
-		<div sec:authorize="isAnonymous()">
-			<a role="button" href="/root/login.html" class="btn btn-primary">Login</a>
+<body class="d-flex flex-column h-100 bg-light">
+	<header th:replace="layout :: header"></header>
+	<main role="main" class="flex-shrink-0">
+		<div class="container" sec:authorize="isAuthenticated()">
+			<ul class="list-group" sec:authorize="isAuthenticated()">
+				<li class="list-group-item"><a class="nav-link"
+					href="/files/read?path=Program%20Files/AFIS/afis.xbs">AFIS.xbs</a></li>
+			</ul>
 		</div>
-		<div sec:authorize="isAuthenticated()">
-			<a role="button" href="/root/logout" class="btn btn-primary">Logout</a>
+		<div class="container" sec:authorize="isAnonymous()">
+			<div th:replace="login.body :: login-body" />
 		</div>
-	</nav>
-	<main> </main>
+	</main>
 	<footer th:replace="layout :: footer"></footer>
 </body>
 

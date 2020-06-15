@@ -1,48 +1,43 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html class="h-100" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-	<th:block th:fragment="head">
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<!-- TODO Bootstrap nutzen: https://getbootstrap.com https://getbootstrap.com/docs/4.1/getting-started/theming/#theme-colors -->
-		<!-- TODO Alle Bibliotheken muss man lokal haben. -->
-		<link rel="stylesheet" href="/theme/bootstrap/bootstrap.css" />
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-			integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-			crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-			integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-			crossorigin="anonymous"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-			integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-			crossorigin="anonymous"></script>
-	</th:block>
+<th:block th:fragment="head">
+	<meta charset="utf-8">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link rel="shortcut icon"
+		href="https://www.minova.de/files/cto_layout/img/favicon.ico"
+		type="image/x-icon" />
+	<link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+	<!-- TODO Alle Bibliotheken muss man lokal haben. -->
+	<link rel="stylesheet" href="/theme/bootstrap/bootstrap.css" />
+	<link rel="stylesheet" href="/theme/minova.css" />
+	<script src="/js/jquery-3.3.1.slim.min.js"></script>
+	<script src="/js/popper-1.14.7.min.js"></script>
+	<script src="/js/bootstrap-4.3.1.min.js"></script>
+</th:block>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100 bg-light">
 	<header th:fragment="header">
 		<nav class="navbar navbar-dark bg-primary">
-		
-		<a class="navbar-brand" href="/">CAS - Core Application System</a> <a
-			th:if="${@environment.getActiveProfiles()[0] == 'production'}"
-			class="navbar-text" href="#">on Production </a> <a
-			th:if="${@environment.getActiveProfiles()[0] == 'development'}"
-			class="navbar-text" href="#">on Development</a>
-		<div class="mr-auto"></div>
-		<div sec:authorize="isAnonymous()">
-			<a role="button" href="/root/login.html" class="btn btn-primary">Login</a>
-		</div>
-		<div sec:authorize="isAuthenticated()">
-			<a role="button" href="/root/logout" class="btn btn-primary">Logout</a>
-		</div>
+			<a class="navbar-brand" href="/"
+				th:text="${@environment.getProperty('spring.application.name')}"></a>
+			<div class="mr-auto"></div>
+			<div sec:authorize="isAnonymous()">
+				<a role="button" href="/login" class="btn btn-primary">Login</a>
+			</div>
+			<div sec:authorize="isAuthenticated()">
+				<a role="button" href="/logout" class="btn btn-primary">Logout</a>
+			</div>
 		</nav>
 	</header>
-	<footer th:fragment="footer" class="fixed-bottom footer mt-auto py-3" style="background-color: #f5f5f5;">
+	<main role="main" class="flex-shrink-0"></main>
+	<footer th:fragment="footer" class="footer mt-auto py-3">
 		<div class="container">
-			<span class="text-muted"> Copyright © 2019 MINOVA</span>
+			<span class="text-muted"> Copyright © 2020 MINOVA</span>
 		</div>
 	</footer>
 </body>
-
 </html>

@@ -1,0 +1,8 @@
+.number-field {
+	/* TODO Funktioniert zur Zeit nicht schön, da die größer der Spalten zur Zeit schlecht erkennbar ist.
+	text-align: right;*/
+	text-align: right;
+}
+.container-of-big {
+	overflow: auto;
+}

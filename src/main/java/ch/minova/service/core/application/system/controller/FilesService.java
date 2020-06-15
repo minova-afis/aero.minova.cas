@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FilesService {
 
-	// Der Dienst wird im Bin Ordner gestartet.
+	// Der Dienst wird im Bin oder lib Ordner gestartet.
 	private final Path serviceFolder;
 	private final Path programFilesFolder;
 	private final Path sharedDataFolder;

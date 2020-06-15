@@ -33,7 +33,7 @@ public class CoreApplicationSystemNService implements ManagedService {
 
 	@Override
 	public void executeService(ServiceMethods serviceMethods) throws Throwable {
-		SpringApplication.run(CoreApplicationSystemSpringApplication.class, args);
+		SpringApplication.run(CoreApplicationSystemApplication.class, args);
 	}
 
 }

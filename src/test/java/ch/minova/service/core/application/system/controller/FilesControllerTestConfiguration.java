@@ -1,5 +1,6 @@
 package ch.minova.service.core.application.system.controller;
 
+import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createDirectory;
 
 import java.io.IOException;
@@ -19,13 +20,15 @@ public class FilesControllerTestConfiguration {
 
 	private final Path programFilesFolder;
 	private final Path serviceFolder;
+	private final Path sharedDataFolder;
 
 	public FilesControllerTestConfiguration() throws IOException {
 		val folder = new TemporaryFolder();
 		folder.create();
-		programFilesFolder = folder.newFolder("Program Files").toPath();
+		sharedDataFolder = folder.newFolder("Shared Data").toPath();
+		programFilesFolder = sharedDataFolder.resolve("Program Files");
 		serviceFolder = programFilesFolder.resolve("core.application.system");
-		createDirectory(serviceFolder);
+		createDirectories(serviceFolder);
 	}
 
 	@Bean

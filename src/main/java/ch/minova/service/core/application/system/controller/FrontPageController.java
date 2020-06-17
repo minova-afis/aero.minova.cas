@@ -7,23 +7,23 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 public class FrontPageController {
-	@GetMapping("/")
+	@GetMapping("")
 	public String root() {
 		return "redirect:/index.html";
 	}
 
-	@GetMapping("/index")
+	@GetMapping("index")
 	public String index() {
-		return "/index.html";
+		return "index.html";
 	}
 	
-	@GetMapping("/index.html")
+	@GetMapping("index.html")
 	public String indexFull() {
-		return "/index.html";
+		return "index.html";
 	}
 
-	@GetMapping("/login")
+	@GetMapping("login")
 	public String login() {
-		return "/index.html";
+		return "index.html";
 	}
 }

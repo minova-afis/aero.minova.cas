@@ -12,9 +12,10 @@ public class FilesService {
 	private final Path serviceFolder;
 	private final Path programFilesFolder;
 	private final Path sharedDataFolder;
+	private final Path systemFolder;
 
 	public FilesService() {
-		this(Paths.get("..").toAbsolutePath());
+		this(Paths.get(".").toAbsolutePath());
 	}
 
 	public FilesService(Path serviceFolder) {
@@ -22,14 +23,15 @@ public class FilesService {
 		this.serviceFolder = serviceFolder.toAbsolutePath();
 		programFilesFolder = serviceFolder.resolve("..").toAbsolutePath();
 		sharedDataFolder = programFilesFolder.resolve("..").toAbsolutePath();
+		systemFolder = sharedDataFolder.resolve("..").toAbsolutePath();
 	}
 
 	public Path applicationFolder(String application) {
 		return programFilesFolder.resolve(application);
 	}
 
-	public Path sharedDataFolder() {
-		return sharedDataFolder;
+	public Path getSystemFolder() {
+		return systemFolder;
 	}
 
 }

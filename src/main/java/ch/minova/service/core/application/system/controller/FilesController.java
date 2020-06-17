@@ -25,13 +25,13 @@ public class FilesController {
 	@Autowired
 	FilesService files;
 
-	@RequestMapping(value = "/files/read")
+	@RequestMapping(value = "files/read")
 	@ResponseBody
 	public String getFile(@RequestParam String path) throws Exception {
-		if (Paths.get(path).startsWith(files.sharedDataFolder())) {
+		if (Paths.get(path).startsWith(files.getSystemFolder())) {
 			throw new IllegalArgumentException(format("Path variable with value \"{0}\" points outside the shared data folder of the system.", path));
 		}
-		return new String(readAllBytes(files.sharedDataFolder().resolve(path)), UTF_8);
+		return new String(readAllBytes(files.getSystemFolder().resolve(path)), UTF_8);
 	}
 
 }

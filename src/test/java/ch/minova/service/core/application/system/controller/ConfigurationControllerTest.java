@@ -31,7 +31,7 @@ public class ConfigurationControllerTest {
 		val afisFolder = files.applicationFolder("AFIS");
 		createDirectory(afisFolder);
 		write(afisFolder.resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		assertThat(testSubject.getFile("Program Files/AFIS/AFIS.xbs")).isEqualTo("<preferences></preferences>");
+		assertThat(testSubject.getFile("Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo("<preferences></preferences>");
 	}
 
 }

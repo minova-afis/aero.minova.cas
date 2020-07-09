@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system.controller;
+package aero.minova.core.application.system.controller;
 
 import static ch.minova.ncore.util.MessageFormat.format;
 import static java.nio.charset.StandardCharsets.UTF_8;

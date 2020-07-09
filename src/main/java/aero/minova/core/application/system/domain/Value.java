@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system.domain;
+package aero.minova.core.application.system.domain;
 
 import static java.util.Objects.requireNonNull;
 

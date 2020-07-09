@@ -19,6 +19,10 @@
 	</scm>
 	<dependencies>
 		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>ch.minova</groupId>
 			<artifactId>ch.minova.install</artifactId>
 			<version>10.25.2</version>

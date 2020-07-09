@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.var;
+import lombok.val;
 
 @RestController
 public class FilesController {
@@ -20,7 +20,7 @@ public class FilesController {
 	@RequestMapping(value = "files/read")
 	@ResponseBody
 	public String getFile(@RequestParam String path) throws Exception {
-		var inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
+		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		if (!inputPath.startsWith(files.getSystemFolder())) {
 			throw new IllegalAccessException("Path variable with value " + path + " points outside the shared data folder of the system.");
 		}

@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system.controller;
+package aero.minova.core.application.system.controller;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

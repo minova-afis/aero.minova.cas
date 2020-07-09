@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system.controller;
+package aero.minova.core.application.system.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

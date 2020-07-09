@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system.controller;
+package aero.minova.core.application.system.controller;
 
 import static java.nio.file.Files.createDirectory;
 import static java.nio.file.Files.write;
@@ -17,12 +17,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import aero.minova.core.application.system.controller.FilesController;
+import aero.minova.core.application.system.controller.FilesService;
 import lombok.val;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class ConfigurationControllerTest {
+public class FileControllerTest {
 
 	@Autowired
 	FilesService files;

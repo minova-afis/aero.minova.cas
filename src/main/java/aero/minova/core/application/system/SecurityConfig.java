@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system;
+package aero.minova.core.application.system;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

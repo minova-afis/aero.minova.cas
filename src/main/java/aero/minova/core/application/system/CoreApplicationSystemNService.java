@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system;
+package aero.minova.core.application.system;
 
 import java.io.IOException;
 

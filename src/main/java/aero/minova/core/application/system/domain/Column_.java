@@ -1,4 +1,4 @@
-package ch.minova.service.core.application.system.domain;
+package aero.minova.core.application.system.domain;
 
 public class Column_ {
 	public Column_(String name, DataType type) {

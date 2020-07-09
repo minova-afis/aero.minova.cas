@@ -23,16 +23,6 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>ch.minova</groupId>
-			<artifactId>ch.minova.install</artifactId>
-			<version>10.25.2</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.minova</groupId>
-			<artifactId>ch.minova.nservice.managed</artifactId>
-			<version>10.22.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
@@ -77,6 +67,10 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-ldap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

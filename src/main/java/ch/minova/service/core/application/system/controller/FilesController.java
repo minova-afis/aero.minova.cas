@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.minova.ncore.util.MessageFormat;
+import lombok.var;
 
 @RestController
 public class FilesController {
@@ -28,10 +29,11 @@ public class FilesController {
 	@RequestMapping(value = "files/read")
 	@ResponseBody
 	public String getFile(@RequestParam String path) throws Exception {
-		if (Paths.get(path).startsWith(files.getSystemFolder())) {
-			throw new IllegalArgumentException(format("Path variable with value \"{0}\" points outside the shared data folder of the system.", path));
+		var inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
+		if (!inputPath.startsWith(files.getSystemFolder())) {
+			throw new IllegalAccessException(format("Path variable with value \"{0}\" points outside the shared data folder of the system.", path));
 		}
-		return new String(readAllBytes(files.getSystemFolder().resolve(path)), UTF_8);
+		return new String(readAllBytes(inputPath), UTF_8);
 	}
 
 }

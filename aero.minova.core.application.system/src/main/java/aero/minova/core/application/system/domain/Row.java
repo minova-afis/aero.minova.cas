@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Row {
-	List<Value> values = new ArrayList<>();
+	private List<Value> values = new ArrayList<>();
 
 	public void addValue(Value v) {
 		getValues().add(v);

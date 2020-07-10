@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Table {
 	String name;
-	List<Column_> columns = new ArrayList<>();
+	List<Column> columns = new ArrayList<>();
 	List<Row> rows = new ArrayList<>();
 
 	public String getName() {
@@ -16,14 +16,14 @@ public class Table {
 		this.name = name;
 	}
 
-	public void addColumn(Column_ c) {
+	public void addColumn(Column c) {
 		if (getRows().size() != 0) {
 			throw new IllegalArgumentException();
 		}
 		getColumns().add(c);
 	}
-	
-	public void addColumns(List<Column_ > c) {
+
+	public void addColumns(List<Column> c) {
 		c.forEach(this::addColumn);
 	}
 
@@ -34,11 +34,11 @@ public class Table {
 		getRows().add(r);
 	}
 
-	public List<Column_> getColumns() {
+	public List<Column> getColumns() {
 		return columns;
 	}
 
-	public void setColumns(List<Column_> columns) {
+	public void setColumns(List<Column> columns) {
 		this.columns = columns;
 	}
 

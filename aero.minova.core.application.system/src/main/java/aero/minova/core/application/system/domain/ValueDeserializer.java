@@ -10,7 +10,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
 public class ValueDeserializer implements JsonDeserializer<Value> {
-
 	@Override
 	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
 		if (json == null || type == null) {
@@ -36,5 +35,4 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 		}
 		return null;
 	}
-
 }

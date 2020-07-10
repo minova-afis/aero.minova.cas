@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Table {
-	String name;
-	List<Column> columns = new ArrayList<>();
-	List<Row> rows = new ArrayList<>();
+	private String name;
+	private List<Column> columns = new ArrayList<>();
+	private List<Row> rows = new ArrayList<>();
 
 	public String getName() {
 		return name;

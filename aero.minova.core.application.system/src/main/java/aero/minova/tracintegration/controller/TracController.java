@@ -9,8 +9,12 @@ import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
-import ch.minova.trac.TracTicketIntegration;
+import aero.minova.tracintegration.TracTicketIntegration;
 
+/**
+ * @author wild
+ * @since 12.4.0
+ */
 @RestController
 public class TracController {
 	// Felder aus dem Ticket

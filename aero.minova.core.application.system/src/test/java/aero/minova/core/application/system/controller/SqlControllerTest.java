@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class SqlControllerTest {
 	
 	@Autowired
-	SqlController testSubject;
+	SqlViewController testSubject;
 
 	@Test
 	void testIndexViewResultName() {

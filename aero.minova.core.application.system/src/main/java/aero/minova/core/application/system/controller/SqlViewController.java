@@ -3,8 +3,11 @@ package aero.minova.core.application.system.controller;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.Value;
 import lombok.val;
 
 @RestController
@@ -43,11 +47,25 @@ public class SqlViewController {
 			}
 			Table inputTable = new Table();
 			inputTable.setName("vWorkingTimeIndex2");
+			inputTable.addColumn(new Column("CustomerText", DataType.STRING));
 			ResultSet resultSet = sqlConnection//
 					.createStatement()//
 					.executeQuery(prepareViewString(inputTable, true, 1000));
 			Table outputTable = new Table();
 			outputTable.setName("vWorkingTimeIndex2");
+			outputTable.setColumns(//
+					inputTable.getColumns().stream()//
+							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
+							.collect(Collectors.toList()));
+			while (resultSet.next()) {
+				Row row = new Row();
+				int i = 1;
+				for (Column column : outputTable.getColumns()) {
+					// TODO Feld typisieren.
+					row.addValue(new Value(resultSet.getString(i++)));
+				}
+				outputTable.addRow(row);
+			}
 			return outputTable;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

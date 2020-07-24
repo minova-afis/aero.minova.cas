@@ -13,7 +13,7 @@ import aero.minova.core.application.system.domain.Table;
 import lombok.val;
 
 @RestController
-public class SqlController {
+public class SqlViewController {
 
 	private Connection sqlConnection = msSqlConnection();
 
@@ -31,4 +31,6 @@ public class SqlController {
 		Table movementTable = new Table();
 		return movementTable;
 	}
+	
+	
 }

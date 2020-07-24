@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import aero.minova.core.application.system.domain.Column;
+import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Table;
 
 @SpringBootTest
@@ -26,7 +28,9 @@ class SqlViewControllerTest {
 
 	@Test
 	void testPrepareViewString_withStarSelect() {
-		assertThat(testSubject.prepareViewString("vWorkingTimeIndex2", new ArrayList<>(), new Table(), true, 1000))
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
 				.isEqualTo("select top 1000 * from vWorkingTimeIndex2");
 	}
 

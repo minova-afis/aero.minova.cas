@@ -23,7 +23,7 @@ public class SqlViewController {
 	public static final String SQL_IS_NOT_NULL = "is not null";
 	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between(", "in(", "not like", "like", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
-	private Connection sqlConnection = msSqlConnection();
+	Connection sqlConnection;
 
 	private Connection msSqlConnection() {
 		try {
@@ -36,11 +36,16 @@ public class SqlViewController {
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView() {
+		if (sqlConnection == null) {
+			sqlConnection = msSqlConnection();
+		}
 		Table movementTable = new Table();
 		return movementTable;
 	}
 	
 	/**
+	 * TODO name, viewFields entfernen.
+	 * 
 	 * Diese methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString".
 	 * 
 	 * Bereitet einen View-String vor und berücksichtigt eine evtl. angegebene Maximalanzahl Ergebnisse
@@ -111,7 +116,7 @@ public class SqlViewController {
 					if (clause.length() > 0) {
 						clause.append(" and ");
 					}
-					if (def.getType().equals(DataType.INSTANT) || def.getType().equals(DataType.ZONED)) {
+					if (def.getType().equals(DataType.DATE)) {
 						// #1543: nur Zeit vergleichen!
 						clause.append("convert(nvarchar(8), ").append(def.getName()).append(", 8)");
 					} else {

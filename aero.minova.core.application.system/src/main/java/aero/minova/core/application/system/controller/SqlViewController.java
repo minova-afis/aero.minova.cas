@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,14 +41,11 @@ public class SqlViewController {
 	}
 
 	@GetMapping(value = "data/index", produces = "application/json")
-	public Table getIndexView() {
+	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
 			if (sqlConnection == null) {
 				sqlConnection = msSqlConnection();
 			}
-			Table inputTable = new Table();
-			inputTable.setName("vWorkingTimeIndex2");
-			inputTable.addColumn(new Column("CustomerText", DataType.STRING));
 			ResultSet resultSet = sqlConnection//
 					.createStatement()//
 					.executeQuery(prepareViewString(inputTable, true, 1000));

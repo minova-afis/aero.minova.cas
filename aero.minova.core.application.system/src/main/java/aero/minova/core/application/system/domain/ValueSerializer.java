@@ -8,7 +8,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 public class ValueSerializer implements JsonSerializer<Value> {
-
 	@Override
 	public JsonElement serialize(Value value, Type type, JsonSerializationContext context) {
 		if (value == null || type == null || value.getValue() == null || value.getType() == null) {
@@ -31,5 +30,4 @@ public class ValueSerializer implements JsonSerializer<Value> {
 			return null;
 		}
 	}
-
 }

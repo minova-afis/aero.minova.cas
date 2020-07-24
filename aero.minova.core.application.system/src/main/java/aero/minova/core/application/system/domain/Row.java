@@ -2,6 +2,7 @@ package aero.minova.core.application.system.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Row {
 	private List<Value> values = new ArrayList<>();

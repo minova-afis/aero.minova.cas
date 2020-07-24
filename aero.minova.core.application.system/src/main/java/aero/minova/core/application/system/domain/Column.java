@@ -1,6 +1,7 @@
 package aero.minova.core.application.system.domain;
 
 public class Column {
+	public static final String AND_FIELD_NAME = "&";
 	private String name;
 	private DataType type;
 

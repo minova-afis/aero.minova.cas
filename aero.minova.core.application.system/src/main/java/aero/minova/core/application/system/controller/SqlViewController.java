@@ -59,7 +59,13 @@ public class SqlViewController {
 				Row row = new Row();
 				for (Column column : outputTable.getColumns()) {
 					// TODO Feld typisieren.
-					row.addValue(new Value(resultSet.getString(column.getName())));
+					if (column.getType() == DataType.STRING) {
+						row.addValue(new Value(resultSet.getString(column.getName())));
+					} else if (column.getType() == DataType.INTEGER) {
+						row.addValue(new Value(resultSet.getInt(column.getName())));
+					} else {
+						throw new UnsupportedOperationException("Der Typ " + column.getType() + " wird nicht unterstützt.");
+					}
 				}
 				outputTable.addRow(row);
 			}

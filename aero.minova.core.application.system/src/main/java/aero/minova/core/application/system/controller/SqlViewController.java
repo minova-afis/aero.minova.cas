@@ -57,10 +57,9 @@ public class SqlViewController {
 							.collect(Collectors.toList()));
 			while (resultSet.next()) {
 				Row row = new Row();
-				int i = 1;
 				for (Column column : outputTable.getColumns()) {
 					// TODO Feld typisieren.
-					row.addValue(new Value(resultSet.getString(i++)));
+					row.addValue(new Value(resultSet.getString(column.getName())));
 				}
 				outputTable.addRow(row);
 			}

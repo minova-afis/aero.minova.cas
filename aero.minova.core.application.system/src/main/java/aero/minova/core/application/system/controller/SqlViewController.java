@@ -18,7 +18,7 @@ import lombok.val;
 
 @RestController
 public class SqlViewController {
-	
+
 	public static final String SQL_IS_NULL = "is null";
 	public static final String SQL_IS_NOT_NULL = "is not null";
 	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between(", "in(", "not like", "like", SQL_IS_NULL, SQL_IS_NOT_NULL };
@@ -36,19 +36,21 @@ public class SqlViewController {
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView() {
+		try {
 		if (sqlConnection == null) {
 			sqlConnection = msSqlConnection();
 		}
 		Table movementTable = new Table();
+		sqlConnection.createStatement().execute(sql)
 		return movementTable;
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
-	
+
 	/**
-	 * TODO name, viewFields entfernen.
-	 * 
-	 * Diese methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString".
-	 * 
-	 * Bereitet einen View-String vor und berücksichtigt eine evtl. angegebene Maximalanzahl Ergebnisse
+	 * TODO name, viewFields entfernen. Diese methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String
+	 * vor und berücksichtigt eine evtl. angegebene Maximalanzahl Ergebnisse
 	 * 
 	 * @param name
 	 *            View/Tabellenname
@@ -65,26 +67,22 @@ public class SqlViewController {
 	 * @since 10.28.0
 	 * @throws IllegalArgumentException
 	 */
-	String prepareViewString(String name, List<Column> viewFields, Table params, boolean autoLike, int maxRows)
-			throws IllegalArgumentException {
-		if (name == null) {
-			throw new IllegalArgumentException("Cannot prepare view/table select with NULL name");
-		}
+	String prepareViewString(Table params, boolean autoLike, int maxRows) throws IllegalArgumentException {
 
 		final StringBuffer sb = new StringBuffer("select");
 		if (maxRows > 0) {
 			sb.append(" top ").append(maxRows);
 		}
-		sb.append(" * from ").append(name);
+		sb.append(" * from ").append(params.getName());
 
-		if (viewFields != null && viewFields.size() > 0 && params != null && params.getRows().size() > 0) {
-			final String where = prepareWhereClause(viewFields, params, autoLike);
+		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
+			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 		}
 
 		return sb.toString();
 	}
-	
+
 	/**
 	 * @param viewFields
 	 *            Felder, die in der View erwartet werden
@@ -96,7 +94,7 @@ public class SqlViewController {
 	 * @author wild
 	 * @since 10.28.0
 	 */
-	private String prepareWhereClause(List<Column> viewFields, Table params, boolean autoLike) {
+	private String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuffer where = new StringBuffer();
 		for (int rowI = 0; rowI < params.getRows().size(); rowI++) {
 			final Row r = params.getRows().get(rowI);
@@ -105,12 +103,12 @@ public class SqlViewController {
 
 			// Eine where Zeile aufbauen
 			final StringBuffer clause = new StringBuffer();
-			COLS: for (final Column def : viewFields) {
+			COLS: for (final Column def : params.getColumns()) {
 				if (Column.AND_FIELD_NAME.equalsIgnoreCase(def.getName())) {
 					continue COLS;
 				}
 
-				final Object valObj = r.getValues().get(viewFields.indexOf(def)).getValue();
+				final Object valObj = r.getValues().get(params.getColumns().indexOf(def)).getValue();
 				String strValue = valObj.toString().trim();
 				if (strValue != null && strValue.length() != 0) {
 					if (clause.length() > 0) {
@@ -157,7 +155,7 @@ public class SqlViewController {
 
 		return where.toString();
 	}
-	
+
 	/**
 	 * Abhängig von dem Feld-Typ, wird der Wert von Kommas umgeben oder nicht
 	 */
@@ -178,7 +176,7 @@ public class SqlViewController {
 		}
 		return value;
 	}
-	
+
 	/**
 	 * Prüft, ob der String einen SQL Operator am Anfang hat
 	 * 
@@ -188,7 +186,7 @@ public class SqlViewController {
 	protected static boolean hasOperator(String value) {
 		return getOperatorEndIndex(value) != 0;
 	}
-	
+
 	/**
 	 * Wenn es einen Operator gibt, dann liefert die Funktion den Index bis zu dem sich der Operator erstreckt
 	 * 

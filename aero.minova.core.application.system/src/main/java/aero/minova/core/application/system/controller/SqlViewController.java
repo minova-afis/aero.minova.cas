@@ -2,6 +2,7 @@ package aero.minova.core.application.system.controller;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,13 +38,18 @@ public class SqlViewController {
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView() {
 		try {
-		if (sqlConnection == null) {
-			sqlConnection = msSqlConnection();
-		}
-		Table movementTable = new Table();
-		sqlConnection.createStatement().execute(sql)
-		return movementTable;
-		} catch(Exception e) {
+			if (sqlConnection == null) {
+				sqlConnection = msSqlConnection();
+			}
+			Table inputTable = new Table();
+			inputTable.setName("vWorkingTimeIndex2");
+			ResultSet resultSet = sqlConnection//
+					.createStatement()//
+					.executeQuery(prepareViewString(inputTable, true, 1000));
+			Table outputTable = new Table();
+			outputTable.setName("vWorkingTimeIndex2");
+			return outputTable;
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

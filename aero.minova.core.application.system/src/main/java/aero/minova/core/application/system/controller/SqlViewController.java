@@ -47,8 +47,8 @@ public class SqlViewController {
 				sqlConnection = msSqlConnection();
 			}
 			ResultSet resultSet = sqlConnection//
-					.createStatement()//
-					.executeQuery(prepareViewString(inputTable, true, 1000));
+					.prepareCall(prepareViewString(inputTable, true, 1000))
+					.executeQuery();
 			Table outputTable = new Table();
 			outputTable.setName("vWorkingTimeIndex2");
 			outputTable.setColumns(//

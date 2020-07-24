@@ -7,13 +7,13 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 /**
- * Der Werte kann auch null sein. Wenn dass nicht so wäre, kännte wir optionale Werte in einere {@link Table} nicht darstellen.
+ * Der Wert kann auch null sein. Wenn dass nicht so wäre, könnten wir optionale Werte in einer {@link Table} nicht darstellen.
  * 
  * @author avots
  */
 public class Value {
-	DataType type;
-	Object value;
+	private DataType type;
+	private Object value;
 
 	public Value(Integer integerValue) {
 		type = DataType.INTEGER;

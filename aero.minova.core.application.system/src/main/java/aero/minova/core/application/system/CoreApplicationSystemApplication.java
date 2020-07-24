@@ -15,20 +15,20 @@ import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.domain.ValueDeserializer;
 import aero.minova.core.application.system.domain.ValueSerializer;
 
-// Der CompponentScan wird verwendet, damit alle Minova Komponenten im classpath geladen werden.
+// Der ComponentScan wird verwendet, damit alle Minova Komponenten im classpath geladen werden.
 @SpringBootApplication
+@ComponentScan("aero.minova")
 @Configuration
 public class CoreApplicationSystemApplication {
-
 	public static void main(String[] args) throws IOException {
 		SpringApplication.run(CoreApplicationSystemApplication.class, args);
 	}
-	
+
 	@Bean
 	public Gson gson() {
-		return new GsonBuilder()//
-				.registerTypeAdapter(Value.class, new ValueSerializer())//
-				.registerTypeAdapter(Value.class, new ValueDeserializer())//
+		return new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
 				.create();
 	}
 }

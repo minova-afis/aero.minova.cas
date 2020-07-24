@@ -1,14 +1,18 @@
 package aero.minova.core.application.system.domain;
 
-public class Column_ {
-	public Column_(String name, DataType type) {
-		this.setName(name);
-		this.setType(type);
+public class Column {
+	private String name;
+	private DataType type;
+
+	public Column(String name, DataType type) {
+		setName(name);
+		setType(type);
 	}
 
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -20,7 +24,4 @@ public class Column_ {
 	public void setType(DataType type) {
 		this.type = type;
 	}
-
-	private String name;
-	private DataType type;
 }

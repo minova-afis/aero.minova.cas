@@ -35,11 +35,11 @@ public class SqlProcedureController {
 			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
 					.forEach(i -> {
 						try {
-							val iVal = inputTable.getRows().get(0).getValues().get(i).getValue();
+							val iVal = inputTable.getRows().get(0).getValues().get(i);
 							if (iVal != null) {
-								preparedStatement.setString(i, iVal.toString());
+								preparedStatement.setString(i + 1, iVal.getValue().toString());
 							}
-						} catch (SQLException e) {
+						} catch (Exception e) {
 							throw new RuntimeException(e);
 						}
 					});

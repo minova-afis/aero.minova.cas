@@ -12,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.Value;
 
 @SpringBootTest
 class SqlViewControllerTest {
@@ -32,6 +34,22 @@ class SqlViewControllerTest {
 		inputTable.setName("vWorkingTimeIndex2");
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
 				.isEqualTo("select top 1000 * from vWorkingTimeIndex2");
+	}
+	
+	@Test
+	void testPrepareViewString_withSelectByOneAttributeValue() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
 	}
 
 }

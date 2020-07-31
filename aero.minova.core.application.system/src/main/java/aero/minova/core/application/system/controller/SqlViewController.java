@@ -1,7 +1,6 @@
 package aero.minova.core.application.system.controller;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.Locale;
 import java.util.Objects;

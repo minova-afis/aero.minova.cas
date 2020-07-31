@@ -3,7 +3,6 @@ package aero.minova.core.application.system.domain;
 import static java.util.Objects.requireNonNull;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 /**

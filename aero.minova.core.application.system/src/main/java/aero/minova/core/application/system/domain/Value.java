@@ -50,11 +50,6 @@ public class Value {
 		setValue(zonedDateTimeValue);
 	}
 
-	public Value(LocalDate dateValue) {
-		type = DataType.DATE;
-		setValue(dateValue);
-	}
-
 	@SuppressWarnings("unchecked")
 	public <T> T getValue(Class<T> type) {
 		return (T) value;

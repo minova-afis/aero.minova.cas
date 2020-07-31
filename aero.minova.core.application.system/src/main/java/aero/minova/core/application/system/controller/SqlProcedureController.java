@@ -25,5 +25,6 @@ public class SqlProcedureController {
 		if (sqlConnection == null) {
 			sqlConnection = msSqlConnection();
 		}
+		throw new UnsupportedOperationException();
 	}
 }

@@ -16,6 +16,7 @@ import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
+import aero.minova.core.application.system.sql.SystemDatabase;
 
 @RestController
 public class SqlViewController {
@@ -26,20 +27,11 @@ public class SqlViewController {
 
 	Connection sqlConnection;
 
-	private Connection msSqlConnection() {
-		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			return DriverManager.getConnection("jdbc:sqlserver://localhost;databaseName=AFIS_HAM", "sa", "Minova+0");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
 			if (sqlConnection == null) {
-				sqlConnection = msSqlConnection();
+				sqlConnection = SystemDatabase.connection();
 			}
 			ResultSet resultSet = sqlConnection//
 					.prepareCall(prepareViewString(inputTable, true, 1000))

@@ -18,6 +18,7 @@ import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
+import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
@@ -25,7 +26,7 @@ import lombok.val;
 public class SqlProcedureController {
 	Connection sqlConnection;
 
-	@PostMapping(value = "data/procedure", produces = "application/json")
+	@PostMapping(value = "data/procedure-with-result-set", produces = "application/json")
 	public Table executeProcedure(@RequestBody Table inputTable) {
 		if (sqlConnection == null) {
 			sqlConnection = SystemDatabase.connection();
@@ -39,7 +40,7 @@ public class SqlProcedureController {
 							if (iVal == null) {
 								preparedStatement.setString(i + 1, "null");
 							} else {
-								preparedStatement.setString(i + 1, iVal.getValue().toString());
+								preparedStatement.setString(i + 1, SqlUtils.toSqlString(iVal));
 							}
 						} catch (Exception e) {
 							throw new RuntimeException(e);

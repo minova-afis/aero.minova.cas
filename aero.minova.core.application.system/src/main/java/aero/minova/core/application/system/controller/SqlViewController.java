@@ -128,12 +128,7 @@ public class SqlViewController {
 					if (clause.length() > 0) {
 						clause.append(" and ");
 					}
-					if (def.getType().equals(DataType.DATE)) {
-						// #1543: nur Zeit vergleichen!
-						clause.append("convert(nvarchar(8), ").append(def.getName()).append(", 8)");
-					} else {
-						clause.append(def.getName());
-					}
+					clause.append(def.getName());
 
 					// #13193
 					if (strValue.equalsIgnoreCase("null") || strValue.equalsIgnoreCase("not null")) {

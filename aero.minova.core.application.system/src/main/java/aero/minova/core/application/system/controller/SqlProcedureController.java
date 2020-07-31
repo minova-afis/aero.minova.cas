@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
@@ -20,6 +21,7 @@ import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
+@RestController
 public class SqlProcedureController {
 	Connection sqlConnection;
 
@@ -33,7 +35,10 @@ public class SqlProcedureController {
 			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
 					.forEach(i -> {
 						try {
-							preparedStatement.setString(i, inputTable.getRows().get(0).getValues().get(i).getValue().toString());
+							val iVal = inputTable.getRows().get(0).getValues().get(i).getValue();
+							if (iVal != null) {
+								preparedStatement.setString(i, iVal.toString());
+							}
 						} catch (SQLException e) {
 							throw new RuntimeException(e);
 						}

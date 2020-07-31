@@ -4,6 +4,9 @@ import static java.util.stream.IntStream.rangeClosed;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -74,6 +77,47 @@ public class SqlProcedureController {
 			}
 			return outputTable;
 		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@PostMapping(value = "data/procedure-with-return-code", produces = "application/json")
+	public Table executeProcedureWithReturnCode(@RequestBody Table inputTable) {
+		if (sqlConnection == null) {
+			sqlConnection = SystemDatabase.connection();
+		}
+		try {
+			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
+			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
+			val preparedStatement = sqlConnection.prepareCall(prepareProcedureString(inputTable, executeStrategies));
+			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
+					.forEach(i -> {
+						try {
+							val iVal = inputTable.getRows().get(0).getValues().get(i);
+							if (iVal == null) {
+								preparedStatement.setString(i + 2, "null");
+							} else {
+								preparedStatement.setString(i + 2, SqlUtils.toSqlString(iVal));
+							}
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					});
+			preparedStatement.registerOutParameter(1, Types.INTEGER);
+			preparedStatement.execute();
+			val returnCode = preparedStatement.getInt(1);
+
+			val outputTable = new Table();
+			outputTable.setName(inputTable.getName());
+			outputTable.setColumns(Arrays.asList(new Column("ReturnCode", DataType.INTEGER)));
+
+			Row row = new Row();
+			row.addValue(new Value(returnCode));
+			outputTable.addRow(row);
+			return outputTable;
+		} catch (
+
+		SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}

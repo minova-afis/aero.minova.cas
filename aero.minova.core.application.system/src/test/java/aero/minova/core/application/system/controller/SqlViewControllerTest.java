@@ -24,12 +24,6 @@ class SqlViewControllerTest {
 	@Autowired
 	SqlViewController testSubject;
 
-	@Disabled
-	@Test
-	void testIndexViewResultName() {
-		// assertThat(testSubject.getIndexView("IndexViewName").getName()).isEqualTo("IndexViewName");
-	}
-
 	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")
 	@Test
 	void testPrepareViewString_withStarSelect() {

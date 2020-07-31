@@ -99,4 +99,29 @@ class SqlViewControllerTest {
 						+ "where (BookingDate <= '2020-07-31')\r\n"//
 						+ "  and (BookingDate > '2020-07-29')");
 	}
+
+	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
+	@Test
+	void testPrepareViewString_withSelectByMultipleOptionalRules() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("WIS"));
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\n" //
+						+ "where (EmployeeText like 'AVM%')\r\n"//
+						+ "   or (EmployeeText like 'WIS%')");
+	}
 }

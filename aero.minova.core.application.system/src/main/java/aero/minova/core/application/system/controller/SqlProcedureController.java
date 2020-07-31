@@ -1,9 +1,9 @@
 package aero.minova.core.application.system.controller;
 
-import java.sql.CallableStatement;
+import static java.util.stream.IntStream.rangeClosed;
+
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -50,21 +50,26 @@ public class SqlProcedureController {
 			val outputTable = new Table();
 			outputTable.setName(inputTable.getName());
 			outputTable.setColumns(//
-					inputTable.getColumns().stream()//
-							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
+					rangeClosed(1, resultSet.getMetaData().getColumnCount())//
+							.mapToObj(i -> {
+								try {
+									return resultSet.getMetaData().getColumnName(i);
+								} catch (SQLException e1) {
+									throw new RuntimeException(e1);
+								}
+							})//
+							.map(columnName -> new Column(columnName, DataType.STRING))//
 							.collect(Collectors.toList()));
 			while (resultSet.next()) {
 				Row row = new Row();
-				for (Column column : outputTable.getColumns()) {
+				rangeClosed(1, resultSet.getMetaData().getColumnCount()).forEach(i -> {
 					// TODO Feld typisieren.
-					if (column.getType() == DataType.STRING) {
-						row.addValue(new Value(resultSet.getString(column.getName())));
-					} else if (column.getType() == DataType.INTEGER) {
-						row.addValue(new Value(resultSet.getInt(column.getName())));
-					} else {
-						throw new UnsupportedOperationException("Der Typ " + column.getType() + " wird nicht unterstützt.");
+					try {
+						row.addValue(new Value(resultSet.getString(i)));
+					} catch (SQLException e) {
+						throw new RuntimeException(e);
 					}
-				}
+				});
 				outputTable.addRow(row);
 			}
 			return outputTable;

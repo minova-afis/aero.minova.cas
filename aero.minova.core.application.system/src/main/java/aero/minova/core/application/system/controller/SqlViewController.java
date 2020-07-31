@@ -37,7 +37,7 @@ public class SqlViewController {
 					.prepareCall(prepareViewString(inputTable, true, 1000))
 					.executeQuery();
 			Table outputTable = new Table();
-			outputTable.setName("vWorkingTimeIndex2");
+			outputTable.setName(inputTable.getName());
 			outputTable.setColumns(//
 					inputTable.getColumns().stream()//
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//

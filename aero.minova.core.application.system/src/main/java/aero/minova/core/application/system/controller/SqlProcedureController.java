@@ -36,7 +36,9 @@ public class SqlProcedureController {
 					.forEach(i -> {
 						try {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);
-							if (iVal != null) {
+							if (iVal == null) {
+								preparedStatement.setString(i + 1, "null");
+							} else {
 								preparedStatement.setString(i + 1, iVal.getValue().toString());
 							}
 						} catch (Exception e) {

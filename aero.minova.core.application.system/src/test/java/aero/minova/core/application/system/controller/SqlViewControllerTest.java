@@ -51,5 +51,23 @@ class SqlViewControllerTest {
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
 				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
 	}
+	
+	@Test
+	void testPrepareViewString_withSelectByMultipleAttributeValue() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value("MIN"));
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%' and CustomerText like 'MIN%')");
+	}
 
 }

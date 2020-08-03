@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,15 +25,13 @@ public class SqlViewController {
 	public static final String SQL_IS_NOT_NULL = "is not null";
 	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between(", "in(", "not like", "like", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
-	Connection sqlConnection;
+	@Autowired
+	SystemDatabase systemDatabase;
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
-			if (sqlConnection == null) {
-				sqlConnection = SystemDatabase.connection();
-			}
-			ResultSet resultSet = sqlConnection//
+			ResultSet resultSet = systemDatabase.connection()//
 					.prepareCall(prepareViewString(inputTable, true, 1000))
 					.executeQuery();
 			Table outputTable = new Table();

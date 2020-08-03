@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,15 +28,13 @@ import lombok.val;
 
 @RestController
 public class SqlProcedureController {
-	Connection sqlConnection;
+	@Autowired
+	SystemDatabase systemDatabase;
 
 	@PostMapping(value = "data/procedure-with-result-set", produces = "application/json")
 	public Table executeProcedure(@RequestBody Table inputTable) {
-		if (sqlConnection == null) {
-			sqlConnection = SystemDatabase.connection();
-		}
 		try {
-			val preparedStatement = sqlConnection.prepareCall(prepareProcedureString(inputTable));
+			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable));
 			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
 					.forEach(i -> {
 						try {
@@ -83,13 +82,10 @@ public class SqlProcedureController {
 
 	@PostMapping(value = "data/procedure-with-return-code", produces = "application/json")
 	public Table executeProcedureWithReturnCode(@RequestBody Table inputTable) {
-		if (sqlConnection == null) {
-			sqlConnection = SystemDatabase.connection();
-		}
 		try {
 			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
-			val preparedStatement = sqlConnection.prepareCall(prepareProcedureString(inputTable, executeStrategies));
+			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable, executeStrategies));
 			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
 					.forEach(i -> {
 						try {

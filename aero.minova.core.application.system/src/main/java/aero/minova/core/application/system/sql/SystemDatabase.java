@@ -3,21 +3,34 @@ package aero.minova.core.application.system.sql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * Es ist zur Zeit immer eine SQL-Datenbank. Es ist zur Zeit nicht zwingenderweiße die selbe Datenbank, wie die default-Datenbank dieser Spring-Boot-Anwendung.
  * 
  * @author avots
  */
+@Component
 public class SystemDatabase {
 
-	private SystemDatabase() {
-		throw new UnsupportedOperationException();
-	}
+	@Value("${aero.minova.database.url:jdbc:sqlserver://localhost;databaseName=AFIS_HAM}")
+	String connectionString;
 
-	public static Connection connection() {
+	@Value("${aero.minova.database.user.name:sa}")
+	String userName;
+	@Value("${aero.minova.database.user.password:Minova+0}")
+	String userPassword;
+
+	private Connection connection;
+
+	public Connection connection() {
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			return DriverManager.getConnection("jdbc:sqlserver://localhost;databaseName=AFIS_HAM", "sa", "Minova+0");
+			if (connection == null) {
+				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+				connection = DriverManager.getConnection(connectionString, userName, userPassword);
+			}
+			return connection;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -118,6 +118,9 @@ public class SqlViewController {
 				if (Column.AND_FIELD_NAME.equalsIgnoreCase(def.getName())) {
 					continue COLS;
 				}
+				if (r.getValues().get(params.getColumns().indexOf(def)) == null) {
+					continue COLS;
+				}
 
 				final Object valObj = r.getValues().get(params.getColumns().indexOf(def)).getValue();
 				String strValue = valObj.toString().trim();

@@ -2,7 +2,6 @@ package aero.minova.core.application.system.controller;
 
 import static java.util.stream.IntStream.rangeClosed;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Arrays;

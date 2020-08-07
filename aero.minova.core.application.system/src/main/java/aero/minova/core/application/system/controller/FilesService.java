@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class FilesService {
 
-	// Der Dienst wird im Bin oder lib Ordner gestartet.
-	private final Path serviceFolder;
 	private final Path programFilesFolder;
 	private final Path sharedDataFolder;
 	private final Path systemFolder;
@@ -20,7 +18,7 @@ public class FilesService {
 
 	public FilesService(Path serviceFolder) {
 		// Mit toAbsolutePath werden die Pfade so einfach und eindeutig wie möglich.
-		this.serviceFolder = serviceFolder.toAbsolutePath();
+		serviceFolder = serviceFolder.toAbsolutePath();
 		programFilesFolder = serviceFolder.resolve("..").toAbsolutePath().normalize();
 		sharedDataFolder = programFilesFolder.resolve("..").toAbsolutePath().normalize();
 		systemFolder = sharedDataFolder.resolve("..").toAbsolutePath().normalize();

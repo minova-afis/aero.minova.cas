@@ -1,11 +1,18 @@
 package aero.minova.core.application.system.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,6 +21,7 @@ import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
+import lombok.val;
 
 @SpringBootTest
 class SqlViewControllerTest {
@@ -114,5 +122,19 @@ class SqlViewControllerTest {
 				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\n" //
 						+ "where (EmployeeText like 'AVM%')\r\n"//
 						+ "   or (EmployeeText like 'WIS%')");
+	}
+	
+	@Test
+	void testConvertSqlResultToRow_UnsupportedTypes() throws SQLException {
+		val outputTable = new Table();
+		outputTable.setName("vWorkingTimeIndex2");
+		outputTable.addColumn(new Column("LastDate", DataType.INSTANT));
+		val sqlSet = Mockito.mock(ResultSet.class);
+		val time = Instant.ofEpochMilli(1598613904487L).toString();
+		when(sqlSet.getString("LastDate")).thenReturn(time);
+		val testResult = testSubject.convertSqlResultToRow(outputTable, sqlSet);
+		assertThat(testResult.getValues()).hasSize(1);
+		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
+		
 	}
 }

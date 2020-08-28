@@ -1,5 +1,6 @@
 package aero.minova.core.application.system.controller;
 
+import static java.sql.Types.VARCHAR;
 import static java.util.stream.IntStream.rangeClosed;
 
 import java.sql.SQLException;
@@ -39,7 +40,7 @@ public class SqlProcedureController {
 						try {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);
 							if (iVal == null) {
-								preparedStatement.setString(i + 1, "null");
+								preparedStatement.setNull(i + 1, VARCHAR);
 							} else {
 								preparedStatement.setString(i + 1, SqlUtils.toSqlString(iVal));
 							}
@@ -90,7 +91,8 @@ public class SqlProcedureController {
 						try {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);
 							if (iVal == null) {
-								preparedStatement.setString(i + 2, "null");
+								// 2 Wird verwendet, da der erste Parameter der return code ist.
+								preparedStatement.setNull(i + 2, VARCHAR);
 							} else {
 								preparedStatement.setString(i + 2, SqlUtils.toSqlString(iVal));
 							}
@@ -100,7 +102,7 @@ public class SqlProcedureController {
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			val returnCode = preparedStatement.getInt(1);
+			val returnCode = 0;//preparedStatement.getInt(1);
 
 			val outputTable = new Table();
 			outputTable.setName(inputTable.getName());

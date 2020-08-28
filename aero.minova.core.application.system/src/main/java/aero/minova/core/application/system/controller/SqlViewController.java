@@ -1,10 +1,13 @@
 package aero.minova.core.application.system.controller;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,35 +29,52 @@ public class SqlViewController {
 
 	@Autowired
 	SystemDatabase systemDatabase;
+	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
 			ResultSet resultSet = systemDatabase.connection()//
-					.prepareCall(prepareViewString(inputTable, true, 1000))
-					.executeQuery();
+					.prepareCall(prepareViewString(inputTable, true, 1000)).executeQuery();
+			return convertSqlResultToTable(inputTable, resultSet);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
+		try {
 			Table outputTable = new Table();
 			outputTable.setName(inputTable.getName());
 			outputTable.setColumns(//
 					inputTable.getColumns().stream()//
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
 							.collect(Collectors.toList()));
-			while (resultSet.next()) {
-				Row row = new Row();
-				for (Column column : outputTable.getColumns()) {
-					// TODO Feld typisieren.
-					if (column.getType() == DataType.STRING) {
-						row.addValue(new Value(resultSet.getString(column.getName())));
-					} else if (column.getType() == DataType.INTEGER) {
-						row.addValue(new Value(resultSet.getInt(column.getName())));
-					} else {
-						throw new UnsupportedOperationException("Der Typ " + column.getType() + " wird nicht unterstützt.");
-					}
-				}
-				outputTable.addRow(row);
+			while (sqlSet.next()) {
+				outputTable.addRow(convertSqlResultToRow(outputTable, sqlSet));
 			}
 			return outputTable;
-		} catch (Exception e) {
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet) {
+		try {
+			Row row = new Row();
+			for (Column column : outputTable.getColumns()) {
+				// TODO Feld typisieren.
+				if (column.getType() == DataType.STRING) {
+					row.addValue(new Value(sqlSet.getString(column.getName())));
+				} else if (column.getType() == DataType.INTEGER) {
+					row.addValue(new Value(sqlSet.getInt(column.getName())));
+				} else {
+					logger.warn(this.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: " + column.getType());
+					row.addValue(new Value(sqlSet.getString(column.getName())));
+				}
+			}
+			return row;
+		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
 	}

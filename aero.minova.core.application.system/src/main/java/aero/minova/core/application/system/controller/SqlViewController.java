@@ -19,6 +19,7 @@ import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SystemDatabase;
+import lombok.val;
 
 @RestController
 public class SqlViewController {
@@ -102,10 +103,21 @@ public class SqlViewController {
 
 		final StringBuffer sb = new StringBuffer("select");
 		if (maxRows > 0) {
-			sb.append(" top ").append(maxRows);
+			sb.append(" top ").append(maxRows).append(" ");
 		}
-		sb.append(" * from ").append(params.getName());
-
+		val outputFormat = params.getColumns().stream()//
+				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+				.collect(Collectors.toList());
+		if (outputFormat.isEmpty()) {
+			sb.append("* from ");
+		} else {
+			sb.append(//
+					outputFormat.stream()//
+							.map(Column::getName)//
+							.collect(Collectors.joining(", ")));
+			sb.append(" from ");
+		}
+		sb.append(params.getName());
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);

@@ -52,7 +52,7 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
+				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
 	}
 
 	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
@@ -71,7 +71,7 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%' and CustomerText like 'MIN%')");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%' and CustomerText like 'MIN%')");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -94,7 +94,7 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\n" //
+				.isEqualTo("select top 1000 BookingDate from vWorkingTimeIndex2\r\n" //
 						+ "where (BookingDate <= '2020-07-31')\r\n"//
 						+ "  and (BookingDate > '2020-07-29')");
 	}
@@ -119,11 +119,11 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 * from vWorkingTimeIndex2\r\n" //
+				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
 						+ "where (EmployeeText like 'AVM%')\r\n"//
 						+ "   or (EmployeeText like 'WIS%')");
 	}
-	
+
 	@Test
 	void testConvertSqlResultToRow_UnsupportedTypes() throws SQLException {
 		val outputTable = new Table();
@@ -135,6 +135,24 @@ class SqlViewControllerTest {
 		val testResult = testSubject.convertSqlResultToRow(outputTable, sqlSet);
 		assertThat(testResult.getValues()).hasSize(1);
 		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
-		
+	}
+
+	@DisplayName("Wähle alle Einträge mit einem bestimmten Wert eines Feldes.")
+	@Test
+	void testPrepareViewString_withSelectByAttributesWithoutConstraint() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(null);
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
 	}
 }

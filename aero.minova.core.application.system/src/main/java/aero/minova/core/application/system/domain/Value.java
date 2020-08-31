@@ -78,6 +78,10 @@ public class Value {
 		return type == DataType.DOUBLE ? (Double) value : null;
 	}
 
+	public Long getLongValue() {
+		return type == DataType.LONG ? (Long) value : null;
+	}
+
 	public Instant getInstantValue() {
 		return type == DataType.INSTANT ? (Instant) value : null;
 	}

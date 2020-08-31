@@ -2,6 +2,9 @@ package aero.minova.core.application.system.controller;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -65,11 +68,28 @@ public class SqlViewController {
 		try {
 			Row row = new Row();
 			for (Column column : outputTable.getColumns()) {
-				// TODO Feld typisieren.
 				if (column.getType() == DataType.STRING) {
 					row.addValue(new Value(sqlSet.getString(column.getName())));
 				} else if (column.getType() == DataType.INTEGER) {
 					row.addValue(new Value(sqlSet.getInt(column.getName())));
+				} else if (column.getType() == DataType.BOOLEAN) {
+					row.addValue(new Value(sqlSet.getBoolean(column.getName())));
+				} else if (column.getType() == DataType.DOUBLE) {
+					row.addValue(new Value(sqlSet.getDouble(column.getName())));
+				} else if (column.getType() == DataType.INSTANT) {
+					if (sqlSet.getTimestamp(column.getName()) == null) {
+						row.addValue(new Value((Instant) null));
+					} else {
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant()));
+					}
+				} else if (column.getType() == DataType.LONG) {
+					row.addValue(new Value(sqlSet.getLong(column.getName())));
+				} else if (column.getType() == DataType.ZONED) {
+					if (sqlSet.getTimestamp(column.getName()) == null) {
+						row.addValue(new Value((ZonedDateTime) null));
+					} else {
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(ZoneId.systemDefault())));
+					}
 				} else {
 					logger.warn(this.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: " + column.getType());
 					row.addValue(new Value(sqlSet.getString(column.getName())));

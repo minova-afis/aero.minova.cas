@@ -2,6 +2,7 @@ package aero.minova.core.application.system.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +25,7 @@ import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
+import aero.minova.core.application.system.sql.SqlUtils;
 import lombok.val;
 
 @SpringBootTest
@@ -136,7 +138,7 @@ class SqlViewControllerTest {
 		val sqlSet = Mockito.mock(ResultSet.class);
 		val time = Instant.ofEpochMilli(1598613904487L).toString();
 		when(sqlSet.getString("LastDate")).thenReturn(time);
-		val testResult = testSubject.convertSqlResultToRow(outputTable, sqlSet);
+		val testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 		assertThat(testResult.getValues()).hasSize(1);
 		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
 	}
@@ -180,7 +182,7 @@ class SqlViewControllerTest {
 		when(sqlSet.getLong("LONG")).thenReturn(7L);
 		when(sqlSet.getString("STRING")).thenReturn("string");
 		when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
-		val testResult = testSubject.convertSqlResultToRow(outputTable, sqlSet);
+		val testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
 		assertThat(testResult.getValues().get(1).getBooleanValue()).isEqualTo(true);
 		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);

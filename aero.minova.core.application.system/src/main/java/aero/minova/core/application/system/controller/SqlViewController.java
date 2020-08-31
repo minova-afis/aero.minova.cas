@@ -36,7 +36,8 @@ public class SqlViewController {
 	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
 			ResultSet resultSet = systemDatabase.connection()//
-					.prepareCall(prepareViewString(inputTable, true, 1000)).executeQuery();
+					.prepareCall(prepareViewString(inputTable, true, 1000))//
+					.executeQuery();
 			return convertSqlResultToTable(inputTable, resultSet);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -1,5 +1,6 @@
 package aero.minova.core.application.system.controller;
 
+import static aero.minova.core.application.system.sql.SqlUtils.convertSqlResultToRow;
 import static java.sql.Types.VARCHAR;
 import static java.util.stream.IntStream.rangeClosed;
 
@@ -7,10 +8,13 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +34,7 @@ import lombok.val;
 public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
+	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@PostMapping(value = "data/procedure-with-result-set", produces = "application/json")
 	public Table executeProcedure(@RequestBody Table inputTable) {
@@ -52,27 +57,12 @@ public class SqlProcedureController {
 			val outputTable = new Table();
 			outputTable.setName(inputTable.getName());
 			outputTable.setColumns(//
-					rangeClosed(1, resultSet.getMetaData().getColumnCount())//
-							.mapToObj(i -> {
-								try {
-									return resultSet.getMetaData().getColumnName(i);
-								} catch (SQLException e1) {
-									throw new RuntimeException(e1);
-								}
-							})//
-							.map(columnName -> new Column(columnName, DataType.STRING))//
+					inputTable.getColumns().stream()//
+							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
+							.filter(column -> !Objects.equals(column.getName(), "FilterLastAction"))//
 							.collect(Collectors.toList()));
 			while (resultSet.next()) {
-				Row row = new Row();
-				rangeClosed(1, resultSet.getMetaData().getColumnCount()).forEach(i -> {
-					// TODO Feld typisieren.
-					try {
-						row.addValue(new Value(resultSet.getString(i)));
-					} catch (SQLException e) {
-						throw new RuntimeException(e);
-					}
-				});
-				outputTable.addRow(row);
+				outputTable.addRow(convertSqlResultToRow(outputTable, resultSet, logger, this, c -> !Objects.equals(c.getName(), "FilterLastAction")));
 			}
 			return outputTable;
 		} catch (SQLException e) {
@@ -102,7 +92,7 @@ public class SqlProcedureController {
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			val returnCode = 0;//preparedStatement.getInt(1);
+			val returnCode = 0;// preparedStatement.getInt(1);
 
 			val outputTable = new Table();
 			outputTable.setName(inputTable.getName());

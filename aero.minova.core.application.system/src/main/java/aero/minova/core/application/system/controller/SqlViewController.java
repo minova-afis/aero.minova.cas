@@ -2,9 +2,6 @@ package aero.minova.core.application.system.controller;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -20,7 +17,7 @@ import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
+import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
@@ -56,46 +53,9 @@ public class SqlViewController {
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
 							.collect(Collectors.toList()));
 			while (sqlSet.next()) {
-				outputTable.addRow(convertSqlResultToRow(outputTable, sqlSet));
+				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, logger, this));
 			}
 			return outputTable;
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet) {
-		try {
-			Row row = new Row();
-			for (Column column : outputTable.getColumns()) {
-				if (column.getType() == DataType.STRING) {
-					row.addValue(new Value(sqlSet.getString(column.getName())));
-				} else if (column.getType() == DataType.INTEGER) {
-					row.addValue(new Value(sqlSet.getInt(column.getName())));
-				} else if (column.getType() == DataType.BOOLEAN) {
-					row.addValue(new Value(sqlSet.getBoolean(column.getName())));
-				} else if (column.getType() == DataType.DOUBLE) {
-					row.addValue(new Value(sqlSet.getDouble(column.getName())));
-				} else if (column.getType() == DataType.INSTANT) {
-					if (sqlSet.getTimestamp(column.getName()) == null) {
-						row.addValue(new Value((Instant) null));
-					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant()));
-					}
-				} else if (column.getType() == DataType.LONG) {
-					row.addValue(new Value(sqlSet.getLong(column.getName())));
-				} else if (column.getType() == DataType.ZONED) {
-					if (sqlSet.getTimestamp(column.getName()) == null) {
-						row.addValue(new Value((ZonedDateTime) null));
-					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(ZoneId.systemDefault())));
-					}
-				} else {
-					logger.warn(this.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: " + column.getType());
-					row.addValue(new Value(sqlSet.getString(column.getName())));
-				}
-			}
-			return row;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}

@@ -5,11 +5,14 @@ import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import org.assertj.core.util.Arrays;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -71,7 +74,8 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%' and CustomerText like 'MIN%')");
+				.isEqualTo(
+						"select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%' and CustomerText like 'MIN%')");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -128,7 +132,7 @@ class SqlViewControllerTest {
 	void testConvertSqlResultToRow_UnsupportedTypes() throws SQLException {
 		val outputTable = new Table();
 		outputTable.setName("vWorkingTimeIndex2");
-		outputTable.addColumn(new Column("LastDate", DataType.INSTANT));
+		outputTable.addColumn(new Column("LastDate", null));
 		val sqlSet = Mockito.mock(ResultSet.class);
 		val time = Instant.ofEpochMilli(1598613904487L).toString();
 		when(sqlSet.getString("LastDate")).thenReturn(time);
@@ -154,5 +158,35 @@ class SqlViewControllerTest {
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
 				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
+	}
+
+	@Test
+	void testAllDataTypes() throws SQLException {
+		val outputTable = new Table();
+		outputTable.setName("vWorkingTimeIndex2");
+		outputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
+		outputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
+		outputTable.addColumn(new Column("DOUBLE", DataType.DOUBLE));
+		outputTable.addColumn(new Column("INTEGER", DataType.INTEGER));
+		outputTable.addColumn(new Column("LONG", DataType.LONG));
+		outputTable.addColumn(new Column("STRING", DataType.STRING));
+		outputTable.addColumn(new Column("ZONED", DataType.ZONED));
+		val sqlSet = Mockito.mock(ResultSet.class);
+		val time = Instant.ofEpochMilli(1598613904487L);
+		when(sqlSet.getTimestamp("INSTANT")).thenReturn(Timestamp.from(time));
+		when(sqlSet.getBoolean("BOOLEAN")).thenReturn(true);
+		when(sqlSet.getDouble("DOUBLE")).thenReturn(3d);
+		when(sqlSet.getInt("INTEGER")).thenReturn(5);
+		when(sqlSet.getLong("LONG")).thenReturn(7L);
+		when(sqlSet.getString("STRING")).thenReturn("string");
+		when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
+		val testResult = testSubject.convertSqlResultToRow(outputTable, sqlSet);
+		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
+		assertThat(testResult.getValues().get(1).getBooleanValue()).isEqualTo(true);
+		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);
+		assertThat(testResult.getValues().get(3).getIntegerValue()).isEqualTo(5);
+		assertThat(testResult.getValues().get(4).getLongValue()).isEqualTo(7L);
+		assertThat(testResult.getValues().get(5).getStringValue()).isEqualTo("string");
+		assertThat(testResult.getValues().get(6).getZonedDateTimeValue()).isEqualTo(time.atZone(ZoneId.systemDefault()));
 	}
 }

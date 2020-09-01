@@ -152,25 +152,25 @@ public enum ExecuteStrategy {
 	 */
 	public static boolean returnRequired(Set<ExecuteStrategy> strategy) {
 		if (strategy == null) {
-			strategy = standard;
+			strategy = STANDARD;
 		}
 		return strategy.contains(RETURN_CODE_IS_CANCEL_IF_MINUS_1) || strategy.contains(RETURN_CODE_IS_ERROR_IF_NOT_0)
 				|| strategy.contains(RETURN_CODE_IS_ERROR_IF_NOT_1);
 	}
 
 	/** Standardstrategie: alle Parameter setzen (primary und non-primary) + via index setzen */
-	public static final Set<ExecuteStrategy> standard = new HashSet<ExecuteStrategy>();
+	public static final Set<ExecuteStrategy> STANDARD = new HashSet<ExecuteStrategy>();
 
 	static {
 		// Standard: Prozedur mit allen Parametern füllen und über den Index ausführen
-		standard.add(SET_PRIMARY_FIELDS);
-		standard.add(SET_NON_PRIMARY_FIELDS);
-		standard.add(SET_VIA_FIELD_INDEX);
+		STANDARD.add(SET_PRIMARY_FIELDS);
+		STANDARD.add(SET_NON_PRIMARY_FIELDS);
+		STANDARD.add(SET_VIA_FIELD_INDEX);
 		// ebenfalls Standard: nocount, das brauchen wir nur in den wenigsten Fällen... dann muss explizit
 		// removeExecuteStrategy(ExecuteStrategy.USE_NOCOUNT);
 		// aufgerufen werden
 		// hab aber rausgefunden, dass standard nicht immer verwendet wird!
 		// also muss USE_NOCOUNT derzeit manuell hinzugefügt werden wo man es braucht!
-		standard.add(USE_NOCOUNT);
+		STANDARD.add(USE_NOCOUNT);
 	}
 }

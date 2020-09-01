@@ -1,0 +1,24 @@
+= Core Application System
+
+* xref:core.application.system.service/README.adoc#[CAS-Dienst]
+
+== Auslieferung als Docker Container
+
+[source,bash]
+.Konsolen-Befehle
+--------
+# Docker Image bauen.
+	build.as.docker.image.sh
+	export.docker.image.sh
+	# Unter 'target/aero.minova.cas.docker.tar' liegt jetzt das Docker image.
+	# Diese muss man jetzt zum Ziel hochladen.
+# Docker Image auf der Ziel Maschine aufsetzen.
+	docker load --input <Pfad zum Docker Image>
+	# Im folgenden kann die Konfiguration über `--env` angepasst werden.
+	docker run \
+		--name=aero.minova.cas \
+		--publish=8084:8084 \
+		--env 'aero.minova.database.url=jdbc:sqlserver://host.docker.internal;databaseName=AFIS_HAM' \
+		aero.minova.cas:latest
+--------
+

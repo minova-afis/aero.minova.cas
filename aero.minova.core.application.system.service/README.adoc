@@ -1,3 +1,5 @@
-# Core Application System
+# Core Application System Dienst
 
-Siehe auch link:http://nexus.minova.com:8000/Module/de.minova.afis/afis.structure.future.html[hier].
+WARNING: Diese Doku ist veraltet.
+
+xref:doc/adoc/index.adoc#[Index]

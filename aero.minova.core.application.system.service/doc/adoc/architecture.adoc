@@ -21,14 +21,14 @@ v1.0, {docdate}
 ....
 @startuml
 [database] <-down-> JPA
-JPA <-down-> [SQL/Data/Event/EventHandler plugins]
-[access.system.service] <-up-> [SQL/Data/Event/EventHandler plugins]
-[access.system.service] <-down-> [REST interface]
-[access.system.service] <-down-> [Website]
-[access.system.client] <-down-> [nservice.managed]
+JPA <-down-> [Access System Service]
+Dateisystem <-down-> [Access System Service]
+[Access System Service] <-left-> [Plugins]
+[Access System Service] <-down-> [REST Interface]
+[Access System Service] <-down-> [Website]
+[REST Interface] <-down-> [nservice.managed]
 [nservice.managed] <-down-> [Dienste]
-[REST interface] <-down-> [access.system.client]
-[access.system.client] <-down-> [RCP Anwendung]
+[REST Interface] <-down-> [WFC Anwendung]
 [Website] <.down.> Admin_Web_Browser
 database "database" {
 }

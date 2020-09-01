@@ -15,13 +15,6 @@ v1.0, {docdate}
 * link:index.html[übergreifendes Modul]
 * link:..[Übersicht]
 
-=== 12.5.0-TODO: Konfiguration Externalisieren
-* #43398 Profile beherschen
-* #43175 Plugin System entwickeln
-
-=== 12.4.0-TODO: Datenbankzugriff über REST
-* #42517 REST API für Datenbank
-
 === 12.3.0: Grundlegende Sicherheit und Auslieferung von Systemdaten mit REST
 * #43323 Verschlüsselung über HTTPS
 * Redirect von HTTP nach HTTPS.

@@ -110,7 +110,7 @@ public class SqlProcedureController {
 	}
 
 	private static String prepareProcedureString(Table params) {
-		return prepareProcedureString(params, ExecuteStrategy.standard);
+		return prepareProcedureString(params, ExecuteStrategy.STANDARD);
 	}
 
 	/**

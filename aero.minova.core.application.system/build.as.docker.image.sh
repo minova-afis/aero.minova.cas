@@ -6,3 +6,4 @@ mvn package spring-boot:repackage
 #	../aero.minova.core.application.system.docker/core.application.system.jar
 docker build --file=Dockerfile.server \
 	--tag=aero.minova.cas:latest --rm=true .
+echo docker run --name=aero.minova.cas --publish=8084:8084 --network="host" aero.minova.cas:latest

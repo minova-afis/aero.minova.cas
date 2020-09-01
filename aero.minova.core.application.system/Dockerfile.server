@@ -1,9 +1,7 @@
 FROM alpine-java:base
 MAINTAINER baeldung.com
 COPY target/aero.minova.cas.jar /opt/aero.minova.cas/lib/
-ENV SPRING_APPLICATION_JSON='{"spring": {"cloud": {"config": {"server": \
-	  {"git": {"uri": "/var/lib/aero.minova.cas", \
-	  "clone-on-start": true}}}}}}'
+ENV SPRING_APPLICATION_JSON='{}'
 ENTRYPOINT ["/usr/bin/java"]
 CMD ["-jar", "/opt/aero.minova.cas/lib/aero.minova.cas.jar"]
 VOLUME /var/lib/aero.minova.cas

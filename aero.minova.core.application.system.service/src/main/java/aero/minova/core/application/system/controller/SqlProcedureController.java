@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
@@ -35,6 +38,7 @@ public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@PostMapping(value = "data/procedure-with-result-set", produces = "application/json")
 	public Table executeProcedure(@RequestBody Table inputTable) {
@@ -92,7 +96,7 @@ public class SqlProcedureController {
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			val returnCode = 0;// preparedStatement.getInt(1);
+			val returnCode = preparedStatement.getInt(1);
 
 			val outputTable = new Table();
 			outputTable.setName(inputTable.getName());
@@ -102,10 +106,20 @@ public class SqlProcedureController {
 			row.addValue(new Value(returnCode));
 			outputTable.addRow(row);
 			return outputTable;
-		} catch (
+		} catch (SQLException e) {
+			try {
+				logger.error("Could not execute \"" + inputTable.getName() + "\" with argument: " + objectMapper.writeValueAsString(e), e);
+			} catch (JsonProcessingException e1) {
+				logger.error("Logging failed: ", e1);
+			}
+			val outputTable = new Table();
+			outputTable.setName(inputTable.getName());
+			outputTable.setColumns(Arrays.asList(new Column("ReturnCode", DataType.INTEGER)));
 
-		SQLException e) {
-			throw new RuntimeException(e);
+			Row row = new Row();
+			row.addValue(new Value(0));
+			outputTable.addRow(row);
+			return outputTable;
 		}
 	}
 

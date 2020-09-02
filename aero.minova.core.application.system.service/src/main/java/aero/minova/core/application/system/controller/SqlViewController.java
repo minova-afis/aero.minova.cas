@@ -20,6 +20,7 @@ import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
+import lombok.var;
 
 @RestController
 public class SqlViewController {
@@ -118,12 +119,31 @@ public class SqlViewController {
 	 * @author wild
 	 * @since 10.28.0
 	 */
-	private String prepareWhereClause(Table params, boolean autoLike) {
+	protected String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuffer where = new StringBuffer();
+		final boolean hasAndClause;
+		// TODO Check size
+		val andFields = params.getColumns().stream()//
+				.filter(c -> Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+				.collect(Collectors.toList());
+		final Column andField;
+		if (andFields.isEmpty()) {
+			hasAndClause = false;
+			andField = null;
+		} else {
+			hasAndClause = true;
+			andField = andFields.get(0);
+		}
+		val andFieldIndex = params.getColumns().indexOf(andField);
 		for (int rowI = 0; rowI < params.getRows().size(); rowI++) {
 			final Row r = params.getRows().get(rowI);
 			// TODO Nicht annehmen, dass die spezielle &-Spalte die letzte Spalte ist.
-			final boolean and = r.getValues().get(r.getValues().size() - 1).getBooleanValue();
+			final boolean and;
+			if (hasAndClause) {
+				and = r.getValues().get(andFieldIndex).getBooleanValue();
+			} else {
+				and = false;
+			}
 
 			// Eine where Zeile aufbauen
 			final StringBuffer clause = new StringBuffer();

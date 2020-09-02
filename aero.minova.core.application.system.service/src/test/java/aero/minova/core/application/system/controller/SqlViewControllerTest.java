@@ -191,4 +191,14 @@ class SqlViewControllerTest {
 		assertThat(testResult.getValues().get(5).getStringValue()).isEqualTo("string");
 		assertThat(testResult.getValues().get(6).getZonedDateTimeValue()).isEqualTo(time.atZone(ZoneId.systemDefault()));
 	}
+	
+	@Test
+	void test_prepareWhereClause_missingAnd() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
+		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		intputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
+		val testProduct = testSubject.prepareWhereClause(intputTable, true);
+	}
 }

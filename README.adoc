@@ -1,6 +1,6 @@
 = Core Application System
 
-* link:./core.application.system.service/README.adoc#[CAS-Dienst]
+* xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
 
 == Auslieferung als Docker Container
 

@@ -28,6 +28,6 @@ public class SqlProcedureControllerTest {
 						, new Column("B", DataType.INTEGER, OutputType.INPUT)//
 						, new Column("B", DataType.INTEGER, OutputType.OUTPUT)));
 		val testProduct = testSubject.prepareProcedureString(testParameter);
-		assertThat(testProduct).isEqualTo("{call testProcedure(?,?,? output)}");
+		assertThat(testProduct).isEqualTo("{call testProcedure(?,?,?)}");
 	}
 }

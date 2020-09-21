@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
@@ -36,8 +38,10 @@ public class SqlViewController {
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
+			val viewQuery = prepareViewString(inputTable, true, 1000);
+			logger.info("Executing: " + viewQuery);
 			ResultSet resultSet = systemDatabase.connection()//
-					.prepareCall(prepareViewString(inputTable, true, 1000))//
+					.prepareCall(viewQuery)//
 					.executeQuery();
 			return convertSqlResultToTable(inputTable, resultSet);
 		} catch (Exception e) {
@@ -147,21 +151,23 @@ public class SqlViewController {
 
 			// Eine where Zeile aufbauen
 			final StringBuffer clause = new StringBuffer();
-			COLS: for (final Column def : params.getColumns()) {
-				if (Column.AND_FIELD_NAME.equalsIgnoreCase(def.getName())) {
+			COLS: for (int colI = 0; colI < r.getValues().size(); ++colI) {
+				val def = r.getValues().get(colI);
+				val col = params.getColumns().get(colI);
+				if (Column.AND_FIELD_NAME.equalsIgnoreCase(col.getName())) {
 					continue COLS;
 				}
-				if (r.getValues().get(params.getColumns().indexOf(def)) == null) {
+				if (r.getValues().get(colI) == null) {
 					continue COLS;
 				}
 
-				final Object valObj = r.getValues().get(params.getColumns().indexOf(def)).getValue();
+				final Object valObj = r.getValues().get(colI).getValue();
 				String strValue = valObj.toString().trim();
 				if (strValue != null && strValue.length() != 0) {
 					if (clause.length() > 0) {
 						clause.append(" and ");
 					}
-					clause.append(def.getName());
+					clause.append(col.getName());
 
 					// #13193
 					if (strValue.equalsIgnoreCase("null") || strValue.equalsIgnoreCase("not null")) {
@@ -179,7 +185,7 @@ public class SqlViewController {
 						}
 					}
 
-					strValue = encloseInCommasIfRequired(def, strValue);
+					strValue = encloseInCommasIfRequired(col, strValue);
 					clause.append(' ').append(strValue);
 				}
 			}

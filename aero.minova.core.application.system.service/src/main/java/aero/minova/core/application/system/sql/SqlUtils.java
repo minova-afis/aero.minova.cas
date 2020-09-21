@@ -36,41 +36,35 @@ public class SqlUtils {
 	}
 
 	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser) {
-		return convertSqlResultToRow(outputTable, sqlSet, logger, conversionUser, c -> true);
-	}
-
-	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser, Predicate<Column> columnSelector) {
 		try {
 			Row row = new Row();
 			for (Column column : outputTable.getColumns()) {
-				if (columnSelector.test(column)) {
-					if (column.getType() == DataType.STRING) {
-						row.addValue(new Value(sqlSet.getString(column.getName())));
-					} else if (column.getType() == DataType.INTEGER) {
-						row.addValue(new Value(sqlSet.getInt(column.getName())));
-					} else if (column.getType() == DataType.BOOLEAN) {
-						row.addValue(new Value(sqlSet.getBoolean(column.getName())));
-					} else if (column.getType() == DataType.DOUBLE) {
-						row.addValue(new Value(sqlSet.getDouble(column.getName())));
-					} else if (column.getType() == DataType.INSTANT) {
-						if (sqlSet.getTimestamp(column.getName()) == null) {
-							row.addValue(new Value((Instant) null));
-						} else {
-							row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant()));
-						}
-					} else if (column.getType() == DataType.LONG) {
-						row.addValue(new Value(sqlSet.getLong(column.getName())));
-					} else if (column.getType() == DataType.ZONED) {
-						if (sqlSet.getTimestamp(column.getName()) == null) {
-							row.addValue(new Value((ZonedDateTime) null));
-						} else {
-							row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault())));
-						}
+				if (column.getType() == DataType.STRING) {
+					row.addValue(new Value(sqlSet.getString(column.getName())));
+				} else if (column.getType() == DataType.INTEGER) {
+					row.addValue(new Value(sqlSet.getInt(column.getName())));
+				} else if (column.getType() == DataType.BOOLEAN) {
+					row.addValue(new Value(sqlSet.getBoolean(column.getName())));
+				} else if (column.getType() == DataType.DOUBLE) {
+					row.addValue(new Value(sqlSet.getDouble(column.getName())));
+				} else if (column.getType() == DataType.INSTANT) {
+					if (sqlSet.getTimestamp(column.getName()) == null) {
+						row.addValue(new Value((Instant) null));
 					} else {
-						logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
-								+ column.getType());
-						row.addValue(new Value(sqlSet.getString(column.getName())));
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant()));
 					}
+				} else if (column.getType() == DataType.LONG) {
+					row.addValue(new Value(sqlSet.getLong(column.getName())));
+				} else if (column.getType() == DataType.ZONED) {
+					if (sqlSet.getTimestamp(column.getName()) == null) {
+						row.addValue(new Value((ZonedDateTime) null));
+					} else {
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault())));
+					}
+				} else {
+					logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
+							+ column.getType());
+					row.addValue(new Value(sqlSet.getString(column.getName())));
 				}
 			}
 			return row;

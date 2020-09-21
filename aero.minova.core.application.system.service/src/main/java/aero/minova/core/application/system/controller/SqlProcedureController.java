@@ -68,17 +68,37 @@ public class SqlProcedureController {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
 				resultSet.setName("resultSet");
-				// TODO Determine output format via result set and not input format: https://docs.oracle.com/javase/7/docs/api/java/sql/ResultSetMetaData.html
-				resultSet.setColumns(inputTable.getColumns()//
-						.stream()//
-						.collect(toList()));
+				val metaData = sqlResultSet.getMetaData();
+				resultSet.setColumns(//
+						range(0, metaData.getColumnCount()).mapToObj(i -> {
+							try {
+								val type = metaData.getColumnType(i);
+								val name = metaData.getColumnName(i);
+								if (type == Types.BOOLEAN) {
+									return new Column(name, DataType.BOOLEAN);
+								} else if (type == Types.DOUBLE) {
+									return new Column(name, DataType.DOUBLE);
+								} else if (type == Types.TIMESTAMP) {
+									return new Column(name, DataType.INSTANT);
+								} else if (type == Types.INTEGER) {
+									return new Column(name, DataType.INTEGER);
+								} else if (type == Types.DOUBLE) {
+									return new Column(name, DataType.DOUBLE);
+								} else if (type == Types.VARCHAR) {
+									return new Column(name, DataType.STRING);
+								} else {
+									throw new UnsupportedOperationException("Unsupported result set type: " + i);
+								}
+							} catch (SQLException e) {
+								throw new RuntimeException(e);
+							}
+						}).collect(toList()));
 				while (sqlResultSet.next()) {
 					resultSet.addRow(//
 							convertSqlResultToRow(resultSet//
 									, sqlResultSet//
 									, logger//
-									, this//
-									, c -> !Objects.equals(c.getName(), "FilterLastAction")));
+									, this));
 				}
 			}
 			val hasOutputParameters = inputTable//

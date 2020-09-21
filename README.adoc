@@ -7,9 +7,10 @@
 [source,bash]
 .Konsolen-Befehle
 --------
+cd aero.minova.core.application.system.service
 # Docker image bauen.
-	build.as.docker.image.sh
-	export.docker.image.sh
+	./build.as.docker.image.sh
+	./export.docker.image.sh
 	# Unter 'target/aero.minova.cas.docker.tar' liegt jetzt das Docker image.
 	# Dieses muss man jetzt zum Ziel hochladen.
 # Docker image auf der Ziel Maschine aufsetzen.

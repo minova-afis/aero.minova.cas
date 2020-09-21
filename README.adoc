@@ -1,6 +1,6 @@
 = Core Application System
 
-* xref:./core.application.system.service/README.adoc#[CAS-Dienst]
+* link:./core.application.system.service/README.adoc#[CAS-Dienst]
 
 == Auslieferung als Docker Container
 

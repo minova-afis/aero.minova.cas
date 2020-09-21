@@ -5,10 +5,17 @@ public class Column {
 	public static final Column AND_FIELD = new Column(Column.AND_FIELD_NAME, DataType.BOOLEAN);
 	private String name;
 	private DataType type;
+	private OutputType outputType;
 
 	public Column(String name, DataType type) {
 		setName(name);
 		setType(type);
+	}
+	
+	public Column(String name, DataType type, OutputType outputType) {
+		setName(name);
+		setType(type);
+		this.outputType = outputType;
 	}
 
 	public String getName() {
@@ -25,5 +32,13 @@ public class Column {
 
 	public void setType(DataType type) {
 		this.type = type;
+	}
+
+	public OutputType getOutputType() {
+		return outputType;
+	}
+
+	public void setOutputType(OutputType outputType) {
+		this.outputType = outputType;
 	}
 }

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
@@ -139,7 +140,7 @@ public class SqlProcedureController {
 		}
 	}
 
-	private static String prepareProcedureString(Table params) {
+	String prepareProcedureString(Table params) {
 		return prepareProcedureString(params, ExecuteStrategy.STANDARD);
 	}
 
@@ -152,7 +153,7 @@ public class SqlProcedureController {
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
-	private static String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
+	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {
 			throw new IllegalArgumentException("Cannot prepare procedure with NULL name");
 		}
@@ -162,7 +163,12 @@ public class SqlProcedureController {
 		final StringBuffer sb = new StringBuffer();
 		sb.append('{').append(returnRequired ? "? = call " : "call ").append(params.getName()).append("(");
 		for (int i = 0; i < paramCount; i++) {
-			sb.append(i == 0 ? "?" : ",?");
+			val param = params.getColumns().get(i);
+			if (param.getOutputType() == OutputType.OUTPUT) {
+				sb.append(i == 0 ? "? output" : ",? output");
+			} else {
+				sb.append(i == 0 ? "?" : ",?");
+			}
 		}
 		sb.append(")}");
 		return sb.toString();

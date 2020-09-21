@@ -46,8 +46,11 @@ public class SqlProcedureController {
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
 	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
+		val offset = 2;
 		try {
-			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable));
+			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
+			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
+			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable, executeStrategies));
 			range(0, inputTable.getRows().get(0).getValues().size())//
 					.forEach(i -> {
 						try {
@@ -55,51 +58,57 @@ public class SqlProcedureController {
 							val type = inputTable.getColumns().get(i).getType();
 							if (iVal == null) {
 								if (type == DataType.BOOLEAN) {
-									preparedStatement.setObject(i + 1, null, Types.BOOLEAN);
+									preparedStatement.setObject(i + offset, null, Types.BOOLEAN);
 								} else if (type == DataType.DOUBLE) {
-									preparedStatement.setObject(i + 1, null, Types.DOUBLE);
+									preparedStatement.setObject(i + offset, null, Types.DOUBLE);
 								} else if (type == DataType.INSTANT) {
-									preparedStatement.setObject(i + 1, null, Types.TIMESTAMP);
+									preparedStatement.setObject(i + offset, null, Types.TIMESTAMP);
 								} else if (type == DataType.INTEGER) {
-									preparedStatement.setObject(i + 1, null, Types.INTEGER);
+									preparedStatement.setObject(i + offset, null, Types.INTEGER);
 								} else if (type == DataType.LONG) {
-									preparedStatement.setObject(i + 1, null, Types.DOUBLE);
+									preparedStatement.setObject(i + offset, null, Types.DOUBLE);
 								} else if (type == DataType.STRING) {
-									preparedStatement.setObject(i + 1, null, Types.NVARCHAR);
+									preparedStatement.setObject(i + offset, null, Types.NVARCHAR);
 								} else if (type == DataType.ZONED) {
-									preparedStatement.setObject(i + 1, null, Types.TIMESTAMP);
+									preparedStatement.setObject(i + offset, null, Types.TIMESTAMP);
 								} else {
 									throw new IllegalArgumentException("Unknown type: " + type.name());
 								}
 							} else {
+								// TODO Allgemeine Methode verwenden, um Code-Duplikation zu vermeiden
 								if (type == DataType.BOOLEAN) {
-									preparedStatement.setBoolean(i + 1, iVal.getBooleanValue());
+									preparedStatement.setBoolean(i + offset, iVal.getBooleanValue());
 								} else if (type == DataType.DOUBLE) {
-									preparedStatement.setDouble(i + 1, iVal.getDoubleValue());
+									preparedStatement.setDouble(i + offset, iVal.getDoubleValue());
 								} else if (type == DataType.INSTANT) {
-									preparedStatement.setTimestamp(i + 1, Timestamp.from(iVal.getInstantValue()));
+									preparedStatement.setTimestamp(i + offset, Timestamp.from(iVal.getInstantValue()));
 								} else if (type == DataType.INTEGER) {
-									preparedStatement.setInt(i + 1, iVal.getIntegerValue());
+									preparedStatement.setInt(i + offset, iVal.getIntegerValue());
 								} else if (type == DataType.LONG) {
-									preparedStatement.setDouble(i + 1, Double.valueOf(iVal.getLongValue()));
+									preparedStatement.setDouble(i + offset, Double.valueOf(iVal.getLongValue()));
 								} else if (type == DataType.STRING) {
-									preparedStatement.setString(i + 1, iVal.getStringValue());
+									preparedStatement.setString(i + offset, iVal.getStringValue());
 								} else if (type == DataType.ZONED) {
-									preparedStatement.setTimestamp(i + 1, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
+									preparedStatement.setTimestamp(i + offset, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
 								} else {
 									throw new IllegalArgumentException("Unknown type: " + type.name());
 								}
 							}
 							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
-								preparedStatement.registerOutParameter(i + 1, Types.VARCHAR);
+								preparedStatement.registerOutParameter(i + offset, Types.VARCHAR);
 							}
 						} catch (Exception e) {
 							throw new RuntimeException("Could not parse input parameter with index:" + i, e);
 						}
 					});
+			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			val result = new SqlProcedureResult();
-			val hasResultSet = preparedStatement.execute();
-			if (hasResultSet) {
+			preparedStatement.execute();
+			val returnCode = preparedStatement.getObject(1);
+			if (returnCode != null) {
+				result.setReturnCode(preparedStatement.getInt(1));
+			}
+			if (null != preparedStatement.getResultSet()) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
 				result.setResultSet(resultSet);
@@ -108,8 +117,8 @@ public class SqlProcedureController {
 				resultSet.setColumns(//
 						range(0, metaData.getColumnCount()).mapToObj(i -> {
 							try {
-								val type = metaData.getColumnType(i + 1);
-								val name = metaData.getColumnName(i + 1);
+								val type = metaData.getColumnType(i + offset);
+								val name = metaData.getColumnName(i + offset);
 								if (type == Types.BOOLEAN) {
 									return new Column(name, DataType.BOOLEAN);
 								} else if (type == Types.DOUBLE) {
@@ -157,7 +166,7 @@ public class SqlProcedureController {
 				range(1, inputTable.getColumns().size())//
 						.forEach(i -> {
 							if (outputColumnsMapping.get(i)) {
-								outputValues.addValue(parseSqlParameter(preparedStatement, i + 1, inputTable.getColumns().get(i)));
+								outputValues.addValue(parseSqlParameter(preparedStatement, i + offset, inputTable.getColumns().get(i)));
 							} else {
 								outputValues.addValue(null);
 							}
@@ -166,62 +175,6 @@ public class SqlProcedureController {
 			return result;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Sollte durch "data/procedure" ersetzt werden.
-	 * 
-	 * @param inputTable
-	 * @return
-	 */
-	@Deprecated
-	@PostMapping(value = "data/procedure-with-return-code", produces = "application/json")
-	public Table executeProcedureWithReturnCode(@RequestBody Table inputTable) {
-		try {
-			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
-			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
-			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable, executeStrategies));
-			range(0, inputTable.getRows().get(0).getValues().size())//
-					.forEach(i -> {
-						try {
-							val iVal = inputTable.getRows().get(0).getValues().get(i);
-							if (iVal == null) {
-								// 2 Wird verwendet, da der erste Parameter der return code ist.
-								preparedStatement.setNull(i + 2, VARCHAR);
-							} else {
-								preparedStatement.setString(i + 2, SqlUtils.toSqlString(iVal));
-							}
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					});
-			preparedStatement.registerOutParameter(1, Types.INTEGER);
-			preparedStatement.execute();
-			val returnCode = preparedStatement.getInt(1);
-
-			val outputTable = new Table();
-			outputTable.setName(inputTable.getName());
-			outputTable.setColumns(Arrays.asList(new Column("ReturnCode", DataType.INTEGER)));
-
-			Row row = new Row();
-			row.addValue(new Value(returnCode));
-			outputTable.addRow(row);
-			return outputTable;
-		} catch (SQLException e) {
-			try {
-				logger.error("Could not execute \"" + inputTable.getName() + "\" with argument: " + objectMapper.writeValueAsString(e), e);
-			} catch (JsonProcessingException e1) {
-				logger.error("Logging failed: ", e1);
-			}
-			val outputTable = new Table();
-			outputTable.setName(inputTable.getName());
-			outputTable.setColumns(Arrays.asList(new Column("ReturnCode", DataType.INTEGER)));
-
-			Row row = new Row();
-			row.addValue(new Value(0));
-			outputTable.addRow(row);
-			return outputTable;
 		}
 	}
 

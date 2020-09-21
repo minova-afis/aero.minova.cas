@@ -108,8 +108,8 @@ public class SqlProcedureController {
 				resultSet.setColumns(//
 						range(0, metaData.getColumnCount()).mapToObj(i -> {
 							try {
-								val type = metaData.getColumnType(i);
-								val name = metaData.getColumnName(i);
+								val type = metaData.getColumnType(i + 1);
+								val name = metaData.getColumnName(i + 1);
 								if (type == Types.BOOLEAN) {
 									return new Column(name, DataType.BOOLEAN);
 								} else if (type == Types.DOUBLE) {
@@ -121,6 +121,8 @@ public class SqlProcedureController {
 								} else if (type == Types.DOUBLE) {
 									return new Column(name, DataType.DOUBLE);
 								} else if (type == Types.VARCHAR) {
+									return new Column(name, DataType.STRING);
+								} else if (type == Types.NVARCHAR) {
 									return new Column(name, DataType.STRING);
 								} else {
 									throw new UnsupportedOperationException("Unsupported result set type: " + i);

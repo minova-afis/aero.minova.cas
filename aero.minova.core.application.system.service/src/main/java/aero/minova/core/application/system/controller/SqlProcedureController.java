@@ -1,8 +1,10 @@
 package aero.minova.core.application.system.controller;
 
 import static aero.minova.core.application.system.sql.SqlUtils.convertSqlResultToRow;
+import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter;
 import static java.sql.Types.VARCHAR;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
 import static java.util.stream.IntStream.rangeClosed;
 
 import java.sql.SQLException;
@@ -11,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class SqlProcedureController {
 	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
 		try {
 			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable));
-			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
+			range(0, inputTable.getRows().get(0).getValues().size())//
 					.forEach(i -> {
 						try {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);
@@ -63,11 +64,11 @@ public class SqlProcedureController {
 			if (hasResultSet) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
-				resultSet.setName(inputTable.getName());
-				resultSet.setColumns(// TODO Determine output format via result set and not input format.
-						inputTable.getColumns()//
-								.stream()//
-								.collect(toList()));
+				resultSet.setName("resultSet");
+				// TODO Determine output format via result set and not input format: https://docs.oracle.com/javase/7/docs/api/java/sql/ResultSetMetaData.html
+				resultSet.setColumns(inputTable.getColumns()//
+						.stream()//
+						.collect(toList()));
 				while (sqlResultSet.next()) {
 					resultSet.addRow(//
 							convertSqlResultToRow(resultSet//
@@ -76,6 +77,29 @@ public class SqlProcedureController {
 									, this//
 									, c -> !Objects.equals(c.getName(), "FilterLastAction")));
 				}
+			}
+			val hasOutputParameters = inputTable//
+					.getColumns()//
+					.stream()//
+					.anyMatch(c -> c.getOutputType() == OutputType.OUTPUT);
+			if (hasOutputParameters) {
+				val outputParameters = new Table();
+				outputParameters.setName("outputParameters");
+				val outputColumnsMapping = inputTable//
+						.getColumns()//
+						.stream()//
+						.map(c -> c.getOutputType() == OutputType.OUTPUT)//
+						.collect(toList());
+				val outputValues = new Row();
+				outputParameters.addRow(outputValues);
+				range(0, inputTable.getColumns().size())//
+						.forEach(i -> {
+							if (outputColumnsMapping.get(i)) {
+								outputValues.addValue(parseSqlParameter(preparedStatement, i, inputTable.getColumns().get(i)));
+							} else {
+								outputValues.addValue(null);
+							}
+						});
 			}
 			val result = new SqlProcedureResult();
 			return result;
@@ -97,7 +121,7 @@ public class SqlProcedureController {
 			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable, executeStrategies));
-			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
+			range(0, inputTable.getRows().get(0).getValues().size())//
 					.forEach(i -> {
 						try {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);

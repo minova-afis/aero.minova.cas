@@ -1,4 +1,4 @@
-package aero.minova.tracintegration.controller;
+package aero.minova.trac.integration.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,7 +9,7 @@ import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
-import aero.minova.tracintegration.TracTicketIntegration;
+import aero.minova.trac.integration.TracTicketIntegration;
 
 /**
  * @author wild

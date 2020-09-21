@@ -1,4 +1,4 @@
-package aero.minova.tracintegration;
+package aero.minova.trac.integration;
 
 import java.util.Date;
 

@@ -1,8 +1,11 @@
 package aero.minova.core.application.system.sql;
 
+import static java.time.ZoneId.systemDefault;
+
+import java.sql.CallableStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.function.Predicate;
 
@@ -61,7 +64,7 @@ public class SqlUtils {
 						if (sqlSet.getTimestamp(column.getName()) == null) {
 							row.addValue(new Value((ZonedDateTime) null));
 						} else {
-							row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(ZoneId.systemDefault())));
+							row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault())));
 						}
 					} else {
 						logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
@@ -72,6 +75,30 @@ public class SqlUtils {
 			}
 			return row;
 		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static Value parseSqlParameter(CallableStatement statement, int index, Column column) {
+		try {
+			if (column.getType() == DataType.STRING) {
+				return new Value(statement.getString(index));
+			} else if (column.getType() == DataType.INTEGER) {
+				return new Value(statement.getInt(index));
+			} else if (column.getType() == DataType.BOOLEAN) {
+				return new Value(statement.getBoolean(index));
+			} else if (column.getType() == DataType.DOUBLE) {
+				return new Value(statement.getDouble(index));
+			} else if (column.getType() == DataType.INSTANT) {
+				return new Value(statement.getTimestamp(index).toInstant());
+			} else if (column.getType() == DataType.LONG) {
+				return new Value(statement.getLong(index));
+			} else if (column.getType() == DataType.ZONED) {
+				return new Value(statement.getTimestamp(index).toInstant().atZone(systemDefault()));
+			} else {
+				throw new UnsupportedOperationException();
+			}
+		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}

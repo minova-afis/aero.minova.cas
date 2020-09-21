@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
+import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
@@ -40,8 +41,8 @@ public class SqlProcedureController {
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	@PostMapping(value = "data/procedure-with-result-set", produces = "application/json")
-	public Table executeProcedure(@RequestBody Table inputTable) {
+	@PostMapping(value = "data/procedure", produces = "application/json")
+	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
 		try {
 			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable));
 			IntStream.range(0, inputTable.getRows().get(0).getValues().size())//
@@ -57,23 +58,31 @@ public class SqlProcedureController {
 							throw new RuntimeException(e);
 						}
 					});
-			val resultSet = preparedStatement.executeQuery();
-			val outputTable = new Table();
-			outputTable.setName(inputTable.getName());
-			outputTable.setColumns(//
+			val sqlResultSet = preparedStatement.executeQuery();
+			val resultSet = new Table();
+			resultSet.setName(inputTable.getName());
+			resultSet.setColumns(//
 					inputTable.getColumns().stream()//
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
 							.filter(column -> !Objects.equals(column.getName(), "FilterLastAction"))//
 							.collect(Collectors.toList()));
-			while (resultSet.next()) {
-				outputTable.addRow(convertSqlResultToRow(outputTable, resultSet, logger, this, c -> !Objects.equals(c.getName(), "FilterLastAction")));
+			while (sqlResultSet.next()) {
+				resultSet.addRow(convertSqlResultToRow(resultSet, sqlResultSet, logger, this, c -> !Objects.equals(c.getName(), "FilterLastAction")));
 			}
-			return outputTable;
+			val result = new SqlProcedureResult();
+			return result;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	/**
+	 * Sollte durch "data/procedure" ersetzt werden.
+	 * 
+	 * @param inputTable
+	 * @return
+	 */
+	@Deprecated
 	@PostMapping(value = "data/procedure-with-return-code", produces = "application/json")
 	public Table executeProcedureWithReturnCode(@RequestBody Table inputTable) {
 		try {

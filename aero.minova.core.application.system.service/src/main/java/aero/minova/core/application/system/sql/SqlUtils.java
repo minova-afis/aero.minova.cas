@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
@@ -84,16 +85,26 @@ public class SqlUtils {
 			} else if (column.getType() == DataType.DOUBLE) {
 				return new Value(statement.getDouble(index));
 			} else if (column.getType() == DataType.INSTANT) {
-				return new Value(statement.getTimestamp(index).toInstant());
+				return new Value(//
+						Optional.ofNullable(statement.getTimestamp(index))//
+								.map(e -> e.toInstant())//
+								.orElse(null));
 			} else if (column.getType() == DataType.LONG) {
 				return new Value(statement.getLong(index));
 			} else if (column.getType() == DataType.ZONED) {
-				return new Value(statement.getTimestamp(index).toInstant().atZone(systemDefault()));
+				return new Value(//
+						Optional.ofNullable(statement.getTimestamp(index))//
+								.map(e -> e.toInstant().atZone(systemDefault()))//
+								.orElse(null));
 			} else {
 				throw new UnsupportedOperationException();
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			try {
+				throw new RuntimeException("Could not parse SQL Parameter " + index + " with value: " + statement.getString(index), e);
+			} catch (SQLException e2) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

@@ -9,6 +9,7 @@ import static java.util.stream.IntStream.range;
 import static java.util.stream.IntStream.rangeClosed;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -51,22 +52,57 @@ public class SqlProcedureController {
 					.forEach(i -> {
 						try {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);
+							val type = inputTable.getColumns().get(i).getType();
 							if (iVal == null) {
-								preparedStatement.setNull(i + 1, VARCHAR);
+								if (type == DataType.BOOLEAN) {
+									preparedStatement.setObject(i + 1, null, Types.BOOLEAN);
+								} else if (type == DataType.DOUBLE) {
+									preparedStatement.setObject(i + 1, null, Types.DOUBLE);
+								} else if (type == DataType.INSTANT) {
+									preparedStatement.setObject(i + 1, null, Types.TIMESTAMP);
+								} else if (type == DataType.INTEGER) {
+									preparedStatement.setObject(i + 1, null, Types.INTEGER);
+								} else if (type == DataType.LONG) {
+									preparedStatement.setObject(i + 1, null, Types.DOUBLE);
+								} else if (type == DataType.STRING) {
+									preparedStatement.setObject(i + 1, null, Types.NVARCHAR);
+								} else if (type == DataType.ZONED) {
+									preparedStatement.setObject(i + 1, null, Types.TIMESTAMP);
+								} else {
+									throw new IllegalArgumentException("Unknown type: " + type.name());
+								}
 							} else {
-								preparedStatement.setString(i + 1, SqlUtils.toSqlString(iVal));
+								if (type == DataType.BOOLEAN) {
+									preparedStatement.setBoolean(i + 1, iVal.getBooleanValue());
+								} else if (type == DataType.DOUBLE) {
+									preparedStatement.setDouble(i + 1, iVal.getDoubleValue());
+								} else if (type == DataType.INSTANT) {
+									preparedStatement.setTimestamp(i + 1, Timestamp.from(iVal.getInstantValue()));
+								} else if (type == DataType.INTEGER) {
+									preparedStatement.setInt(i + 1, iVal.getIntegerValue());
+								} else if (type == DataType.LONG) {
+									preparedStatement.setDouble(i + 1, Double.valueOf(iVal.getLongValue()));
+								} else if (type == DataType.STRING) {
+									preparedStatement.setString(i + 1, iVal.getStringValue());
+								} else if (type == DataType.ZONED) {
+									preparedStatement.setTimestamp(i + 1, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
+								} else {
+									throw new IllegalArgumentException("Unknown type: " + type.name());
+								}
 							}
 							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
 								preparedStatement.registerOutParameter(i + 1, Types.VARCHAR);
 							}
 						} catch (Exception e) {
-							throw new RuntimeException(e);
+							throw new RuntimeException("Could not parse input parameter with index:" + i, e);
 						}
 					});
+			val result = new SqlProcedureResult();
 			val hasResultSet = preparedStatement.execute();
 			if (hasResultSet) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
+				result.setResultSet(resultSet);
 				resultSet.setName("resultSet");
 				val metaData = sqlResultSet.getMetaData();
 				resultSet.setColumns(//
@@ -107,6 +143,7 @@ public class SqlProcedureController {
 					.anyMatch(c -> c.getOutputType() == OUTPUT);
 			if (hasOutputParameters) {
 				val outputParameters = new Table();
+				result.setOutputParameters(outputParameters);
 				outputParameters.setName("outputParameters");
 				val outputColumnsMapping = inputTable//
 						.getColumns()//
@@ -115,16 +152,15 @@ public class SqlProcedureController {
 						.collect(toList());
 				val outputValues = new Row();
 				outputParameters.addRow(outputValues);
-				range(0, inputTable.getColumns().size())//
+				range(1, inputTable.getColumns().size())//
 						.forEach(i -> {
 							if (outputColumnsMapping.get(i)) {
-								outputValues.addValue(parseSqlParameter(preparedStatement, i, inputTable.getColumns().get(i)));
+								outputValues.addValue(parseSqlParameter(preparedStatement, i + 1, inputTable.getColumns().get(i)));
 							} else {
 								outputValues.addValue(null);
 							}
 						});
 			}
-			val result = new SqlProcedureResult();
 			return result;
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -210,12 +246,7 @@ public class SqlProcedureController {
 		final StringBuffer sb = new StringBuffer();
 		sb.append('{').append(returnRequired ? "? = call " : "call ").append(params.getName()).append("(");
 		for (int i = 0; i < paramCount; i++) {
-			val param = params.getColumns().get(i);
-			if (param.getOutputType() == OUTPUT) {
-				sb.append(i == 0 ? "? output" : ",? output");
-			} else {
-				sb.append(i == 0 ? "?" : ",?");
-			}
+			sb.append(i == 0 ? "?" : ",?");
 		}
 		sb.append(")}");
 		return sb.toString();

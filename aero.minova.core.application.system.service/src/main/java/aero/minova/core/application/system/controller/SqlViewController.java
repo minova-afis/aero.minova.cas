@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,6 +19,7 @@ import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
@@ -38,12 +40,30 @@ public class SqlViewController {
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
-			val viewQuery = prepareViewString(inputTable, true, 1000);
+			val countQuery = prepareViewString(inputTable, true, 1000, true);
+			logger.info("Executing: " + countQuery);
+			val viewCounter = systemDatabase//
+					.connection()//
+					.prepareCall(countQuery)//
+					.executeQuery();
+			viewCounter.next();
+			val viewCount = viewCounter.getInt(1);
+			val limit = Optional.ofNullable(inputTable.getMetaData())//
+					.map(m -> m.getLimited())//
+					.orElse(Integer.MAX_VALUE);
+			val viewQuery = prepareViewString(inputTable, true, limit, false);
 			logger.info("Executing: " + viewQuery);
 			ResultSet resultSet = systemDatabase.connection()//
 					.prepareCall(viewQuery)//
 					.executeQuery();
-			return convertSqlResultToTable(inputTable, resultSet);
+			val result = convertSqlResultToTable(inputTable, resultSet);
+			if (limit < viewCount) {
+				if (result.getMetaData() == null) {
+					result.setMetaData(new TableMetaData());
+				}
+				result.getMetaData().setLimited(limit);
+			}
+			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -80,28 +100,34 @@ public class SqlViewController {
 	 *            wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
 	 * @param maxRows
 	 *            maximale Anzahl Ergebnisse (Zeilen), die die Abfrage liefern soll, 0 für unbegrenzt
+	 * @param count
+	 *            Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
 	 * @return Präparierter View-String, der ausgeführt werden kann
 	 * @author wild
 	 * @since 10.28.0
 	 * @throws IllegalArgumentException
 	 */
-	String prepareViewString(Table params, boolean autoLike, int maxRows) throws IllegalArgumentException {
+	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count) throws IllegalArgumentException {
 
-		final StringBuffer sb = new StringBuffer("select");
-		if (maxRows > 0) {
-			sb.append(" top ").append(maxRows).append(" ");
-		}
-		val outputFormat = params.getColumns().stream()//
-				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
-				.collect(Collectors.toList());
-		if (outputFormat.isEmpty()) {
-			sb.append("* from ");
+		final StringBuffer sb = new StringBuffer();
+		if (count) {
+			sb.append("select count(1) from ");
 		} else {
-			sb.append(//
-					outputFormat.stream()//
-							.map(Column::getName)//
-							.collect(Collectors.joining(", ")));
-			sb.append(" from ");
+			if (maxRows > 0) {
+				sb.append("select top ").append(maxRows).append(" ");
+			}
+			val outputFormat = params.getColumns().stream()//
+					.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+					.collect(Collectors.toList());
+			if (outputFormat.isEmpty()) {
+				sb.append("* from ");
+			} else {
+				sb.append(//
+						outputFormat.stream()//
+								.map(Column::getName)//
+								.collect(Collectors.joining(", ")));
+				sb.append(" from ");
+			}
 		}
 		sb.append(params.getName());
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {

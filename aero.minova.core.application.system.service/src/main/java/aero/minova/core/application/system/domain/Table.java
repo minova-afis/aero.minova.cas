@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Table {
 	private String name;
+	private TableMetaData metaData;
 	private List<Column> columns = new ArrayList<>();
 	private List<Row> rows = new ArrayList<>();
 
@@ -48,5 +49,13 @@ public class Table {
 
 	public void setRows(List<Row> rows) {
 		this.rows = rows;
+	}
+
+	public TableMetaData getMetaData() {
+		return metaData;
+	}
+
+	public void setMetaData(TableMetaData meta_data) {
+		this.metaData = meta_data;
 	}
 }

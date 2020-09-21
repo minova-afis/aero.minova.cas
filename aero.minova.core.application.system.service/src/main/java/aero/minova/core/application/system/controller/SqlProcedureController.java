@@ -1,5 +1,6 @@
 package aero.minova.core.application.system.controller;
 
+import static aero.minova.core.application.system.domain.OutputType.OUTPUT;
 import static aero.minova.core.application.system.sql.SqlUtils.convertSqlResultToRow;
 import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter;
 import static java.sql.Types.VARCHAR;
@@ -26,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
@@ -56,6 +56,9 @@ public class SqlProcedureController {
 							} else {
 								preparedStatement.setString(i + 1, SqlUtils.toSqlString(iVal));
 							}
+							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
+								preparedStatement.registerOutParameter(i + 1, Types.VARCHAR);
+							}
 						} catch (Exception e) {
 							throw new RuntimeException(e);
 						}
@@ -81,14 +84,14 @@ public class SqlProcedureController {
 			val hasOutputParameters = inputTable//
 					.getColumns()//
 					.stream()//
-					.anyMatch(c -> c.getOutputType() == OutputType.OUTPUT);
+					.anyMatch(c -> c.getOutputType() == OUTPUT);
 			if (hasOutputParameters) {
 				val outputParameters = new Table();
 				outputParameters.setName("outputParameters");
 				val outputColumnsMapping = inputTable//
 						.getColumns()//
 						.stream()//
-						.map(c -> c.getOutputType() == OutputType.OUTPUT)//
+						.map(c -> c.getOutputType() == OUTPUT)//
 						.collect(toList());
 				val outputValues = new Row();
 				outputParameters.addRow(outputValues);
@@ -188,7 +191,7 @@ public class SqlProcedureController {
 		sb.append('{').append(returnRequired ? "? = call " : "call ").append(params.getName()).append("(");
 		for (int i = 0; i < paramCount; i++) {
 			val param = params.getColumns().get(i);
-			if (param.getOutputType() == OutputType.OUTPUT) {
+			if (param.getOutputType() == OUTPUT) {
 				sb.append(i == 0 ? "? output" : ",? output");
 			} else {
 				sb.append(i == 0 ? "?" : ",?");

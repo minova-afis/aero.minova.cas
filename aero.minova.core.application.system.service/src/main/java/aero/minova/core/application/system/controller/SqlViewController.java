@@ -86,6 +86,10 @@ public class SqlViewController {
 		}
 	}
 
+	String prepareViewString(Table params, boolean autoLike, int maxRows) throws IllegalArgumentException {
+		return prepareViewString(params, autoLike, maxRows, false);
+	}
+
 	/**
 	 * TODO name, viewFields entfernen. Diese methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String
 	 * vor und berücksichtigt eine evtl. angegebene Maximalanzahl Ergebnisse

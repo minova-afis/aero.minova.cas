@@ -163,6 +163,7 @@ public class SqlProcedureController {
 						.collect(toList());
 				val outputValues = new Row();
 				outputParameters.addRow(outputValues);
+				outputParameters.setColumns(inputTable.getColumns());
 				range(1, inputTable.getColumns().size())//
 						.forEach(i -> {
 							if (outputColumnsMapping.get(i)) {

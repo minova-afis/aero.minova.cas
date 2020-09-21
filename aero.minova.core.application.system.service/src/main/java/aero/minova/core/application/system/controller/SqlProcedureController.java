@@ -2,6 +2,7 @@ package aero.minova.core.application.system.controller;
 
 import static aero.minova.core.application.system.sql.SqlUtils.convertSqlResultToRow;
 import static java.sql.Types.VARCHAR;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.rangeClosed;
 
 import java.sql.SQLException;
@@ -10,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
@@ -58,16 +58,23 @@ public class SqlProcedureController {
 							throw new RuntimeException(e);
 						}
 					});
-			val sqlResultSet = preparedStatement.executeQuery();
-			val resultSet = new Table();
-			resultSet.setName(inputTable.getName());
-			resultSet.setColumns(//
-					inputTable.getColumns().stream()//
-							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
-							.filter(column -> !Objects.equals(column.getName(), "FilterLastAction"))//
-							.collect(Collectors.toList()));
-			while (sqlResultSet.next()) {
-				resultSet.addRow(convertSqlResultToRow(resultSet, sqlResultSet, logger, this, c -> !Objects.equals(c.getName(), "FilterLastAction")));
+			val hasResultSet = preparedStatement.execute();
+			if (hasResultSet) {
+				val sqlResultSet = preparedStatement.getResultSet();
+				val resultSet = new Table();
+				resultSet.setName(inputTable.getName());
+				resultSet.setColumns(// TODO Determine output format via result set and not input format.
+						inputTable.getColumns()//
+								.stream()//
+								.collect(toList()));
+				while (sqlResultSet.next()) {
+					resultSet.addRow(//
+							convertSqlResultToRow(resultSet//
+									, sqlResultSet//
+									, logger//
+									, this//
+									, c -> !Objects.equals(c.getName(), "FilterLastAction")));
+				}
 			}
 			val result = new SqlProcedureResult();
 			return result;

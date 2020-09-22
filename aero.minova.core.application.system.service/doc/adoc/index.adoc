@@ -14,7 +14,7 @@ v1.0, {docdate}
 
 * Zurück zur link:..[Übersicht]
 
-* xref:api.adoc#[API] (veraltet)
+* xref:api.adoc#[API]
 * xref:requirements.adoc#[Anforderungen] (veraltet)
 * xref:architecture.adoc#[Architektur] (veraltet)
 * xref:versions.adoc#[Versionen]

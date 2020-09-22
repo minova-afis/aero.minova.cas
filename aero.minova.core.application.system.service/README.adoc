@@ -1,5 +1,3 @@
 # Core Application System Dienst
 
-WARNING: Diese Doku ist veraltet.
-
 xref:doc/adoc/index.adoc#[Index]

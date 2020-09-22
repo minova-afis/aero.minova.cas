@@ -21,13 +21,3 @@ Um das Program auszuführen muss man ein Profil aktivieren.
 Unter `./src/main/resources/application-*.properties` kann man die Profile finden
 und über das Program Argument `--spring.profiles.active=<Profil-Name>` aktivieren.
 
-== Zugriff auf Queries und Tabellen
-
-Wir sollten am Anfang vielleicht den Zugriff selber programmieren.
-Dann können wird dabei die Probleme zusammentragen und entsprechend eine bessere Lösung finden.
-
-Man müsste dazu für jede Query und Tabelle ein DTO definieren, welches das Format bestimmt. Dafür müsste man die CRUD und Execute Operationen implementieren, die meistens trivial sind.
-
-Es ist sowieso zur Zeit unklar, ob wir Teile der alten API in der Datenbank 1 zu 1 in Rest übertragen wollen.
-Es könnte besser sein, wenn diese getrennt entwickelt werden,
-

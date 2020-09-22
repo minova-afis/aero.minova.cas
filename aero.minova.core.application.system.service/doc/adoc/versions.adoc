@@ -14,27 +14,3 @@ v1.0, {docdate}
 
 * link:index.html[übergreifendes Modul]
 * link:..[Übersicht]
-
-=== 12.3.0: Grundlegende Sicherheit und Auslieferung von Systemdaten mit REST
-* #43323 Verschlüsselung über HTTPS
-* Redirect von HTTP nach HTTPS.
-* Anmeldung via AD
-* #43452 Systemdaten über REST ausgeben
-* Spring Boot Security verstehen.
-* Admin-Seite erstellen.
-* Admin-Dashboard einfügen.
-
-=== 12.2.0: Dienst einbinden.
-* #41454: Wir haben einen Dienst entwickelt, der Dokumention für die Anwendung bereitstellen soll.
-  Wir könnten den Webstorage durch das Access System erreichbar, un damit testen wie man Plugin-Funktionalität durch das Access System erreichbar machen.
-  Zudem müsste dieser Dienst ein Plugin sein, da es ja nur ein Interface für die Datenbank ist.
-* Es wurde das Modul `ch.minova.parent.spring.plugin` eingeführt, welches als Parent für Plugin Projekte verwendet wird.
-
-=== 12.1.0: Minimum Viable Product implementieren.
-* Erstelle den Dienst als installierbare Spring Boot Anwendung und Minova Dienst.
-* Per REST wird die Konfigurations-Datei der dazugehörigen XBS geladen werden (bspw. `AFIS.xbs`).
-* Die Konfigurations-Datei soll beobachtet werden und auf Änderungen soll der Dienst diese auch anwenden.
-Dazu wird `ch.minova.nservice.managed` entsprechend weiterentwickelt und genutzt, da es bereits den Dienst so aufteilt, dass das Laden der Konfiguration getrennt von dem Rest ist.
-* H2-Datenbank wird dazu genutzt.
-
-=== 12.0.0: Projekt intialisiert.

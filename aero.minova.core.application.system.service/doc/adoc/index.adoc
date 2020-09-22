@@ -14,10 +14,10 @@ v1.0, {docdate}
 
 * Zurück zur link:..[Übersicht]
 
-* link:requirements.html[Anforderungen]
-* link:architecture.html[Architektur]
+* link:requirements.html[Anforderungen] (veraltet)
+* link:architecture.html[Architektur] (veraltet)
 * link:versions.html[Versionen]
-* link:development.html[Entwicklung]
+* link:development.html[Entwicklung] (veraltet)
 
 == Beschreibung
 

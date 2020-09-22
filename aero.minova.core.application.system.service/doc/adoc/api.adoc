@@ -2,13 +2,11 @@
 
 Die Authentifizierung funktioniert zur Zeit via Basic Auth statt.
 
-== data/procedure
+== Table
 
-=== Table
+Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
 
-Die Table wird als Eingabe und Teil der Ausgabe verwendet.
-
-Generel gilt, dass jedes Feld bis auf name Optional.
+Generel gilt, dass jedes Feld bis auf name optional ist.
 
 [source,json]
 --------
@@ -34,11 +32,11 @@ Generel gilt, dass jedes Feld bis auf name Optional.
 }
 --------
 
-==== name
+=== name
 
 Der Name der Prozedur, der ausgeführt wird.
 
-==== metaData/limited
+=== metaData/limited
 
 Default: (2^32)-1 = 2.147.483.647
 Wertebereich: 1 bis 2.147.483.647
@@ -48,15 +46,34 @@ Wenn diese Tabelle zurückgegebn wird,
 ist dieser Wert nur dann vorhanden,
 wenn nicht alle Werte zurückgegeben wurden.
 
-==== columns
+=== columns
 
 Die Parameter-Typen der Prozedur.
 
-==== rows
+=== columns/values/*
+
+Die Werte dürfen prinzipiel von einem beliebigen Typ sein,
+müssen aber mit dem Typ der spalte kompatibel sein.
+Im einfachsten Fall ist der Typ eines values gleich dem type der Spalte (columns/*/type).
+
+Der Typ wird anhand des prefix des values angegeben:
+* "b-" boolean: false|true
+* "d-" double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
+* "i-" Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
+* "n-" Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
+* "s-" String
+* "z-" ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+
+=== rows
 
 Die Parameter der Prozedur
 
-=== SqlProcedureResult
+== data/procedure
+
+Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
+Diese Table enthält die Parameter für die SQL-Prozedur
+
+Die Antwort hat folgendes Format:
 
 [source,json]
 --------
@@ -69,12 +86,23 @@ Die Parameter der Prozedur
 
 ==== resultSet
 
-Gibt im vorher erwähnten Tabellen-Format alle selektierten Werte zurück.
+Gibt im Table-Format alle selektierten Werte zurück.
+Werden keine Werte selektiert, wird die Tabelle in der Antwort nicht angegeben.
 
 ==== outputParameters
 
-Gibt im vorher erwähnten Tabellen-Format alle Input und Output-Parameter-Werte zurück.
+Gibt im Table-Format alle Input und Output-Parameter-Werte zurück.
+Diese Tabelle enthät nur 1 Zeile.
+Wenn keine die Eingabe keine Spalten vom OutputType Output hat, wird diese Tabelle nicht zurückgegeben.
 
 ==== returnCode
 
-Der return code der SQL-Prozedur falls vorhanden.
+Der return code der SQL-Prozedur, falls vorhanden.
+
+== data/view
+
+Als Ausgabe wird eine Table mit den selektierten Werten zurückgegeben.
+
+Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
+Die Eingabe-Tabelle schränkt die Auswahl der selektierten Werte ein.
+Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.plugin1

@@ -14,10 +14,11 @@ v1.0, {docdate}
 
 * Zurück zur link:..[Übersicht]
 
-* link:requirements.html[Anforderungen] (veraltet)
-* link:architecture.html[Architektur] (veraltet)
-* link:versions.html[Versionen]
-* link:development.html[Entwicklung] (veraltet)
+* xref:api.adoc#[API] (veraltet)
+* xref:requirements.adoc#[Anforderungen] (veraltet)
+* xref:architecture.adoc#[Architektur] (veraltet)
+* xref:versions.adoc#[Versionen]
+* xref:development.adoc#[Entwicklung] (veraltet)
 
 == Beschreibung
 

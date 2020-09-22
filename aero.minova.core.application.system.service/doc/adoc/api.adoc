@@ -1,0 +1,80 @@
+= CAS API
+
+Die Authentifizierung funktioniert zur Zeit via Basic Auth statt.
+
+== data/procedure
+
+=== Table
+
+Die Table wird als Eingabe und Teil der Ausgabe verwendet.
+
+Generel gilt, dass jedes Feld bis auf name Optional.
+
+[source,json]
+--------
+{
+	"name": "ProcedureName",
+	"metaData": {
+		"limited": 1000
+	},
+	"columns": [
+		{
+			"name": "ParameterName",
+			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED",
+			"OutputType": "INPUT|OUTPUT"
+		},...
+	],
+	"rows": [
+		{
+			"values": [
+				"(b|d|i|n|s|z-Value)|null",...
+			]
+		}
+	]
+}
+--------
+
+==== name
+
+Der Name der Prozedur, der ausgeführt wird.
+
+==== metaData/limited
+
+Default: (2^32)-1 = 2.147.483.647
+Wertebereich: 1 bis 2.147.483.647
+
+Gibt an, wieviele Treffer bei der Anfrage zurückgegeben werden sollen.
+Wenn diese Tabelle zurückgegebn wird,
+ist dieser Wert nur dann vorhanden,
+wenn nicht alle Werte zurückgegeben wurden.
+
+==== columns
+
+Die Parameter-Typen der Prozedur.
+
+==== rows
+
+Die Parameter der Prozedur
+
+=== SqlProcedureResult
+
+[source,json]
+--------
+{
+	"resultSet": <Table>,
+	"outputParameters": <Table>,
+	"returnCode": <Integer>
+}
+--------
+
+==== resultSet
+
+Gibt im vorher erwähnten Tabellen-Format alle selektierten Werte zurück.
+
+==== outputParameters
+
+Gibt im vorher erwähnten Tabellen-Format alle Input und Output-Parameter-Werte zurück.
+
+==== returnCode
+
+Der return code der SQL-Prozedur falls vorhanden.

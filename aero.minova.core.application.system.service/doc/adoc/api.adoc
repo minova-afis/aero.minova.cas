@@ -39,6 +39,7 @@ Der Name der Prozedur, der ausgeführt wird.
 === metaData/limited
 
 Default: (2^32)-1 = 2.147.483.647
+
 Wertebereich: 1 bis 2.147.483.647
 
 Gibt an, wieviele Treffer bei der Anfrage zurückgegeben werden sollen.
@@ -57,6 +58,7 @@ müssen aber mit dem Typ der spalte kompatibel sein.
 Im einfachsten Fall ist der Typ eines values gleich dem type der Spalte (columns/*/type).
 
 Der Typ wird anhand des prefix des values angegeben:
+
 * "b-" boolean: false|true
 * "d-" double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
 * "i-" Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".

@@ -19,7 +19,7 @@ Generel gilt, dass jedes Feld bis auf name optional ist.
 		{
 			"name": "ParameterName",
 			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED",
-			"OutputType": "INPUT|OUTPUT"
+			"outputType": "INPUT|OUTPUT"
 		},...
 	],
 	"rows": [

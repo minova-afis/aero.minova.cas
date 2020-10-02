@@ -35,6 +35,7 @@ import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
+import aero.minova.trac.integration.controller.TracController;
 import lombok.val;
 
 @RestController
@@ -42,10 +43,17 @@ public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	@Autowired
+	TracController trac;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
 	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
+		if ("Ticket".equals(inputTable.getName())) {
+			val result = new SqlProcedureResult();
+			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
+			return result;
+		}
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		try {

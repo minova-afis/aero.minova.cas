@@ -93,9 +93,8 @@ Werden keine Werte selektiert, wird die Tabelle in der Antwort nicht angegeben.
 
 ==== outputParameters
 
-Gibt im Table-Format alle Input und Output-Parameter-Werte zurück.
+Gibt im Table-Format alle Input und Output-Parameter-Werte zurück, wenn es einen Output-Parameter in der Eingabe gab.
 Diese Tabelle enthät nur 1 Zeile.
-Wenn keine die Eingabe keine Spalten vom OutputType Output hat, wird diese Tabelle nicht zurückgegeben(funktioniert noch nicht korrekt für nicht output Parameter siehe #29).
 
 ==== returnCode
 

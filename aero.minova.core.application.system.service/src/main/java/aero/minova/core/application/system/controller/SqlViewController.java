@@ -40,7 +40,7 @@ public class SqlViewController {
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
 		try {
-			val countQuery = prepareViewString(inputTable, true, 1000, true);
+			val countQuery = prepareViewString(inputTable, false, 1000, true);
 			logger.info("Executing: " + countQuery);
 			val viewCounter = systemDatabase//
 					.connection()//
@@ -51,7 +51,7 @@ public class SqlViewController {
 			val limit = Optional.ofNullable(inputTable.getMetaData())//
 					.map(m -> m.getLimited())//
 					.orElse(Integer.MAX_VALUE);
-			val viewQuery = prepareViewString(inputTable, true, limit, false);
+			val viewQuery = prepareViewString(inputTable, false, limit, false);
 			logger.info("Executing: " + viewQuery);
 			ResultSet resultSet = systemDatabase.connection()//
 					.prepareCall(viewQuery)//
@@ -215,7 +215,7 @@ public class SqlViewController {
 						}
 					}
 
-					strValue = encloseInCommasIfRequired(col, strValue);
+					strValue = encloseInCommasIfRequired(def, strValue);
 					clause.append(' ').append(strValue);
 				}
 			}
@@ -237,7 +237,7 @@ public class SqlViewController {
 	/**
 	 * Abhängig von dem Feld-Typ, wird der Wert von Kommas umgeben oder nicht
 	 */
-	protected static String encloseInCommasIfRequired(Column vd, String value) {
+	protected static String encloseInCommasIfRequired(Value vd, String value) {
 		if (vd == null || value == null) {
 			return value;
 		}

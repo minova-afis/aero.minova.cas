@@ -191,14 +191,25 @@ class SqlViewControllerTest {
 		assertThat(testResult.getValues().get(5).getStringValue()).isEqualTo("string");
 		assertThat(testResult.getValues().get(6).getZonedDateTimeValue()).isEqualTo(time.atZone(ZoneId.systemDefault()));
 	}
-	
+
 	@Test
-	void test_prepareWhereClause_missingAnd() {
+	void test_prepareWhereClause_AndColumnNotAtEnd() {
 		val intputTable = new Table();
 		intputTable.setName("vWorkingTimeIndex2");
 		intputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
 		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		intputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
-		val testProduct = testSubject.prepareWhereClause(intputTable, true);
+		testSubject.prepareWhereClause(intputTable, true);
+	}
+
+	@Test
+	void test_SearchViaString() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		val row = new Row();
+		row.addValue(new Value("1"));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like '1%')");
 	}
 }

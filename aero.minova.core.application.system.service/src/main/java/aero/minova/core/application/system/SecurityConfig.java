@@ -25,6 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
+		http.requiresChannel().anyRequest().requiresSecure();
 	}
 
 	@Bean
@@ -35,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.inMemoryAuthentication()//
-				.withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN")//
+				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("ADMIN")//
 				.and().withUser("user").password(passwordEncoder().encode("user")).roles("USER");
 	}
 

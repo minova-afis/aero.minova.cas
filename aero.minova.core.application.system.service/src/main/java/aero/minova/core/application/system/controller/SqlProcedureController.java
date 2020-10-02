@@ -186,7 +186,7 @@ public class SqlProcedureController {
 							if (outputColumnsMapping.get(i)) {
 								outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
 							} else {
-								outputValues.addValue(null);
+								inputTable.getRows().get(0).getValues().get(i);
 							}
 						});
 			}

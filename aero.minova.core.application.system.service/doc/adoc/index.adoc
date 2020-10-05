@@ -15,14 +15,17 @@ v1.0, {docdate}
 * Zurück zur link:..[Übersicht]
 
 * xref:api.adoc#[API]
-* xref:requirements.adoc#[Anforderungen] (veraltet)
-* xref:architecture.adoc#[Architektur] (veraltet)
 * xref:versions.adoc#[Versionen]
-* xref:development.adoc#[Entwicklung] (veraltet)
 
 == Beschreibung
 
 Dieser Dienst soll in Zukunft die erste Anlaufstelle für andere Dienste sein.
 Der Dienst wurde mit dem Ticket #42940 ins leben gerufen.
+
+== Installation
+
+* Inhalt von lib und die gebaut jar in einen Ordner bringen.
+* `application-production.properties` und `aero.minova.core.application.system.xml` an das System anpassen.
+* Als Windows Dienst mithilfe von `aero.minova.core.application.system.exe install` via cmd installieren.
 
 //  Das Dokument sollte mit einer leeren Zeile enden.

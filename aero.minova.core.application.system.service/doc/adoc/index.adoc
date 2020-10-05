@@ -1,14 +1,4 @@
-////
-Für die Administratoransicht die folgende Zeile aus dem Kommentar nach unten kopieren.
-:admin: ja
-Für die Entwickleransicht (Developer) die folgende Zeile aus dem Kommentar nach unten kopieren.
-:dev: ja
-////
-:dev: ja
-
 = Core Application Server (CAS)
-Martins Avots <avots@minova.de>
-v1.0, {docdate}
 
 == Links
 
@@ -27,5 +17,3 @@ Der Dienst wurde mit dem Ticket #42940 ins leben gerufen.
 * Inhalt von lib und die gebaut jar in einen Ordner bringen.
 * `application-production.properties` und `aero.minova.core.application.system.xml` an das System anpassen.
 * Als Windows Dienst mithilfe von `aero.minova.core.application.system.exe install` via cmd installieren.
-
-//  Das Dokument sollte mit einer leeren Zeile enden.

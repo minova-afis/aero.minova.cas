@@ -1,14 +1,4 @@
-////
-Für die Administratoransicht die folgende Zeile aus dem Kommentar nach unten kopieren.:admin:
-Für die Entwickleransicht (Developer) die folgende Zeile aus dem Kommentar nach unten kopieren.
-:dev:
-////
-:dev: ja
-
 = Core Application Server Versionen
-Martins Avots <avots@minova.de>
-v1.0, {docdate}
-
 
 == Links
 

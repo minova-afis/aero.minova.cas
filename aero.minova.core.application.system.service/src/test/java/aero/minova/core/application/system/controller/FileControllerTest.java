@@ -32,13 +32,13 @@ public class FileControllerTest {
 		val afisFolder = files.applicationFolder("AFIS");
 		createDirectory(afisFolder);
 		write(afisFolder.resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		assertThat(testSubject.getFile("Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo("<preferences></preferences>");
+		assertThat(testSubject.getFile("Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
 	public void testIllegal() {
 		Assertions.assertThrows(IllegalAccessException.class,
-				() -> assertThat(testSubject.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo("<preferences></preferences>"));
+				() -> assertThat(testSubject.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs")));
 	}
 
 }

@@ -31,7 +31,7 @@ public class TracController {
 	public static final String SERVICE_KEY = "ServiceKey";
 
 	private final TracTicketIntegration tracIntegration = new TracTicketIntegration();
-//	private final Server server = Server.getInstance();
+	// private final Server server = Server.getInstance();
 
 	@GetMapping(value = "data/ticket", produces = "application/json")
 	public Table getTicket(@RequestParam String ticketNo) {
@@ -49,23 +49,33 @@ public class TracController {
 
 	private Table fetchFromTrac(int ticketNumber) {
 		Table ticketTable = createEmptyTicketTable();
-
 		tracIntegration.setTicketNumber(ticketNumber);
-		if (tracIntegration.getStatus() == TracTicketIntegration.TICKET_OK) {
-			Row row = new Row();
-			row.addValue(new Value(ticketNumber));
-			row.addValue(new Value(tracIntegration.getOrderReceiver()));
-			row.addValue(new Value(tracIntegration.getServiceContract()));
-			row.addValue(new Value(tracIntegration.getServiceObject()));
-			row.addValue(new Value(tracIntegration.getService()));
-			row.addValue(new Value(tracIntegration.getDescription()));
-
-			ticketTable.addRow(row);
+		if (ticketNumber == -123) {
+			ticketTable.addRow(ticketInformation(-123, "MIN", "WFC", "LOHN", "ZPROGRAM", "#37: Trac-Ticket Dummy Implementierung auf publictest bereitstellen."));
+		} else {
+			if (tracIntegration.getStatus() == TracTicketIntegration.TICKET_OK) {
+				ticketTable.addRow(//
+						ticketInformation(//
+								ticketNumber//
+								, tracIntegration.getOrderReceiver()//
+								, tracIntegration.getServiceContract()//
+								, tracIntegration.getServiceObject()//
+								, tracIntegration.getService()//
+								, tracIntegration.getDescription()));
+			}
 		}
-
-//		Ticket ticket = server.getTicket(ticketNumber);
-
 		return ticketTable;
+	}
+
+	private Row ticketInformation(int ticketNumber, String orderReceiver, String serviceContract, String serviceObject, String service, String description) {
+		final Row ticketInformation = new Row();
+		ticketInformation.addValue(new Value(ticketNumber));
+		ticketInformation.addValue(new Value(orderReceiver));
+		ticketInformation.addValue(new Value(serviceContract));
+		ticketInformation.addValue(new Value(serviceObject));
+		ticketInformation.addValue(new Value(service));
+		ticketInformation.addValue(new Value(description));
+		return ticketInformation;
 	}
 
 	private Table createEmptyTicketTable() {

@@ -1,9 +1,11 @@
 package aero.minova.trac.integration.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
@@ -33,6 +35,9 @@ public class TracController {
 	private final TracTicketIntegration tracIntegration = new TracTicketIntegration();
 	// private final Server server = Server.getInstance();
 
+	@Autowired
+	SqlViewController svc;
+
 	@GetMapping(value = "data/ticket", produces = "application/json")
 	public Table getTicket(@RequestParam String ticketNo) {
 		Table ticketTable = null;
@@ -51,7 +56,8 @@ public class TracController {
 		Table ticketTable = createEmptyTicketTable();
 		tracIntegration.setTicketNumber(ticketNumber);
 		if (ticketNumber == -123) {
-			ticketTable.addRow(ticketInformation(-123, "MIN", "WFC", "LOHN", "ZPROGRAM", "#37: Trac-Ticket Dummy Implementierung auf publictest bereitstellen."));
+			ticketTable
+					.addRow(ticketInformation(-123, "MIN", "WFC", "LOHN", "ZPROGRAM", "#37: Trac-Ticket Dummy Implementierung auf publictest bereitstellen."));
 		} else {
 			if (tracIntegration.getStatus() == TracTicketIntegration.TICKET_OK) {
 				ticketTable.addRow(//
@@ -75,7 +81,42 @@ public class TracController {
 		ticketInformation.addValue(new Value(serviceObject));
 		ticketInformation.addValue(new Value(service));
 		ticketInformation.addValue(new Value(description));
+
+		if (svc != null) {
+			ticketInformation.addValue(resolveLookup(orderReceiver, "tOrderReceiver"));
+			ticketInformation.addValue(resolveLookup(serviceContract, "tServiceContract"));
+			ticketInformation.addValue(resolveLookup(serviceObject, "tServiceObject"));
+			ticketInformation.addValue(resolveLookup(service, "tService"));
+		}
 		return ticketInformation;
+	}
+
+	/**
+	 * Holt sich für den Keytext den KeyLong aus der Datenbank
+	 * 
+	 * @param keyText
+	 * @param tableName
+	 * @return
+	 */
+	private Value resolveLookup(String keyText, String tableName) {
+		Table inputTable = new Table();
+		inputTable.setName(tableName);
+		inputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		inputTable.addColumn(new Column("KeyText", DataType.STRING));
+//		inputTable.addColumn(new Column("Description", DataType.STRING));
+		inputTable.addColumn(new Column("LastAction", DataType.INTEGER));
+		Row inputRow = new Row();
+		inputRow.addValue(null);
+		inputRow.addValue(new Value(keyText));
+//		inputRow.addValue(null); // Description
+		inputRow.addValue(new Value(">0")); // LastAction
+		inputTable.addRow(inputRow);
+		Table outputTable = svc.getIndexView(inputTable);
+		Value outputValue = null;
+		if (!outputTable.getRows().isEmpty()) {
+			outputValue = outputTable.getRows().get(0).getValues().get(0);
+		}
+		return outputValue;
 	}
 
 	private Table createEmptyTicketTable() {
@@ -88,7 +129,11 @@ public class TracController {
 		ticketTable.addColumn(new Column(TICKET_SERVICEOBJECT, DataType.STRING));
 		ticketTable.addColumn(new Column(TICKET_SERVICE, DataType.STRING));
 		ticketTable.addColumn(new Column(TICKET_DESCRIPTION, DataType.STRING));
-		// für die Keys bräuchten wir Datenbankzugriff
+		// für die Keys brauchen wir Datenbankzugriff
+		ticketTable.addColumn(new Column(ORDERRECEIVER_KEY, DataType.INTEGER));
+		ticketTable.addColumn(new Column(SERVICECONTRACT_KEY, DataType.INTEGER));
+		ticketTable.addColumn(new Column(SERVICEOBJECT_KEY, DataType.INTEGER));
+		ticketTable.addColumn(new Column(SERVICE_KEY, DataType.INTEGER));
 
 		return ticketTable;
 	}

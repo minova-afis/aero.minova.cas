@@ -3,17 +3,13 @@ package aero.minova.core.application.system.controller;
 import static aero.minova.core.application.system.domain.OutputType.OUTPUT;
 import static aero.minova.core.application.system.sql.SqlUtils.convertSqlResultToRow;
 import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter;
-import static java.sql.Types.VARCHAR;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
-import static java.util.stream.IntStream.rangeClosed;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -23,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import aero.minova.core.application.system.domain.Column;
@@ -31,9 +26,7 @@ import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
-import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import aero.minova.trac.integration.controller.TracController;
 import lombok.val;
@@ -43,8 +36,10 @@ public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+
 	@Autowired
 	TracController trac;
+
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
@@ -54,6 +49,7 @@ public class SqlProcedureController {
 			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
 			return result;
 		}
+
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		try {
@@ -232,5 +228,4 @@ public class SqlProcedureController {
 		sb.append(")}");
 		return sb.toString();
 	}
-
 }

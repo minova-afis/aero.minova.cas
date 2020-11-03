@@ -1,12 +1,10 @@
 package aero.minova.core.application.system.controller;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +22,9 @@ import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
-import lombok.var;
 
 @RestController
 public class SqlViewController {
-
 	public static final String SQL_IS_NULL = "is null";
 	public static final String SQL_IS_NOT_NULL = "is not null";
 	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between(", "in(", "not like", "like", SQL_IS_NULL, SQL_IS_NOT_NULL };
@@ -49,7 +45,7 @@ public class SqlViewController {
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
 			val limit = Optional.ofNullable(inputTable.getMetaData())//
-					.map(m -> m.getLimited())//
+					.map(TableMetaData::getLimited)//
 					.orElse(Integer.MAX_VALUE);
 			val viewQuery = prepareViewString(inputTable, false, limit, false);
 			logger.info("Executing: " + viewQuery);
@@ -91,13 +87,9 @@ public class SqlViewController {
 	}
 
 	/**
-	 * TODO name, viewFields entfernen. Diese methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String
-	 * vor und berücksichtigt eine evtl. angegebene Maximalanzahl Ergebnisse
+	 * Diese Methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String vor und berücksichtigt eine evtl.
+	 * angegebene Maximalanzahl Ergebnisse
 	 * 
-	 * @param name
-	 *            View/Tabellenname
-	 * @param viewFields
-	 *            Felder, die in der View erwartet werden
 	 * @param params
 	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
 	 * @param autoLike
@@ -108,11 +100,9 @@ public class SqlViewController {
 	 *            Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
 	 * @return Präparierter View-String, der ausgeführt werden kann
 	 * @author wild
-	 * @since 10.28.0
 	 * @throws IllegalArgumentException
 	 */
 	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count) throws IllegalArgumentException {
-
 		final StringBuffer sb = new StringBuffer();
 		if (count) {
 			sb.append("select count(1) from ");
@@ -143,15 +133,12 @@ public class SqlViewController {
 	}
 
 	/**
-	 * @param viewFields
-	 *            Felder, die in der View erwartet werden
 	 * @param params
 	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
 	 * @param autoLike
 	 *            wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
 	 * @return die Where-Klausel für die angegebenen Parameter
 	 * @author wild
-	 * @since 10.28.0
 	 */
 	protected String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuffer where = new StringBuffer();
@@ -286,5 +273,4 @@ public class SqlViewController {
 		}
 		return 0;
 	}
-
 }

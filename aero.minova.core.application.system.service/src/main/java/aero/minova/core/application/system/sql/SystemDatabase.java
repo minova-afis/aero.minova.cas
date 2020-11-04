@@ -7,13 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Es ist zur Zeit immer eine SQL-Datenbank. Es ist zur Zeit nicht zwingenderweiße die selbe Datenbank, wie die default-Datenbank dieser Spring-Boot-Anwendung.
+ * Es ist zur Zeit immer eine SQL-Datenbank. Es ist zur Zeit nicht zwingenderweise dieselbe Datenbank, wie die default-Datenbank dieser Spring-Boot-Anwendung.
  * 
  * @author avots
  */
 @Component
 public class SystemDatabase {
-
 	@Value("${aero.minova.database.url:jdbc:sqlserver://localhost;databaseName=AFIS_HAM}")
 	String connectionString;
 
@@ -35,5 +34,4 @@ public class SystemDatabase {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

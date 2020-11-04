@@ -1,5 +1,7 @@
 package aero.minova.trac.integration.controller;
 
+import java.text.MessageFormat;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +35,6 @@ public class TracController {
 	public static final String SERVICE_KEY = "ServiceKey";
 
 	private final TracTicketIntegration tracIntegration = new TracTicketIntegration();
-	// private final Server server = Server.getInstance();
 
 	@Autowired
 	SqlViewController svc;
@@ -46,7 +47,7 @@ public class TracController {
 			int ticketNumber = Integer.parseInt(ticketNo);
 			ticketTable = fetchFromTrac(ticketNumber);
 		} catch (NumberFormatException ex) {
-			// TODO Fehler anzeigen
+			throw new IllegalArgumentException(MessageFormat.format("Ticketnummer {0} ist nicht numerisch", ticketNo), ex);
 		}
 
 		return ticketTable != null ? ticketTable : createEmptyTicketTable();
@@ -82,12 +83,11 @@ public class TracController {
 		ticketInformation.addValue(new Value(service));
 		ticketInformation.addValue(new Value(description));
 
-		if (svc != null) {
-			ticketInformation.addValue(resolveLookup(orderReceiver, "tOrderReceiver"));
-			ticketInformation.addValue(resolveLookup(serviceContract, "tServiceContract"));
-			ticketInformation.addValue(resolveLookup(serviceObject, "tServiceObject"));
-			ticketInformation.addValue(resolveLookup(service, "tService"));
-		}
+		ticketInformation.addValue(resolveLookup(orderReceiver, "tOrderReceiver"));
+		ticketInformation.addValue(resolveLookup(serviceContract, "tServiceContract"));
+		ticketInformation.addValue(resolveLookup(serviceObject, "tServiceObject"));
+		ticketInformation.addValue(resolveLookup(service, "tService"));
+
 		return ticketInformation;
 	}
 
@@ -103,13 +103,13 @@ public class TracController {
 		inputTable.setName(tableName);
 		inputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 		inputTable.addColumn(new Column("KeyText", DataType.STRING));
-//		inputTable.addColumn(new Column("Description", DataType.STRING));
+//		inputTable.addColumn(new Column("Description", DataType.STRING)); evtl. erweitern um Description
 		inputTable.addColumn(new Column("LastAction", DataType.INTEGER));
 		Row inputRow = new Row();
 		inputRow.addValue(null);
 		inputRow.addValue(new Value(keyText));
 //		inputRow.addValue(null); // Description
-		inputRow.addValue(new Value(">0")); // LastAction
+		inputRow.addValue(new Value(">0")); // LastAction: nur nicht gelöschte
 		inputTable.addRow(inputRow);
 		Table outputTable = svc.getIndexView(inputTable);
 		Value outputValue = null;

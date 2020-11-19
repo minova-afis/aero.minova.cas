@@ -254,20 +254,75 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Ticket\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"TicketNumber\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\": [\r\n                \"s-5687\"\r\n            ]\r\n        }\r\n    ]\r\n}"
+					"raw": "{\r\n    \"name\": \"Ticket\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"TicketNumber\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\": [\r\n                \"s--123\"\r\n            ]\r\n        }\r\n    ]\r\n}"
 				},
 				"url": {
-					"raw": "https://mintest.minova.com:8084/data/procedure",
+					"raw": "https://publictest.minova.com:17280/data/procedure",
 					"protocol": "https",
 					"host": [
-						"mintest",
+						"publictest",
 						"minova",
 						"com"
 					],
-					"port": "8084",
+					"port": "17280",
 					"path": [
 						"data",
 						"procedure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ping",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "rqgzxTf71EAx8chvchMi",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "indexViewName",
+						"type": "text",
+						"value": "Test",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"vWorkingTimeIndex2\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"KeyLong\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"EmployeeText\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"CustomerText\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"ChargedQuantity\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"&\",\r\n            \"type\": \"BOOLEAN\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\" : [\r\n                \"s->0\"\r\n                ,\"s-%VM\"\r\n                ,\"s-MIN\"\r\n                , \"s->0.5\"\r\n                , \"b-false\"\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://publictest.minova.com:17280/ping",
+					"protocol": "https",
+					"host": [
+						"publictest",
+						"minova",
+						"com"
+					],
+					"port": "17280",
+					"path": [
+						"ping"
 					]
 				}
 			},

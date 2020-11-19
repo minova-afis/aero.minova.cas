@@ -107,3 +107,16 @@ Als Ausgabe wird eine Table mit den selektierten Werten zurückgegeben.
 Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 Die Eingabe-Tabelle schränkt die Auswahl der selektierten Werte ein.
 Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.plugin1
+
+== /ping
+
+Hiermit kann man die Verbindung und die Anmeldedaten prüfen.
+Hat keine Eingabe und gibt als Antwort ein JSON-Object mit einem returnCode von 0 zurück,
+wenn alles gut gelaufen ist.
+
+[source,json]
+--------
+{
+	"returnCode":1
+}
+--------

@@ -28,6 +28,7 @@ public class SystemDatabase {
 			if (connection == null) {
 				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 				connection = DriverManager.getConnection(connectionString, userName, userPassword);
+				connection.setAutoCommit(false);
 			}
 			return connection;
 		} catch (Exception e) {

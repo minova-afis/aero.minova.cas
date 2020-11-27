@@ -1,5 +1,11 @@
+### Eclipse
 bin/
 target/
 .classpath
 .project
 .settings
+
+### Intellji
+*.iml
+.idea/
+

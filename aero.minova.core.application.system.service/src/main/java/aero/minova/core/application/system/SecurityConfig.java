@@ -21,7 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Value("${security.ldap.address:ldap://mindcsrv.minova.com:3268/}")
 	private String ldapServerAddress;
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/", "/img/**", "/js/**", "/theme/**", "/index", "/login").permitAll();
@@ -34,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
+		http.requiresChannel().anyRequest().requiresSecure();
 	}
 
 	@Bean

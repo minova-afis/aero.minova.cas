@@ -6,6 +6,7 @@ import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -43,7 +44,7 @@ public class SqlProcedureController {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
-	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
+	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws SQLException {
 		if ("Ticket".equals(inputTable.getName())) {
 			val result = new SqlProcedureResult();
 			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
@@ -52,10 +53,11 @@ public class SqlProcedureController {
 
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
+		Connection connection = systemDatabase.connection();
 		try {
 			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
-			val preparedStatement = systemDatabase.connection().prepareCall(prepareProcedureString(inputTable, executeStrategies));
+			val preparedStatement = connection.prepareCall(prepareProcedureString(inputTable, executeStrategies));
 			range(0, inputTable.getColumns().size())//
 					.forEach(i -> {
 						try {
@@ -194,9 +196,16 @@ public class SqlProcedureController {
 							}
 						});
 			}
+			connection.commit();
 			return result;
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			logger.error("Couldn't execute procedure: ", e);
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				logger.error("Couldn't roll back procedure execution: ", e1);
+			}
+			throw e;
 		}
 	}
 

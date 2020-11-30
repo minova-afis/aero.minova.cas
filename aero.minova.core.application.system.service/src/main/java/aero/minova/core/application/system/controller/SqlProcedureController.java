@@ -204,7 +204,6 @@ public class SqlProcedureController {
 				connection.rollback();
 			} catch (SQLException e1) {
 				logger.error("Couldn't roll back procedure execution: ", e1);
-				throw e;
 			}
 			throw e;
 		}

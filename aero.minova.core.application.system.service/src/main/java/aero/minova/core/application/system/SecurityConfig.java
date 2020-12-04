@@ -16,10 +16,10 @@ import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Value("${security.ldap.domain:minova.com}")
+	@Value("${security_ldap_domain:minova.com}")
 	private String domain;
 
-	@Value("${security.ldap.address:ldap://mindcsrv.minova.com:3268/}")
+	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
 	private String ldapServerAddress;
 
 	@Override

@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SystemDatabase {
-	@Value("${aero.minova.database.url:jdbc:sqlserver://localhost;databaseName=AFIS_HAM}")
+	@Value("${aero_minova_database_url:jdbc:sqlserver://localhost;databaseName=AFIS_HAM}")
 	String connectionString;
 
-	@Value("${aero.minova.database.user.name:sa}")
+	@Value("${aero_minova_database_user_name:sa}")
 	String userName;
-	@Value("${aero.minova.database.user.password:Minova+0}")
+	@Value("${aero_minova_database_user_password:Minova+0}")
 	String userPassword;
 
 	private Connection connection;

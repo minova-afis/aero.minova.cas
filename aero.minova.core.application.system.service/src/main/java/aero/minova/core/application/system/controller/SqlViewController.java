@@ -1,11 +1,9 @@
 package aero.minova.core.application.system.controller;
 
-import java.sql.ResultSet;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import aero.minova.core.application.system.domain.*;
+import aero.minova.core.application.system.sql.SqlUtils;
+import aero.minova.core.application.system.sql.SystemDatabase;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.TableMetaData;
-import aero.minova.core.application.system.domain.Value;
-import aero.minova.core.application.system.sql.SqlUtils;
-import aero.minova.core.application.system.sql.SystemDatabase;
-import lombok.val;
+import java.sql.ResultSet;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class SqlViewController {

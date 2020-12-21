@@ -6,6 +6,8 @@ import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -53,7 +55,7 @@ public class SqlProcedureController {
 
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
-		Connection connection = systemDatabase.connection();
+		final val connection = systemDatabase.getConnection();
 		try {
 			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
@@ -206,6 +208,8 @@ public class SqlProcedureController {
 				logger.error("Couldn't roll back procedure execution: ", e1);
 			}
 			throw e;
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 	}
 
@@ -215,9 +219,8 @@ public class SqlProcedureController {
 
 	/**
 	 * Bereitet einen Prozedur-String vor
-	 * 
-	 * @param name
-	 * @param fds
+	 *
+	 * @param params
 	 * @param strategy
 	 * @return
 	 * @throws IllegalArgumentException

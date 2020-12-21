@@ -4,7 +4,6 @@ import aero.minova.core.application.system.domain.*;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import aero.minova.trac.integration.controller.TracController;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +32,6 @@ public class SqlProcedureController {
 
 	@Autowired
 	TracController trac;
-
-	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
 	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws SQLException {
@@ -138,8 +135,6 @@ public class SqlProcedureController {
 									return new Column(name, DataType.INSTANT);
 								} else if (type == Types.INTEGER) {
 									return new Column(name, DataType.INTEGER);
-								} else if (type == Types.DOUBLE) {
-									return new Column(name, DataType.DOUBLE);
 								} else if (type == Types.VARCHAR) {
 									return new Column(name, DataType.STRING);
 								} else if (type == Types.NVARCHAR) {
@@ -185,7 +180,7 @@ public class SqlProcedureController {
 							if (outputColumnsMapping.get(i)) {
 								outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
 							} else {
-								inputTable.getRows().get(0).getValues().get(i);
+								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 							}
 						});
 			}
@@ -211,10 +206,10 @@ public class SqlProcedureController {
 	/**
 	 * Bereitet einen Prozedur-String vor
 	 *
-	 * @param params
-	 * @param strategy
-	 * @return
-	 * @throws IllegalArgumentException
+	 * @param params SQL-Call-Parameter
+	 * @param strategy SQL-Execution-Strategie
+	 * @return SQL-Code
+	 * @throws IllegalArgumentException Fehler, wenn die Daten in params nicht richtig sind.
 	 */
 	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {
@@ -223,7 +218,7 @@ public class SqlProcedureController {
 		final int paramCount = params.getColumns().size();
 		final boolean returnRequired = ExecuteStrategy.returnRequired(strategy);
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		sb.append('{').append(returnRequired ? "? = call " : "call ").append(params.getName()).append("(");
 		for (int i = 0; i < paramCount; i++) {
 			sb.append(i == 0 ? "?" : ",?");

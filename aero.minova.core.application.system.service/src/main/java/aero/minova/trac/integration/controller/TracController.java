@@ -1,19 +1,14 @@
 package aero.minova.trac.integration.controller;
 
-import java.text.MessageFormat;
-
+import aero.minova.core.application.system.controller.SqlViewController;
+import aero.minova.core.application.system.domain.*;
+import aero.minova.trac.integration.TracTicketIntegration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
-import aero.minova.trac.integration.TracTicketIntegration;
+import java.text.MessageFormat;
 
 /**
  * @author wild

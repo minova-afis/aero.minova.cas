@@ -1,9 +1,9 @@
 package aero.minova.core.application.system.domain;
 
-import static java.util.Objects.requireNonNull;
-
 import java.time.Instant;
 import java.time.ZonedDateTime;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Der Wert kann auch null sein. Wenn dass nicht so wäre, könnten wir optionale Werte in einer {@link Table} nicht darstellen.

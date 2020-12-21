@@ -1,9 +1,8 @@
 package aero.minova.core.application.system.controller;
 
+import aero.minova.core.application.system.domain.PingResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import aero.minova.core.application.system.domain.PingResponse;
 
 @RestController
 public class CommunicationController {

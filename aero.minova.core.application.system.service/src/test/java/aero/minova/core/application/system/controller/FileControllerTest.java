@@ -1,11 +1,6 @@
 package aero.minova.core.application.system.controller;
 
-import static java.nio.file.Files.createDirectory;
-import static java.nio.file.Files.write;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.nio.charset.StandardCharsets;
-
+import lombok.val;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -14,7 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import lombok.val;
+import java.nio.charset.StandardCharsets;
+
+import static java.nio.file.Files.createDirectory;
+import static java.nio.file.Files.write;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

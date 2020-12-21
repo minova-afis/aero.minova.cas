@@ -1,14 +1,20 @@
 package aero.minova.core.application.system.sql;
 
+import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.sql.Connection;
 import java.sql.DriverManager;
-
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * Es ist zur Zeit immer eine SQL-Datenbank. Es ist zur Zeit nicht zwingenderweise dieselbe Datenbank, wie die default-Datenbank dieser Spring-Boot-Anwendung.
- * 
+ *
  * @author avots
  */
 @Component
@@ -20,19 +26,40 @@ public class SystemDatabase {
 	String userName;
 	@Value("${aero_minova_database_user_password:Minova+0}")
 	String userPassword;
+	private LinkedList<Connection> freeConnections = new LinkedList<>();
 
-	private Connection connection;
 
-	public Connection connection() {
+	public synchronized Connection getConnection() {
 		try {
-			if (connection == null) {
+			final Connection connection;
+			if (freeConnections.isEmpty()) {
 				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 				connection = DriverManager.getConnection(connectionString, userName, userPassword);
 				connection.setAutoCommit(false);
+			} else {
+				connection = freeConnections.poll();
 			}
 			return connection;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void freeUpConnection(Connection connection) {
+		CompletableFuture.runAsync(() -> freeUpConnectionSynchronously(connection));
+	}
+
+	private synchronized void freeUpConnectionSynchronously(Connection connection) {
+		if (!freeConnections.contains(connection)) {
+			try {
+				if (connection.isValid(10)) {
+					freeConnections.add(connection);
+				}
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			throw new IllegalArgumentException("Can not free up already freed up connection: " + connection);
 		}
 	}
 }

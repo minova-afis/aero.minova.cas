@@ -45,9 +45,11 @@ public class SqlProcedureController {
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
 		try {
-			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
+			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
-			val preparedStatement = connection.prepareCall(prepareProcedureString(inputTable, executeStrategies));
+			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
+			logger.info("Executing: " + procedureCall);
+			final val preparedStatement = connection.prepareCall(procedureCall);
 			range(0, inputTable.getColumns().size())//
 					.forEach(i -> {
 						try {

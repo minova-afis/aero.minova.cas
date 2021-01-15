@@ -3,9 +3,8 @@ package aero.minova.trac.integration.controller;
 import java.text.MessageFormat;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Column;
@@ -19,7 +18,7 @@ import aero.minova.trac.integration.TracTicketIntegration;
  * @author wild
  * @since 12.4.0
  */
-@RestController
+@Service
 public class TracController {
 	// Felder aus dem Ticket
 	public static final String TICKET_ID = "TicketKey";
@@ -39,7 +38,6 @@ public class TracController {
 	@Autowired
 	SqlViewController svc;
 
-	@GetMapping(value = "data/ticket", produces = "application/json")
 	public Table getTicket(@RequestParam String ticketNo) {
 		Table ticketTable = null;
 

@@ -10,12 +10,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +29,7 @@ import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import aero.minova.trac.integration.controller.TracController;
@@ -38,15 +43,30 @@ public class SqlProcedureController {
 
 	@Autowired
 	TracController trac;
+	
+	@Autowired
+	SqlViewController svc;
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
 	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws SQLException {
+		
 		if ("Ticket".equals(inputTable.getName())) {
 			val result = new SqlProcedureResult();
 			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
 			return result;
 		}
-
+		
+		val test = SecurityContextHolder.getContext().getAuthentication().getAuthorities()// 
+				.stream()//
+				.filter(s -> svc.checkPrivilege(s.getAuthority().substring(5),inputTable.getName()))//
+				.findAny();
+		if(!test.isPresent()){
+			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+		}
+		return calculateSqlProcedureResult(inputTable);	
+	}		
+		
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws SQLException { 
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		Connection connection = systemDatabase.connection();
@@ -121,7 +141,7 @@ public class SqlProcedureController {
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			val result = new SqlProcedureResult();
-			preparedStatement.execute();
+			preparedStatement.execute(); 
 			if (null != preparedStatement.getResultSet()) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();

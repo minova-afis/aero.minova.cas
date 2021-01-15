@@ -1,6 +1,9 @@
 package aero.minova.core.application.system.controller;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,6 +12,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,9 +40,37 @@ public class SqlViewController {
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@GetMapping(value = "data/index", produces = "application/json")
-	public Table getIndexView(@RequestBody Table inputTable) {
+	public Table getIndexView(@RequestBody Table inputTable ) {
+		val test = SecurityContextHolder.getContext().getAuthentication().getAuthorities()//
+				.stream()//
+				.filter(s -> checkPrivilege(s.getAuthority().substring(5),inputTable.getName()))//
+				.findAny();
+		if(!test.isPresent()){
+			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+		}
+		return getIndexViewUnsecure(inputTable);
+		
+	}
+	
+	/**
+	 *	Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt
+	**/
+	public boolean checkPrivilege(String securityToken, String privilegeName) {
+		Table foo = new Table();
+		foo.setName("vCASUserPrivileges");
+		List<Column>columns = new ArrayList<>(); 
+		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
+		columns.add(new Column("KeyLong", DataType.STRING));
+		foo.setColumns(columns);
+		Row bar = new Row();
+		bar.setValues(Arrays.asList(new Value(privilegeName),new Value(securityToken)));
+		foo.addRow(bar);
+		return !getIndexViewUnsecure(foo).getRows().isEmpty();
+	}
+
+	public Table getIndexViewUnsecure(Table inputTable) {
 		try {
-			val countQuery = prepareViewString(inputTable, false, 1000, true);
+			val countQuery = prepareViewString(inputTable, false, 1000, true);			
 			logger.info("Executing: " + countQuery);
 			val viewCounter = systemDatabase//
 					.connection()//
@@ -64,6 +98,7 @@ public class SqlViewController {
 			throw new RuntimeException(e);
 		}
 	}
+				
 
 	protected Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
 		try {

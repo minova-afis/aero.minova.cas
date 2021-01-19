@@ -1,6 +1,6 @@
 CREATE VIEW vCASUserPrivileges
 with encryption AS
-select UP.KeyText  as PrivilegeKeyText, UG.KeyLong as KeyLong
+select UP.KeyText  as PrivilegeKeyText, UG.KeyText as KeyText
 from 
 tUserPrivilege UP
 join tLuUserPrivilegeUserGroup UPG on UP.KeyLong=UPG.UserPrivilegeKey

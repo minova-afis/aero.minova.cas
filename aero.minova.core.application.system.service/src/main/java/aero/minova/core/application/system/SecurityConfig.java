@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,9 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.inMemoryAuthentication()//
 				.withUser("user").password(passwordEncoder().encode("password")).roles("USER")
 				.and()
-				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("ADMIN")
-				.and()
-				.withUser("test").password(passwordEncoder().encode("Minova+0")).roles("Dispatcher","ADMIN");
+				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("ADMIN","USER", "admin");
 //		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
 //			auth.authenticationProvider(new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress))
 //	            .ldapAuthentication().userDetailsContextMapper(userDetailsContextMapper());
@@ -85,29 +84,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)  {
         		Table foo = new Table();
-        		foo.setName("vCASUserRoles");
+        		foo.setName("tUser");
         		List<Column>columns = new ArrayList<>(); 
-        		columns.add(new Column("KeyText", DataType.STRING));
-        		columns.add(new Column("UserSecurityToken", DataType.STRING));
         		columns.add(new Column("KeyLong", DataType.INTEGER));
+        		columns.add(new Column("KeyText", DataType.STRING));
+        		columns.add(new Column("SecurityToken", DataType.STRING));
+        		columns.add(new Column("Memberships", DataType.STRING));
         		foo.setColumns(columns);
         		Row bar = new Row();
-        		bar.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username),new aero.minova.core.application.system.domain.Value(""),new aero.minova.core.application.system.domain.Value("")));
+        		bar.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(""),new aero.minova.core.application.system.domain.Value(username),new aero.minova.core.application.system.domain.Value(""),new aero.minova.core.application.system.domain.Value("")));
         		foo.addRow(bar);
         		
         	    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         		
-        		List<Row> result = svc.getIndexViewUnsecure(foo).getRows();
+        	    //dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
+        		String result = svc.getIndexViewUnsecure(foo).getRows().get(3).toString();
         		
-        		//fügt alle gefundenen UserGroups als deren KeyLong hinzu
-        		for (Row row : result) {
-        			if(!grantedAuthorities.contains(new SimpleGrantedAuthority(row.getValues().get(2).getStringValue()))){
-        				grantedAuthorities.add(new SimpleGrantedAuthority(row.getValues().get(2).getStringValue()));
-        		    }
-        		}
-        		//fügt SecurityToken hinzu
-        		grantedAuthorities.add(new SimpleGrantedAuthority(result.get(0).getValues().get(1).getStringValue()));
-        		
+        		//fügt alle SecurityTokens - sprich alle GruppenSecurityTokens und der persönliche UserSecurityToken -
+        		//des eingeloggten Benutzers den Rechten innerhalb des Programms zu
+        		//diese Tokens werden in der Datenbank mit '#' voneinander getrennt
+        		Stream<String> stream = Stream.of(result.split("#"));
+        		stream.forEach(s -> grantedAuthorities.add(new SimpleGrantedAuthority(s.replace("#", "").trim().toLowerCase())));
+ 
                 return super.mapUserFromContext(ctx, username, grantedAuthorities);
             }
         };

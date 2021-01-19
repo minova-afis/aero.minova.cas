@@ -3,6 +3,8 @@ package aero.minova.core.application.system.controller;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,7 +63,7 @@ public class SqlViewController {
 		foo.setName("vCASUserPrivileges");
 		List<Column>columns = new ArrayList<>(); 
 		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
-		columns.add(new Column("KeyLong", DataType.STRING));
+		columns.add(new Column("KeyText", DataType.STRING));
 		foo.setColumns(columns);
 		Row bar = new Row();
 		bar.setValues(Arrays.asList(new Value(privilegeName),new Value(securityToken)));
@@ -97,8 +100,7 @@ public class SqlViewController {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-				
+	}				
 
 	protected Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
 		try {
@@ -145,7 +147,19 @@ public class SqlViewController {
 			if (maxRows > 0) {
 				sb.append("select top ").append(maxRows).append(" ");
 			}
-			val outputFormat = params.getColumns().stream()//
+			
+			//Column-Level-Security wird nur bei Index-View benötigt
+//			List<Column> accessableColumns;
+//			if(params.getName().toLowerCase().contains("index")){
+//				accessableColumns = columnSecurity(params.getName(),params.getColumns());
+//			}else{
+//				accessableColumns = params.getColumns();
+//			}
+			
+			List<Column> accessableColumns = params.getColumns();
+			
+				
+			val outputFormat = accessableColumns.stream()//
 					.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
 					.collect(Collectors.toList());
 			if (outputFormat.isEmpty()) {
@@ -163,8 +177,74 @@ public class SqlViewController {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 		}
-
 		return sb.toString();
+	}
+	
+	/**
+	 * @param tablename
+	 *            der Name der Tabelle, dessen Spalten geprüft werden müssen
+	 * @param wantedColumns
+	 *            die Spalten, welche angefragt werden
+	 * @return die Liste an Tabellenspalten, welche für die Index-View von diesem User verwendet werden dürfen
+	 * @author weber
+	 */
+	public List<Column> columnSecurity(String tablename, List<Column> wantedColumns) {
+		Table foo = new Table();
+		foo.setName("tColumnSecurity");
+		List<Column>columns = new ArrayList<>(); 
+		columns.add(new Column("KeyLong", DataType.INTEGER));
+		columns.add(new Column("TableName", DataType.STRING));
+		columns.add(new Column("ColumnName", DataType.STRING));
+		columns.add(new Column("SecurityToken", DataType.STRING));
+		columns.add(new Column("&",DataType.BOOLEAN));
+		foo.setColumns(columns);
+		@SuppressWarnings("unchecked")
+		List<GrantedAuthority> userGroups = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		for (GrantedAuthority grantedAuthority : userGroups) {
+			Row bar = new Row();
+			bar.setValues(Arrays.asList(new Value(""),new Value(tablename),new Value(""),new Value(grantedAuthority.getAuthority().substring(5)),new Value(false)));
+			foo.addRow(bar);
+		}
+		List<Row> result = getIndexViewUnsecure(foo).getRows();
+		List<String> accessableColumns = new ArrayList<String>();
+		//verschiedene SecurityTokens können dieselbe Erlaubnis haben, deshalb Doppelte rausfiltern
+		for (Row row : result) {
+			if(!accessableColumns.contains(row.getValues().get(2).getStringValue())) {
+				accessableColumns.add(row.getValues().get(2).getStringValue());
+			}
+			
+//			if(!accessableColumns.contains(new Column(row.getValues().get(2).getStringValue(),DataType.STRING))) {			
+//				accessableColumns.add(new Column(row.getValues().get(2).getStringValue(),DataType.STRING));
+//			}
+		}
+		
+		List<Column> accessableWantedColumns = new ArrayList<Column>();	
+		//falls es keinen Eintrag in accessableColumns gibt, dann darf keine Spalte aus der Tabelle angesehen werden
+		if(accessableColumns.isEmpty()) {
+			accessableWantedColumns.add(new Column("null", DataType.STRING));
+			return accessableWantedColumns;
+		}
+		//wantedColumns ist leer, wenn alle Spalten angefordert wurden, in diesem Fall geben wir die Spalten zurück, welche genehmigt sind
+		if(wantedColumns.isEmpty()) {
+			for (String s : accessableColumns) {
+				accessableWantedColumns.add(new Column(s, DataType.STRING));
+			}
+			return accessableWantedColumns;
+		}
+		
+		//in allen anderen Fällen müssen wir herausfiltern, welche der angeforderten Spalten genehmigt werden können
+		for (Column column : wantedColumns) {
+			if(accessableColumns.contains(column.getName())) {
+				accessableWantedColumns.add(column);
+			}else {
+				accessableWantedColumns.add(new Column("null", DataType.STRING));
+			}
+		}
+		//falls die Liste danach immernoch leer ist, darf keine Spalte gesehen werden
+		if(accessableWantedColumns.isEmpty()) {
+			accessableWantedColumns.add(new Column("null", DataType.STRING));
+		}
+		return accessableWantedColumns;
 	}
 
 	/**
@@ -178,6 +258,7 @@ public class SqlViewController {
 	protected String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuffer where = new StringBuffer();
 		final boolean hasAndClause;
+		boolean whereClauseExists = false;
 		// TODO Check size
 		val andFields = params.getColumns().stream()//
 				.filter(c -> Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
@@ -246,6 +327,7 @@ public class SqlViewController {
 			if (clause.length() > 0) {
 				if (where.length() == 0) {
 					where.append("\r\nwhere ");
+					whereClauseExists = true;
 				} else {
 					where.append(and ? "\r\n  and " : "\r\n   or ");
 				}
@@ -253,9 +335,43 @@ public class SqlViewController {
 			}
 		}
 
+		//funktioniert mit dem momentanen Aufbau der Views nicht, da keine SecurityToken Spalten existieren 		
+		//Row-Level-Security nur benötigt, wenn es sich um eine Index-View handelt
+		if(params.getName().toLowerCase().contains("index")){
+			final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists);
+			where.append(onlyAuthorizedRows);
+		}
+
 		return where.toString();
 	}
-
+	
+	/**
+	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an
+	 * 
+	 * @param boolean 
+	 * 				Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
+	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
+	 */
+	protected String rowLevelSecurity(boolean where) {
+		final StringBuffer rowSec = new StringBuffer();
+		//Falls where-Klausel bereits vorhanden 'and' anfügen, wenn nicht, dann 'where'
+		if (where) {
+			rowSec.append("\r\n and " );
+		}else{
+			rowSec.append("\r\nwhere  ");
+		}
+		//Wenn SecurityToken null, dann darf jeder User die Spalte sehen
+		rowSec.append(" ( SecurityToken = 'null' )");
+		@SuppressWarnings("unchecked")
+		List<GrantedAuthority> userGroups = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		
+		for (GrantedAuthority grantedAuthority : userGroups) {
+			rowSec.append("\r\n  or ( SecurityToken = '");
+			rowSec.append(grantedAuthority.getAuthority().substring(5)).append("' )");	
+		}
+		return rowSec.toString();
+	}
+	
 	/**
 	 * Abhängig von dem Feld-Typ, wird der Wert von Kommas umgeben oder nicht
 	 */

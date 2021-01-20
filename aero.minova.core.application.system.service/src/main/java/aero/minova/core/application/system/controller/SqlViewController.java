@@ -73,10 +73,10 @@ public class SqlViewController {
 
 	public Table getIndexViewUnsecure(Table inputTable) {
 		try {
-//			if(inputTable.getName().toLowerCase().contains("index")) {
-//				Table accessableTable = columnSecurity(inputTable);
-//				inputTable = accessableTable;
-//			}
+			if(inputTable.getName().toLowerCase().contains("index")) {
+				Table accessableTable = columnSecurity(inputTable);
+				inputTable = accessableTable;
+			}
 			val countQuery = prepareViewString(inputTable, false, 1000, true);			
 			logger.info("Executing: " + countQuery);
 			val viewCounter = systemDatabase//
@@ -99,10 +99,6 @@ public class SqlViewController {
 					result.setMetaData(new TableMetaData());
 				}
 				result.getMetaData().setLimited(limit);
-			}
-			//TODO Entscheiden, ob COLUMN-SECURITY vor der SQL-Abfrage oder danach
-			if(inputTable.getName().toLowerCase().contains("index")) {
-				return columnSecurity(result);
 			}
 			return result;
 		} catch (Exception e) {
@@ -177,11 +173,9 @@ public class SqlViewController {
 	}
 	
 	/**
-	 * @param tablename
-	 *            der Name der Tabelle, dessen Spalten geprüft werden müssen
-	 * @param wantedColumns
-	 *            die Spalten, welche angefragt werden
-	 * @return die Liste an Tabellenspalten, welche für die Index-View von diesem User verwendet werden dürfen
+	 * @param inputTable
+	 *            die Tabelle mit den Spalten, welche angefragt werden
+	 * @return Tabelle mit bereits konfigurierten Spalten, welche für die Index-View von diesem User verwendet werden dürfen
 	 * @author weber
 	 */
 	public Table columnSecurity(Table inputTable) {
@@ -202,30 +196,33 @@ public class SqlViewController {
 			foo.addRow(bar);
 		}
 		List<Row> result = getIndexViewUnsecure(foo).getRows();
-		List<String> grantedColumns = new ArrayList<String>();
-		//verschiedene SecurityTokens können dieselbe Erlaubnis haben, deshalb Doppelte rausfiltern
-		for (Row row : result) {
-			if(!grantedColumns.contains(row.getValues().get(2).getStringValue())) {
-				grantedColumns.add(row.getValues().get(2).getStringValue());
-			}
-		}
-		List<Column> wantedColumns = new ArrayList<Column>(inputTable.getColumns());
-
-		//Hier wird herausgefiltert, welche der angeforderten Spalten(wantedColumns) genehmigt werden kann(grantedColumns)
-		for (Column column : wantedColumns) {
-			if(!grantedColumns.contains(column.getName())) {
-				for (Row r : inputTable.getRows()) {
-					r.getValues().remove(inputTable.getColumns().indexOf(column));
+		
+		//wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
+		if(!result.isEmpty()) {
+			List<String> grantedColumns = new ArrayList<String>();
+			//verschiedene SecurityTokens können dieselbe Erlaubnis haben, deshalb Doppelte rausfiltern
+			for (Row row : result) {
+				if(!grantedColumns.contains(row.getValues().get(2).getStringValue())) {
+					grantedColumns.add(row.getValues().get(2).getStringValue());
 				}
-				inputTable.getColumns().remove(column);
 			}
-		}
+			List<Column> wantedColumns = new ArrayList<Column>(inputTable.getColumns());
 
-		//falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
-		if(inputTable.getColumns().isEmpty()) {
-			throw new RuntimeException("Insufficient Permission for " + inputTable.getName() + "; User with Username '"
-					+ SecurityContextHolder.getContext().getAuthentication().getName() + "' is not allowed to see any column of this table");
-			
+			//Hier wird herausgefiltert, welche der angeforderten Spalten(wantedColumns) genehmigt werden kann(grantedColumns)
+			for (Column column : wantedColumns) {
+				if(!grantedColumns.contains(column.getName())) {
+					for (Row r : inputTable.getRows()) {
+						r.getValues().remove(inputTable.getColumns().indexOf(column));
+					}
+					inputTable.getColumns().remove(column);
+				}
+			}	
+
+			//falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
+			if(inputTable.getColumns().isEmpty()) {
+				throw new RuntimeException("Insufficient Permission for " + inputTable.getName() + "; User with Username '"
+					+ SecurityContextHolder.getContext().getAuthentication().getName() + "' is not allowed to see the selected column of this table");
+			}
 		}
 		return inputTable;
 	}
@@ -318,12 +315,12 @@ public class SqlViewController {
 			}
 		}
 
-		//funktioniert mit dem momentanen Aufbau der Views nicht, da keine SecurityToken-Spalten existieren 		
+		//funktioniert theoretisch schon,Index-Views müssen allerdings eine SecurityToken-Spalte haben 		
 		//Row-Level-Security nur benötigt, wenn es sich um eine Index-View handelt
-//		if(params.getName().toLowerCase().contains("index")){
-//			final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists);
-//			where.append(onlyAuthorizedRows);
-//		}
+		if(params.getName().toLowerCase().contains("index")){
+			final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists);
+			where.append(onlyAuthorizedRows);
+		}
 
 		return where.toString();
 	}
@@ -344,15 +341,19 @@ public class SqlViewController {
 			rowSec.append("\r\nwhere  (");
 		}
 		//Wenn SecurityToken null, dann darf jeder User die Spalte sehen
-		rowSec.append(" ( SecurityToken = 'NULL' )");
+		rowSec.append(" ( SecurityToken IS NULL )");
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> userGroups = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		
-		for (GrantedAuthority grantedAuthority : userGroups) {
-			rowSec.append("\r\n  or ( SecurityToken = '");
-			rowSec.append(grantedAuthority.getAuthority().substring(5)).append("' )");	
-		}
-		rowSec.append(" )");
+		if(userGroups.size()>0) {
+			rowSec.append("\r\n  or ( SecurityToken IN (");
+			for (GrantedAuthority grantedAuthority : userGroups) {
+				rowSec.append("'").append(grantedAuthority.getAuthority().substring(5)).append("',");	
+			}
+			rowSec.deleteCharAt(rowSec.length()-1);
+			rowSec.append(") )");
+			}
+		rowSec.append(")");
 		return rowSec.toString();
 	}
 	

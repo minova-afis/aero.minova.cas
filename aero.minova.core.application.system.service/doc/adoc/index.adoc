@@ -6,6 +6,7 @@
 
 * xref:api.adoc#[API]
 * xref:versions.adoc#[Versionen]
+* xref:security.adoc#[Sicherheitsmechanismen]
 
 == Beschreibung
 

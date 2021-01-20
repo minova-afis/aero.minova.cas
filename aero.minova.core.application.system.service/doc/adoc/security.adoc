@@ -28,8 +28,8 @@ eine WHERE-Bedingung hinzugefügt, welche auf die vorhandenen SecurityToken abfr
 ----
 SELECT [...] FROM v[*]Index
 WHERE [...] 
-AND ( (SecurityToken = 'NULL')
-    OR  ( SecurityToken = 'admin')) 
+AND ( (SecurityToken IN NULL)
+    OR  ( SecurityToken IN ('admin',[...]) )) 
 ----
 
 Hierfür brauchen die betroffenen Index-Views natürlich eine Spalte 'SecurityTokens', in welcher diese abgefragt werden können.
@@ -51,3 +51,5 @@ OR    ...
 * *TableName*: der Name der Table, auf deren Spalten wir zugreifen wollen
 * *ColumnName*: der Name der Spalte, welche freigegeben ist
 * *SecurityToken*: der SecurityToken der Gruppe oder des Users, welcher diese Spalte ansehen darf
+
+Ist kein Eintrag für eine Tabelle in tColumnSecurity, darf der User auf die gesamte Tabelle zugreifen.

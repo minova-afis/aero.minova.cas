@@ -1,0 +1,52 @@
+== Security innerhalb der Anwendung
+
+ 
+=== SecurityToken
+
+Jeder User hat eine Reihe an SecurityToken. Neben seinem Eigenen verfügt er
+zudem über die SecurityTokens der Gruppen, in welche er sich befindet. 
+
+Der User mitsamt seines Usernames, seinem spezifischen SecurityToken und 
+seinen Gruppen-SecurityTokens ist in der Table tUser hinterlegt.
+
+[source, sql]
+----
+SELECT KeyLong,KeyText,SecurityToken,Memberships FROM tUser
+----
+
+* *KeyText*: der Name des Users
+* *SecurityToken*: der eindeutige SecurityToken des Users
+* *Memberships*: ein String an SecurityToken, welche mit " #" voneinander getrennt sind. 
+Dieser String beinhaltet sowohl den User-SecurityToken, als auch die Group-SecurityToken
+
+=== Row-Level-Security
+
+Da jeder User eine ganze Reihe von SecurityTokens hat, wird am Ende eines Selects auf eine View, welche den Substring "Index" enthält,
+eine WHERE-Bedingung hinzugefügt, welche auf die vorhandenen SecurityToken abfragt.
+
+[source, sql]
+----
+SELECT [...] FROM v[*]Index
+WHERE [...] 
+AND ( (SecurityToken = 'null')
+    OR  ( SecurityToken = 'admin')) 
+----
+
+Hierfür brauchen die betroffenen Index-Views natürlich eine Spalte 'SecurityTokens', in welcher diese abgefragt werden können.
+
+=== Column-Level-Security
+
+Grundsätzlich darf ein User keine Spalten einer Index-View sehen.
+Die Genehmigungen für die Spalten werden anhand der SecurityToken und mithilfe der Tabelle tColumnSecurity erteilt.
+
+[source, sql]
+----
+SELECT KeyLong,TableName,ColumnName,SecurityToken FROM tColumnSecurity
+WHERE (TableName = 'vBeispielIndex' AND   SecurityToken = 'admin')
+OR    (TableName = 'vBeispielIndex' AND   SecurityToken = 'verwaltung')
+OR    ...
+----
+
+* *TableName*: der Name der Table, auf deren Spalten wir zugreifen wollen
+* *ColumnName*: der Name der Spalte, welche freigegeben ist
+* *SecurityToken*: der SecurityToken der Gruppe oder des Users, welcher diese Spalte ansehen darf

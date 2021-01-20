@@ -28,11 +28,12 @@ eine WHERE-Bedingung hinzugefügt, welche auf die vorhandenen SecurityToken abfr
 ----
 SELECT [...] FROM v[*]Index
 WHERE [...] 
-AND ( (SecurityToken = 'null')
+AND ( (SecurityToken = 'NULL')
     OR  ( SecurityToken = 'admin')) 
 ----
 
 Hierfür brauchen die betroffenen Index-Views natürlich eine Spalte 'SecurityTokens', in welcher diese abgefragt werden können.
+Auf eine Spalte mit dem SecurityToken *NULL* darf jeder User zugreifen.
 
 === Column-Level-Security
 

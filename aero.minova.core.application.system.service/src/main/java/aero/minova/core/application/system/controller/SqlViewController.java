@@ -344,7 +344,7 @@ public class SqlViewController {
 			rowSec.append("\r\nwhere  (");
 		}
 		//Wenn SecurityToken null, dann darf jeder User die Spalte sehen
-		rowSec.append(" ( SecurityToken = 'null' )");
+		rowSec.append(" ( SecurityToken = 'NULL' )");
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> userGroups = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		

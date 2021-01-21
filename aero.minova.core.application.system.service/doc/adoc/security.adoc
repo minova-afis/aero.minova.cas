@@ -37,7 +37,6 @@ Auf eine Spalte mit dem SecurityToken *NULL* darf jeder User zugreifen.
 
 === Column-Level-Security
 
-Grundsätzlich darf ein User keine Spalten einer Index-View sehen.
 Die Genehmigungen für die Spalten werden anhand der SecurityToken und mithilfe der Tabelle tColumnSecurity erteilt.
 
 [source, sql]
@@ -53,3 +52,4 @@ OR    ...
 * *SecurityToken*: der SecurityToken der Gruppe oder des Users, welcher diese Spalte ansehen darf
 
 Ist kein Eintrag für eine Tabelle in tColumnSecurity, darf der User auf die gesamte Tabelle zugreifen.
+Falls mindestens ein Eintrag vorhanden ist, darf der User nur die von der Selektion gefundenen Spalten betrachten.

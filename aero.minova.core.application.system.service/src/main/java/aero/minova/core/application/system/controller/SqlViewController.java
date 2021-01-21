@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.management.RuntimeErrorException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,19 +188,29 @@ public class SqlViewController {
 		columns.add(new Column("TableName", DataType.STRING));
 		columns.add(new Column("ColumnName", DataType.STRING));
 		columns.add(new Column("SecurityToken", DataType.STRING));
-		columns.add(new Column(Column.AND_FIELD_NAME, DataType.BOOLEAN));
 		foo.setColumns(columns);
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> userGroups = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		for (GrantedAuthority grantedAuthority : userGroups) {
-			Row bar = new Row();
-			bar.setValues(Arrays.asList(new Value(""),new Value(inputTable.getName()),new Value(""),new Value(grantedAuthority.getAuthority().substring(5)),new Value(false)));
-			foo.addRow(bar);
+		if(userGroups.size()<=0) {
+			throw new RuntimeException("User has no Authorities");
 		}
-		List<Row> result = getIndexViewUnsecure(foo).getRows();
-		
-		//wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
-		if(!result.isEmpty()) {
+		List<Row> result = new ArrayList<>();
+		for (GrantedAuthority grantedAuthority : userGroups) {
+			//das Privileg ist nur für uns interessant, wenn es überhaupt auf die Tabelle zurgreifen dürfte
+			if(checkPrivilege(grantedAuthority.getAuthority().substring(5),inputTable.getName())) {
+				Row bar = new Row();
+				bar.setValues(Arrays.asList(new Value(""),new Value(inputTable.getName()),new Value(""),new Value(grantedAuthority.getAuthority().substring(5))));
+				List<Row> checkRow= new ArrayList<>();
+				checkRow.add(bar);
+				foo.setRows(checkRow);
+				List<Row> tokenSpecificAuthorities = getIndexViewUnsecure(foo).getRows();
+				//wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
+				if(tokenSpecificAuthorities.isEmpty()) {
+					return inputTable;
+				}
+				result.addAll(tokenSpecificAuthorities);
+			}
+		}
 			List<String> grantedColumns = new ArrayList<String>();
 			//verschiedene SecurityTokens können dieselbe Erlaubnis haben, deshalb Doppelte rausfiltern
 			for (Row row : result) {
@@ -221,9 +233,8 @@ public class SqlViewController {
 			//falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
 			if(inputTable.getColumns().isEmpty()) {
 				throw new RuntimeException("Insufficient Permission for " + inputTable.getName() + "; User with Username '"
-					+ SecurityContextHolder.getContext().getAuthentication().getName() + "' is not allowed to see the selected column of this table");
+					+ SecurityContextHolder.getContext().getAuthentication().getName() + "' is not allowed to see the selected columns of this table");
 			}
-		}
 		return inputTable;
 	}
 

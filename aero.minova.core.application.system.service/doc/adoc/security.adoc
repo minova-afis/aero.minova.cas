@@ -3,8 +3,9 @@
  
 === SecurityToken
 
-Jeder User hat eine Reihe an SecurityToken. Neben seinem Eigenen verfügt er
-zudem über die SecurityTokens der Gruppen, in welche er sich befindet. 
+Jeder User erhält bei Login eine Reihe an SecurityToken.
+Neben den SecurityTokens, welche aus dem Active Directory dem User bereits zugeordnet wurden,
+erhält er zudem die SecurityTokens der Gruppen, in welche er sich befindet und einen einzigartigen SecurityToken. 
 
 Der User mitsamt seines Usernames, seinem spezifischen SecurityToken und 
 seinen Gruppen-SecurityTokens ist in der Table tUser hinterlegt.
@@ -19,6 +20,17 @@ SELECT KeyLong,KeyText,SecurityToken,Memberships FROM tUser
 * *Memberships*: ein String an SecurityToken, welche mit " #" voneinander getrennt sind. 
 Dieser String beinhaltet sowohl den User-SecurityToken, als auch die Group-SecurityToken
 
+Anhand der Memberships kann man dann über die Tabelle tUserGroups auch die Memberships(SecurityToken) der Gruppen erhalten, welche 
+die UserSecurityToken der User enthalten, dessen Spalten der eingeloggte User sehen darf.
+
+[source, sql]
+----
+SELECT KeyText,SecurityToken FROM tUserGroup
+----
+
+* *KeyText* der Name der UserGroup, welche in den Memberships des Users enthalten ist
+* *SecurityToken* die SecurityToken der User, mithilfe die Mitglieder der Gruppe bestimmte Spalten sehen dürfen. Diese Tokens sind ebenfalls mit " #" voneinander getrennt.
+
 === Row-Level-Security
 
 Da jeder User eine ganze Reihe von SecurityTokens hat, wird am Ende eines Selects auf eine View, welche den Substring "Index" enthält,
@@ -26,7 +38,7 @@ eine WHERE-Bedingung hinzugefügt, welche auf die vorhandenen SecurityToken abfr
 
 [source, sql]
 ----
-SELECT [...] FROM v[*]Index
+SELECT [...] FROM vBeispielIndex
 WHERE [...] 
 AND ( (SecurityToken IN NULL)
     OR  ( SecurityToken IN ('admin',[...]) )) 
@@ -37,7 +49,7 @@ Auf eine Spalte mit dem SecurityToken *NULL* darf jeder User zugreifen.
 
 === Column-Level-Security
 
-Die Genehmigungen für die Spalten werden anhand der SecurityToken und mithilfe der Tabelle tColumnSecurity erteilt.
+Die Genehmigungen für die Spalten einer Index-View werden anhand der SecurityToken und mithilfe der Tabelle tColumnSecurity erteilt.
 
 [source, sql]
 ----

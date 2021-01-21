@@ -3,23 +3,17 @@ package aero.minova.core.application.system.controller;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.management.RuntimeErrorException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,7 +64,7 @@ public class SqlViewController {
 		Row bar = new Row();
 		bar.setValues(Arrays.asList(new Value(privilegeName),new Value(securityToken)));
 		foo.addRow(bar);
-		return !getIndexViewUnsecure(foo).getRows().isEmpty();
+		return !getSecurityView(foo).getRows().isEmpty();
 	}
 
 	public Table getIndexViewUnsecure(Table inputTable) {
@@ -106,7 +100,25 @@ public class SqlViewController {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}				
+	}
+	
+	/*	
+	 * Wie indexView, nur ohne die erste Abfrage, um die maximale Länge zu erhalten
+	 * Ist nur für die Sicherheitsabfragen gedacht, um nicht zu viele unnötige SQL-Abfrgane zu machen
+	 */
+	public Table getSecurityView(Table inputTable) {
+		try {
+			val viewQuery = prepareViewString(inputTable, false, 1000, false);
+			logger.info("Executing: " + viewQuery);
+			ResultSet resultSet = systemDatabase.connection()//
+					.prepareCall(viewQuery)//
+					.executeQuery();
+			val result = convertSqlResultToTable(inputTable, resultSet);
+			return result;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	protected Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
 		try {
@@ -203,7 +215,7 @@ public class SqlViewController {
 				List<Row> checkRow= new ArrayList<>();
 				checkRow.add(bar);
 				foo.setRows(checkRow);
-				List<Row> tokenSpecificAuthorities = getIndexViewUnsecure(foo).getRows();
+				List<Row> tokenSpecificAuthorities = getSecurityView(foo).getRows();
 				//wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
 				if(tokenSpecificAuthorities.isEmpty()) {
 					return inputTable;

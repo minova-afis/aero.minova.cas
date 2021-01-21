@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.inMemoryAuthentication()//
 				.withUser("user").password(passwordEncoder().encode("password")).roles("dispatcher")
 				.and()
-				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("admin", "bla");
+				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("admin");
 //		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
 //			auth.authenticationProvider(new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress))
 //	            .ldapAuthentication().userDetailsContextMapper(userDetailsContextMapper());
@@ -86,26 +88,54 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         		Table foo = new Table();
         		foo.setName("tUser");
         		List<Column>columns = new ArrayList<>(); 
-        		columns.add(new Column("KeyLong", DataType.INTEGER));
         		columns.add(new Column("KeyText", DataType.STRING));
         		columns.add(new Column("SecurityToken", DataType.STRING));
         		columns.add(new Column("Memberships", DataType.STRING));
         		foo.setColumns(columns);
         		Row bar = new Row();
-        		bar.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(""),new aero.minova.core.application.system.domain.Value(username),new aero.minova.core.application.system.domain.Value(""),new aero.minova.core.application.system.domain.Value("")));
+        		bar.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username),new aero.minova.core.application.system.domain.Value(""),new aero.minova.core.application.system.domain.Value("")));
         		foo.addRow(bar);
         		
-        	    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        		
         	    //dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-        		String result = svc.getIndexViewUnsecure(foo).getRows().get(3).toString();
+        		String result = svc.getSecurityView(foo).getRows().get(0).getValues().get(2).getStringValue();
         		
-        		//fügt alle SecurityTokens - sprich alle GruppenSecurityTokens und der persönliche UserSecurityToken -
-        		//des eingeloggten Benutzers den Rechten innerhalb des Programms zu
-        		//diese Tokens werden in der Datenbank mit '#' voneinander getrennt
-        		Stream<String> stream = Stream.of(result.split("#"));
-        		stream.forEach(s -> grantedAuthorities.add(new SimpleGrantedAuthority(s.replace("#", "").trim().toLowerCase())));
- 
+        		//alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
+        		List<String> userSecurityTokens = new ArrayList<>();
+        		userSecurityTokens = Stream.of(result.trim().split("#"))//
+        	      .map (elem -> new String(elem))//
+        	      .collect(Collectors.toList());
+        		
+        		//füge die authorities hinzu, welche aus dem Active Directory kommen
+        		for (GrantedAuthority ga : authorities) {
+					userSecurityTokens.add(ga.getAuthority().substring(5));
+				}
+        				
+        		//die Berechtigungen der Gruppen noch herausfinden
+        		Table groups = new Table();
+        		groups.setName("tUserGroup");
+        		List<Column>groupcolumns = new ArrayList<>(); 
+        		groupcolumns.add(new Column("KeyText", DataType.STRING));
+        		groupcolumns.add(new Column("SecurityToken", DataType.STRING));
+        		groups.setColumns(groupcolumns);
+        		for (String s : userSecurityTokens) {
+        			Row tokens = new Row();
+        			tokens.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(s),new aero.minova.core.application.system.domain.Value("NOT NULL")));
+        			groups.addRow(tokens);
+        		}
+        		List<Row> groupTokens = svc.getSecurityView(groups).getRows();
+        		for (Row r : groupTokens) {
+        			userSecurityTokens.addAll(Arrays.asList(r.getValues().get(1).getStringValue().split("#")));
+        		}
+        		
+        	    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        		for (String string : userSecurityTokens) {
+        			if(!string.equals("")) {
+        				SimpleGrantedAuthority sga = new SimpleGrantedAuthority(string);
+        				if(!grantedAuthorities.contains(sga))
+        					grantedAuthorities.add(sga);
+        			}
+        		}
+        		
                 return super.mapUserFromContext(ctx, username, grantedAuthorities);
             }
         };

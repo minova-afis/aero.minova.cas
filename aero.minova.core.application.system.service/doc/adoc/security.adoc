@@ -12,7 +12,7 @@ seinen Gruppen-SecurityTokens ist in der Table tUser hinterlegt.
 
 [source, sql]
 ----
-SELECT KeyLong,KeyText,SecurityToken,Memberships FROM tUser
+select KeyLong,KeyText,SecurityToken,Memberships from tUser
 ----
 
 * *KeyText*: der Name des Users
@@ -25,7 +25,7 @@ die UserSecurityToken der User enthalten, dessen Spalten der eingeloggte User se
 
 [source, sql]
 ----
-SELECT KeyText,SecurityToken FROM tUserGroup
+select KeyText,SecurityToken from tUserGroup
 ----
 
 * *KeyText* der Name der UserGroup, welche in den Memberships des Users enthalten ist
@@ -38,10 +38,10 @@ eine WHERE-Bedingung hinzugefügt, welche auf die vorhandenen SecurityToken abfr
 
 [source, sql]
 ----
-SELECT [...] FROM vBeispielIndex
-WHERE [...] 
-AND ( (SecurityToken IN NULL)
-    OR  ( SecurityToken IN ('admin',[...]) )) 
+select [...] from vBeispielIndex
+where [...] 
+and ( (SecurityToken in NULL)
+    or  ( SecurityToken in ('admin',[...]) )) 
 ----
 
 Hierfür brauchen die betroffenen Index-Views natürlich eine Spalte 'SecurityTokens', in welcher diese abgefragt werden können.
@@ -53,10 +53,10 @@ Die Genehmigungen für die Spalten einer Index-View werden anhand der SecurityTo
 
 [source, sql]
 ----
-SELECT KeyLong,TableName,ColumnName,SecurityToken FROM tColumnSecurity
-WHERE (TableName = 'vBeispielIndex' AND   SecurityToken = 'admin')
-OR    (TableName = 'vBeispielIndex' AND   SecurityToken = 'verwaltung')
-OR    ...
+select KeyLong,TableName,ColumnName,SecurityToken from tColumnSecurity
+where (TableName = 'vBeispielIndex' and   SecurityToken = 'admin')
+or    (TableName = 'vBeispielIndex' and   SecurityToken = 'verwaltung')
+or    ...
 ----
 
 * *TableName*: der Name der Table, auf deren Spalten wir zugreifen wollen

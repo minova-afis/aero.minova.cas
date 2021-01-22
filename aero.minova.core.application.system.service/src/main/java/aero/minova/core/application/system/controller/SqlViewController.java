@@ -69,10 +69,6 @@ public class SqlViewController {
 
 	public Table getIndexViewUnsecure(Table inputTable) {
 		try {
-			if(inputTable.getName().toLowerCase().contains("index")) {
-				Table accessableTable = columnSecurity(inputTable);
-				inputTable = accessableTable;
-			}
 			val countQuery = prepareViewString(inputTable, false, 1000, true);			
 			logger.info("Executing: " + countQuery);
 			val viewCounter = systemDatabase//
@@ -165,6 +161,10 @@ public class SqlViewController {
 			if (maxRows > 0) {
 				sb.append("select top ").append(maxRows).append(" ");
 			}
+			if(params.getName().startsWith("v")&&params.getName().toLowerCase().contains("index")) {
+				Table accessableTable = columnSecurity(params);
+				params = accessableTable;
+			}
 			val outputFormat = params.getColumns().stream()//
 					.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
 					.collect(Collectors.toList());
@@ -179,9 +179,19 @@ public class SqlViewController {
 			}
 		}
 		sb.append(params.getName());
+		boolean whereClauseExists = false;
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
+			if(!where.trim().equals(""))
+			whereClauseExists = true;
+		}
+
+		//funktioniert theoretisch schon,Index-Views müssen allerdings eine SecurityToken-Spalte haben 		
+		//Row-Level-Security nur benötigt, wenn es sich um eine Index-View handelt
+		if(params.getName().startsWith("v")&&params.getName().toLowerCase().contains("index")){
+			final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists);
+			sb.append(onlyAuthorizedRows);
 		}
 		return sb.toString();
 	}
@@ -231,6 +241,11 @@ public class SqlViewController {
 				}
 			}
 			List<Column> wantedColumns = new ArrayList<Column>(inputTable.getColumns());
+			
+			if(wantedColumns.isEmpty())
+				for (String s : grantedColumns) {
+					inputTable.addColumn(new Column(s,DataType.STRING));
+				}
 
 			//Hier wird herausgefiltert, welche der angeforderten Spalten(wantedColumns) genehmigt werden kann(grantedColumns)
 			for (Column column : wantedColumns) {
@@ -261,7 +276,6 @@ public class SqlViewController {
 	protected String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuffer where = new StringBuffer();
 		final boolean hasAndClause;
-		boolean whereClauseExists = false;
 		// TODO Check size
 		val andFields = params.getColumns().stream()//
 				.filter(c -> Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
@@ -330,19 +344,11 @@ public class SqlViewController {
 			if (clause.length() > 0) {
 				if (where.length() == 0) {
 					where.append("\r\nwhere ");
-					whereClauseExists = true;
 				} else {
 					where.append(and ? "\r\n  and " : "\r\n   or ");
 				}
 				where.append('(').append(clause.toString()).append(')');
 			}
-		}
-
-		//funktioniert theoretisch schon,Index-Views müssen allerdings eine SecurityToken-Spalte haben 		
-		//Row-Level-Security nur benötigt, wenn es sich um eine Index-View handelt
-		if(params.getName().toLowerCase().contains("index")){
-			final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists);
-			where.append(onlyAuthorizedRows);
 		}
 
 		return where.toString();
@@ -359,9 +365,9 @@ public class SqlViewController {
 		final StringBuffer rowSec = new StringBuffer();
 		//Falls where-Klausel bereits vorhanden 'and' anfügen, wenn nicht, dann 'where'
 		if (where) {
-			rowSec.append("\r\n and (" );
+			rowSec.append("\r\nand (" );
 		}else{
-			rowSec.append("\r\nwhere  (");
+			rowSec.append("\r\nwhere (");
 		}
 		//Wenn SecurityToken null, dann darf jeder User die Spalte sehen
 		rowSec.append(" ( SecurityToken IS NULL )");
@@ -369,14 +375,14 @@ public class SqlViewController {
 		List<GrantedAuthority> userGroups = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		
 		if(userGroups.size()>0) {
-			rowSec.append("\r\n  or ( SecurityToken IN (");
+			rowSec.append("\r\nor ( SecurityToken IN (");
 			for (GrantedAuthority grantedAuthority : userGroups) {
 				rowSec.append("'").append(grantedAuthority.getAuthority().substring(5)).append("',");	
 			}
 			rowSec.deleteCharAt(rowSec.length()-1);
 			rowSec.append(") )");
 			}
-		rowSec.append(")");
+		rowSec.append(" )");
 		return rowSec.toString();
 	}
 	

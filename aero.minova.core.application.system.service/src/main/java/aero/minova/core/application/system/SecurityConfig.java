@@ -101,8 +101,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         		
         		//alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
         		List<String> userSecurityTokens = new ArrayList<>();
-        		userSecurityTokens = Stream.of(result.trim().split("#"))//
-        	      .map (elem -> new String(elem))//
+        		userSecurityTokens = Stream.of(result.split("#"))//
+        	      .map (elem -> new String(elem).trim())//
         	      .collect(Collectors.toList());
         		
         		//füge die authorities hinzu, welche aus dem Active Directory kommen
@@ -124,7 +124,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         		}
         		List<Row> groupTokens = svc.getSecurityView(groups).getRows();
         		for (Row r : groupTokens) {
-        			userSecurityTokens.addAll(Arrays.asList(r.getValues().get(1).getStringValue().split("#")));
+        			userSecurityTokens.addAll(Arrays.asList(r.getValues().get(1).getStringValue().trim().split("#")));
         		}
         		
         	    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();

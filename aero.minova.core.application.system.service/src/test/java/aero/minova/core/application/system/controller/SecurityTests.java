@@ -100,6 +100,22 @@ class SecurityTests {
 					+ "\r\nor ( SecurityToken IN ('admin') ) )");
 	}
 	
+	@DisplayName("Mehrere Rollen mit Einschränkungen")
+	@WithMockUser(username="admin", roles = {"admin","dispo"})
+	@Test
+	void test_ViewStringWithAuthenticatedUserButMultipleBlockedColumn() {
+		val intputTable = new Table();
+		intputTable.setName("vJournalIndexTest");
+		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
+			.isEqualTo("select top 1000 OrderReceiverKey, ServiceKey, ChargedQuantity from vJournalIndexTest"
+					+ "\r\nwhere ( ( SecurityToken IS NULL )"
+					+ "\r\nor ( SecurityToken IN ('admin','dispo') ) )");
+	}
+	
 	@DisplayName("Frage nach geblockter Spalte mit Wert, bekomme nur sichtbare Spalten ohne Abfrage auf Wert")
 	@WithMockUser(username="admin", roles = {"admin"})
 	@Test

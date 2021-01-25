@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
@@ -18,7 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,11 +32,11 @@ import aero.minova.core.application.system.domain.*;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Value("${security_ldap_domain:minova.com}")
-	private String domain;
-
-	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
-	private String ldapServerAddress;
+//	@Value("${security_ldap_domain:minova.com}")
+//	private String domain;
+//
+//	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
+//	private String ldapServerAddress;
 	
 	@Autowired
 	SqlViewController svc;
@@ -80,11 +78,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 	
-	@Bean
-    public UserDetailsContextMapper userDetailsContextMapper() {
+	@Bean("ldapUser")
+    public UserDetailsContextMapper userDetailsContextMapper() throws RuntimeException{
         return new LdapUserDetailsMapper() {
             @Override
-            public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)  {
+            public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities) throws RuntimeException {
         		Table foo = new Table();
         		foo.setName("tUser");
         		List<Column>columns = new ArrayList<>(); 
@@ -96,20 +94,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         		bar.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username),new aero.minova.core.application.system.domain.Value(""),new aero.minova.core.application.system.domain.Value("")));
         		foo.addRow(bar);
         		
+
         	    //dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-        		String result = svc.getSecurityView(foo).getRows().get(0).getValues().get(2).getStringValue();
+        		Table tokensFromUser = svc.getSecurityView(foo);
+        		if(tokensFromUser.getRows().size()==0)
+        			throw new RuntimeException("User with username " + username + " is not registered in the data repository");
+        		
+        		String result = tokensFromUser.getRows().get(0).getValues().get(2).getStringValue();
         		
         		//alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
         		List<String> userSecurityTokens = new ArrayList<>();
         		userSecurityTokens = Stream.of(result.split("#"))//
-        	      .map (elem -> new String(elem).trim())//
-        	      .collect(Collectors.toList());
+        				.map (elem -> new String(elem).trim())//
+        				.collect(Collectors.toList());
+        		
+        		//userSecurityToken
+        		if(!userSecurityTokens.contains(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim()))
+					userSecurityTokens.add(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim());
         		
         		//füge die authorities hinzu, welche aus dem Active Directory kommen
         		for (GrantedAuthority ga : authorities) {
 					userSecurityTokens.add(ga.getAuthority().substring(5));
 				}
-        				
+        		        		
         		//die Berechtigungen der Gruppen noch herausfinden
         		Table groups = new Table();
         		groups.setName("tUserGroup");
@@ -118,22 +125,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         		groupcolumns.add(new Column("SecurityToken", DataType.STRING));
         		groups.setColumns(groupcolumns);
         		for (String s : userSecurityTokens) {
+        			if(!s.trim().equals("")) {
         			Row tokens = new Row();
         			tokens.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(s),new aero.minova.core.application.system.domain.Value("NOT NULL")));
         			groups.addRow(tokens);
+        			}
         		}
-        		List<Row> groupTokens = svc.getSecurityView(groups).getRows();
-        		for (Row r : groupTokens) {
-        			userSecurityTokens.addAll(Arrays.asList(r.getValues().get(1).getStringValue().trim().split("#")));
+        		if(groups.getRows().size()>0) {
+        			List<Row> groupTokens = svc.getSecurityView(groups).getRows();
+        			List<String> groupSecurityTokens = new ArrayList<>();
+        			for (Row r : groupTokens) {
+        				groupSecurityTokens.addAll(Arrays.asList(r.getValues().get(1).getStringValue().split("#")));
+        			}
+        		
+        			//verschiedene Rollen können dieselbe Berechtigung haben, deshalb rausfiltern
+        			for (String string : groupSecurityTokens) {
+        				if(!userSecurityTokens.contains(string.trim()))
+        					userSecurityTokens.add(string);
+					}
         		}
         		
         	    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         		for (String string : userSecurityTokens) {
-        			if(!string.equals("")) {
-        				SimpleGrantedAuthority sga = new SimpleGrantedAuthority(string);
-        				if(!grantedAuthorities.contains(sga))
-        					grantedAuthorities.add(sga);
-        			}
+        			if(!string.equals(""))
+        				grantedAuthorities.add(new SimpleGrantedAuthority(string));
         		}
         		
                 return super.mapUserFromContext(ctx, username, grantedAuthorities);

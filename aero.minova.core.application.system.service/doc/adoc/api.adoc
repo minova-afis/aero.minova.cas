@@ -106,7 +106,7 @@ Als Ausgabe wird eine Table mit den selektierten Werten zurückgegeben.
 
 Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 Die Eingabe-Tabelle schränkt die Auswahl der selektierten Werte ein.
-Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.plugin1
+Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.model
 
 == /ping
 

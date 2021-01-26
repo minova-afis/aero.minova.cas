@@ -66,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.inMemoryAuthentication()//
 				.withUser("user").password(passwordEncoder().encode("password")).roles("dispatcher")
 				.and()
-				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("admin");
+				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("admin","dispo");
 //		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
 //			auth.authenticationProvider(new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress))
 //	            .ldapAuthentication().userDetailsContextMapper(userDetailsContextMapper());
@@ -96,21 +96,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         		
 
         	    //dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-        		Table tokensFromUser = svc.getSecurityView(foo);
-        		if(tokensFromUser.getRows().size()==0)
-        			throw new RuntimeException("User with username " + username + " is not registered in the data repository");
-        		
-        		String result = tokensFromUser.getRows().get(0).getValues().get(2).getStringValue();
-        		
-        		//alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
+        		Table tokensFromUser = svc.getTableForSecurityCheck(foo);
         		List<String> userSecurityTokens = new ArrayList<>();
-        		userSecurityTokens = Stream.of(result.split("#"))//
-        				.map (elem -> new String(elem).trim())//
-        				.collect(Collectors.toList());
         		
-        		//userSecurityToken
-        		if(!userSecurityTokens.contains(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim()))
-					userSecurityTokens.add(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim());
+        		
+        		if(tokensFromUser.getRows().size()>0) {
+        			String result = tokensFromUser.getRows().get(0).getValues().get(2).getStringValue();
+        		
+        			//alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
+        			userSecurityTokens = Stream.of(result.split("#"))//
+        					.map (elem -> new String(elem).trim())//
+        					.collect(Collectors.toList());
+        		
+        			//userSecurityToken
+        			if(!userSecurityTokens.contains(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim()))
+        				userSecurityTokens.add(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim());
+        		}else{
+        			userSecurityTokens.add(username);
+        		}
         		
         		//füge die authorities hinzu, welche aus dem Active Directory kommen
         		for (GrantedAuthority ga : authorities) {
@@ -132,7 +135,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         			}
         		}
         		if(groups.getRows().size()>0) {
-        			List<Row> groupTokens = svc.getSecurityView(groups).getRows();
+        			List<Row> groupTokens = svc.getTableForSecurityCheck(groups).getRows();
         			List<String> groupSecurityTokens = new ArrayList<>();
         			for (Row r : groupTokens) {
         				groupSecurityTokens.addAll(Arrays.asList(r.getValues().get(1).getStringValue().split("#")));

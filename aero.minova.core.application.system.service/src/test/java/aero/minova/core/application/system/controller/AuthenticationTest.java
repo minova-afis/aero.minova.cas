@@ -127,9 +127,9 @@ public class AuthenticationTest {
 				"password");
 		Object authDetails = new Object();
 		authRequest.setDetails(authDetails);
-		assertThatExceptionOfType(RuntimeException.class)//
-			.isThrownBy(() -> ldapProvider.authenticate(authRequest))
-			.withMessageContaining("User with username " + authRequest.getName() + " is not registered in the data repository");
+		Authentication authResult = ldapProvider.authenticate(authRequest);
+		UserDetails user = (UserDetails) authResult.getPrincipal();
+		assertThat(user.getAuthorities()).hasSize(1);
 	}
 	
 	@DisplayName("User ohne Gruppen")

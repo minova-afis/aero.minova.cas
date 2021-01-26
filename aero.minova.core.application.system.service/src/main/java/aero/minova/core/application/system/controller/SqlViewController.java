@@ -39,8 +39,7 @@ public class SqlViewController {
 		try {
 			val countQuery = prepareViewString(inputTable, false, 1000, true);
 			logger.info("Executing: " + countQuery);
-			val viewCounter = systemDatabase//
-					.getConnection()//
+			val viewCounter = connection
 					.prepareCall(countQuery)//
 					.executeQuery();
 			viewCounter.next();

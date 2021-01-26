@@ -1,16 +1,17 @@
 package aero.minova.core.application.system.controller;
 
-import lombok.val;
+import static java.nio.file.Files.createDirectories;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
 import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
-import static java.nio.file.Files.createDirectories;
+import lombok.val;
 
 @TestConfiguration
 @Profile("test")

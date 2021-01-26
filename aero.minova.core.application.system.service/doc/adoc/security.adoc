@@ -8,7 +8,7 @@ Neben den SecurityTokens, welche aus dem Active Directory dem User bereits zugeo
 erhält er zudem die SecurityTokens der Gruppen, in welche er sich befindet und einen einzigartigen SecurityToken. 
 
 Der User mitsamt seines Usernames, seinem spezifischen SecurityToken und 
-seinen Gruppen-SecurityTokens ist in der Table tUser hinterlegt.
+seinen GruppenSecurityTokens(Memberships) ist in der Tabelle tUser hinterlegt.
 
 [source, sql]
 ----
@@ -18,10 +18,15 @@ select KeyLong,KeyText,SecurityToken,Memberships from tUser
 * *KeyText*: der Name des Users
 * *SecurityToken*: der eindeutige SecurityToken des Users
 * *Memberships*: ein String an SecurityToken, welche mit " #" voneinander getrennt sind. 
-Dieser String beinhaltet sowohl den User-SecurityToken, als auch die Group-SecurityToken
+Dieser String beinhaltet sowohl den UserSecurityToken, als auch die GroupSecurityToken
 
-Anhand der Memberships kann man dann über die Tabelle tUserGroups auch die Memberships(SecurityToken) der Gruppen erhalten, welche 
+Falls kein Eintrag für den eingeloggten User in der Tabelle tUser befindet, gilt sein Username als einer der SecurityTokens.
+
+Die Gruppen aus dem Active Directory des Users zählen ebenfalls zu den Memberships und werden in jedem Fall auch gegen die Datenbank abgefragt.
+
+Anhand der Memberships erhält man über die Tabelle tUserGroups die Memberships(SecurityToken) der Gruppen, welche 
 die UserSecurityToken der User enthalten, dessen Spalten der eingeloggte User sehen darf.
+
 
 [source, sql]
 ----
@@ -31,31 +36,56 @@ select KeyText,SecurityToken from tUserGroup
 * *KeyText* der Name der UserGroup, welche in den Memberships des Users enthalten ist
 * *SecurityToken* die SecurityToken der User, mithilfe die Mitglieder der Gruppe bestimmte Spalten sehen dürfen. Diese Tokens sind ebenfalls mit " #" voneinander getrennt.
 
-=== Row-Level-Security
+=== Tabellenzugriffserlaubnis
 
-Da jeder User eine ganze Reihe von SecurityTokens hat, wird am Ende eines Selects auf eine View, welche den Substring "Index" enthält,
-eine WHERE-Bedingung hinzugefügt, welche auf die vorhandenen SecurityToken abfragt.
+Bei jedem Aufruf der Methode _getIndexView(Table_ _inputTable)_ wird auf der View vCASUserPrivileges nach den nötigen Berechtigungen gesucht.
+Dies geschieht mit der Methode _checkPrivilege(Table_ _inputTable)_ in folgender Form:
 
 [source, sql]
 ----
-select [...] from vBeispielIndex
-where [...] 
+select PrivilegeKeyText,KeyText,RowLevelSecurity from vCASUserPrivileges
+where (PrivilegeKeyText = 'inputTable.getName()' and KeyText='admin')
+or    (PrivilegeKeyText = 'inputTable.getName()' and KeyText='verwaltung')
+or    ...
+----
+
+* *PrivilegeKeyText*: der Name der Tabelle, auf welche der User zugreifen möchte
+* *KeyText*: eine der Rollen des Users
+* *RowLevelSecurity*: ein Bit, welches darauf hinweist, ob diese Rolle auf der angefragten Tabelle nur bestimmte Spalten sehen darf; siehe <<Row-Level-Security>>
+
+Diese Liste an Tripeln wird dann an die dafür vorgesehenen Methoden weiter gereicht. 
+
+
+=== Row-Level-Security
+
+Da jeder User eine ganze Reihe von SecurityToken hat, wird am Ende eines Selects
+eine WHERE-Bedingung hinzugefügt, welche auf die vorhandenen SecurityToken abfragt.
+Anhand der Liste an Tripeln, welche zu Beginn der SQL-Abfrage erstellt wurde, siehe <<Tabellenzugriffserlaubnis>>, wird untersucht, ob eine der Rollen ein Bit mit dem Wert *false* enthält.
+Falls dies zutrifft, darf der User alle Einträge der Tabelle sehen, wenn nicht, darf er nur die Spalten sehen, zu welchen er den passenden SecurityToken hat. 
+
+[source, sql]
+----
+select [...] from vBeispielView
+where [...]
 and ( (SecurityToken in NULL)
     or  ( SecurityToken in ('admin',[...]) )) 
 ----
 
-Hierfür brauchen die betroffenen Index-Views natürlich eine Spalte 'SecurityTokens', in welcher diese abgefragt werden können.
+Hierfür brauchen die betroffenen Tabellen natürlich eine Spalte '_SecurityToken_', in welcher diese abgefragt werden können.
 Auf eine Spalte mit dem SecurityToken *NULL* darf jeder User zugreifen.
 
 === Column-Level-Security
 
-Die Genehmigungen für die Spalten einer Index-View werden anhand der SecurityToken und mithilfe der Tabelle tColumnSecurity erteilt.
+Mit der List an Tripeln, siehe <<Tabellenzugriffserlaubnis>>, wird erst ermittelt, welche Rollen überhaupt auf die Tabelle zugreifen dürfen.
+Die SecurityToken werden dann mithilfe der Tabelle tColumnSecurity abgefragt, ob einer dieser Tokens dazu berechtigt ist, die gesamte Tabelle zu sehen.
+Falls dies nicht der Fall ist, erhält man aus eben jener Tabelle alle Spalten, welche berücksichtigt werden dürfen mit folgender SQL-Abfrage:
+
 
 [source, sql]
 ----
 select KeyLong,TableName,ColumnName,SecurityToken from tColumnSecurity
-where (TableName = 'vBeispielIndex' and   SecurityToken = 'admin')
-or    (TableName = 'vBeispielIndex' and   SecurityToken = 'verwaltung')
+where (TableName = 'vBeispielView' and SecurityToken = 'admin')
+or    (TableName = 'vBeispielView' and SecurityToken = 'verwaltung')
 or    ...
 ----
 
@@ -63,5 +93,4 @@ or    ...
 * *ColumnName*: der Name der Spalte, welche freigegeben ist
 * *SecurityToken*: der SecurityToken der Gruppe oder des Users, welcher diese Spalte ansehen darf
 
-Ist kein Eintrag für eine Tabelle in tColumnSecurity, darf der User auf die gesamte Tabelle zugreifen.
-Falls mindestens ein Eintrag vorhanden ist, darf der User nur die von der Selektion gefundenen Spalten betrachten.
+

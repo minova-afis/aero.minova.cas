@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -38,21 +43,30 @@ class SecurityTests {
 	@Test
 	void test_checkPrivilege() {
 		String tableName = "tEmployee";
-		String groupName = "admin";
-		String secondGroup = "dispatcher";
-		assertThat(testSubject.checkPrivilege(groupName,tableName))//
-			.isEqualTo(true);
-		assertThat(testSubject.checkPrivilege(secondGroup, tableName))//
+		List<GrantedAuthority> ga = new ArrayList<>();
+		ga.add(new SimpleGrantedAuthority("ROLE_admin"));
+		assertThat(testSubject.checkPrivilege(ga,tableName).getRows().isEmpty())//
 			.isEqualTo(false);
+		ga.clear();
+		ga.add(new SimpleGrantedAuthority("ROLE_dispatcher"));
+		assertThat(testSubject.checkPrivilege(ga, tableName).getRows().isEmpty())//
+			.isEqualTo(true);
 	}
 	
 	@DisplayName("Row-Level-Security ohne Rollen")
 	@WithMockUser(username="user", roles = {})
 	@Test
-	void test_rowLevelSecurityWithNoUser() {
-		assertThat(testSubject.rowLevelSecurity(false))//
+	void test_rowLevelSecurityWithNoRoles() {
+		Row inputRow = new Row();
+		List<Row> userGroups = new ArrayList<>();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		
+		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
 			.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL ) )");
-		assertThat(testSubject.rowLevelSecurity(true))//
+		assertThat(testSubject.rowLevelSecurity(true, userGroups))//
 		.isEqualTo("\r\nand ( ( SecurityToken IS NULL ) )");
 	}
 	
@@ -60,13 +74,83 @@ class SecurityTests {
 	@WithMockUser(username="user", roles = {"user", "dispatcher" ,"codemonkey"})
 	@Test
 	void test_rowLevelSecurityMultipleRoles() {
-		assertThat(testSubject.rowLevelSecurity(false))//
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("user"));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		
+		inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("dispatcher"));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		
+		inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("codemonkey"));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
 			.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )"
 					+ "\r\nor ( SecurityToken IN ('codemonkey','dispatcher','user') ) )");
-		assertThat(testSubject.rowLevelSecurity(true))//
+		assertThat(testSubject.rowLevelSecurity(true, userGroups))//
 			.isEqualTo("\r\nand ( ( SecurityToken IS NULL )"
 					+ "\r\nor ( SecurityToken IN ('codemonkey','dispatcher','user') ) )");
 	}
+	
+	@DisplayName("Row-Level-Security mit mehreren Rollen, aber nur 2 von 3 dürften auf die Tabelle zugreifen (man soll trotzdem im WHERE 3 Rollen haben")
+	@WithMockUser(username="user", roles = {"user", "dispatcher" ,"codemonkey"})
+	@Test
+	void test_rowLevelSecurityMultipleRolesAndOneExtra() {
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("user"));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		
+		inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("codemonkey"));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
+			.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )"
+					+ "\r\nor ( SecurityToken IN ('codemonkey','dispatcher','user') ) )");
+		assertThat(testSubject.rowLevelSecurity(true, userGroups))//
+			.isEqualTo("\r\nand ( ( SecurityToken IS NULL )"
+					+ "\r\nor ( SecurityToken IN ('codemonkey','dispatcher','user') ) )");
+	}
+	
+	
+	@DisplayName("Row-Level-Security mit mehreren Rollen, aber eine darf alle Spalten sehen")
+	@WithMockUser(username="user", roles = {"user", "dispatcher" ,"codemonkey"})
+	@Test
+	void test_rowLevelSecurityWithOneAuthenticatedRole() {
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("user"));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		
+		inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("dispatcher"));
+		inputRow.addValue(new Value(true));
+		userGroups.add(inputRow);
+		
+		inputRow = new Row();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value("codemonkey"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
+			.isEqualTo("");
+	}
+	
 	
 	@DisplayName("Frage nach mehreren Spalten, bekomme alle zurück.")
 	@WithMockUser(username="user", roles = {"dispatcher"})
@@ -78,14 +162,24 @@ class SecurityTests {
 		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
 		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
 		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ServiceKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('dispatcher') ) )");
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("dispatcher"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		
+		List<Column> resultColumns = new ArrayList<>();
+		resultColumns.add(new Column("OrderReceiverKey",DataType.INTEGER));
+		resultColumns.add(new Column("ServiceKey", DataType.STRING));
+		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		
+		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		assertThat(result.getColumns().equals(resultColumns));
 	}
 	
 	@DisplayName("Frage nach mehreren Spalten, bekomme aber nur die mit Berechtigung zurück.")
-	@WithMockUser(username="admin", roles = {"admin"})
+	@WithMockUser(username="admin")
 	@Test
 	void test_ViewStringWithAuthenticatedUserButOneBlockedColumn() {
 		val intputTable = new Table();
@@ -94,10 +188,19 @@ class SecurityTests {
 		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
 		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
 		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('admin') ) )");
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("admin"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		
+		List<Column> resultColumns = new ArrayList<>();
+		resultColumns.add(new Column("OrderReceiverKey",DataType.INTEGER));
+		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		
+		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		assertThat(result.getColumns().equals(resultColumns));
 	}
 	
 	@DisplayName("Mehrere Rollen mit Einschränkungen")
@@ -110,10 +213,25 @@ class SecurityTests {
 		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
 		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
 		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ServiceKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('admin','dispo') ) )");
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("admin"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("dispo"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		
+		List<Column> resultColumns = new ArrayList<>();
+		resultColumns.add(new Column("OrderReceiverKey",DataType.INTEGER));
+		resultColumns.add(new Column("ServiceKey", DataType.STRING));
+		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		
+		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		assertThat(result.getColumns().equals(resultColumns));
 	}
 	
 	@DisplayName("Frage nach geblockter Spalte mit Wert, bekomme nur sichtbare Spalten ohne Abfrage auf Wert")
@@ -134,65 +252,23 @@ class SecurityTests {
 		inputRow.addValue(new Value(false));
 		intputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('admin') ) )");
-	}
-	
-	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, aber eine Spalte mit angefragtem Wert ist blockiert.")
-	@WithMockUser(username="admin", roles = {"admin"})
-	@Test
-	void test_ViewStringWithAuthenticatedUserButBlockedColumnAndBlockedWhereClause() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
-		{
+		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value(">"+"0"));
-		inputRow.addValue(new Value(">"+"3"));
-		inputRow.addValue(new Value(">"+"5"));
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("admin"));
 		inputRow.addValue(new Value(false));
-		intputTable.addRow(inputRow);
-		}
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere (OrderReceiverKey > '0' and ChargedQuantity > '5')"
-					+ "\r\nand ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('admin') ) )");
-	
+		userGroups.add(inputRow);
+		
+		List<Column> resultColumns = new ArrayList<>();
+		resultColumns.add(new Column("OrderReceiverKey",DataType.INTEGER));
+		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		
+		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		assertThat(result.getColumns().equals(resultColumns));
 	}
 	
-	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, bekomme alle zurück, da berechtigt.")
-	@WithMockUser(username="admin", roles = {"dispatcher"})
-	@Test
-	void test_ViewStringWithAuthenticatedUserWithNoBlockedColumns() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
-		{
-		Row inputRow = new Row();
-		inputRow.addValue(new Value(">"+"0"));
-		inputRow.addValue(new Value(">"+"3"));
-		inputRow.addValue(new Value(">"+"5"));
-		inputRow.addValue(new Value(false));
-		intputTable.addRow(inputRow);
-		}
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ServiceKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere (OrderReceiverKey > '0' and ServiceKey > '3' and ChargedQuantity > '5')"
-					+ "\r\nand ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('dispatcher') ) )");
 	
-	}
-	
-	@DisplayName("User hat keine  Berechtigung, um auf Tabelle zuzugreifen, aber hat einen Eintrag in der tColumnSecurity")
+	@DisplayName("User hat keine Berechtigung, um auf Tabelle zuzugreifen, aber hat einen Eintrag in der tColumnSecurity")
 	@WithMockUser(username="admin", roles = {"afis"})
 	@Test
 	void test_ViewStringWithUnauthenticatedUserWithBlockedColumns() throws Exception {
@@ -210,9 +286,16 @@ class SecurityTests {
 		inputRow.addValue(new Value(false));
 		intputTable.addRow(inputRow);
 		}
-		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.getIndexViewUnsecure(intputTable));
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("vWorkingTimeIndex2"));
+		inputRow.addValue(new Value("afis"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		
+		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.columnSecurity(intputTable, userGroups));
 		thrown.expect(RuntimeException.class);
-		assertEquals("java.lang.RuntimeException: Insufficient Permission for vJournalIndexTest; User with Username 'admin'"
+		assertEquals("Insufficient Permission for vJournalIndexTest; User with Username 'admin'"
 				+ " is not allowed to see the selected columns of this table", exception.getMessage());
 	
 	}
@@ -223,10 +306,19 @@ class SecurityTests {
 	void test_ViewStringWithAuthenticatedUserWithNoHead() {
 		val intputTable = new Table();
 		intputTable.setName("vJournalIndexTest");
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('admin') ) )");
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("admin"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		
+		List<Column> resultColumns = new ArrayList<>();
+		resultColumns.add(new Column("OrderReceiverKey",DataType.INTEGER));
+		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		
+		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		assertThat(result.getColumns().equals(resultColumns));
 	
 	}
 	
@@ -248,11 +340,24 @@ class SecurityTests {
 		inputRow.addValue(new Value(false));
 		intputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ServiceKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere (OrderReceiverKey > '0' and ServiceKey > '3' and ChargedQuantity > '5')"
-					+ "\r\nand ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('dispatcher','user') ) )");
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("dispatcher"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("user"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		
+		List<Column> resultColumns = new ArrayList<>();
+		resultColumns.add(new Column("OrderReceiverKey",DataType.INTEGER));
+		resultColumns.add(new Column("ServiceKey", DataType.STRING));
+		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		
+		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		assertThat(result.getColumns().equals(resultColumns));
 	
 	}
 	
@@ -274,11 +379,29 @@ class SecurityTests {
 		inputRow.addValue(new Value(false));
 		intputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(intputTable, true, 1000))//
-			.isEqualTo("select top 1000 OrderReceiverKey, ServiceKey, ChargedQuantity from vJournalIndexTest"
-					+ "\r\nwhere (OrderReceiverKey > '0' and ServiceKey > '3' and ChargedQuantity > '5')"
-					+ "\r\nand ( ( SecurityToken IS NULL )"
-					+ "\r\nor ( SecurityToken IN ('admin','dispatcher','user') ) )");
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("admin"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		inputRow = new Row();
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("dispatcher"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		inputRow.addValue(new Value("vJournalIndexTest"));
+		inputRow.addValue(new Value("user"));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		
+		List<Column> resultColumns = new ArrayList<>();
+		resultColumns.add(new Column("OrderReceiverKey",DataType.INTEGER));
+		resultColumns.add(new Column("ServiceKey", DataType.STRING));
+		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		
+		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		assertThat(result.getColumns().equals(resultColumns));
 	
 	}
 	

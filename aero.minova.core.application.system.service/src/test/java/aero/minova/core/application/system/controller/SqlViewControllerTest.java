@@ -10,6 +10,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,7 +38,13 @@ class SqlViewControllerTest {
 	void testPrepareViewString_withStarSelect() {
 		Table inputTable = new Table();
 		inputTable.setName("vWorkingTimeIndex2");
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+		Row inputRow = new Row();
+		List<Row> userGroups = new ArrayList<>();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 * from vWorkingTimeIndex2");
 	}
 
@@ -52,7 +61,13 @@ class SqlViewControllerTest {
 			inputRow.addValue(new Value(false));
 			inputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+		Row inputRow = new Row();
+		List<Row> userGroups = new ArrayList<>();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
 	}
 
@@ -71,7 +86,13 @@ class SqlViewControllerTest {
 			inputRow.addValue(new Value(false));
 			inputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+		Row inputRow = new Row();
+		List<Row> userGroups = new ArrayList<>();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo(
 						"select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%' and CustomerText like 'MIN%')");
 	}
@@ -95,7 +116,13 @@ class SqlViewControllerTest {
 			inputRow.addValue(new Value(true));
 			inputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+		Row inputRow = new Row();
+		List<Row> userGroups = new ArrayList<>();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 BookingDate from vWorkingTimeIndex2\r\n" //
 						+ "where (BookingDate <= '2020-07-31')\r\n"//
 						+ "  and (BookingDate > '2020-07-29')");
@@ -120,7 +147,13 @@ class SqlViewControllerTest {
 			inputRow.addValue(new Value(false));
 			inputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+		Row inputRow = new Row();
+		List<Row> userGroups = new ArrayList<>();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
 						+ "where (EmployeeText like 'AVM%')\r\n"//
 						+ "   or (EmployeeText like 'WIS%')");
@@ -154,7 +187,13 @@ class SqlViewControllerTest {
 			inputRow.addValue(new Value(false));
 			inputTable.addRow(inputRow);
 		}
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
+		Row inputRow = new Row();
+		List<Row> userGroups = new ArrayList<>();
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(""));
+		inputRow.addValue(new Value(false));
+		userGroups.add(inputRow);
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
 	}
 

@@ -11,11 +11,13 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,11 +54,10 @@ public class SqlProcedureController {
 			return result;
 		}
 		
-		val test = SecurityContextHolder.getContext().getAuthentication().getAuthorities()// 
-				.stream()//
-				.filter(s -> svc.checkPrivilege(s.getAuthority().substring(5),inputTable.getName()))//
-				.findAny();
-		if(!test.isPresent()){
+		//bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
+		@SuppressWarnings("unchecked")
+		List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		if(svc.checkPrivilege(userAuthorities, inputTable.getName()).getRows().isEmpty()){
 			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
 		}
 		return calculateSqlProcedureResult(inputTable);	

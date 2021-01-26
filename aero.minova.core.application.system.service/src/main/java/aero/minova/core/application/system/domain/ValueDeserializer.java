@@ -1,13 +1,13 @@
 package aero.minova.core.application.system.domain;
 
+import java.lang.reflect.Type;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-
-import java.lang.reflect.Type;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 
 public class ValueDeserializer implements JsonDeserializer<Value> {
 	@Override

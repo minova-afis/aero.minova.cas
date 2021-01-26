@@ -51,6 +51,8 @@ public class SystemDatabase {
 			try {
 				if (connection.isValid(10)) {
 					freeConnections.add(connection);
+				} else {
+					connection.close();
 				}
 			} catch (SQLException e) {
 				throw new RuntimeException(e);

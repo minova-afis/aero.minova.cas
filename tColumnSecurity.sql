@@ -1,8 +1,0 @@
-CREATE TABLE tColumnSecurity(
-	KeyLong INT NOT NULL IDENTITY,
-	TableName VARCHAR(50) NOT NULL,
-	ColumnName VARCHAR(50) NOT NULL,
-	SecurityToken VARCHAR(50) NOT NULL,
-)
-ALTER TABLE tColumnSecurity
-ADD CONSTRAINT PK_tColumnSecurity_KeyLong PRIMARY KEY (KeyLong)

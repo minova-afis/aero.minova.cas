@@ -8,5 +8,19 @@ Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 
 == Properties
 * aero_minova_core_application_root_path
-* Default: ../../..
-* Werte: Absolute Pfade und Pfade relative zum Ausführungsort
+
+** *Default*: `../../..`
+
+** *Werte*: Absolute Pfade und Pfade relative zum Ausführungsort
+
+* aero_minova_database_url
+
+** *Default*: `jdbc:sqlserver://localhost;databaseName=AFIS_HAM`
+
+* aero_minova_database_user_name
+
+** *Default*: `sa`
+
+* aero_minova_database_user_password
+
+** *Default*: `Minova+0`

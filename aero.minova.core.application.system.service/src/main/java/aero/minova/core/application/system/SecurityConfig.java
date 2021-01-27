@@ -29,6 +29,7 @@ import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
+import lombok.val;
 
 @EnableWebSecurity
 @Configuration
@@ -86,34 +87,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			@Override
 			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
 					throws RuntimeException {
-				Table foo = new Table();
-				foo.setName("tUser");
+				Table tUser = new Table();
+				tUser.setName("tUser");
 				List<Column> columns = new ArrayList<>();
 				columns.add(new Column("KeyText", DataType.STRING));
 				columns.add(new Column("SecurityToken", DataType.STRING));
 				columns.add(new Column("Memberships", DataType.STRING));
-				foo.setColumns(columns);
-				Row bar = new Row();
-				bar.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username),
+				tUser.setColumns(columns);
+				Row userEntry = new Row();
+				userEntry.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username),
 						new aero.minova.core.application.system.domain.Value(""), new aero.minova.core.application.system.domain.Value("")));
-				foo.addRow(bar);
+				tUser.addRow(userEntry);
 
 				// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-				Table tokensFromUser = svc.getTableForSecurityCheck(foo);
+				Table membershipsFromUser = svc.getTableForSecurityCheck(tUser);
 				List<String> userSecurityTokens = new ArrayList<>();
 
-				if (tokensFromUser.getRows().size() > 0) {
-					String result = tokensFromUser.getRows().get(0).getValues().get(2).getStringValue();
+				if (membershipsFromUser.getRows().size() > 0) {
+					String result = membershipsFromUser.getRows().get(0).getValues().get(2).getStringValue();
 
 					// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
 					userSecurityTokens = Stream.of(result.split("#"))//
-							.map(elem -> new String(elem).trim())//
+							.map(String::trim)//
 							.collect(Collectors.toList());
 
-					// userSecurityToken
-					if (!userSecurityTokens.contains(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim()))
-						userSecurityTokens.add(tokensFromUser.getRows().get(0).getValues().get(1).getStringValue().trim());
+					// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
+					String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().trim();
+					if (!userSecurityTokens.contains(uniqueUserToken))
+						userSecurityTokens.add(uniqueUserToken);
 				} else {
+					// falls der User nicht in der Datenbank gefunden wurde, wird sein Benutzername als einzigartiger userSecurityToken verwendet
 					userSecurityTokens.add(username);
 				}
 
@@ -141,12 +144,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					List<Row> groupTokens = svc.getTableForSecurityCheck(groups).getRows();
 					List<String> groupSecurityTokens = new ArrayList<>();
 					for (Row r : groupTokens) {
-						groupSecurityTokens.addAll(Arrays.asList(r.getValues().get(1).getStringValue().trim().split("#")));
+						String memberships = r.getValues().get(1).getStringValue();
+						// alle SecurityToken einer Gruppe der Liste hinzufügen
+						val membershipsAsList = Stream.of(memberships.split("#"))//
+								.map(String::trim)//
+								.collect(Collectors.toList());
+						groupSecurityTokens.addAll(membershipsAsList);
 					}
 
-					// verschiedene Rollen können dieselbe Berechtigung haben, deshalb rausfiltern
+					// verschiedene Rollen/Gruppen können dieselbe Berechtigung haben, deshalb rausfiltern
 					for (String string : groupSecurityTokens) {
-						if (!userSecurityTokens.contains(string.trim()))
+						if (!userSecurityTokens.contains(string))
 							userSecurityTokens.add(string);
 					}
 				}

@@ -43,6 +43,8 @@ public class SqlViewController {
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		List<Row> authoritiesForThisTable = checkPrivilege(allUserAuthorities, inputTable.getName()).getRows();
+		if (authoritiesForThisTable.isEmpty())
+			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
 		try {
 			Table accessableTable = columnSecurity(inputTable, authoritiesForThisTable);
 			inputTable = accessableTable;
@@ -79,14 +81,14 @@ public class SqlViewController {
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt
 	 **/
 	public Table checkPrivilege(List<GrantedAuthority> securityToken, String privilegeName) {
-		Table foo = new Table();
-		foo.setName("vCASUserPrivileges");
+		Table userPrivileges = new Table();
+		userPrivileges.setName("vCASUserPrivileges");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
 		columns.add(new Column("KeyText", DataType.STRING));
 		columns.add(new Column("RowLevelSecurity", DataType.BOOLEAN));
 		columns.add(Column.AND_FIELD);
-		foo.setColumns(columns);
+		userPrivileges.setColumns(columns);
 
 		List<String> userTokens = new ArrayList<>();
 		for (GrantedAuthority ga : securityToken) {
@@ -94,11 +96,11 @@ public class SqlViewController {
 		}
 
 		for (String s : userTokens) {
-			Row bar = new Row();
-			bar.setValues(Arrays.asList(new Value(privilegeName), new Value(s), new Value(""), new Value(false)));
-			foo.addRow(bar);
+			Row tableNameAndUserToken = new Row();
+			tableNameAndUserToken.setValues(Arrays.asList(new Value(privilegeName), new Value(s), new Value(""), new Value(false)));
+			userPrivileges.addRow(tableNameAndUserToken);
 		}
-		return getTableForSecurityCheck(foo);
+		return getTableForSecurityCheck(userPrivileges);
 	}
 
 	/*
@@ -229,10 +231,12 @@ public class SqlViewController {
 			}
 		}
 		List<String> grantedColumns = new ArrayList<String>();
-		// verschiedene SecurityTokens können dieselbe Erlaubnis haben, deshalb Doppelte rausfiltern
+		// die Spaltennamen, welche wir durch den Select erhalten haben in eine List packen, dabei darauf achten,
+		// dass verschiedene SecurityTokens dieselbe Erlaubnis haben können, deshalb Doppelte rausfiltern
 		for (Row row : result) {
-			if (!grantedColumns.contains(row.getValues().get(1).getStringValue())) {
-				grantedColumns.add(row.getValues().get(1).getStringValue());
+			String grantedColumnFromtColumnSecurity = row.getValues().get(1).getStringValue();
+			if (!grantedColumns.contains(grantedColumnFromtColumnSecurity)) {
+				grantedColumns.add(grantedColumnFromtColumnSecurity);
 			}
 		}
 

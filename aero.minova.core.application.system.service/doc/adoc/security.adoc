@@ -3,7 +3,7 @@
  
 === SecurityToken
 
-Jeder User erhält bei Login eine Reihe an SecurityToken.
+Jeder User erhält beim Login eine Reihe an SecurityToken.
 Neben den SecurityTokens, welche aus dem Active Directory dem User bereits zugeordnet wurden,
 erhält er zudem die SecurityTokens der Gruppen, in welche er sich befindet und einen einzigartigen SecurityToken. 
 
@@ -20,7 +20,7 @@ select KeyLong,KeyText,SecurityToken,Memberships from tUser
 * *Memberships*: ein String an SecurityToken, welche mit " #" voneinander getrennt sind. 
 Dieser String beinhaltet sowohl den UserSecurityToken, als auch die GroupSecurityToken
 
-Falls kein Eintrag für den eingeloggten User in der Tabelle tUser befindet, gilt sein Username als einer der SecurityTokens.
+Falls kein Eintrag für den eingeloggten User in der Tabelle tUser existiert, gilt sein Username als einer der SecurityTokens.
 
 Die Gruppen aus dem Active Directory des Users zählen ebenfalls zu den Memberships und werden in jedem Fall auch gegen die Datenbank abgefragt.
 
@@ -71,14 +71,14 @@ and ( (SecurityToken in NULL)
     or  ( SecurityToken in ('admin',[...]) )) 
 ----
 
-Hierfür brauchen die betroffenen Tabellen natürlich eine Spalte '_SecurityToken_', in welcher diese abgefragt werden können.
+Hierfür brauchen die betroffenen Tabellen natürlich eine Spalte '_SecurityToken_', in welcher diese hinterlegt werden können.
 Auf eine Spalte mit dem SecurityToken *NULL* darf jeder User zugreifen.
 
 === Column-Level-Security
 
 Mit der List an Tripeln, siehe <<Tabellenzugriffserlaubnis>>, wird erst ermittelt, welche Rollen überhaupt auf die Tabelle zugreifen dürfen.
 Die SecurityToken werden dann mithilfe der Tabelle tColumnSecurity abgefragt, ob einer dieser Tokens dazu berechtigt ist, die gesamte Tabelle zu sehen.
-Falls dies nicht der Fall ist, erhält man aus eben jener Tabelle alle Spalten, welche berücksichtigt werden dürfen mit folgender SQL-Abfrage:
+Falls dies nicht der Fall ist, erhält man aus eben jener Tabelle alle Spalten, welche berücksichtigt werden dürfen, mit folgender SQL-Abfrage:
 
 
 [source, sql]
@@ -89,7 +89,7 @@ or    (TableName = 'vBeispielView' and SecurityToken = 'verwaltung')
 or    ...
 ----
 
-* *TableName*: der Name der Table, auf deren Spalten wir zugreifen wollen
+* *TableName*: der Name der Table, auf deren Spalten der User zugreifen möchte
 * *ColumnName*: der Name der Spalte, welche freigegeben ist
 * *SecurityToken*: der SecurityToken der Gruppe oder des Users, welcher diese Spalte ansehen darf
 

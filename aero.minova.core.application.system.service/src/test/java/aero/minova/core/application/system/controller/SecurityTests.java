@@ -44,11 +44,11 @@ class SecurityTests {
 	void test_checkPrivilege() {
 		String tableName = "tEmployee";
 		List<GrantedAuthority> ga = new ArrayList<>();
-		ga.add(new SimpleGrantedAuthority("ROLE_admin"));
+		ga.add(new SimpleGrantedAuthority("admin"));
 		assertThat(testSubject.checkPrivilege(ga, tableName).getRows().isEmpty())//
 				.isEqualTo(false);
 		ga.clear();
-		ga.add(new SimpleGrantedAuthority("ROLE_dispatcher"));
+		ga.add(new SimpleGrantedAuthority("dispatcher"));
 		assertThat(testSubject.checkPrivilege(ga, tableName).getRows().isEmpty())//
 				.isEqualTo(true);
 	}

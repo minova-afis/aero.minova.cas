@@ -25,7 +25,6 @@ public class SystemDatabase {
 	String userPassword;
 	private LinkedList<Connection> freeConnections = new LinkedList<>();
 
-
 	public synchronized Connection getConnection() {
 		try {
 			final Connection connection;

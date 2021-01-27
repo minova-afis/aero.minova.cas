@@ -1,0 +1,12 @@
+= Properties des Dienstes
+
+Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
+
+== Links
+
+* Zurück zur xref:index.adoc[Übersicht]
+
+== Properties
+* aero_minova_core_application_root_path
+* Default: ../../..
+* Werte: Absolute Pfade und Pfade relative zum Ausführungsort

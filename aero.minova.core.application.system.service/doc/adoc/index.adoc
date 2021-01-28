@@ -5,6 +5,7 @@
 * Zurück zur link:..[Übersicht]
 
 * xref:api.adoc#[API]
+* xref:properties.adoc#[Properties]
 * xref:versions.adoc#[Versionen]
 
 == Beschreibung

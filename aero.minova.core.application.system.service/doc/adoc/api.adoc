@@ -1,12 +1,14 @@
 = CAS API
 
-Die Authentifizierung funktioniert zur Zeit via Basic Auth statt.
+Konkrete Beispiele sind in einer xref:../../aero.minova.service.core.application.system.postman_collection.json#[Postman Collection] gelistet.
+Die Authentifizierung findet über Basic Auth statt.
 
 == Table
 
 Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
 
-Generel gilt, dass jedes Feld bis auf name optional ist.
+Generell gilt, dass jedes Fled bis auf metaData ein Pflichtfeld ist.
+Die jeweiligen values müssen genauso viele Werte haben wie columns.
 
 [source,json]
 --------
@@ -34,37 +36,37 @@ Generel gilt, dass jedes Feld bis auf name optional ist.
 
 === name
 
-Der Name der Prozedur, der ausgeführt wird.
+Der Name der Prozedur, die ausgeführt wird.
 
 === metaData/limited
 
-Default: (2^32)-1 = 2.147.483.647
+* *Default*: (2^32)-1 = 2.147.483.647
 
-Wertebereich: 1 bis 2.147.483.647
+* *Wertebereich*: 1 bis 2.147.483.647
 
 Gibt an, wieviele Treffer bei der Anfrage zurückgegeben werden sollen.
-Wenn diese Tabelle zurückgegebn wird,
+Wenn diese Tabelle zurückgegeben wird,
 ist dieser Wert nur dann vorhanden,
 wenn nicht alle Werte zurückgegeben wurden.
 
 === columns
 
-Die Parameter-Typen der Prozedur.
+Die Parameter-Typen das Aufrufes.
 
 === columns/values/*
 
 Die Werte dürfen prinzipiel von einem beliebigen Typ sein,
-müssen aber mit dem Typ der spalte kompatibel sein.
-Im einfachsten Fall ist der Typ eines values gleich dem type der Spalte (columns/*/type).
+müssen aber mit dem Typ der jeweiligen Spalte kompatibel sein.
+Im einfachsten Fall ist der Typ eines Values gleich dem Typ der jeweiligen Spalte (columns/*/type).
 
-Der Typ wird anhand des prefix des values angegeben:
+Der Typ wird anhand des Prefixes des Values angegeben:
 
-* "b-" boolean: false|true
-* "d-" double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
-* "i-" Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
-* "n-" Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
-* "s-" String
-* "z-" ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"b-"*: boolean: false|true
+* *"d-"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
+* *"i-"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
+* *"n-"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
+* *"s-"*: String
+* *"z-"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
 
 === rows
 
@@ -72,8 +74,18 @@ Die Parameter der Prozedur
 
 == data/procedure
 
+Führt eine Prozedur auf dem Server aus.
+Häufig ist dies eine SQL-Prozedur auf dem SQL-Server.
+
+=== Eingabe
+
 Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
-Diese Table enthält die Parameter für die SQL-Prozedur
+
+Diese Table enthält die Parameter für die SQL-Prozedur.
+Die columns beschreiben den Namen und den Typ der Argumente.
+Die rows enthält eine Zeile in der die Argumente gelistet sind.
+
+=== Ausgabe
 
 Die Antwort hat folgendes Format:
 
@@ -100,7 +112,105 @@ Diese Tabelle enthät nur 1 Zeile.
 
 Der return code der SQL-Prozedur, falls vorhanden.
 
+=== Spezielle Prozeduren
+
+Es gibt die Prozedur `Ticket`, welche durch das CAS bereitgestellt wird.
+Diese sucht anhand der Ticket Nummer, die Daten des Tickets im Trac
+und im SQL-Server nach.
+
+[source,json]
+.Als Parameter muss die `TicketNumber` übergeben werden, wobei das Ticket -123 ein nicht existierende Test-Ticket ist, welches immer abrufbar ist:
+--------
+{
+    "name": "Ticket",
+    "columns": [
+        {
+            "name": "TicketNumber",
+            "type": "INTEGER",
+            "outputType": "OUTPUT"
+        }
+    ],
+    "rows": [
+        {
+            "values": [
+                "s--123"
+            ]
+        }
+    ]
+}
+--------
+
+[source,json]
+.Als Antwort bekommt man die Details des Tickets zurück.
+----
+{
+    "resultSet": {
+        "name": "Ticket",
+        "columns": [
+            {
+                "name": "TicketKey",
+                "type": "INTEGER"
+            },
+            {
+                "name": "OrderReceiver",
+                "type": "STRING"
+            },
+            {
+                "name": "ServiceContract",
+                "type": "STRING"
+            },
+            {
+                "name": "ServiceObject",
+                "type": "STRING"
+            },
+            {
+                "name": "Service",
+                "type": "STRING"
+            },
+            {
+                "name": "Description",
+                "type": "STRING"
+            },
+            {
+                "name": "OrderReceiverKey",
+                "type": "INTEGER"
+            },
+            {
+                "name": "ServiceContractKey",
+                "type": "INTEGER"
+            },
+            {
+                "name": "ServiceObjectKey",
+                "type": "INTEGER"
+            },
+            {
+                "name": "ServiceKey",
+                "type": "INTEGER"
+            }
+        ],
+        "rows": [
+            {
+                "values": [
+                    "n--123",
+                    "s-MIN",
+                    "s-WFC",
+                    "s-LOHN",
+                    "s-ZPROGRAM",
+                    "s-#37: Trac-Ticket Dummy Implementierung auf publictest bereitstellen.",
+                    null,
+                    null,
+                    null,
+                    null
+                ]
+            }
+        ]
+    }
+}
+----
+
 == data/view
+
+Selektiert Objekte (View, Tabelle etc.) des SQL-Servers.
 
 Als Ausgabe wird eine Table mit den selektierten Werten zurückgegeben.
 

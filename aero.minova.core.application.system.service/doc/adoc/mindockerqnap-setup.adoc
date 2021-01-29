@@ -1,4 +1,6 @@
-= Installation/Update von CAS auf dem mindockerqnap
+= Installation/Update von CAS auf dem mindockerqnap für die Stundenerfassung
+
+CAS für die Stunderfassung ist unter link:https://192.168.2.104:8084[https://192.168.2.104:8084] erreichbar.
 
 == Installation/Update des Docker-Image
 
@@ -10,14 +12,19 @@ Zuerst braucht man ein Docker-Image, welches man selber bauen kann:
 * xref:../../../export.docker.image.sh#[export.docker.image.sh]
 * Danach ist im target-Ordner das Docker-Image zu finden, welches mit tar endet.
 
-=== Installation
+=== Installation/Update
 
 Auf link:https://mindockerqnap.minova.com[mindockerqnap.minova.com]
 kann man sich auf unserem QNAP-Server anmelden.
 Das Passwort für den admin steht im KeePass.
 
-Über die App Container Station kann man die Docker Images verwalten.
+
+Über die App Container Station kann man die Docker-Images verwalten.
 Zuerst sollte man in der Übersicht den alten Docker-Container beenden.
+Nach der Installation/Update sollte man den alte Docker-Container löschen.
+Es ist nicht möglich, die Umgebungsvariablen oder die Freigaben eines Docker-Containers zu ändern.
+Stattdessen muss man diesen neu aufsetzen.
+
 Danach kann man über die Import-Funktionalität eine neues Docker-Image installieren.
 Dabei muss folgendes eingestellt werden:
 

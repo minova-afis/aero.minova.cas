@@ -64,8 +64,8 @@ und dessen Punkt auf `/var/lib/aero.minova.cas` zeigt.
 
 === Nacharbeiten
 
-Danach kann man das Image in der Übersicht starten.
-Zudem kann man d
+Danach kann man den Container in der Übersicht starten.
+Zudem kann man den alten Container danach löschen.
 
 == Hochladen von Dateien
 

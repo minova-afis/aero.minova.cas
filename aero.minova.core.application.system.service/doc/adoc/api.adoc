@@ -83,7 +83,7 @@ Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 
 Diese Table enthält die Parameter für die SQL-Prozedur.
 Die columns beschreiben den Namen und den Typ der Argumente.
-Die rows enthält eine Zeile, in der die Argumente gelistet sind.
+Die rows enthalten eine Zeile, in der die Argumente gelistet sind.
 
 === Ausgabe
 

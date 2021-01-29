@@ -10,7 +10,8 @@ Zuerst braucht man ein Docker-Image, welches man selber bauen kann:
 
 * xref:../../../build.as.docker.image.sh#[build.as.docker.image.sh]
 * xref:../../../export.docker.image.sh#[export.docker.image.sh]
-* Danach ist im target-Ordner das Docker-Image zu finden, welches mit tar endet.
+
+Danach ist im target-Ordner das Docker-Image zu finden, welches mit tar endet.
 
 === Installation/Update
 

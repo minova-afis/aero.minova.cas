@@ -7,7 +7,7 @@ Die Authentifizierung findet über Basic Auth statt.
 
 Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
 
-Generell gilt, dass jedes Fled bis auf metaData ein Pflichtfeld ist.
+Generell gilt, dass jedes Feld bis auf metaData ein Pflichtfeld ist.
 Die jeweiligen values müssen genauso viele Werte haben wie columns.
 
 [source,json]
@@ -44,7 +44,7 @@ Der Name der Prozedur, die ausgeführt wird.
 
 * *Wertebereich*: 1 bis 2.147.483.647
 
-Gibt an, wieviele Treffer bei der Anfrage zurückgegeben werden sollen.
+Gibt an, wie viele Treffer bei der Anfrage zurückgegeben werden sollen.
 Wenn diese Tabelle zurückgegeben wird,
 ist dieser Wert nur dann vorhanden,
 wenn nicht alle Werte zurückgegeben wurden.
@@ -55,7 +55,7 @@ Die Parameter-Typen das Aufrufes.
 
 === columns/values/*
 
-Die Werte dürfen prinzipiel von einem beliebigen Typ sein,
+Die Werte dürfen prinzipiell von einem beliebigen Typ sein,
 müssen aber mit dem Typ der jeweiligen Spalte kompatibel sein.
 Im einfachsten Fall ist der Typ eines Values gleich dem Typ der jeweiligen Spalte (columns/*/type).
 
@@ -70,7 +70,7 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 
 === rows
 
-Die Parameter der Prozedur
+Die Parameter der Prozedur.
 
 == data/procedure
 
@@ -83,7 +83,7 @@ Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 
 Diese Table enthält die Parameter für die SQL-Prozedur.
 Die columns beschreiben den Namen und den Typ der Argumente.
-Die rows enthält eine Zeile in der die Argumente gelistet sind.
+Die rows enthält eine Zeile, in der die Argumente gelistet sind.
 
 === Ausgabe
 
@@ -106,20 +106,20 @@ Werden keine Werte selektiert, wird die Tabelle in der Antwort nicht angegeben.
 ==== outputParameters
 
 Gibt im Table-Format alle Input und Output-Parameter-Werte zurück, wenn es einen Output-Parameter in der Eingabe gab.
-Diese Tabelle enthät nur 1 Zeile.
+Diese Tabelle enthält nur 1 Zeile.
 
 ==== returnCode
 
-Der return code der SQL-Prozedur, falls vorhanden.
+Der Return Code der SQL-Prozedur, falls vorhanden.
 
 === Spezielle Prozeduren
 
 Es gibt die Prozedur `Ticket`, welche durch das CAS bereitgestellt wird.
-Diese sucht anhand der Ticket Nummer, die Daten des Tickets im Trac
-und im SQL-Server nach.
+Diese sucht anhand der Ticketnummer nach den Daten des Tickets im Trac
+und im SQL-Server.
 
 [source,json]
-.Als Parameter muss die `TicketNumber` übergeben werden, wobei das Ticket -123 ein nicht existierende Test-Ticket ist, welches immer abrufbar ist:
+.Als Parameter muss die `TicketNumber` übergeben werden, wobei das Ticket -123 ein nicht existierendes Test-Ticket ist, welches immer abrufbar ist:
 --------
 {
     "name": "Ticket",
@@ -210,7 +210,7 @@ und im SQL-Server nach.
 
 == data/view
 
-Selektiert Objekte (View, Tabelle etc.) des SQL-Servers.
+Selektiert Objekte (View, Tabelle, etc.) des SQL-Servers.
 
 Als Ausgabe wird eine Table mit den selektierten Werten zurückgegeben.
 
@@ -221,7 +221,7 @@ Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova
 == /ping
 
 Hiermit kann man die Verbindung und die Anmeldedaten prüfen.
-Hat keine Eingabe und gibt als Antwort ein JSON-Object mit einem returnCode von 0 zurück,
+Hat keine Eingabe und gibt als Antwort ein JSON-Object mit einem Return Code von 0 zurück,
 wenn alles gut gelaufen ist.
 
 [source,json]

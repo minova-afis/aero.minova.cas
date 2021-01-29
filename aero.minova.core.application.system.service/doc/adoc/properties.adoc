@@ -11,7 +11,7 @@ Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 
 ** *Default*: `../../..`
 
-** *Wertebereich*: Absolute Pfade und Pfade relative zum Ausführungsort
+** *Wertebereich*: Absolute Pfade und relative Pfade zum Ausführungsort
 
 * aero_minova_database_url
 

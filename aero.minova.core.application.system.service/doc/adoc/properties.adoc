@@ -23,4 +23,4 @@ Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 
 * aero_minova_database_user_password
 
-** *Default*: `Minova+0`
+** *Default*: `password`

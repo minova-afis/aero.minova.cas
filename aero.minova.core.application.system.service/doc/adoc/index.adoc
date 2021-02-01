@@ -5,6 +5,8 @@
 * Zurück zur link:..[Übersicht]
 
 * xref:api.adoc#[API]
+* xref:mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
+* xref:properties.adoc#[Properties]
 * xref:versions.adoc#[Versionen]
 
 == Beschreibung

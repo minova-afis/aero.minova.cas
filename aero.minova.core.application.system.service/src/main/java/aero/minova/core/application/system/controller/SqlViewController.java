@@ -3,6 +3,7 @@ package aero.minova.core.application.system.controller;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -92,6 +93,7 @@ public class SqlViewController {
 					if (!(iVal == null)) {
 						String stringValue = parseType(iVal, type);
 						preparedStatement.setString(i + parameterOffset, stringValue);
+						logger.info("Filling in: " + parameterOffset + " " + stringValue);
 					} else {
 						// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
 						// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
@@ -122,7 +124,7 @@ public class SqlViewController {
 		} else if (type == DataType.STRING) {
 			parsedType = val.getStringValue();
 		} else if (type == DataType.ZONED) {
-			parsedType = val.getZonedDateTimeValue().toInstant() + "";
+			parsedType = val.getZonedDateTimeValue() + "";
 		} else {
 			throw new IllegalArgumentException("Unknown type: " + type.name());
 		}
@@ -131,6 +133,10 @@ public class SqlViewController {
 
 		if (hasOperator(parsedType))
 			parsedType = parsedType.substring(getOperatorEndIndex(parsedType));
+
+		// beim Zoned-Typ gäbe es Probleme beim parsen nach Instant, falls ein Operator davor wäre
+		if (type == DataType.ZONED)
+			parsedType = ZonedDateTime.parse(parsedType).toInstant().toString();
 
 		return parsedType;
 	}
@@ -265,7 +271,11 @@ public class SqlViewController {
 						clause.append("is ").append(strValue);
 					} else {
 						if (!hasOperator(strValue)) {
-							if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_")) || autoLike) {
+							if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%"))) {
+								strValue += "%";
+								params.getRows().get(rowI).getValues().get(colI).setValue(strValue);
+							}
+							if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_"))) {
 								clause.append(" like");
 							} else {
 								clause.append(" =");
@@ -273,11 +283,7 @@ public class SqlViewController {
 						} else {
 							clause.append(" ").append(strValue.substring(0, getOperatorEndIndex(strValue)));
 						}
-
 						clause.append(' ').append("?");
-						if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%")) && (!hasOperator(strValue))) {
-							clause.append("%");
-						}
 					}
 				}
 			}

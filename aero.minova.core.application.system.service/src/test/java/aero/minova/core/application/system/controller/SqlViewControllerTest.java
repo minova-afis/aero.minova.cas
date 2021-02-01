@@ -55,7 +55,8 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?%)");
+				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
+		assertThat(inputTable.getRows().get(0).getValues().get(0).getStringValue()).isEqualTo("AVM%");
 	}
 
 	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
@@ -74,7 +75,7 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?% and CustomerText like ?%)");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ? and CustomerText like ?)");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -123,8 +124,8 @@ class SqlViewControllerTest {
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
 				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
-						+ "where (EmployeeText like ?%)\r\n"//
-						+ "   or (EmployeeText like ?%)");
+						+ "where (EmployeeText like ?)\r\n"//
+						+ "   or (EmployeeText like ?)");
 	}
 
 	@Test
@@ -156,7 +157,7 @@ class SqlViewControllerTest {
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?%)");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
 	}
 
 	@Test
@@ -207,7 +208,7 @@ class SqlViewControllerTest {
 		val row = new Row();
 		row.addValue(new Value("1"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?%)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?)");
 	}
 
 	@Test
@@ -228,7 +229,7 @@ class SqlViewControllerTest {
 		assertThat(testSubject.parseType(new Value(true), DataType.BOOLEAN)).isEqualTo("true");
 		assertThat(testSubject.parseType(new Value("<2.5"), DataType.DOUBLE)).isEqualTo("2.5");
 		assertThat(testSubject.parseType(new Value("<1"), DataType.INTEGER)).isEqualTo("1");
-		assertThat(testSubject.parseType(new Value(">252345275L"), DataType.LONG)).isEqualTo("252345275");
+		assertThat(testSubject.parseType(new Value(">252345275L"), DataType.LONG)).isEqualTo("252345275L");
 		assertThat(testSubject.parseType(new Value("Test"), DataType.STRING)).isEqualTo("Test");
 		Instant instant = Instant.now();
 		assertThat(testSubject.parseType(new Value(">" + instant), DataType.INSTANT)).isEqualTo(instant.toString());

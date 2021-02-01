@@ -71,6 +71,15 @@ public class SqlViewController {
 		}
 	}
 
+	/**
+	 * der Value könnte noch einen SQL Operator enthalten, welcher hier entfernt wird
+	 * 
+	 * @param inputTable
+	 *            die Table, welche vom getIndexView aufgerufen wurde
+	 * @param preparedStatement
+	 *            das Prepared Statement, welches nur noch befüllt werden muss
+	 * @return das befüllte, ausführbare Prepared Statement
+	 */
 	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
 		int parameterOffset = 1;
 
@@ -83,8 +92,9 @@ public class SqlViewController {
 					if (!(iVal == null)) {
 						String stringValue = parseType(iVal, type);
 						preparedStatement.setString(i + parameterOffset, stringValue);
-						logger.info("Filling in: " + parameterOffset + " " + stringValue);
 					} else {
+						// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
+						// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
 						parameterOffset--;
 					}
 				} catch (Exception e) {
@@ -94,25 +104,31 @@ public class SqlViewController {
 		return preparedStatement;
 	}
 
-	private String parseType(Value val, DataType type) {
+	/**
+	 * der Value könnte noch einen SQL Operator enthalten, welcher hier entfernt wird
+	 */
+	protected String parseType(Value val, DataType type) {
 		String parsedType;
 		if (type == DataType.BOOLEAN) {
 			parsedType = val.getBooleanValue() + "";
 		} else if (type == DataType.DOUBLE) {
-			parsedType = val.getStringValue();
+			parsedType = val.getDoubleValue() + "";
 		} else if (type == DataType.INSTANT) {
-			parsedType = val.getInstantValue().toString();
+			parsedType = val.getInstantValue() + "";
 		} else if (type == DataType.INTEGER) {
-			parsedType = val.getStringValue();
+			parsedType = val.getIntegerValue() + "";
 		} else if (type == DataType.LONG) {
-			parsedType = val.getStringValue();
+			parsedType = val.getLongValue() + "";
 		} else if (type == DataType.STRING) {
 			parsedType = val.getStringValue();
 		} else if (type == DataType.ZONED) {
-			parsedType = val.getInstantValue().toString();
+			parsedType = val.getZonedDateTimeValue().toInstant() + "";
 		} else {
 			throw new IllegalArgumentException("Unknown type: " + type.name());
 		}
+		if (parsedType.equals("null"))
+			parsedType = val.getStringValue();
+
 		if (hasOperator(parsedType))
 			parsedType = parsedType.substring(getOperatorEndIndex(parsedType));
 
@@ -177,7 +193,7 @@ public class SqlViewController {
 			} else {
 				final int paramCount = outputFormat.size();
 				for (int i = 0; i < paramCount; i++) {
-					sb.append(i == 0 ? outputFormat.get(i).getName() : "," + outputFormat.get(i).getName());
+					sb.append(i == 0 ? outputFormat.get(i).getName() : ", " + outputFormat.get(i).getName());
 				}
 				sb.append(" from ");
 			}
@@ -250,7 +266,7 @@ public class SqlViewController {
 						clause.append("is ").append(strValue);
 					} else {
 						if (!hasOperator(strValue)) {
-							if (def.getType() == DataType.STRING && strValue.contains("%") || strValue.contains("_")) {
+							if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_")) || autoLike) {
 								clause.append(" like");
 							} else {
 								clause.append(" =");
@@ -281,6 +297,7 @@ public class SqlViewController {
 		return where.toString();
 	}
 
+	// TODO: Methode encloseInCommasIfRequired() könnte mit den Änderungen von #8 eigentlich entfernt werden?
 	/**
 	 * Abhängig von dem Feld-Typ, wird der Wert von Kommas umgeben oder nicht
 	 */

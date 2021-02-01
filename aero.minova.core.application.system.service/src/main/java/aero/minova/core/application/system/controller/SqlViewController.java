@@ -1,5 +1,7 @@
 package aero.minova.core.application.system.controller;
 
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Locale;
 import java.util.Objects;
@@ -37,21 +39,23 @@ public class SqlViewController {
 	public Table getIndexView(@RequestBody Table inputTable) {
 		final val connection = systemDatabase.getConnection();
 		try {
-			val countQuery = prepareViewString(inputTable, false, 1000, true);
+			final val countQuery = prepareViewString(inputTable, false, 1000, true);
 			logger.info("Executing: " + countQuery);
-			val viewCounter = connection
-					.prepareCall(countQuery)//
-					.executeQuery();
+			val preparedCountStatement = connection.prepareCall(countQuery);
+			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement);
+			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
 			val limit = Optional.ofNullable(inputTable.getMetaData())//
 					.map(TableMetaData::getLimited)//
 					.orElse(Integer.MAX_VALUE);
-			val viewQuery = prepareViewString(inputTable, false, limit, false);
+
+			final val viewQuery = prepareViewString(inputTable, false, limit, false);
 			logger.info("Executing: " + viewQuery);
-			ResultSet resultSet = connection
-					.prepareCall(viewQuery)//
-					.executeQuery();
+			val preparedStatement = connection.prepareCall(viewQuery);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+			ResultSet resultSet = preparedViewStatement.executeQuery();
+
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			if (limit < viewCount) {
 				if (result.getMetaData() == null) {
@@ -65,6 +69,54 @@ public class SqlViewController {
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}
+	}
+
+	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
+		int parameterOffset = 1;
+
+		for (int i = 0; i < inputTable.getColumns().size(); i++) {
+			if (!inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME))
+				try {
+					val iVal = inputTable.getRows().get(0).getValues().get(i);
+					val type = inputTable.getColumns().get(i).getType();
+
+					if (!(iVal == null)) {
+						String stringValue = parseType(iVal, type);
+						preparedStatement.setString(i + parameterOffset, stringValue);
+						logger.info("Filling in: " + parameterOffset + " " + stringValue);
+					} else {
+						parameterOffset--;
+					}
+				} catch (Exception e) {
+					throw new RuntimeException("Could not parse input parameter with index:" + i, e);
+				}
+		}
+		return preparedStatement;
+	}
+
+	private String parseType(Value val, DataType type) {
+		String parsedType;
+		if (type == DataType.BOOLEAN) {
+			parsedType = val.getBooleanValue() + "";
+		} else if (type == DataType.DOUBLE) {
+			parsedType = val.getStringValue();
+		} else if (type == DataType.INSTANT) {
+			parsedType = val.getInstantValue().toString();
+		} else if (type == DataType.INTEGER) {
+			parsedType = val.getStringValue();
+		} else if (type == DataType.LONG) {
+			parsedType = val.getStringValue();
+		} else if (type == DataType.STRING) {
+			parsedType = val.getStringValue();
+		} else if (type == DataType.ZONED) {
+			parsedType = val.getInstantValue().toString();
+		} else {
+			throw new IllegalArgumentException("Unknown type: " + type.name());
+		}
+		if (hasOperator(parsedType))
+			parsedType = parsedType.substring(getOperatorEndIndex(parsedType));
+
+		return parsedType;
 	}
 
 	protected Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
@@ -106,22 +158,27 @@ public class SqlViewController {
 	 */
 	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count) throws IllegalArgumentException {
 		final StringBuffer sb = new StringBuffer();
+		if (params.getName() == null || params.getName().trim().length() == 0) {
+			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+		}
+
+		val outputFormat = params.getColumns().stream()//
+				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+				.collect(Collectors.toList());
+
 		if (count) {
 			sb.append("select count(1) from ");
 		} else {
 			if (maxRows > 0) {
 				sb.append("select top ").append(maxRows).append(" ");
 			}
-			val outputFormat = params.getColumns().stream()//
-					.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
-					.collect(Collectors.toList());
 			if (outputFormat.isEmpty()) {
 				sb.append("* from ");
 			} else {
-				sb.append(//
-						outputFormat.stream()//
-								.map(Column::getName)//
-								.collect(Collectors.joining(", ")));
+				final int paramCount = outputFormat.size();
+				for (int i = 0; i < paramCount; i++) {
+					sb.append(i == 0 ? outputFormat.get(i).getName() : "," + outputFormat.get(i).getName());
+				}
 				sb.append(" from ");
 			}
 		}
@@ -190,22 +247,23 @@ public class SqlViewController {
 
 					// #13193
 					if (strValue.equalsIgnoreCase("null") || strValue.equalsIgnoreCase("not null")) {
-						strValue = "is " + strValue;
-					}
-					if (!hasOperator(strValue)) {
-						if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && !strValue.contains("%")) {
-							strValue += "%";
-						}
-
-						if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_"))) {
-							clause.append(" like");
+						clause.append("is ").append(strValue);
+					} else {
+						if (!hasOperator(strValue)) {
+							if (def.getType() == DataType.STRING && strValue.contains("%") || strValue.contains("_")) {
+								clause.append(" like");
+							} else {
+								clause.append(" =");
+							}
 						} else {
-							clause.append(" =");
+							clause.append(" ").append(strValue.substring(0, getOperatorEndIndex(strValue)));
+						}
+
+						clause.append(' ').append("?");
+						if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%")) && (!hasOperator(strValue))) {
+							clause.append("%");
 						}
 					}
-
-					strValue = encloseInCommasIfRequired(def, strValue);
-					clause.append(' ').append(strValue);
 				}
 			}
 

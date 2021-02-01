@@ -302,28 +302,6 @@ public class SqlViewController {
 		return where.toString();
 	}
 
-	// TODO: Methode encloseInCommasIfRequired() könnte mit den Änderungen von #8 eigentlich entfernt werden?
-	/**
-	 * Abhängig von dem Feld-Typ, wird der Wert von Kommas umgeben oder nicht
-	 */
-	protected static String encloseInCommasIfRequired(Value vd, String value) {
-		if (vd == null || value == null) {
-			return value;
-		}
-
-		if (SQL_IS_NULL.equalsIgnoreCase(value.trim()) || SQL_IS_NOT_NULL.equalsIgnoreCase(value.trim())) {
-			return value;
-		} else if (vd.getType() == DataType.STRING || vd.getType().equals(DataType.INSTANT) || vd.getType().equals(DataType.ZONED)) {
-			final int i = getOperatorEndIndex(value);
-			if (i > 0) {
-				return value.substring(0, i) + " '" + value.substring(i).trim() + "'";
-			} else {
-				return "'" + value.substring(i).trim() + "'";
-			}
-		}
-		return value;
-	}
-
 	/**
 	 * Prüft, ob der String einen SQL Operator am Anfang hat
 	 * 

@@ -21,7 +21,7 @@ public class FilesController {
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		if (!inputPath.startsWith(files.getSystemFolder())) {
-			throw new IllegalAccessException("Path variable with value " + path + " points outside the shared data folder of the system.");
+			throw new IllegalAccessException("Path variable with value " + path + " points outside the shared data folder of the system: " + inputPath);
 		}
 		return readAllBytes(inputPath);
 	}

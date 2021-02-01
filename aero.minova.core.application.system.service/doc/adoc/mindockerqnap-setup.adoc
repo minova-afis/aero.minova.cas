@@ -1,0 +1,77 @@
+= Installation/Update von CAS auf dem mindockerqnap für die Stundenerfassung
+
+CAS für die Stunderfassung ist unter link:https://192.168.2.104:8084[https://192.168.2.104:8084] erreichbar.
+
+== Installation/Update des Docker-Image
+
+=== Vorbereitung
+
+Zuerst braucht man ein Docker-Image, welches man selber bauen kann:
+
+* xref:../../../build.as.docker.image.sh#[build.as.docker.image.sh]
+* xref:../../../export.docker.image.sh#[export.docker.image.sh]
+
+Danach ist im target-Ordner das Docker-Image zu finden, welches mit tar endet.
+
+=== Installation/Update
+
+Auf link:https://mindockerqnap.minova.com[mindockerqnap.minova.com]
+kann man sich auf unserem QNAP-Server anmelden.
+Das Passwort für den admin steht im KeePass.
+
+
+Über die App Container Station kann man die Docker-Images verwalten.
+Zuerst sollte man in der Übersicht den alten Docker-Container beenden.
+Nach der Installation/Update sollte man den alte Docker-Container löschen.
+Es ist nicht möglich, die Umgebungsvariablen oder die Freigaben eines Docker-Containers zu ändern.
+Stattdessen muss man diesen neu aufsetzen.
+
+Danach kann man über die Import-Funktionalität eine neues Docker-Image installieren.
+Dabei muss folgendes eingestellt werden:
+
+==== Umgebungsvariablen
+
+[text]
+.Caption
+--------
+aero_minova_core_application_root_path=/var/lib/aero.minova.cas/system-files
+aero_minova_database_url=jdbc:sqlserver://sql-veeam/sis;domain=min
+aero_minova_database_user_name=casuser
+aero_minova_database_user_password={steht im KeePass}
+security_ldap_domain=minova.com
+security_ldap_address=ldap://mindcsrv.minova.com:3268/
+SERVER_SSL_KEY_STORE=/var/lib/aero.minova.cas/private-4f265f52567ff437e8c9140be4c79a809973164f0643efb461dca7d079773ccb/keystore.p12
+SERVER_SSL_KEY_ALIAS=publictest.minova.com
+SERVER_SSL_KEY_STORE_PASSWORD=minova123
+LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CORE_ENV=DEBUG
+--------
+
+==== Netzwerk-Konfiguration
+
+* Bridge Modus verwenden.
+* Statische IP nutzen.
+* *IP-Adresse*: 192.168.2.104
+* *Gateway*: 192.168.2.10
+
+==== Freigabe
+
+In der Freigabe muss das `Volume vom Host` `/share/CACHEDEV1_DATA/Container/container-station-data/lib/docker/volumes/4f7a62bdda040012e88e3366c0cf7a0d838be2b3bd0b05f7de898fce55a852f3/_data`
+auf den Punkt `/var/lib/aero.minova.cas` eingebunden werden.
+Ein neues Volume soll nicht eingebunden werden.
+*Man muss also die erste Einbindung in der Freigabe beim der Installation
+explizit löschen.*
+Es ist der erste Eintrag unter `Neues Volume`, welcher leer ist,
+und dessen Punkt auf `/var/lib/aero.minova.cas` zeigt.
+
+=== Nacharbeiten
+
+Danach kann man den Container in der Übersicht starten.
+Zudem kann man den alten Container danach löschen.
+
+== Hochladen von Dateien
+
+Auf link:https://mindockerqnap.minova.com[mindockerqnap.minova.com]
+kann man sich auf unserem QNAP-Server anmelden.
+Das Passwort für den admin steht im KeePass.
+
+Über die FileStation kann man die Dateien über den Browser auf den Server kopieren.

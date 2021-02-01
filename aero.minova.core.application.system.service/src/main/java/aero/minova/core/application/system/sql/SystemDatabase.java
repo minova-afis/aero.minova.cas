@@ -21,10 +21,9 @@ public class SystemDatabase {
 
 	@Value("${aero_minova_database_user_name:sa}")
 	String userName;
-	@Value("${aero_minova_database_user_password:Minova+0}")
+	@Value("${aero_minova_database_user_password:password}")
 	String userPassword;
 	private LinkedList<Connection> freeConnections = new LinkedList<>();
-
 
 	public synchronized Connection getConnection() {
 		try {

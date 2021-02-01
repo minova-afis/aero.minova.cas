@@ -93,7 +93,6 @@ public class SqlViewController {
 					if (!(iVal == null)) {
 						String stringValue = parseType(iVal, type);
 						preparedStatement.setString(i + parameterOffset, stringValue);
-						logger.info("Filling in: " + parameterOffset + " " + stringValue);
 					} else {
 						// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
 						// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden

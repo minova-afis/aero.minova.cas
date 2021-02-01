@@ -178,23 +178,22 @@ public class SqlViewController {
 			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
 		}
 
-		val outputFormat = params.getColumns().stream()//
-				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
-				.collect(Collectors.toList());
-
 		if (count) {
 			sb.append("select count(1) from ");
 		} else {
 			if (maxRows > 0) {
 				sb.append("select top ").append(maxRows).append(" ");
 			}
+			val outputFormat = params.getColumns().stream()//
+					.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+					.collect(Collectors.toList());
 			if (outputFormat.isEmpty()) {
 				sb.append("* from ");
 			} else {
-				final int paramCount = outputFormat.size();
-				for (int i = 0; i < paramCount; i++) {
-					sb.append(i == 0 ? outputFormat.get(i).getName() : ", " + outputFormat.get(i).getName());
-				}
+				sb.append(//
+						outputFormat.stream()//
+								.map(Column::getName)//
+								.collect(Collectors.joining(", ")));
 				sb.append(" from ");
 			}
 		}

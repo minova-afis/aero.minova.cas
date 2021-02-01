@@ -115,6 +115,14 @@ public class SqlViewController {
 		inputRow.addValue(new Value(false));
 		userGroups.add(inputRow);
 		try {
+
+			// TODO: Änderung aus Issue #8 (SQL Injection verhindern) auch für die Methode aktivieren
+//			final val viewQuery = prepareViewString(inputTable, false, limit, false);
+//			logger.info("Executing: " + viewQuery);
+//			val preparedStatement = connection.prepareCall(viewQuery);
+//			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+//			ResultSet resultSet = preparedViewStatement.executeQuery();
+
 			val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
 			logger.info("Executing: " + viewQuery);
 			ResultSet resultSet = systemDatabase.connection()//

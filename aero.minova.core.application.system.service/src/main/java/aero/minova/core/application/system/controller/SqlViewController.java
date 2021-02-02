@@ -3,6 +3,7 @@ package aero.minova.core.application.system.controller;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
@@ -74,7 +75,7 @@ public class SqlViewController {
 	}
 
 	/**
-	 * der Value könnte noch einen SQL Operator enthalten, welcher hier entfernt wird
+	 * das Prepared Statement wird mit den dafür vorgesehenen Parametern befüllt
 	 * 
 	 * @param inputTable
 	 *            die Table, welche vom getIndexView aufgerufen wurde
@@ -134,9 +135,24 @@ public class SqlViewController {
 		if (hasOperator(parsedType))
 			parsedType = parsedType.substring(getOperatorEndIndex(parsedType));
 
-		// beim Zoned-Typ gäbe es Probleme beim parsen nach Instant, falls ein Operator davor wäre
-		if (type == DataType.ZONED)
-			parsedType = ZonedDateTime.parse(parsedType).toInstant().toString();
+		try {
+			if (type == DataType.BOOLEAN) {
+				Boolean.parseBoolean(parsedType);
+			} else if (type == DataType.DOUBLE) {
+				Double.parseDouble(parsedType);
+			} else if (type == DataType.INSTANT) {
+				Instant.parse(parsedType);
+			} else if (type == DataType.INTEGER) {
+				Integer.parseInt(parsedType);
+			} else if (type == DataType.LONG) {
+				Long.parseLong(parsedType.replace("L", ""));
+			} else if (type == DataType.ZONED) {
+				// beim Zoned-Typ gäbe es Probleme beim parsen nach Instant, falls ein Operator davor wäre
+				parsedType = ZonedDateTime.parse(parsedType).toInstant().toString();
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Could not parse value '" + parsedType + "' with type " + type.name());
+		}
 
 		return parsedType;
 	}

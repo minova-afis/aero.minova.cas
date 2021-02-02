@@ -39,7 +39,7 @@ public class SqlProcedureController {
 	TracController trac;
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
-	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws SQLException {
+	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
 		if ("Ticket".equals(inputTable.getName())) {
 			val result = new SqlProcedureResult();
 			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
@@ -49,6 +49,8 @@ public class SqlProcedureController {
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
+		val result = new SqlProcedureResult();
+
 		try {
 			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
@@ -121,13 +123,11 @@ public class SqlProcedureController {
 						}
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
-			val result = new SqlProcedureResult();
 			preparedStatement.execute();
 			if (null != preparedStatement.getResultSet()) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
 				result.setResultSet(resultSet);
-				resultSet.setName("resultSet");
 				val metaData = sqlResultSet.getMetaData();
 				resultSet.setColumns(//
 						range(0, metaData.getColumnCount()).mapToObj(i -> {
@@ -149,8 +149,8 @@ public class SqlProcedureController {
 								} else {
 									throw new UnsupportedOperationException("Unsupported result set type: " + i);
 								}
-							} catch (SQLException e) {
-								throw new RuntimeException(e);
+							} catch (Exception e) {
+								throw new RuntimeException("Could not parse resultset: ", e);
 							}
 						}).collect(toList()));
 				while (sqlResultSet.next()) {
@@ -192,18 +192,21 @@ public class SqlProcedureController {
 						});
 			}
 			connection.commit();
-			return result;
-		} catch (SQLException e) {
-			logger.error("Couldn't execute procedure: ", e);
+		} catch (Exception e) {
+			Exception sqlE = new Exception("Couldn't execute procedure: " + e.getMessage());
+			logger.error(sqlE.getMessage());
+			result.setReturnErrorMessage(sqlE);
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				logger.error("Couldn't roll back procedure execution: ", e1);
+				Exception ex = new Exception("Couldn't roll back procedure execution: " + e1.getMessage());
+				logger.error(ex.getMessage());
+				result.setReturnErrorMessage(ex);
 			}
-			throw e;
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}
+		return result;
 	}
 
 	String prepareProcedureString(Table params) {

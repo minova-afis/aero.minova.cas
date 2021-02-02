@@ -7,4 +7,5 @@ public class SqlProcedureResult {
 	private Table resultSet;
 	private Table outputParameters;
 	private Integer returnCode;
+	private Exception returnErrorMessage;
 }

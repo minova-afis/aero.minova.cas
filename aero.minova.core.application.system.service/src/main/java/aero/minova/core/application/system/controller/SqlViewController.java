@@ -39,6 +39,7 @@ public class SqlViewController {
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
 		final val connection = systemDatabase.getConnection();
+		Table result = new Table();
 		try {
 			final val countQuery = prepareViewString(inputTable, false, 1000, true);
 			logger.info("Executing: " + countQuery);
@@ -57,19 +58,19 @@ public class SqlViewController {
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
-			val result = convertSqlResultToTable(inputTable, resultSet);
+			result = convertSqlResultToTable(inputTable, resultSet);
 			if (limit < viewCount) {
 				if (result.getMetaData() == null) {
 					result.setMetaData(new TableMetaData());
 				}
 				result.getMetaData().setLimited(limit);
 			}
-			return result;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			result.setReturnErrorMessage(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}
+		return result;
 	}
 
 	/**

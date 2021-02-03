@@ -1,6 +1,6 @@
 = Installation/Update von CAS auf dem mindockerqnap für die Stundenerfassung
 
-CAS für die Stunderfassung ist unter link:https://192.168.2.104:8084[https://192.168.2.104:8084] erreichbar.
+CAS für die Stunderfassung ist unter link:https://mincas.minova.com:8084[https://mincas.minova.com:8084] erreichbar.
 
 == Installation/Update des Docker-Image
 

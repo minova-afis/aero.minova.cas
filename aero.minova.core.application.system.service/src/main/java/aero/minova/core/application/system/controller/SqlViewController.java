@@ -1,14 +1,18 @@
 package aero.minova.core.application.system.controller;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
@@ -67,7 +72,17 @@ public class SqlViewController {
 				result.getMetaData().setLimited(limit);
 			}
 		} catch (Exception e) {
-			result.setReturnErrorMessage(e);
+			ErrorMessage error = new ErrorMessage();
+			error.setErrorMessage(e);
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			String messages = sw.toString();
+			List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
+					.map(String::trim)//
+					.collect(Collectors.toList());
+			error.setTrace(trace);
+			result.setReturnErrorMessage(error);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}
@@ -129,12 +144,15 @@ public class SqlViewController {
 		} else {
 			throw new IllegalArgumentException("Unknown type: " + type.name());
 		}
-		if (parsedType.equals("null"))
+		if (parsedType.equals("null")) {
 			parsedType = val.getStringValue();
+		}
 
-		if (hasOperator(parsedType))
+		if (hasOperator(parsedType)) {
 			parsedType = parsedType.substring(getOperatorEndIndex(parsedType));
+		}
 
+		// Prüfen, ob der String dem Typ entspricht
 		try {
 			if (type == DataType.BOOLEAN) {
 				Boolean.parseBoolean(parsedType);
@@ -149,6 +167,10 @@ public class SqlViewController {
 			} else if (type == DataType.ZONED) {
 				// beim Zoned-Typ gäbe es Probleme beim parsen nach Instant, falls ein Operator davor wäre
 				parsedType = ZonedDateTime.parse(parsedType).toInstant().toString();
+			} else if (type == DataType.STRING) {
+
+			} else {
+				throw new IllegalArgumentException("Unknown type: " + type.name());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Could not parse value '" + parsedType + "' with type " + type.name());

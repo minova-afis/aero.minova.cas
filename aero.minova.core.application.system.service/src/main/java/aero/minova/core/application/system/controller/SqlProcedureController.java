@@ -6,11 +6,15 @@ import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
-import java.sql.SQLException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
@@ -193,15 +198,32 @@ public class SqlProcedureController {
 			}
 			connection.commit();
 		} catch (Exception e) {
-			Exception sqlE = new Exception("Couldn't execute procedure: " + e.getMessage());
+			Exception sqlE = new Exception("Couldn't execute procedure: ", e);
 			logger.error(sqlE.getMessage());
-			result.setReturnErrorMessage(sqlE);
+			ErrorMessage error = new ErrorMessage();
+			error.setErrorMessage(sqlE);
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			sqlE.printStackTrace(pw);
+			String messages = sw.toString();
+			List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
+					.map(String::trim)//
+					.collect(Collectors.toList());
+			error.setTrace(trace);
+			result.setReturnErrorMessage(error);
 			try {
 				connection.rollback();
-			} catch (SQLException e1) {
-				Exception ex = new Exception("Couldn't roll back procedure execution: " + e1.getMessage());
+			} catch (Exception e1) {
+				Exception ex = new Exception("Couldn't roll back procedure execution: ", e);
 				logger.error(ex.getMessage());
-				result.setReturnErrorMessage(ex);
+				error.setErrorMessage(ex);
+				ex.printStackTrace(pw);
+				messages = sw.toString();
+				trace = Stream.of(messages.split("\n\tat|\n"))//
+						.map(String::trim)//
+						.collect(Collectors.toList());
+				error.setTrace(trace);
+				result.setReturnErrorMessage(error);
 			}
 		} finally {
 			systemDatabase.freeUpConnection(connection);

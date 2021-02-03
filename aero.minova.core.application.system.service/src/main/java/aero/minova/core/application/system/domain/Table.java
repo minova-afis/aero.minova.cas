@@ -8,7 +8,7 @@ public class Table {
 	private TableMetaData metaData;
 	private List<Column> columns = new ArrayList<>();
 	private List<Row> rows = new ArrayList<>();
-	private Exception returnErrorMessage;
+	private ErrorMessage returnErrorMessage;
 
 	public String getName() {
 		return name;
@@ -60,11 +60,11 @@ public class Table {
 		this.metaData = meta_data;
 	}
 
-	public Exception getReturnErrorMessage() {
+	public ErrorMessage getReturnErrorMessage() {
 		return returnErrorMessage;
 	}
 
-	public void setReturnErrorMessage(Exception returnErrorMessage) {
-		this.returnErrorMessage = returnErrorMessage;
+	public void setReturnErrorMessage(ErrorMessage errorMessage) {
+		this.returnErrorMessage = errorMessage;
 	}
 }

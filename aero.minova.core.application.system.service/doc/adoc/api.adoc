@@ -15,8 +15,12 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 {
 	"name": "ProcedureName",
 	"metaData": {
-		"limited": 1000
-	},
+        "limited": 10,
+        "page": 1,
+        "totalResults": 10,
+        "totalPages": 1,
+        "resultsLeft": 0
+    },
 	"columns": [
 		{
 			"name": "ParameterName",
@@ -38,16 +42,42 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 
 Der Name der Prozedur, die ausgeführt wird.
 
-=== metaData/limited
+=== metaData
 
-* *Default*: (2^32)-1 = 2.147.483.647
+Anhand von metaData kann man die sichtbare Ergebnissemenge einschränken.
+Dies ist durch die Parameter limited und page möglich.
 
-* *Wertebereich*: 1 bis 2.147.483.647
+.veränderbare Parameter:
+* limited
+* page
+
+.unveränderbare/vom Service berechnete Parameter:
+* totalResults
+* totalPages
+* resultsLeft
+
+==== metaData/limited
 
 Gibt an, wie viele Treffer bei der Anfrage zurückgegeben werden sollen.
-Wenn diese Tabelle zurückgegeben wird,
-ist dieser Wert nur dann vorhanden,
-wenn nicht alle Werte zurückgegeben wurden.
+Ist der Wert 0, werden alle Treffer zurückgegeben und der Wert der totalResults angezeigt.
+
+==== metaData/page
+
+Basierend auf limited wird die n-te Seite der totalPages ausgegeben.
+Ist kein Wert für page gesetzt, werden die Ergebnisse von 0 bis limited,
+also die 1.Seite, zurückgegeben.
+
+==== metaData/totalResults
+
+Zeigt an, wie viele Rows für die angegebenen Suchparameter gefunden wurden.
+
+==== metaData/totalPages
+
+Gibt an, wie viele Seiten basierend auf den totalResults und limited errechnet wurden.
+
+==== metaData/resultsLeft
+
+Gibt an, wie viele Rows nach der jetzigen Seite noch übrig sind.
 
 === columns
 
@@ -81,7 +111,7 @@ Häufig ist dies eine SQL-Prozedur auf dem SQL-Server.
 
 Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 
-Diese Table enthält die Parameter für die SQL-Prozedur.
+Diese Table enthält die Parameter für die SQL-Prozedur und optional Metadaten.
 Die columns beschreiben den Namen und den Typ der Argumente.
 Die rows enthalten eine Zeile, in der die Argumente gelistet sind.
 

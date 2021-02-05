@@ -7,7 +7,7 @@ Die Authentifizierung findet über Basic Auth statt.
 
 Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
 
-Generell gilt, dass jedes Feld bis auf metaData ein Pflichtfeld ist.
+Generell gilt, dass jedes Feld bis auf metaDataund returnErrorMessage ein Pflichtfeld ist.
 Die jeweiligen values müssen genauso viele Werte haben wie columns.
 
 [source,json]
@@ -30,7 +30,15 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 				"(b|d|i|n|s|z-Value)|null",...
 			]
 		}
-	]
+	],
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [ 
+			"StackTraceMessages",
+			...
+		]
+	} 
 }
 --------
 
@@ -53,7 +61,7 @@ wenn nicht alle Werte zurückgegeben wurden.
 
 Die Parameter-Typen das Aufrufes.
 
-=== columns/values/*
+==== columns/values/*
 
 Die Werte dürfen prinzipiell von einem beliebigen Typ sein,
 müssen aber mit dem Typ der jeweiligen Spalte kompatibel sein.
@@ -72,6 +80,26 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 
 Die Parameter der Prozedur.
 
+=== returnErrorMessage
+
+Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.
+
+Sie wird nur befüllt, falls ein Fehler auftritt. 
+Ansonsten ist dieses Objekt *null*.
+
+==== returnErrorMessage/detailsMessage
+
+Die DetailsMessage der Exception, die geworfen wurde.
+
+==== returnErrorMessage/cause
+
+Der Grund, weshalb die Exception geworfen wurde, z.b.:
+java.lang.NullPointerException.
+
+==== returnErrorMessage/trace
+
+Der StackTrace der geworfenen Exception nach jedem Abatz getrennt.
+
 == data/procedure
 
 Führt eine Prozedur auf dem Server aus.
@@ -87,7 +115,7 @@ Die rows enthalten eine Zeile, in der die Argumente gelistet sind.
 
 === Ausgabe
 
-Die Antwort hat folgendes Format:
+Die Antwort hat bei Erfolg folgendes Format:
 
 [source,json]
 --------
@@ -95,6 +123,23 @@ Die Antwort hat folgendes Format:
 	"resultSet": <Table>,
 	"outputParameters": <Table>,
 	"returnCode": <Integer>
+}
+--------
+
+Bei Misserfolg hat sie dieses Format:
+
+[source,json]
+--------
+{
+	"returnCode": <Integer>
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [ 
+			"StackTraceMessages",
+			...
+		]
+	} 
 }
 --------
 
@@ -111,6 +156,7 @@ Diese Tabelle enthält nur 1 Zeile.
 ==== returnCode
 
 Der Return Code der SQL-Prozedur, falls vorhanden.
+Bei Erfolg ist er entweder 0 oder positiv. Bei Misserfolg negativ.
 
 === Spezielle Prozeduren
 

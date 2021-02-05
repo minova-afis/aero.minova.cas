@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,31 +45,42 @@ public class SqlViewController {
 	public Table getIndexView(@RequestBody Table inputTable) {
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
+		TableMetaData inputMetaData = inputTable.getMetaData();
+		if (inputTable.getMetaData() == null) {
+			inputMetaData = new TableMetaData();
+		}
+		int page;
+		int limit;
+		// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
+		if (inputMetaData.getPage() == null || inputMetaData.getPage() <= 0) {
+			page = 1;
+		} else {
+			page = inputMetaData.getPage();
+		}
+		// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
+		if (inputMetaData.getLimited() == null || inputMetaData.getLimited() < 0) {
+			limit = 0;
+		} else {
+			limit = inputMetaData.getLimited();
+		}
 		try {
-			final val countQuery = prepareViewString(inputTable, false, 1000, true);
+			final val countQuery = prepareViewString(inputTable, false, limit, true);
 			logger.info("Executing: " + countQuery);
 			val preparedCountStatement = connection.prepareCall(countQuery);
 			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement);
 			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
-			val limit = Optional.ofNullable(inputTable.getMetaData())//
-					.map(TableMetaData::getLimited)//
-					.orElse(Integer.MAX_VALUE);
 
-			final val viewQuery = prepareViewString(inputTable, false, limit, false);
+			final val viewQuery = pagingWithSeek(inputTable, false, limit, false, page);
 			logger.info("Executing: " + viewQuery);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
-			if (limit < viewCount) {
-				if (result.getMetaData() == null) {
-					result.setMetaData(new TableMetaData());
-				}
-				result.getMetaData().setLimited(limit);
-			}
+			result.fillMetaDate(result, limit, viewCount, page);
+
 		} catch (Exception e) {
 			ErrorMessage error = new ErrorMessage();
 			error.setErrorMessage(e);
@@ -247,6 +257,45 @@ public class SqlViewController {
 			sb.append(where);
 		}
 
+		return sb.toString();
+	}
+
+	/*
+	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen
+	 */
+	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page) {
+		final StringBuffer sb = new StringBuffer();
+		if (params.getName() == null || params.getName().trim().length() == 0) {
+			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+		}
+		sb.append("select ");
+		val outputFormat = params.getColumns().stream()//
+				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+				.collect(Collectors.toList());
+		if (outputFormat.isEmpty()) {
+			sb.append("* from ");
+		} else {
+			sb.append(//
+					outputFormat.stream()//
+							.map(Column::getName)//
+							.collect(Collectors.joining(", ")));
+			sb.append(" from ");
+		}
+
+		sb.append("( select Row_Number() over (order by KeyLong) as RowNum, * from ").append(params.getName());
+		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
+			final String where = prepareWhereClause(params, autoLike);
+			sb.append(where);
+		}
+		sb.append(") as RowConstraintResult");
+
+		if (page >= 0) {
+			sb.append("\r\nwhere RowNum >" + ((page - 1) * maxRows));
+			// bei 0 sollen einfach alle Ergebnisse ausgegeben werden
+			if (maxRows > 0) {
+				sb.append("\r\nand RowNum <=" + (((page - 1) * maxRows) + maxRows) + " order by RowNum");
+			}
+		}
 		return sb.toString();
 	}
 

@@ -29,6 +29,7 @@ import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import aero.minova.trac.integration.controller.TracController;
@@ -57,6 +58,25 @@ public class SqlProcedureController {
 		val result = new SqlProcedureResult();
 
 		try {
+			TableMetaData inputMetaData = inputTable.getMetaData();
+			if (inputMetaData == null) {
+				inputTable.setMetaData(new TableMetaData());
+				inputMetaData = inputTable.getMetaData();
+			}
+			int page;
+			int limit;
+			// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
+			if (inputMetaData.getPage() == null || inputMetaData.getPage() <= 0) {
+				page = 1;
+			} else {
+				page = inputMetaData.getPage();
+			}
+			// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
+			if (inputMetaData.getLimited() == null || inputMetaData.getLimited() < 0) {
+				limit = 0;
+			} else {
+				limit = inputMetaData.getLimited();
+			}
 			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
@@ -158,13 +178,28 @@ public class SqlProcedureController {
 								throw new RuntimeException("Could not parse resultset: ", e);
 							}
 						}).collect(toList()));
+				int totalResults = 0;
+				resultSet.setMetaData(new TableMetaData());
 				while (sqlResultSet.next()) {
-					resultSet.addRow(//
-							convertSqlResultToRow(resultSet//
-									, sqlResultSet//
-									, logger//
-									, this));
+					if (limit > 0) {
+						// nur die Menge an Rows, welche auf der gewünschten Page liegen
+						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (((page - 1) * limit) + limit)) {
+							resultSet.addRow(//
+									convertSqlResultToRow(resultSet//
+											, sqlResultSet//
+											, logger//
+											, this));
+						}
+					} else {
+						resultSet.addRow(//
+								convertSqlResultToRow(resultSet//
+										, sqlResultSet//
+										, logger//
+										, this));
+					}
+					totalResults++;
 				}
+				resultSet.fillMetaDate(resultSet, limit, totalResults, page);
 			}
 			// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
 			val returnCode = preparedStatement.getObject(1);

@@ -211,6 +211,7 @@ public class SqlProcedureController {
 					.collect(Collectors.toList());
 			error.setTrace(trace);
 			result.setReturnErrorMessage(error);
+			result.setReturnCode(-1);
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
@@ -224,6 +225,7 @@ public class SqlProcedureController {
 						.collect(Collectors.toList());
 				error.setTrace(trace);
 				result.setReturnErrorMessage(error);
+				result.setReturnCode(-2);
 			}
 		} finally {
 			systemDatabase.freeUpConnection(connection);

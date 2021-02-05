@@ -1,0 +1,88 @@
+== Projekt CAS
+
+Beim Entwickeln eines neuen CAS Moduls muss folgende Struktur beachtet werden:
+
+=== Namenskonvention
+
+CAS Module beginnen mit dem Prefix *"aero.minova.cas."*.
+
+=== Ordnerstruktur
+
+Die Struktur des CAS Projekts und der CAS Modlue folgen der Konvention nach 
+link:https://github.com/minova-afis/aero.minova.spring.service/[Minova Spring Boot Standart]
+
+Eine solche Ordnerstruktur sieht folgendermaßen aus:
+
+----
+cas-project
++--cas-modul
+|	+-- src
+|	|	+-- main/
+|	|	|	+-- java/
+|	|	|	+-- resources/
+|	|	|
+|	|	+-- test/
+|	|		+-- java/
+|	|	
+|	+-- doc/
+|	|	+-- adoc/
+|	|	
+|	+-- pom.xml
+|	+-- README.adoc
+|
++-- pom.xml
++-- README.adoc
+----
+
+=== pom.xml
+
+Sowohl das Projekt, als auch das Modul selbst, besitzen jeweils eine pom.xml.
+Muss ein Plugin hinzugefügt werden, geschieht dies in der POM des Projekts.
+Eine Dependency hingegen wird in der POM des Moduls eingefügt.
+
+
+=== src/main/java
+
+In diesem Verzeichnis liegt wie es Usus ist der Source Code.
+----
++-- cas-modul
+	+-- src
+	|	+-- main/
+	|	|	+-- java/
+	|	|		+-- cas-modul/
+	.	|			+-- cas-modul.java	
+	.	.			+-- cas-modul.xml
+		.			+-- Setup.xml
+[...]		
+----
+
+
+Es sollte immer ein Package geben, welches denselben Namen trägt wie das Modul.
+In diesem sollte eine *.xml-Datei* liegen, welche das UI der Erweiterung beschreibt, und/oder eine *.java-Datei* existieren, welche das Modul startet.
+Auch die beiden Dateien sollten nach dem Modul benannt sein.
+Falls benötigt kann es zusätzlich noch eine *Setup.xml* geben.
+
+=== src/main/resources
+
+In diesem Ordner werden Konfigurationsdateien wie die _application.properties_ oder andere wichtige Dateien wie der _Keystore_ hinterlegt.
+
+=== src/test/java
+
+Dort werden alle Klassen hinterlegt, welche zum Testen des Programms implementiert wurden.
+
+=== doc/adoc
+
+----
++--cas-modul
+	[...]	
+	+-- doc/
+		+-- adoc/
+			+-- index.adoc
+----
+
+In diesem Ordner werden alle Dokumente bezüglich des Modules als *.adoc*-Dateien abgelegt.
+
+
+Hier sollte es eine *index.adoc* geben, welche als Inhaltsverzeichnis für weitere adoc-Dateien innerhalb des Moduls dient.
+Außerdem sollte die README.adoc des Moduls auf die index.adoc verweisen.
+

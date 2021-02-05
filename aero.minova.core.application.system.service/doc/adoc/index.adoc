@@ -3,7 +3,7 @@
 == Links
 
 * Zurück zur link:..[Übersicht]
-
+* xref:projectStructure.adoc#[Projektstruktur]
 * xref:api.adoc#[API]
 * xref:mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
 * xref:properties.adoc#[Properties]

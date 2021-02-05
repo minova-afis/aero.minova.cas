@@ -17,6 +17,26 @@ public class Table {
 		this.name = name;
 	}
 
+	public void fillMetaDate(Table inputTable, int limit, int totalResults, int page) {
+		TableMetaData metaData = inputTable.getMetaData();
+		if (inputTable.getMetaData() == null) {
+			metaData = new TableMetaData();
+		}
+		if (limit <= 0) {
+			limit = totalResults;
+		}
+		if (totalResults > 0 && limit > 0) {
+			int totalPages = (int) Math.ceil(totalResults / (double) limit);
+			metaData.setResultsLeft(Math.max(totalResults - (page * limit), 0));
+			metaData.setTotalPages(totalPages);
+		}
+		metaData.setLimited(limit);
+		metaData.setPage(page);
+		metaData.setTotalResults(totalResults);
+
+		this.metaData = metaData;
+	}
+
 	public void addColumn(Column c) {
 		if (getRows().size() != 0) {
 			throw new IllegalArgumentException();

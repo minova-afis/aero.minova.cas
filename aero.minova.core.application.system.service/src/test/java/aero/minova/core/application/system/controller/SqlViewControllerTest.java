@@ -236,4 +236,66 @@ class SqlViewControllerTest {
 		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
 		assertThat(testSubject.parseType(new Value("<" + time), DataType.ZONED)).isEqualTo(instant.toString());
 	}
+
+	@DisplayName("Zeige erste Seite.")
+	@Test
+	void testPaging() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value("MIN"));
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1))//
+				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
+						+ "\r\nwhere (EmployeeText like ? and CustomerText like ?) ) as RowConstraintResult" + "\r\nwhere RowNum > 0"
+						+ "\r\nand RowNum <= 3 order by RowNum");
+	}
+
+	@DisplayName("Zeige Einträge auf höherer Page.")
+	@Test
+	void testPagingOnHighPage() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value("MIN"));
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5))//
+				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
+						+ "\r\nwhere (EmployeeText like ? and CustomerText like ?) ) as RowConstraintResult" + "\r\nwhere RowNum > 12"
+						+ "\r\nand RowNum <= 15 order by RowNum");
+	}
+
+	@DisplayName("Zeige alle Einträge (auch wenn Page eingestellt ist).")
+	@Test
+	void testPagingAllEntries() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value("MIN"));
+			inputRow.addValue(new Value(false));
+			inputTable.addRow(inputRow);
+		}
+		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5))//
+				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
+						+ "\r\nwhere (EmployeeText like ? and CustomerText like ?) ) as RowConstraintResult" + "\r\nwhere RowNum > 0");
+	}
 }

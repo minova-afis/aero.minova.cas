@@ -258,6 +258,16 @@ class SqlViewControllerTest {
 						+ "\r\nand RowNum <= 3 order by RowNum");
 	}
 
+	@DisplayName("Zeige alles auf erster Seite.")
+	@Test
+	void testPagingWithNoAttributes() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1))//
+				.isEqualTo("select * from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2" + " ) as RowConstraintResult"
+						+ "\r\nwhere RowNum > 0" + "\r\nand RowNum <= 3 order by RowNum");
+	}
+
 	@DisplayName("Zeige Einträge auf höherer Page.")
 	@Test
 	void testPagingOnHighPage() {

@@ -55,9 +55,10 @@ In diesem Verzeichnis liegt wie es Usus ist der Source Code.
 	|	+-- main/
 	|	|	+-- java/
 	|	|		+-- cas-modul/
-	.	|			+-- cas-modul.java	
-	.	.			+-- cas-modul.xml
-		.			+-- Setup.xml
+	|	|			+-- cas-modul.java	
+	.	|			+-- cas-modul.xml
+	.	.			+-- setup/
+		.				+--Setup.xml
 [...]		
 ----
 
@@ -65,7 +66,9 @@ In diesem Verzeichnis liegt wie es Usus ist der Source Code.
 Es sollte immer ein Package geben, welches denselben Namen trägt wie das Modul.
 In diesem sollte eine *.xml-Datei* liegen, welche das UI der Erweiterung beschreibt, und/oder eine *.java-Datei* existieren, welche das Modul startet.
 Auch die beiden Dateien sollten nach dem Modul benannt sein.
-Falls benötigt kann es zusätzlich noch eine *Setup.xml* geben.
+
+Falls es sich um ein installierbares Modul handelt, wird
+zusätzlich noch eine *Setup.xml* benötigt, welche sich im gleichnamigen Unter-Paket befinden muss.
 
 === src/main/resources
 

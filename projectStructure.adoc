@@ -8,7 +8,7 @@ CAS Module beginnen mit dem Prefix *"aero.minova.cas."*.
 
 === Ordnerstruktur
 
-Die Struktur des CAS Projekts und der CAS Modlue folgen der Konvention nach 
+Die Struktur des CAS Projekts und der CAS Module folgen der Konvention nach 
 link:https://github.com/minova-afis/aero.minova.spring.service/[Minova Spring Boot Standard]
 
 Die Ordnerstruktur sieht folgendermaßen aus:

@@ -1,0 +1,26 @@
+= Properties des Dienstes
+
+Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
+
+== Links
+
+* Zurück zur xref:index.adoc[Übersicht]
+
+== Minova Properties
+* aero_minova_core_application_root_path
+
+** *Default*: `../../..`
+
+** *Wertebereich*: Absolute Pfade und relative Pfade zum Ausführungsort
+
+* aero_minova_database_url
+
+** *Default*: `jdbc:sqlserver://localhost;databaseName=AFIS_HAM`
+
+* aero_minova_database_user_name
+
+** *Default*: `sa`
+
+* aero_minova_database_user_password
+
+** *Default*: `password`

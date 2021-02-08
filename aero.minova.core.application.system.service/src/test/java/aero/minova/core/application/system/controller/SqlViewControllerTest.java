@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class SqlViewControllerTest {
 			inputRow.addValue(new Value("AVM"));
 			inputRow.addValue(new Value(false));
 			inputTable.addRow(inputRow);
-		}
+    }
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
 		inputRow.addValue(new Value(""));
@@ -68,7 +69,8 @@ class SqlViewControllerTest {
 		inputRow.addValue(new Value(false));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
+				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
+		assertThat(inputTable.getRows().get(0).getValues().get(0).getStringValue()).isEqualTo("AVM%");
 	}
 
 	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
@@ -93,8 +95,7 @@ class SqlViewControllerTest {
 		inputRow.addValue(new Value(false));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo(
-						"select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%' and CustomerText like 'MIN%')");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ? and CustomerText like ?)");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -124,8 +125,8 @@ class SqlViewControllerTest {
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 BookingDate from vWorkingTimeIndex2\r\n" //
-						+ "where (BookingDate <= '2020-07-31')\r\n"//
-						+ "  and (BookingDate > '2020-07-29')");
+						+ "where (BookingDate <= ?)\r\n"//
+						+ "  and (BookingDate > ?)");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -155,8 +156,8 @@ class SqlViewControllerTest {
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
-						+ "where (EmployeeText like 'AVM%')\r\n"//
-						+ "   or (EmployeeText like 'WIS%')");
+						+ "where (EmployeeText like ?)\r\n"//
+						+ "   or (EmployeeText like ?)");
 	}
 
 	@Test
@@ -194,7 +195,7 @@ class SqlViewControllerTest {
 		inputRow.addValue(new Value(false));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like 'AVM%')");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
 	}
 
 	@Test
@@ -245,6 +246,32 @@ class SqlViewControllerTest {
 		val row = new Row();
 		row.addValue(new Value("1"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like '1%')");
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?)");
+	}
+
+	@Test
+	void test_parseMethod() {
+		assertThat(testSubject.parseType(new Value(true), DataType.BOOLEAN)).isEqualTo("true");
+		assertThat(testSubject.parseType(new Value(2.5), DataType.DOUBLE)).isEqualTo("2.5");
+		assertThat(testSubject.parseType(new Value(1), DataType.INTEGER)).isEqualTo("1");
+		assertThat(testSubject.parseType(new Value(252345275L), DataType.LONG)).isEqualTo("252345275");
+		assertThat(testSubject.parseType(new Value("Test"), DataType.STRING)).isEqualTo("Test");
+		Instant instant = Instant.now();
+		assertThat(testSubject.parseType(new Value(instant), DataType.INSTANT)).isEqualTo(instant.toString());
+		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
+		assertThat(testSubject.parseType(new Value(time), DataType.ZONED)).isEqualTo(instant.toString());
+	}
+
+	@Test
+	void test_parseMethodWithOperators() {
+		assertThat(testSubject.parseType(new Value(true), DataType.BOOLEAN)).isEqualTo("true");
+		assertThat(testSubject.parseType(new Value("<2.5"), DataType.DOUBLE)).isEqualTo("2.5");
+		assertThat(testSubject.parseType(new Value("<1"), DataType.INTEGER)).isEqualTo("1");
+		assertThat(testSubject.parseType(new Value(">252345275L"), DataType.LONG)).isEqualTo("252345275L");
+		assertThat(testSubject.parseType(new Value("Test"), DataType.STRING)).isEqualTo("Test");
+		Instant instant = Instant.now();
+		assertThat(testSubject.parseType(new Value(">" + instant), DataType.INSTANT)).isEqualTo(instant.toString());
+		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
+		assertThat(testSubject.parseType(new Value("<" + time), DataType.ZONED)).isEqualTo(instant.toString());
 	}
 }

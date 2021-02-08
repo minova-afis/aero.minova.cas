@@ -7,7 +7,7 @@ Die Authentifizierung findet über Basic Auth statt.
 
 Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
 
-Generell gilt, dass jedes Feld bis auf metaDataund returnErrorMessage ein Pflichtfeld ist.
+Generell gilt, dass jedes Feld bis auf metaData und returnErrorMessage ein Pflichtfeld ist.
 Die jeweiligen values müssen genauso viele Werte haben wie columns.
 
 [source,json]

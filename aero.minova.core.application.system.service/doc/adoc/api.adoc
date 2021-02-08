@@ -14,13 +14,14 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 --------
 {
 	"name": "ProcedureName",
-	"metaData": {
-        "limited": 10,
-        "page": 1,
-        "totalResults": 10,
-        "totalPages": 1,
-        "resultsLeft": 0
-    },
+	"metaData": 
+		{
+        	"limited": 10,
+        	"page": 1,
+        	"totalResults": 10,
+        	"totalPages": 1,
+        	"resultsLeft": 0
+    	},
 	"columns": [
 		{
 			"name": "ParameterName",

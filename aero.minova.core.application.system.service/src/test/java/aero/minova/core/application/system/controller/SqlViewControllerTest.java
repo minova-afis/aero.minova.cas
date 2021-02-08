@@ -236,23 +236,4 @@ class SqlViewControllerTest {
 		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
 		assertThat(testSubject.parseType(new Value("<" + time), DataType.ZONED)).isEqualTo(instant.toString());
 	}
-
-	@Test
-	void test_getIndexViewErrorHandling() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("KeyLong", DataType.ZONED));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(null);
-			inputRow.addValue(new Value(false));
-			inputTable.addRow(inputRow);
-		}
-		Table result = testSubject.getIndexView(inputTable);
-		assertThat(result).isNotEqualTo(null);
-		assertThat(result.getReturnErrorMessage()).isNotEqualTo(null);
-	}
 }

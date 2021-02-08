@@ -7,7 +7,7 @@ Die Authentifizierung findet über Basic Auth statt.
 
 Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
 
-Generell gilt, dass jedes Feld bis auf metaData und returnErrorMessage ein Pflichtfeld ist.
+Generell gilt, dass jedes Feld bis auf metaData ein Pflichtfeld ist.
 Die jeweiligen values müssen genauso viele Werte haben wie columns.
 
 [source,json]
@@ -30,17 +30,11 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 				"(b|d|i|n|s|z-Value)|null",...
 			]
 		}
-	],
-	"returnErrorMessage": {
-		"detailsMessage": "ExceptionMessage",
-		"cause": "ExceptionCause",
-		"trace": [ 
-			"StackTraceMessages",
-			...
-		]
-	} 
+	]
 }
 --------
+
+<<Im Fehlerfall>> erweitert sich die Ausgabe-Table um einen weiteren Parameter.
 
 === name
 
@@ -80,26 +74,6 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 
 Die Parameter der Prozedur.
 
-=== returnErrorMessage
-
-Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.
-
-Sie wird nur befüllt, falls ein Fehler auftritt. 
-Ansonsten ist dieses Objekt *null*.
-
-==== returnErrorMessage/detailsMessage
-
-Die DetailsMessage der Exception, die geworfen wurde.
-
-==== returnErrorMessage/cause
-
-Der Grund, weshalb die Exception geworfen wurde, z.b.:
-java.lang.NullPointerException.
-
-==== returnErrorMessage/trace
-
-Der StackTrace der geworfenen Exception nach jedem Abatz getrennt.
-
 == data/procedure
 
 Führt eine Prozedur auf dem Server aus.
@@ -126,22 +100,7 @@ Die Antwort hat bei Erfolg folgendes Format:
 }
 --------
 
-Bei Misserfolg hat sie dieses Format:
-
-[source,json]
---------
-{
-	"returnCode": <Integer>
-	"returnErrorMessage": {
-		"detailsMessage": "ExceptionMessage",
-		"cause": "ExceptionCause",
-		"trace": [ 
-			"StackTraceMessages",
-			...
-		]
-	} 
-}
---------
+Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
 
 ==== resultSet
 
@@ -276,3 +235,38 @@ wenn alles gut gelaufen ist.
 	"returnCode":1
 }
 --------
+
+== Im Fehlerfall
+
+Ist die Eingabe fehlerhaft oder treten sonstige Fehler bei der Verarbeitung des Services auf,
+erscheint am Ende der angeforderten Table oder Prozedur folgende Nachricht:
+
+----
+	[...]
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [ 
+			"StackTraceMessages",
+			...
+		]
+	} 
+----
+
+Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.
+
+Sie wird nur befüllt, falls ein Fehler auftritt. 
+Ansonsten ist dieses Objekt *null*.
+
+==== returnErrorMessage/detailsMessage
+
+Die DetailsMessage der Exception, die geworfen wurde.
+
+==== returnErrorMessage/cause
+
+Der Grund, weshalb die Exception geworfen wurde, z.b.:
+_java.lang.NullPointerException_.
+
+==== returnErrorMessage/trace
+
+Der StackTrace der geworfenen Exception nach jedem Abatz getrennt.

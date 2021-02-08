@@ -287,13 +287,13 @@ public class SqlViewController {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 		}
-		sb.append(") as RowConstraintResult");
+		sb.append(" ) as RowConstraintResult");
 
-		if (page >= 0) {
-			sb.append("\r\nwhere RowNum >" + ((page - 1) * maxRows));
+		if (page > 0) {
+			sb.append("\r\nwhere RowNum > " + ((page - 1) * maxRows));
 			// bei 0 sollen einfach alle Ergebnisse ausgegeben werden
 			if (maxRows > 0) {
-				sb.append("\r\nand RowNum <=" + (((page - 1) * maxRows) + maxRows) + " order by RowNum");
+				sb.append("\r\nand RowNum <= " + (((page - 1) * maxRows) + maxRows) + " order by RowNum");
 			}
 		}
 		return sb.toString();

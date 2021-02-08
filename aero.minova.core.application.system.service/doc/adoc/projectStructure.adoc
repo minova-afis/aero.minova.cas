@@ -9,23 +9,28 @@ CAS Module beginnen mit dem Prefix *"aero.minova.cas."*.
 === Ordnerstruktur
 
 Die Struktur des CAS Projekts und der CAS Modlue folgen der Konvention nach 
-link:https://github.com/minova-afis/aero.minova.spring.service/[Minova Spring Boot Standart]
+link:https://github.com/minova-afis/aero.minova.spring.service/[Minova Spring Boot Standard]
 
-Eine solche Ordnerstruktur sieht folgendermaßen aus:
+Die Ordnerstruktur sieht folgendermaßen aus:
 
 ----
 cas-project
-+--cas-modul
-|	+-- src
-|	|	+-- main/
-|	|	|	+-- java/
-|	|	|	+-- resources/
++--bundles
+|	+--cas-modul
+|	+--cas-modul
+|	+--cas-modul
+|	|	+-- src
+|	|	|	+-- main/
+|	|	|	|	+-- java/
+|	|	|	|	+-- resources/
+|	|	|	|
+|	|	|	+-- test/
+|	|	|		+-- java/
 |	|	|
-|	|	+-- test/
-|	|		+-- java/
-|	|	
-|	+-- doc/
-|	|	+-- adoc/
+|	|	+-- doc/
+|	|	|	+-- adoc/
+|	|	|
+|	|	+-- pom.xml
 |	|	
 |	+-- pom.xml
 |	+-- README.adoc
@@ -36,8 +41,8 @@ cas-project
 
 === pom.xml
 
-Sowohl das Projekt, als auch das Modul selbst, besitzen jeweils eine pom.xml.
-Muss ein Plugin hinzugefügt werden, geschieht dies in der POM des Projekts.
+Sowohl das Projekt, sowie der Ordner _bundles_, als auch das Modul selbst, besitzen jeweils eine pom.xml.
+Muss ein Plugin hinzugefügt werden, geschieht dies möglichst in der POM des Projekts.
 Eine Dependency hingegen wird in der POM des Moduls eingefügt.
 
 
@@ -80,9 +85,15 @@ Dort werden alle Klassen hinterlegt, welche zum Testen des Programms implementie
 			+-- index.adoc
 ----
 
-In diesem Ordner werden alle Dokumente bezüglich des Modules als *.adoc*-Dateien abgelegt.
+In diesem Ordner wird jegliche Dokumentation bezüglich des Moduls als *.adoc*-Dateien abgelegt.
 
 
 Hier sollte es eine *index.adoc* geben, welche als Inhaltsverzeichnis für weitere adoc-Dateien innerhalb des Moduls dient.
-Außerdem sollte die README.adoc des Moduls auf die index.adoc verweisen.
+Außerdem sollte die *README.adoc* des _bundles_ auf diese index.adoc verweisen, sodass die README.adoc als Inhaltsverzeichnis des Projektes fungiert.
 
+
+=== SQL
+
+Müssen neue Tabellen,Views oder Prozeduren für das Modul bereit gestellt/geändert werden,
+werden diese nicht mehr innerhalb des Moduls in einem extra Package hinterlegt,
+sondern werden direkt im data schema initialisiert/geändert.

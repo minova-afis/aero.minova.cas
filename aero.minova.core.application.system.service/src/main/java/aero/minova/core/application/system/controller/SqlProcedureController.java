@@ -6,7 +6,6 @@ import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -66,11 +65,13 @@ public class SqlProcedureController {
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws SQLException { 
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
-		Connection connection = systemDatabase.connection();
+		final val connection = systemDatabase.getConnection();
 		try {
-			Set<ExecuteStrategy> executeStrategies = new HashSet<>();
+			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
-			val preparedStatement = connection.prepareCall(prepareProcedureString(inputTable, executeStrategies));
+			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
+			logger.info("Executing: " + procedureCall);
+			final val preparedStatement = connection.prepareCall(procedureCall);
 			range(0, inputTable.getColumns().size())//
 					.forEach(i -> {
 						try {
@@ -158,8 +159,6 @@ public class SqlProcedureController {
 									return new Column(name, DataType.INSTANT);
 								} else if (type == Types.INTEGER) {
 									return new Column(name, DataType.INTEGER);
-								} else if (type == Types.DOUBLE) {
-									return new Column(name, DataType.DOUBLE);
 								} else if (type == Types.VARCHAR) {
 									return new Column(name, DataType.STRING);
 								} else if (type == Types.NVARCHAR) {
@@ -205,7 +204,7 @@ public class SqlProcedureController {
 							if (outputColumnsMapping.get(i)) {
 								outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
 							} else {
-								inputTable.getRows().get(0).getValues().get(i);
+								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 							}
 						});
 			}
@@ -219,6 +218,8 @@ public class SqlProcedureController {
 				logger.error("Couldn't roll back procedure execution: ", e1);
 			}
 			throw e;
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 	}
 
@@ -228,12 +229,14 @@ public class SqlProcedureController {
 
 	/**
 	 * Bereitet einen Prozedur-String vor
-	 * 
-	 * @param name
-	 * @param fds
+	 *
+	 * @param params
+	 *            SQL-Call-Parameter
 	 * @param strategy
-	 * @return
+	 *            SQL-Execution-Strategie
+	 * @return SQL-Code
 	 * @throws IllegalArgumentException
+	 *             Fehler, wenn die Daten in params nicht richtig sind.
 	 */
 	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {
@@ -242,7 +245,7 @@ public class SqlProcedureController {
 		final int paramCount = params.getColumns().size();
 		final boolean returnRequired = ExecuteStrategy.returnRequired(strategy);
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		sb.append('{').append(returnRequired ? "? = call " : "call ").append(params.getName()).append("(");
 		for (int i = 0; i < paramCount; i++) {
 			sb.append(i == 0 ? "?" : ",?");

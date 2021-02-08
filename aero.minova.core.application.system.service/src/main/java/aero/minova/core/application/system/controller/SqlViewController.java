@@ -1,9 +1,12 @@
 package aero.minova.core.application.system.controller;
 
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,15 +48,15 @@ public class SqlViewController {
 		List<Row> authoritiesForThisTable = checkPrivilege(allUserAuthorities, inputTable.getName()).getRows();
 		if (authoritiesForThisTable.isEmpty())
 			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+		final val connection = systemDatabase.getConnection();
 		try {
 			Table accessableTable = columnSecurity(inputTable, authoritiesForThisTable);
 			inputTable = accessableTable;
 			val countQuery = prepareViewString(inputTable, false, 1000, true, authoritiesForThisTable);
 			logger.info("Executing: " + countQuery);
-			val viewCounter = systemDatabase//
-					.connection()//
-					.prepareCall(countQuery)//
-					.executeQuery();
+			val preparedCountStatement = connection.prepareCall(countQuery);
+			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement);
+			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
 			val limit = Optional.ofNullable(inputTable.getMetaData())//
@@ -61,9 +64,10 @@ public class SqlViewController {
 					.orElse(Integer.MAX_VALUE);
 			val viewQuery = prepareViewString(inputTable, false, limit, false, authoritiesForThisTable);
 			logger.info("Executing: " + viewQuery);
-			ResultSet resultSet = systemDatabase.connection()//
-					.prepareCall(viewQuery)//
-					.executeQuery();
+			val preparedStatement = connection.prepareCall(viewQuery);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+			ResultSet resultSet = preparedViewStatement.executeQuery();
+
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			if (limit < viewCount) {
 				if (result.getMetaData() == null) {
@@ -74,7 +78,77 @@ public class SqlViewController {
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
+	}
+
+	/**
+	 * der Value könnte noch einen SQL Operator enthalten, welcher hier entfernt wird
+	 * 
+	 * @param inputTable
+	 *            die Table, welche vom getIndexView aufgerufen wurde
+	 * @param preparedStatement
+	 *            das Prepared Statement, welches nur noch befüllt werden muss
+	 * @return das befüllte, ausführbare Prepared Statement
+	 */
+	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
+		int parameterOffset = 1;
+
+		for (int i = 0; i < inputTable.getColumns().size(); i++) {
+			if (!inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME))
+				try {
+					val iVal = inputTable.getRows().get(0).getValues().get(i);
+					val type = inputTable.getColumns().get(i).getType();
+
+					if (!(iVal == null)) {
+						String stringValue = parseType(iVal, type);
+						preparedStatement.setString(i + parameterOffset, stringValue);
+					} else {
+						// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
+						// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
+						parameterOffset--;
+					}
+				} catch (Exception e) {
+					throw new RuntimeException("Could not parse input parameter with index:" + i, e);
+				}
+		}
+		return preparedStatement;
+	}
+
+	/**
+	 * der Value könnte noch einen SQL Operator enthalten, welcher hier entfernt wird
+	 */
+	protected String parseType(Value val, DataType type) {
+		String parsedType;
+		if (type == DataType.BOOLEAN) {
+			parsedType = val.getBooleanValue() + "";
+		} else if (type == DataType.DOUBLE) {
+			parsedType = val.getDoubleValue() + "";
+		} else if (type == DataType.INSTANT) {
+			parsedType = val.getInstantValue() + "";
+		} else if (type == DataType.INTEGER) {
+			parsedType = val.getIntegerValue() + "";
+		} else if (type == DataType.LONG) {
+			parsedType = val.getLongValue() + "";
+		} else if (type == DataType.STRING) {
+			parsedType = val.getStringValue();
+		} else if (type == DataType.ZONED) {
+			parsedType = val.getZonedDateTimeValue() + "";
+		} else {
+			throw new IllegalArgumentException("Unknown type: " + type.name());
+		}
+		if (parsedType.equals("null"))
+			parsedType = val.getStringValue();
+
+		if (hasOperator(parsedType))
+			parsedType = parsedType.substring(getOperatorEndIndex(parsedType));
+
+		// beim Zoned-Typ gäbe es Probleme beim parsen nach Instant, falls ein Operator davor wäre
+		if (type == DataType.ZONED)
+			parsedType = ZonedDateTime.parse(parsedType).toInstant().toString();
+
+		return parsedType;
 	}
 
 	/**
@@ -174,6 +248,10 @@ public class SqlViewController {
 	 */
 	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuffer sb = new StringBuffer();
+		if (params.getName() == null || params.getName().trim().length() == 0) {
+			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+		}
+
 		if (count) {
 			sb.append("select count(1) from ");
 		} else {
@@ -329,22 +407,23 @@ public class SqlViewController {
 
 					// #13193
 					if (strValue.equalsIgnoreCase("null") || strValue.equalsIgnoreCase("not null")) {
-						strValue = "is " + strValue;
-					}
-					if (!hasOperator(strValue)) {
-						if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && !strValue.contains("%")) {
-							strValue += "%";
-						}
-
-						if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_"))) {
-							clause.append(" like");
+						clause.append("is ").append(strValue);
+					} else {
+						if (!hasOperator(strValue)) {
+							if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%"))) {
+								strValue += "%";
+								params.getRows().get(rowI).getValues().get(colI).setValue(strValue);
+							}
+							if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_"))) {
+								clause.append(" like");
+							} else {
+								clause.append(" =");
+							}
 						} else {
-							clause.append(" =");
+							clause.append(" ").append(strValue.substring(0, getOperatorEndIndex(strValue)));
 						}
+						clause.append(' ').append("?");
 					}
-
-					strValue = encloseInCommasIfRequired(def, strValue);
-					clause.append(' ').append(strValue);
 				}
 			}
 
@@ -404,27 +483,6 @@ public class SqlViewController {
 		}
 		rowSec.append(" )");
 		return rowSec.toString();
-	}
-
-	/**
-	 * Abhängig von dem Feld-Typ, wird der Wert von Kommas umgeben oder nicht
-	 */
-	protected static String encloseInCommasIfRequired(Value vd, String value) {
-		if (vd == null || value == null) {
-			return value;
-		}
-
-		if (SQL_IS_NULL.equalsIgnoreCase(value.trim()) || SQL_IS_NOT_NULL.equalsIgnoreCase(value.trim())) {
-			return value;
-		} else if (vd.getType() == DataType.STRING || vd.getType().equals(DataType.INSTANT) || vd.getType().equals(DataType.ZONED)) {
-			final int i = getOperatorEndIndex(value);
-			if (i > 0) {
-				return value.substring(0, i) + " '" + value.substring(i).trim() + "'";
-			} else {
-				return "'" + value.substring(i).trim() + "'";
-			}
-		}
-		return value;
 	}
 
 	/**

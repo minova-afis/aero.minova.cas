@@ -5,6 +5,8 @@
 * Zurück zur link:..[Übersicht]
 
 * xref:api.adoc#[API]
+* xref:mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
+* xref:properties.adoc#[Properties]
 * xref:versions.adoc#[Versionen]
 * xref:security.adoc#[Sicherheitsmechanismen]
 
@@ -18,3 +20,6 @@ Der Dienst wurde mit dem Ticket #42940 ins leben gerufen.
 * Inhalt von lib und die gebaut jar in einen Ordner bringen.
 * `application-production.properties` und `aero.minova.core.application.system.xml` an das System anpassen.
 * Als Windows Dienst mithilfe von `aero.minova.core.application.system.exe install` via cmd installieren.
+
+NOTE: Es gibt die Möglichkeit diesen Dienst in Zukunft mit dem Installtool zu installieren.
+Siehe ch.minova.service.afis.dispatch.restriction.loader.plot oder frage AVM)

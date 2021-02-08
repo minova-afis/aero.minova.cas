@@ -1,11 +1,12 @@
 package org.lustin.trac.xmlprc;
 
-/**
- * @author lustin
- */
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+
+/**
+ * @author lustin
+ */
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.common.TypeConverter;

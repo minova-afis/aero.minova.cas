@@ -63,17 +63,21 @@ public class SqlProcedureController {
 				inputTable.setMetaData(new TableMetaData());
 				inputMetaData = inputTable.getMetaData();
 			}
-			int page;
-			int limit;
+			final int page;
+			final int limit;
 			// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
-			if (inputMetaData.getPage() == null || inputMetaData.getPage() <= 0) {
+			if (inputMetaData.getPage() == null) {
 				page = 1;
+			} else if (inputMetaData.getPage() <= 0) {
+				throw new IllegalArgumentException("Page must be higher than 0");
 			} else {
 				page = inputMetaData.getPage();
 			}
 			// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
-			if (inputMetaData.getLimited() == null || inputMetaData.getLimited() < 0) {
+			if (inputMetaData.getLimited() == null) {
 				limit = 0;
+			} else if (inputMetaData.getLimited() < 0) {
+				throw new IllegalArgumentException("Limited must be higher or equal to 0");
 			} else {
 				limit = inputMetaData.getLimited();
 			}
@@ -183,7 +187,7 @@ public class SqlProcedureController {
 				while (sqlResultSet.next()) {
 					if (limit > 0) {
 						// nur die Menge an Rows, welche auf der gewünschten Page liegen
-						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (((page - 1) * limit) + limit)) {
+						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
 							resultSet.addRow(//
 									convertSqlResultToRow(resultSet//
 											, sqlResultSet//

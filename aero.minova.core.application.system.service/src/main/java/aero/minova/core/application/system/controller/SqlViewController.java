@@ -46,26 +46,30 @@ public class SqlViewController {
 	public Table getIndexView(@RequestBody Table inputTable) {
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
-		TableMetaData inputMetaData = inputTable.getMetaData();
-		if (inputTable.getMetaData() == null) {
-			inputMetaData = new TableMetaData();
-		}
-		int page;
-		int limit;
-		// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
-		if (inputMetaData.getPage() == null || inputMetaData.getPage() <= 0) {
-			page = 1;
-		} else {
-			page = inputMetaData.getPage();
-		}
-		// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
-		if (inputMetaData.getLimited() == null || inputMetaData.getLimited() < 0) {
-			limit = 0;
-		} else {
-			limit = inputMetaData.getLimited();
-		}
 		try {
-			final val countQuery = prepareViewString(inputTable, false, limit, true);
+			TableMetaData inputMetaData = inputTable.getMetaData();
+			if (inputTable.getMetaData() == null) {
+				inputMetaData = new TableMetaData();
+			}
+			final int page;
+			final int limit;
+			// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
+			if (inputMetaData.getPage() == null) {
+				page = 1;
+			} else if (inputMetaData.getPage() <= 0) {
+				throw new IllegalArgumentException("Page must be higher than 0");
+			} else {
+				page = inputMetaData.getPage();
+			}
+			// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
+			if (inputMetaData.getLimited() == null) {
+				limit = 0;
+			} else if (inputMetaData.getLimited() < 0) {
+				throw new IllegalArgumentException("Limited must be higher or equal to 0");
+			} else {
+				limit = inputMetaData.getLimited();
+			}
+			final val countQuery = prepareViewString(inputTable, false, 1, true);
 			logger.info("Executing: " + countQuery);
 			val preparedCountStatement = connection.prepareCall(countQuery);
 			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement);
@@ -83,8 +87,9 @@ public class SqlViewController {
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
+			Exception sqlE = new Exception("Couldn't execute query: ", e);
 			ErrorMessage error = new ErrorMessage();
-			error.setErrorMessage(e);
+			error.setErrorMessage(sqlE);
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
@@ -308,7 +313,7 @@ public class SqlViewController {
 			sb.append("\r\nwhere RowNum > " + ((page - 1) * maxRows));
 			// bei 0 sollen einfach alle Ergebnisse ausgegeben werden
 			if (maxRows > 0) {
-				sb.append("\r\nand RowNum <= " + (((page - 1) * maxRows) + maxRows) + " order by RowNum");
+				sb.append("\r\nand RowNum <= " + (page * maxRows) + " order by RowNum");
 			}
 		}
 		return sb.toString();

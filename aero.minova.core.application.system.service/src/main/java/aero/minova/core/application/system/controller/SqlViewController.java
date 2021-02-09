@@ -3,10 +3,10 @@ package aero.minova.core.application.system.controller;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,8 +46,9 @@ public class SqlViewController {
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		List<Row> authoritiesForThisTable = checkPrivilege(allUserAuthorities, inputTable.getName()).getRows();
-		if (authoritiesForThisTable.isEmpty())
+		if (authoritiesForThisTable.isEmpty()) {
 			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+		}
 		final val connection = systemDatabase.getConnection();
 		try {
 			Table accessableTable = columnSecurity(inputTable, authoritiesForThisTable);
@@ -95,23 +96,36 @@ public class SqlViewController {
 	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
 		int parameterOffset = 1;
 
-		for (int i = 0; i < inputTable.getColumns().size(); i++) {
-			if (!inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME))
+		List<Value> inputValues = new ArrayList<>();
+		for (Row row : inputTable.getRows()) {
+			inputValues.addAll(row.getValues());
+		}
+
+		for (int i = 0; i < inputValues.size(); i++) {
+			int columnPointer = i % inputTable.getColumns().size();
+			if (!inputTable.getColumns().get(columnPointer).getName().equals(Column.AND_FIELD_NAME)) {
 				try {
-					val iVal = inputTable.getRows().get(0).getValues().get(i);
-					val type = inputTable.getColumns().get(i).getType();
+					val iVal = inputValues.get(i);
+					val type = inputTable.getColumns().get(columnPointer).getType();
 
 					if (!(iVal == null)) {
 						String stringValue = parseType(iVal, type);
-						preparedStatement.setString(i + parameterOffset, stringValue);
+						if (!stringValue.trim().isEmpty()) {
+							preparedStatement.setString(i + parameterOffset, stringValue);
+						} else {
+							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
+							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
+							parameterOffset--;
+						}
 					} else {
-						// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
-						// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
 						parameterOffset--;
 					}
 				} catch (Exception e) {
 					throw new RuntimeException("Could not parse input parameter with index:" + i, e);
 				}
+			} else {
+				parameterOffset--;
+			}
 		}
 		return preparedStatement;
 	}
@@ -188,20 +202,13 @@ public class SqlViewController {
 		inputRow.addValue(new Value(""));
 		inputRow.addValue(new Value(false));
 		userGroups.add(inputRow);
+		final val connection = systemDatabase.getConnection();
 		try {
-
-			// TODO: Änderung aus Issue #8 (SQL Injection verhindern) auch für die Methode aktivieren
-//			final val viewQuery = prepareViewString(inputTable, false, limit, false);
-//			logger.info("Executing: " + viewQuery);
-//			val preparedStatement = connection.prepareCall(viewQuery);
-//			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
-//			ResultSet resultSet = preparedViewStatement.executeQuery();
-
-			val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
+			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
 			logger.info("Executing: " + viewQuery);
-			ResultSet resultSet = systemDatabase.connection()//
-					.prepareCall(viewQuery)//
-					.executeQuery();
+			val preparedStatement = connection.prepareCall(viewQuery);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+			ResultSet resultSet = preparedViewStatement.executeQuery();
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;
 		} catch (Exception e) {

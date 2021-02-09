@@ -17,10 +17,7 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"metaData": 
 		{
         	"limited": 10,
-        	"page": 1,
-        	"totalResults": 10,
-        	"totalPages": 1,
-        	"resultsLeft": 0
+        	...
     	},
 	"columns": [
 		{
@@ -45,40 +42,31 @@ Der Name der Prozedur, die ausgeführt wird.
 
 === metaData
 
+----
+	"metaData": 
+		{
+        	"limited": 10,
+        	"page": 1,
+        	"totalResults": 10,
+        	"totalPages": 1,
+        	"resultsLeft": 0
+    	},
+----
+
 Anhand von metaData kann man die sichtbare Ergebnissemenge einschränken.
 Dies ist durch die Parameter limited und page möglich.
 
 .veränderbare Parameter:
-* limited
-* page
+* *limited*: Anzahl an Treffern, welche bei der Anfrage zurückgegeben werden sollen.
+Ist der Wert 0, werden alle Treffer zurückgegeben und der Wert der totalResults angezeigt.
+* *page*: die n-te Seite der totalPages basierend auf limited.
+Ist kein Wert für page gesetzt, werden die Ergebnisse von 0 bis limited,
+also die 1.Seite, ausgegeben.
 
 .unveränderbare/vom Service berechnete Parameter:
-* totalResults
-* totalPages
-* resultsLeft
-
-==== metaData/limited
-
-Gibt an, wie viele Treffer bei der Anfrage zurückgegeben werden sollen.
-Ist der Wert 0, werden alle Treffer zurückgegeben und der Wert der totalResults angezeigt.
-
-==== metaData/page
-
-Basierend auf limited wird die n-te Seite der totalPages ausgegeben.
-Ist kein Wert für page gesetzt, werden die Ergebnisse von 0 bis limited,
-also die 1.Seite, zurückgegeben.
-
-==== metaData/totalResults
-
-Zeigt an, wie viele Rows für die angegebenen Suchparameter gefunden wurden.
-
-==== metaData/totalPages
-
-Gibt an, wie viele Seiten basierend auf den totalResults und limited errechnet wurden.
-
-==== metaData/resultsLeft
-
-Gibt an, wie viele Rows nach der jetzigen Seite noch übrig sind.
+* *totalResults*: Anzahl an Rows, welche für die angegebenen Suchparameter gefunden wurden.
+* *totalPages*: Anzahl an Seiten, welche basierend auf den totalResults und limited errechnet wurden.
+* *resultsLeft*: Anzahl an Rows, welche nach der momentanen Seite noch übrig sind.
 
 === columns
 

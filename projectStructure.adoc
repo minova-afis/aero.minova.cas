@@ -21,12 +21,7 @@ cas-project
 |	+-- pom.xml
 |
 +--server/
-|	+-- src/
-|	|	+-- main/
-|	|	|	+-- java/
-|	|	|
-|	|	+-- test/
-|	|		+-- java/
+|	+-- aero.minova.cas.server/
 |	|	
 |	+-- pom.xml
 |
@@ -54,38 +49,40 @@ Sowohl das Projekt selbst, sowie die Ordner client, server und setup besitzen je
 sodass *insgesamt vier POMs* im gesamten Projekt exisiteren:
 
 * in der POM des *Projektes* werden die drei Verzeichnisse als Modules eingebunden.
-* in der POM des *client*-Ordners werden nötige Plugins als jars eingebunden.
-* in der POM des *server*-Ordners sind die Dependencies eingebunden, welche für den Source Code benötigt werden.
+* in der POM des *client*-Ordners werden nötige Plugins für die RCP-Anwendung als Unterbundles eingebunden.
+* in der POM des *server*-Ordners wird zusätzliche Logik in Form von Plugind eingebunden.
 * in der POM des *setup*-Ordners sind die jars des client- und des server-Verzeichnisses eingebunden.
 
 === client/
 ----
 +--client/
 	+-- bundle/
-	|	+-- plugin.jar
+	|	+-- aero.minova.cas.clientplugin/
+	|	+-- aero.minova.cas.clientplugin/
+	|	+-- aero.minova.cas.clientplugin/
 	|
 	+-- pom.xml
 ----
 
 Im Verzeichnis 'client' werden alle Plugins, 
-welche benötigt werden im Unterordner bundle/ abgelegt und in der POM des client-Ordners eingebunden.
+welche für die RCP-Anwendung benötigt werden, im Unterordner 'bundle'
+als Projekte abgelegt, welches Jars generieren können.
+Wichtig ist dabei, die Plugins auch in die POM des client-Ordners einzubinden.
 
 === server/
 ----
 +-- server/
-	+-- src/
-	|	+-- main/
-	|		+-- java/
-	|		|	
-	|		+--test/
+	+-- aero.minova.cas.server/
+	|	+--  aero.minova.cas.serverplugin
+	|	+--  aero.minova.cas.serverplugin
+	|	+--  aero.minova.cas.serverplugin
 	|
 	+-- pom.xml
 ----
 
-
-Im Verzeichnis 'server' wird die verarbeitende Logik des CAS implementiert.
-Jeglicher Source Code wird also hier hinterlegt. 
-Bei diesem handelt es sich um Spring Boot Komponenten und Services.
+Der 'server' Ordner enthält ein Projekt,
+welches ein oder mehrere Plugins für das CAS bereitstellt.
+Auch hier darf nicht vergessen werden, die Plugins in die POM einzubinden.
 
 === setup/
 ----

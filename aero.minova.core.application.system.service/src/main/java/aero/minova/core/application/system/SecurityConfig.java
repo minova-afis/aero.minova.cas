@@ -88,7 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
 					throws RuntimeException {
 				Table tUser = new Table();
-				tUser.setName("tUser");
+				tUser.setName("xtcasUser");
 				List<Column> columns = new ArrayList<>();
 				columns.add(new Column("KeyText", DataType.STRING));
 				columns.add(new Column("SecurityToken", DataType.STRING));
@@ -127,7 +127,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 				// die Berechtigungen der Gruppen noch herausfinden
 				Table groups = new Table();
-				groups.setName("tUserGroup");
+				groups.setName("xtcasUserGroup");
 				List<Column> groupcolumns = new ArrayList<>();
 				groupcolumns.add(new Column("KeyText", DataType.STRING));
 				groupcolumns.add(new Column("SecurityToken", DataType.STRING));

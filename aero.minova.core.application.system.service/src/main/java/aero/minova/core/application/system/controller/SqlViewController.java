@@ -4,6 +4,8 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -95,23 +97,37 @@ public class SqlViewController {
 	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
 		int parameterOffset = 1;
 
-		for (int i = 0; i < inputTable.getColumns().size(); i++) {
-			if (!inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME))
+		List<Value> inputValues = new ArrayList<>();
+		for (Row row : inputTable.getRows()) {
+			inputValues.addAll(row.getValues());
+		}
+
+		for (int i = 0; i < inputValues.size(); i++) {
+			// auf diese Weise kann man die Columns mehrfach entlang gehen ohne einen NullPointer befürchten zu müssen
+			int columnPointer = i % inputTable.getColumns().size();
+			if (!inputTable.getColumns().get(columnPointer).getName().equals(Column.AND_FIELD_NAME)) {
 				try {
-					val iVal = inputTable.getRows().get(0).getValues().get(i);
-					val type = inputTable.getColumns().get(i).getType();
+					val iVal = inputValues.get(i);
+					val type = inputTable.getColumns().get(columnPointer).getType();
 
 					if (!(iVal == null)) {
 						String stringValue = parseType(iVal, type);
-						preparedStatement.setString(i + parameterOffset, stringValue);
+						if (!stringValue.trim().isEmpty()) {
+							preparedStatement.setString(i + parameterOffset, stringValue);
+						} else {
+							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' oder Column.name = Column.AND_FIELD_NAME hat
+							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
+							parameterOffset--;
+						}
 					} else {
-						// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
-						// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
 						parameterOffset--;
 					}
 				} catch (Exception e) {
 					throw new RuntimeException("Could not parse input parameter with index:" + i, e);
 				}
+			} else {
+				parameterOffset--;
+			}
 		}
 		return preparedStatement;
 	}

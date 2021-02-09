@@ -8,95 +8,124 @@ CAS Module beginnen mit dem Prefix *"aero.minova.cas."*.
 
 === Ordnerstruktur
 
-Die Struktur des CAS Projekts und der CAS Module folgen der Konvention nach 
-link:https://github.com/minova-afis/aero.minova.spring.service/[Minova Spring Boot Standard]
+Die Struktur des CAS Projekts soll dem Beispiel 
+link:https://github.com/minova-afis/aero.minova.workingtime[aero.minova.workingtime] folgen.
 
 Die Ordnerstruktur sieht folgendermaßen aus:
 
 ----
 cas-project
-+--bundles
-|	+--cas-modul
-|	+--cas-modul
-|	+--cas-modul
-|	|	+-- src
-|	|	|	+-- main/
-|	|	|	|	+-- java/
-|	|	|	|	+-- resources/
-|	|	|	|
-|	|	|	+-- test/
-|	|	|		+-- java/
++--client/
+|	+-- bundle/
+|	|
+|	+-- pom.xml
+|
++--server/
+|	+-- src/
+|	|	+-- main/
+|	|	|	+-- java/
 |	|	|
-|	|	+-- doc/
-|	|	|	+-- adoc/
-|	|	|
-|	|	+-- pom.xml
+|	|	+-- test/
+|	|		+-- java/
 |	|	
 |	+-- pom.xml
-|	+-- README.adoc
 |
++--setup/
+|	+-- src/
+|	|	+-- main/
+|	|		+-- resources/
+|	|
+|	+-- doc/
+|	|	+-- adoc/
+|	|
+|	+-- pom.xml
+|	
 +-- pom.xml
 +-- README.adoc
+
 ----
+
+
+Die *README.adoc* des Root-Verzeichnisses enthält wichtige Informationen zum CAS und dient als Anleitung zur Installation beim Kunden.
 
 === pom.xml
 
-Sowohl das Projekt, sowie der Ordner _bundles_, als auch das Modul selbst, besitzen jeweils eine pom.xml.
-Muss ein Plugin hinzugefügt werden, geschieht dies möglichst in der POM des Projekts.
-Eine Dependency hingegen wird in der POM des Moduls eingefügt.
+Sowohl das Projekt selbst, sowie die Ordner client, server und setup besitzen jeweils eine pom.xml,
+sodass *insgesamt vier POMs* im gesamten Projekt exisiteren:
 
+* in der POM des *Projektes* werden die drei Verzeichnisse als Modules eingebunden.
+* in der POM des *client*-Ordners werden nötige Plugins als jars eingebunden.
+* in der POM des *server*-Ordners sind die Dependencies eingebunden, welche für den Source Code benötigt werden.
+* in der POM des *setup*-Ordners sind die jars des client- und des server-Verzeichnisses eingebunden.
 
-=== src/main/java
-
-In diesem Verzeichnis liegt wie es Usus ist der Source Code.
+=== client/
 ----
-+-- cas-modul
-	+-- src
++--client/
+	+-- bundle/
+	|	+-- plugin.jar
+	|
+	+-- pom.xml
+----
+
+Im Verzeichnis 'client' werden alle Plugins, 
+welche benötigt werden im Unterordner bundle/ abgelegt und in der POM des client-Ordners eingebunden.
+
+=== server/
+----
++-- server/
+	+-- src/
 	|	+-- main/
-	|	|	+-- java/
-	|	|		+-- cas-modul/
-	|	|			+-- cas-modul.java	
-	.	|			+-- cas-modul.xml
-	.	.			+-- setup/
-		.				+--Setup.xml
+	|		+-- java/
+	|		|	
+	|		+--test/
+	|
+	+-- pom.xml
+----
+
+
+Im Verzeichnis 'server' wird die verarbeitende Logik des CAS implementiert.
+Jeglicher Source Code wird also hier hinterlegt. 
+Bei diesem handelt es sich um Spring Boot Komponenten und Services.
+
+=== setup/
+----
++-- setup/
+	+-- src/
+	|	+-- main/
+	|	|	+-- resources/
+	|	|		+--Setup.xml
+	|	|		+-- xml/
+	|	|		|	+-- cas-project.xml
+	.	|		+-- sql/
+	.	.			+-- xpcasProcedure
+		.			+-- xvcasView
+					+-- xtcasTable
 [...]		
 ----
 
 
-Es sollte immer ein Package geben, welches denselben Namen trägt wie das Modul.
-In diesem sollte eine *.xml-Datei* liegen, welche das UI der Erweiterung beschreibt, und/oder eine *.java-Datei* existieren, welche das Modul startet.
-Auch die beiden Dateien sollten nach dem Modul benannt sein.
+Im Verzeichnis 'setup' sollte es unter src/main/resources eine *Setup.xml* geben, welche zur Installation dient.
+Falls weitere xml-Dateien benötigt werden, können diese im Unterordner *xml/* abgelegt werden.
+Auch andere Ressourcen wie Icons gehören in den setup-Ordner.
 
-Falls es sich um ein installierbares Modul handelt, wird
-zusätzlich noch eine *Setup.xml* benötigt, welche sich im gleichnamigen Unter-Paket befinden muss.
+Desweiteren können zusätzliche SQL Ressourcen im Unterordner *sql/* abgelegt werden. Hierbei ist zu beachten, dass:
 
-=== src/main/resources
+* Prozeduren mit *'xpcas'* 
+* Views mit *'xvcas'* und
+* Tabellen mit *'xtcas'*
+beginnen müssen.
 
-In diesem Ordner werden Konfigurationsdateien wie die _application.properties_ oder andere wichtige Dateien wie der _Keystore_ hinterlegt.
-
-=== src/test/java
-
-Dort werden alle Klassen hinterlegt, welche zum Testen des Programms implementiert wurden.
-
-=== doc/adoc
+==== doc/adoc/
 
 ----
-+--cas-modul
++--setup
 	[...]	
 	+-- doc/
 		+-- adoc/
 			+-- index.adoc
 ----
 
-In diesem Ordner wird jegliche Dokumentation bezüglich des Moduls als *.adoc*-Dateien abgelegt.
-
+Im *doc/adoc/*-Verzeichnis wird jegliche Dokumentation bezüglich der Funktionalitäten des CAS als *.adoc*-Dateien abgelegt.
 
 Hier sollte es eine *index.adoc* geben, welche als Inhaltsverzeichnis für weitere adoc-Dateien innerhalb des Moduls dient.
-Außerdem sollte die *README.adoc* des _bundles_ auf diese index.adoc verweisen, sodass die README.adoc als Inhaltsverzeichnis des Projektes fungiert.
 
-
-=== SQL
-
-Müssen neue Tabellen,Views oder Prozeduren für das Modul bereit gestellt/geändert werden,
-werden diese nicht mehr innerhalb des Moduls in einem extra Package hinterlegt,
-sondern werden direkt im data schema initialisiert/geändert.

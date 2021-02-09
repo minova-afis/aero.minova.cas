@@ -50,7 +50,7 @@ sodass *insgesamt vier POMs* im gesamten Projekt exisiteren:
 
 * in der POM des *Projektes* werden die drei Verzeichnisse als Modules eingebunden.
 * in der POM des *client*-Ordners werden nötige Plugins für die RCP-Anwendung als Unterbundles eingebunden.
-* in der POM des *server*-Ordners wird zusätzliche Logik in Form von Plugind eingebunden.
+* in der POM des *server*-Ordners wird zusätzliche Logik in Form von Plugins eingebunden.
 * in der POM des *setup*-Ordners sind die jars des client- und des server-Verzeichnisses eingebunden.
 
 === client/
@@ -72,17 +72,27 @@ Wichtig ist dabei, die Plugins auch in die POM des client-Ordners einzubinden.
 === server/
 ----
 +-- server/
-	+-- aero.minova.cas.server/
-	|	+--  aero.minova.cas.serverplugin
-	|	+--  aero.minova.cas.serverplugin
-	|	+--  aero.minova.cas.serverplugin
+	+-- aero.minova.cas.serverplugin/
+	|	+--  src/
+	|	|	+-- main/
+	|	|		+-- java/
+	|	|	+-- test/
+	|	|		+-- java/
+	|	|
+	|	+-- pom.xml
+	|
+	+-- aero.minova.cas.serverplugin/
 	|
 	+-- pom.xml
 ----
 
 Der 'server' Ordner enthält ein Projekt,
 welches ein oder mehrere Plugins für das CAS bereitstellt.
+Diese Plugins müssen ebenfalls als Projekte, welche eine Jar erzeugen können, abgelegt werden. 
 Auch hier darf nicht vergessen werden, die Plugins in die POM einzubinden.
+
+Im Großteil der Fälle wird hier nur ein Plugin vorhanden sein, 
+weshalb dann auch nur eine POM benötigt wird.
 
 === setup/
 ----

@@ -1,0 +1,7 @@
+== Sicherheitsmechanismen
+
+=== SQL Injection
+
+Sowohl beim Aufruf von data/procedure, als auch beim Aufruf von data/index werden prepared statements verwendet.
+
+Desweiteren wird beim Befüllen der statements überprüft, ob der Typ des values mit dem Typ der angefragten Spalte übereinstimmt. 

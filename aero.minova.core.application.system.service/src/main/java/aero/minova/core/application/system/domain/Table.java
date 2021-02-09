@@ -8,6 +8,7 @@ public class Table {
 	private TableMetaData metaData;
 	private List<Column> columns = new ArrayList<>();
 	private List<Row> rows = new ArrayList<>();
+	private ErrorMessage returnErrorMessage;
 
 	public String getName() {
 		return name;
@@ -57,5 +58,13 @@ public class Table {
 
 	public void setMetaData(TableMetaData meta_data) {
 		this.metaData = meta_data;
+	}
+
+	public ErrorMessage getReturnErrorMessage() {
+		return returnErrorMessage;
+	}
+
+	public void setReturnErrorMessage(ErrorMessage errorMessage) {
+		this.returnErrorMessage = errorMessage;
 	}
 }

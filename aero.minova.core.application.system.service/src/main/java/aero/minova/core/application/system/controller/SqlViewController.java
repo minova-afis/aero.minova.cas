@@ -75,7 +75,7 @@ public class SqlViewController {
 
 			val result = convertSqlResultToTable(inputTable, resultSet);
 
-			result.fillMetaDate(result, limit, viewCount, page);
+			result.fillMetaData(result, limit, viewCount, page);
 
 			return result;
 		} catch (Exception e) {

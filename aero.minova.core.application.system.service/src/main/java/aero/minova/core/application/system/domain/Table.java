@@ -17,7 +17,7 @@ public class Table {
 		this.name = name;
 	}
 
-	public void fillMetaDate(Table inputTable, int limit, int totalResults, int page) {
+	public void fillMetaData(Table inputTable, int limit, int totalResults, int page) {
 		TableMetaData metaData = inputTable.getMetaData();
 		if (inputTable.getMetaData() == null) {
 			metaData = new TableMetaData();

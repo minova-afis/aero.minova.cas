@@ -170,7 +170,7 @@ public class SqlViewController {
 	 **/
 	public Table checkPrivilege(List<GrantedAuthority> securityToken, String privilegeName) {
 		Table userPrivileges = new Table();
-		userPrivileges.setName("vCASUserPrivileges");
+		userPrivileges.setName("xvcasUserPrivileges");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
 		columns.add(new Column("KeyText", DataType.STRING));
@@ -301,7 +301,7 @@ public class SqlViewController {
 	 */
 	public Table columnSecurity(Table inputTable, List<Row> userGroups) {
 		Table foo = new Table();
-		foo.setName("tColumnSecurity");
+		foo.setName("xtcasColumnSecurity");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("TableName", DataType.STRING));
 		columns.add(new Column("ColumnName", DataType.STRING));

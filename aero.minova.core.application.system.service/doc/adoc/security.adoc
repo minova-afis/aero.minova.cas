@@ -8,11 +8,11 @@ Neben den SecurityTokens, welche aus dem Active Directory dem User bereits zugeo
 erhält er zudem die SecurityTokens der Gruppen, in welche er sich befindet und einen einzigartigen SecurityToken. 
 
 Der User mitsamt seines Usernames, seinem spezifischen SecurityToken und 
-seinen GruppenSecurityTokens(Memberships) ist in der Tabelle tUser hinterlegt.
+seinen GruppenSecurityTokens(Memberships) ist in der Tabelle xtcasUser hinterlegt.
 
 [source, sql]
 ----
-select KeyLong,KeyText,SecurityToken,Memberships from tUser
+select KeyLong,KeyText,SecurityToken,Memberships from xtcasUser
 ----
 
 * *KeyText*: der Name des Users
@@ -30,7 +30,7 @@ die UserSecurityToken der User enthalten, dessen Spalten der eingeloggte User se
 
 [source, sql]
 ----
-select KeyText,SecurityToken from tUserGroup
+select KeyText,SecurityToken from xtcasUserGroup
 ----
 
 * *KeyText* der Name der UserGroup, welche in den Memberships des Users enthalten ist
@@ -38,12 +38,12 @@ select KeyText,SecurityToken from tUserGroup
 
 === Tabellenzugriffserlaubnis
 
-Bei jedem Aufruf der Methode _getIndexView(Table_ _inputTable)_ wird auf der View vCASUserPrivileges nach den nötigen Berechtigungen gesucht.
+Bei jedem Aufruf der Methode _getIndexView(Table_ _inputTable)_ wird auf der View xvcasUserPrivileges nach den nötigen Berechtigungen gesucht.
 Dies geschieht mit der Methode _checkPrivilege(Table_ _inputTable)_ in folgender Form:
 
 [source, sql]
 ----
-select PrivilegeKeyText,KeyText,RowLevelSecurity from vCASUserPrivileges
+select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserPrivileges
 where (PrivilegeKeyText = 'inputTable.getName()' and KeyText='admin')
 or    (PrivilegeKeyText = 'inputTable.getName()' and KeyText='verwaltung')
 or    ...
@@ -77,13 +77,13 @@ Auf eine Spalte mit dem SecurityToken *NULL* darf jeder User zugreifen.
 === Column-Level-Security
 
 Mit der List an Tripeln, siehe <<Tabellenzugriffserlaubnis>>, wird erst ermittelt, welche Rollen überhaupt auf die Tabelle zugreifen dürfen.
-Die SecurityToken werden dann mithilfe der Tabelle tColumnSecurity abgefragt, ob einer dieser Tokens dazu berechtigt ist, die gesamte Tabelle zu sehen.
+Die SecurityToken werden dann mithilfe der Tabelle xtcasColumnSecurity abgefragt, ob einer dieser Tokens dazu berechtigt ist, die gesamte Tabelle zu sehen.
 Falls dies nicht der Fall ist, erhält man aus eben jener Tabelle alle Spalten, welche berücksichtigt werden dürfen, mit folgender SQL-Abfrage:
 
 
 [source, sql]
 ----
-select KeyLong,TableName,ColumnName,SecurityToken from tColumnSecurity
+select KeyLong,TableName,ColumnName,SecurityToken from xtcasColumnSecurity
 where (TableName = 'vBeispielView' and SecurityToken = 'admin')
 or    (TableName = 'vBeispielView' and SecurityToken = 'verwaltung')
 or    ...

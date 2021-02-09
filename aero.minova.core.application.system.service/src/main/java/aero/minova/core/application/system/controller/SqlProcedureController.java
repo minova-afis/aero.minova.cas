@@ -199,7 +199,7 @@ public class SqlProcedureController {
 					}
 					totalResults++;
 				}
-				resultSet.fillMetaDate(resultSet, limit, totalResults, page);
+				resultSet.fillMetaData(resultSet, limit, totalResults, page);
 			}
 			// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
 			val returnCode = preparedStatement.getObject(1);

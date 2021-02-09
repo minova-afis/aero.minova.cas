@@ -80,7 +80,7 @@ public class SqlViewController {
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
-			result.fillMetaDate(result, limit, viewCount, page);
+			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
 			ErrorMessage error = new ErrorMessage();

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
@@ -20,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
@@ -35,11 +37,11 @@ import lombok.val;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-//	@Value("${security_ldap_domain:minova.com}")
-//	private String domain;
-//
-//	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
-//	private String ldapServerAddress;
+	@Value("${security_ldap_domain:minova.com}")
+	private String domain;
+
+	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
+	private String ldapServerAddress;
 
 	@Autowired
 	SqlViewController svc;
@@ -56,7 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
-//		http.requiresChannel().anyRequest().requiresSecure();
+		http.requiresChannel().anyRequest().requiresSecure();
 	}
 
 	@Bean

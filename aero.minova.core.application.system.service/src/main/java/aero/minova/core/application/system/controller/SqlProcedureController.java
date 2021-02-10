@@ -44,7 +44,7 @@ public class SqlProcedureController {
 
 	@Autowired
 	TracController trac;
-	
+
 	@Autowired
 	SqlViewController svc;
 
@@ -55,17 +55,17 @@ public class SqlProcedureController {
 			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
 			return result;
 		}
-		
-		//bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
+
+		// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		if(svc.checkPrivilege(userAuthorities, inputTable.getName()).getRows().isEmpty()){
+		if (svc.checkPrivilege(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
 			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
 		}
-		return calculateSqlProcedureResult(inputTable);	
-	}		
-		
-	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws SQLException { 
+		return calculateSqlProcedureResult(inputTable);
+	}
+
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) {
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();

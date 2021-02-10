@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,32 +58,49 @@ public class SqlViewController {
 		try {
 			Table accessableTable = columnSecurity(inputTable, authoritiesForThisTable);
 			inputTable = accessableTable;
-			val countQuery = prepareViewString(inputTable, false, 1000, true, authoritiesForThisTable);
+
+			TableMetaData inputMetaData = inputTable.getMetaData();
+			if (inputTable.getMetaData() == null) {
+				inputMetaData = new TableMetaData();
+			}
+			final int page;
+			final int limit;
+			// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
+			if (inputMetaData.getPage() == null) {
+				page = 1;
+			} else if (inputMetaData.getPage() <= 0) {
+				throw new IllegalArgumentException("Page must be higher than 0");
+			} else {
+				page = inputMetaData.getPage();
+			}
+			// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
+			if (inputMetaData.getLimited() == null) {
+				limit = 0;
+			} else if (inputMetaData.getLimited() < 0) {
+				throw new IllegalArgumentException("Limited must be higher or equal to 0");
+			} else {
+				limit = inputMetaData.getLimited();
+			}
+			final val countQuery = prepareViewString(inputTable, false, 1, true, authoritiesForThisTable);
 			logger.info("Executing: " + countQuery);
 			val preparedCountStatement = connection.prepareCall(countQuery);
 			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement);
 			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
-			val limit = Optional.ofNullable(inputTable.getMetaData())//
-					.map(TableMetaData::getLimited)//
-					.orElse(Integer.MAX_VALUE);
-			val viewQuery = prepareViewString(inputTable, false, limit, false, authoritiesForThisTable);
+			val viewQuery = pagingWithSeek(inputTable, false, limit, false, authoritiesForThisTable);
 			logger.info("Executing: " + viewQuery);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
-			if (limit < viewCount) {
-				if (result.getMetaData() == null) {
-					result.setMetaData(new TableMetaData());
-				}
-				result.getMetaData().setLimited(limit);
-			}
+			result.fillMetaData(result, limit, viewCount, page);
+
 		} catch (Exception e) {
+			Exception sqlE = new Exception("Couldn't execute query: ", e);
 			ErrorMessage error = new ErrorMessage();
-			error.setErrorMessage(e);
+			error.setErrorMessage(sqlE);
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
@@ -118,6 +134,7 @@ public class SqlViewController {
 		}
 
 		for (int i = 0; i < inputValues.size(); i++) {
+			// auf diese Weise kann man die Columns mehrfach entlang gehen ohne einen NullPointer befürchten zu müssen
 			int columnPointer = i % inputTable.getColumns().size();
 			if (!inputTable.getColumns().get(columnPointer).getName().equals(Column.AND_FIELD_NAME)) {
 				try {
@@ -129,7 +146,7 @@ public class SqlViewController {
 						if (!stringValue.trim().isEmpty()) {
 							preparedStatement.setString(i + parameterOffset, stringValue);
 						} else {
-							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null' hat
+							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' oder Column.name = Column.AND_FIELD_NAME hat
 							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
 							parameterOffset--;
 						}
@@ -328,6 +345,50 @@ public class SqlViewController {
 		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 
+		return sb.toString();
+	}
+
+	/*
+	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen
+	 */
+	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
+		final StringBuffer sb = new StringBuffer();
+		if (params.getName() == null || params.getName().trim().length() == 0) {
+			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+		}
+		sb.append("select ");
+		val outputFormat = params.getColumns().stream()//
+				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+				.collect(Collectors.toList());
+		if (outputFormat.isEmpty()) {
+			sb.append("* from ");
+		} else {
+			sb.append(//
+					outputFormat.stream()//
+							.map(Column::getName)//
+							.collect(Collectors.joining(", ")));
+			sb.append(" from ");
+		}
+
+		sb.append("( select Row_Number() over (order by KeyLong) as RowNum, * from ").append(params.getName());
+		boolean whereClauseExists = false;
+		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
+			final String where = prepareWhereClause(params, autoLike);
+			sb.append(where);
+			if (!where.trim().equals(""))
+				whereClauseExists = true;
+		}
+    final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
+		sb.append(onlyAuthorizedRows);
+		sb.append(" ) as RowConstraintResult");
+
+		if (page > 0) {
+			sb.append("\r\nwhere RowNum > " + ((page - 1) * maxRows));
+			// bei 0 sollen einfach alle Ergebnisse ausgegeben werden
+			if (maxRows > 0) {
+				sb.append("\r\nand RowNum <= " + (page * maxRows) + " order by RowNum");
+			}
+		}
 		return sb.toString();
 	}
 

@@ -14,9 +14,11 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 --------
 {
 	"name": "ProcedureName",
-	"metaData": {
-		"limited": 1000
-	},
+	"metaData": 
+		{
+        	"limited": 10,
+        	...
+    	},
 	"columns": [
 		{
 			"name": "ParameterName",
@@ -40,16 +42,33 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 
 Der Name der Prozedur, die ausgeführt wird.
 
-=== metaData/limited
+=== metaData
 
-* *Default*: (2^32)-1 = 2.147.483.647
+----
+	"metaData": 
+		{
+        	"limited": 10,
+        	"page": 1,
+        	"totalResults": 10,
+        	"totalPages": 1,
+        	"resultsLeft": 0
+    	},
+----
 
-* *Wertebereich*: 1 bis 2.147.483.647
+Anhand von metaData kann man die sichtbare Ergebnissemenge einschränken.
+Dies ist durch die Parameter limited und page möglich.
 
-Gibt an, wie viele Treffer bei der Anfrage zurückgegeben werden sollen.
-Wenn diese Tabelle zurückgegeben wird,
-ist dieser Wert nur dann vorhanden,
-wenn nicht alle Werte zurückgegeben wurden.
+.veränderbare Parameter:
+* *limited*: Anzahl an Treffern, welche bei der Anfrage zurückgegeben werden sollen.
+Ist der Wert 0, werden alle Treffer zurückgegeben und der Wert der totalResults angezeigt.
+* *page*: die n-te Seite der totalPages basierend auf limited.
+Ist kein Wert für page gesetzt, werden die Ergebnisse von 0 bis limited,
+also die 1.Seite, ausgegeben.
+
+.unveränderbare/vom Service berechnete Parameter:
+* *totalResults*: Anzahl an Rows, welche für die angegebenen Suchparameter gefunden wurden.
+* *totalPages*: Anzahl an Seiten, welche basierend auf den totalResults und limited errechnet wurden.
+* *resultsLeft*: Anzahl an Rows, welche nach der momentanen Seite noch übrig sind.
 
 === columns
 
@@ -83,7 +102,7 @@ Häufig ist dies eine SQL-Prozedur auf dem SQL-Server.
 
 Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 
-Diese Table enthält die Parameter für die SQL-Prozedur.
+Diese Table enthält die Parameter für die SQL-Prozedur und optional Metadaten.
 Die columns beschreiben den Namen und den Typ der Argumente.
 Die rows enthalten eine Zeile, in der die Argumente gelistet sind.
 

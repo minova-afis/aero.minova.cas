@@ -66,14 +66,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()//
-				.withUser("user").password(passwordEncoder().encode("password")).roles("dispatcher")//
-				.and()//
-				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("admin", "dispo");
-//		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
-//			auth.authenticationProvider(new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress))
-//	            .ldapAuthentication().userDetailsContextMapper(userDetailsContextMapper());
-//		}
+		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
+			auth.authenticationProvider(new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress));
+		} else {
+			auth.inMemoryAuthentication()//
+					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles("ADMIN");
+		}
 	}
 
 	@Bean

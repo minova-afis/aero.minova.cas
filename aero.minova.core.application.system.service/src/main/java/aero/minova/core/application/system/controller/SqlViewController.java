@@ -88,7 +88,7 @@ public class SqlViewController {
 			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
-			val viewQuery = pagingWithSeek(inputTable, false, limit, false, authoritiesForThisTable);
+			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
 			logger.info("Executing: " + viewQuery);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
@@ -142,8 +142,11 @@ public class SqlViewController {
 					val type = inputTable.getColumns().get(columnPointer).getType();
 
 					if (!(iVal == null)) {
+						// null und not null werden bereits in der prepareWherelause-Methode eingesetzt
 						String stringValue = parseType(iVal, type);
-						if (!stringValue.trim().isEmpty()) {
+						if (stringValue.equalsIgnoreCase("null") || stringValue.equalsIgnoreCase("not null")) {
+							parameterOffset--;
+						} else if (!stringValue.trim().isEmpty()) {
 							preparedStatement.setString(i + parameterOffset, stringValue);
 						} else {
 							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' oder Column.name = Column.AND_FIELD_NAME hat
@@ -378,7 +381,7 @@ public class SqlViewController {
 			if (!where.trim().equals(""))
 				whereClauseExists = true;
 		}
-    final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 		sb.append(" ) as RowConstraintResult");
 
@@ -513,7 +516,7 @@ public class SqlViewController {
 
 					// #13193
 					if (strValue.equalsIgnoreCase("null") || strValue.equalsIgnoreCase("not null")) {
-						clause.append("is ").append(strValue);
+						clause.append(" is ").append(strValue);
 					} else {
 						if (!hasOperator(strValue)) {
 							if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%"))) {

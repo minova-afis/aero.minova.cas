@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -209,32 +208,6 @@ class SqlViewControllerTest {
 		row.addValue(new Value("1"));
 		intputTable.getRows().add(row);
 		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?)");
-	}
-
-	@Test
-	void test_parseMethod() {
-		assertThat(testSubject.parseType(new Value(true), DataType.BOOLEAN)).isEqualTo("true");
-		assertThat(testSubject.parseType(new Value(2.5), DataType.DOUBLE)).isEqualTo("2.5");
-		assertThat(testSubject.parseType(new Value(1), DataType.INTEGER)).isEqualTo("1");
-		assertThat(testSubject.parseType(new Value(252345275L), DataType.LONG)).isEqualTo("252345275");
-		assertThat(testSubject.parseType(new Value("Test"), DataType.STRING)).isEqualTo("Test");
-		Instant instant = Instant.now();
-		assertThat(testSubject.parseType(new Value(instant), DataType.INSTANT)).isEqualTo(instant.toString());
-		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
-		assertThat(testSubject.parseType(new Value(time), DataType.ZONED)).isEqualTo(instant.toString());
-	}
-
-	@Test
-	void test_parseMethodWithOperators() {
-		assertThat(testSubject.parseType(new Value(true), DataType.BOOLEAN)).isEqualTo("true");
-		assertThat(testSubject.parseType(new Value("<2.5"), DataType.DOUBLE)).isEqualTo("2.5");
-		assertThat(testSubject.parseType(new Value("<1"), DataType.INTEGER)).isEqualTo("1");
-		assertThat(testSubject.parseType(new Value(">252345275L"), DataType.LONG)).isEqualTo("252345275L");
-		assertThat(testSubject.parseType(new Value("Test"), DataType.STRING)).isEqualTo("Test");
-		Instant instant = Instant.now();
-		assertThat(testSubject.parseType(new Value(">" + instant), DataType.INSTANT)).isEqualTo(instant.toString());
-		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
-		assertThat(testSubject.parseType(new Value("<" + time), DataType.ZONED)).isEqualTo(instant.toString());
 	}
 
 	@DisplayName("Zeige erste Seite.")

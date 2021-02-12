@@ -91,10 +91,10 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 * *"s"*: String
 * *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
 
-Außerdem kann eine *rule* angegeben werden, nachdem der angegebene Wert verarbeitet werden soll.
+Außerdem kann durch das Hinzufügen von *#* eine *rule* angegeben werden, nachdem der angegebene Wert verarbeitet werden soll.
 Zulässige Eingaben sind *<> , <=, >=, <, >, =, between(), in(), not like, like, null* und *not null*.
 
-Wichtig dabei zu beachten ist, dass *nach* der rule *ein* Zeichen frei sein muss und dass der Typ des Values *String* sein muss.
+Wichtig dabei zu beachten ist, dass *zwischen* rule und Value *ein* Zeichen frei und der Typ des Values *String* sein muss.
 
 === rows
 

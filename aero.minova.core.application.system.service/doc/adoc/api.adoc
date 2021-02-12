@@ -29,7 +29,9 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"rows": [
 		{
 			"values": [
-				"(b|d|i|n|s|z-Value)|null",...
+				"(b|d|i|n|s|z-Value)|"
+				"(b|d|i|n|s|z#rule-Value)|"
+				"null",...
 			]
 		}
 	]
@@ -82,12 +84,17 @@ Im einfachsten Fall ist der Typ eines Values gleich dem Typ der jeweiligen Spalt
 
 Der Typ wird anhand des Prefixes des Values angegeben:
 
-* *"b-"*: boolean: false|true
-* *"d-"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
-* *"i-"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
-* *"n-"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
-* *"s-"*: String
-* *"z-"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"b"*: boolean: false|true
+* *"d"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
+* *"i"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
+* *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
+* *"s"*: String
+* *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+
+Außerdem kann eine *rule* angegeben werden, nachdem der angegebene Wert verarbeitet werden soll.
+Zulässige Eingaben sind *<> , <=, >=, <, >, =, between(), in(), not like, like, is null* und *is not null*.
+
+Wichtig dabei zu beachten ist, dass *nach* der rule *ein* Zeichen frei sein muss und dass der Typ des Values *String* sein muss.
 
 === rows
 

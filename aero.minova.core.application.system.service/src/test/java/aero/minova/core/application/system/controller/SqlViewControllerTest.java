@@ -86,13 +86,13 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("<=" + LocalDate.of(2020, 7, 31).toString()));
+			inputRow.addValue(new Value(LocalDate.of(2020, 7, 31).toString(), "<="));
 			inputRow.addValue(new Value(false));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(">" + LocalDate.of(2020, 7, 29).toString()));
+			inputRow.addValue(new Value(LocalDate.of(2020, 7, 29).toString(), ">"));
 			inputRow.addValue(new Value(true));
 			inputTable.addRow(inputRow);
 		}
@@ -208,6 +208,41 @@ class SqlViewControllerTest {
 		row.addValue(new Value("1"));
 		intputTable.getRows().add(row);
 		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?)");
+	}
+
+	@Test
+	void test_whereWithIn() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		val row = new Row();
+		row.addValue(new Value("1,2,3", "in()"));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong in( ? , ? , ? ))");
+	}
+
+	@Test
+	void test_whereWithBetween() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		val row = new Row();
+		row.addValue(new Value("1,2,3", "between()"));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong between ? and ?)");
+	}
+
+	@Test
+	void test_whereNULL() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		intputTable.addColumn(new Column("KeyText", DataType.STRING));
+		val row = new Row();
+		row.addValue(new Value("", "is not null"));
+		row.addValue(new Value("", "is null"));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong is not null and KeyText is null)");
 	}
 
 	@DisplayName("Zeige erste Seite.")

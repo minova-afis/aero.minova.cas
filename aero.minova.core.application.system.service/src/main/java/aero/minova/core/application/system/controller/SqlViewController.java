@@ -330,6 +330,7 @@ public class SqlViewController {
 
 				final Object valObj = r.getValues().get(colI).getValue();
 				String strValue = valObj.toString().trim();
+				String ruleValue = r.getValues().get(colI).getRule();
 				if (strValue != null && strValue.length() != 0) {
 					if (clause.length() > 0) {
 						clause.append(" and ");
@@ -337,7 +338,6 @@ public class SqlViewController {
 					clause.append(col.getName());
 
 					// #13193
-					String ruleValue = r.getValues().get(colI).getRule();
 					if (ruleValue != null && ruleValue.length() != 0) {
 						if (ruleValue.contains("in")) {
 							clause.append(" in(");
@@ -357,7 +357,7 @@ public class SqlViewController {
 						} else if (ruleValue.contains("between")) {
 							clause.append(" between ? and ?");
 						} else {
-							clause.append(" ").append(ruleValue.toLowerCase()).append(' ').append("?");
+							clause.append(" ").append(ruleValue).append(' ').append("?");
 						}
 					} else {
 						if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%"))) {
@@ -370,6 +370,21 @@ public class SqlViewController {
 							clause.append(" =");
 						}
 						clause.append(' ').append("?");
+					}
+					// falls im Wert-Feld nichts steht, könnte immer noch die Regel is null oder is not null angefragt werden
+				} else if (ruleValue != null) {
+					if (ruleValue.contains("not null")) {
+						if (clause.length() > 0) {
+							clause.append(" and ");
+						}
+						clause.append(col.getName());
+						clause.append(" is not null");
+					} else if (ruleValue.contains("null")) {
+						if (clause.length() > 0) {
+							clause.append(" and ");
+						}
+						clause.append(col.getName());
+						clause.append(" is null");
 					}
 				}
 			}

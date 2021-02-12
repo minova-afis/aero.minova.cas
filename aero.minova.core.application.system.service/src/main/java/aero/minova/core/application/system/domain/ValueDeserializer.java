@@ -25,8 +25,13 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 		String value = json.getAsString().substring(2);
 
 		if (rule.contains("#")) {
-			rule = value.substring(0, getOperatorEndIndex(value));
-			value = value.substring(getOperatorEndIndex(value) + 1, value.length());
+			rule = value.substring(0, getOperatorEndIndex(value)).toLowerCase();
+			// falls die Regel is null oder is not null ist, macht es keinen Sinn, dass ein Wert weiter gegeben werden würde
+			if (rule.contains("null")) {
+				value = "";
+			} else {
+				value = value.substring(getOperatorEndIndex(value) + 1, value.length());
+			}
 		} else {
 			rule = null;
 		}

@@ -11,8 +11,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
 public class ValueDeserializer implements JsonDeserializer<Value> {
-	public static final String SQL_IS_NULL = "is null";
-	public static final String SQL_IS_NOT_NULL = "is not null";
+	public static final String SQL_IS_NULL = "null";
+	public static final String SQL_IS_NOT_NULL = "not null";
 	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "not like", "like", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
 	@Override

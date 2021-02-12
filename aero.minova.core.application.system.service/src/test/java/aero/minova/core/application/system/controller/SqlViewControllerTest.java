@@ -49,8 +49,8 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
@@ -68,9 +68,9 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
@@ -87,13 +87,13 @@ class SqlViewControllerTest {
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(LocalDate.of(2020, 7, 31).toString(), "<="));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(LocalDate.of(2020, 7, 29).toString(), ">"));
-			inputRow.addValue(new Value(true));
+			inputRow.addValue(new Value(true, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
@@ -111,14 +111,14 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("WIS"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("WIS", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
@@ -150,9 +150,9 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value("AVM", null));
 			inputRow.addValue(null);
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000))//
@@ -205,7 +205,7 @@ class SqlViewControllerTest {
 		intputTable.setName("vWorkingTimeIndex2");
 		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 		val row = new Row();
-		row.addValue(new Value("1"));
+		row.addValue(new Value("1", null));
 		intputTable.getRows().add(row);
 		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?)");
 	}
@@ -255,9 +255,9 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1))//
@@ -286,9 +286,9 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5))//
@@ -307,9 +307,9 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5))//

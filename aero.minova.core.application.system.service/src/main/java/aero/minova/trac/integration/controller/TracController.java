@@ -76,12 +76,12 @@ public class TracController {
 
 	private Row ticketInformation(int ticketNumber, String orderReceiver, String serviceContract, String serviceObject, String service, String description) {
 		final Row ticketInformation = new Row();
-		ticketInformation.addValue(new Value(ticketNumber));
-		ticketInformation.addValue(new Value(orderReceiver));
-		ticketInformation.addValue(new Value(serviceContract));
-		ticketInformation.addValue(new Value(serviceObject));
-		ticketInformation.addValue(new Value(service));
-		ticketInformation.addValue(new Value(description));
+		ticketInformation.addValue(new Value(ticketNumber, null));
+		ticketInformation.addValue(new Value(orderReceiver, null));
+		ticketInformation.addValue(new Value(serviceContract, null));
+		ticketInformation.addValue(new Value(serviceObject, null));
+		ticketInformation.addValue(new Value(service, null));
+		ticketInformation.addValue(new Value(description, null));
 
 		ticketInformation.addValue(resolveLookup(orderReceiver, "tOrderReceiver"));
 		ticketInformation.addValue(resolveLookup(serviceContract, "tServiceContract"));
@@ -107,9 +107,9 @@ public class TracController {
 		inputTable.addColumn(new Column("LastAction", DataType.INTEGER));
 		Row inputRow = new Row();
 		inputRow.addValue(null);
-		inputRow.addValue(new Value(keyText));
+		inputRow.addValue(new Value(keyText, null));
 //		inputRow.addValue(null); // Description
-		inputRow.addValue(new Value(">0")); // LastAction: nur nicht gelöschte
+		inputRow.addValue(new Value("0", ">")); // LastAction: nur nicht gelöschte
 		inputTable.addRow(inputRow);
 		Table outputTable = svc.getIndexView(inputTable);
 		Value outputValue = null;

@@ -40,31 +40,31 @@ public class SqlUtils {
 			Row row = new Row();
 			for (Column column : outputTable.getColumns()) {
 				if (column.getType() == DataType.STRING) {
-					row.addValue(new Value(sqlSet.getString(column.getName())));
+					row.addValue(new Value(sqlSet.getString(column.getName()), null));
 				} else if (column.getType() == DataType.INTEGER) {
-					row.addValue(new Value(sqlSet.getInt(column.getName())));
+					row.addValue(new Value(sqlSet.getInt(column.getName()), null));
 				} else if (column.getType() == DataType.BOOLEAN) {
-					row.addValue(new Value(sqlSet.getBoolean(column.getName())));
+					row.addValue(new Value(sqlSet.getBoolean(column.getName()), null));
 				} else if (column.getType() == DataType.DOUBLE) {
-					row.addValue(new Value(sqlSet.getDouble(column.getName())));
+					row.addValue(new Value(sqlSet.getDouble(column.getName()), null));
 				} else if (column.getType() == DataType.INSTANT) {
 					if (sqlSet.getTimestamp(column.getName()) == null) {
-						row.addValue(new Value((Instant) null));
+						row.addValue(new Value((Instant) null, null));
 					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant()));
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant(), null));
 					}
 				} else if (column.getType() == DataType.LONG) {
-					row.addValue(new Value(sqlSet.getLong(column.getName())));
+					row.addValue(new Value(sqlSet.getLong(column.getName()), null));
 				} else if (column.getType() == DataType.ZONED) {
 					if (sqlSet.getTimestamp(column.getName()) == null) {
-						row.addValue(new Value((ZonedDateTime) null));
+						row.addValue(new Value((ZonedDateTime) null, null));
 					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault())));
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault()), null));
 					}
 				} else {
 					logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
 							+ column.getType());
-					row.addValue(new Value(sqlSet.getString(column.getName())));
+					row.addValue(new Value(sqlSet.getString(column.getName()), null));
 				}
 			}
 			return row;
@@ -76,25 +76,27 @@ public class SqlUtils {
 	public static Value parseSqlParameter(CallableStatement statement, int index, Column column) {
 		try {
 			if (column.getType() == DataType.STRING) {
-				return new Value(statement.getString(index));
+				return new Value(statement.getString(index), null);
 			} else if (column.getType() == DataType.INTEGER) {
-				return new Value(statement.getInt(index));
+				return new Value(statement.getInt(index), null);
 			} else if (column.getType() == DataType.BOOLEAN) {
-				return new Value(statement.getBoolean(index));
+				return new Value(statement.getBoolean(index), null);
 			} else if (column.getType() == DataType.DOUBLE) {
-				return new Value(statement.getDouble(index));
+				return new Value(statement.getDouble(index), null);
 			} else if (column.getType() == DataType.INSTANT) {
 				return new Value(//
 						Optional.ofNullable(statement.getTimestamp(index))//
 								.map(e -> e.toInstant())//
-								.orElse(null));
+								.orElse(null),
+						null);
 			} else if (column.getType() == DataType.LONG) {
-				return new Value(statement.getLong(index));
+				return new Value(statement.getLong(index), null);
 			} else if (column.getType() == DataType.ZONED) {
 				return new Value(//
 						Optional.ofNullable(statement.getTimestamp(index))//
 								.map(e -> e.toInstant().atZone(systemDefault()))//
-								.orElse(null));
+								.orElse(null),
+						null);
 			} else {
 				throw new UnsupportedOperationException();
 			}

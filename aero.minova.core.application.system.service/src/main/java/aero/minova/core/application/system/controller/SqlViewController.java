@@ -111,7 +111,6 @@ public class SqlViewController {
 	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
 		int parameterOffset = 1;
 
-		// der Value an der Stelle des COLUMN.AND_FIELDS ist für uns an der Stelle uninteressant
 		List<Value> inputValues = new ArrayList<>();
 		for (Row row : inputTable.getRows()) {
 			for (int i = 0; i < row.getValues().size(); i++) {
@@ -337,7 +336,6 @@ public class SqlViewController {
 					}
 					clause.append(col.getName());
 
-					// #13193
 					if (ruleValue != null && ruleValue.length() != 0) {
 						if (ruleValue.contains("in")) {
 							clause.append(" in(");
@@ -377,14 +375,12 @@ public class SqlViewController {
 						if (clause.length() > 0) {
 							clause.append(" and ");
 						}
-						clause.append(col.getName());
-						clause.append(" is not null");
+						clause.append(col.getName()).append(" is not null");
 					} else if (ruleValue.contains("null")) {
 						if (clause.length() > 0) {
 							clause.append(" and ");
 						}
-						clause.append(col.getName());
-						clause.append(" is null");
+						clause.append(col.getName()).append(" is null");
 					}
 				}
 			}

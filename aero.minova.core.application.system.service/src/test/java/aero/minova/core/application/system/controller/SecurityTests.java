@@ -3,15 +3,21 @@ package aero.minova.core.application.system.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,19 +43,39 @@ class SecurityTests {
 	@Autowired
 	SqlViewController testSubject;
 
+	@Spy
+	SqlViewController spyController;
+
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		spyController = spy(testSubject);
+	}
 
 	@Test
 	void test_checkPrivilege() {
 		String tableName = "tEmployee";
 		List<GrantedAuthority> ga = new ArrayList<>();
 		ga.add(new SimpleGrantedAuthority("admin"));
-		assertThat(testSubject.checkPrivilege(ga, tableName).getRows().isEmpty())//
+		Table user = new Table();
+		user.addColumn(new Column("", DataType.STRING));
+		Row r = new Row();
+		r.addValue(new Value("admin"));
+		user.addRow(r);
+
+		doReturn(user).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		assertThat(spyController.checkPrivilege(ga, tableName).getRows().isEmpty())//
 				.isEqualTo(false);
 		ga.clear();
 		ga.add(new SimpleGrantedAuthority("dispatcher"));
-		assertThat(testSubject.checkPrivilege(ga, tableName).getRows().isEmpty())//
+
+		doReturn(new Table()).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		assertThat(spyController.checkPrivilege(ga, tableName).getRows().isEmpty())//
 				.isEqualTo(true);
 	}
 
@@ -150,12 +176,12 @@ class SecurityTests {
 	@WithMockUser(username = "user", roles = { "dispatcher" })
 	@Test
 	void test_ViewStringWithAuthenticatedUser() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
 		inputRow.addValue(new Value("vJournalIndexTest"));
@@ -168,7 +194,9 @@ class SecurityTests {
 		resultColumns.add(new Column("ServiceKey", DataType.STRING));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
 
-		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		doReturn(inputTable).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -176,12 +204,12 @@ class SecurityTests {
 	@WithMockUser(username = "admin")
 	@Test
 	void test_ViewStringWithAuthenticatedUserButOneBlockedColumn() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
 		inputRow.addValue(new Value("vJournalIndexTest"));
@@ -192,8 +220,12 @@ class SecurityTests {
 		List<Column> resultColumns = new ArrayList<>();
 		resultColumns.add(new Column("OrderReceiverKey", DataType.INTEGER));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		Table mockResult = new Table();
+		mockResult.addColumns(resultColumns);
 
-		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -201,12 +233,12 @@ class SecurityTests {
 	@WithMockUser(username = "admin", roles = { "admin", "dispo" })
 	@Test
 	void test_ViewStringWithAuthenticatedUserButMultipleBlockedColumn() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
 		inputRow.addValue(new Value("vJournalIndexTest"));
@@ -224,7 +256,12 @@ class SecurityTests {
 		resultColumns.add(new Column("ServiceKey", DataType.STRING));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
 
-		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		Table mockResult = new Table();
+		mockResult.addColumns(resultColumns);
+
+		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -232,19 +269,19 @@ class SecurityTests {
 	@WithMockUser(username = "admin", roles = { "admin" })
 	@Test
 	void test_ViewStringWithAuthenticatedUserButBlockedWhereClause() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(""));
 			inputRow.addValue(new Value(">" + "3"));
 			inputRow.addValue(new Value(""));
 			inputRow.addValue(new Value(false));
-			intputTable.addRow(inputRow);
+			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
@@ -257,7 +294,12 @@ class SecurityTests {
 		resultColumns.add(new Column("OrderReceiverKey", DataType.INTEGER));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
 
-		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		Table mockResult = new Table();
+		mockResult.addColumns(resultColumns);
+
+		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -265,19 +307,19 @@ class SecurityTests {
 	@WithMockUser(username = "admin", roles = { "afis" })
 	@Test
 	void test_ViewStringWithUnauthenticatedUserWithBlockedColumns() throws Exception {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(">" + "0"));
 			inputRow.addValue(new Value(">" + "3"));
 			inputRow.addValue(new Value(">" + "5"));
 			inputRow.addValue(new Value(false));
-			intputTable.addRow(inputRow);
+			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
@@ -285,8 +327,11 @@ class SecurityTests {
 		inputRow.addValue(new Value("afis"));
 		inputRow.addValue(new Value(false));
 		userGroups.add(inputRow);
+		Table mockResult = new Table();
 
-		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.columnSecurity(intputTable, userGroups));
+		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Throwable exception = assertThrows(RuntimeException.class, () -> spyController.columnSecurity(inputTable, userGroups));
 		thrown.expect(RuntimeException.class);
 		assertEquals("Insufficient Permission for vJournalIndexTest; User with Username 'admin'" + " is not allowed to see the selected columns of this table",
 				exception.getMessage());
@@ -297,8 +342,8 @@ class SecurityTests {
 	@WithMockUser(username = "admin", roles = { "admin" })
 	@Test
 	void test_ViewStringWithAuthenticatedUserWithNoHead() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
 		inputRow.addValue(new Value("vJournalIndexTest"));
@@ -310,7 +355,12 @@ class SecurityTests {
 		resultColumns.add(new Column("OrderReceiverKey", DataType.INTEGER));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
 
-		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		Table mockResult = new Table();
+		mockResult.addColumns(resultColumns);
+
+		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
 
 	}
@@ -319,19 +369,19 @@ class SecurityTests {
 	@WithMockUser(username = "admin", roles = { "dispatcher", "user" })
 	@Test
 	void test_ViewStringWithOneAuthenticatedUserWithNoBlockedColumns() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(">" + "0"));
 			inputRow.addValue(new Value(">" + "3"));
 			inputRow.addValue(new Value(">" + "5"));
 			inputRow.addValue(new Value(false));
-			intputTable.addRow(inputRow);
+			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
@@ -349,7 +399,12 @@ class SecurityTests {
 		resultColumns.add(new Column("ServiceKey", DataType.STRING));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
 
-		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		Table mockResult = new Table();
+		mockResult.addColumns(resultColumns);
+
+		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
 
 	}
@@ -358,19 +413,19 @@ class SecurityTests {
 	@WithMockUser(username = "admin", roles = { "admin", "dispatcher", "user" })
 	@Test
 	void test_ViewStringWithMultipleAuthenticatedUserWithNoBlockedColumns() {
-		val intputTable = new Table();
-		intputTable.setName("vJournalIndexTest");
-		intputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
-		intputTable.addColumn(new Column("ServiceKey", DataType.STRING));
-		intputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+		val inputTable = new Table();
+		inputTable.setName("vJournalIndexTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(">" + "0"));
 			inputRow.addValue(new Value(">" + "3"));
 			inputRow.addValue(new Value(">" + "5"));
 			inputRow.addValue(new Value(false));
-			intputTable.addRow(inputRow);
+			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
@@ -392,8 +447,12 @@ class SecurityTests {
 		resultColumns.add(new Column("OrderReceiverKey", DataType.INTEGER));
 		resultColumns.add(new Column("ServiceKey", DataType.STRING));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
+		Table mockResult = new Table();
+		mockResult.addColumns(resultColumns);
 
-		Table result = testSubject.columnSecurity(intputTable, userGroups);
+		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
 
 	}

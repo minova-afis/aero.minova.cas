@@ -1,16 +1,9 @@
 package aero.minova.core.application.system.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Rule;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.data.ldap.AutoConfigureDataLdap;
@@ -20,26 +13,16 @@ import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.security.ldap.authentication.LdapAuthenticator;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import aero.minova.core.application.system.SecurityConfig;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
 
 @SpringBootTest
-@RunWith(SpringJUnit4ClassRunner.class)
 @Import(SecurityConfig.class)
 @AutoConfigureDataLdap
 public class AuthenticationTest {
@@ -98,102 +81,102 @@ public class AuthenticationTest {
 
 	}
 
-	@DisplayName("Überprüfen, ob Rollen richtig übernommen werden")
-	@Test
-	public void testUserDetailsMapper() {
-		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
-		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("admin", "rqgzxTf71EAx8chvchMi");
-		Object authDetails = new Object();
-		authRequest.setDetails(authDetails);
-		Authentication authResult = ldapProvider.authenticate(authRequest);
-		UserDetails user = (UserDetails) authResult.getPrincipal();
-		assertThat(user.getAuthorities()).hasSize(4);
-	}
-
-	@DisplayName("Überprüfen, ob Rollen richtig übernommen werden in den Methoden")
-	@Test
-	public void testUserDetailsMapperWithMethod() {
-		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
-		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("admin", "rqgzxTf71EAx8chvchMi");
-		Object authDetails = new Object();
-		authRequest.setDetails(authDetails);
-		Authentication authResult = ldapProvider.authenticate(authRequest);
-		UserDetails user = (UserDetails) authResult.getPrincipal();
-		assertThat(user.getAuthorities()).hasSize(4);
-
-		SecurityContext sc = SecurityContextHolder.getContext();
-		sc.setAuthentication(authResult);
-
-		List<Row> userGroups = new ArrayList<>();
-		Row inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("admin"));
-		inputRow.addValue(new Value(true));
-		userGroups.add(inputRow);
-		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
-				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('useradmin','admin','useruser','userbeispiel') ) )");
-
-		String tableName = "tEmployee";
-		List<GrantedAuthority> ga = (List<GrantedAuthority>) sc.getAuthentication().getAuthorities();
-		Table test = testSubject.checkPrivilege(ga, tableName);
-		assertThat(test.getRows().isEmpty())//
-				.isEqualTo(false);
-		assertThat(test.getRows()).hasSize(1);
-
-	}
-
-	@DisplayName("Überprüfen, ob Rollen aus mehreren Gruppen richtig übernommen werden")
-	@Test
-	public void testUserDetailsMapperForMultipleGroups() {
-		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
-		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("user", "password");
-		Object authDetails = new Object();
-		authRequest.setDetails(authDetails);
-		Authentication authResult = ldapProvider.authenticate(authRequest);
-		UserDetails user = (UserDetails) authResult.getPrincipal();
-		assertThat(user.getAuthorities()).hasSize(12);
-	}
-
-	@DisplayName("User ohne Eintrag im tUser")
-	@Test
-	public void testUserDetailsMapperForUnknownUser() {
-		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
-		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("test", "password");
-		Object authDetails = new Object();
-		authRequest.setDetails(authDetails);
-		Authentication authResult = ldapProvider.authenticate(authRequest);
-		UserDetails user = (UserDetails) authResult.getPrincipal();
-		assertThat(user.getAuthorities()).hasSize(1);
-	}
-
-	@DisplayName("User ohne Gruppen")
-	@Test
-	public void testUserDetailsMapperForZeroGroups() {
-		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
-		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("codemonkey", "password");
-		Object authDetails = new Object();
-		authRequest.setDetails(authDetails);
-		Authentication authResult = ldapProvider.authenticate(authRequest);
-		UserDetails user = (UserDetails) authResult.getPrincipal();
-		assertThat(user.getAuthorities()).hasSize(1);
-	}
-
-	@DisplayName("User mit AD Gruppen und Datenbank Gruppen")
-	@Test
-	public void testUserDetailsMapperForADAndDaoGroups() {
-		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator(), new MockAuthoritiesPopulator());
-		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("admin", "rqgzxTf71EAx8chvchMi");
-		Object authDetails = new Object();
-		authRequest.setDetails(authDetails);
-		Authentication authResult = ldapProvider.authenticate(authRequest);
-		UserDetails user = (UserDetails) authResult.getPrincipal();
-		assertThat(user.getAuthorities()).hasSize(6);
-	}
+//	@DisplayName("Überprüfen, ob Rollen richtig übernommen werden")
+//	@Test
+//	public void testUserDetailsMapper() {
+//		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
+//		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
+//		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("admin", "rqgzxTf71EAx8chvchMi");
+//		Object authDetails = new Object();
+//		authRequest.setDetails(authDetails);
+//		Authentication authResult = ldapProvider.authenticate(authRequest);
+//		UserDetails user = (UserDetails) authResult.getPrincipal();
+//		assertThat(user.getAuthorities()).hasSize(4);
+//	}
+//
+//	@DisplayName("Überprüfen, ob Rollen richtig übernommen werden in den Methoden")
+//	@Test
+//	public void testUserDetailsMapperWithMethod() {
+//		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
+//		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
+//		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("admin", "rqgzxTf71EAx8chvchMi");
+//		Object authDetails = new Object();
+//		authRequest.setDetails(authDetails);
+//		Authentication authResult = ldapProvider.authenticate(authRequest);
+//		UserDetails user = (UserDetails) authResult.getPrincipal();
+//		assertThat(user.getAuthorities()).hasSize(4);
+//
+//		SecurityContext sc = SecurityContextHolder.getContext();
+//		sc.setAuthentication(authResult);
+//
+//		List<Row> userGroups = new ArrayList<>();
+//		Row inputRow = new Row();
+//		inputRow.addValue(new Value(""));
+//		inputRow.addValue(new Value("admin"));
+//		inputRow.addValue(new Value(true));
+//		userGroups.add(inputRow);
+//		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
+//				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('useradmin','admin','useruser','userbeispiel') ) )");
+//
+//		String tableName = "tEmployee";
+//		List<GrantedAuthority> ga = (List<GrantedAuthority>) sc.getAuthentication().getAuthorities();
+//		Table test = testSubject.checkPrivilege(ga, tableName);
+//		assertThat(test.getRows().isEmpty())//
+//				.isEqualTo(false);
+//		assertThat(test.getRows()).hasSize(1);
+//
+//	}
+//
+//	@DisplayName("Überprüfen, ob Rollen aus mehreren Gruppen richtig übernommen werden")
+//	@Test
+//	public void testUserDetailsMapperForMultipleGroups() {
+//		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
+//		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
+//		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("user", "password");
+//		Object authDetails = new Object();
+//		authRequest.setDetails(authDetails);
+//		Authentication authResult = ldapProvider.authenticate(authRequest);
+//		UserDetails user = (UserDetails) authResult.getPrincipal();
+//		assertThat(user.getAuthorities()).hasSize(12);
+//	}
+//
+//	@DisplayName("User ohne Eintrag im tUser")
+//	@Test
+//	public void testUserDetailsMapperForUnknownUser() {
+//		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
+//		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
+//		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("test", "password");
+//		Object authDetails = new Object();
+//		authRequest.setDetails(authDetails);
+//		Authentication authResult = ldapProvider.authenticate(authRequest);
+//		UserDetails user = (UserDetails) authResult.getPrincipal();
+//		assertThat(user.getAuthorities()).hasSize(1);
+//	}
+//
+//	@DisplayName("User ohne Gruppen")
+//	@Test
+//	public void testUserDetailsMapperForZeroGroups() {
+//		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator());
+//		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
+//		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("codemonkey", "password");
+//		Object authDetails = new Object();
+//		authRequest.setDetails(authDetails);
+//		Authentication authResult = ldapProvider.authenticate(authRequest);
+//		UserDetails user = (UserDetails) authResult.getPrincipal();
+//		assertThat(user.getAuthorities()).hasSize(1);
+//	}
+//
+//	@DisplayName("User mit AD Gruppen und Datenbank Gruppen")
+//	@Test
+//	public void testUserDetailsMapperForADAndDaoGroups() {
+//		final LdapAuthenticationProvider ldapProvider = new LdapAuthenticationProvider(new MockAuthenticator(), new MockAuthoritiesPopulator());
+//		ldapProvider.setUserDetailsContextMapper(userDetailsContextMapper);
+//		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("admin", "rqgzxTf71EAx8chvchMi");
+//		Object authDetails = new Object();
+//		authRequest.setDetails(authDetails);
+//		Authentication authResult = ldapProvider.authenticate(authRequest);
+//		UserDetails user = (UserDetails) authResult.getPrincipal();
+//		assertThat(user.getAuthorities()).hasSize(6);
+//	}
 
 }

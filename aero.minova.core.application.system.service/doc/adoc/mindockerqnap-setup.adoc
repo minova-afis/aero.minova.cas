@@ -1,6 +1,7 @@
 = Installation/Update von CAS auf dem mindockerqnap für die Stundenerfassung
 
-CAS für die Stunderfassung ist unter link:https://mincas.minova.com:8084[https://mincas.minova.com:8084] erreichbar.
+CAS für die Stunderfassung ist unter link:https://stunden.minova.com:8084[https://mincas.minova.com:8084] erreichbar.
+Der Keystore mit dem öffentlichen Zertifikat kan hier link:../../keystore.p12[hier] geladen werden.
 
 == Installation/Update des Docker-Image
 
@@ -50,8 +51,8 @@ LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CORE_ENV=DEBUG
 
 * Bridge Modus verwenden.
 * Statische IP nutzen.
-* *IP-Adresse*: 192.168.2.104
-* *Gateway*: 192.168.2.10
+* *IP-Adresse*: 192.168.1.104
+* *Gateway*: 192.168.1.10
 
 ==== Freigabe
 

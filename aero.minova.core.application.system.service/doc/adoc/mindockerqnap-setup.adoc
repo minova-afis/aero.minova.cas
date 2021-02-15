@@ -2,6 +2,7 @@
 
 CAS für die Stunderfassung ist unter link:https://stunden.minova.com:8084[https://mincas.minova.com:8084] erreichbar.
 Der Keystore mit dem öffentlichen Zertifikat kan hier link:../../keystore.p12[hier] geladen werden.
+Das Passwort lautet `geheim`.
 
 == Installation/Update des Docker-Image
 

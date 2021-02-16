@@ -37,7 +37,7 @@ Dabei muss folgendes eingestellt werden:
 .Caption
 --------
 aero_minova_core_application_root_path=/var/lib/aero.minova.cas/system-files
-aero_minova_database_url=jdbc:sqlserver://sql-veeam.minova.com/sis;domain=min
+aero_minova_database_url=dbc:sqlserver://sql-veeam.minova.com;databaseName=sis;domain=min
 aero_minova_database_user_name=casuser
 aero_minova_database_user_password={steht im KeePass}
 security_ldap_domain=minova.com
@@ -57,7 +57,7 @@ LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CORE_ENV=DEBUG
 
 ==== Freigabe
 
-In der Freigabe muss das `Volume vom Host` `/share/CACHEDEV1_DATA/Container/container-station-data/lib/docker/volumes/4f7a62bdda040012e88e3366c0cf7a0d838be2b3bd0b05f7de898fce55a852f3/_data`
+In der Freigabe muss das `Volume vom Host` `/share/CACHEDEV1_DATA/Container/container-station-data/lib/docker/volumes/Stundenerfassung/_data`
 auf den Punkt `/var/lib/aero.minova.cas` eingebunden werden.
 Ein neues Volume soll nicht eingebunden werden.
 *Man muss also die erste Einbindung in der Freigabe beim der Installation

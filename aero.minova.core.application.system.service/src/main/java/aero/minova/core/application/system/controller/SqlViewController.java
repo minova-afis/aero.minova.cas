@@ -340,18 +340,11 @@ public class SqlViewController {
 						if (ruleValue.contains("in")) {
 							clause.append(" in(");
 
-							List<String> inBetweenValues = new ArrayList<>();
-							inBetweenValues = Stream.of(strValue.split(","))//
-									.collect(Collectors.toList());
-
-							String comma = "";
 							// für jeden der Komma-getrennten Werte muss ein Fragezeichen da sein
-							for (int i = 0; i < inBetweenValues.size(); i++) {
-								clause.append(comma).append(" ? ");
-								comma = ",";
-							}
+							String valuesSeperatedByString = Stream.of(strValue.split(",")) //
+									.map(s -> "?").collect(Collectors.joining(", "));
 
-							clause.append(")");
+							clause.append(valuesSeperatedByString).append(")");
 						} else if (ruleValue.contains("between")) {
 							clause.append(" between ? and ?");
 						} else {

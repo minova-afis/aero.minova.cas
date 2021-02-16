@@ -4,6 +4,16 @@ CAS für die Stunderfassung ist unter link:https://stunden.minova.com:8084[https
 Der Keystore mit dem öffentlichen Zertifikat kan link:../../keystore.p12[hier] geladen werden.
 Das Passwort lautet `geheim`.
 
+== Editierung von Einstellungen
+
+Einige Einstellungen der Container kann man in der Übersicht der Containerstation editieren.
+Das gilt aber nicht für alle.
+Für die restlichen Einstellungen kann man folgende Datei auf dem QNAP `/Container/container-station-data/lib/docker/containers/<container id>/config.v2.json`
+editieren.
+
+Nach der Anpassung muss die Container Station über das App Center neugestartet werden.
+Dazu wählt man in dem App Center die Kategorie `Meine Apps` und stopp (Knopf mit Pfeil nach unten) die Container Station und start diese wieder.
+
 == Installation/Update des Docker-Image
 
 === Vorbereitung

@@ -197,12 +197,12 @@ public class SqlViewController {
 
 		List<String> userTokens = new ArrayList<>();
 		for (GrantedAuthority ga : securityToken) {
-			userTokens.add(ga.getAuthority());
+			userTokens.add(ga.getAuthority().substring(5));
 		}
 
 		for (String s : userTokens) {
 			Row tableNameAndUserToken = new Row();
-			tableNameAndUserToken.setValues(Arrays.asList(new Value(privilegeName), new Value(s), new Value(""), new Value(false)));
+			tableNameAndUserToken.setValues(Arrays.asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
 		return getTableForSecurityCheck(userPrivileges);
@@ -215,9 +215,9 @@ public class SqlViewController {
 	public Table getTableForSecurityCheck(Table inputTable) {
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		final val connection = systemDatabase.getConnection();
 		try {
@@ -373,7 +373,8 @@ public class SqlViewController {
 		for (Row row : userGroups) {
 			if (row.getValues().get(0).getStringValue().equals(inputTable.getName())) {
 				Row bar = new Row();
-				bar.setValues(Arrays.asList(new Value(inputTable.getName()), new Value(""), new Value(row.getValues().get(1).getStringValue())));
+				bar.setValues(
+						Arrays.asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
 				List<Row> checkRow = new ArrayList<>();
 				checkRow.add(bar);
 				foo.setRows(checkRow);

@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +46,9 @@ public class SqlProcedureController {
 	@Autowired
 	TracController trac;
 
+	@Autowired
+	SqlViewController svc;
+
 	@PostMapping(value = "data/procedure", produces = "application/json")
 	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
 		if ("Ticket".equals(inputTable.getName())) {
@@ -52,6 +57,16 @@ public class SqlProcedureController {
 			return result;
 		}
 
+		// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
+		@SuppressWarnings("unchecked")
+		List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+		if (svc.checkPrivilege(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
+			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+		}
+		return calculateSqlProcedureResult(inputTable);
+	}
+
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) {
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();

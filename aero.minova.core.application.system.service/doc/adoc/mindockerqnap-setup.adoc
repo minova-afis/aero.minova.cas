@@ -37,7 +37,7 @@ Dabei muss folgendes eingestellt werden:
 .Caption
 --------
 aero_minova_core_application_root_path=/var/lib/aero.minova.cas/system-files
-aero_minova_database_url=dbc:sqlserver://sql-veeam.minova.com;databaseName=sis;domain=min
+aero_minova_database_url=jdbc:sqlserver://sql-veeam.minova.com;databaseName=sis;domain=min
 aero_minova_database_user_name=casuser
 aero_minova_database_user_password={steht im KeePass}
 security_ldap_domain=minova.com

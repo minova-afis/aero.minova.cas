@@ -2,6 +2,11 @@
 
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
 
+== Maske für das Editieren von Rechten
+
+* Source Code: http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic
+* Installierbare Modul: acode/snapshot/aero.minova.cas.logic.jar
+
 == Auslieferung als Docker Container
 
 [source,bash]

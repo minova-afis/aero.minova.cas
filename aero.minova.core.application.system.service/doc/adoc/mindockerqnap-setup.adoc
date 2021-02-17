@@ -52,6 +52,7 @@ aero_minova_database_user_name=casuser
 aero_minova_database_user_password={steht im KeePass}
 security_ldap_domain=minova.com
 security_ldap_address=ldap://mindcsrv.minova.com:3268/
+logging_path=/var/lib/aero.minova.cas/log
 SERVER_SSL_KEY_STORE=/var/lib/aero.minova.cas/private-4f265f52567ff437e8c9140be4c79a809973164f0643efb461dca7d079773ccb/keystore.p12
 SERVER_SSL_KEY_ALIAS=publictest.minova.com
 SERVER_SSL_KEY_STORE_PASSWORD=minova123

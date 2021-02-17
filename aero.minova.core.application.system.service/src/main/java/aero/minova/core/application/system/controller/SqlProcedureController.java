@@ -148,7 +148,9 @@ public class SqlProcedureController {
 								}
 							}
 						} catch (Exception e) {
-							throw new RuntimeException("Could not parse input parameter with index:" + i, e);
+							throw new RuntimeException("Could not parse input parameter with index: " + i + "; Value was '"
+									+ inputTable.getRows().get(0).getValues().get(i).getStringValue() + "' but ColumnType was '"
+									+ inputTable.getColumns().get(i).getType() + "'", e);
 						}
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);

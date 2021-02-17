@@ -4,6 +4,7 @@ import static java.nio.file.Files.readAllBytes;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,7 +34,7 @@ public class FilesController {
 	}
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody String getHash(@RequestParam String path) throws Exception {
+	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		if (!inputPath.startsWith(files.getSystemFolder())) {
 			throw new IllegalAccessException("Path variable with value " + path + " points outside the shared data folder of the system: " + inputPath);
@@ -41,7 +42,7 @@ public class FilesController {
 		return hashFile(inputPath);
 	}
 
-	private static String hashFile(Path p) throws IOException {
+	private static byte[] hashFile(Path p) throws IOException {
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("MD5");
@@ -51,6 +52,6 @@ public class FilesController {
 		md.update(readAllBytes(p));
 
 		String fx = "%0" + (md.getDigestLength() * 2) + "x";
-		return String.format(fx, new BigInteger(1, md.digest()));
+		return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 	}
 }

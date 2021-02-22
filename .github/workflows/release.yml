@@ -1,0 +1,10 @@
+name: Release
+on:
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        mvn --batch-mode release:prepare -P repo-github
+        mvn --batch-mode release:perform -P repo-github

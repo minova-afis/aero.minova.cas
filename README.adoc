@@ -7,25 +7,3 @@
 * Source Code: http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic
 * Installierbare Modul: acode/snapshot/aero.minova.cas.logic.jar
 * Alternativ: xref:./aero.minova.core.application.system.service/doc/adoc/privileges.adoc#[Manuelle Rechteverwaltung]
-
-== Auslieferung als Docker Container
-
-[source,bash]
-.Konsolen-Befehle
---------
-cd aero.minova.core.application.system.service
-# Docker image bauen.
-	./build.as.docker.image.sh
-	./export.docker.image.sh
-	# Unter 'target/aero.minova.cas.docker.tar' liegt jetzt das Docker image.
-	# Dieses muss man jetzt zum Ziel hochladen.
-# Docker image auf der Ziel Maschine aufsetzen.
-	docker load --input <Pfad zum Docker Image>
-	# Im folgenden kann die Konfiguration über `--env` angepasst werden.
-	docker run \
-		--name=aero.minova.cas \
-		--publish=8084:8084 \
-		--env 'aero_minova_database_url=jdbc:sqlserver://host.docker.internal;databaseName=AFIS_HAM' \
-		aero.minova.cas:latest
---------
-

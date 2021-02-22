@@ -15,6 +15,8 @@ jobs:
           server-password: MAVEN_PASSWORD
       - name: Release
         run: |
+          ssh-add ~/.ssh/github_rsa
+          ssh-add -l
           git config --global user.email "service@minova.com"
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service

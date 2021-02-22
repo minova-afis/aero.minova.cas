@@ -5,6 +5,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+          java-package: 'jdk'
     - run: |
+        cd $GITHUB_WORKSPACE/core.application.system.service
         mvn --batch-mode release:prepare -P repo-github
         mvn --batch-mode release:perform -P repo-github

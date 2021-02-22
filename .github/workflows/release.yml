@@ -13,6 +13,7 @@ jobs:
           server-id: github
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
+          ssh-private-key: ${{ secrets.MINOVA_GITHUB_GIT_SSH_PRIVATE_KEY }}
       - name: Release
         run: |
           git config --global user.email "service@minova.com"

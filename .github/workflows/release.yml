@@ -15,6 +15,8 @@ jobs:
           server-password: MAVEN_PASSWORD
       - name: Release
         run: |
+          git config --global user.email "service@minova.com"
+          git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service
           mvn --batch-mode release:prepare -P repo-github
           mvn --batch-mode release:perform -P repo-github

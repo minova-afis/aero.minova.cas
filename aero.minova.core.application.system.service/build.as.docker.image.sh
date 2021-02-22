@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-echo "Enter the docker user name: "
-read docker_user
 docker build --tag=alpine-java:base --rm=true .
 mvn clean verify
 mvn package spring-boot:repackage

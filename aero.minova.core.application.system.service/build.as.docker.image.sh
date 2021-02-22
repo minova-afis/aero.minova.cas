@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
+echo "Enter the docker user name: "
+read docker_user
 docker build --tag=alpine-java:base --rm=true .
 mvn clean verify
 mvn package spring-boot:repackage
-#cp target/core.application.system-12.4.0-SNAPSHOT.jar \
-#	../aero.minova.core.application.system.docker/core.application.system.jar
-docker build --tag=aero.minova.cas:latest --rm=true .
-echo This command also contains some helpful commands, in its source code.
+docker build --tag=$docker_user/aero.minova.cas:latest .
 exit
 
-echo docker run --name=aero.minova.cas --publish=8084:8084 --network="host" aero.minova.cas:latest
+echo Stop and remove container: docker rm -f <container id>
+echo docker run --name=aero.minova.cas --publish=8084:8084 $docker_user/aero.minova.cas:latest
 echo List all running containers: docker ps
 echo Stop docker docker stop <container id|name>
 echo docker container ls

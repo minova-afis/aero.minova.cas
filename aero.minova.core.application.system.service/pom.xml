@@ -115,5 +115,4 @@
 			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
 		</repository>
 	</repositories>
-</profiles>
 </project>

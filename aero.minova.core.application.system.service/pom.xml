@@ -13,7 +13,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<!-- TODO Verschiebe dies nach aero.minova.maven.root. -->
 		<java.version>1.8</java.version>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 	<scm>
 		<developerConnection>scm:git:ssh://trac.minova.com/var/git/minova.git/modules/ch.minova.service.core.application.system</developerConnection>

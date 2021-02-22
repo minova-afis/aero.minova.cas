@@ -19,7 +19,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 	<scm>
-		<developerConnection>scm:git:ssh://trac.minova.com/var/git/minova.git/modules/ch.minova.service.core.application.system</developerConnection>
+		<developerConnection>scm:git:git@github.com:minova-afis/aero.minova.core.application.system.git</developerConnection>
 	</scm>
 	<dependencies>
 		<dependency>

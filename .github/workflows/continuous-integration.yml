@@ -18,3 +18,6 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service
           mvn clean verify
+        env:
+          MAVEN_USERNAME: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_TOKEN }}

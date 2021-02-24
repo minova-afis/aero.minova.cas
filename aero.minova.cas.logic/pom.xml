@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>ch.minova</groupId>
 		<artifactId>ch.minova.parent</artifactId>
-		<version>11.3.1</version>
+		<version>10.9.1</version>
 		<relativePath />
 	</parent>
 	<scm>

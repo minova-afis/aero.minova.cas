@@ -277,7 +277,7 @@ class SqlViewControllerTest {
 		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 		intputTable.addColumn(new Column("KeyText", DataType.STRING));
 		val row = new Row();
-		row.addValue(new Value("", "is not null"));
+		row.addValue(new Value("", "is !null"));
 		row.addValue(new Value("", "is null"));
 		intputTable.getRows().add(row);
 		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong is not null and KeyText is null)");

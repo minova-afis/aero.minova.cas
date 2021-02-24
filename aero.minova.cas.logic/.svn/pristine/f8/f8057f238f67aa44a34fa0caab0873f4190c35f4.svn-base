@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<table name="xtcasUser" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="table.xsd">
+	<column name="KeyLong">
+		<integer nullable="false" identity="true"/>
+	</column>
+	<column name="KeyText">
+		<varchar length="10" nullable="false"/>
+	</column>
+	<column name="UserSecurityToken">
+		<varchar length="50" nullable="false"/>
+	</column>
+	<column name="Memberships">
+		<varchar length="250"/>
+	</column>
+	<column name="LastUser" default="system_user">
+		<varchar length="50" nullable="false"/>
+	</column>
+	<column name="LastDate" default="getdate()">
+		<datetime nullable="false"/>
+	</column>
+	<column name="LastAction" default="1">
+		<integer nullable="false"/>
+	</column>
+	<primarykey>
+		<column>KeyLong</column>
+	</primarykey>
+	<uniquekey name="UQ_xtcasUser">
+		<column>KeyText</column>
+	</uniquekey>
+</table>

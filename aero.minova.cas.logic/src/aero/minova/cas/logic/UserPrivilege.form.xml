@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="UserPrivilege" title="@UserPrivilege" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+<form icon="UserPrivilege" title="@UserPrivilege" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<index-view id="IndexView" source="xvcasUserPrivilegeIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number/>

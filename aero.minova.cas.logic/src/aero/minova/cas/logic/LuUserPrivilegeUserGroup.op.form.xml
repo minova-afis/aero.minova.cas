@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grid icon="LuUserPrivilegeUserGroup" title="@LuUserPrivilegeUserGroup" procedure-prefix="xpcas" procedure-suffix="LuUserPrivilegeUserGroup"
-	read-requires-all-params="true" delete-requires-all-params="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">
+	read-requires-all-params="true" delete-requires-all-params="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 		<number/>
 	</field>

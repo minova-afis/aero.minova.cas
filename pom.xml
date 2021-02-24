@@ -7,5 +7,6 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>aero.minova.core.application.system.service</module>
+		<module>aero.minova.cas.logic</module>
 	</modules>
 </project>

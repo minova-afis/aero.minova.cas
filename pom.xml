@@ -16,4 +16,11 @@
 		<!-- TODO Wird erst wieder aktiviert, wenn wir das Install-Tool auf Github haben. -->
 		<!-->module>aero.minova.cas.logic</module -->
 	</modules>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</repositories>
 </project>

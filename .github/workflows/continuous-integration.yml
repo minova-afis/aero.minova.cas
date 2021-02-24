@@ -14,6 +14,8 @@ jobs:
         with:
           java-version: '11'
           java-package: 'jdk'
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
       - name: Build
         run: |
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service

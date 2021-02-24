@@ -503,7 +503,7 @@ public class SqlViewController {
 					}
 					// falls im Wert-Feld nichts steht, könnte immer noch die Regel is null oder is not null angefragt werden
 				} else if (ruleValue != null) {
-					if (ruleValue.contains("not null")) {
+					if (ruleValue.contains("!null")) {
 						if (clause.length() > 0) {
 							clause.append(" and ");
 						}

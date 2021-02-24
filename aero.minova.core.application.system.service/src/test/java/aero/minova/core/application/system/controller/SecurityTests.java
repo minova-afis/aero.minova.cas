@@ -63,7 +63,7 @@ class SecurityTests {
 		Table user = new Table();
 		user.addColumn(new Column("", DataType.STRING));
 		Row r = new Row();
-		r.addValue(new Value("admin"));
+		r.addValue(new Value("admin", null));
 		user.addRow(r);
 
 		doReturn(user).when(spyController).getTableForSecurityCheck(Mockito.any());
@@ -85,9 +85,9 @@ class SecurityTests {
 	void test_rowLevelSecurityWithNoRoles() {
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 
 		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
@@ -102,21 +102,21 @@ class SecurityTests {
 	void test_rowLevelSecurityMultipleRoles() {
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("user"));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("user", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 
 		inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("dispatcher"));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("dispatcher", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 
 		inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("codemonkey"));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("codemonkey", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('ROLE_codemonkey','ROLE_dispatcher','ROLE_user') ) )");
@@ -130,15 +130,15 @@ class SecurityTests {
 	void test_rowLevelSecurityMultipleRolesAndOneExtra() {
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("user"));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("user", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 
 		inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("codemonkey"));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("codemonkey", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('ROLE_codemonkey','ROLE_dispatcher','ROLE_user') ) )");
@@ -152,21 +152,21 @@ class SecurityTests {
 	void test_rowLevelSecurityWithOneAuthenticatedRole() {
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("user"));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("user", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 
 		inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("dispatcher"));
-		inputRow.addValue(new Value(true));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("dispatcher", null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 
 		inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value("codemonkey"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("codemonkey", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("");
@@ -184,9 +184,9 @@ class SecurityTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("dispatcher"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("dispatcher", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 
 		List<Column> resultColumns = new ArrayList<>();
@@ -212,9 +212,9 @@ class SecurityTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("admin"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("admin", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 
 		List<Column> resultColumns = new ArrayList<>();
@@ -241,14 +241,14 @@ class SecurityTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("admin"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("admin", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("dispo"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("dispo", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 
 		List<Column> resultColumns = new ArrayList<>();
@@ -277,17 +277,17 @@ class SecurityTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(""));
-			inputRow.addValue(new Value(">" + "3"));
-			inputRow.addValue(new Value(""));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("", null));
+			inputRow.addValue(new Value("3", ">"));
+			inputRow.addValue(new Value("", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("admin"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("admin", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 
 		List<Column> resultColumns = new ArrayList<>();
@@ -315,17 +315,17 @@ class SecurityTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(">" + "0"));
-			inputRow.addValue(new Value(">" + "3"));
-			inputRow.addValue(new Value(">" + "5"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("0", ">"));
+			inputRow.addValue(new Value("3", ">"));
+			inputRow.addValue(new Value("5", ">"));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vWorkingTimeIndex2"));
-		inputRow.addValue(new Value("afis"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vWorkingTimeIndex2", null));
+		inputRow.addValue(new Value("afis", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		Table mockResult = new Table();
 
@@ -346,9 +346,9 @@ class SecurityTests {
 		inputTable.setName("vJournalIndexTest");
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("admin"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("admin", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 
 		List<Column> resultColumns = new ArrayList<>();
@@ -377,21 +377,21 @@ class SecurityTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(">" + "0"));
-			inputRow.addValue(new Value(">" + "3"));
-			inputRow.addValue(new Value(">" + "5"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("0", ">"));
+			inputRow.addValue(new Value("3", ">"));
+			inputRow.addValue(new Value("5", ">"));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("dispatcher"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("dispatcher", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("user"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("user", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 
 		List<Column> resultColumns = new ArrayList<>();
@@ -421,26 +421,26 @@ class SecurityTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(">" + "0"));
-			inputRow.addValue(new Value(">" + "3"));
-			inputRow.addValue(new Value(">" + "5"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("0", ">"));
+			inputRow.addValue(new Value("3", ">"));
+			inputRow.addValue(new Value("5", ">"));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("admin"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("admin", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		inputRow = new Row();
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("dispatcher"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("dispatcher", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		inputRow.addValue(new Value("vJournalIndexTest"));
-		inputRow.addValue(new Value("user"));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("vJournalIndexTest", null));
+		inputRow.addValue(new Value("user", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 
 		List<Column> resultColumns = new ArrayList<>();

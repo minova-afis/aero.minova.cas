@@ -5,12 +5,9 @@ import java.io.StringWriter;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,9 +34,6 @@ import lombok.val;
 
 @RestController
 public class SqlViewController {
-	public static final String SQL_IS_NULL = "is null";
-	public static final String SQL_IS_NOT_NULL = "is not null";
-	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between(", "in(", "not like", "like", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
 	@Autowired
 	SystemDatabase systemDatabase;
@@ -130,97 +124,62 @@ public class SqlViewController {
 
 		List<Value> inputValues = new ArrayList<>();
 		for (Row row : inputTable.getRows()) {
-			inputValues.addAll(row.getValues());
+			for (int i = 0; i < row.getValues().size(); i++) {
+				// nur die Values von den Spalten, welche nicht die AND_FIELD Spalte ist, interessiert uns
+				if (!inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
+					inputValues.add(row.getValues().get(i));
+				}
+			}
 		}
 
 		for (int i = 0; i < inputValues.size(); i++) {
-			// auf diese Weise kann man die Columns mehrfach entlang gehen ohne einen NullPointer befürchten zu müssen
-			int columnPointer = i % inputTable.getColumns().size();
-			if (!inputTable.getColumns().get(columnPointer).getName().equals(Column.AND_FIELD_NAME)) {
-				try {
-					val iVal = inputValues.get(i);
-					val type = inputTable.getColumns().get(columnPointer).getType();
-
-					if (!(iVal == null)) {
-						// null und not null werden bereits in der prepareWherelause-Methode eingesetzt
-						String stringValue = parseType(iVal, type);
-						if (stringValue.equalsIgnoreCase("null") || stringValue.equalsIgnoreCase("not null")) {
-							parameterOffset--;
-						} else if (!stringValue.trim().isEmpty()) {
+			try {
+				val iVal = inputValues.get(i);
+				if (!(iVal == null)) {
+					val rule = iVal.getRule();
+					String stringValue = iVal.getValue() + "";
+					if (rule == null) {
+						if (!stringValue.trim().isEmpty()) {
 							preparedStatement.setString(i + parameterOffset, stringValue);
 						} else {
-							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' oder Column.name = Column.AND_FIELD_NAME hat
+							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' hat
 							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
 							parameterOffset--;
 						}
-					} else {
+					} else if (rule.contains("in")) {
+						List<String> inBetweenValues = new ArrayList<>();
+						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
+								.collect(Collectors.toList());
+						for (String string : inBetweenValues) {
+							preparedStatement.setString(i + parameterOffset, string);
+							parameterOffset++;
+						}
+						// i zählt als nächstes hoch, deswegem muss parameterOffset wieder um 1 verringert werden
 						parameterOffset--;
+					} else if (rule.contains("between")) {
+						List<String> inBetweenValues = new ArrayList<>();
+						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
+								.collect(Collectors.toList());
+						// bei between vertrauen wir nicht darauf, dass der Nutzer wirklich nur zwei Werte einträgt,
+						// sondern nehmen den ersten und den letzten Wert
+						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(0));
+						parameterOffset++;
+						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(inBetweenValues.size() - 1));
+					} else {
+						if (!stringValue.trim().isEmpty()) {
+							preparedStatement.setString(i + parameterOffset, stringValue);
+						} else {
+							parameterOffset--;
+						}
 					}
-				} catch (Exception e) {
-					throw new RuntimeException("Could not parse input parameter with index:" + i, e);
+				} else {
+					parameterOffset--;
 				}
-			} else {
-				parameterOffset--;
+			} catch (Exception e) {
+				throw new RuntimeException("Could not parse input parameter with index:" + i, e);
 			}
 		}
 		return preparedStatement;
-	}
-
-	/**
-	 * der Value könnte noch einen SQL Operator enthalten, welcher hier entfernt wird
-	 */
-	protected String parseType(Value val, DataType type) {
-		String parsedType;
-		if (type == DataType.BOOLEAN) {
-			parsedType = val.getBooleanValue() + "";
-		} else if (type == DataType.DOUBLE) {
-			parsedType = val.getDoubleValue() + "";
-		} else if (type == DataType.INSTANT) {
-			parsedType = val.getInstantValue() + "";
-		} else if (type == DataType.INTEGER) {
-			parsedType = val.getIntegerValue() + "";
-		} else if (type == DataType.LONG) {
-			parsedType = val.getLongValue() + "";
-		} else if (type == DataType.STRING) {
-			parsedType = val.getStringValue();
-		} else if (type == DataType.ZONED) {
-			parsedType = val.getZonedDateTimeValue() + "";
-		} else {
-			throw new IllegalArgumentException("Unknown type: " + type.name());
-		}
-		if (parsedType.equals("null")) {
-			parsedType = val.getStringValue();
-		}
-
-		if (hasOperator(parsedType)) {
-			parsedType = parsedType.substring(getOperatorEndIndex(parsedType));
-		}
-
-		// Prüfen, ob der String dem Typ entspricht
-		try {
-			if (type == DataType.BOOLEAN) {
-				Boolean.parseBoolean(parsedType);
-			} else if (type == DataType.DOUBLE) {
-				Double.parseDouble(parsedType);
-			} else if (type == DataType.INSTANT) {
-				Instant.parse(parsedType);
-			} else if (type == DataType.INTEGER) {
-				Integer.parseInt(parsedType);
-			} else if (type == DataType.LONG) {
-				Long.parseLong(parsedType.replace("L", ""));
-			} else if (type == DataType.ZONED) {
-				// beim Zoned-Typ gäbe es Probleme beim parsen nach Instant, falls ein Operator davor wäre
-				parsedType = ZonedDateTime.parse(parsedType).toInstant().toString();
-			} else if (type == DataType.STRING) {
-
-			} else {
-				throw new IllegalArgumentException("Unknown type: " + type.name());
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Could not parse value '" + parsedType + "' with type " + type.name());
-		}
-
-		return parsedType;
 	}
 
 	/**
@@ -238,12 +197,12 @@ public class SqlViewController {
 
 		List<String> userTokens = new ArrayList<>();
 		for (GrantedAuthority ga : securityToken) {
-			userTokens.add(ga.getAuthority());
+			userTokens.add(ga.getAuthority().substring(5));
 		}
 
 		for (String s : userTokens) {
 			Row tableNameAndUserToken = new Row();
-			tableNameAndUserToken.setValues(Arrays.asList(new Value(privilegeName), new Value(s), new Value(""), new Value(false)));
+			tableNameAndUserToken.setValues(Arrays.asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
 		return getTableForSecurityCheck(userPrivileges);
@@ -256,9 +215,9 @@ public class SqlViewController {
 	public Table getTableForSecurityCheck(Table inputTable) {
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		final val connection = systemDatabase.getConnection();
 		try {
@@ -414,7 +373,8 @@ public class SqlViewController {
 		for (Row row : userGroups) {
 			if (row.getValues().get(0).getStringValue().equals(inputTable.getName())) {
 				Row bar = new Row();
-				bar.setValues(Arrays.asList(new Value(inputTable.getName()), new Value(""), new Value(row.getValues().get(1).getStringValue())));
+				bar.setValues(
+						Arrays.asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
 				List<Row> checkRow = new ArrayList<>();
 				checkRow.add(bar);
 				foo.setRows(checkRow);
@@ -508,30 +468,51 @@ public class SqlViewController {
 
 				final Object valObj = r.getValues().get(colI).getValue();
 				String strValue = valObj.toString().trim();
+				String ruleValue = r.getValues().get(colI).getRule();
 				if (strValue != null && strValue.length() != 0) {
 					if (clause.length() > 0) {
 						clause.append(" and ");
 					}
 					clause.append(col.getName());
 
-					// #13193
-					if (strValue.equalsIgnoreCase("null") || strValue.equalsIgnoreCase("not null")) {
-						clause.append(" is ").append(strValue);
-					} else {
-						if (!hasOperator(strValue)) {
-							if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%"))) {
-								strValue += "%";
-								params.getRows().get(rowI).getValues().get(colI).setValue(strValue);
-							}
-							if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_"))) {
-								clause.append(" like");
-							} else {
-								clause.append(" =");
-							}
+					if (ruleValue != null && ruleValue.length() != 0) {
+						if (ruleValue.contains("in")) {
+							clause.append(" in(");
+
+							// für jeden der Komma-getrennten Werte muss ein Fragezeichen da sein
+							String valuesSeperatedByString = Stream.of(strValue.split(",")) //
+									.map(s -> "?").collect(Collectors.joining(", "));
+
+							clause.append(valuesSeperatedByString).append(")");
+						} else if (ruleValue.contains("between")) {
+							clause.append(" between ? and ?");
 						} else {
-							clause.append(" ").append(strValue.substring(0, getOperatorEndIndex(strValue)));
+							clause.append(" ").append(ruleValue).append(' ').append("?");
+						}
+					} else {
+						if (autoLike && valObj instanceof String && def.getType() == DataType.STRING && (!strValue.contains("%"))) {
+							strValue += "%";
+							params.getRows().get(rowI).getValues().get(colI).setValue(strValue);
+						}
+						if (def.getType() == DataType.STRING && (strValue.contains("%") || strValue.contains("_"))) {
+							clause.append(" like");
+						} else {
+							clause.append(" =");
 						}
 						clause.append(' ').append("?");
+					}
+					// falls im Wert-Feld nichts steht, könnte immer noch die Regel is null oder is not null angefragt werden
+				} else if (ruleValue != null) {
+					if (ruleValue.contains("!null")) {
+						if (clause.length() > 0) {
+							clause.append(" and ");
+						}
+						clause.append(col.getName()).append(" is not null");
+					} else if (ruleValue.contains("null")) {
+						if (clause.length() > 0) {
+							clause.append(" and ");
+						}
+						clause.append(col.getName()).append(" is null");
 					}
 				}
 			}
@@ -592,37 +573,5 @@ public class SqlViewController {
 		}
 		rowSec.append(" )");
 		return rowSec.toString();
-	}
-
-	/**
-	 * Prüft, ob der String einen SQL Operator am Anfang hat
-	 * 
-	 * @param value
-	 * @return
-	 */
-	protected static boolean hasOperator(String value) {
-		return getOperatorEndIndex(value) != 0;
-	}
-
-	/**
-	 * Wenn es einen Operator gibt, dann liefert die Funktion den Index bis zu dem sich der Operator erstreckt
-	 * 
-	 * @param value
-	 * @return 0, wenn es keinen Operator gibt
-	 */
-	protected static int getOperatorEndIndex(String value) {
-		if (value == null || value.length() == 0) {
-			return 0;
-		}
-		// Wir simulieren einen ltrim, um die Anfangsposition des Operators festzustellen
-		String tmp = (value + "_").trim();
-		tmp = tmp.toLowerCase(Locale.ENGLISH).substring(0, tmp.length() - 1);
-		final int shift = value.length() - tmp.length();
-		for (final String sqlOperator : SQL_OPERATORS) {
-			if (tmp.startsWith(sqlOperator)) {
-				return shift + sqlOperator.length();
-			}
-		}
-		return 0;
 	}
 }

@@ -29,7 +29,9 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"rows": [
 		{
 			"values": [
-				"(b|d|i|n|s|z-Value)|null",...
+				"(f-Operator-(b|d|i|n|s|z)-Value)|"
+				"(b|d|i|n|s|z-Value)|"
+				"null",...
 			]
 		}
 	]
@@ -82,12 +84,15 @@ Im einfachsten Fall ist der Typ eines Values gleich dem Typ der jeweiligen Spalt
 
 Der Typ wird anhand des Prefixes des Values angegeben:
 
-* *"b-"*: boolean: false|true
-* *"d-"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
-* *"i-"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
-* *"n-"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
-* *"s-"*: String
-* *"z-"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"b"*: boolean: false|true
+* *"d"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
+* *"i"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
+* *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
+* *"s"*: String
+* *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
+ 
+Durch den Prefix "f-" können die Operatoren *<> , <=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.
 
 === rows
 

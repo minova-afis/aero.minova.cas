@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +40,9 @@ class SqlViewControllerTest {
 		inputTable.setName("vWorkingTimeIndex2");
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 * from vWorkingTimeIndex2");
@@ -58,15 +57,15 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
@@ -83,16 +82,16 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ? and CustomerText like ?)");
@@ -107,21 +106,21 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("<=" + LocalDate.of(2020, 7, 31).toString()));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value(LocalDate.of(2020, 7, 31).toString(), "<="));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(">" + LocalDate.of(2020, 7, 29).toString()));
-			inputRow.addValue(new Value(true));
+			inputRow.addValue(new Value(LocalDate.of(2020, 7, 29).toString(), ">"));
+			inputRow.addValue(new Value(true, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 BookingDate from vWorkingTimeIndex2\r\n" //
@@ -138,21 +137,21 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("WIS"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("WIS", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
@@ -183,16 +182,16 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
+			inputRow.addValue(new Value("AVM", null));
 			inputRow.addValue(null);
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
@@ -244,35 +243,44 @@ class SqlViewControllerTest {
 		intputTable.setName("vWorkingTimeIndex2");
 		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 		val row = new Row();
-		row.addValue(new Value("1"));
+		row.addValue(new Value("1", null));
 		intputTable.getRows().add(row);
 		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?)");
 	}
 
 	@Test
-	void test_parseMethod() {
-		assertThat(testSubject.parseType(new Value(true), DataType.BOOLEAN)).isEqualTo("true");
-		assertThat(testSubject.parseType(new Value(2.5), DataType.DOUBLE)).isEqualTo("2.5");
-		assertThat(testSubject.parseType(new Value(1), DataType.INTEGER)).isEqualTo("1");
-		assertThat(testSubject.parseType(new Value(252345275L), DataType.LONG)).isEqualTo("252345275");
-		assertThat(testSubject.parseType(new Value("Test"), DataType.STRING)).isEqualTo("Test");
-		Instant instant = Instant.now();
-		assertThat(testSubject.parseType(new Value(instant), DataType.INSTANT)).isEqualTo(instant.toString());
-		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
-		assertThat(testSubject.parseType(new Value(time), DataType.ZONED)).isEqualTo(instant.toString());
+	void test_whereWithIn() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		val row = new Row();
+		row.addValue(new Value("1,2,3", "in()"));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong in(?, ?, ?))");
 	}
 
 	@Test
-	void test_parseMethodWithOperators() {
-		assertThat(testSubject.parseType(new Value(true), DataType.BOOLEAN)).isEqualTo("true");
-		assertThat(testSubject.parseType(new Value("<2.5"), DataType.DOUBLE)).isEqualTo("2.5");
-		assertThat(testSubject.parseType(new Value("<1"), DataType.INTEGER)).isEqualTo("1");
-		assertThat(testSubject.parseType(new Value(">252345275L"), DataType.LONG)).isEqualTo("252345275L");
-		assertThat(testSubject.parseType(new Value("Test"), DataType.STRING)).isEqualTo("Test");
-		Instant instant = Instant.now();
-		assertThat(testSubject.parseType(new Value(">" + instant), DataType.INSTANT)).isEqualTo(instant.toString());
-		ZonedDateTime time = instant.atZone(ZoneId.systemDefault());
-		assertThat(testSubject.parseType(new Value("<" + time), DataType.ZONED)).isEqualTo(instant.toString());
+	void test_whereWithBetween() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		val row = new Row();
+		row.addValue(new Value("1,2,3", "between()"));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong between ? and ?)");
+	}
+
+	@Test
+	void test_whereNULL() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		intputTable.addColumn(new Column("KeyText", DataType.STRING));
+		val row = new Row();
+		row.addValue(new Value("", "is not null"));
+		row.addValue(new Value("", "is null"));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong is not null and KeyText is null)");
 	}
 
 	@DisplayName("Zeige erste Seite.")
@@ -285,16 +293,16 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
@@ -310,9 +318,9 @@ class SqlViewControllerTest {
 		inputTable.setName("vWorkingTimeIndex2");
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
 				.isEqualTo("select * from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2" + " ) as RowConstraintResult"
@@ -329,16 +337,16 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
@@ -356,16 +364,16 @@ class SqlViewControllerTest {
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM"));
-			inputRow.addValue(new Value("MIN"));
-			inputRow.addValue(new Value(false));
+			inputRow.addValue(new Value("AVM", null));
+			inputRow.addValue(new Value("MIN", null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(""));
-		inputRow.addValue(new Value(false));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"

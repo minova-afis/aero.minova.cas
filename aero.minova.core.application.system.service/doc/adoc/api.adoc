@@ -29,8 +29,8 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"rows": [
 		{
 			"values": [
+				"(f-Operator-(b|d|i|n|s|z)-Value)|"
 				"(b|d|i|n|s|z-Value)|"
-				"(b|d|i|n|s|z#rule-Value)|"
 				"null",...
 			]
 		}
@@ -90,11 +90,9 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 * *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
 * *"s"*: String
 * *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
-
-Außerdem kann durch das Hinzufügen von *#* eine *rule* angegeben werden, nachdem der angegebene Wert verarbeitet werden soll.
-Zulässige Eingaben sind *<> , <=, >=, <, >, =, between(), in(), not like, like, null* und *not null*.
-
-Wichtig dabei zu beachten ist, dass *zwischen* rule und Value *ein* Zeichen frei und der Typ des Values *String* sein muss.
+* *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
+ 
+Durch den Prefix "f-" können die Operatoren *<> , <=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.
 
 === rows
 

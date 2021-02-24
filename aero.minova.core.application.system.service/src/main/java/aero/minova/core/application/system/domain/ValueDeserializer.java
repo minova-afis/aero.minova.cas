@@ -12,8 +12,8 @@ import com.google.gson.JsonParseException;
 
 public class ValueDeserializer implements JsonDeserializer<Value> {
 	public static final String SQL_IS_NULL = "null";
-	public static final String SQL_IS_NOT_NULL = "not null";
-	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "not like", "like", SQL_IS_NULL, SQL_IS_NOT_NULL };
+	public static final String SQL_IS_NOT_NULL = "!null";
+	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
 	@Override
 	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
@@ -21,16 +21,27 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 			return null;
 		}
 		String typeString = json.getAsString().substring(0, 1);
-		String rule = json.getAsString().substring(1, 2);
 		String value = json.getAsString().substring(2);
+		String rule;
 
-		if (rule.contains("#")) {
-			rule = value.substring(0, getOperatorEndIndex(value)).toLowerCase();
+		if (typeString.contains("f")) {
+			int operatorPos = getOperatorEndIndex(value);
+			rule = value.substring(0, operatorPos).toLowerCase();
 			// falls die Regel is null oder is not null ist, macht es keinen Sinn, dass ein Wert weiter gegeben werden würde
 			if (rule.contains("null")) {
 				value = "";
+				typeString = "s";
+			} else if (rule.contains("!~")) {
+				rule = "not like";
+				typeString = value.substring(operatorPos + 1, operatorPos + 2);
+				value = value.substring(operatorPos + 3, value.length());
+			} else if (rule.contains("~")) {
+				rule = "like";
+				typeString = value.substring(operatorPos + 1, operatorPos + 2);
+				value = value.substring(operatorPos + 3, value.length());
 			} else {
-				value = value.substring(getOperatorEndIndex(value) + 1, value.length());
+				typeString = value.substring(operatorPos + 1, operatorPos + 2);
+				value = value.substring(operatorPos + 3, value.length());
 			}
 		} else {
 			rule = null;

@@ -28,7 +28,7 @@ jobs:
           git config --global user.email "service@minova.com"
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service
-          mvn --batch-mode release:prepare release:perform -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN -DreleaseVersion=$releaseVersion -DdevelopmentVersion=$nextDevelopmentVersion-SNAPSHOT
+          mvn --batch-mode release:prepare release:perform -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT
         env:
           MAVEN_USERNAME: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_TOKEN }}

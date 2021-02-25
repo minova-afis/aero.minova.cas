@@ -60,7 +60,7 @@ public class SqlProcedureController {
 		// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		if (svc.checkPrivilege(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
+		if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
 			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
 		}
 		return calculateSqlProcedureResult(inputTable);

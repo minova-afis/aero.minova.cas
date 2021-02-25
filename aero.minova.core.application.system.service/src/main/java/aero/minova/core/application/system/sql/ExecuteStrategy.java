@@ -81,15 +81,19 @@ public enum ExecuteStrategy {
 	// ###############################
 	/** Der return-Wert der Daten-Komponente (z.B. Prozedur, View). Wird nicht von allen Datenquellen unterstützt */
 	RETURN_CODE_IGNORE,
-	/** Der return Wert <> 0 bedeutet Fehler. Wird nicht von allen Datenquellen unterstützt */
+	/** Der return Wert &lt;&gt; 0 bedeutet Fehler. Wird nicht von allen Datenquellen unterstützt */
 	RETURN_CODE_IS_ERROR_IF_NOT_0,
-	/** Der return Wert <> 1 bedeutet Fehler. Wird nicht von allen Datenquellen unterstützt */
+	/** Der return Wert &lt;&gt; 1 bedeutet Fehler. Wird nicht von allen Datenquellen unterstützt */
 	RETURN_CODE_IS_ERROR_IF_NOT_1,
 	/** Der return Wert -1 bedeutet Abbruch. Wird nicht von allen Datenquellen unterstützt */
 	RETURN_CODE_IS_CANCEL_IF_MINUS_1;
 
 	/**
 	 * Liefert Strategien, die konträr zu der angegebenen sind. So ist z.B. SET_ALL_FIELDS konträr zu SET_NO_FIELDS
+	 * 
+	 * @param strategy
+	 *            Die ursprüngliche Ausführungs-Strategie.
+	 * @return Die konträren Strategien.
 	 */
 	public static final Set<ExecuteStrategy> getContrairedStrategies(ExecuteStrategy strategy) {
 		final Set<ExecuteStrategy> toRet = new HashSet<ExecuteStrategy>();
@@ -148,7 +152,9 @@ public enum ExecuteStrategy {
 	}
 
 	/**
-	 * Liefert true, wenn die Strategie einen Rückgabewert von der Prozedur (ala 'return 1') erfordert.
+	 * @param strategy
+	 *            Die zu prüfenden Strategien
+	 * @return true, wenn die Strategie einen Rückgabewert von der Prozedur (ala 'return 1') erfordert.
 	 */
 	public static boolean returnRequired(Set<ExecuteStrategy> strategy) {
 		if (strategy == null) {

@@ -68,14 +68,14 @@ class SecurityTests {
 
 		doReturn(user).when(spyController).getTableForSecurityCheck(Mockito.any());
 
-		assertThat(spyController.checkPrivilege(ga, tableName).getRows().isEmpty())//
+		assertThat(spyController.getPrivilegePermissions(ga, tableName).getRows().isEmpty())//
 				.isEqualTo(false);
 		ga.clear();
 		ga.add(new SimpleGrantedAuthority("dispatcher"));
 
 		doReturn(new Table()).when(spyController).getTableForSecurityCheck(Mockito.any());
 
-		assertThat(spyController.checkPrivilege(ga, tableName).getRows().isEmpty())//
+		assertThat(spyController.getPrivilegePermissions(ga, tableName).getRows().isEmpty())//
 				.isEqualTo(true);
 	}
 

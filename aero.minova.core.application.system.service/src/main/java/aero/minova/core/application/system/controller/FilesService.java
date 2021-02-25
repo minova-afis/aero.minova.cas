@@ -30,7 +30,7 @@ public class FilesService {
 	}
 
 	/**
-	 * Mit {@link Paths#toAbsolutePath} und {@link Paths#normalize} werden die Pfade so eindeutig wie möglich.
+	 * Mit {@link Path#toAbsolutePath()} und {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
 	 */
 	@PostConstruct
 	public void setUp() {

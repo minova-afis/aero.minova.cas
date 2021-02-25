@@ -50,6 +50,7 @@ public class SqlViewController {
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		try {
+			// TODO Warum wird dies Tabelle in eine Variable gespeichert, die nur einmal verwendet wird?
 			Table accessableTable = columnSecurity(inputTable, authoritiesForThisTable);
 			inputTable = accessableTable;
 
@@ -189,6 +190,7 @@ public class SqlViewController {
 	 *            Die Gruppen, die dem anfordenden gehören.
 	 * @param privilegeName
 	 *            Das Privilege, für das ein Recht eingefordert wird.
+	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
 	 **/
 	public Table getPrivilegePermissions(List<GrantedAuthority> securityTokens, String privilegeName) {
 		Table userPrivileges = new Table();
@@ -364,9 +366,16 @@ public class SqlViewController {
 	}
 
 	/**
+	 * Entfernt alle spalten der Eingabe-Tabelle, auf die der Nutzer keinen Zugriff hat.
+	 * <p>
+	 * TODO Idee: Mann sollte eine neue Tabelle erstellen, statt die eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht
+	 * geändert wird.
+	 * 
 	 * @param inputTable
-	 *            die Tabelle mit den Spalten, welche angefragt werden
-	 * @return Tabelle mit bereits konfigurierten Spalten, welche für die Index-View von diesem User verwendet werden dürfen
+	 *            Enthält den Tabellen-Namen und die Spalten, welche von einem Nutzer angefragt werden.
+	 * @param userGroups
+	 *            Die Nutzer-Gruppen/Rollen, welche Zugriff auf die Tabelle haben wollen.
+	 * @return Diese Tabelle enhtält die Spalten, welche für die Index-View von diesem User verwendet werden dürfen.
 	 * @author weber
 	 */
 	public Table columnSecurity(Table inputTable, List<Row> userGroups) {

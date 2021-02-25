@@ -20,8 +20,8 @@ jobs:
           java-version: '11'
           java-package: 'jdk'
           server-id: github
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
+          server-username: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_USERNAME }}
+          server-password: ${{ secrets.MINOVA_GITHUB_RELEASE_TOKEN }}
           ssh-private-key: ${{ secrets.MINOVA_GITHUB_GIT_SSH_PRIVATE_KEY }}
       - name: Release
         run: |

@@ -1,6 +1,15 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version'
+        required: true
+        default: 'warning'
+      nextDevelopmentVersion:
+        description: 'Next Development Version ("-SNAPSHOT" muss nicht angegeben werden.)'
+        required: true
+        default: 'warning'
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -19,7 +28,7 @@ jobs:
           git config --global user.email "service@minova.com"
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service
-          mvn --batch-mode release:prepare release:perform -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN
+          mvn --batch-mode release:prepare release:perform -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN -DreleaseVersion=$releaseVersion -DdevelopmentVersion=$nextDevelopmentVersion-SNAPSHOT
         env:
           MAVEN_USERNAME: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_TOKEN }}

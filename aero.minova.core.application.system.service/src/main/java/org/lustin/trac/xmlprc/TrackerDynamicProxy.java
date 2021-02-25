@@ -47,7 +47,7 @@ public class TrackerDynamicProxy {
 	}
 
 	/**
-	 * Returns the factories client.
+	 * @return Returns the factories client.
 	 */
 	public XmlRpcClient getClient() {
 		return client;
@@ -77,6 +77,7 @@ public class TrackerDynamicProxy {
 	 * 
 	 * @param clazz
 	 *            Type of the new instance.
+	 * @return This is the newly created instance.
 	 */
 	public Object newInstance(Class<?> clazz) {
 		return newInstance(Thread.currentThread().getContextClassLoader(), clazz);
@@ -87,8 +88,9 @@ public class TrackerDynamicProxy {
 	 * 
 	 * @param classLoader
 	 *            Class loader used for instance creation.
-	 * @param Type
-	 *            of the new instance.
+	 * @param clazz
+	 *            Type of the new instance.
+	 * @return This is the newly created instance.
 	 */
 	public Object newInstance(ClassLoader classLoader, final Class<?> clazz) {
 		return Proxy.newProxyInstance(classLoader, new Class[] { clazz }, new InvocationHandler() {

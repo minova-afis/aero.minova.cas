@@ -43,7 +43,7 @@ public class SqlViewController {
 	public Table getIndexView(@RequestBody Table inputTable) {
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		List<Row> authoritiesForThisTable = checkPrivilege(allUserAuthorities, inputTable.getName()).getRows();
+		List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
 		if (authoritiesForThisTable.isEmpty()) {
 			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
 		}
@@ -183,9 +183,14 @@ public class SqlViewController {
 	}
 
 	/**
-	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt
+	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt.
+	 * 
+	 * @param securityTokens
+	 *            Die Gruppen, die dem anfordenden gehören.
+	 * @param privilegeName
+	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 **/
-	public Table checkPrivilege(List<GrantedAuthority> securityToken, String privilegeName) {
+	public Table getPrivilegePermissions(List<GrantedAuthority> securityTokens, String privilegeName) {
 		Table userPrivileges = new Table();
 		userPrivileges.setName("xvcasUserPrivileges");
 		List<Column> columns = new ArrayList<>();
@@ -196,7 +201,7 @@ public class SqlViewController {
 		userPrivileges.setColumns(columns);
 
 		List<String> userTokens = new ArrayList<>();
-		for (GrantedAuthority ga : securityToken) {
+		for (GrantedAuthority ga : securityTokens) {
 			userTokens.add(ga.getAuthority().substring(5));
 		}
 
@@ -208,9 +213,13 @@ public class SqlViewController {
 		return getTableForSecurityCheck(userPrivileges);
 	}
 
-	/*
-	 * Wie indexView, nur ohne die erste Abfrage, um die maximale Länge zu erhalten Ist nur für die Sicherheitsabfragen gedacht, um nicht zu viele unnötige
-	 * SQL-Abfrgane zu machen
+	/**
+	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage, um die maximale Länge zu erhalten Ist nur für die Sicherheitsabfragen gedacht,
+	 * um nicht zu viele unnötige SQL-Abfrgane zu machen.
+	 * 
+	 * @param inputTable
+	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
+	 * @return Das Ergebnis der Abfrage.
 	 */
 	public Table getTableForSecurityCheck(Table inputTable) {
 		List<Row> userGroups = new ArrayList<>();
@@ -534,11 +543,13 @@ public class SqlViewController {
 	/**
 	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an
 	 * 
-	 * @param boolean
+	 * @param isFirstWhereClause
 	 *            Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
+	 * @param authorities
+	 *            Die Rollen des Nutzers, welche ein Recht auf einen Zugriff haben.
 	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
 	 */
-	protected String rowLevelSecurity(boolean where, List<Row> authorities) {
+	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> authorities) {
 
 		List<String> roles = new ArrayList<>();
 
@@ -552,7 +563,7 @@ public class SqlViewController {
 
 		final StringBuffer rowSec = new StringBuffer();
 		// Falls where-Klausel bereits vorhanden 'and' anfügen, wenn nicht, dann 'where'
-		if (where) {
+		if (isFirstWhereClause) {
 			rowSec.append("\r\nand (");
 		} else {
 			rowSec.append("\r\nwhere (");

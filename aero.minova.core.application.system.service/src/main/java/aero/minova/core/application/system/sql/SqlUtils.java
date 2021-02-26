@@ -6,6 +6,7 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public class SqlUtils {
 					if (sqlSet.getTimestamp(column.getName()) == null) {
 						row.addValue(new Value((Instant) null, null));
 					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant(), null));
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toLocalDateTime().toInstant(ZoneOffset.UTC), null));
 					}
 				} else if (column.getType() == DataType.LONG) {
 					row.addValue(new Value(sqlSet.getLong(column.getName()), null));

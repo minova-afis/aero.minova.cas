@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -130,7 +132,8 @@ public class SqlProcedureController {
 								} else if (type == DataType.DOUBLE) {
 									preparedStatement.setDouble(i + parameterOffset, iVal.getDoubleValue());
 								} else if (type == DataType.INSTANT) {
-									preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getInstantValue()));
+									preparedStatement.setTimestamp(i + parameterOffset,
+											Timestamp.valueOf(LocalDateTime.ofInstant(iVal.getInstantValue(), ZoneId.of("UTC"))));
 								} else if (type == DataType.INTEGER) {
 									preparedStatement.setInt(i + parameterOffset, iVal.getIntegerValue());
 								} else if (type == DataType.LONG) {

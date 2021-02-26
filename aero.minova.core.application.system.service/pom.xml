@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>core.application.system.service</artifactId>
 	<version>12.8.0-SNAPSHOT</version>
@@ -19,8 +21,8 @@
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</developerConnection>
-	  <tag>v12.5.0</tag>
-  </scm>
+		<tag>v12.5.0</tag>
+	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -108,6 +110,36 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.12</version>
+				<executions>
+					<execution>
+						<id>default</id>
+						<goals>
+							<goal>build</goal>
+							<goal>push</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>tag-latest</id>
+						<goals>
+							<goal>build</goal>
+							<goal>push</goal>
+						</goals>
+						<configuration>
+							<tag>latest</tag>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<username>${env.MINOVA_DOCKER_USER}</username>
+					<password>${env.MINOVA_DOCKER_ACCESS_TOKEN}</password>
+					<repository>registry.hub.docker.com/${env.MINOVA_DOCKER_USER}/${project.groupId}.${project.artifactId}</repository>
+					<tag>${project.version}</tag>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

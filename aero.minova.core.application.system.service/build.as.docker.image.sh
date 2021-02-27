@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-docker build --tag=alpine-java:base --rm=true .
 mvn clean verify
 mvn package spring-boot:repackage
 docker build --tag=$docker_user/aero.minova.cas:latest .

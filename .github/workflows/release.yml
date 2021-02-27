@@ -25,7 +25,7 @@ jobs:
         run: |
           git config --global user.email "service@minova.com"
           git config --global user.name "minova-worker"
-          cd $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service
           mvn --batch-mode release:prepare release:perform -P repo-github \
             -Dusername=$GITHUB_RELEASE_USERNAME \
             -Dpassword=$GITHUB_RELEASE_TOKEN \

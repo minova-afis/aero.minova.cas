@@ -32,6 +32,11 @@ jobs:
             -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
             -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
             --settings .github/settings.xml
+          docker build --tag=alpine-java:base --rm=true .
+          mvn package spring-boot:repackage
+          docker build --tag=$docker_user/aero.minova.cas:latest .
+          docker login --username ${{ secrets.MINOVA_DOCKER_USER}} --password ${{ secrets.MINOVA_DOCKER_ACCESS_TOKEN}}
+          docker push ${{ secrets.MINOVA_DOCKER_USER}}/aero.minova.cas:${{ github.event.inputs.releaseVersion }}
         env:
           MAVEN_USERNAME: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_TOKEN }}

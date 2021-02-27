@@ -31,7 +31,7 @@ jobs:
             -Dpassword=$GITHUB_RELEASE_TOKEN \
             -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
             -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
-            --settings .github/settings.xml
+            --settings ../.github/settings.xml
           docker build --tag=alpine-java:base --rm=true .
           mvn package spring-boot:repackage
           docker build --tag=$docker_user/aero.minova.cas:{{ github.event.inputs.releaseVersion }} .

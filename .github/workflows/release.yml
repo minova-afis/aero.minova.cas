@@ -33,7 +33,7 @@ jobs:
             -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
             --settings ../.github/settings.xml
           mvn package spring-boot:repackage
-          docker build --tag=$docker_user/aero.minova.cas:{{ github.event.inputs.releaseVersion }} .
+          docker build --tag=$docker_user/aero.minova.cas:${{ github.event.inputs.releaseVersion }} .
           docker login --username ${{ secrets.MINOVA_DOCKER_USER}} --password ${{ secrets.MINOVA_DOCKER_ACCESS_TOKEN}}
           docker push ${{ secrets.MINOVA_DOCKER_USER}}/aero.minova.cas:${{ github.event.inputs.releaseVersion }}
         env:

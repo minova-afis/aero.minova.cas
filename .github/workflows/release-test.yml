@@ -1,0 +1,32 @@
+name: Release Test
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version'
+        required: true
+        default: 'warning'
+      nextDevelopmentVersion:
+        description: 'Next Development Version ("-SNAPSHOT" muss nicht angegeben werden.)'
+        required: true
+        default: 'warning'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+          java-package: 'jdk'
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Build
+        run: |
+          cd $GITHUB_WORKSPACE
+          mvn clean verify -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN
+        env:
+          MAVEN_USERNAME: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MINOVA_GITHUB_RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

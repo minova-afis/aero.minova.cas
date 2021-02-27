@@ -1,5 +1,15 @@
 = Core Application System
 
+Der Kern des Systems ist ein Dienst,
+welcher eine einfache Schnittstelle zu Daten und Prozeduren bereitstellt.
+Kombiniert mit einem Modul-System können hiermit Daten und Prozeduren einer SQL-Datenbank
+sowie eines Dateisystems eingerichtet, gepflegt und zugegriffen werden.
+
+Der Fokus liegt hierbei das Backend und Infrastruktur für Eclipse-Anwendungen bereitzustellen.
+Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
+
+== Sturktur
+
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
 
 == Maske für das Editieren von Rechten
@@ -7,4 +17,3 @@
 * Source Code: http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic
 * Installierbare Modul: acode/snapshot/aero.minova.cas.logic.jar
 * Alternativ: xref:./aero.minova.core.application.system.service/doc/adoc/privileges.adoc#[Manuelle Rechteverwaltung]
-

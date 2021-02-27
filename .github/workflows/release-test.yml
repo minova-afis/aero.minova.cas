@@ -28,7 +28,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           mvn --batch-mode release:prepare release:perform -P repo-github \
             -Dusername=$GITHUB_RELEASE_USERNAME \
-            -Dpssword=$GITHUB_RELEASE_TOKEN \
+            -Dpassword=$GITHUB_RELEASE_TOKEN \
             -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
             -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
             --settings .github/settings.xml

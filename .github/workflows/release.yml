@@ -1,15 +1,15 @@
-name: Release Test
+name: Release
 on:
   workflow_dispatch:
     inputs:
       releaseVersion:
         description: 'Release Version'
         required: true
-        default: 'warning'
+        default: ''
       nextDevelopmentVersion:
         description: 'Next Development Version ("-SNAPSHOT" muss nicht angegeben werden.)'
         required: true
-        default: 'warning'
+        default: ''
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -5,7 +5,7 @@ welcher eine einfache Schnittstelle zu Daten und Prozeduren bereitstellt.
 Kombiniert mit einem Modul-System können hiermit Daten und Prozeduren einer SQL-Datenbank
 sowie eines Dateisystems eingerichtet, gepflegt und zugegriffen werden.
 
-Der Fokus liegt hierbei das Backend und Infrastruktur für Eclipse-Anwendungen bereitzustellen.
+Der Fokus liegt hierbei auf das Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.
 Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
 
 == Sturktur

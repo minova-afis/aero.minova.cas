@@ -1,17 +1,15 @@
 package aero.minova.core.application.system.sql;
 
-import static java.time.ZoneId.systemDefault;
-
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 
+import aero.minova.core.application.system.CoreApplicationSystemApplication;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
@@ -52,7 +50,7 @@ public class SqlUtils {
 					if (sqlSet.getTimestamp(column.getName()) == null) {
 						row.addValue(new Value((Instant) null, null));
 					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toLocalDateTime().toInstant(ZoneOffset.UTC), null));
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant(), null));
 					}
 				} else if (column.getType() == DataType.LONG) {
 					row.addValue(new Value(sqlSet.getLong(column.getName()), null));
@@ -60,7 +58,7 @@ public class SqlUtils {
 					if (sqlSet.getTimestamp(column.getName()) == null) {
 						row.addValue(new Value((ZonedDateTime) null, null));
 					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault()), null));
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(CoreApplicationSystemApplication.zone), null));
 					}
 				} else {
 					logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
@@ -95,7 +93,7 @@ public class SqlUtils {
 			} else if (column.getType() == DataType.ZONED) {
 				return new Value(//
 						Optional.ofNullable(statement.getTimestamp(index))//
-								.map(e -> e.toInstant().atZone(systemDefault()))//
+								.map(e -> e.toInstant().atZone(CoreApplicationSystemApplication.zone))//
 								.orElse(null),
 						null);
 			} else {

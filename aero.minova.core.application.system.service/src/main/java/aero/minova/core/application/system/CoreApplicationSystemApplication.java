@@ -1,6 +1,8 @@
 package aero.minova.core.application.system;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.util.TimeZone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +22,12 @@ import aero.minova.core.application.system.domain.ValueSerializer;
 @ComponentScan("aero.minova")
 @Configuration
 public class CoreApplicationSystemApplication {
+
+	public static ZoneId zone = ZoneId.systemDefault();
+
 	public static void main(String[] args) throws IOException {
+		// Zeitzone muss global auf UTC gesetzt sein, da Server auch UTC ist und sonst Abweichungen beim Parsen von Instant auftreten
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		SpringApplication.run(CoreApplicationSystemApplication.class, args);
 	}
 

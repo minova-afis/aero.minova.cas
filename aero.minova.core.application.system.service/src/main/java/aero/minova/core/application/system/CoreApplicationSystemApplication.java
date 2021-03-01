@@ -23,6 +23,7 @@ import aero.minova.core.application.system.domain.ValueSerializer;
 @Configuration
 public class CoreApplicationSystemApplication {
 
+	// die alte Zeitzone wird 'aufgehoben', falls man mal den Zoned-Datentyp braucht
 	public static ZoneId zone = ZoneId.systemDefault();
 
 	public static void main(String[] args) throws IOException {

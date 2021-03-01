@@ -12,13 +12,11 @@ import java.util.TimeZone;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import aero.minova.core.application.system.CoreApplicationSystemApplication;
-
 @SpringBootTest
 public class TimeZoneParseTest {
 
-	// Die alte System-Zeitzone
-	public static ZoneId zone = CoreApplicationSystemApplication.zone;
+	// Die alte System-Zeitzone war bei mir z.b. 'Europe/Berlin'
+	public static ZoneId zone = ZoneId.of("Europe/Berlin");
 
 	@Test
 	public void parseTestWithWrongTimeZone() {

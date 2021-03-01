@@ -96,7 +96,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				tUser.setColumns(columns);
 				Row userEntry = new Row();
 				userEntry.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username, null),
-						new aero.minova.core.application.system.domain.Value("", null), new aero.minova.core.application.system.domain.Value("", null)));
+						new aero.minova.core.application.system.domain.Value("", null), //
+						new aero.minova.core.application.system.domain.Value("", null)));
 				tUser.addRow(userEntry);
 
 				// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste

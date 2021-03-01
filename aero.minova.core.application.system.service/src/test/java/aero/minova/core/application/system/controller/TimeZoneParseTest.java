@@ -12,14 +12,17 @@ import java.util.TimeZone;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import aero.minova.core.application.system.CoreApplicationSystemApplication;
+
 @SpringBootTest
 public class TimeZoneParseTest {
 
 	// Die alte System-Zeitzone
-	public static ZoneId zone = ZoneId.systemDefault();
+	public static ZoneId zone = CoreApplicationSystemApplication.zone;
 
 	@Test
-	public void parseTestWithWringTimeZone() {
+	public void parseTestWithWrongTimeZone() {
+		TimeZone.setDefault(TimeZone.getTimeZone(zone));
 		Instant i = Instant.now();
 		Timestamp oldTime = Timestamp.from(i);
 

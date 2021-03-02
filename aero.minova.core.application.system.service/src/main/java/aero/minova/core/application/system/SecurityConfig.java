@@ -69,7 +69,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
-			auth.authenticationProvider(new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress));
+			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
+			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
+			auth.authenticationProvider(acldap);
 		} else {
 			auth.inMemoryAuthentication()//
 					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("ADMIN");

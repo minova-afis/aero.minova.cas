@@ -1,7 +1,8 @@
 == Initialisieren der Datenbanktabellen
 
-Die SQL-Skripte zum Initialisieren der Tabellen können in folgender Reihenfolge augeführt werden.
+Die SQL-Skripte zum Initialisieren und befüllen der Tabellen können in folgender Reihenfolge augeführt werden.
 
+=== Tabellen
 [source::sql]
 ----
 
@@ -74,4 +75,32 @@ join xtcasUserGroup UG on UG.KeyLong=UPG.UserGroupKey
 
 ----
 
-Für das Befüllen der Tabellen siehe: xref:./aero.minova.core.application.system.service/doc/adoc/privileges.adoc#[Manuelle Rechteverwaltung]
+=== Start Rechte
+
+[source::sql]
+
+----
+insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('admin','#admin')
+insert into xtCasUserPrivilege (KeyText) VALUES ('tEmployee')
+insert into xtCasUserPrivilege (KeyText) VALUES ('tService')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeOrderReceiverList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeOrderReceiverList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeOrderReceiverResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceContractList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceContractResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceObjectList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceObjectResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spDeleteWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spInsertWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spReadWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spUpdateWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeCheckData')
+insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeFill')
+insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex')
+insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex2')
+insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndexPrint')
+----
+
+Für das weitere Befüllen der Tabellen siehe: xref:./aero.minova.core.application.system.service/doc/adoc/privileges.adoc#[Manuelle Rechteverwaltung]

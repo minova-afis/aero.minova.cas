@@ -114,7 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 							.collect(Collectors.toList());
 
 					// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
-					String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().trim();
+					String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().replace("#", "").trim();
 					if (!userSecurityTokens.contains(uniqueUserToken))
 						userSecurityTokens.add(uniqueUserToken);
 				} else {

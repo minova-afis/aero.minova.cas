@@ -58,7 +58,7 @@ public class SqlUtils {
 					if (sqlSet.getTimestamp(column.getName()) == null) {
 						row.addValue(new Value((ZonedDateTime) null, null));
 					} else {
-						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(CoreApplicationSystemApplication.zone), null));
+						row.addValue(new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(CoreApplicationSystemApplication.DEFAULT_ZONE), null));
 					}
 				} else {
 					logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
@@ -93,7 +93,7 @@ public class SqlUtils {
 			} else if (column.getType() == DataType.ZONED) {
 				return new Value(//
 						Optional.ofNullable(statement.getTimestamp(index))//
-								.map(e -> e.toInstant().atZone(CoreApplicationSystemApplication.zone))//
+								.map(e -> e.toInstant().atZone(CoreApplicationSystemApplication.DEFAULT_ZONE))//
 								.orElse(null),
 						null);
 			} else {

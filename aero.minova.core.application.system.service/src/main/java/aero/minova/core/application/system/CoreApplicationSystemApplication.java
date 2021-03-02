@@ -24,7 +24,7 @@ import aero.minova.core.application.system.domain.ValueSerializer;
 public class CoreApplicationSystemApplication {
 
 	// die alte Zeitzone wird 'aufgehoben', falls man mal den Zoned-Datentyp braucht
-	public static ZoneId zone = ZoneId.systemDefault();
+	public static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
 
 	public static void main(String[] args) throws IOException {
 		// Zeitzone muss global auf UTC gesetzt sein, da Server auch UTC ist und sonst Abweichungen beim Parsen von Instant auftreten

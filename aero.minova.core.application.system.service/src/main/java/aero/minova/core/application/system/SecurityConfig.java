@@ -93,7 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				tUser.setName("xtcasUser");
 				List<Column> columns = new ArrayList<>();
 				columns.add(new Column("KeyText", DataType.STRING));
-				columns.add(new Column("SecurityToken", DataType.STRING));
+				columns.add(new Column("UserSecurityToken", DataType.STRING));
 				columns.add(new Column("Memberships", DataType.STRING));
 				tUser.setColumns(columns);
 				Row userEntry = new Row();

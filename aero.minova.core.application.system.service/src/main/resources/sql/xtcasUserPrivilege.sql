@@ -1,6 +1,6 @@
 CREATE TABLE xtcasUserPrivilege (
     KeyLong INT NOT NULL IDENTITY,
-    KeyText VARCHAR(10) NOT NULL,
+    KeyText VARCHAR(50) NOT NULL,
 )
 
 ALTER TABLE xtcasUserPrivilege

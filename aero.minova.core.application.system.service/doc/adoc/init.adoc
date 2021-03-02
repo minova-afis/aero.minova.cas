@@ -1,0 +1,77 @@
+== Initialisieren der Datenbanktabellen
+
+Die SQL-Skripte zum Initialisieren der Tabellen können in folgender Reihenfolge augeführt werden.
+
+[source::sql]
+----
+
+CREATE TABLE xtcasUser (
+    KeyLong INT NOT NULL IDENTITY,
+    KeyText VARCHAR(50) NOT NULL,
+    UserSecurityToken VARCHAR(50) NOT NULL,
+	Memberships VARCHAR(250)
+)
+
+ALTER TABLE xtcasUser
+ADD CONSTRAINT UQ_xtcasUser UNIQUE (KeyLong,UserSecurityToken,KeyText),
+    CONSTRAINT PK_xtcasUser_KeyLong PRIMARY KEY (KeyLong)
+
+
+CREATE TABLE xtcasUserGroup (
+    KeyLong INT NOT NULL IDENTITY,
+    KeyText VARCHAR(50) NOT NULL,
+	Description VARCHAR(50),
+	UserCode VARCHAR(50),
+    SecurityToken VARCHAR(250) NOT NULL
+)
+
+ALTER TABLE xtcasUserGroup
+ADD CONSTRAINT UQ_xtcasUserGroup UNIQUE (KeyLong,KeyText),
+    CONSTRAINT PK_xtcasUserGroup_KeyLong PRIMARY KEY (KeyLong)
+
+
+CREATE TABLE xtcasUserPrivilege (
+    KeyLong INT NOT NULL IDENTITY,
+    KeyText VARCHAR(50) NOT NULL,
+)
+
+ALTER TABLE xtcasUserPrivilege
+ADD CONSTRAINT UQ_xtcasUserPrivilege UNIQUE (KeyText),
+    CONSTRAINT PK_xtcasUserPrivilege_KeyLong PRIMARY KEY (KeyLong)
+
+
+CREATE TABLE xtcasColumnSecurity(
+	KeyLong INT NOT NULL IDENTITY,
+	TableName VARCHAR(50) NOT NULL,
+	ColumnName VARCHAR(50) NOT NULL,
+	SecurityToken VARCHAR(50) NOT NULL,
+)
+ALTER TABLE xtcasColumnSecurity
+ADD CONSTRAINT PK_xtcasColumnSecurity_KeyLong PRIMARY KEY (KeyLong)
+
+
+create table xtcasLuUserPrivilegeUserGroup (
+    KeyLong INT NOT NULL IDENTITY,
+    UserPrivilegeKey INT NOT NULL,
+    UserGroupKey INT NOT NULL,
+	RowLevelSecurity BIT
+)
+
+ALTER TABLE xtcasLuUserPrivilegeUserGroup
+ADD CONSTRAINT PK_xtcasLuUserPrivilegesUserGroup_KeyLong PRIMARY KEY (KeyLong),
+	CONSTRAINT FK_xtcasLuUserPrivilegesUserGroup_UserGroupKey Foreign KEY (UserGroupKey) REFERENCES xtcasUserGroup (KeyLong),
+	CONSTRAINT FK_xtcasLuUserPrivilegesUserGroup_UserPrivilegeKey FOREIGN KEY (UserPrivilegeKey) REFERENCES xtcasUserPrivilege (KeyLong),
+	CONSTRAINT DF_xtcasLuUserPrivilegesUserGroup_RowLevelSecurity DEFAULT 0 FOR RowLevelSecurity
+
+
+CREATE VIEW xvcasUserPrivileges
+with encryption AS
+select UP.KeyLong, UP.KeyText as PrivilegeKeyText, UG.KeyText as KeyText, UPG.RowLevelSecurity
+from 
+xtcasUserPrivilege UP
+join xtcasLuUserPrivilegeUserGroup UPG on UP.KeyLong=UPG.UserPrivilegeKey
+join xtcasUserGroup UG on UG.KeyLong=UPG.UserGroupKey
+
+----
+
+Für das Befüllen der Tabellen siehe: xref:./aero.minova.core.application.system.service/doc/adoc/privileges.adoc#[Manuelle Rechteverwaltung]

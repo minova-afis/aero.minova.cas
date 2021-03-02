@@ -103,4 +103,4 @@ insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex2')
 insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndexPrint')
 ----
 
-Für das weitere Befüllen der Tabellen siehe: xref:./aero.minova.core.application.system.service/doc/adoc/privileges.adoc#[Manuelle Rechteverwaltung]
+Für das weitere Befüllen der Tabellen siehe: xref:privileges.adoc#[Manuelle Rechteverwaltung]

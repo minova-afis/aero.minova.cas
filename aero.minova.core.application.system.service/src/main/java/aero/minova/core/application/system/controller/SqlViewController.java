@@ -142,6 +142,7 @@ public class SqlViewController {
 					if (rule == null) {
 						if (!stringValue.trim().isEmpty()) {
 							preparedStatement.setString(i + parameterOffset, stringValue);
+							logger.info("Insert value '" + stringValue + "' at position " + (i + parameterOffset));
 						} else {
 							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' hat
 							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
@@ -153,6 +154,7 @@ public class SqlViewController {
 								.collect(Collectors.toList());
 						for (String string : inBetweenValues) {
 							preparedStatement.setString(i + parameterOffset, string);
+							logger.info("Insert value '" + string + "' at position " + (i + parameterOffset));
 							parameterOffset++;
 						}
 						// i zählt als nächstes hoch, deswegem muss parameterOffset wieder um 1 verringert werden
@@ -164,11 +166,14 @@ public class SqlViewController {
 						// bei between vertrauen wir nicht darauf, dass der Nutzer wirklich nur zwei Werte einträgt,
 						// sondern nehmen den ersten und den letzten Wert
 						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(0));
+						logger.info("Insert value '" + inBetweenValues.get(0) + "' at position " + (i + parameterOffset));
 						parameterOffset++;
 						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(inBetweenValues.size() - 1));
+						logger.info("Insert value '" + inBetweenValues.get(inBetweenValues.size() - 1) + "' at position " + (i + parameterOffset));
 					} else {
 						if (!stringValue.trim().isEmpty()) {
 							preparedStatement.setString(i + parameterOffset, stringValue);
+							logger.info("Insert value '" + stringValue + "' at position " + (i + parameterOffset));
 						} else {
 							parameterOffset--;
 						}
@@ -563,8 +568,11 @@ public class SqlViewController {
 		List<String> roles = new ArrayList<>();
 
 		for (Row row : authorities) {
-			if (!row.getValues().get(2).getBooleanValue())
+			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
+			if (!row.getValues().get(2).getBooleanValue()) {
 				return "";
+			}
+			// hier sind die Rolen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
 			String value = row.getValues().get(1).getStringValue().trim();
 			if ((!value.equals("")) && (!roles.contains(value)))
 				roles.add(row.getValues().get(1).getStringValue());
@@ -580,13 +588,10 @@ public class SqlViewController {
 		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen
 		rowSec.append(" ( SecurityToken IS NULL )");
 
-		@SuppressWarnings("unchecked")
-		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-		if (allUserAuthorities.size() > 0) {
+		if (roles.size() > 0) {
 			rowSec.append("\r\nor ( SecurityToken IN (");
-			for (GrantedAuthority ga : allUserAuthorities) {
-				rowSec.append("'").append(ga.getAuthority().trim()).append("',");
+			for (String r : roles) {
+				rowSec.append("'").append(r.trim()).append("',");
 			}
 			rowSec.deleteCharAt(rowSec.length() - 1);
 			rowSec.append(") )");

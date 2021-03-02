@@ -124,6 +124,7 @@ public class SqlProcedureController {
 								} else {
 									throw new IllegalArgumentException("Unknown type: " + type.name());
 								}
+								logger.info("Insert value " + iVal + " at position " + (i + parameterOffset));
 							} else {
 								if (type == DataType.BOOLEAN) {
 									preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
@@ -142,6 +143,7 @@ public class SqlProcedureController {
 								} else {
 									throw new IllegalArgumentException("Unknown type: " + type.name());
 								}
+								logger.info("Insert value '" + iVal.getValue() + "' at position " + (i + parameterOffset));
 							}
 							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
 								if (type == DataType.BOOLEAN) {

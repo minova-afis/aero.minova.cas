@@ -136,7 +136,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					if (!s.trim().equals("")) {
 						Row tokens = new Row();
 						tokens.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(s.trim(), null),
-								new aero.minova.core.application.system.domain.Value("", "not null")));
+								new aero.minova.core.application.system.domain.Value("", "!null")));
 						groups.addRow(tokens);
 					}
 				}

@@ -119,31 +119,9 @@ class SecurityTests {
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
-				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('ROLE_codemonkey','ROLE_dispatcher','ROLE_user') ) )");
+				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('user','dispatcher','codemonkey') ) )");
 		assertThat(testSubject.rowLevelSecurity(true, userGroups))//
-				.isEqualTo("\r\nand ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('ROLE_codemonkey','ROLE_dispatcher','ROLE_user') ) )");
-	}
-
-	@DisplayName("Row-Level-Security mit mehreren Rollen, aber nur 2 von 3 dürften auf die Tabelle zugreifen (man soll trotzdem im WHERE 3 Rollen haben")
-	@WithMockUser(username = "user", roles = { "user", "dispatcher", "codemonkey" })
-	@Test
-	void test_rowLevelSecurityMultipleRolesAndOneExtra() {
-		List<Row> userGroups = new ArrayList<>();
-		Row inputRow = new Row();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("user", null));
-		inputRow.addValue(new Value(true, null));
-		userGroups.add(inputRow);
-
-		inputRow = new Row();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("codemonkey", null));
-		inputRow.addValue(new Value(true, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
-				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('ROLE_codemonkey','ROLE_dispatcher','ROLE_user') ) )");
-		assertThat(testSubject.rowLevelSecurity(true, userGroups))//
-				.isEqualTo("\r\nand ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('ROLE_codemonkey','ROLE_dispatcher','ROLE_user') ) )");
+				.isEqualTo("\r\nand ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('user','dispatcher','codemonkey') ) )");
 	}
 
 	@DisplayName("Row-Level-Security mit mehreren Rollen, aber eine darf alle Spalten sehen")

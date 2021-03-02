@@ -6,11 +6,11 @@ image::Manuelles Hinzufügen von Rechten.png[]
 ----
 insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('admin','#admin')
 
-insert into tUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex2')
+insert into xtcasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex2')
 ----
 
 Nachdem man die Gruppe in xtcasUserGroup angelegt hat,
-muss in tUserPrivilege das gewünschte Recht ebenfalls angelegt werden, falls es noch nicht vorhanden ist.
+muss in xtcasUserPrivilege das gewünschte Recht ebenfalls angelegt werden, falls es noch nicht vorhanden ist.
  
 [source::sql]
 ----
@@ -29,7 +29,7 @@ Für den Eintrag im xtcasLuUserPrivilegeUserGroup werden dann die KeyLongs vom g
 ----
 
 select 'insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey) VALUES ('+cast(tu.KeyLong as nvarchar)+',1)'
-from tUserPrivilege tu
+from xtcasUserPrivilege tu
 left join xtcasLuUserPrivilegeUserGroup x on x.UserPrivilegeKey = tu.KeyLong
 where x.KeyLong is null
 

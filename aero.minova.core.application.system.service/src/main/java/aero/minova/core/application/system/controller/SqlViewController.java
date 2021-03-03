@@ -49,11 +49,8 @@ public class SqlViewController {
 		}
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
+		inputTable = columnSecurity(inputTable, authoritiesForThisTable);
 		try {
-			// TODO Warum wird dies Tabelle in eine Variable gespeichert, die nur einmal verwendet wird?
-			Table accessableTable = columnSecurity(inputTable, authoritiesForThisTable);
-			inputTable = accessableTable;
-
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {
 				inputMetaData = new TableMetaData();

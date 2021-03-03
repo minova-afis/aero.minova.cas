@@ -12,19 +12,22 @@ seinen GruppenSecurityTokens(Memberships) ist in der Tabelle xtcasUser hinterleg
 
 [source, sql]
 ----
-select KeyLong,KeyText,SecurityToken,Memberships from xtcasUser
+select KeyLong,KeyText,UserSecurityToken,Memberships from xtcasUser
 ----
 
 * *KeyText*: der Name des Users
-* *SecurityToken*: der eindeutige SecurityToken des Users
+* *UserSecurityToken*: der eindeutige SecurityToken des Users. Hier wird der Keytext aus der Tabelle tEmployee verwendet!
 * *Memberships*: ein String an SecurityToken, welche mit " #" voneinander getrennt sind. 
 Dieser String beinhaltet sowohl den UserSecurityToken, als auch die GroupSecurityToken
 
-Falls kein Eintrag für den eingeloggten User in der Tabelle tUser existiert, gilt sein Username als einer der SecurityTokens.
+.Gewöhnlicher Eintrag für User ohne spezielle Rechte
+image::images/xtcasuser-example.png[]
+
+Falls kein Eintrag für den eingeloggten User in der Tabelle xtcasUser existiert, gilt sein UserSecurityToken als einer der SecurityTokens.
 
 Die Gruppen aus dem Active Directory des Users zählen ebenfalls zu den Memberships und werden in jedem Fall auch gegen die Datenbank abgefragt.
 
-Anhand der Memberships erhält man über die Tabelle tUserGroups die Memberships(SecurityToken) der Gruppen, welche 
+Anhand der Memberships erhält man über die Tabelle xtcasUserGroups die Memberships(SecurityToken) der Gruppen, welche 
 die UserSecurityToken der User enthalten, dessen Spalten der eingeloggte User sehen darf.
 
 
@@ -35,6 +38,9 @@ select KeyText,SecurityToken from xtcasUserGroup
 
 * *KeyText* der Name der UserGroup, welche in den Memberships des Users enthalten ist
 * *SecurityToken* die SecurityToken der User, mithilfe die Mitglieder der Gruppe bestimmte Spalten sehen dürfen. Diese Tokens sind ebenfalls mit " #" voneinander getrennt.
+
+.Eintrag für Gruppen mit speziellen Rechten
+image::images/xtcasusergroup-example.png[]
 
 === Tabellenzugriffserlaubnis
 
@@ -93,9 +99,49 @@ or    ...
 * *ColumnName*: der Name der Spalte, welche freigegeben ist
 * *SecurityToken*: der SecurityToken der Gruppe oder des Users, welcher diese Spalte ansehen darf
 
+=== Hinzufügen eines Tabelleneintrags durch eine Prozedur
+
+Im folgenden Beispiel werden wir einen Datensatz mit Hilfe der Prozedur: _xpcasInsertWorkingTime_
+hinzufügen. Damit der Benutzer der Einzige ist, der das Recht hat seine eigenen Daten ansehen zu können, wird dem Datensatz in der Tabelle tJournal ein entsprechender UserSecurityToken gesetzt. 
+
+Der UserSecurityToken **(tEmployee.KeyText)** wird für den neu eingetragenen Datensatz eingefügt.
+
+[source, sql]
+----
+alter procedure dbo.xpcasInsertWorkingTime (
+	@KeyLong int output,
+	@EmployeeKey int,
+	[...]
+) as
+	declare @UnitKey int
+	[...]
+
+	select @SecurityTokenEmployee = KeyText 
+	from tEmployee where keyLong = @EmployeeKey
+
+	exec xpcasWorkingTimeCheckData 
+		[...]
+
+	insert into tJournal (
+		ServiceProviderKey,
+		[...]
+		RenderedQuantityUnitKey,
+		SecurityToken
+	) values (
+		@ServiceProviderKey,
+		[...]
+		@UnitKey,
+		@SecurityTokenEmployee
+	)
+
+	select @KeyLong = @@identity
+
+	return 1
+----
+
 
 === SQL Injection
 
 Sowohl beim Aufruf von data/procedure, als auch beim Aufruf von data/index werden prepared statements verwendet.
 
-Desweiteren wird beim Befüllen der statements überprüft, ob der Typ des values mit dem Typ der angefragten Spalte übereinstimmt. 
+Des Weiteren wird beim Befüllen der statements überprüft, ob der Typ des values mit dem Typ der angefragten Spalte übereinstimmt. 

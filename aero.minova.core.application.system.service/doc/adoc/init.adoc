@@ -15,7 +15,7 @@ CREATE TABLE xtcasUser (
 
 ALTER TABLE xtcasUser
 ADD CONSTRAINT UQ_xtcasUser UNIQUE (KeyLong,UserSecurityToken,KeyText),
-    CONSTRAINT PK_xtcasUser_KeyLong PRIMARY KEY (KeyLong)
+    CONSTRAINT PK_xtcasUser_KeyLong PRIMARY KEY (KeyLong);
 
 
 CREATE TABLE xtcasUserGroup (
@@ -28,7 +28,7 @@ CREATE TABLE xtcasUserGroup (
 
 ALTER TABLE xtcasUserGroup
 ADD CONSTRAINT UQ_xtcasUserGroup UNIQUE (KeyLong,KeyText),
-    CONSTRAINT PK_xtcasUserGroup_KeyLong PRIMARY KEY (KeyLong)
+    CONSTRAINT PK_xtcasUserGroup_KeyLong PRIMARY KEY (KeyLong);
 
 
 CREATE TABLE xtcasUserPrivilege (
@@ -38,7 +38,7 @@ CREATE TABLE xtcasUserPrivilege (
 
 ALTER TABLE xtcasUserPrivilege
 ADD CONSTRAINT UQ_xtcasUserPrivilege UNIQUE (KeyText),
-    CONSTRAINT PK_xtcasUserPrivilege_KeyLong PRIMARY KEY (KeyLong)
+    CONSTRAINT PK_xtcasUserPrivilege_KeyLong PRIMARY KEY (KeyLong);
 
 
 CREATE TABLE xtcasColumnSecurity(
@@ -48,7 +48,7 @@ CREATE TABLE xtcasColumnSecurity(
 	SecurityToken VARCHAR(50) NOT NULL,
 )
 ALTER TABLE xtcasColumnSecurity
-ADD CONSTRAINT PK_xtcasColumnSecurity_KeyLong PRIMARY KEY (KeyLong)
+ADD CONSTRAINT PK_xtcasColumnSecurity_KeyLong PRIMARY KEY (KeyLong);
 
 
 create table xtcasLuUserPrivilegeUserGroup (
@@ -64,7 +64,12 @@ ADD CONSTRAINT PK_xtcasLuUserPrivilegesUserGroup_KeyLong PRIMARY KEY (KeyLong),
 	CONSTRAINT FK_xtcasLuUserPrivilegesUserGroup_UserPrivilegeKey FOREIGN KEY (UserPrivilegeKey) REFERENCES xtcasUserPrivilege (KeyLong),
 	CONSTRAINT DF_xtcasLuUserPrivilegesUserGroup_RowLevelSecurity DEFAULT 0 FOR RowLevelSecurity
 
+----
 
+Hier wird die View xvcasUserPrivileges angelegt!
+
+[source::sql]
+----
 CREATE VIEW xvcasUserPrivileges
 with encryption AS
 select UP.KeyLong, UP.KeyText as PrivilegeKeyText, UG.KeyText as KeyText, UPG.RowLevelSecurity

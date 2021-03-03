@@ -103,4 +103,13 @@ insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex2')
 insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndexPrint')
 ----
 
+Nachdem diese Rechte in die xtCasUserPrivilege-Tabelle eingefügt wurden, können mit folgender Query können Queries erstellt werden, welche die fehlenden Berechtigungen für den Admin bereit stellen.
+
+----
+select 'insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey) VALUES ('+cast(tu.KeyLong as nvarchar)+','+ (select cast(KeyLong as nvarchar) from xtcasUserGroup where KeyText = 'admin') +')'
+from xtCasUserPrivilege tu
+left join xtcasLuUserPrivilegeUserGroup x on x.UserPrivilegeKey = tu.KeyLong
+where x.KeyLong is null
+----
+
 Für das weitere Befüllen der Tabellen siehe: xref:privileges.adoc#[Manuelle Rechteverwaltung]

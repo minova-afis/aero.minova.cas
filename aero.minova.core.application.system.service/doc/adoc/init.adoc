@@ -1,4 +1,4 @@
-== Initialisieren der Datenbanktabellen
+== Initialisieren und Manuelles Befüllen der Datenbanktabellen
 
 Die SQL-Skripte zum Initialisieren und befüllen der Tabellen können in folgender Reihenfolge augeführt werden.
 
@@ -75,36 +75,51 @@ join xtcasUserGroup UG on UG.KeyLong=UPG.UserGroupKey
 
 ----
 
+=== Admin-User
+
+Nach dem Anlegen der Tabellen kann zum Test ein Admin-User erstellt werden, welcher alle Rechte uneingeschränkt zugewiesen bekommt.
+
+[source::sql]
+----
+insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('admin','#admin')
+----
+
+Es reicht vollkommen diesen nur in der xtcasUserGroup anzulegen.
+
 === Start Rechte
+
+Folgende Rechte werden benötigt, damit alle Funktionalitäten des RCP WFC genutzt werden können.
 
 [source::sql]
 
 ----
-insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('admin','#admin')
 insert into xtCasUserPrivilege (KeyText) VALUES ('tEmployee')
 insert into xtCasUserPrivilege (KeyText) VALUES ('tService')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeOrderReceiverList')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeOrderReceiverList')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeOrderReceiverResolve')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceContractList')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceContractResolve')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceObjectList')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceObjectResolve')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceList')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeServiceResolve')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spDeleteWorkingTime')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spInsertWorkingTime')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spReadWorkingTime')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spUpdateWorkingTime')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeCheckData')
-insert into xtCasUserPrivilege (KeyText) VALUES ('spWorkingTimeFill')
-insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex')
-insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndex2')
-insert into xtCasUserPrivilege (KeyText) VALUES ('vWorkingTimeIndexPrint')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeOrderReceiverList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeOrderReceiverList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeOrderReceiverResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeServiceContractList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeServiceContractResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeServiceObjectList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeServiceObjectResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeServiceList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeServiceResolve')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasDeleteWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasInsertWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasReadWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasUpdateWorkingTime')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeCheckData')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeFill')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xvcasWorkingTimeIndex')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xvcasWorkingTimeIndex2')
+insert into xtCasUserPrivilege (KeyText) VALUES ('xvcasWorkingTimeIndexPrint')
 ----
 
-Nachdem diese Rechte in die xtCasUserPrivilege-Tabelle eingefügt wurden, können mit folgender Query können Queries erstellt werden, welche die fehlenden Berechtigungen für den Admin bereit stellen.
 
+Nachdem diese Rechte in die xtCasUserPrivilege-Tabelle eingefügt wurden, können mit folgender Query die fehlenden Berechtigungen für den Admin bereit gestellt werden.
+
+.Diese SQL-Query generiert die xtcasLuUserPrivilegeUserGroup-Query für alle (UserPrivilegeKey des Admin-Users, UserGroupKey)-Kombinationen, welche noch nicht vorhanden sind. Es ist sinnvoll, diese zu verwenden, wenn viele Privilegien auf einmal freigeschalten werden sollen.
+[source::sql]
 ----
 select 'insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey) VALUES ('+cast(tu.KeyLong as nvarchar)+','+ (select cast(KeyLong as nvarchar) from xtcasUserGroup where KeyText = 'admin') +')'
 from xtCasUserPrivilege tu
@@ -112,4 +127,30 @@ left join xtcasLuUserPrivilegeUserGroup x on x.UserPrivilegeKey = tu.KeyLong
 where x.KeyLong is null
 ----
 
-Für das weitere Befüllen der Tabellen siehe: xref:privileges.adoc#[Manuelle Rechteverwaltung]
+IMPORTANT: Falls zu Beginn ein neuer Datenbank-User angelegt wurde,
+darf der 'grant select' nicht fehlen.
+
+[source::sql]
+----
+create user cas
+
+[...]
+
+grant select on xvcasWorkingTimeIndex2 to cas
+grant select on xtcasColumnSecurity to cas
+
+grant execute on xpcasWorkingTimeOrderReceiverList to cas
+grant execute on xpcasWorkingTimeOrderReceiverResolve to cas
+grant execute on xpcasWorkingTimeServiceContractList to cas
+grant execute on xpcasWorkingTimeServiceContractResolve to cas
+grant execute on xpcasWorkingTimeServiceObjectList to cas
+grant execute on xpcasWorkingTimeServiceObjectResolve to cas
+grant execute on xpcasWorkingTimeServiceList to cas
+grant execute on xpcasWorkingTimeServiceResolve to cas
+
+grant execute on xpcasDeleteWorkingTime to cas
+grant execute on xpcasInsertWorkingTime to cas
+grant execute on xpcasReadWorkingTime to cas
+grant execute on xpcasUpdateWorkingTime to cas
+----
+

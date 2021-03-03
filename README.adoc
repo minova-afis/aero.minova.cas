@@ -16,4 +16,4 @@ Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
 
 * Source Code: http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic
 * Installierbare Modul: acode/snapshot/aero.minova.cas.logic.jar
-* Alternativ: xref:./aero.minova.core.application.system.service/doc/adoc/privileges.adoc#[Manuelle Rechteverwaltung]
+* Alternativ: xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]

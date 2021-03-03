@@ -204,7 +204,7 @@ public class SqlViewController {
 
 		List<String> userTokens = new ArrayList<>();
 		for (GrantedAuthority ga : securityTokens) {
-			userTokens.add(ga.getAuthority().substring(5));
+			userTokens.add(ga.getAuthority());
 		}
 
 		for (String s : userTokens) {

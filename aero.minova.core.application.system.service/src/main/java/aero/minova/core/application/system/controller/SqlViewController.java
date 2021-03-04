@@ -196,8 +196,10 @@ public class SqlViewController {
 	 **/
 	public Table getPrivilegePermissions(List<GrantedAuthority> securityTokens, String privilegeName) {
 
-		Authentication secContext = SecurityContextHolder.getContext().getAuthentication();
-		loadPrivileges(secContext.getName(), (List<GrantedAuthority>) secContext.getAuthorities());
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null) {
+			loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
+		}
 
 		Table userPrivileges = new Table();
 		userPrivileges.setName("xvcasUserPrivileges");

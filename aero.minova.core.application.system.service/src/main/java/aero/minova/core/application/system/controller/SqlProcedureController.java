@@ -71,6 +71,7 @@ public class SqlProcedureController {
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
 		val result = new SqlProcedureResult();
+		StringBuffer sb = new StringBuffer();
 
 		try {
 			TableMetaData inputMetaData = inputTable.getMetaData();
@@ -99,7 +100,7 @@ public class SqlProcedureController {
 			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
-			logger.info("Executing: " + procedureCall);
+			sb.append("Executing: " + procedureCall);
 			final val preparedStatement = connection.prepareCall(procedureCall);
 			range(0, inputTable.getColumns().size())//
 					.forEach(i -> {
@@ -107,6 +108,7 @@ public class SqlProcedureController {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);
 							val type = inputTable.getColumns().get(i).getType();
 							if (iVal == null) {
+								sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal);
 								if (type == DataType.BOOLEAN) {
 									preparedStatement.setObject(i + parameterOffset, null, Types.BOOLEAN);
 								} else if (type == DataType.DOUBLE) {
@@ -124,8 +126,8 @@ public class SqlProcedureController {
 								} else {
 									throw new IllegalArgumentException("Unknown type: " + type.name());
 								}
-								logger.info("Insert value " + iVal + " at position " + (i + parameterOffset));
 							} else {
+								sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal.getValue().toString());
 								if (type == DataType.BOOLEAN) {
 									preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
 								} else if (type == DataType.DOUBLE) {
@@ -143,7 +145,6 @@ public class SqlProcedureController {
 								} else {
 									throw new IllegalArgumentException("Unknown type: " + type.name());
 								}
-								logger.info("Insert value '" + iVal.getValue() + "' at position " + (i + parameterOffset));
 							}
 							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
 								if (type == DataType.BOOLEAN) {
@@ -255,9 +256,10 @@ public class SqlProcedureController {
 						});
 			}
 			connection.commit();
+			logger.info("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
 			Exception sqlE = new Exception("Couldn't execute procedure: ", e);
-			logger.error(sqlE.getMessage());
+			logger.error("Procedure could not be filled: " + sb.toString() + "\n" + e.getMessage());
 			ErrorMessage error = new ErrorMessage();
 			error.setErrorMessage(sqlE);
 			StringWriter sw = new StringWriter();

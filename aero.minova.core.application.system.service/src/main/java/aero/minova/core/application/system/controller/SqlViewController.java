@@ -74,16 +74,14 @@ public class SqlViewController {
 				limit = inputMetaData.getLimited();
 			}
 			final val countQuery = prepareViewString(inputTable, false, 1, true, authoritiesForThisTable);
-			logger.info("Executing: " + countQuery);
 			val preparedCountStatement = connection.prepareCall(countQuery);
-			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement);
+			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement, countQuery);
 			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
 			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
-			logger.info("Executing: " + viewQuery);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery);
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
@@ -117,8 +115,10 @@ public class SqlViewController {
 	 *            das Prepared Statement, welches nur noch befüllt werden muss
 	 * @return das befüllte, ausführbare Prepared Statement
 	 */
-	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
+	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query) {
 		int parameterOffset = 1;
+		StringBuilder sb = new StringBuilder();
+		sb.append(query);
 
 		List<Value> inputValues = new ArrayList<>();
 		for (Row row : inputTable.getRows()) {
@@ -129,7 +129,6 @@ public class SqlViewController {
 				}
 			}
 		}
-
 		for (int i = 0; i < inputValues.size(); i++) {
 			try {
 				val iVal = inputValues.get(i);
@@ -138,8 +137,8 @@ public class SqlViewController {
 					String stringValue = iVal.getValue() + "";
 					if (rule == null) {
 						if (!stringValue.trim().isEmpty()) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
 							preparedStatement.setString(i + parameterOffset, stringValue);
-							logger.info("Insert value '" + stringValue + "' at position " + (i + parameterOffset));
 						} else {
 							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' hat
 							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
@@ -150,8 +149,8 @@ public class SqlViewController {
 						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
 								.collect(Collectors.toList());
 						for (String string : inBetweenValues) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + string);
 							preparedStatement.setString(i + parameterOffset, string);
-							logger.info("Insert value '" + string + "' at position " + (i + parameterOffset));
 							parameterOffset++;
 						}
 						// i zählt als nächstes hoch, deswegem muss parameterOffset wieder um 1 verringert werden
@@ -162,15 +161,15 @@ public class SqlViewController {
 								.collect(Collectors.toList());
 						// bei between vertrauen wir nicht darauf, dass der Nutzer wirklich nur zwei Werte einträgt,
 						// sondern nehmen den ersten und den letzten Wert
+						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(0));
 						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(0));
-						logger.info("Insert value '" + inBetweenValues.get(0) + "' at position " + (i + parameterOffset));
 						parameterOffset++;
+						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(inBetweenValues.size() - 1));
 						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(inBetweenValues.size() - 1));
-						logger.info("Insert value '" + inBetweenValues.get(inBetweenValues.size() - 1) + "' at position " + (i + parameterOffset));
 					} else {
 						if (!stringValue.trim().isEmpty()) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
 							preparedStatement.setString(i + parameterOffset, stringValue);
-							logger.info("Insert value '" + stringValue + "' at position " + (i + parameterOffset));
 						} else {
 							parameterOffset--;
 						}
@@ -179,8 +178,10 @@ public class SqlViewController {
 					parameterOffset--;
 				}
 			} catch (Exception e) {
+				logger.error("Statement could not be filled: " + sb.toString());
 				throw new RuntimeException("Could not parse input parameter with index:" + i, e);
 			}
+			logger.info("Statement succesfully filled: " + sb.toString());
 		}
 		return preparedStatement;
 	}
@@ -235,9 +236,8 @@ public class SqlViewController {
 		final val connection = systemDatabase.getConnection();
 		try {
 			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
-			logger.info("Executing: " + viewQuery);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery);
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;

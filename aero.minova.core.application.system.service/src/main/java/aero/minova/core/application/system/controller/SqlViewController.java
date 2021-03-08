@@ -41,16 +41,17 @@ public class SqlViewController {
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) {
-		@SuppressWarnings("unchecked")
-		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
-		if (authoritiesForThisTable.isEmpty()) {
-			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
-		}
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
-		inputTable = columnSecurity(inputTable, authoritiesForThisTable);
+		StringBuilder sb = new StringBuilder();
 		try {
+			@SuppressWarnings("unchecked")
+			List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
+			if (authoritiesForThisTable.isEmpty()) {
+				throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+			}
+			inputTable = columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {
 				inputMetaData = new TableMetaData();
@@ -75,19 +76,21 @@ public class SqlViewController {
 			}
 			final val countQuery = prepareViewString(inputTable, false, 1, true, authoritiesForThisTable);
 			val preparedCountStatement = connection.prepareCall(countQuery);
-			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement, countQuery);
+			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement, countQuery, sb);
 			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
 			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			logger.info("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
+			logger.error("Statement could not be executed: " + sb.toString());
 			Exception sqlE = new Exception("Couldn't execute query: ", e);
 			ErrorMessage error = new ErrorMessage();
 			error.setErrorMessage(sqlE);
@@ -115,9 +118,8 @@ public class SqlViewController {
 	 *            das Prepared Statement, welches nur noch befüllt werden muss
 	 * @return das befüllte, ausführbare Prepared Statement
 	 */
-	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query) {
+	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
 		int parameterOffset = 1;
-		StringBuilder sb = new StringBuilder();
 		sb.append(query);
 
 		List<Value> inputValues = new ArrayList<>();
@@ -181,8 +183,8 @@ public class SqlViewController {
 				logger.error("Statement could not be filled: " + sb.toString());
 				throw new RuntimeException("Could not parse input parameter with index:" + i, e);
 			}
-			logger.info("Statement succesfully filled: " + sb.toString());
 		}
+		sb.append("\n");
 		return preparedStatement;
 	}
 
@@ -227,6 +229,7 @@ public class SqlViewController {
 	 * @return Das Ergebnis der Abfrage.
 	 */
 	public Table getTableForSecurityCheck(Table inputTable) {
+		StringBuilder sb = new StringBuilder();
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
 		inputRow.addValue(new Value("", null));
@@ -237,11 +240,13 @@ public class SqlViewController {
 		try {
 			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			logger.info("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;
 		} catch (Exception e) {
+			logger.error("Statement could not be executed: " + sb.toString());
 			throw new RuntimeException(e);
 		}
 	}
@@ -556,23 +561,24 @@ public class SqlViewController {
 	 * 
 	 * @param isFirstWhereClause
 	 *            Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
-	 * @param authorities
+	 * @param requestingAtuhorities
 	 *            Die Rollen des Nutzers, welche ein Recht auf einen Zugriff haben.
 	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
 	 */
-	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> authorities) {
+	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
 
-		List<String> roles = new ArrayList<>();
+		List<String> requestingRoles = new ArrayList<>();
 
-		for (Row row : authorities) {
+		for (Row authority : requestingAtuhorities) {
 			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
-			if (!row.getValues().get(2).getBooleanValue()) {
+			if (!authority.getValues().get(2).getBooleanValue()) {
 				return "";
 			}
 			// hier sind die Rolen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
-			String value = row.getValues().get(1).getStringValue().trim();
-			if ((!value.equals("")) && (!roles.contains(value)))
-				roles.add(row.getValues().get(1).getStringValue());
+			String value = authority.getValues().get(1).getStringValue().trim();
+			if ((!value.equals("")) && (!requestingRoles.contains(value))) {
+				requestingRoles.add(authority.getValues().get(1).getStringValue());
+			}
 		}
 
 		final StringBuffer rowSec = new StringBuffer();
@@ -585,9 +591,9 @@ public class SqlViewController {
 		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen
 		rowSec.append(" ( SecurityToken IS NULL )");
 
-		if (roles.size() > 0) {
+		if (requestingRoles.size() > 0) {
 			rowSec.append("\r\nor ( SecurityToken IN (");
-			for (String r : roles) {
+			for (String r : requestingRoles) {
 				rowSec.append("'").append(r.trim()).append("',");
 			}
 			rowSec.deleteCharAt(rowSec.length() - 1);

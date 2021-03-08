@@ -100,7 +100,6 @@ public class SqlProcedureController {
 			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
-			sb.append("Executing: " + procedureCall);
 			final val preparedStatement = connection.prepareCall(procedureCall);
 			range(0, inputTable.getColumns().size())//
 					.forEach(i -> {

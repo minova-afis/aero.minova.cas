@@ -263,7 +263,8 @@ wenn alles gut gelaufen ist.
 == Im Fehlerfall
 
 Ist die Eingabe fehlerhaft oder treten sonstige Fehler bei der Verarbeitung des Services auf,
-erscheint am Ende der angeforderten Table oder Prozedur folgende Nachricht:
+wird an den Client ein Internal Server Error, bzw. Server Code 500, gesendet.
+Außerdem erscheint am Ende der angeforderten -aber leeren- Table oder Prozedur folgende Nachricht:
 
 ----
 	[...]

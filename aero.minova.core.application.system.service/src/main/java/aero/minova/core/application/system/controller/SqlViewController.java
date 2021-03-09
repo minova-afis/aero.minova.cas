@@ -372,13 +372,13 @@ public class SqlViewController {
 	 * @author weber
 	 */
 	public Table columnSecurity(Table inputTable, List<Row> userGroups) {
-		Table foo = new Table();
-		foo.setName("xtcasColumnSecurity");
+		Table columnSec = new Table();
+		columnSec.setName("xtcasColumnSecurity");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("TableName", DataType.STRING));
 		columns.add(new Column("ColumnName", DataType.STRING));
 		columns.add(new Column("SecurityToken", DataType.STRING));
-		foo.setColumns(columns);
+		columnSec.setColumns(columns);
 
 		List<Row> result = new ArrayList<>();
 		for (Row row : userGroups) {
@@ -388,8 +388,8 @@ public class SqlViewController {
 						Arrays.asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
 				List<Row> checkRow = new ArrayList<>();
 				checkRow.add(bar);
-				foo.setRows(checkRow);
-				List<Row> tokenSpecificAuthorities = getTableForSecurityCheck(foo).getRows();
+				columnSec.setRows(checkRow);
+				List<Row> tokenSpecificAuthorities = getTableForSecurityCheck(columnSec).getRows();
 				// wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
 				if (tokenSpecificAuthorities.isEmpty())
 					return inputTable;
@@ -425,7 +425,8 @@ public class SqlViewController {
 
 		// falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
 		if (inputTable.getColumns().isEmpty()) {
-			throw new RuntimeException("msg.ColumnSecurityError %" + SecurityContextHolder.getContext().getAuthentication().getName());
+			throw new RuntimeException(
+					"msg.ColumnSecurityError %" + SecurityContextHolder.getContext().getAuthentication().getName() + " %" + inputTable.getName());
 		}
 		return inputTable;
 	}

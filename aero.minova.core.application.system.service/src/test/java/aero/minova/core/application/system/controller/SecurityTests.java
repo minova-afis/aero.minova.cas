@@ -311,8 +311,7 @@ class SecurityTests {
 
 		Throwable exception = assertThrows(RuntimeException.class, () -> spyController.columnSecurity(inputTable, userGroups));
 		thrown.expect(RuntimeException.class);
-		assertEquals("Insufficient Permission for vJournalIndexTest; User with Username 'admin'" + " is not allowed to see the selected columns of this table",
-				exception.getMessage());
+		assertEquals("msg.ColumnSecurityError %admin %vJournalIndexTest", exception.getMessage());
 
 	}
 

@@ -69,7 +69,7 @@ public class SqlUtils {
 			}
 			return row;
 		} catch (Throwable e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("msg.ConvertTableError");
 		}
 	}
 
@@ -102,7 +102,7 @@ public class SqlUtils {
 			}
 		} catch (SQLException e) {
 			try {
-				throw new RuntimeException("Could not parse SQL Parameter " + index + " with value: " + statement.getString(index), e);
+				throw new RuntimeException("msg.SqlParameterParseError %" + index + " %" + statement.getString(index));
 			} catch (SQLException e2) {
 				throw new RuntimeException(e);
 			}

@@ -1,7 +1,5 @@
 package aero.minova.trac.integration.controller;
 
-import java.text.MessageFormat;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,7 +43,7 @@ public class TracController {
 			int ticketNumber = Integer.parseInt(ticketNo);
 			ticketTable = fetchFromTrac(ticketNumber);
 		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException(MessageFormat.format("Ticketnummer {0} ist nicht numerisch", ticketNo), ex);
+			throw new IllegalArgumentException("msg.TicketNummberErrpr %" + ticketNo);
 		}
 
 		return ticketTable != null ? ticketTable : createEmptyTicketTable();

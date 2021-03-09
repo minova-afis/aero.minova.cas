@@ -41,13 +41,13 @@ public class FilesService {
 		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
 		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
-			logger.error("System folder does not exist (see aero_minova_core_application_root_path): " + systemFolder);
+			logger.error("msg.SystemFolder %" + systemFolder);
 		}
 		if (!isDirectory(sharedDataFolder)) {
-			logger.error("Shared data folder does not exist (see aero_minova_core_application_root_path): " + sharedDataFolder);
+			logger.error("msg.SharedFolder %" + sharedDataFolder);
 		}
 		if (!isDirectory(programFilesFolder)) {
-			logger.error("Program files folder does not exist (see aero_minova_core_application_root_path): " + programFilesFolder);
+			logger.error("msg.ProgramFilesFolder %" + programFilesFolder);
 		}
 	}
 

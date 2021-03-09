@@ -46,7 +46,7 @@ public class SqlViewController {
 			List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
 			if (authoritiesForThisTable.isEmpty()) {
-				throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
 			inputTable = columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
@@ -59,7 +59,7 @@ public class SqlViewController {
 			if (inputMetaData.getPage() == null) {
 				page = 1;
 			} else if (inputMetaData.getPage() <= 0) {
-				throw new IllegalArgumentException("Page must be higher than 0");
+				throw new IllegalArgumentException("msg.PageError");
 			} else {
 				page = inputMetaData.getPage();
 			}
@@ -67,7 +67,7 @@ public class SqlViewController {
 			if (inputMetaData.getLimited() == null) {
 				limit = 0;
 			} else if (inputMetaData.getLimited() < 0) {
-				throw new IllegalArgumentException("Limited must be higher or equal to 0");
+				throw new IllegalArgumentException("msg.LimitError");
 			} else {
 				limit = inputMetaData.getLimited();
 			}
@@ -167,7 +167,7 @@ public class SqlViewController {
 				}
 			} catch (Exception e) {
 				logger.error("Statement could not be filled: " + sb.toString());
-				throw new RuntimeException("Could not parse input parameter with index:" + i, e);
+				throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
 			}
 		}
 		sb.append("\n");
@@ -277,7 +277,7 @@ public class SqlViewController {
 	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuffer sb = new StringBuffer();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
-			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 
 		if (count) {
@@ -320,7 +320,7 @@ public class SqlViewController {
 	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
 		final StringBuffer sb = new StringBuffer();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
-			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 		sb.append("select ");
 		val outputFormat = params.getColumns().stream()//
@@ -425,8 +425,7 @@ public class SqlViewController {
 
 		// falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
 		if (inputTable.getColumns().isEmpty()) {
-			throw new RuntimeException("Insufficient Permission for " + inputTable.getName() + "; User with Username '"
-					+ SecurityContextHolder.getContext().getAuthentication().getName() + "' is not allowed to see the selected columns of this table");
+			throw new RuntimeException("msg.ColumnSecurityError %" + SecurityContextHolder.getContext().getAuthentication().getName());
 		}
 		return inputTable;
 	}

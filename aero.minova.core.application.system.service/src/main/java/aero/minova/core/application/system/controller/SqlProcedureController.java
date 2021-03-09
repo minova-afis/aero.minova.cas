@@ -56,7 +56,7 @@ public class SqlProcedureController {
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
-			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+			throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 		}
 		return calculateSqlProcedureResult(inputTable);
 	}
@@ -80,7 +80,7 @@ public class SqlProcedureController {
 			if (inputMetaData.getPage() == null) {
 				page = 1;
 			} else if (inputMetaData.getPage() <= 0) {
-				throw new IllegalArgumentException("Page must be higher than 0");
+				throw new IllegalArgumentException("msg.PageError");
 			} else {
 				page = inputMetaData.getPage();
 			}
@@ -88,7 +88,7 @@ public class SqlProcedureController {
 			if (inputMetaData.getLimited() == null) {
 				limit = 0;
 			} else if (inputMetaData.getLimited() < 0) {
-				throw new IllegalArgumentException("Limited must be higher or equal to 0");
+				throw new IllegalArgumentException("msg.LimitError");
 			} else {
 				limit = inputMetaData.getLimited();
 			}
@@ -119,7 +119,7 @@ public class SqlProcedureController {
 								} else if (type == DataType.ZONED) {
 									preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
 								} else {
-									throw new IllegalArgumentException("Unknown type: " + type.name());
+									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
 							} else {
 								sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal.getValue().toString());
@@ -138,7 +138,7 @@ public class SqlProcedureController {
 								} else if (type == DataType.ZONED) {
 									preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
 								} else {
-									throw new IllegalArgumentException("Unknown type: " + type.name());
+									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
 							}
 							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
@@ -157,13 +157,11 @@ public class SqlProcedureController {
 								} else if (type == DataType.ZONED) {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
 								} else {
-									throw new IllegalArgumentException("Unknown type: " + type.name());
+									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
 							}
 						} catch (Exception e) {
-							throw new RuntimeException("Could not parse input parameter with index: " + i + "; Value was '"
-									+ inputTable.getRows().get(0).getValues().get(i).getStringValue() + "' but ColumnType was '"
-									+ inputTable.getColumns().get(i).getType() + "'", e);
+							throw new RuntimeException("msg.ParseError %" + i);
 						}
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
@@ -191,10 +189,10 @@ public class SqlProcedureController {
 								} else if (type == Types.NVARCHAR) {
 									return new Column(name, DataType.STRING);
 								} else {
-									throw new UnsupportedOperationException("Unsupported result set type: " + i);
+									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}
 							} catch (Exception e) {
-								throw new RuntimeException("Could not parse resultset: ", e);
+								throw new RuntimeException("msg.ParseResultSetError");
 							}
 						}).collect(toList()));
 				int totalResults = 0;
@@ -257,8 +255,7 @@ public class SqlProcedureController {
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
-				Exception ex = new Exception("Couldn't roll back procedure execution: ", e);
-				logger.error(ex.getMessage());
+				logger.error("Couldn't roll back procedure execution: " + e.getMessage());
 			}
 			throw e;
 		} finally {
@@ -284,7 +281,7 @@ public class SqlProcedureController {
 	 */
 	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {
-			throw new IllegalArgumentException("Cannot prepare procedure with NULL name");
+			throw new IllegalArgumentException("msg.ProzedureNullName");
 		}
 		final int paramCount = params.getColumns().size();
 		final boolean returnRequired = ExecuteStrategy.returnRequired(strategy);

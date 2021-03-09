@@ -6,15 +6,11 @@ import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
@@ -50,7 +45,7 @@ public class SqlProcedureController {
 	SqlViewController svc;
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
-	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
+	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws Exception {
 		if ("Ticket".equals(inputTable.getName())) {
 			val result = new SqlProcedureResult();
 			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
@@ -61,16 +56,17 @@ public class SqlProcedureController {
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
-			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
+			throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 		}
 		return calculateSqlProcedureResult(inputTable);
 	}
 
-	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) {
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws Exception {
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
 		val result = new SqlProcedureResult();
+		StringBuffer sb = new StringBuffer();
 
 		try {
 			TableMetaData inputMetaData = inputTable.getMetaData();
@@ -84,7 +80,7 @@ public class SqlProcedureController {
 			if (inputMetaData.getPage() == null) {
 				page = 1;
 			} else if (inputMetaData.getPage() <= 0) {
-				throw new IllegalArgumentException("Page must be higher than 0");
+				throw new IllegalArgumentException("msg.PageError");
 			} else {
 				page = inputMetaData.getPage();
 			}
@@ -92,14 +88,14 @@ public class SqlProcedureController {
 			if (inputMetaData.getLimited() == null) {
 				limit = 0;
 			} else if (inputMetaData.getLimited() < 0) {
-				throw new IllegalArgumentException("Limited must be higher or equal to 0");
+				throw new IllegalArgumentException("msg.LimitError");
 			} else {
 				limit = inputMetaData.getLimited();
 			}
 			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
-			logger.info("Executing: " + procedureCall);
+			sb.append(procedureCall);
 			final val preparedStatement = connection.prepareCall(procedureCall);
 			range(0, inputTable.getColumns().size())//
 					.forEach(i -> {
@@ -107,6 +103,7 @@ public class SqlProcedureController {
 							val iVal = inputTable.getRows().get(0).getValues().get(i);
 							val type = inputTable.getColumns().get(i).getType();
 							if (iVal == null) {
+								sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal);
 								if (type == DataType.BOOLEAN) {
 									preparedStatement.setObject(i + parameterOffset, null, Types.BOOLEAN);
 								} else if (type == DataType.DOUBLE) {
@@ -122,9 +119,10 @@ public class SqlProcedureController {
 								} else if (type == DataType.ZONED) {
 									preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
 								} else {
-									throw new IllegalArgumentException("Unknown type: " + type.name());
+									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
 							} else {
+								sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal.getValue().toString());
 								if (type == DataType.BOOLEAN) {
 									preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
 								} else if (type == DataType.DOUBLE) {
@@ -140,7 +138,7 @@ public class SqlProcedureController {
 								} else if (type == DataType.ZONED) {
 									preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
 								} else {
-									throw new IllegalArgumentException("Unknown type: " + type.name());
+									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
 							}
 							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
@@ -159,13 +157,11 @@ public class SqlProcedureController {
 								} else if (type == DataType.ZONED) {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
 								} else {
-									throw new IllegalArgumentException("Unknown type: " + type.name());
+									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
 							}
 						} catch (Exception e) {
-							throw new RuntimeException("Could not parse input parameter with index: " + i + "; Value was '"
-									+ inputTable.getRows().get(0).getValues().get(i).getStringValue() + "' but ColumnType was '"
-									+ inputTable.getColumns().get(i).getType() + "'", e);
+							throw new RuntimeException("msg.ParseError %" + i);
 						}
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
@@ -193,10 +189,10 @@ public class SqlProcedureController {
 								} else if (type == Types.NVARCHAR) {
 									return new Column(name, DataType.STRING);
 								} else {
-									throw new UnsupportedOperationException("Unsupported result set type: " + i);
+									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}
 							} catch (Exception e) {
-								throw new RuntimeException("Could not parse resultset: ", e);
+								throw new RuntimeException("msg.ParseResultSetError");
 							}
 						}).collect(toList()));
 				int totalResults = 0;
@@ -253,36 +249,15 @@ public class SqlProcedureController {
 						});
 			}
 			connection.commit();
+			logger.info("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
-			Exception sqlE = new Exception("Couldn't execute procedure: ", e);
-			logger.error(sqlE.getMessage());
-			ErrorMessage error = new ErrorMessage();
-			error.setErrorMessage(sqlE);
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			sqlE.printStackTrace(pw);
-			String messages = sw.toString();
-			List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
-					.map(String::trim)//
-					.collect(Collectors.toList());
-			error.setTrace(trace);
-			result.setReturnErrorMessage(error);
-			result.setReturnCode(-1);
+			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage());
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
-				Exception ex = new Exception("Couldn't roll back procedure execution: ", e);
-				logger.error(ex.getMessage());
-				error.setErrorMessage(ex);
-				ex.printStackTrace(pw);
-				messages = sw.toString();
-				trace = Stream.of(messages.split("\n\tat|\n"))//
-						.map(String::trim)//
-						.collect(Collectors.toList());
-				error.setTrace(trace);
-				result.setReturnErrorMessage(error);
-				result.setReturnCode(-2);
+				logger.error("Couldn't roll back procedure execution: " + e.getMessage());
 			}
+			throw e;
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}
@@ -306,7 +281,7 @@ public class SqlProcedureController {
 	 */
 	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {
-			throw new IllegalArgumentException("Cannot prepare procedure with NULL name");
+			throw new IllegalArgumentException("msg.ProzedureNullName");
 		}
 		final int paramCount = params.getColumns().size();
 		final boolean returnRequired = ExecuteStrategy.returnRequired(strategy);

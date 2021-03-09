@@ -1,7 +1,5 @@
 package aero.minova.core.application.system.controller;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
@@ -40,20 +37,18 @@ public class SqlViewController {
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@GetMapping(value = "data/index", produces = "application/json")
-	public Table getIndexView(@RequestBody Table inputTable) {
-		@SuppressWarnings("unchecked")
-		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
-		if (authoritiesForThisTable.isEmpty()) {
-			throw new RuntimeException("Insufficient Permission for " + inputTable.getName());
-		}
+	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
+		StringBuilder sb = new StringBuilder();
 		try {
-			// TODO Warum wird dies Tabelle in eine Variable gespeichert, die nur einmal verwendet wird?
-			Table accessableTable = columnSecurity(inputTable, authoritiesForThisTable);
-			inputTable = accessableTable;
-
+			@SuppressWarnings("unchecked")
+			List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
+			if (authoritiesForThisTable.isEmpty()) {
+				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
+			}
+			inputTable = columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {
 				inputMetaData = new TableMetaData();
@@ -64,7 +59,7 @@ public class SqlViewController {
 			if (inputMetaData.getPage() == null) {
 				page = 1;
 			} else if (inputMetaData.getPage() <= 0) {
-				throw new IllegalArgumentException("Page must be higher than 0");
+				throw new IllegalArgumentException("msg.PageError");
 			} else {
 				page = inputMetaData.getPage();
 			}
@@ -72,39 +67,28 @@ public class SqlViewController {
 			if (inputMetaData.getLimited() == null) {
 				limit = 0;
 			} else if (inputMetaData.getLimited() < 0) {
-				throw new IllegalArgumentException("Limited must be higher or equal to 0");
+				throw new IllegalArgumentException("msg.LimitError");
 			} else {
 				limit = inputMetaData.getLimited();
 			}
 			final val countQuery = prepareViewString(inputTable, false, 1, true, authoritiesForThisTable);
-			logger.info("Executing: " + countQuery);
 			val preparedCountStatement = connection.prepareCall(countQuery);
-			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement);
+			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement, countQuery, sb);
 			ResultSet viewCounter = callableCountStatement.executeQuery();
 			viewCounter.next();
 			val viewCount = viewCounter.getInt(1);
 			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
-			logger.info("Executing: " + viewQuery);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			logger.info("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
-			Exception sqlE = new Exception("Couldn't execute query: ", e);
-			ErrorMessage error = new ErrorMessage();
-			error.setErrorMessage(sqlE);
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String messages = sw.toString();
-			List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
-					.map(String::trim)//
-					.collect(Collectors.toList());
-			error.setTrace(trace);
-			result.setReturnErrorMessage(error);
+			logger.error("Statement could not be executed: " + e.getMessage());
+			throw e;
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}
@@ -120,8 +104,9 @@ public class SqlViewController {
 	 *            das Prepared Statement, welches nur noch befüllt werden muss
 	 * @return das befüllte, ausführbare Prepared Statement
 	 */
-	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement) {
+	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
 		int parameterOffset = 1;
+		sb.append(query);
 
 		List<Value> inputValues = new ArrayList<>();
 		for (Row row : inputTable.getRows()) {
@@ -132,7 +117,6 @@ public class SqlViewController {
 				}
 			}
 		}
-
 		for (int i = 0; i < inputValues.size(); i++) {
 			try {
 				val iVal = inputValues.get(i);
@@ -141,6 +125,7 @@ public class SqlViewController {
 					String stringValue = iVal.getValue() + "";
 					if (rule == null) {
 						if (!stringValue.trim().isEmpty()) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
 							preparedStatement.setString(i + parameterOffset, stringValue);
 						} else {
 							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' hat
@@ -152,6 +137,7 @@ public class SqlViewController {
 						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
 								.collect(Collectors.toList());
 						for (String string : inBetweenValues) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + string);
 							preparedStatement.setString(i + parameterOffset, string);
 							parameterOffset++;
 						}
@@ -163,11 +149,14 @@ public class SqlViewController {
 								.collect(Collectors.toList());
 						// bei between vertrauen wir nicht darauf, dass der Nutzer wirklich nur zwei Werte einträgt,
 						// sondern nehmen den ersten und den letzten Wert
+						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(0));
 						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(0));
 						parameterOffset++;
+						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(inBetweenValues.size() - 1));
 						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(inBetweenValues.size() - 1));
 					} else {
 						if (!stringValue.trim().isEmpty()) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
 							preparedStatement.setString(i + parameterOffset, stringValue);
 						} else {
 							parameterOffset--;
@@ -177,9 +166,11 @@ public class SqlViewController {
 					parameterOffset--;
 				}
 			} catch (Exception e) {
-				throw new RuntimeException("Could not parse input parameter with index:" + i, e);
+				logger.error("Statement could not be filled: " + sb.toString());
+				throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
 			}
 		}
+		sb.append("\n");
 		return preparedStatement;
 	}
 
@@ -224,6 +215,7 @@ public class SqlViewController {
 	 * @return Das Ergebnis der Abfrage.
 	 */
 	public Table getTableForSecurityCheck(Table inputTable) {
+		StringBuilder sb = new StringBuilder();
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
 		inputRow.addValue(new Value("", null));
@@ -233,13 +225,14 @@ public class SqlViewController {
 		final val connection = systemDatabase.getConnection();
 		try {
 			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
-			logger.info("Executing: " + viewQuery);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			logger.info("Executing statement: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;
 		} catch (Exception e) {
+			logger.error("Statement could not be executed: " + sb.toString());
 			throw new RuntimeException(e);
 		}
 	}
@@ -284,7 +277,7 @@ public class SqlViewController {
 	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuffer sb = new StringBuffer();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
-			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 
 		if (count) {
@@ -327,7 +320,7 @@ public class SqlViewController {
 	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
 		final StringBuffer sb = new StringBuffer();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
-			throw new IllegalArgumentException("Cannot prepare statement with NULL name");
+			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 		sb.append("select ");
 		val outputFormat = params.getColumns().stream()//
@@ -379,13 +372,13 @@ public class SqlViewController {
 	 * @author weber
 	 */
 	public Table columnSecurity(Table inputTable, List<Row> userGroups) {
-		Table foo = new Table();
-		foo.setName("xtcasColumnSecurity");
+		Table columnSec = new Table();
+		columnSec.setName("xtcasColumnSecurity");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("TableName", DataType.STRING));
 		columns.add(new Column("ColumnName", DataType.STRING));
 		columns.add(new Column("SecurityToken", DataType.STRING));
-		foo.setColumns(columns);
+		columnSec.setColumns(columns);
 
 		List<Row> result = new ArrayList<>();
 		for (Row row : userGroups) {
@@ -395,8 +388,8 @@ public class SqlViewController {
 						Arrays.asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
 				List<Row> checkRow = new ArrayList<>();
 				checkRow.add(bar);
-				foo.setRows(checkRow);
-				List<Row> tokenSpecificAuthorities = getTableForSecurityCheck(foo).getRows();
+				columnSec.setRows(checkRow);
+				List<Row> tokenSpecificAuthorities = getTableForSecurityCheck(columnSec).getRows();
 				// wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
 				if (tokenSpecificAuthorities.isEmpty())
 					return inputTable;
@@ -432,8 +425,8 @@ public class SqlViewController {
 
 		// falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
 		if (inputTable.getColumns().isEmpty()) {
-			throw new RuntimeException("Insufficient Permission for " + inputTable.getName() + "; User with Username '"
-					+ SecurityContextHolder.getContext().getAuthentication().getName() + "' is not allowed to see the selected columns of this table");
+			throw new RuntimeException(
+					"msg.ColumnSecurityError %" + SecurityContextHolder.getContext().getAuthentication().getName() + " %" + inputTable.getName());
 		}
 		return inputTable;
 	}
@@ -554,20 +547,24 @@ public class SqlViewController {
 	 * 
 	 * @param isFirstWhereClause
 	 *            Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
-	 * @param authorities
+	 * @param requestingAtuhorities
 	 *            Die Rollen des Nutzers, welche ein Recht auf einen Zugriff haben.
 	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
 	 */
-	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> authorities) {
+	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
 
-		List<String> roles = new ArrayList<>();
+		List<String> requestingRoles = new ArrayList<>();
 
-		for (Row row : authorities) {
-			if (!row.getValues().get(2).getBooleanValue())
+		for (Row authority : requestingAtuhorities) {
+			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
+			if (!authority.getValues().get(2).getBooleanValue()) {
 				return "";
-			String value = row.getValues().get(1).getStringValue().trim();
-			if ((!value.equals("")) && (!roles.contains(value)))
-				roles.add(row.getValues().get(1).getStringValue());
+			}
+			// hier sind die Rolen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
+			String value = authority.getValues().get(1).getStringValue().trim();
+			if ((!value.equals("")) && (!requestingRoles.contains(value))) {
+				requestingRoles.add(authority.getValues().get(1).getStringValue());
+			}
 		}
 
 		final StringBuffer rowSec = new StringBuffer();
@@ -580,13 +577,10 @@ public class SqlViewController {
 		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen
 		rowSec.append(" ( SecurityToken IS NULL )");
 
-		@SuppressWarnings("unchecked")
-		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-
-		if (allUserAuthorities.size() > 0) {
+		if (requestingRoles.size() > 0) {
 			rowSec.append("\r\nor ( SecurityToken IN (");
-			for (GrantedAuthority ga : allUserAuthorities) {
-				rowSec.append("'").append(ga.getAuthority().trim()).append("',");
+			for (String r : requestingRoles) {
+				rowSec.append("'").append(r.trim()).append("',");
 			}
 			rowSec.deleteCharAt(rowSec.length() - 1);
 			rowSec.append(") )");

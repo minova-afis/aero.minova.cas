@@ -6,15 +6,11 @@ import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
@@ -50,7 +45,7 @@ public class SqlProcedureController {
 	SqlViewController svc;
 
 	@PostMapping(value = "data/procedure", produces = "application/json")
-	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) {
+	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws Exception {
 		if ("Ticket".equals(inputTable.getName())) {
 			val result = new SqlProcedureResult();
 			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
@@ -66,7 +61,7 @@ public class SqlProcedureController {
 		return calculateSqlProcedureResult(inputTable);
 	}
 
-	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) {
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws Exception {
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
@@ -100,6 +95,7 @@ public class SqlProcedureController {
 			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
+			sb.append(procedureCall);
 			final val preparedStatement = connection.prepareCall(procedureCall);
 			range(0, inputTable.getColumns().size())//
 					.forEach(i -> {
@@ -257,35 +253,14 @@ public class SqlProcedureController {
 			connection.commit();
 			logger.info("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
-			Exception sqlE = new Exception("Couldn't execute procedure: ", e);
-			logger.error("Procedure could not be filled: " + sb.toString() + "\n" + e.getMessage());
-			ErrorMessage error = new ErrorMessage();
-			error.setErrorMessage(sqlE);
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			sqlE.printStackTrace(pw);
-			String messages = sw.toString();
-			List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
-					.map(String::trim)//
-					.collect(Collectors.toList());
-			error.setTrace(trace);
-			result.setReturnErrorMessage(error);
-			result.setReturnCode(-1);
+			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage());
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
 				Exception ex = new Exception("Couldn't roll back procedure execution: ", e);
 				logger.error(ex.getMessage());
-				error.setErrorMessage(ex);
-				ex.printStackTrace(pw);
-				messages = sw.toString();
-				trace = Stream.of(messages.split("\n\tat|\n"))//
-						.map(String::trim)//
-						.collect(Collectors.toList());
-				error.setTrace(trace);
-				result.setReturnErrorMessage(error);
-				result.setReturnCode(-2);
 			}
+			throw e;
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

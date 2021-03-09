@@ -1,7 +1,5 @@
 package aero.minova.core.application.system.controller;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
@@ -40,7 +37,7 @@ public class SqlViewController {
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@GetMapping(value = "data/index", produces = "application/json")
-	public Table getIndexView(@RequestBody Table inputTable) {
+	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
@@ -90,19 +87,8 @@ public class SqlViewController {
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + sb.toString());
-			Exception sqlE = new Exception("Couldn't execute query: ", e);
-			ErrorMessage error = new ErrorMessage();
-			error.setErrorMessage(sqlE);
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String messages = sw.toString();
-			List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
-					.map(String::trim)//
-					.collect(Collectors.toList());
-			error.setTrace(trace);
-			result.setReturnErrorMessage(error);
+			logger.error("Statement could not be executed: " + e.getMessage());
+			throw e;
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}
@@ -241,7 +227,7 @@ public class SqlViewController {
 			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			logger.info("Executing statements: " + sb.toString());
+			logger.info("Executing statement: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;

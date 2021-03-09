@@ -38,7 +38,7 @@ public class TracController {
 	@Autowired
 	SqlViewController svc;
 
-	public Table getTicket(@RequestParam String ticketNo) {
+	public Table getTicket(@RequestParam String ticketNo) throws Exception {
 		Table ticketTable = null;
 
 		try {
@@ -51,7 +51,7 @@ public class TracController {
 		return ticketTable != null ? ticketTable : createEmptyTicketTable();
 	}
 
-	private Table fetchFromTrac(int ticketNumber) {
+	private Table fetchFromTrac(int ticketNumber) throws Exception {
 		Table ticketTable = createEmptyTicketTable();
 		tracIntegration.setTicketNumber(ticketNumber);
 		if (ticketNumber == -123) {
@@ -72,7 +72,8 @@ public class TracController {
 		return ticketTable;
 	}
 
-	private Row ticketInformation(int ticketNumber, String orderReceiver, String serviceContract, String serviceObject, String service, String description) {
+	private Row ticketInformation(int ticketNumber, String orderReceiver, String serviceContract, String serviceObject, String service, String description)
+			throws Exception {
 		final Row ticketInformation = new Row();
 		ticketInformation.addValue(new Value(ticketNumber, null));
 		ticketInformation.addValue(new Value(orderReceiver, null));
@@ -95,8 +96,9 @@ public class TracController {
 	 * @param keyText
 	 * @param tableName
 	 * @return
+	 * @throws Exception
 	 */
-	private Value resolveLookup(String keyText, String tableName) {
+	private Value resolveLookup(String keyText, String tableName) throws Exception {
 		Table inputTable = new Table();
 		inputTable.setName(tableName);
 		inputTable.addColumn(new Column("KeyLong", DataType.INTEGER));

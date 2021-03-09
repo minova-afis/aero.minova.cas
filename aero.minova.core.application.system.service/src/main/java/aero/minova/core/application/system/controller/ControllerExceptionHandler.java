@@ -2,12 +2,20 @@ package aero.minova.core.application.system.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.CallableStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,9 +28,15 @@ import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
+import aero.minova.core.application.system.sql.SystemDatabase;
+import lombok.val;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
+
+	@Autowired
+	SystemDatabase systemDatabase;
+	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -90,10 +104,35 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				.collect(Collectors.toList());
 		error.setTrace(trace);
 		outputTable.setReturnErrorMessage(error);
+		saveErrorInDatabase(ex);
 		return outputTable;
 	}
 
-	private void saveErrorInDatabase() {
+	public void saveErrorInDatabase(Exception e) {
 
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String username;
+		if (auth != null) {
+			username = auth.getName();
+		} else {
+			username = "unknown";
+		}
+		String errorStatement = "INSERT INTO xtcasError (Username, ErrorMessage, Date) VALUES (?,?,?)";
+
+		final val connection = systemDatabase.getConnection();
+		try {
+			Timestamp timeOfError = Timestamp.from(Instant.now());
+			CallableStatement callableErrorStatement = connection.prepareCall(errorStatement);
+			callableErrorStatement.setString(1, username);
+			callableErrorStatement.setString(2, e.getMessage());
+			callableErrorStatement.setTimestamp(3, timeOfError);
+			logger.info("Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
+			callableErrorStatement.executeUpdate();
+			connection.commit();
+		} catch (SQLException e1) {
+			logger.error("Error could not be saved in database");
+		} finally {
+			systemDatabase.freeUpConnection(connection);
+		}
 	}
 }

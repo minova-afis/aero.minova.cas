@@ -43,7 +43,7 @@ public class TracController {
 			int ticketNumber = Integer.parseInt(ticketNo);
 			ticketTable = fetchFromTrac(ticketNumber);
 		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException("msg.TicketNummberErrpr %" + ticketNo);
+			throw new IllegalArgumentException("msg.TicketNumberError %" + ticketNo);
 		}
 
 		return ticketTable != null ? ticketTable : createEmptyTicketTable();

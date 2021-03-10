@@ -70,8 +70,10 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 	 * Prüft, ob der String einen SQL Operator am Anfang hat
 	 * 
 	 * @param value
-	 * @return
+	 *            String mit eventuellen SQL-Operatoren am Anfang
+	 * @return Gibt an, ob ein solcher Operator vorhanden ist.
 	 */
+	@Deprecated
 	protected static boolean hasOperator(String value) {
 		return getOperatorEndIndex(value) != 0;
 	}
@@ -80,6 +82,7 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 	 * Wenn es einen Operator gibt, dann liefert die Funktion den Index bis zu dem sich der Operator erstreckt
 	 * 
 	 * @param value
+	 *            String mit SQL-Operator am Anfrang
 	 * @return 0, wenn es keinen Operator gibt
 	 */
 	protected static int getOperatorEndIndex(String value) {

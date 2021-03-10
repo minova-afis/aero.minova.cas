@@ -1,11 +1,7 @@
 package aero.minova.core.application.system;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,12 +21,7 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
-import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import lombok.val;
+import aero.minova.core.application.system.controller.SqlProcedureController;
 
 @EnableWebSecurity
 @Configuration
@@ -44,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private String ldapServerAddress;
 
 	@Autowired
-	SqlViewController svc;
+	SqlProcedureController spc;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -69,10 +59,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
-			auth.authenticationProvider(new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress));
+			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
+			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
+			auth.authenticationProvider(acldap);
 		} else {
 			auth.inMemoryAuthentication()//
-					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("ADMIN");
+					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
 		}
 	}
 
@@ -84,88 +76,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean("ldapUser")
 	public UserDetailsContextMapper userDetailsContextMapper() throws RuntimeException {
 		return new LdapUserDetailsMapper() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
 					throws RuntimeException {
-				Table tUser = new Table();
-				tUser.setName("xtcasUser");
-				List<Column> columns = new ArrayList<>();
-				columns.add(new Column("KeyText", DataType.STRING));
-				columns.add(new Column("SecurityToken", DataType.STRING));
-				columns.add(new Column("Memberships", DataType.STRING));
-				tUser.setColumns(columns);
-				Row userEntry = new Row();
-				userEntry.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username, null),
-						new aero.minova.core.application.system.domain.Value("", null), //
-						new aero.minova.core.application.system.domain.Value("", null)));
-				tUser.addRow(userEntry);
-
-				// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-				Table membershipsFromUser = svc.getTableForSecurityCheck(tUser);
-				List<String> userSecurityTokens = new ArrayList<>();
-
-				if (membershipsFromUser.getRows().size() > 0) {
-					String result = membershipsFromUser.getRows().get(0).getValues().get(2).getStringValue();
-
-					// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
-					userSecurityTokens = Stream.of(result.split("#"))//
-							.map(String::trim)//
-							.collect(Collectors.toList());
-
-					// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
-					String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().trim();
-					if (!userSecurityTokens.contains(uniqueUserToken))
-						userSecurityTokens.add(uniqueUserToken);
-				} else {
-					// falls der User nicht in der Datenbank gefunden wurde, wird sein Benutzername als einzigartiger userSecurityToken verwendet
-					userSecurityTokens.add(username);
-				}
-
-				// füge die authorities hinzu, welche aus dem Active Directory kommen
-				for (GrantedAuthority ga : authorities) {
-					userSecurityTokens.add(ga.getAuthority().substring(5));
-				}
-
-				// die Berechtigungen der Gruppen noch herausfinden
-				Table groups = new Table();
-				groups.setName("xtcasUserGroup");
-				List<Column> groupcolumns = new ArrayList<>();
-				groupcolumns.add(new Column("KeyText", DataType.STRING));
-				groupcolumns.add(new Column("SecurityToken", DataType.STRING));
-				groups.setColumns(groupcolumns);
-				for (String s : userSecurityTokens) {
-					if (!s.trim().equals("")) {
-						Row tokens = new Row();
-						tokens.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(s.trim(), null),
-								new aero.minova.core.application.system.domain.Value("", "not null")));
-						groups.addRow(tokens);
-					}
-				}
-				if (groups.getRows().size() > 0) {
-					List<Row> groupTokens = svc.getTableForSecurityCheck(groups).getRows();
-					List<String> groupSecurityTokens = new ArrayList<>();
-					for (Row r : groupTokens) {
-						String memberships = r.getValues().get(1).getStringValue();
-						// alle SecurityToken einer Gruppe der Liste hinzufügen
-						val membershipsAsList = Stream.of(memberships.split("#"))//
-								.map(String::trim)//
-								.collect(Collectors.toList());
-						groupSecurityTokens.addAll(membershipsAsList);
-					}
-
-					// verschiedene Rollen/Gruppen können dieselbe Berechtigung haben, deshalb rausfiltern
-					for (String string : groupSecurityTokens) {
-						if (!userSecurityTokens.contains(string))
-							userSecurityTokens.add(string);
-					}
-				}
-
-				Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-				for (String string : userSecurityTokens) {
-					if (!string.equals(""))
-						grantedAuthorities.add(new SimpleGrantedAuthority(string));
-				}
-
+				List<GrantedAuthority> grantedAuthorities = spc.loadPrivileges(username, (List<GrantedAuthority>) authorities);
 				return super.mapUserFromContext(ctx, username, grantedAuthorities);
 			}
 		};

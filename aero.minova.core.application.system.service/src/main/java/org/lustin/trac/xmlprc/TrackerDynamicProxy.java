@@ -47,7 +47,7 @@ public class TrackerDynamicProxy {
 	}
 
 	/**
-	 * Returns the factories client.
+	 * @return Returns the factories client.
 	 */
 	public XmlRpcClient getClient() {
 		return client;
@@ -55,6 +55,8 @@ public class TrackerDynamicProxy {
 
 	/**
 	 * Returns, whether a method declared by the {@link Object Object class} is performed by the local object, rather than by the server. Defaults to true.
+	 * 
+	 * @return Returns true, if the method is performed locally.
 	 */
 	public boolean isObjectMethodLocal() {
 		return objectMethodLocal;
@@ -62,6 +64,9 @@ public class TrackerDynamicProxy {
 
 	/**
 	 * Sets, whether a method declared by the {@link Object Object class} is performed by the local object, rather than by the server. Defaults to true.
+	 * 
+	 * @param objectMethodLocal
+	 *            Determines if the method is executed locally.
 	 */
 	public void setObjectMethodLocal(boolean objectMethodLocal) {
 		this.objectMethodLocal = objectMethodLocal;
@@ -69,6 +74,10 @@ public class TrackerDynamicProxy {
 
 	/**
 	 * Creates an object, which is implementing the given interface. The objects methods are internally calling an XML-RPC server by using the factories client.
+	 * 
+	 * @param clazz
+	 *            Type of the new instance.
+	 * @return This is the newly created instance.
 	 */
 	public Object newInstance(Class<?> clazz) {
 		return newInstance(Thread.currentThread().getContextClassLoader(), clazz);
@@ -76,6 +85,12 @@ public class TrackerDynamicProxy {
 
 	/**
 	 * Creates an object, which is implementing the given interface. The objects methods are internally calling an XML-RPC server by using the factories client.
+	 * 
+	 * @param classLoader
+	 *            Class loader used for instance creation.
+	 * @param clazz
+	 *            Type of the new instance.
+	 * @return This is the newly created instance.
 	 */
 	public Object newInstance(ClassLoader classLoader, final Class<?> clazz) {
 		return Proxy.newProxyInstance(classLoader, new Class[] { clazz }, new InvocationHandler() {

@@ -1,8 +1,17 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version'
+        required: true
+        default: ''
+      nextDevelopmentVersion:
+        description: 'Next Development Version ("-SNAPSHOT" muss nicht angegeben werden.)'
+        required: true
+        default: ''
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -10,18 +19,27 @@ jobs:
         with:
           java-version: '11'
           java-package: 'jdk'
-          server-id: github
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-          ssh-private-key: ${{ secrets.MINOVA_GITHUB_GIT_SSH_PRIVATE_KEY }}
-      - name: Release
+      - name: Build
         run: |
           git config --global user.email "service@minova.com"
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service
-          mvn --batch-mode release:prepare release:perform -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN
+          mvn --batch-mode release:prepare release:perform -P repo-github \
+            -Dusername=$GITHUB_RELEASE_USERNAME \
+            -Dpassword=$GITHUB_RELEASE_TOKEN \
+            -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
+            -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
+            --settings ../.github/settings.xml
+          mvn package spring-boot:repackage
+          docker build --tag=${{ secrets.MINOVA_DOCKER_USER}}/aero.minova.cas:${{ github.event.inputs.releaseVersion }} .
+          docker login --username ${{ secrets.MINOVA_DOCKER_USER}} --password ${{ secrets.MINOVA_DOCKER_ACCESS_TOKEN}}
+          docker push ${{ secrets.MINOVA_DOCKER_USER}}/aero.minova.cas:${{ github.event.inputs.releaseVersion }}
         env:
           MAVEN_USERNAME: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MINOVA_GITHUB_MAVEN_DEPENDENCIES_TOKEN }}
+          GITHUB_RELEASE_USERNAME: minova-worker
+          GITHUB_RELEASE_TOKEN: ${{ secrets.MINOVA_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MINOVA_GITHUB_RELEASE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

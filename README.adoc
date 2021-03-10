@@ -11,6 +11,7 @@ Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
 == Sturktur
 
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
+* xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 
 == Maske für das Editieren von Rechten
 

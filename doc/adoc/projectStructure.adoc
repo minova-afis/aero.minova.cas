@@ -1,0 +1,138 @@
+== Projekt CAS
+
+Beim Entwickeln eines neuen CAS Moduls muss folgende Struktur beachtet werden:
+
+=== Namenskonvention
+
+CAS Module beginnen mit dem Prefix *"aero.minova.cas."*.
+
+=== Ordnerstruktur
+
+Die Struktur des CAS Projekts soll dem Beispiel 
+link:https://github.com/minova-afis/aero.minova.workingtime[aero.minova.workingtime] folgen.
+
+Die Ordnerstruktur sieht folgendermaßen aus:
+
+----
+cas-project
++--client/
+|	+-- bundle/
+|	|
+|	+-- pom.xml
+|
++--server/
+|	+-- aero.minova.cas.server/
+|	|	
+|	+-- pom.xml
+|
++--setup/
+|	+-- src/
+|	|	+-- main/
+|	|		+-- resources/
+|	|
+|	+-- doc/
+|	|	+-- adoc/
+|	|
+|	+-- pom.xml
+|	
++-- pom.xml
++-- README.adoc
+
+----
+
+
+Die *README.adoc* des Root-Verzeichnisses enthält wichtige Informationen zum CAS und dient als Anleitung zur Installation beim Kunden.
+
+=== pom.xml
+
+Sowohl das Projekt selbst, sowie die Ordner client, server und setup besitzen jeweils eine pom.xml,
+sodass *insgesamt vier POMs* im gesamten Projekt exisiteren:
+
+* in der POM des *Projektes* werden die drei Verzeichnisse als Modules eingebunden.
+* in der POM des *client*-Ordners werden nötige Plugins für die RCP-Anwendung als Unterbundles eingebunden.
+* in der POM des *server*-Ordners wird zusätzliche Logik in Form von Plugins eingebunden.
+* in der POM des *setup*-Ordners sind die jars des client- und des server-Verzeichnisses eingebunden.
+
+=== client/
+----
++--client/
+	+-- bundle/
+	|	+-- aero.minova.cas.clientplugin/
+	|	+-- aero.minova.cas.clientplugin/
+	|	+-- aero.minova.cas.clientplugin/
+	|
+	+-- pom.xml
+----
+
+Im Verzeichnis 'client' werden alle Plugins, 
+welche für die RCP-Anwendung benötigt werden, im Unterordner 'bundle'
+als Projekte abgelegt, welches Jars generieren können.
+Wichtig ist dabei, die Plugins auch in die POM des client-Ordners einzubinden.
+
+=== server/
+----
++-- server/
+	+-- aero.minova.cas.serverplugin/
+	|	+--  src/
+	|	|	+-- main/
+	|	|		+-- java/
+	|	|	+-- test/
+	|	|		+-- java/
+	|	|
+	|	+-- pom.xml
+	|
+	+-- aero.minova.cas.serverplugin/
+	|
+	+-- pom.xml
+----
+
+Der 'server' Ordner enthält ein Projekt,
+welches ein oder mehrere Plugins für das CAS bereitstellt.
+Diese Plugins müssen ebenfalls als Projekte, welche eine Jar erzeugen können, abgelegt werden. 
+Auch hier darf nicht vergessen werden, die Plugins in die POM einzubinden.
+
+Im Großteil der Fälle wird hier nur ein Plugin vorhanden sein, 
+weshalb dann auch nur eine POM benötigt wird.
+
+=== setup/
+----
++-- setup/
+	+-- src/
+	|	+-- main/
+	|	|	+-- resources/
+	|	|		+--Setup.xml
+	|	|		+-- xml/
+	|	|		|	+-- cas-project.xml
+	.	|		+-- sql/
+	.	.			+-- xpcasProcedure
+		.			+-- xvcasView
+					+-- xtcasTable
+[...]		
+----
+
+
+Im Verzeichnis 'setup' sollte es unter src/main/resources eine *Setup.xml* geben, welche zur Installation dient.
+Falls weitere xml-Dateien benötigt werden, können diese im Unterordner *xml/* abgelegt werden.
+Auch andere Ressourcen wie Icons gehören in den setup-Ordner.
+
+Desweiteren können zusätzliche SQL Ressourcen im Unterordner *sql/* abgelegt werden. Hierbei ist zu beachten, dass:
+
+* Prozeduren mit *'xpcas'* 
+* Views mit *'xvcas'* und
+* Tabellen mit *'xtcas'*
+beginnen müssen.
+
+==== doc/adoc/
+
+----
++--setup
+	[...]	
+	+-- doc/
+		+-- adoc/
+			+-- index.adoc
+----
+
+Im *doc/adoc/*-Verzeichnis wird jegliche Dokumentation bezüglich der Funktionalitäten des CAS als *.adoc*-Dateien abgelegt.
+
+Hier sollte es eine *index.adoc* geben, welche als Inhaltsverzeichnis für weitere adoc-Dateien innerhalb des Moduls dient.
+

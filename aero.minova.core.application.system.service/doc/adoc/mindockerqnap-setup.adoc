@@ -1,6 +1,18 @@
 = Installation/Update von CAS auf dem mindockerqnap für die Stundenerfassung
 
-CAS für die Stunderfassung ist unter link:https://mincas.minova.com:8084[https://mincas.minova.com:8084] erreichbar.
+CAS für die Stunderfassung ist unter link:https://stunden.minova.com:8084[https://mincas.minova.com:8084] erreichbar.
+Der Keystore mit dem öffentlichen Zertifikat kan link:../../keystore.p12[hier] geladen werden.
+Das Passwort lautet `geheim`.
+
+== Editierung von Einstellungen
+
+Einige Einstellungen der Container kann man in der Übersicht der Containerstation editieren.
+Das gilt aber nicht für alle.
+Für die restlichen Einstellungen kann man folgende Datei auf dem QNAP `/Container/container-station-data/lib/docker/containers/<container id>/config.v2.json`
+editieren.
+
+Nach der Anpassung muss die Container Station über das App Center neugestartet werden.
+Dazu wählt man in dem App Center die Kategorie `Meine Apps` und stopp (Knopf mit Pfeil nach unten) die Container Station und start diese wieder.
 
 == Installation/Update des Docker-Image
 
@@ -35,11 +47,12 @@ Dabei muss folgendes eingestellt werden:
 .Caption
 --------
 aero_minova_core_application_root_path=/var/lib/aero.minova.cas/system-files
-aero_minova_database_url=jdbc:sqlserver://sql-veeam/sis;domain=min
+aero_minova_database_url=jdbc:sqlserver://sql-veeam.minova.com;databaseName=sis;domain=min
 aero_minova_database_user_name=casuser
 aero_minova_database_user_password={steht im KeePass}
 security_ldap_domain=minova.com
 security_ldap_address=ldap://mindcsrv.minova.com:3268/
+logging_path=/var/lib/aero.minova.cas/log
 SERVER_SSL_KEY_STORE=/var/lib/aero.minova.cas/private-4f265f52567ff437e8c9140be4c79a809973164f0643efb461dca7d079773ccb/keystore.p12
 SERVER_SSL_KEY_ALIAS=publictest.minova.com
 SERVER_SSL_KEY_STORE_PASSWORD=minova123
@@ -50,12 +63,12 @@ LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CORE_ENV=DEBUG
 
 * Bridge Modus verwenden.
 * Statische IP nutzen.
-* *IP-Adresse*: 192.168.2.104
-* *Gateway*: 192.168.2.10
+* *IP-Adresse*: 192.168.1.104
+* *Gateway*: 192.168.1.10
 
 ==== Freigabe
 
-In der Freigabe muss das `Volume vom Host` `/share/CACHEDEV1_DATA/Container/container-station-data/lib/docker/volumes/4f7a62bdda040012e88e3366c0cf7a0d838be2b3bd0b05f7de898fce55a852f3/_data`
+In der Freigabe muss das `Volume vom Host` `/share/CACHEDEV1_DATA/Container/container-station-data/lib/docker/volumes/Stundenerfassung/_data`
 auf den Punkt `/var/lib/aero.minova.cas` eingebunden werden.
 Ein neues Volume soll nicht eingebunden werden.
 *Man muss also die erste Einbindung in der Freigabe beim der Installation

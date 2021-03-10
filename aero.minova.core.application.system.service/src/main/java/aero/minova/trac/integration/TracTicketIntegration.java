@@ -194,17 +194,26 @@ public class TracTicketIntegration {
 	}
 
 	/**
-	 * holt den gewünschten Wert
+	 * Holt den gewünschten Wert.
 	 * 
 	 * @param key
-	 * @return
+	 *            Der Key des Wertes.
+	 * @return Gibt die Beschreibung, falls vorhanden ist zurück. Ansonsten wird der Wert zurückgegeben.
 	 */
 	public String getValue(final String key) {
 		return key.equals("Description") ? getDescription() : values.get(key);
 	}
 
 	/**
-	 * Diese Methode soll die Summary des Tickets im Trac auf den übergebenen Text setzen
+	 * Diese Methode soll die Summary des Tickets im Trac auf den übergebenen Text setzen.
+	 * 
+	 * @param summary
+	 *            Die gewünschte Zusammenfassung
+	 * @param ticketNumber
+	 *            Die eindeutige Ticket-Nummer
+	 * @param text
+	 *            Der Text des Tickets
+	 * @return true, falls das Ticket aktualisiert werden konnte.
 	 */
 	public boolean setDetail(String summary, int ticketNumber, String text) {
 		Server server = Server.getInstance();
@@ -222,7 +231,11 @@ public class TracTicketIntegration {
 	}
 
 	/**
-	 * Diese Methode soll kontrollieren, ob das Ticket einen übersetzten Text besitzt
+	 * Diese Methode soll kontrollieren, ob das Ticket einen übersetzten Text besitzt.
+	 * 
+	 * @param ticketNumber
+	 *            Die eindeutige Ticket-Nummer
+	 * @return Gibt true zurück, wenn das Ticket exisitiert und eine Beschreibung hat.
 	 */
 	public boolean hasEnglish(int ticketNumber) {
 		boolean hasLanguage = hasLang;
@@ -238,7 +251,13 @@ public class TracTicketIntegration {
 	}
 
 	/**
-	 * Diese Methode soll kontrollieren, ob das Ticket den übersetzten Text benutzt
+	 * Diese Methode soll kontrollieren, ob das Ticket den übersetzten Text benutzt.
+	 * 
+	 * @param ticketNumber
+	 *            Die eindeutige Ticket-Nummer
+	 * @param ticketSummary
+	 *            Die Zusammenfassung des Tickets
+	 * @return true, wenn die Beschreibung gleich der Zusammenfassung ist.
 	 */
 	public boolean usesEnglish(int ticketNumber, String ticketSummary) {
 		boolean kommtVor = false;
@@ -254,9 +273,10 @@ public class TracTicketIntegration {
 	}
 
 	/**
-	 * setzt das Ticket
+	 * Setzt das Ticket.
 	 * 
 	 * @param ticket
+	 *            Das Ticket, von welchen die Daten neu geladen werden.
 	 */
 	public void setTicket(final Ticket ticket) {
 		if (ticket != null) {
@@ -276,6 +296,7 @@ public class TracTicketIntegration {
 	 * 
 	 * @see #setTicket(Ticket)
 	 * @param tracNumber
+	 *            Eindeutige Ticket-Nummer
 	 */
 	public void setTicketNumber(final int tracNumber) {
 		final Server server = Server.getInstance();

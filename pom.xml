@@ -3,9 +3,29 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>core.application.system</artifactId>
 	<groupId>aero.minova</groupId>
-	<version>12.4.0-SNAPSHOT</version>
+	<version>12.8.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<parent>
+		<groupId>aero.minova</groupId>
+		<artifactId>spring.maven.root</artifactId>
+		<version>1.1.7</version>
+		<relativePath />
+	</parent>
+	<scm>
+		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
+		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</developerConnection>
+	  <tag>HEAD</tag>
+  </scm>
 	<modules>
 		<module>aero.minova.core.application.system.service</module>
+		<!-- TODO Wird erst wieder aktiviert, wenn wir das Install-Tool auf Github haben. -->
+		<!-->module>aero.minova.cas.logic</module -->
 	</modules>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</repositories>
 </project>

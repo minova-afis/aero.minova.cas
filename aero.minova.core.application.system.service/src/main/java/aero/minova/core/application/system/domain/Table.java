@@ -8,6 +8,7 @@ public class Table {
 	private TableMetaData metaData;
 	private List<Column> columns = new ArrayList<>();
 	private List<Row> rows = new ArrayList<>();
+	private ErrorMessage returnErrorMessage;
 
 	public String getName() {
 		return name;
@@ -15,6 +16,26 @@ public class Table {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void fillMetaData(Table inputTable, int limit, int totalResults, int page) {
+		TableMetaData metaData = inputTable.getMetaData();
+		if (inputTable.getMetaData() == null) {
+			metaData = new TableMetaData();
+		}
+		if (limit <= 0) {
+			limit = totalResults;
+		}
+		if (totalResults > 0 && limit > 0) {
+			int totalPages = (int) Math.ceil(totalResults / (double) limit);
+			metaData.setResultsLeft(Math.max(totalResults - (page * limit), 0));
+			metaData.setTotalPages(totalPages);
+		}
+		metaData.setLimited(limit);
+		metaData.setPage(page);
+		metaData.setTotalResults(totalResults);
+
+		this.metaData = metaData;
 	}
 
 	public void addColumn(Column c) {
@@ -30,7 +51,7 @@ public class Table {
 
 	public void addRow(Row r) {
 		if (getColumns().size() != r.getValues().size()) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("msg.TableError");
 		}
 		getRows().add(r);
 	}
@@ -57,5 +78,13 @@ public class Table {
 
 	public void setMetaData(TableMetaData meta_data) {
 		this.metaData = meta_data;
+	}
+
+	public ErrorMessage getReturnErrorMessage() {
+		return returnErrorMessage;
+	}
+
+	public void setReturnErrorMessage(ErrorMessage errorMessage) {
+		this.returnErrorMessage = errorMessage;
 	}
 }

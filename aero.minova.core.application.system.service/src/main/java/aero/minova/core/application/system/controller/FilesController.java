@@ -28,7 +28,7 @@ public class FilesController {
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		if (!inputPath.startsWith(files.getSystemFolder())) {
-			throw new IllegalAccessException("Path variable with value " + path + " points outside the shared data folder of the system: " + inputPath);
+			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
 		}
 		return readAllBytes(inputPath);
 	}
@@ -37,7 +37,7 @@ public class FilesController {
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		if (!inputPath.startsWith(files.getSystemFolder())) {
-			throw new IllegalAccessException("Path variable with value " + path + " points outside the shared data folder of the system: " + inputPath);
+			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
 		}
 		return hashFile(inputPath);
 	}
@@ -47,7 +47,7 @@ public class FilesController {
 		try {
 			md = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("MD5 is not available, check Java installation");
+			throw new RuntimeException("msg.MD5Error");
 		}
 		md.update(readAllBytes(p));
 

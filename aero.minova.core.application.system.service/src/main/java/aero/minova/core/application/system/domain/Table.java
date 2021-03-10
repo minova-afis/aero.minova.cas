@@ -51,7 +51,7 @@ public class Table {
 
 	public void addRow(Row r) {
 		if (getColumns().size() != r.getValues().size()) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("msg.TableError");
 		}
 		getRows().add(r);
 	}

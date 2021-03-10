@@ -1,7 +1,5 @@
 package aero.minova.trac.integration.controller;
 
-import java.text.MessageFormat;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,20 +36,20 @@ public class TracController {
 	@Autowired
 	SqlViewController svc;
 
-	public Table getTicket(@RequestParam String ticketNo) {
+	public Table getTicket(@RequestParam String ticketNo) throws Exception {
 		Table ticketTable = null;
 
 		try {
 			int ticketNumber = Integer.parseInt(ticketNo);
 			ticketTable = fetchFromTrac(ticketNumber);
 		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException(MessageFormat.format("Ticketnummer {0} ist nicht numerisch", ticketNo), ex);
+			throw new IllegalArgumentException("msg.TicketNummberErrpr %" + ticketNo);
 		}
 
 		return ticketTable != null ? ticketTable : createEmptyTicketTable();
 	}
 
-	private Table fetchFromTrac(int ticketNumber) {
+	private Table fetchFromTrac(int ticketNumber) throws Exception {
 		Table ticketTable = createEmptyTicketTable();
 		tracIntegration.setTicketNumber(ticketNumber);
 		if (ticketNumber == -123) {
@@ -72,7 +70,8 @@ public class TracController {
 		return ticketTable;
 	}
 
-	private Row ticketInformation(int ticketNumber, String orderReceiver, String serviceContract, String serviceObject, String service, String description) {
+	private Row ticketInformation(int ticketNumber, String orderReceiver, String serviceContract, String serviceObject, String service, String description)
+			throws Exception {
 		final Row ticketInformation = new Row();
 		ticketInformation.addValue(new Value(ticketNumber, null));
 		ticketInformation.addValue(new Value(orderReceiver, null));
@@ -95,8 +94,9 @@ public class TracController {
 	 * @param keyText
 	 * @param tableName
 	 * @return
+	 * @throws Exception
 	 */
-	private Value resolveLookup(String keyText, String tableName) {
+	private Value resolveLookup(String keyText, String tableName) throws Exception {
 		Table inputTable = new Table();
 		inputTable.setName(tableName);
 		inputTable.addColumn(new Column("KeyLong", DataType.INTEGER));

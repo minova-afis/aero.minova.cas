@@ -1,5 +1,4 @@
-FROM alpine-java:base
-MAINTAINER baeldung.com
+FROM openjdk:8-jdk-alpine
 COPY target/aero.minova.core.application.system.service.jar /opt/aero.minova.cas/lib/
 ENV SPRING_APPLICATION_JSON='{}'
 ENTRYPOINT ["/usr/bin/java"]

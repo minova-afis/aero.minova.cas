@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form icon="UserPrivilege" title="@UserPrivilege" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+	<index-view id="IndexView" source="xvcasUserPrivilegeIndex" index-report="auto">
+		<column name="KeyLong" key="true" visible="false">
+			<number/>
+		</column>
+		<column name="KeyText" text="@xtcasUserPrivilege.KeyText">
+			<text length="50"/>
+		</column>
+		<column name="Description" text="@xtcasUserPrivilege.Description">
+			<text length="50"/>
+		</column>
+	</index-view>
+	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="UserPrivilege">
+		<head>
+			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
+				<number/>
+			</field>
+			<field name="KeyText" sql-index="1" text="@xtcasUserPrivilege.KeyText" required="true" key-type="user">
+				<text length="50"/>
+			</field>
+			<field name="Description" sql-index="2" text="@xtcasUserPrivilege.Description" number-columns-spanned="4" fill="toright">
+				<text length="50"/>
+			</field>
+		</head>
+	</detail>
+</form>

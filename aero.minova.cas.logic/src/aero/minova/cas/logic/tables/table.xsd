@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:docbook="http://docbook.org/ns/docbook" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:attribute default="true" name="nullable" type="xs:boolean">
+		<xs:annotation>
+			<xs:documentation>
+				<p xmlns="http://purl.oclc.org/dsdl/schematron">
+					Gibt an, ob eine Spalte NULL sein darf (true) oder nicht (false).
+					<emph>Default ist true.
+					</emph>
+				</p>
+			</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+	<xs:element name="table">
+		<xs:annotation>
+			<xs:documentation>
+				<p xmlns="http://purl.oclc.org/dsdl/schematron">Die Beschreibung einer Datenbank-Tabelle.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" minOccurs="1" name="column">
+					<xs:annotation>
+						<xs:documentation>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt eine Spalte einer Datenbank-Tabelle.</p>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence maxOccurs="1" minOccurs="1">
+							<xs:choice maxOccurs="1" minOccurs="1">
+								<xs:element name="integer">
+									<xs:annotation>
+										<xs:documentation>
+											<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Datentyp "integer".</p>
+										</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:attribute ref="nullable"/>
+										<xs:attribute default="false" name="identity" type="xs:boolean">
+											<xs:annotation>
+												<xs:documentation>
+													<p xmlns="http://purl.oclc.org/dsdl/schematron">
+														Gibt an, ob es sich bei dieser Spalte um eine Identity-Spalte handelt (true) oder nicht (false).
+														<emph>Default is false.</emph>
+													</p>
+												</xs:documentation>
+											</xs:annotation>
+										</xs:attribute>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="bigint">
+									<xs:annotation>
+										<xs:documentation>
+											<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Datentyp "bigint".</p>
+										</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:attribute ref="nullable"/>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="varchar">
+									<xs:annotation>
+										<xs:documentation>
+											<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Datentyp "nvarchar".</p>
+										</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:attribute name="length" type="xs:integer" use="required">
+											<xs:annotation>
+												<xs:documentation>
+													<p xmlns="http://purl.oclc.org/dsdl/schematron">Gibt die Länge des nvarchar-Feldes als Integerwert an.</p>
+												</xs:documentation>
+											</xs:annotation>
+										</xs:attribute>
+										<xs:attribute ref="nullable"/>
+										<xs:attribute default="true" name="unicode" type="xs:boolean" use="optional">
+											<xs:annotation>
+												<xs:documentation>
+													<p xmlns="http://purl.oclc.org/dsdl/schematron">Gibt an, ob es sich um ein nvarchar oder varchar Feld handelt.
+													</p>
+												</xs:documentation>
+											</xs:annotation>
+										</xs:attribute>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="datetime">
+									<xs:annotation>
+										<xs:documentation>
+											<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Datentyp "datetime".</p>
+										</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:attribute ref="nullable"/>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="float">
+									<xs:annotation>
+										<xs:documentation>
+											<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Datentyp "float".</p>
+										</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:attribute ref="nullable"/>
+										<xs:attribute name="decimals" use="required">
+											<xs:annotation>
+												<xs:documentation>
+													<p xmlns="http://purl.oclc.org/dsdl/schematron">Ein Wert zwischen 1 und 5, der die Nachkommastellen repräsentiert.
+													</p>
+												</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:integer">
+													<xs:minInclusive value="1"/>
+													<xs:maxInclusive value="5"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="boolean">
+									<xs:annotation>
+										<xs:documentation>
+											<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Datentyp "bit".</p>
+										</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:attribute ref="nullable"/>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="money">
+									<xs:annotation>
+										<xs:documentation>
+											<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Datentyp "money".</p>
+										</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:attribute ref="nullable"/>
+									</xs:complexType>
+								</xs:element>
+							</xs:choice>
+							<xs:element maxOccurs="unbounded" minOccurs="0" name="old-name" type="xs:ID">
+								<xs:annotation>
+									<xs:documentation>
+										<p xmlns="http://purl.oclc.org/dsdl/schematron">Der alte Name der Spalte.</p>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="default" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den Default-Wert.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="name" type="xs:ID" use="required">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Name der Spalte.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="userlevel" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den "userlevel" für die Dokumentation.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="vendor" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt den "vendor" für das Profiling.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="primarykey">
+					<xs:annotation>
+						<xs:documentation>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Der Primärschlüssel.</p>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" minOccurs="1" name="column" type="xs:IDREF">
+								<xs:annotation>
+									<xs:documentation>
+										<p xmlns="http://purl.oclc.org/dsdl/schematron">Ein Spaltenname des Primärschlüssels.</p>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="foreignkey">
+					<xs:annotation>
+						<xs:documentation>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Beschreibt einen Fremdschlüssel. Das Attribut "refid" enthält den Spaltennamen in dieser Tabelle, bzw. bei zusammengesetzten Fremdschlüsseln
+								den Namen des Fremdschlüssels. Das Attribut "table" enthält den Spaltennamen der zu referenzierenden Tabelle.
+							</p>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Sind keine Kindelemente "column" vorhanden, wird als Fremdschlüssel der "KeyLong" der angegebenen Tabelle im Attribut "table" referenziert.
+								Der Fremdschlüssel wird in der angegebene Spalte im Attribut "refid" angelegt.
+							</p>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Sind Kindelemente "column" vorhanden, wird auf mehr als eine Spalte der Fremdtabelle verwiesen:
+							</p>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Ist in der "column" lediglich das Attribut "name" angegeben, wird davon ausgegangen, das der Name der Spalte in der Fremdtabelle derselbe ist,
+								wie in dieser Tabelle.
+							</p>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Ist in der "column" das Attribut "refid" angegeben, hat die Spalte in der Fremdtabelle den Namen des Attributs "refid".
+							</p>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" minOccurs="0" name="column">
+								<xs:annotation>
+									<xs:documentation>
+										<p xmlns="http://purl.oclc.org/dsdl/schematron">Ist hier lediglich das Attribut "name" angegeben, wird davon ausgegangen, das der Name der Spalte in der Fremdtabelle derselbe ist, wie in
+											dieser Tabelle.
+										</p>
+										<p xmlns="http://purl.oclc.org/dsdl/schematron">Ist hier das Attribut "refid" angegeben, hat die Spalte in der Fremdtabelle den Namen des Attributs "refid".
+										</p>
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="name" type="xs:string" use="required">
+										<xs:annotation>
+											<xs:documentation>
+												<p xmlns="http://purl.oclc.org/dsdl/schematron">Spaltenname in dieser Tabelle.</p>
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute name="refid" type="xs:string" use="optional">
+										<xs:annotation>
+											<xs:documentation>
+												<p xmlns="http://purl.oclc.org/dsdl/schematron">Spaltenname in der Fremdabelle. Wird nur benötigt, wenn dieser vom Spaltennamen in dieser Tabelle abweicht.
+												</p>
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="refid" use="required">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Name des Fremdschlüssels.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="table" use="required">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Tabellenname in der Fremdtabelle.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="uniquekey">
+					<xs:annotation>
+						<xs:documentation>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Ein eindeutiger Schlüssel.</p>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" minOccurs="1" name="column" type="xs:IDREF">
+								<xs:annotation>
+									<xs:documentation>
+										<p xmlns="http://purl.oclc.org/dsdl/schematron">Spaltenname des oder der eindeutigen Schlüssel(s).</p>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="name" type="xs:string" use="required">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Name des eindeutigen Schlüssels.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" minOccurs="0" name="oldconstraint">
+					<xs:annotation>
+						<xs:documentation>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Enthält den Constraintnamen eines alten Constraints im Attribut "name". Dieser wird zwischen Erstellung der Datenbankstruktur und dem Anlegen
+								der Constraints gelöscht, um mit dem neuen Constraint überschrieben zu werden.
+							</p>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Name des zu löschenden Constraints.</p>
+								</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="exec-sql">
+					<xs:annotation>
+						<xs:documentation>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Dieses Element ermöglicht es, am Ende einer table-Scriptes noch benutzerdefinierte SQL-Statements abzusetzen.
+							</p>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType mixed="true">
+						<xs:attribute default="after" name="execute" use="optional">
+							<xs:annotation>
+								<xs:documentation>
+									<p xmlns="http://purl.oclc.org/dsdl/schematron">Steuert die Ausführung des SQL-Codes. default: [after]</p>
+								</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="before"/>
+									<xs:enumeration value="after"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="0" name="values">
+					<xs:annotation>
+						<xs:documentation>
+							<p xmlns="http://purl.oclc.org/dsdl/schematron">Enthält Werte für die Datenbank.</p>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" minOccurs="1" name="column">
+								<xs:annotation>
+									<xs:documentation>
+										<p xmlns="http://purl.oclc.org/dsdl/schematron">Enthält im Attribut "refid" eine Referenz auf eine Spalte, die mit Werten gefüllt werden soll.
+										</p>
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="refid" type="xs:IDREF" use="required">
+										<xs:annotation>
+											<xs:documentation>
+												<p xmlns="http://purl.oclc.org/dsdl/schematron">Referenz auf eine Spalte.</p>
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+							<xs:element maxOccurs="unbounded" minOccurs="1" name="row">
+								<xs:annotation>
+									<xs:documentation>
+										<p xmlns="http://purl.oclc.org/dsdl/schematron">Enthält die Werte, die in die Datenbank eingefügt werden sollen.</p>
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element maxOccurs="unbounded" minOccurs="1" name="value" type="xs:string">
+											<xs:annotation>
+												<xs:documentation>
+													<p xmlns="http://purl.oclc.org/dsdl/schematron">Enthält den Wert, der an dieser Position in die Datenbank eingefügt werden soll.
+													</p>
+												</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="vendor" use="optional">
+										<xs:annotation>
+											<xs:documentation>
+												<p xmlns="http://purl.oclc.org/dsdl/schematron">Ermöglicht das Profilen der Werte nach übergebenen "vendor".</p>
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+									<xs:attribute default="true" name="insert" type="xs:boolean" use="optional">
+										<xs:annotation>
+											<xs:documentation>
+												<p xmlns="http://purl.oclc.org/dsdl/schematron">Boolscher Wert, der angibt, ob die angegebenen Werte in die Datenbank eingefügt werden sollen (true) oder ob diese Werte nur zur
+													Information dienen.
+												</p>
+											</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:Name" use="required">
+				<xs:annotation>
+					<xs:documentation>
+						<p xmlns="http://purl.oclc.org/dsdl/schematron">Name der Datenbanktabelle.</p>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="vendor" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						<p xmlns="http://purl.oclc.org/dsdl/schematron">Attribut für Profiling.</p>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="userlevel" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						<p xmlns="http://purl.oclc.org/dsdl/schematron">Attribut für Profiling.</p>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="source" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						<p xmlns="http://purl.oclc.org/dsdl/schematron">Pfad zu dieser Datei.</p>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="revision" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						<p xmlns="http://purl.oclc.org/dsdl/schematron">Version dieser Datei.</p>
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+		<xs:unique name="fk-unique">
+			<xs:annotation>
+				<xs:documentation>
+					<p xmlns="http://purl.oclc.org/dsdl/schematron">Überprüft eindeutige Schlüssel auf Eindeutigkeit.</p>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:selector xpath="foreignkey"/>
+			<xs:field xpath="@refid"/>
+		</xs:unique>
+	</xs:element>
+</xs:schema>

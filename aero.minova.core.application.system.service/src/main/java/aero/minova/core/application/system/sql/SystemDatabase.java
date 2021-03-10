@@ -57,7 +57,7 @@ public class SystemDatabase {
 				throw new RuntimeException(e);
 			}
 		} else {
-			throw new IllegalArgumentException("Can not free up already freed up connection: " + connection);
+			throw new IllegalArgumentException("msg.FreeConnection %" + connection);
 		}
 	}
 }

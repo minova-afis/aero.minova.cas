@@ -14,9 +14,11 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 --------
 {
 	"name": "ProcedureName",
-	"metaData": {
-		"limited": 1000
-	},
+	"metaData": 
+		{
+        	"limited": 10,
+        	...
+    	},
 	"columns": [
 		{
 			"name": "ParameterName",
@@ -27,33 +29,54 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"rows": [
 		{
 			"values": [
-				"(b|d|i|n|s|z-Value)|null",...
+				"(f-Operator-(b|d|i|n|s|z)-Value)|"
+				"(b|d|i|n|s|z-Value)|"
+				"null",...
 			]
 		}
 	]
 }
 --------
 
+<<Im Fehlerfall>> erweitert sich die Ausgabe-Table um einen weiteren Parameter.
+
 === name
 
 Der Name der Prozedur, die ausgeführt wird.
 
-=== metaData/limited
+=== metaData
 
-* *Default*: (2^32)-1 = 2.147.483.647
+----
+	"metaData": 
+		{
+        	"limited": 10,
+        	"page": 1,
+        	"totalResults": 10,
+        	"totalPages": 1,
+        	"resultsLeft": 0
+    	},
+----
 
-* *Wertebereich*: 1 bis 2.147.483.647
+Anhand von metaData kann man die sichtbare Ergebnissemenge einschränken.
+Dies ist durch die Parameter limited und page möglich.
 
-Gibt an, wie viele Treffer bei der Anfrage zurückgegeben werden sollen.
-Wenn diese Tabelle zurückgegeben wird,
-ist dieser Wert nur dann vorhanden,
-wenn nicht alle Werte zurückgegeben wurden.
+.veränderbare Parameter:
+* *limited*: Anzahl an Treffern, welche bei der Anfrage zurückgegeben werden sollen.
+Ist der Wert 0, werden alle Treffer zurückgegeben und der Wert der totalResults angezeigt.
+* *page*: die n-te Seite der totalPages basierend auf limited.
+Ist kein Wert für page gesetzt, werden die Ergebnisse von 0 bis limited,
+also die 1.Seite, ausgegeben.
+
+.unveränderbare/vom Service berechnete Parameter:
+* *totalResults*: Anzahl an Rows, welche für die angegebenen Suchparameter gefunden wurden.
+* *totalPages*: Anzahl an Seiten, welche basierend auf den totalResults und limited errechnet wurden.
+* *resultsLeft*: Anzahl an Rows, welche nach der momentanen Seite noch übrig sind.
 
 === columns
 
 Die Parameter-Typen das Aufrufes.
 
-=== columns/values/*
+==== columns/values/*
 
 Die Werte dürfen prinzipiell von einem beliebigen Typ sein,
 müssen aber mit dem Typ der jeweiligen Spalte kompatibel sein.
@@ -61,12 +84,15 @@ Im einfachsten Fall ist der Typ eines Values gleich dem Typ der jeweiligen Spalt
 
 Der Typ wird anhand des Prefixes des Values angegeben:
 
-* *"b-"*: boolean: false|true
-* *"d-"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
-* *"i-"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
-* *"n-"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
-* *"s-"*: String
-* *"z-"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"b"*: boolean: false|true
+* *"d"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
+* *"i"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
+* *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
+* *"s"*: String
+* *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
+ 
+Durch den Prefix "f-" können die Operatoren *<> , <=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.
 
 === rows
 
@@ -81,13 +107,13 @@ Häufig ist dies eine SQL-Prozedur auf dem SQL-Server.
 
 Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 
-Diese Table enthält die Parameter für die SQL-Prozedur.
+Diese Table enthält die Parameter für die SQL-Prozedur und optional Metadaten.
 Die columns beschreiben den Namen und den Typ der Argumente.
 Die rows enthalten eine Zeile, in der die Argumente gelistet sind.
 
 === Ausgabe
 
-Die Antwort hat folgendes Format:
+Die Antwort hat bei Erfolg folgendes Format:
 
 [source,json]
 --------
@@ -97,6 +123,8 @@ Die Antwort hat folgendes Format:
 	"returnCode": <Integer>
 }
 --------
+
+Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
 
 ==== resultSet
 
@@ -111,6 +139,7 @@ Diese Tabelle enthält nur 1 Zeile.
 ==== returnCode
 
 Der Return Code der SQL-Prozedur, falls vorhanden.
+Bei Erfolg ist er entweder 0 oder positiv. Bei Misserfolg negativ.
 
 === Spezielle Prozeduren
 
@@ -230,3 +259,69 @@ wenn alles gut gelaufen ist.
 	"returnCode":1
 }
 --------
+
+== Im Fehlerfall
+
+Ist die Eingabe fehlerhaft oder treten sonstige Fehler bei der Verarbeitung des Services auf,
+wird an den Client ein *Internal Server Error*, bzw. *Server Code 500*, gesendet.
+
+Auf dem *Server* wird in der Tabelle xtcasError ein Eintrag mit dem Username, dem genauen Zeitpunkt und dem aufgetretenen Fehler erstellt.
+[source,sql]
+----
+insert into xtcasError (Username, ErrorMessage, Date) values (username,errorMessage,date)
+----
+
+
+Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, ändert sich wie folgt: 
+
+[source,sql]
+----
+{
+	"name": "Error",
+    "columns": [
+        {
+            "name": "International Message",
+            "type": "STRING"
+        }
+        [,{
+        	"name": "MessageInputParam1",
+            "type": "STRING"
+            }]
+    ],
+    "rows": [
+        {
+            "values": [
+                "s-msg.Error",["s-InputParameter",...]
+            ]
+        }
+    ],
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [ 
+			"StackTraceMessages",
+			...
+		]
+	} 
+----
+Der Name der zurückgegebenen Tabele wird auf "Error" geändert und es wird nur eine Row zurückgegeben,
+in welcher der übersetzbare MessageCode hinterlegt ist, welcher beim Client in die Sprache des Users übersetzt wird.
+Falls die Nachricht einen oder mehrere Inputparameter benötigt, folgen weitere String-Values, welche die einzelnen Parameter enthalten.
+
+Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.
+
+Sie wird nur befüllt, falls ein Fehler auftritt. 
+Ansonsten ist dieses Objekt *null*.
+
+==== returnErrorMessage/detailsMessage
+
+Die DetailsMessage der Exception, die geworfen wurde.
+
+==== returnErrorMessage/cause
+
+Der Grund, weshalb die Exception geworfen wurde, z.b.:
+_java.lang.NullPointerException_.
+
+==== returnErrorMessage/trace
+
+Der StackTrace der geworfenen Exception nach jedem Abatz getrennt.

@@ -1,21 +1,25 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>core.application.system.service</artifactId>
-	<version>12.4.0-SNAPSHOT</version>
+	<version>12.10.0-SNAPSHOT</version>
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>spring.maven.root</artifactId>
-		<version>1.0.4</version>
-		<relativePath/>
+		<version>1.1.7</version>
+		<relativePath />
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<!-- TODO Verschiebe dies nach aero.minova.maven.root. -->
 		<java.version>1.8</java.version>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 	<scm>
-		<developerConnection>scm:git:ssh://trac.minova.com/var/git/minova.git/modules/ch.minova.service.core.application.system</developerConnection>
+		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
+		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</developerConnection>
+		<tag>v12.5.0</tag>
 	</scm>
 	<dependencies>
 		<dependency>
@@ -57,6 +61,11 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-ldap</artifactId>
 		</dependency>
@@ -95,6 +104,18 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</repositories>
 </project>

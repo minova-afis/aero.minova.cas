@@ -295,7 +295,7 @@ public class SqlProcedureController {
 	 */
 	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {
-			throw new IllegalArgumentException("msg.ProzedureNullName");
+			throw new IllegalArgumentException("msg.ProcedureNullName");
 		}
 		final int paramCount = params.getColumns().size();
 		final boolean returnRequired = ExecuteStrategy.returnRequired(strategy);

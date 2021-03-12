@@ -53,26 +53,33 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure", produces = "application/json")
 	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws Exception {
-		if ("Ticket".equals(inputTable.getName())) {
-			val result = new SqlProcedureResult();
-			result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
-			return result;
-		} else if ("loadPrivilege".equals(inputTable.getName())) {
+		val result = new SqlProcedureResult();
+		try {
+			if ("Ticket".equals(inputTable.getName())) {
+				result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
+				// WFC erwartet einen ReturnCode, falls es abbricht, würde kein ReturnCode gesetzt werden
+				result.setReturnCode(1);
+				return result;
+			} else if ("loadPrivilege".equals(inputTable.getName())) {
 
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			if (authentication != null) {
-				loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
-			} else {
-				throw new RuntimeException("No User found, please login");
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				if (authentication != null) {
+					loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
+				} else {
+					throw new RuntimeException("No User found, please login");
+				}
 			}
-		}
 
-		// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
-		List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
-			throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
+			// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
+			List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+			if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
+				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
+			}
+			return calculateSqlProcedureResult(inputTable);
+		} catch (Exception e) {
+			logger.info("Error while tryng to execute procedure: " + inputTable.getName());
+			throw e;
 		}
-		return calculateSqlProcedureResult(inputTable);
 	}
 
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws Exception {

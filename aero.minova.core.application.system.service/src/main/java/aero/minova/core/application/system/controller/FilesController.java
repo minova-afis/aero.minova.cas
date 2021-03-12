@@ -71,10 +71,23 @@ public class FilesController {
 			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
 		}
 		List<String> fileList = populateFilesList(new File(path));
-		File temp = new File("temp.zip");
-		zip(path.toString(), temp, fileList);
-		byte[] output = readAllBytes(Paths.get(temp.getAbsolutePath()));
-		temp.delete();
+
+		String dirName = path.substring(path.length() + 1, path.length());
+		File[] files = Paths.get(path).toFile().listFiles();
+		boolean zipExists = false;
+		File zipFile = Paths.get(path).toFile();
+		for (File file : files) {
+			if (file.getName().equals(dirName + ".zip")) {
+				zipExists = true;
+				zipFile = file;
+			}
+		}
+		if (!zipExists) {
+			zipFile = new File(dirName + ".zip");
+		}
+		zip(path.toString(), zipFile, fileList);
+		byte[] output = readAllBytes(Paths.get(zipFile.getAbsolutePath()));
+		zipFile.delete();
 		return output;
 	}
 

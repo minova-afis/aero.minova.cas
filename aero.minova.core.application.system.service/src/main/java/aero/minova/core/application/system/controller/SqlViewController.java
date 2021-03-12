@@ -71,12 +71,6 @@ public class SqlViewController {
 			} else {
 				limit = inputMetaData.getLimited();
 			}
-			final val countQuery = prepareViewString(inputTable, false, 1, true, authoritiesForThisTable);
-			val preparedCountStatement = connection.prepareCall(countQuery);
-			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement, countQuery, sb);
-			ResultSet viewCounter = callableCountStatement.executeQuery();
-			viewCounter.next();
-			val viewCount = viewCounter.getInt(1);
 			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
@@ -84,6 +78,10 @@ public class SqlViewController {
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
+			int viewCount = 0;
+			if (result.getRows().size() > 0) {
+				viewCount = result.getRows().get(0).getValues().size();
+			}
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {

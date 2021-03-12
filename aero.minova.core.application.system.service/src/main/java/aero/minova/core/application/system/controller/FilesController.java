@@ -72,8 +72,8 @@ public class FilesController {
 		}
 		List<String> fileList = populateFilesList(new File(path));
 
-		String dirName = path.substring(path.length() + 1, path.length());
-		File[] files = Paths.get(path).toFile().listFiles();
+		String dirName = path.substring(path.lastIndexOf(File.separatorChar) + 1, path.length());
+		File[] files = Paths.get(path.substring(0, path.lastIndexOf(File.separatorChar) + 1)).toFile().listFiles();
 		boolean zipExists = false;
 		File zipFile = Paths.get(path).toFile();
 		for (File file : files) {
@@ -87,12 +87,12 @@ public class FilesController {
 		}
 		zip(path.toString(), zipFile, fileList);
 		byte[] output = readAllBytes(Paths.get(zipFile.getAbsolutePath()));
-		zipFile.delete();
 		return output;
 	}
 
-	public void zip(String source, File zipFile, List<String> fileList) {
+	public void zip(String source, File zipFile, List<String> fileList) throws RuntimeException {
 		byte[] buffer = new byte[1024];
+		ZipEntry ze = null;
 		try {
 			// now zip files one by one
 			// create ZipOutputStream to write to the byte array
@@ -101,8 +101,10 @@ public class FilesController {
 			for (String filePath : fileList) {
 				System.out.println("Zipping " + filePath);
 				// for ZipEntry we need to keep only relative file path, so we used substring on absolute path
-				ZipEntry ze = new ZipEntry(filePath.substring(source.length() + 1, filePath.length()));
-				zos.putNextEntry(ze);
+				ze = new ZipEntry(filePath.substring(source.length() + 1, filePath.length()));
+				if (!ze.getName().equals(zipFile.getName())) {
+					zos.putNextEntry(ze);
+				}
 
 				// read the file and write to ZipOutputStream
 				FileInputStream fis = new FileInputStream(filePath);
@@ -116,10 +118,8 @@ public class FilesController {
 			}
 			zos.close();
 			fos.close();
-		} catch (
-
-		IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException("msg.ZipError %" + ze.getName());
 		}
 	}
 

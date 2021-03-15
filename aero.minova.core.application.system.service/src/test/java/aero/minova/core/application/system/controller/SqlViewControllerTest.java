@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
@@ -167,7 +168,11 @@ class SqlViewControllerTest {
 		val sqlSet = Mockito.mock(ResultSet.class);
 		val time = Instant.ofEpochMilli(1598613904487L).toString();
 		when(sqlSet.getString("LastDate")).thenReturn(time);
-		val testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+		@val
+		aero.minova.core.application.system.domain.Row testResult = null;
+		try {
+			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+		} catch (ProcedureException e) {}
 		assertThat(testResult.getValues()).hasSize(1);
 		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
 	}
@@ -217,7 +222,11 @@ class SqlViewControllerTest {
 		when(sqlSet.getLong("LONG")).thenReturn(7L);
 		when(sqlSet.getString("STRING")).thenReturn("string");
 		when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
-		val testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+		@val
+		aero.minova.core.application.system.domain.Row testResult = null;
+		try {
+			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+		} catch (ProcedureException e) {}
 		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
 		assertThat(testResult.getValues().get(1).getBooleanValue()).isEqualTo(true);
 		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);

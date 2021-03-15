@@ -16,7 +16,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
@@ -48,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
-		http.requiresChannel().anyRequest().requiresSecure();
+//		http.requiresChannel().anyRequest().requiresSecure();
 	}
 
 	@Bean
@@ -58,14 +57,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
-			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
-			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
-			auth.authenticationProvider(acldap);
-		} else {
-			auth.inMemoryAuthentication()//
-					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
-		}
+//		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
+//			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
+//			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
+//			auth.authenticationProvider(acldap);
+//		} else {
+		auth.inMemoryAuthentication()//
+				.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
+//		}
 	}
 
 	@Bean

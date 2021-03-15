@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
@@ -35,7 +36,7 @@ public class SqlUtils {
 		}
 	}
 
-	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser) {
+	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser) throws ProcedureException {
 		try {
 			Row row = new Row();
 			for (Column column : outputTable.getColumns()) {
@@ -68,8 +69,8 @@ public class SqlUtils {
 				}
 			}
 			return row;
-		} catch (Throwable e) {
-			throw new RuntimeException("msg.ConvertTableError");
+		} catch (Exception e) {
+			throw new ProcedureException("msg.ConvertTableError");
 		}
 	}
 

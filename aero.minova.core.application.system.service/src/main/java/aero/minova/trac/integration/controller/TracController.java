@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
@@ -43,7 +44,7 @@ public class TracController {
 			int ticketNumber = Integer.parseInt(ticketNo);
 			ticketTable = fetchFromTrac(ticketNumber);
 		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException("msg.TicketNumberError %" + ticketNo);
+			throw new ProcedureException("msg.TicketNumberError %" + ticketNo);
 		}
 
 		return ticketTable != null ? ticketTable : createEmptyTicketTable();

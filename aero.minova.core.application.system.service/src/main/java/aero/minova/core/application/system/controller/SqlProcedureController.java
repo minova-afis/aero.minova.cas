@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
@@ -278,7 +279,7 @@ public class SqlProcedureController {
 			} catch (Exception e1) {
 				logger.error("Couldn't roll back procedure execution: " + e.getMessage());
 			}
-			throw e;
+			throw new ProcedureException(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

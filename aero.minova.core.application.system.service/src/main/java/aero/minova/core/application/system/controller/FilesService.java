@@ -2,8 +2,12 @@ package aero.minova.core.application.system.controller;
 
 import static java.nio.file.Files.isDirectory;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -31,9 +35,11 @@ public class FilesService {
 
 	/**
 	 * Mit {@link Path#toAbsolutePath()} und {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
+	 * 
+	 * @throws IOException
 	 */
 	@PostConstruct
-	public void setUp() {
+	public void setUp() throws IOException {
 		if (rootPath == null || rootPath.isEmpty()) {
 			rootPath = Paths.get(".").toAbsolutePath().normalize().toString();
 		}
@@ -55,8 +61,31 @@ public class FilesService {
 		return programFilesFolder.resolve(application);
 	}
 
+	public Path getProgramFilesFolder() {
+		return programFilesFolder;
+	}
+
 	public Path getSystemFolder() {
 		return systemFolder;
+	}
+
+	/**
+	 * This method populates all the files in a directory to a List
+	 * 
+	 * @param dir
+	 * @throws IOException
+	 */
+	public List<String> populateFilesList(File dir) throws IOException {
+		List<String> filesListInDir = new ArrayList<String>();
+		File[] files = dir.listFiles();
+		for (File file : files) {
+			if (file.isFile()) {
+				filesListInDir.add(file.getAbsolutePath());
+			} else {
+				populateFilesList(file);
+			}
+		}
+		return filesListInDir;
 	}
 
 }

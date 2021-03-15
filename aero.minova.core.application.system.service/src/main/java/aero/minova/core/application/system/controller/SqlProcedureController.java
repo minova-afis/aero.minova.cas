@@ -62,7 +62,7 @@ public class SqlProcedureController {
 				result.setReturnCode(1);
 				return result;
 			} else if ("loadPrivilege".equals(inputTable.getName())) {
-
+				// Abfrage mur für jUnit-Tests, da dabei Authentication = null
 				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 				if (authentication != null) {
 					loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());

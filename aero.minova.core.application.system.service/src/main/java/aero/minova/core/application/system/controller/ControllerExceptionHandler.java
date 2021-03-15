@@ -25,8 +25,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.ErrorMessage;
+import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
+import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.TableException;
 import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
@@ -37,6 +40,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	@Autowired
 	SystemDatabase systemDatabase;
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+
+	@ExceptionHandler(ProcedureException.class)
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+	public SqlProcedureResult procedureException(ProcedureException ex, WebRequest request) {
+		return prepareExceptionReturnSqlProcedureResult(ex);
+	}
+
+	@ExceptionHandler(TableException.class)
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+	public Table tableException(TableException ex, WebRequest request) {
+		return prepareExceptionReturnTable(ex);
+	}
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -108,10 +123,61 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return outputTable;
 	}
 
+	private SqlProcedureResult prepareExceptionReturnSqlProcedureResult(Exception ex) {
+		SqlProcedureResult result = new SqlProcedureResult();
+		Table resultSetTable = new Table();
+		resultSetTable.setName("Error");
+		resultSetTable.addColumn(new Column("International Message", DataType.STRING));
+		String errorMessage = ex.getMessage();
+
+		if (errorMessage == null) {
+			errorMessage = "msg.NoErrorMessageAvailable";
+		}
+		// falls die Message in der Form 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird' ist
+		List<String> errorMessageParts = Stream.of(errorMessage.split("%"))//
+				.map(String::trim)//
+				.collect(Collectors.toList());
+
+		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
+		// Hinzufügen der Spalten für die InputParameter der Internationalierung
+		for (int i = 1; i < errorMessageParts.size(); i++) {
+			resultSetTable.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
+		}
+
+		Row internatMsg = new Row();
+
+		// Hinzufügen der International Message und der InputParameter der Internationalierung
+		for (int i = 0; i < errorMessageParts.size(); i++) {
+			Value param = new Value(errorMessageParts.get(i), null);
+			internatMsg.addValue(param);
+		}
+
+		resultSetTable.addRow(internatMsg);
+
+		Exception sqlE = new Exception("Couldn't execute query: " + errorMessage, ex);
+		ErrorMessage error = new ErrorMessage();
+		error.setErrorMessage(sqlE);
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		String messages = sw.toString();
+		List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
+				.map(String::trim)//
+				.collect(Collectors.toList());
+		error.setTrace(trace);
+		resultSetTable.setReturnErrorMessage(error);
+		saveErrorInDatabase(ex);
+
+		result.setResultSet(resultSetTable);
+		result.setReturnCode(-1);
+		return result;
+	}
+
 	public void saveErrorInDatabase(Exception e) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username;
+		// Abfrage mur für jUnit-Tests, da dabei Authentication = null
 		if (auth != null) {
 			username = auth.getName();
 		} else {

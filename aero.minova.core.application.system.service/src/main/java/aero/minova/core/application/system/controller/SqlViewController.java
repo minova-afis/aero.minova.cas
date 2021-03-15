@@ -23,6 +23,7 @@ import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.TableException;
 import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SqlUtils;
@@ -71,12 +72,6 @@ public class SqlViewController {
 			} else {
 				limit = inputMetaData.getLimited();
 			}
-			final val countQuery = prepareViewString(inputTable, false, 1, true, authoritiesForThisTable);
-			val preparedCountStatement = connection.prepareCall(countQuery);
-			PreparedStatement callableCountStatement = fillPreparedViewString(inputTable, preparedCountStatement, countQuery, sb);
-			ResultSet viewCounter = callableCountStatement.executeQuery();
-			viewCounter.next();
-			val viewCount = viewCounter.getInt(1);
 			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
@@ -84,11 +79,15 @@ public class SqlViewController {
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
+			int viewCount = 0;
+			if (result.getRows().size() > 0) {
+				viewCount = result.getRows().get(0).getValues().size();
+			}
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
 			logger.error("Statement could not be executed: " + e.getMessage());
-			throw e;
+			throw new TableException(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

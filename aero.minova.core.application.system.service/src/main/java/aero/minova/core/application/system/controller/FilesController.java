@@ -18,10 +18,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.val;
 
 @RestController
-@DependsOn("FilesService")
 public class FilesController {
 
 	@Autowired
@@ -68,11 +64,6 @@ public class FilesController {
 		return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 	}
 
-	/*
-	 * wird zwar bei Programmstart ausgeführt, aber durch die DependsOn-Notation müsste es erst nach der setup-Methode von der FilesService Klasse aufgerufen
-	 * werden
-	 */
-	@PostConstruct
 	public void hashAll() throws IOException {
 		List<String> programFiles = files.populateFilesList(files.getProgramFilesFolder().toFile());
 		for (String path : programFiles) {
@@ -80,9 +71,9 @@ public class FilesController {
 			// wir wollen nicht noch einen Hash von einer gehashten Datei
 			if (!fileSuffix.toLowerCase().equals("md5")) {
 				byte[] hashOfFile = hashFile(Paths.get(path));
-				File hashedFile = new File(path.substring(0, path.lastIndexOf(".")) + ".md5");
+				File hashedFile = new File(path + ".md5");
 				// erzeugt auch die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
-				Files.write(Paths.get(path), hashOfFile);
+				Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 			}
 
 		}
@@ -109,6 +100,7 @@ public class FilesController {
 		if (!zipExists) {
 			zipFile = new File(dirName + ".zip");
 		}
+//		Files.write(Paths.get(path), hashOfFile);
 		zip(path.toString(), zipFile, fileList);
 		byte[] output = readAllBytes(Paths.get(zipFile.getAbsolutePath()));
 		return output;

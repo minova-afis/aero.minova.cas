@@ -82,7 +82,7 @@ public class FilesService {
 			if (file.isFile()) {
 				filesListInDir.add(file.getAbsolutePath());
 			} else {
-				populateFilesList(file);
+				filesListInDir.addAll(populateFilesList(file));
 			}
 		}
 		return filesListInDir;

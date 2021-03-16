@@ -15,14 +15,11 @@ import java.util.zip.ZipInputStream;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.val;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public class FileControllerTest {
@@ -149,7 +146,7 @@ public class FileControllerTest {
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		write(programFilesFolder.resolve("AFIS").resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
 
 		byte[] zipped = testSubject.getZip(serviceFolder.toString());
 
@@ -169,7 +166,7 @@ public class FileControllerTest {
 		out.close();
 		byte[] unzipped = out.toByteArray();
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"))).isEqualTo(unzipped);
-		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.zip"))).isNotEqualTo(new String("").getBytes(StandardCharsets.UTF_8));
+		assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip"))).isNotEqualTo(new String("").getBytes(StandardCharsets.UTF_8));
 		assertThat(unzipped).isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -188,6 +185,28 @@ public class FileControllerTest {
 		testSubject.files.setUp();
 
 		Assertions.assertThrows(IllegalAccessException.class, () -> assertThat(testSubject.getZip("../Shared Data/Program Files/AFIS/AFIS.xbs")));
+	}
+
+	@Test
+	public void testLegalZipAll() throws Exception {
+		final val rootPath = new TemporaryFolder();
+		rootPath.create();
+		final val rootFolder = rootPath.getRoot().toPath();
+		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
+		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
+		final val serviceFolder = programFilesFolder.resolve("AFIS");
+		createDirectories(serviceFolder);
+
+		final val testSubject = new FilesController();
+		testSubject.files = new FilesService(rootFolder.toString());
+		testSubject.files.setUp();
+
+		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		write(programFilesFolder.resolve("AFIS").resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+
+		testSubject.zipAll();
+
+		assertThat(Files.exists(programFilesFolder.resolve("AFIS.zip"))).isTrue();
 	}
 
 	@Test
@@ -212,7 +231,6 @@ public class FileControllerTest {
 		testSubject.hashAll();
 
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"))).isNotEqualTo(old);
-		assertThat(Files.exists(programFilesFolder.resolve("AFIS").resolve("AFIS.zip.md5"))).isTrue();
 		assertThat(Files.exists(programFilesFolder.resolve("AFIS").resolve("AFIS.zip.md5"))).isTrue();
 
 	}

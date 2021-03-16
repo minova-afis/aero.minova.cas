@@ -21,6 +21,10 @@ import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.val;
 
 @RestController
+// benötigt, damit JUnit-Tests nicht abbrechen
+@ConditionalOnProperty(prefix = "application.runner", value = "enabled", havingValue = "true", matchIfMissing = true)
 public class FilesController {
 
 	@Autowired
@@ -68,8 +74,8 @@ public class FilesController {
 	}
 
 	// je höher die Zahl bei @Order, desto später wird die Methode ausgeführt
-//	@EventListener(ApplicationReadyEvent.class)
-//	@Order(2)
+	@EventListener(ApplicationReadyEvent.class)
+	@Order(2)
 	@RequestMapping(value = "files/hashAll")
 	public void hashAll() throws IOException {
 		List<String> programFiles = files.populateFilesList(files.getSystemFolder().toFile());
@@ -93,8 +99,8 @@ public class FilesController {
 	}
 
 	// je niedriger die Zahl bei @Order, desto früher wird die Methode ausgeführt
-//	@EventListener(ApplicationReadyEvent.class)
-//	@Order(1)
+	@EventListener(ApplicationReadyEvent.class)
+	@Order(1)
 	@RequestMapping(value = "files/zipAll")
 	public void zipAll() throws Exception {
 		List<String> programFiles = files.populateFilesList(files.getSystemFolder().toFile());

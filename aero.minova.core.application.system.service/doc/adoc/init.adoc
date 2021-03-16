@@ -156,6 +156,8 @@ create user cas
 grant select on xvcasWorkingTimeIndex2 to cas
 grant select on xtcasColumnSecurity to cas
 
+grant insert on xtcasError to cas
+
 grant select on tService to cas
 grant select on tServiceObject to cas
 grant select on tServiceContract to cas

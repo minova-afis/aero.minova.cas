@@ -34,7 +34,8 @@ import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
 import lombok.val;
 
-@SpringBootTest
+//benötigt, damit JUnit-Tests nicht abbrechen
+@SpringBootTest(properties = { "application.runner.enabled=false" })
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 @WebAppConfiguration

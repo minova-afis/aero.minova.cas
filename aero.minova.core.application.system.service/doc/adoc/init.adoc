@@ -3,8 +3,18 @@
 Die SQL-Skripte zum Initialisieren und befüllen der Tabellen können in folgender Reihenfolge augeführt werden.
 
 === Tabellen
-[source::sql]
+[source,sql]
 ----
+
+create table xtcasError(
+	KeyLong INT NOT NULL IDENTITY,
+	Username VARCHAR(10) NOT NULL,
+	ErrorMessage VARCHAR(250) NOT NULL,
+	Date DATETIME NOT NULL,
+)
+
+ALTER TABLE xtcasError
+ADD CONSTRAINT PK_xtcasError_KeyLong PRIMARY KEY (KeyLong)
 
 CREATE TABLE xtcasUser (
     KeyLong INT NOT NULL IDENTITY,
@@ -68,7 +78,7 @@ ADD CONSTRAINT PK_xtcasLuUserPrivilegesUserGroup_KeyLong PRIMARY KEY (KeyLong),
 
 Hier wird die View xvcasUserPrivileges angelegt!
 
-[source::sql]
+[source,sql]
 ----
 CREATE VIEW xvcasUserPrivileges
 with encryption AS
@@ -84,7 +94,7 @@ join xtcasUserGroup UG on UG.KeyLong=UPG.UserGroupKey
 
 Nach dem Anlegen der Tabellen kann zum Test ein Admin-User erstellt werden, welcher alle Rechte uneingeschränkt zugewiesen bekommt.
 
-[source::sql]
+[source,sql]
 ----
 insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('admin','#admin')
 ----
@@ -100,7 +110,9 @@ Folgende Rechte werden benötigt, damit alle Funktionalitäten des RCP WFC genut
 ----
 insert into xtCasUserPrivilege (KeyText) VALUES ('tEmployee')
 insert into xtCasUserPrivilege (KeyText) VALUES ('tService')
-insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeOrderReceiverList')
+insert into xtCasUserPrivilege (KeyText) VALUES ('tServiceObject')
+insert into xtCasUserPrivilege (KeyText) VALUES ('tOrderReceiver')
+insert into xtCasUserPrivilege (KeyText) VALUES ('tServiceContract')
 insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeOrderReceiverList')
 insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeOrderReceiverResolve')
 insert into xtCasUserPrivilege (KeyText) VALUES ('xpcasWorkingTimeServiceContractList')
@@ -143,6 +155,11 @@ create user cas
 
 grant select on xvcasWorkingTimeIndex2 to cas
 grant select on xtcasColumnSecurity to cas
+
+grant select on tService to cas
+grant select on tServiceObject to cas
+grant select on tServiceContract to cas
+grant select on tOrderReceiver to cas
 
 grant execute on xpcasWorkingTimeOrderReceiverList to cas
 grant execute on xpcasWorkingTimeOrderReceiverResolve to cas

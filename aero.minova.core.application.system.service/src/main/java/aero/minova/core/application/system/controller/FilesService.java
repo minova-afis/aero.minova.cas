@@ -61,10 +61,6 @@ public class FilesService {
 		return programFilesFolder.resolve(application);
 	}
 
-	public Path getProgramFilesFolder() {
-		return programFilesFolder;
-	}
-
 	public Path getSystemFolder() {
 		return systemFolder;
 	}
@@ -79,9 +75,8 @@ public class FilesService {
 		List<String> filesListInDir = new ArrayList<String>();
 		File[] files = dir.listFiles();
 		for (File file : files) {
-			if (file.isFile()) {
-				filesListInDir.add(file.getAbsolutePath());
-			} else {
+			filesListInDir.add(file.getAbsolutePath());
+			if (file.isDirectory()) {
 				filesListInDir.addAll(populateFilesList(file));
 			}
 		}

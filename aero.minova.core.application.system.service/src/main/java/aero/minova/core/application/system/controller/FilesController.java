@@ -86,7 +86,7 @@ public class FilesController {
 				String filePrefix = path.substring(0, path.lastIndexOf("."));
 				fileSuffix = path.substring(filePrefix.lastIndexOf(".") + 1, path.length());
 			}
-			// wir wollen nicht noch einen Hash von einer gehashten Datei und auch keinen Hash von einem Directory
+			// wir wollen nicht noch einen Hash von einer gehashten Datei und auch keinen Hash von einem Directory ( zips allerdings schon)
 			if ((!fileSuffix.toLowerCase().contains("md5")) && (!new File(path).isDirectory())) {
 				byte[] hashOfFile = hashFile(Paths.get(path));
 				File hashedFile = new File(path + ".md5");
@@ -111,7 +111,7 @@ public class FilesController {
 				String filePrefix = path.substring(0, path.lastIndexOf("."));
 				fileSuffix = path.substring(filePrefix.lastIndexOf(".") + 1, path.length());
 			}
-			// wir wollen nicht noch einen zip von einer zip Datei
+			// wir wollen nicht noch einen zip von einer zip Datei, wir wollen allerdings hier NUR Directories haben
 			if ((!fileSuffix.toLowerCase().contains("zip")) && (new File(path)).isDirectory()) {
 				byte[] zipDataOfFile = getZip(path);
 				File zippedFile = new File(path + ".zip");
@@ -132,7 +132,10 @@ public class FilesController {
 		File zipFile = new File(path + ".zip");
 		// erzeugt Datei, falls sie noch nicht existiert, macht ansonsten nichts
 		zipFile.createNewFile();
-		zip(path.toString(), zipFile, fileList);
+
+		// dadurch bekommt man beim entpacken auch den Ordner, in dem der Inhalt ist, und nicht nur den Inhalt
+		String sourcePath = path.substring(0, path.lastIndexOf(File.separator));
+		zip(sourcePath, zipFile, fileList);
 		return readAllBytes(Paths.get(zipFile.getAbsolutePath()));
 	}
 
@@ -144,7 +147,8 @@ public class FilesController {
 			ZipOutputStream zos = new ZipOutputStream(fos);
 			for (String filePath : fileList) {
 
-				if (new File(filePath).isFile()) {
+				// noch mehr zipps in einer zip sind sinnlos
+				if (new File(filePath).isFile() && (!filePath.contains("zip"))) {
 					ze = new ZipEntry(filePath.substring(source.length() + 1, filePath.length()));
 					if (!ze.getName().equals(zipFile.getName())) {
 						zos.putNextEntry(ze);

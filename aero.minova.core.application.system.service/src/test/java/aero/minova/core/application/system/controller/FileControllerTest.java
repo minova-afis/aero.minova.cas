@@ -202,7 +202,7 @@ public class FileControllerTest {
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		write(programFilesFolder.resolve("AFIS").resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
 
 		testSubject.zipAll();
 
@@ -224,14 +224,14 @@ public class FileControllerTest {
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		write(programFilesFolder.resolve("AFIS").resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"), new String("").getBytes(StandardCharsets.UTF_8));
 		byte[] old = readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"));
 
 		testSubject.hashAll();
 
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"))).isNotEqualTo(old);
-		assertThat(Files.exists(programFilesFolder.resolve("AFIS").resolve("AFIS.zip.md5"))).isTrue();
+		assertThat(Files.exists(programFilesFolder.resolve("AFIS.zip.md5"))).isTrue();
 
 	}
 

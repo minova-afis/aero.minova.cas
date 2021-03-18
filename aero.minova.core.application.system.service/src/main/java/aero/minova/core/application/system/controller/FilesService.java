@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lombok.val;
+
 @Service
 public class FilesService {
 
@@ -71,16 +73,24 @@ public class FilesService {
 	 * @param dir
 	 * @throws IOException
 	 */
-	public List<String> populateFilesList(File dir) throws IOException {
-		List<String> filesListInDir = new ArrayList<String>();
-		File[] files = dir.listFiles();
+	public List<Path> populateFilesList(Path dir) throws IOException {
+		List<Path> filesListInDir = new ArrayList<>();
+		File[] files = dir.toFile().listFiles();
 		for (File file : files) {
-			filesListInDir.add(file.getAbsolutePath());
+			filesListInDir.add(Paths.get(file.getAbsolutePath()));
 			if (file.isDirectory()) {
-				filesListInDir.addAll(populateFilesList(file));
+				filesListInDir.addAll(populateFilesList(file.toPath()));
 			}
 		}
 		return filesListInDir;
+	}
+
+	public Path checkLegalPath(String path) throws IllegalAccessException {
+		val inputPath = systemFolder.resolve(path).toAbsolutePath().normalize();
+		if (!inputPath.startsWith(systemFolder)) {
+			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
+		}
+		return inputPath;
 	}
 
 }

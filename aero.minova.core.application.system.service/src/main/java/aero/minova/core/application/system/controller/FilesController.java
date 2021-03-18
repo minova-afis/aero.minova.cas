@@ -40,23 +40,17 @@ public class FilesController {
 
 	@Autowired
 	FilesService files;
-	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	static Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
-		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
-		if (!inputPath.startsWith(files.getSystemFolder())) {
-			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
-		}
+		val inputPath = files.checkLegalPath(path);
 		return readAllBytes(inputPath);
 	}
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
-		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
-		if (!inputPath.startsWith(files.getSystemFolder())) {
-			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
-		}
+		val inputPath = files.checkLegalPath(path);
 		return hashFile(inputPath);
 	}
 
@@ -78,17 +72,17 @@ public class FilesController {
 	@Order(2)
 	@RequestMapping(value = "files/hashAll")
 	public void hashAll() throws IOException {
-		List<String> programFiles = files.populateFilesList(files.getSystemFolder().toFile());
-		for (String path : programFiles) {
-			String fileSuffix = path.substring(path.lastIndexOf(".") + 1, path.length());
+		List<Path> programFiles = files.populateFilesList(files.getSystemFolder());
+		for (Path path : programFiles) {
+			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
 			// bevor die Dateien gehashed werden, werden sie gezipped (siehe @Order)
 			if (fileSuffix.toLowerCase().equals("zip")) {
-				String filePrefix = path.substring(0, path.lastIndexOf("."));
-				fileSuffix = path.substring(filePrefix.lastIndexOf(".") + 1, path.length());
+				String filePrefix = path.toString().substring(0, path.toString().lastIndexOf("."));
+				fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1, path.toString().length());
 			}
 			// wir wollen nicht noch einen Hash von einer gehashten Datei und auch keinen Hash von einem Directory ( zips allerdings schon)
-			if ((!fileSuffix.toLowerCase().contains("md5")) && (!new File(path).isDirectory())) {
-				byte[] hashOfFile = hashFile(Paths.get(path));
+			if ((!fileSuffix.toLowerCase().contains("md5")) && (!path.toFile().isDirectory())) {
+				byte[] hashOfFile = hashFile(path);
 				File hashedFile = new File(path + ".md5");
 				// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
 				logger.info("Hashing: " + hashedFile.getAbsolutePath());
@@ -103,16 +97,16 @@ public class FilesController {
 	@Order(1)
 	@RequestMapping(value = "files/zipAll")
 	public void zipAll() throws Exception {
-		List<String> programFiles = files.populateFilesList(files.getSystemFolder().toFile());
-		for (String path : programFiles) {
-			String fileSuffix = path.substring(path.lastIndexOf(".") + 1, path.length());
+		List<Path> programFiles = files.populateFilesList(files.getSystemFolder());
+		for (Path path : programFiles) {
+			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
 			// es kann sein, dass von einem vorherigen Start bereits gezippte Dateien vorhanden sind, welche schon gehashed wurden
 			if (fileSuffix.toLowerCase().equals("md5")) {
-				String filePrefix = path.substring(0, path.lastIndexOf("."));
-				fileSuffix = path.substring(filePrefix.lastIndexOf(".") + 1, path.length());
+				String filePrefix = path.toString().substring(0, path.toString().lastIndexOf("."));
+				fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1, path.toString().length());
 			}
 			// wir wollen nicht noch einen zip von einer zip Datei, wir wollen allerdings hier NUR Directories haben
-			if ((!fileSuffix.toLowerCase().contains("zip")) && (new File(path)).isDirectory()) {
+			if ((!fileSuffix.toLowerCase().contains("zip")) && (path.toFile().isDirectory())) {
 				byte[] zipDataOfFile = getZip(path);
 				File zippedFile = new File(path + ".zip");
 				logger.info("Zipping: " + zippedFile.getAbsolutePath());
@@ -123,39 +117,36 @@ public class FilesController {
 	}
 
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
-		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
-		if (!inputPath.startsWith(files.getSystemFolder())) {
-			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
-		}
-		List<String> fileList = files.populateFilesList(new File(path));
+	public @ResponseBody byte[] getZip(@RequestParam Path path) throws Exception {
+		val inputPath = files.checkLegalPath(path.toString());
+		List<Path> fileList = files.populateFilesList(path);
 		File zipFile = new File(path + ".zip");
 		// erzeugt Datei, falls sie noch nicht existiert, macht ansonsten nichts
 		zipFile.createNewFile();
 
 		// dadurch bekommt man beim entpacken auch den Ordner, in dem der Inhalt ist, und nicht nur den Inhalt
-		String sourcePath = path.substring(0, path.lastIndexOf(File.separator));
+		String sourcePath = path.toString().substring(0, path.toString().lastIndexOf(File.separator));
 		zip(sourcePath, zipFile, fileList);
 		return readAllBytes(Paths.get(zipFile.getAbsolutePath()));
 	}
 
-	public void zip(String source, File zipFile, List<String> fileList) throws RuntimeException {
+	public void zip(String source, File zipFile, List<Path> fileList) throws RuntimeException {
 		ZipEntry ze = null;
 		try {
-			// jede Datei wird einzeln zu dem ZIP hinzugefügt
+			// Jede Datei wird einzeln zu dem ZIP hinzugefügt.
 			FileOutputStream fos = new FileOutputStream(zipFile);
 			ZipOutputStream zos = new ZipOutputStream(fos);
-			for (String filePath : fileList) {
+			for (Path filePath : fileList) {
 
 				// noch mehr zipps in einer zip sind sinnlos
-				if (new File(filePath).isFile() && (!filePath.contains("zip"))) {
-					ze = new ZipEntry(filePath.substring(source.length() + 1, filePath.length()));
+				if (filePath.toFile().isFile() && (!filePath.toString().contains("zip"))) {
+					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()));
 					if (!ze.getName().equals(zipFile.getName())) {
 						zos.putNextEntry(ze);
 					}
 
-					// jeder Eintrag wird nacheinander in die ZIP Datei geschrieben mithilfe eines Buffers
-					FileInputStream fis = new FileInputStream(filePath);
+					// Jeder Eintrag wird nacheinander in die ZIP Datei geschrieben mithilfe eines Buffers.
+					FileInputStream fis = new FileInputStream(filePath.toFile());
 					int len;
 					byte[] buffer = new byte[1024];
 					BufferedInputStream entryStream = new BufferedInputStream(fis, 2048);

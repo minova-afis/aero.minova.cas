@@ -12,8 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -141,9 +143,12 @@ public class FilesController {
 				// noch mehr zipps in einer zip sind sinnlos
 				if (filePath.toFile().isFile() && (!filePath.toString().contains("zip"))) {
 					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()));
-					if (!ze.getName().equals(zipFile.getName())) {
-						zos.putNextEntry(ze);
-					}
+
+					// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,
+					// wenn die Zip erstellt wird.
+					ze.setCreationTime(FileTime.from(Instant.EPOCH));
+					ze.setTime(0);
+					zos.putNextEntry(ze);
 
 					// Jeder Eintrag wird nacheinander in die ZIP Datei geschrieben mithilfe eines Buffers.
 					FileInputStream fis = new FileInputStream(filePath.toFile());

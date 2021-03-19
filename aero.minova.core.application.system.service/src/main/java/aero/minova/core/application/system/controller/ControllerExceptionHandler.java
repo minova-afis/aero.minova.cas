@@ -81,7 +81,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		Table outputTable = new Table();
 		outputTable.setName("Error");
 		outputTable.addColumn(new Column("International Message", DataType.STRING));
-		String errorMessage = ex.getMessage();
+		String errorMessage = ex.getCause().getMessage();
 
 		if (errorMessage == null) {
 			errorMessage = "msg.NoErrorMessageAvailable";
@@ -128,7 +128,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		Table resultSetTable = new Table();
 		resultSetTable.setName("Error");
 		resultSetTable.addColumn(new Column("International Message", DataType.STRING));
-		String errorMessage = ex.getMessage();
+		String errorMessage = ex.getCause().getMessage();
 
 		if (errorMessage == null) {
 			errorMessage = "msg.NoErrorMessageAvailable";

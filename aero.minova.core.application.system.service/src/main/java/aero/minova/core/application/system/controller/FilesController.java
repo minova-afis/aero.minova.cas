@@ -2,9 +2,11 @@ package aero.minova.core.application.system.controller;
 
 import static java.nio.file.Files.readAllBytes;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.val;
-
 @RestController
 public class FilesController {
 
@@ -26,7 +26,11 @@ public class FilesController {
 
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
-		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
+		Path inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
+		File f = inputPath.toFile();
+		if (!f.exists()) {
+			throw new NoSuchFileException("msg.FileError %" + path);
+		}
 		if (!inputPath.startsWith(files.getSystemFolder())) {
 			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
 		}
@@ -35,7 +39,11 @@ public class FilesController {
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
-		val inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
+		Path inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
+		File f = inputPath.toFile();
+		if (!f.exists()) {
+			throw new NoSuchFileException("msg.FileError %" + path);
+		}
 		if (!inputPath.startsWith(files.getSystemFolder())) {
 			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
 		}
@@ -50,7 +58,6 @@ public class FilesController {
 			throw new RuntimeException("msg.MD5Error");
 		}
 		md.update(readAllBytes(p));
-
 		String fx = "%0" + (md.getDigestLength() * 2) + "x";
 		return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 	}

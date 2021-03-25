@@ -2,6 +2,7 @@ package aero.minova.core.application.system.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.NoSuchFileException;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -53,6 +54,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return prepareExceptionReturnTable(ex);
 	}
 
+	@ExceptionHandler(NoSuchFileException.class)
+	@ResponseStatus(value = HttpStatus.NOT_FOUND)
+	public Table noSuchFileException(NoSuchFileException ex, WebRequest request) {
+		return prepareExceptionReturnTable(ex);
+	}
+
+	@ExceptionHandler(IllegalAccessException.class)
+	@ResponseStatus(value = HttpStatus.NOT_FOUND)
+	public Table illegalAccessException(IllegalAccessException ex, WebRequest request) {
+		return prepareExceptionReturnTable(ex);
+	}
+
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public Table illegalArgumentException(IllegalArgumentException ex, WebRequest request) {
@@ -81,7 +94,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		Table outputTable = new Table();
 		outputTable.setName("Error");
 		outputTable.addColumn(new Column("International Message", DataType.STRING));
-		String errorMessage = ex.getCause().getMessage();
+		String errorMessage = null;
+		try {
+			errorMessage = ex.getCause().getMessage();
+		} catch (Exception e) {
+			errorMessage = ex.getMessage();
+		}
 
 		if (errorMessage == null) {
 			errorMessage = "msg.NoErrorMessageAvailable";
@@ -107,7 +125,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 		outputTable.addRow(internatMsg);
 
-		Exception sqlE = new Exception("Couldn't execute query: " + errorMessage, ex);
+		Exception sqlE = new Exception(errorMessage, ex);
 		ErrorMessage error = new ErrorMessage();
 		error.setErrorMessage(sqlE);
 		StringWriter sw = new StringWriter();
@@ -154,7 +172,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 		resultSetTable.addRow(internatMsg);
 
-		Exception sqlE = new Exception("Couldn't execute query: " + errorMessage, ex);
+		Exception sqlE = new Exception(errorMessage, ex);
 		ErrorMessage error = new ErrorMessage();
 		error.setErrorMessage(sqlE);
 		StringWriter sw = new StringWriter();

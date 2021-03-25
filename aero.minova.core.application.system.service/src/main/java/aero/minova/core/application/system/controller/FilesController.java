@@ -28,11 +28,11 @@ public class FilesController {
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		Path inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		File f = inputPath.toFile();
-		if (!f.exists()) {
-			throw new NoSuchFileException("msg.FileError %" + path);
-		}
 		if (!inputPath.startsWith(files.getSystemFolder())) {
 			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
+		}
+		if (!f.exists()) {
+			throw new NoSuchFileException("msg.FileError %" + path);
 		}
 		return readAllBytes(inputPath);
 	}
@@ -41,11 +41,11 @@ public class FilesController {
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		Path inputPath = files.getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		File f = inputPath.toFile();
-		if (!f.exists()) {
-			throw new NoSuchFileException("msg.FileError %" + path);
-		}
 		if (!inputPath.startsWith(files.getSystemFolder())) {
 			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
+		}
+		if (!f.exists()) {
+			throw new NoSuchFileException("msg.FileError %" + path);
 		}
 		return hashFile(inputPath);
 	}

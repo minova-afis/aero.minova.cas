@@ -1,4 +1,4 @@
-package aero.minova.core.application.system.controller;
+package aero.minova.core.application.system;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.ErrorMessage;

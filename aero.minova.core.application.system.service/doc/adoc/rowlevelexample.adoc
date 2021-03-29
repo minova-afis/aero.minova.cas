@@ -73,6 +73,6 @@ IMPORTANT: Beim letzten Schritt ist es sehr wichtig,
  
 IMPORTANT: Von nun an müssen auch die Speicherprozeduren darauf achten, 
 dass der UserSecurityToken des Benutzers  aus der xtcasUser-Tabelle immer in der SecurityToken-Spalte von tJournal mitgespeichert wird.
-Wirrd der Eintrag ohne SecurityToken gespeichert,
+Wird der Eintrag ohne SecurityToken gespeichert,
 erhält dieser den Default-Wert *null* und jeder andere Benutzer hätte Zugriff auf diesen Eintrag.
 

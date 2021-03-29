@@ -232,10 +232,12 @@ public class FileControllerTest {
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		int hexOld = readAllBytes(programFilesFolder.resolve("AFIS.zip")).hashCode();
 
 		testSubject.zipAll();
 
 		assertThat(Files.exists(programFilesFolder.resolve("AFIS.zip"))).isTrue();
+		assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip")).hashCode()).isNotEqualTo(hexOld);
 	}
 
 	@Test

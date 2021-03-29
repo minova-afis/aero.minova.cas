@@ -105,7 +105,7 @@ Es reicht vollkommen diesen nur in der xtcasUserGroup anzulegen.
 
 Folgende Rechte werden benötigt, damit alle Funktionalitäten des RCP WFC genutzt werden können.
 
-[source::sql]
+[source,sql]
 
 ----
 insert into xtCasUserPrivilege (KeyText) VALUES ('tEmployee')
@@ -147,7 +147,7 @@ where x.KeyLong is null
 IMPORTANT: Falls zu Beginn ein neuer Datenbank-User angelegt wurde,
 darf der 'grant select' nicht fehlen.
 
-[source::sql]
+[source,sql]
 ----
 create user cas
 

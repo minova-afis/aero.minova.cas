@@ -1,0 +1,78 @@
+== Aktivieren der RowLevelSecurity
+
+Um die RowLevelSecurity für die Stundenerfassung aktivieren zu können,
+benötigt die Tabelle tJournal auch eine RowLevelSecurity-Spalte.
+
+[source,sql]
+----
+ALTER TABLE tJournal
+ADD SecurityToken VARCHAR (50) DEFAULT NULL;
+----
+
+Außerdem muss diese auch in der xvcasWorkingTimeIndex2 mit eingeschlossen werden.
+
+[source, sql]
+----
+alter view dbo.xvcasWorkingTimeIndex2 as
+select
+j.KeyLong,
+e.KeyText as EmployeeText,
+[...]
+j.SecurityToken
+from tJournal j
+inner join tService s on j.ServiceKey = s.KeyLong
+inner join tUnit u on u.KeyLong = s.UnitKey and u.UnitTypeKey = 4
+inner join tOrderReceiver o on j.OrderReceiverKey = o.KeyLong
+inner join tServiceObject so on j.ServiceObjectKey = so.KeyLong
+left join tEmployee e on j.EmployeeKey = e.KeyLong
+left join tInvoice i on j.InvoiceKey = i.KeyLong
+left join tServiceContract sc on j.ServiceContractKey = sc.KeyLong
+where j.LastAction > 0
+and j.BookingDate > getdate() - 35
+----
+
+Beim Anlegen der User in der Datenbank müssen die Memberships der Gruppen zugewiesen werden.
+
+.Hier zum Beispiel die Mitarbeiter mit dem Login-Namen 'chef', 'gruppenleiter1' und 'mitarbeiter1'.
+[source, sql]
+----
+Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('ldapname','tEmployee.ShortDescription','Gruppen')
+
+Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('chef', '#chef','#management')
+Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('gruppenleiter1', '#leiter1','#gruppe1')
+Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('mitarbeiter1', '#mitarbeiter1','#mitarbeiter1')
+
+Insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('management','')
+Insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('gruppe1','#mitarbeiter1#mitarbeiter2#mitarbeiter3[...]')
+Insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('mitarbeiter1','#mitarbeiter1')
+----
+
+'chef' soll alle Einträge seiner Mitarbeiter sehen können und benötigt deshalb seine eigene Gruppe 'management'.
+Diese besitzt zwar keine SecurityToken, diese benötigt die Gruppe allerdings auch nicht. Warum wird im nächsten Schritt klar.
+
+'gruppenleiter1' soll nur die Einträge seiner Mitarbeiter sehen können, 
+deshalb besitzt 'gruppe1' die verschiedenen SecurityTokens der Mitarbeiter der Gruppe des 'gruppenleiter1'.
+
+Zuletzt soll 'mitarbeiter1' nur seine eigenen Einträge sehen können. Auch er erhält seine eigene Gruppe. 
+
+[source,sql]
+----
+
+Insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey, RowLevelSecurity) VALUES (Key von xvcasWorkingTimeIndex2, GroupKey von management, 0)
+
+Insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey, RowLevelSecurity) VALUES (Key von xvcasWorkingTimeIndex2, GroupKey von gruppe, 1)
+
+Insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey, RowLevelSecurity) VALUES (Key von xvcasWorkingTimeIndex2, GroupKey von mitarbeiter1, 1)
+----
+
+IMPORTANT: Beim letzten Schritt ist es sehr wichtig,
+ dass der Wert bei RowLevelSecurity auf 1 gesetzt wird,
+ da dies die Spaltenüberprüfung überhaupt erst aktiviert.
+ Deshalb hat die Gruppe 'management' RowLevelSecurity = 0, 
+ denn somit wird nicht nach SecurityTokens gefiltert und 'chef' darf alle Spalten seiner Mitarbeiter sehen.
+ 
+IMPORTANT: Von nun an müssen auch die Speicherprozeduren darauf achten, 
+dass der UserSecurityToken des Benutzers  aus der xtcasUser-Tabelle immer in der SecurityToken-Spalte von tJournal mitgespeichert wird.
+Wirrd der Eintrag ohne SecurityToken gespeichert,
+erhält dieser den Default-Wert *null* und jeder andere Benutzer hätte Zugriff auf diesen Eintrag.
+

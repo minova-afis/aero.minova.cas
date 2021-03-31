@@ -187,11 +187,7 @@ public class SqlProcedureController {
 						}
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
-//			try {
 			preparedStatement.execute();
-//			} catch (Exception e) {
-//				throw new RuntimeException("msg.SqlServerError", e);
-//			}
 			if (null != preparedStatement.getResultSet()) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();

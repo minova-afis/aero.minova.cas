@@ -13,7 +13,8 @@ import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.Table;
 import lombok.val;
 
-@SpringBootTest
+//benötigt, damit JUnit-Tests nicht abbrechen
+@SpringBootTest(properties = { "application.runner.enabled=false" })
 public class SqlProcedureControllerTest {
 	@Autowired
 	SqlProcedureController testSubject;

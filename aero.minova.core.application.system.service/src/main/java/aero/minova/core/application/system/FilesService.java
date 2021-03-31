@@ -4,6 +4,7 @@ import static java.nio.file.Files.isDirectory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import lombok.val;
 
 @Service
 public class FilesService {
@@ -85,10 +84,14 @@ public class FilesService {
 		return filesListInDir;
 	}
 
-	public Path checkLegalPath(String path) throws IllegalAccessException {
-		val inputPath = systemFolder.resolve(path).toAbsolutePath().normalize();
-		if (!inputPath.startsWith(systemFolder)) {
+	public Path checkLegalPath(String path) throws Exception {
+		Path inputPath = getSystemFolder().resolve(path).toAbsolutePath().normalize();
+		File f = inputPath.toFile();
+		if (!inputPath.startsWith(getSystemFolder())) {
 			throw new IllegalAccessException("msg.PathError %" + path + " %" + inputPath);
+		}
+		if (!f.exists()) {
+			throw new NoSuchFileException("msg.FileError %" + path);
 		}
 		return inputPath;
 	}

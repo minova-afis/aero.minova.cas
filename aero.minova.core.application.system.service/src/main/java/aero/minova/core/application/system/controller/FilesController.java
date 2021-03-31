@@ -65,7 +65,6 @@ public class FilesController {
 			throw new RuntimeException("msg.MD5Error");
 		}
 		md.update(readAllBytes(p));
-
 		String fx = "%0" + (md.getDigestLength() * 2) + "x";
 		return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 	}

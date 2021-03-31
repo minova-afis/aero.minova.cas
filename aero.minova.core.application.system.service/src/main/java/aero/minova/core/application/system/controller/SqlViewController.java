@@ -81,7 +81,7 @@ public class SqlViewController {
 			result = convertSqlResultToTable(inputTable, resultSet);
 			int viewCount = 0;
 			if (result.getRows().size() > 0) {
-				viewCount = result.getRows().get(0).getValues().size();
+				viewCount = result.getRows().size();
 			}
 			result.fillMetaData(result, limit, viewCount, page);
 

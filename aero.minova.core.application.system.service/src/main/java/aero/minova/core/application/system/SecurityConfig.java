@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,7 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.sql.SystemDatabase;
 
 @EnableWebSecurity
 @Configuration
@@ -32,6 +34,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
 	private String ldapServerAddress;
+
+	@Autowired
+	SystemDatabase systemDatabase;
+
+	@Autowired
+	DriverManagerDataSource dataSource;
 
 	@Autowired
 	SqlProcedureController spc;
@@ -62,6 +70,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
 			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
 			auth.authenticationProvider(acldap);
+		} else if (dataSource != null) {
+			auth.jdbcAuthentication()//
+					.dataSource(dataSource)//
+					.usersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?")//
+					.authoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
 		} else {
 			auth.inMemoryAuthentication()//
 					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");

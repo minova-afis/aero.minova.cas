@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +26,10 @@ public class SystemDatabase {
 	String userName;
 	@Value("${aero_minova_database_user_password:password}")
 	String userPassword;
+
+	@Value("${custom_useDataSource:false}")
+	boolean useDataSource;
+
 	private LinkedList<Connection> freeConnections = new LinkedList<>();
 
 	public synchronized Connection getConnection() {
@@ -65,9 +68,12 @@ public class SystemDatabase {
 		}
 	}
 
-	@Bean
+	public boolean isUseDataSource() {
+		return useDataSource;
+	}
+
 	public DataSource getDataSource() throws SQLException {
-		if (connectionString == null || connectionString.equals("")) {
+		if (!useDataSource) {
 			return null;
 		}
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();

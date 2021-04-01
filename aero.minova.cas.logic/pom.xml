@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>aero.minova</groupId>
 	<artifactId>aero.minova.cas.logic</artifactId>
 	<version>12.0.0-SNAPSHOT</version>
 	<parent>
 		<groupId>ch.minova</groupId>
-		<artifactId>ch.minova.parent</artifactId>
-		<version>10.9.1</version>
-		<relativePath />
+		<artifactId>ch.minova.parent.git</artifactId>
+		<version>11.0.1</version>
+		<relativePath/>
 	</parent>
 	<scm>
-		<developerConnection>scm:svn:http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic/trunk</developerConnection>
+		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
+		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</developerConnection>
+		<tag>HEAD</tag>
 	</scm>
 	<dependencies>
 		<dependency>
@@ -23,7 +25,7 @@
 		<dependency>
 			<groupId>ch.minova</groupId>
 			<artifactId>ch.minova.images</artifactId>
-			<version>10.45.1</version>
+			<version>11.48.0</version>
 		</dependency>
 	</dependencies>
 </project>

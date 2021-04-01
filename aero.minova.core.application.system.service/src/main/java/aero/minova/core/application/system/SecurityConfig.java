@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +16,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
@@ -39,9 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	SystemDatabase systemDatabase;
 
 	@Autowired
-	DriverManagerDataSource dataSource;
-
-	@Autowired
 	SqlProcedureController spc;
 
 	@Override
@@ -56,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
-		http.requiresChannel().anyRequest().requiresSecure();
+//		http.requiresChannel().anyRequest().requiresSecure();
 	}
 
 	@Bean
@@ -66,13 +61,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
-			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
-			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
-			auth.authenticationProvider(acldap);
-		} else if (dataSource != null) {
+//		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
+//			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
+//			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
+//			auth.authenticationProvider(acldap);
+//		} else 
+		if (systemDatabase.isUseDataSource()) {
 			auth.jdbcAuthentication()//
-					.dataSource(dataSource)//
+					.dataSource(systemDatabase.getDataSource())//
 					.usersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?")//
 					.authoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
 		} else {

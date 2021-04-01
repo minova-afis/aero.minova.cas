@@ -6,7 +6,11 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -59,5 +63,18 @@ public class SystemDatabase {
 		} else {
 			throw new IllegalArgumentException("msg.FreeConnection %" + connection);
 		}
+	}
+
+	@Bean
+	public DataSource getDataSource() throws SQLException {
+		if (connectionString == null || connectionString.equals("")) {
+			return null;
+		}
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		dataSource.setUrl(connectionString);
+		dataSource.setUsername(userName);
+		dataSource.setPassword(userPassword);
+		return dataSource;
 	}
 }

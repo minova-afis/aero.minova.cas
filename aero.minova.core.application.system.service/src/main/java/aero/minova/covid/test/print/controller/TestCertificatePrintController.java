@@ -1,4 +1,4 @@
-package aero.minova.covid.test.print;
+package aero.minova.covid.test.print.controller;
 
 import java.net.Socket;
 import java.nio.file.Files;

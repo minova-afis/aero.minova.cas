@@ -1,4 +1,4 @@
-package aero.minova.covid.test.print;
+package aero.minova.covid.test.print.domain;
 
 import java.time.LocalDate;
 

@@ -1,4 +1,4 @@
-package aero.minova.covid.test.print;
+package aero.minova.covid.test.print.controller;
 
 import static java.util.Arrays.asList;
 
@@ -9,6 +9,9 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import aero.minova.covid.test.print.domain.TimeLocation;
+import aero.minova.covid.test.print.domain.Timeslot;
 
 @RestController
 public class MeetingController {

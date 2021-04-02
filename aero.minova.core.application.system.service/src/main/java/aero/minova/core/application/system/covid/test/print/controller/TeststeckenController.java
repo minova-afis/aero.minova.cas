@@ -1,4 +1,4 @@
-package aero.minova.covid.test.print.controller;
+package aero.minova.core.application.system.covid.test.print.controller;
 
 import java.util.Arrays;
 import java.util.List;

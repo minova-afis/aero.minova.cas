@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.covid.test.print.domain.DateRequest;
 import aero.minova.covid.test.print.domain.TimeLocation;
 import aero.minova.covid.test.print.domain.Timeslot;
 
@@ -30,7 +31,7 @@ public class MeetingController {
 	}
 
 	@GetMapping(value = "meeting/date/available", produces = "application/json")
-	public List<LocalDate> getAvailableTimeslot(@RequestBody LocalDate startDate, LocalDate endDate) throws Exception {
+	public List<LocalDate> getAvailableTimeslot(@RequestBody DateRequest testStreckenKeyText) throws Exception {
 		return asList(LocalDate.of(2021, 4, 1));
 	}
 }

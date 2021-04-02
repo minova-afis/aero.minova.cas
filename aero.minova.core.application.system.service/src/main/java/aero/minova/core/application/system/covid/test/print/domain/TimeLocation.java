@@ -1,15 +1,15 @@
-package aero.minova.covid.test.print.domain;
+package aero.minova.core.application.system.covid.test.print.domain;
 
-import javax.persistence.Entity;
+import java.time.LocalDate;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-public class DateRequest {
+public class TimeLocation {
 	private String testStreckKeyText;
+	private LocalDate date;
 }

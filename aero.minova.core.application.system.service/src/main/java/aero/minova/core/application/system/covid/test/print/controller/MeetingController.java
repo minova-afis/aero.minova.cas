@@ -1,25 +1,48 @@
-package aero.minova.covid.test.print.controller;
+package aero.minova.core.application.system.covid.test.print.controller;
 
 import static java.util.Arrays.asList;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.covid.test.print.domain.DateRequest;
-import aero.minova.covid.test.print.domain.TimeLocation;
-import aero.minova.covid.test.print.domain.Timeslot;
+import aero.minova.core.application.system.controller.SqlViewController;
+import aero.minova.core.application.system.covid.test.print.domain.DateRequest;
+import aero.minova.core.application.system.covid.test.print.domain.TimeLocation;
+import aero.minova.core.application.system.covid.test.print.domain.Timeslot;
+import aero.minova.core.application.system.sql.SystemDatabase;
+import lombok.val;
 
 @CrossOrigin
 @RestController
 public class MeetingController {
+
+	@Autowired
+	SqlViewController sqlViewController;
+	@Autowired
+	SystemDatabase systemDatabase;
+	Logger logger = LoggerFactory.getLogger(MeetingController.class);
+
 	@PostMapping(value = "meeting/time/available", produces = "application/json")
 	public List<Timeslot> getAvailableTimeslot(@RequestBody TimeLocation timeLocation) throws Exception {
+		val connection = systemDatabase.getConnection();
+		val viewQuery = sqlViewController.pagingWithSeek(null, false, -1, false, -1, Arrays.asList());
+		// val preparedStatement = connection.prepareCall(viewQuery);
+		// val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+		// logger.info("Executing statements: " + sb.toString());
+		// ResultSet resultSet = preparedViewStatement.executeQuery();
+
+		// result = convertSqlResultToTable(inputTable, resultSet);
+
 		return asList(new Timeslot(LocalDateTime.of(2021, 4, 1, 9, 0), LocalDateTime.of(2021, 4, 1, 9, 30)), //
 				new Timeslot(LocalDateTime.of(2021, 4, 1, 9, 30), LocalDateTime.of(2021, 4, 1, 10, 0)), //
 				new Timeslot(LocalDateTime.of(2021, 4, 1, 10, 0), LocalDateTime.of(2021, 4, 1, 10, 30)), //

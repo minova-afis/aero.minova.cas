@@ -2,6 +2,7 @@ package aero.minova.covid.test.print;
 
 import static java.util.Arrays.asList;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,5 +24,10 @@ public class MeetingController {
 				new Timeslot(LocalDateTime.of(2021, 4, 1, 12, 30), LocalDateTime.of(2021, 4, 1, 13, 0)), //
 				new Timeslot(LocalDateTime.of(2021, 4, 1, 12, 0), LocalDateTime.of(2021, 4, 1, 13, 30))//
 		);
+	}
+
+	@GetMapping(value = "meeting/date/available", produces = "application/json")
+	public List<LocalDate> getAvailableTimeslot(@RequestBody LocalDate startDate, LocalDate endDate) throws Exception {
+		return asList(LocalDate.of(2021, 4, 1));
 	}
 }

@@ -67,18 +67,18 @@ public class SqlProcedureController {
 				if (authentication != null) {
 					loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
 				} else {
-					throw new RuntimeException("No User found, please login");
+					throw new ProcedureException("No User found, please login");
 				}
 			}
 
 			// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
 			List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
-				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
+				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
 			return calculateSqlProcedureResult(inputTable);
 		} catch (Exception e) {
-			logger.info("Error while tryng to execute procedure: " + inputTable.getName());
+			logger.info("Error while trying to execute procedure: " + inputTable.getName());
 			throw e;
 		}
 	}

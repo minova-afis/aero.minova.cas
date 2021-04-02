@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova</groupId>
@@ -8,8 +9,7 @@
 	<parent>
 		<groupId>ch.minova</groupId>
 		<artifactId>ch.minova.parent.git</artifactId>
-		<version>11.0.1</version>
-		<relativePath/>
+		<version>10.1.2</version>
 	</parent>
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
@@ -20,12 +20,109 @@
 		<dependency>
 			<groupId>ch.minova</groupId>
 			<artifactId>ch.minova.install</artifactId>
-			<version>10.27.0</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.minova</groupId>
-			<artifactId>ch.minova.images</artifactId>
-			<version>11.48.0</version>
+			<version>10.25.0</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>it.bancaditalia.oss</groupId>
+				<artifactId>file-list-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<id>table-index</id>
+						<goals>
+							<goal>list</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<baseDir>src/aero/minova/cas/logic/tables</baseDir>
+							<outputFile>${project.build.directory}/table-index.xml</outputFile>
+							<includes>*.table.xml</includes>
+							<type>xml</type>
+							<fields>name</fields>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xml-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<configuration>
+							<transformationSets>
+								<transformationSet>
+									<dir>src/</dir>
+									<outputDir>target/classes/</outputDir>
+									<stylesheet>build/form2xml.xsl</stylesheet>
+									<includes>
+										<include>**/*.form.xml</include>
+									</includes>
+									<fileMappers>
+										<fileMapper
+											implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+											<pattern>\.form\.xml$</pattern>
+											<replacement>.xml</replacement>
+										</fileMapper>
+									</fileMappers>
+								</transformationSet>
+								<transformationSet>
+									<dir>src/</dir>
+									<outputDir>doc/adoc/</outputDir>
+									<stylesheet>build/table2adoc.xsl</stylesheet>
+									<includes>
+										<include>**/*.table.xml</include>
+									</includes>
+									<fileMappers>
+										<fileMapper
+											implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+											<pattern>\.table\.xml$</pattern>
+											<replacement>.adoc</replacement>
+										</fileMapper>
+										<org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+									</fileMappers>
+								</transformationSet>
+								<transformationSet>
+									<dir>src/aero/minova/finance/tables/</dir>
+									<outputDir>doc/adoc/</outputDir>
+									<stylesheet>build/table2adoc.xsl</stylesheet>
+									<includes>
+										<include>defaults.xml</include>
+									</includes>
+									<fileMappers>
+										<fileMapper
+											implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+											<pattern>\.xml$</pattern>
+											<replacement>.adoc</replacement>
+										</fileMapper>
+										<org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+									</fileMappers>
+								</transformationSet>
+								<transformationSet>
+									<dir>${project.build.directory}</dir>
+									<outputDir>doc/adoc/</outputDir>
+									<stylesheet>build/table-index2adoc.xsl</stylesheet>
+									<includes>
+										<include>table-index.xml</include>
+									</includes>
+									<fileMappers>
+										<fileMapper
+											implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+											<pattern>\.xml$</pattern>
+											<replacement>.adoc</replacement>
+										</fileMapper>
+										<org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+									</fileMappers>
+								</transformationSet>
+							</transformationSets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

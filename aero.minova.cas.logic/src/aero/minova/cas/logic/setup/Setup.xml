@@ -3,7 +3,6 @@
 	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
 	<required-modules>
 		<module name="ch.minova.install" major="10" minor="27"/>
-		<module name="ch.minova.images" major="11" minor="48"/>
 		<!-- TODO "ch.minova.i18n" -->
 	</required-modules>
 	<sql-code>

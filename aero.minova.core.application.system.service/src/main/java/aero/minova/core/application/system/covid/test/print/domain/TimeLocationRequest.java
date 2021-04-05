@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class TimeLocationRequest {
-	private String testStreckKeyText;
+	private int testStreckKeyLong;
 	private LocalDate date;
 }

@@ -48,6 +48,7 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		val inputPath = files.checkLegalPath(path);
+		logger.info("files/read: " + path);
 		return readAllBytes(inputPath);
 	}
 

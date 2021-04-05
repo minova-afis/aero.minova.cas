@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import aero.minova.core.application.system.covid.test.print.repository.TestTerminRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,8 @@ public class MeetingController {
 
 	@PostMapping(value = "meeting/time/available", produces = "application/json")
 	public List<Timeslot> getAvailableTimeslot(@RequestBody TimeLocation timeLocation) throws Exception {
-		val connection = systemDatabase.getConnection();
-		val viewQuery = sqlViewController.pagingWithSeek(null, false, -1, false, -1, Arrays.asList());
+		//val connection = systemDatabase.getConnection();
+		//val viewQuery = sqlViewController.pagingWithSeek(null, false, -1, null, -1, Arrays.asList());
 		// val preparedStatement = connection.prepareCall(viewQuery);
 		// val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 		// logger.info("Executing statements: " + sb.toString());

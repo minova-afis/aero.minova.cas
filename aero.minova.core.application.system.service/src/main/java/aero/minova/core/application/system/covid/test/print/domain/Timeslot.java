@@ -12,9 +12,11 @@ import lombok.NoArgsConstructor;
 public class Timeslot {
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
+	private int availableCapacity;
 
-	public Timeslot(LocalDateTime startTime, LocalDateTime endTime) {
+	public Timeslot(LocalDateTime startTime, LocalDateTime endTime, int availableCapacity) {
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.availableCapacity = availableCapacity;
 	}
 }

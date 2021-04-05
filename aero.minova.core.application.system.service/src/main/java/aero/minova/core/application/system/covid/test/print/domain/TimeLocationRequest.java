@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-public class TimeLocation {
+public class TimeLocationRequest {
 	private String testStreckKeyText;
 	private LocalDate date;
 }

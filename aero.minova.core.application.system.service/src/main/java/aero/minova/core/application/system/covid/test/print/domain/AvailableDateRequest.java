@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-public class DateRequest {
-	private String testStreckKeyText;
+public class AvailableDateRequest {
+	private int testStreckKeyLong;
 }

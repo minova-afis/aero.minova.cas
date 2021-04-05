@@ -5,12 +5,22 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
 public class AvailableTestsPerDate {
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
+            .ofPattern("dd.MM.yyyy")
+            .withZone(ZoneId.systemDefault());
+
     private String testStreckKeyText;
-    private LocalDate date;
+    private String date;
     private int availableTests;
+
+    public void setDate(LocalDate localDate) {
+        date = DATE_FORMATTER.format(localDate);
+    }
 }

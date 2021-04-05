@@ -27,23 +27,10 @@ import lombok.val;
 @RestController
 public class MeetingController {
 
-	@Autowired
-	SqlViewController sqlViewController;
-	@Autowired
-	SystemDatabase systemDatabase;
 	Logger logger = LoggerFactory.getLogger(MeetingController.class);
 
 	@PostMapping(value = "meeting/time/available", produces = "application/json")
 	public List<Timeslot> getAvailableTimeslot(@RequestBody TimeLocation timeLocation) throws Exception {
-		//val connection = systemDatabase.getConnection();
-		//val viewQuery = sqlViewController.pagingWithSeek(null, false, -1, null, -1, Arrays.asList());
-		// val preparedStatement = connection.prepareCall(viewQuery);
-		// val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-		// logger.info("Executing statements: " + sb.toString());
-		// ResultSet resultSet = preparedViewStatement.executeQuery();
-
-		// result = convertSqlResultToTable(inputTable, resultSet);
-
 		return asList(new Timeslot(LocalDateTime.of(2021, 4, 1, 9, 0), LocalDateTime.of(2021, 4, 1, 9, 30)), //
 				new Timeslot(LocalDateTime.of(2021, 4, 1, 9, 30), LocalDateTime.of(2021, 4, 1, 10, 0)), //
 				new Timeslot(LocalDateTime.of(2021, 4, 1, 10, 0), LocalDateTime.of(2021, 4, 1, 10, 30)), //

@@ -16,9 +16,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -49,18 +53,28 @@ public class SqlProcedureController {
 	TracController trac;
 
 	@Autowired
+	TestCertificatePrintController testCertificatePrintController;
+
+	@Autowired
 	SqlViewController svc;
 
+	// , produces = "application/json"
 	@SuppressWarnings("unchecked")
-	@PostMapping(value = "data/procedure", produces = "application/json")
-	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws Exception {
+	@PostMapping(value = "data/procedure")
+	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
+		if ("xpctsPrintTestergebnis".equals(inputTable.getName())) {
+			return ResponseEntity
+					.ok()
+					.contentType(MediaType.APPLICATION_PDF)
+					.body(testCertificatePrintController.getTestCertificate());
+		}
 		val result = new SqlProcedureResult();
 		try {
 			if ("Ticket".equals(inputTable.getName())) {
 				result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
 				// WFC erwartet einen ReturnCode, falls es abbricht, würde kein ReturnCode gesetzt werden
 				result.setReturnCode(1);
-				return result;
+				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} else if ("loadPrivilege".equals(inputTable.getName())) {
 				// Abfrage mur für jUnit-Tests, da dabei Authentication = null
 				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -76,7 +90,7 @@ public class SqlProcedureController {
 			if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
-			return calculateSqlProcedureResult(inputTable);
+			return new ResponseEntity(calculateSqlProcedureResult(inputTable), HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			logger.info("Error while tryng to execute procedure: " + inputTable.getName());
 			throw e;

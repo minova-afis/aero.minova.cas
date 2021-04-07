@@ -38,9 +38,9 @@ Beim Anlegen der User in der Datenbank müssen die Memberships der Gruppen zugew
 ----
 Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('ldapname','tEmployee.ShortDescription','Gruppen')
 
-Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('chef', '#chef','#management')
-Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('gruppenleiter1', '#leiter1','#gruppe1')
-Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('mitarbeiter1', '#mitarbeiter1','#mitarbeiter1')
+Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('chef', 'chef','#management')
+Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('gruppenleiter1', 'leiter1','#gruppe1')
+Insert into xtcasUser (KeyText,UserSecurityToken,Memberships) VALUES ('mitarbeiter1', 'mitarbeiter1','#mitarbeiter1')
 
 Insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('management','')
 Insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('gruppe1','#mitarbeiter1#mitarbeiter2#mitarbeiter3[...]')

@@ -34,11 +34,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
 	private String ldapServerAddress;
 
-	@Autowired
-	SystemDatabase systemDatabase;
+	@Value("${login_dataSource:}")
+	private String dataSource;
 
 	@Autowired
 	SqlProcedureController spc;
+
+	@Autowired
+	SystemDatabase systemDatabase;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -62,16 +65,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
+		if (dataSource.equals("ldap")) {
 			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
 			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
 			auth.authenticationProvider(acldap);
-		} else if (systemDatabase.isUseDataSource()) {
+		} else if (dataSource.equals("database")) {
 			auth.jdbcAuthentication()//
 					.dataSource(systemDatabase.getDataSource())//
 					.usersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?")//
 					.authoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
-		} else {
+		} else if (dataSource.equals("admin")) {
 			auth.inMemoryAuthentication()//
 					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
 		}

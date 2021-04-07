@@ -27,9 +27,6 @@ public class SystemDatabase {
 	@Value("${aero_minova_database_user_password:password}")
 	String userPassword;
 
-	@Value("${custom_useDataSource:false}")
-	boolean useDataSource;
-
 	private LinkedList<Connection> freeConnections = new LinkedList<>();
 
 	public synchronized Connection getConnection() {
@@ -68,14 +65,7 @@ public class SystemDatabase {
 		}
 	}
 
-	public boolean isUseDataSource() {
-		return useDataSource;
-	}
-
 	public DataSource getDataSource() throws SQLException {
-		if (!useDataSource) {
-			return null;
-		}
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 		dataSource.setUrl(connectionString);

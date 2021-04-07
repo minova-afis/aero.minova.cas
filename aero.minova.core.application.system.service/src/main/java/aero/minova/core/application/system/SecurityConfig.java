@@ -25,6 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.sql.SystemDatabase;
 
 @EnableWebSecurity
 @Configuration
@@ -36,8 +37,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
 	private String ldapServerAddress;
 
+	@Value("${login_dataSource:}")
+	private String dataSource;
+
 	@Autowired
 	SqlProcedureController spc;
+
+	@Autowired
+	SystemDatabase systemDatabase;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -62,11 +69,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		if (ldapServerAddress != null && !ldapServerAddress.trim().isEmpty()) {
+		if (dataSource.equals("ldap")) {
 			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
 			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
 			auth.authenticationProvider(acldap);
-		} else {
+		} else if (dataSource.equals("database")) {
+			auth.jdbcAuthentication()//
+					.dataSource(systemDatabase.getDataSource())//
+					.usersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?")//
+					.authoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
+		} else if (dataSource.equals("admin")) {
 			auth.inMemoryAuthentication()//
 					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
 		}

@@ -11,7 +11,7 @@
 * xref:properties.adoc#[Properties]
 * xref:versions.adoc#[Versionen]
 * xref:security.adoc#[Sicherheitsmechanismen]
-* xref:rowlevelexample.adox#[Beispiel zum Aktivieren der RowLevelSecurity]
+* xref:rowlevelexample.adoc#[Beispiel zum Aktivieren der RowLevelSecurity]
 
 == Beschreibung
 

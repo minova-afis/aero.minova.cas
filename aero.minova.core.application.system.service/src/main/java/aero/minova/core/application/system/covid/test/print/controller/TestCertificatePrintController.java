@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.minova.xml.XMLServiceEvent;
 
-@CrossOrigin
 @RestController
 public class TestCertificatePrintController {
 
@@ -30,6 +29,7 @@ public class TestCertificatePrintController {
 	@Value("${testReport:\\TEST_SYSTEME\\system.active\\Shared Data\\Program Files\\reports\\DailySupplierReport.xsl}")
 	private String testReport;
 
+	@CrossOrigin
 	@RequestMapping(value = "covid/test/certificate/print", produces = { MediaType.APPLICATION_PDF_VALUE })
 	public @ResponseBody byte[] getTestCertificate() throws Exception {
 		final Path targetPath = Paths.get(testTargetPdf);

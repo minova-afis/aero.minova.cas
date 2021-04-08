@@ -29,7 +29,6 @@ import aero.minova.core.application.system.covid.test.print.domain.AvailableDate
 import aero.minova.core.application.system.covid.test.print.domain.TimeLocationRequest;
 import aero.minova.core.application.system.covid.test.print.domain.Timeslot;
 
-@CrossOrigin
 @RestController
 public class MeetingController {
 
@@ -41,6 +40,7 @@ public class MeetingController {
     @Autowired
     SqlViewController sqlViewController;
 
+    @CrossOrigin
     @PostMapping(value = "meeting/time/available", produces = "application/json")
     public List<Timeslot> getAvailableTimeslot(@RequestBody TimeLocationRequest timeLocationRequest) throws Exception {
         val sqlRequest = new Table();

@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 public class AvailableTestsPerDate {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
-            .ofPattern("dd.MM.yyyy")
+            .ofPattern("yyyy-MM-dd")
             .withZone(ZoneId.systemDefault());
 
     private String testStreckKeyText;

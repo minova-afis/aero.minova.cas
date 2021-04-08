@@ -23,7 +23,7 @@ public class TeststeckenController {
     SqlViewController sqlViewController;
 
     @CrossOrigin
-    @PostMapping(value = "testStrecken/keyTexts", produces = "application/json")
+    @GetMapping(value = "testStrecken/keyTexts", produces = "application/json")
     public List<TestStrecke> getTestStreckenKeyTexts() throws Exception {
         val sqlRequest = new Table();
         sqlRequest.setName("xtctsTestStrecke");

@@ -1,6 +1,8 @@
 package aero.minova.core.application.system;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.util.TimeZone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,6 +23,7 @@ import aero.minova.core.application.system.domain.ValueSerializer;
 @Configuration
 public class CoreApplicationSystemApplication {
 	public static void main(String[] args) throws IOException {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		SpringApplication.run(CoreApplicationSystemApplication.class, args);
 	}
 

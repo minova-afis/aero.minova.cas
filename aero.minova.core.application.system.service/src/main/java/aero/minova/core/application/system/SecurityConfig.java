@@ -60,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
 		http.requiresChannel().anyRequest().requiresSecure();
+		http.cors();
 	}
 
 	@Bean
@@ -102,10 +103,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		};
 	}
 
-	/*@Bean
+	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
 		return source;
-	}*/
+	}
 }

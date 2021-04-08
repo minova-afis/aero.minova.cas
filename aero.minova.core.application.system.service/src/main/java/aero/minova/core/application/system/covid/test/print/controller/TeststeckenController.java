@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.stream.Collectors.toList;
 
-@CrossOrigin
 @RestController
 public class TeststeckenController {
 
     @Autowired
     SqlViewController sqlViewController;
 
+    @CrossOrigin
     @PostMapping(value = "testStrecken/keyTexts", produces = "application/json")
     public List<TestStrecke> getTestStreckenKeyTexts() throws Exception {
         val sqlRequest = new Table();

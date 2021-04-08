@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,12 @@ public class SqlViewController {
     SystemDatabase systemDatabase;
     Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
+    @Autowired
+    Gson gson;
+
     @GetMapping(value = "data/index", produces = "application/json")
     public Table getIndexView(@RequestBody Table inputTable) throws Exception {
+        logger.info("data/view: " + gson.toJson(inputTable));
         final val connection = systemDatabase.getConnection();
         Table result = new Table();
         StringBuilder sb = new StringBuilder();

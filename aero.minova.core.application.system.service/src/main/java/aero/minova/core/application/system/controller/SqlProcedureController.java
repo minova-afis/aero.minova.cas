@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +60,14 @@ public class SqlProcedureController {
 	@Autowired
 	SqlViewController svc;
 
+	@Autowired
+	Gson gson;
+
 	// , produces = "application/json"
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
+		logger.info("data/procedure: " + gson.toJson(inputTable));
 		if ("xpctsPrintTestergebnis".equals(inputTable.getName())) {
 			return ResponseEntity
 					.ok()
@@ -296,7 +301,7 @@ public class SqlProcedureController {
 			connection.commit();
 			logger.info("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
-			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage());
+			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage(), e);
 			try {
 				connection.rollback();
 			} catch (Exception e1) {

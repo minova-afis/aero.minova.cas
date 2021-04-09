@@ -1,5 +1,6 @@
 package aero.minova.core.application.system.covid.test.print.controller;
 
+import java.io.File;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,9 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.covid.test.print.MailService;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -24,6 +28,8 @@ import ch.minova.xml.XMLServiceEvent;
 
 @RestController
 public class TestCertificatePrintController {
+
+    final Logger logger = LoggerFactory.getLogger(TestCertificatePrintController.class);
 
     @Value("${ch.minova.service.xmlprinter.service.port:1506}")
     private String xmlPrinterServicePort;
@@ -69,22 +75,28 @@ public class TestCertificatePrintController {
                  */
                 sleep();
                 val testCertificate = Files.readAllBytes(targetPath);
-                {
-                    val message = mailSender.createMimeMessage();
-                    {
-                        val helper = new MimeMessageHelper(message, true);
-                        helper.setTo("afis@minova.de");
-                        helper.setFrom(mailService.mailAddress);
-                        helper.setSubject("COVID-Test-Zertifikat");
-                        helper.setText("Test", true);
-                        helper.addAttachment("COVID-Test-Zertifikat.pdf", targetPath.toFile());
-                    }
-                    mailSender.send(message);
-                }
+                sendCertificateByMail(targetPath.toFile());
                 return testCertificate;
             }
         }
         throw new RuntimeException("Could not generate test certificate.");
+    }
+
+    private void sendCertificateByMail(File testCertificatePdf) {
+        try {
+            val message = mailSender.createMimeMessage();
+            {
+                val helper = new MimeMessageHelper(message, true);
+                helper.setTo("afis@minova.de");
+                helper.setFrom(mailService.mailAddress);
+                helper.setSubject("COVID-Test-Zertifikat");
+                helper.setText("Test", true);
+                helper.addAttachment("COVID-Test-Zertifikat.pdf", testCertificatePdf);
+            }
+            mailSender.send(message);
+        } catch (Exception e) {
+            logger.error("Could not send certificate pdf.", e);
+        }
     }
 
     private void sleep() {

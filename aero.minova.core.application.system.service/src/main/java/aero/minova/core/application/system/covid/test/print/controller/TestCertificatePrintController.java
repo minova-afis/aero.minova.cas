@@ -13,6 +13,7 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,8 @@ public class TestCertificatePrintController {
     @Autowired
     private SqlProcedureController sqlProcedureController;
 
+    @Autowired
+    private JavaMailSender mailSender;
     @Autowired
     private MailService mailService;
 
@@ -67,7 +70,7 @@ public class TestCertificatePrintController {
                 sleep();
                 val testCertificate = Files.readAllBytes(targetPath);
                 {
-                    val message = mailService.getJavaMailSender().createMimeMessage();
+                    val message = mailSender.createMimeMessage();
                     {
                         val helper = new MimeMessageHelper(message, true);
                         helper.setTo("afis@minova.de");
@@ -76,7 +79,7 @@ public class TestCertificatePrintController {
                         helper.setText("Test", true);
                         helper.addAttachment("COVID-Test-Zertifikat.pdf", targetPath.toFile());
                     }
-                    mailService.getJavaMailSender().send(message);
+                    mailSender.send(message);
                 }
                 return testCertificate;
             }

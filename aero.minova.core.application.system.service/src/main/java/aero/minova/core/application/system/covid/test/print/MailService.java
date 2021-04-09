@@ -14,7 +14,7 @@ public class MailService {
     private String mailServerHost;
     @Value("${mailServerPort:}")
     private String mailServerPort;
-    @Value("${mailAddress:}")
+    @Value("${spring.mail.username:}")
     public String mailAddress;
     @Value("${mailPassword:}")
     private String mailPassword;
@@ -27,11 +27,13 @@ public class MailService {
     @Value("${mail.debug:false}")
     private String mailDebug;
 
-    @Bean
+    /*@Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(mailServerHost);
-        mailSender.setPort(Integer.valueOf(mailServerPort));
+        if (mailServerPort != null || mailServerPort.isEmpty()) {
+            mailSender.setPort(Integer.parseInt(mailServerPort));
+        }
 
         mailSender.setUsername(mailAddress);
         mailSender.setPassword(mailPassword);
@@ -43,5 +45,5 @@ public class MailService {
         props.put("mail.debug", mailDebug);
 
         return mailSender;
-    }
+    }*/
 }

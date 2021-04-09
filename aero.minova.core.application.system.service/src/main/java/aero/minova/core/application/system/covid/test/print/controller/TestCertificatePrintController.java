@@ -41,11 +41,11 @@ public class TestCertificatePrintController {
         val folder = Paths.get(testTargetPdf);
         Files.createDirectories(folder);
         val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml").toAbsolutePath();
-        Files.write(path, testCertificateReportXml.getBytes());
-        val targetPath = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
         if (Files.exists(path)) {
             Files.delete(path);
         }
+        Files.write(path, testCertificateReportXml.getBytes());
+        val targetPath = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
         if (Files.exists(targetPath)) {
             Files.delete(targetPath);
         }

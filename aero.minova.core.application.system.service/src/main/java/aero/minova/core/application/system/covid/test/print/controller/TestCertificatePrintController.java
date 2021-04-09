@@ -27,7 +27,7 @@ public class TestCertificatePrintController {
     @Value("${testTargetPdf:../../tmp/}")
     private String testTargetPdf;
 
-    @Value("${testReport:..reports/CTSTestZertifikat.xsl}")
+    @Value("${testReport:../reports/CTSTestZertifikat.xsl}")
     private String testReport;
 
     @Autowired
@@ -43,7 +43,7 @@ public class TestCertificatePrintController {
         val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml").toAbsolutePath();
         Files.write(path, testCertificateReportXml.getBytes());
         val targetPath = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
-        new XMLServiceEvent(path.toString(), testReport, targetPath.toString())//
+        new XMLServiceEvent(path.toString(), Paths.get(testReport).toAbsolutePath().toString(), targetPath.toString())//
                 .send(new Socket("localhost", Integer.valueOf(xmlPrinterServicePort)));
         for (int i = 0; i < 10; ++i) {
             sleep();

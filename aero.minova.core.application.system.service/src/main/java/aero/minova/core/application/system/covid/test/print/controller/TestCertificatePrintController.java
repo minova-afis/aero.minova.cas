@@ -1,6 +1,7 @@
 package aero.minova.core.application.system.covid.test.print.controller;
 
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,7 +45,7 @@ public class TestCertificatePrintController {
         if (Files.exists(path)) {
             Files.delete(path);
         }
-        Files.write(path, testCertificateReportXml.getBytes());
+        Files.write(path, testCertificateReportXml.getBytes(StandardCharsets.UTF_8));
         val targetPath = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
         if (Files.exists(targetPath)) {
             Files.delete(targetPath);

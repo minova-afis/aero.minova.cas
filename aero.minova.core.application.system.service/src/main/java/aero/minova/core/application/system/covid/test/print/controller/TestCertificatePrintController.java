@@ -75,7 +75,9 @@ public class TestCertificatePrintController {
                  */
                 sleep();
                 val testCertificate = Files.readAllBytes(targetPath);
-                sendCertificateByMail(targetPath.toFile());
+                new Thread(() -> {
+                    sendCertificateByMail(targetPath.toFile());
+                }).start();
                 return testCertificate;
             }
         }

@@ -24,10 +24,10 @@ public class TestCertificatePrintController {
     @Value("${ch.minova.service.xmlprinter.service.port:1506}")
     private String xmlPrinterServicePort;
 
-    @Value("${testTargetPdf:C:\\TEST_SYSTEME\\system.active\\Shared Data\\Daily\\DailySupplierReport_7_3.pdf}")
+    @Value("${testTargetPdf:../../tmp/}")
     private String testTargetPdf;
 
-    @Value("${testReport:\\TEST_SYSTEME\\system.active\\Shared Data\\Program Files\\reports\\DailySupplierReport.xsl}")
+    @Value("${testReport:..reports/CTSTestZertifikat.xsl}")
     private String testReport;
 
     @Autowired
@@ -38,9 +38,9 @@ public class TestCertificatePrintController {
     public @ResponseBody
     byte[] getTestCertificate(Integer keyLong) throws Exception {
         val testCertificateReportXml = testCertificateReportXml(keyLong);
-        val folder = Paths.get("D:/minova-systems/systems/com.minova.vgeibelstadt/Shared Data/tmp");
+        val folder = Paths.get(testTargetPdf);
         Files.createDirectories(folder);
-        val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong +".xml");
+        val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml");
         Files.write(path, testCertificateReportXml.getBytes());
         val targetPath = Paths.get(testTargetPdf);
         new XMLServiceEvent(path.toString(), testReport, targetPath.toString())//

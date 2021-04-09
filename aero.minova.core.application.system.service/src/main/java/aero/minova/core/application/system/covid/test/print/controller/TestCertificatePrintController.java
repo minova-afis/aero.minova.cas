@@ -37,10 +37,12 @@ public class TestCertificatePrintController {
     @RequestMapping(value = "covid/test/certificate/print", produces = {MediaType.APPLICATION_PDF_VALUE})
     public @ResponseBody
     byte[] getTestCertificate(Integer keyLong) throws Exception {
-        final val testCertificateReportXml = testCertificateReportXml(keyLong);
-        final val path = Paths.get("D:/minova-systems/systems/com.minova.vgeibelstadt/Shared Data/tmp").resolve("xpctsXMLTestzertifikat." + keyLong +".xml");
+        val testCertificateReportXml = testCertificateReportXml(keyLong);
+        val folder = Paths.get("D:/minova-systems/systems/com.minova.vgeibelstadt/Shared Data/tmp");
+        Files.createDirectories(folder);
+        val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong +".xml");
         Files.write(path, testCertificateReportXml.getBytes());
-        final Path targetPath = Paths.get(testTargetPdf);
+        val targetPath = Paths.get(testTargetPdf);
         new XMLServiceEvent(path.toString(), testReport, targetPath.toString())//
                 .send(new Socket("localhost", Integer.valueOf(xmlPrinterServicePort)));
         for (int i = 0; i < 10; ++i) {
@@ -51,7 +53,9 @@ public class TestCertificatePrintController {
                  * sind.
                  */
                 sleep();
-                return Files.readAllBytes(targetPath);
+                val testCertificate = Files.readAllBytes(targetPath);
+                Files.delete(targetPath);
+                return testCertificate;
             }
         }
         throw new RuntimeException("Could not generate test certificate.");

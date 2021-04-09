@@ -7,11 +7,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.covid.test.print.MailService;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,6 +35,9 @@ public class TestCertificatePrintController {
 
     @Autowired
     private SqlProcedureController sqlProcedureController;
+
+    @Autowired
+    private MailService mailService;
 
     @CrossOrigin
     @RequestMapping(value = "covid/test/certificate/print", produces = {MediaType.APPLICATION_PDF_VALUE})
@@ -61,6 +66,18 @@ public class TestCertificatePrintController {
                  */
                 sleep();
                 val testCertificate = Files.readAllBytes(targetPath);
+                {
+                    val message = mailService.getJavaMailSender().createMimeMessage();
+                    {
+                        val helper = new MimeMessageHelper(message, true);
+                        helper.setTo("afis@minova.de");
+                        helper.setFrom(mailService.mailAddress);
+                        helper.setSubject("COVID-Test-Zertifikat");
+                        helper.setText("Test", true);
+                        helper.addAttachment("COVID-Test-Zertifikat.pdf", targetPath.toFile());
+                    }
+                    mailService.getJavaMailSender().send(message);
+                }
                 return testCertificate;
             }
         }

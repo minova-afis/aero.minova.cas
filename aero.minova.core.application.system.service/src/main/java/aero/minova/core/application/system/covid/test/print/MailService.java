@@ -15,11 +15,17 @@ public class MailService {
     @Value("${mailServerPort:}")
     private String mailServerPort;
     @Value("${mailAddress:}")
-    private String mailAddress;
+    public String mailAddress;
     @Value("${mailPassword:}")
     private String mailPassword;
     @Value("${mailTransportProtocol:smtp}")
     private String mailTransportProtocol;
+    @Value("${mail.smtp.auth:true}")
+    private String mailSmtpAuth;
+    @Value("${mail.smtp.starttls.enable:true}")
+    private String mailSmtpStarttlEnable;
+    @Value("${mail.debug:false}")
+    private String mailDebug;
 
     @Bean
     public JavaMailSender getJavaMailSender() {
@@ -32,9 +38,9 @@ public class MailService {
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", mailTransportProtocol);
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
+        props.put("mail.smtp.auth", mailSmtpAuth);
+        props.put("mail.smtp.starttls.enable", mailSmtpStarttlEnable);
+        props.put("mail.debug", mailDebug);
 
         return mailSender;
     }

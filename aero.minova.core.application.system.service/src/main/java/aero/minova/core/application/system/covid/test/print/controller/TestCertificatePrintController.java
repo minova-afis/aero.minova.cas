@@ -40,9 +40,9 @@ public class TestCertificatePrintController {
         val testCertificateReportXml = testCertificateReportXml(keyLong);
         val folder = Paths.get(testTargetPdf);
         Files.createDirectories(folder);
-        val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml");
+        val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml").toAbsolutePath();
         Files.write(path, testCertificateReportXml.getBytes());
-        val targetPath = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf");
+        val targetPath = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
         new XMLServiceEvent(path.toString(), testReport, targetPath.toString())//
                 .send(new Socket("localhost", Integer.valueOf(xmlPrinterServicePort)));
         for (int i = 0; i < 10; ++i) {

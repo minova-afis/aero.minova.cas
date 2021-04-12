@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
-import aero.minova.core.application.system.covid.test.print.MailService;
+import aero.minova.core.application.system.covid.test.print.TestCertificateMailService;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class TestCertificatePrintController {
     private SqlProcedureController sqlProcedureController;
 
     @Autowired
-    MailService covidTestMailService;
+    TestCertificateMailService covidTestTestCertificateMailService;
 
     public @ResponseBody
     byte[] getTestCertificate(Integer keyLong) throws Exception {
@@ -90,7 +90,7 @@ public class TestCertificatePrintController {
                         .getValues()
                         .get(0)
                         .getIntegerValue();
-                covidTestMailService.sendCertificateByMail
+                covidTestTestCertificateMailService.sendCertificateByMail
                         (getTestCertificatePath(testCertificateKeyLong).toFile());
             }
         }

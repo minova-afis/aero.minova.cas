@@ -9,12 +9,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
 import java.io.File;
 
 @Service
-public class MailService {
-    final Logger logger = LoggerFactory.getLogger(MailService.class);
+public class TestCertificateMailService {
+    final Logger logger = LoggerFactory.getLogger(TestCertificateMailService.class);
 
     @Value("${spring.mail.username:}")
     public String mailAddress;

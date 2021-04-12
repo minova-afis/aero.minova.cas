@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import aero.minova.core.application.system.covid.test.print.MailService;
+import aero.minova.core.application.system.covid.test.print.TestCertificateMailService;
 import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ public class SqlProcedureController {
     Gson gson;
 
     @Autowired
-    MailService mailService;
+    TestCertificateMailService testCertificateMailService;
 
     // , produces = "application/json"
     @SuppressWarnings("unchecked")

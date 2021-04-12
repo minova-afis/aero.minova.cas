@@ -35,7 +35,7 @@ public class MeetingFormController {
 	@Autowired
 	SqlProcedureController sqlProcedureController;
 
-	@PostMapping(value = "/meeting/book", produces = "application/json")
+	@PostMapping(value = "public/meeting/book", produces = "application/json")
 	public TestTermin bookMeeting(@RequestBody MeetingFormInformation input) throws Exception {
 
 		// Überprüfen, ob der Termin auch in der Zukunft liegt

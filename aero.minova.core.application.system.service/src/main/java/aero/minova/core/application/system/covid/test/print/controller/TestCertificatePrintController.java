@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
-import aero.minova.core.application.system.covid.test.print.CovidTestMailService;
+import aero.minova.core.application.system.covid.test.print.MailService;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class TestCertificatePrintController {
     private SqlProcedureController sqlProcedureController;
 
     @Autowired
-    CovidTestMailService covidTestMailService;
+    MailService covidTestMailService;
 
     public @ResponseBody
     byte[] getTestCertificate(Integer keyLong) throws Exception {

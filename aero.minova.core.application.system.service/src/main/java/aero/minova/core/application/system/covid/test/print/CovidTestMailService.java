@@ -1,24 +1,20 @@
 package aero.minova.core.application.system.covid.test.print;
 
-import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
 import aero.minova.core.application.system.domain.Table;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.Properties;
 
 @Service
-public class MailService {
-    final Logger logger = LoggerFactory.getLogger(MailService.class);
+public class CovidTestMailService {
+    final Logger logger = LoggerFactory.getLogger(CovidTestMailService.class);
 
     @Value("${mailServerHost:}")
     private String mailServerHost;

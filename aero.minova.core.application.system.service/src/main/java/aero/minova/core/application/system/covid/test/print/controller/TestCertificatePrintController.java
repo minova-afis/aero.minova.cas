@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.covid.test.print.CovidTestMailService;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class TestCertificatePrintController {
         throw new RuntimeException("Could not generate test certificate.");
     }
 
-    public void xpctsInsertTestErgebnis(Table inputTable, Table outputTable) {
+    public void xpctsInsertTestErgebnis(Table inputTable, Table outputTable) throws Exception {
         if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
             val testErgebnisValueKey = inputTable
                     .getRows()
@@ -83,6 +84,7 @@ public class TestCertificatePrintController {
                         .getValues()
                         .get(0)
                         .getIntegerValue();
+                val testCertificatePdf = getTestCertificate(testCertificateKeyLong);
             }
         }
     }

@@ -44,7 +44,7 @@ public class TestCertificatePrintController {
 
     public @ResponseBody
     byte[] getTestCertificate(Integer keyLong) throws Exception {
-        val testCertificate = Files.readAllBytes(getTestCertificatePath(keyLong));
+        return Files.readAllBytes(getTestCertificatePath(keyLong));
     }
 
     private Path getTestCertificatePath(Integer keyLong) throws Exception {

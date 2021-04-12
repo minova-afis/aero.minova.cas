@@ -43,11 +43,6 @@ public class TestCertificatePrintController {
     @Autowired
     private SqlProcedureController sqlProcedureController;
 
-    @Autowired
-    private JavaMailSender mailSender;
-    @Autowired
-    private MailService mailService;
-
     @CrossOrigin
     @RequestMapping(value = "covid/test/certificate/print", produces = {MediaType.APPLICATION_PDF_VALUE})
     public @ResponseBody
@@ -75,30 +70,10 @@ public class TestCertificatePrintController {
                  */
                 sleep();
                 val testCertificate = Files.readAllBytes(targetPath);
-                new Thread(() -> {
-                    sendCertificateByMail(targetPath.toFile());
-                }).start();
                 return testCertificate;
             }
         }
         throw new RuntimeException("Could not generate test certificate.");
-    }
-
-    private void sendCertificateByMail(File testCertificatePdf) {
-        try {
-            val message = mailSender.createMimeMessage();
-            {
-                val helper = new MimeMessageHelper(message, true);
-                helper.setTo("afis@minova.de");
-                helper.setFrom(mailService.mailAddress);
-                helper.setSubject("COVID-Test-Zertifikat");
-                helper.setText("Test", true);
-                helper.addAttachment("COVID-Test-Zertifikat.pdf", testCertificatePdf);
-            }
-            mailSender.send(message);
-        } catch (Exception e) {
-            logger.error("Could not send certificate pdf.", e);
-        }
     }
 
     private void sleep() {

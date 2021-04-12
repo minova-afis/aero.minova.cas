@@ -30,7 +30,7 @@ public class TestCertificatePrintController {
 	private String testReport;
 
 	@CrossOrigin
-	@RequestMapping(value = "covid/test/certificate/print", produces = { MediaType.APPLICATION_PDF_VALUE })
+	@RequestMapping(value = "public/covid/test/certificate/print", produces = { MediaType.APPLICATION_PDF_VALUE })
 	public @ResponseBody byte[] getTestCertificate() throws Exception {
 		final Path targetPath = Paths.get(testTargetPdf);
 		new XMLServiceEvent(testInputXml, testReport, targetPath.toString())//

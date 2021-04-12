@@ -16,13 +16,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import aero.minova.core.application.system.covid.test.print.MailService;
+import aero.minova.core.application.system.covid.test.print.CovidTestMailService;
 import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +64,7 @@ public class SqlProcedureController {
     Gson gson;
 
     @Autowired
-    MailService mailService;
+    CovidTestMailService mailService;
 
     // , produces = "application/json"
     @SuppressWarnings("unchecked")

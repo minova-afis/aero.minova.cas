@@ -68,7 +68,7 @@ public class TestCertificatePrintController {
         throw new RuntimeException("Could not generate test certificate.");
     }
 
-    public void xpctsInsertTestErgebnis(Table inputTable) {
+    public void xpctsInsertTestErgebnis(Table inputTable, Table outputTable) {
         if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
             val testErgebnisValueKey = inputTable
                     .getRows()
@@ -77,7 +77,12 @@ public class TestCertificatePrintController {
                     .get(3)
                     .getIntegerValue();
             if (testErgebnisValueKey == 1) {
-
+                val testCertificateKeyLong = outputTable
+                        .getRows()
+                        .get(0)
+                        .getValues()
+                        .get(0)
+                        .getIntegerValue();
             }
         }
     }

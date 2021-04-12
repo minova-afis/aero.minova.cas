@@ -84,9 +84,9 @@ public class SqlProcedureController {
                                             .get(0)
                                             .getIntegerValue()));
         }
-        val result = new SqlProcedureResult();
         try {
             if ("Ticket".equals(inputTable.getName())) {
+                val result = new SqlProcedureResult();
                 result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
                 // WFC erwartet einen ReturnCode, falls es abbricht, würde kein ReturnCode gesetzt werden
                 result.setReturnCode(1);
@@ -106,10 +106,11 @@ public class SqlProcedureController {
             if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
                 throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
             }
+            val result = calculateSqlProcedureResult(inputTable);
             if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
-                testCertificatePrintController.xpctsInsertTestErgebnis(inputTable);
+                testCertificatePrintController.xpctsInsertTestErgebnis(inputTable, result.getOutputParameters());
             }
-            return new ResponseEntity(calculateSqlProcedureResult(inputTable), HttpStatus.ACCEPTED);
+            return new ResponseEntity(result, HttpStatus.ACCEPTED);
         } catch (Exception e) {
             logger.info("Error while trying to execute procedure: " + inputTable.getName());
             throw e;

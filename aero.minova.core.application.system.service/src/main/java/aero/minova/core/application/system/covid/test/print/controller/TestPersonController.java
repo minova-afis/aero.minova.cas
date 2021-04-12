@@ -35,9 +35,10 @@ public class TestPersonController {
 	private final Pattern emailpattern = Pattern.compile("^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
 	private final Pattern postalcodepattern = Pattern.compile("^0[1-9]\\d\\d(?<!0100)0|0[1-9]\\d\\d[1-9]|[1-9]\\d{3}[0-8]|[1-9]\\d{3}(?<!9999)9$");
 
-	@PostMapping(value = "testPerson/register", produces = "application/json")
+	@PostMapping(value = "/public/testPerson/register", produces = "application/json")
 	public void registerTestPerson(@RequestBody TestPersonInformation input) throws Exception {
 
+		// Überprüft die Angaben auf Format und Länge
 		checkUserInput(input);
 
 		// Überprüfen, ob die Person bereits im System registriert ist
@@ -61,52 +62,42 @@ public class TestPersonController {
 			throw new RuntimeException("Ein Benutzer mit dieser Emailadresse existiert bereits!");
 		}
 
-		// TODO Emailverifikation
-
-	}
-
-	@PostMapping(value = "testPerson/finishregistration", produces = "application/json")
-	public void finishRegistrationTestPerson(@RequestBody TestPersonInformation input) throws Exception {
-		// Anlegen des Benutzers
-		Table sqlRequest = new Table();
-		sqlRequest.setName("xpctsInsertTestPerson");
-		sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
-		sqlRequest.addColumn(new Column("FirstName", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("LastName", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Street", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("PostalCode", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("City", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Birthdate", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Phone", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Phone2", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Password", DataType.STRING, OutputType.INPUT));
+		Table sqlInsertRequest = new Table();
+		sqlInsertRequest.setName("xpctsInsertTestPerson");
+		sqlInsertRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		sqlInsertRequest.addColumn(new Column("FirstName", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("LastName", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("Street", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("PostalCode", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("City", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("Birthdate", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("Phone", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("Phone2", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("Password", DataType.STRING, OutputType.INPUT));
 		{
-			val firstRequestParams = new Row();
-			sqlRequest.getRows().add(firstRequestParams);
-			firstRequestParams.addValue(null);
-			firstRequestParams.addValue(new Value(input.getFirstname(), null));
-			firstRequestParams.addValue(new Value(input.getLastname(), null));
-			firstRequestParams.addValue(new Value(input.getStreet(), null));
-			firstRequestParams.addValue(new Value(input.getPostalcode(), null));
-			firstRequestParams.addValue(new Value(input.getCity(), null));
-			firstRequestParams.addValue(new Value(Instant.from(input.getBirthdate()), null));
-			firstRequestParams.addValue(new Value(input.getPhonenumber(), null));
-			firstRequestParams.addValue(new Value(input.getPhonenumber2(), null));
-			firstRequestParams.addValue(new Value(input.getEmail(), null));
-			firstRequestParams.addValue(new Value(input.getPassword(), null));
+			val secondRequestParams = new Row();
+			sqlInsertRequest.getRows().add(secondRequestParams);
+			secondRequestParams.addValue(null);
+			secondRequestParams.addValue(new Value(input.getFirstname(), null));
+			secondRequestParams.addValue(new Value(input.getLastname(), null));
+			secondRequestParams.addValue(new Value(input.getStreet(), null));
+			secondRequestParams.addValue(new Value(input.getPostalcode(), null));
+			secondRequestParams.addValue(new Value(input.getCity(), null));
+			secondRequestParams.addValue(new Value(Instant.from(input.getBirthdate()), null));
+			secondRequestParams.addValue(new Value(input.getPhonenumber(), null));
+			secondRequestParams.addValue(new Value(input.getPhonenumber2(), null));
+			secondRequestParams.addValue(new Value(input.getEmail(), null));
+			secondRequestParams.addValue(new Value(input.getPassword(), null));
 		}
-		// Hiermit wird der unsichere Zugriff ermöglicht.
-		val requestingAuthority = new Row();
-		requestingAuthority.addValue(new Value(false, "1"));
-		requestingAuthority.addValue(new Value(false, "2"));
-		requestingAuthority.addValue(new Value(false, "3"));
 
-		sqlProcedureController.calculateSqlProcedureResult(sqlRequest);
+		sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
+
+		// TODO Email senden
 
 	}
 
-	@PostMapping(value = "testPerson/login", produces = "application/json")
+	@PostMapping(value = "/public/testPerson/login", produces = "application/json")
 	public long loginTestPerson(@RequestBody UserInfo info) throws Exception {
 
 		if (info.getEmail().isEmpty()) {

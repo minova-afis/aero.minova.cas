@@ -3,6 +3,7 @@ package aero.minova.core.application.system.covid.test.print.controller;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
@@ -38,8 +39,15 @@ public class TestCertificatePrintController {
     @Autowired
     private SqlProcedureController sqlProcedureController;
 
+    @Autowired
+    CovidTestMailService covidTestMailService;
+
     public @ResponseBody
     byte[] getTestCertificate(Integer keyLong) throws Exception {
+        val testCertificate = Files.readAllBytes(getTestCertificatePath(keyLong));
+    }
+
+    private Path getTestCertificatePath(Integer keyLong) throws Exception {
         val testCertificateReportXml = testCertificateReportXml(keyLong);
         val folder = Paths.get(testTargetPdf);
         Files.createDirectories(folder);
@@ -62,8 +70,7 @@ public class TestCertificatePrintController {
                  * sind.
                  */
                 sleep();
-                val testCertificate = Files.readAllBytes(targetPath);
-                return testCertificate;
+                return targetPath;
             }
         }
         throw new RuntimeException("Could not generate test certificate.");
@@ -84,7 +91,8 @@ public class TestCertificatePrintController {
                         .getValues()
                         .get(0)
                         .getIntegerValue();
-                val testCertificatePdf = getTestCertificate(testCertificateKeyLong);
+                covidTestMailService.sendCertificateByMail
+                        (getTestCertificatePath(testCertificateKeyLong).toFile());
             }
         }
     }

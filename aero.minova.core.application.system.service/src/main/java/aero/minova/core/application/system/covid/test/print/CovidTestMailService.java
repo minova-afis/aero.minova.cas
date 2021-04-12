@@ -36,7 +36,7 @@ public class CovidTestMailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    private void sendCertificateByMail(File testCertificatePdf) {
+    public void sendCertificateByMail(File testCertificatePdf) {
         try {
             val message = mailSender.createMimeMessage();
             {

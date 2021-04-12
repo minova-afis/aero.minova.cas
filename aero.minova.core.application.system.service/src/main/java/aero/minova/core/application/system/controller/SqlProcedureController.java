@@ -107,7 +107,7 @@ public class SqlProcedureController {
                 throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
             }
             if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
-                mailService.xpctsInsertTestErgebnis(inputTable);
+                testCertificatePrintController.xpctsInsertTestErgebnis(inputTable);
             }
             return new ResponseEntity(calculateSqlProcedureResult(inputTable), HttpStatus.ACCEPTED);
         } catch (Exception e) {

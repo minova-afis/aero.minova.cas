@@ -37,8 +37,6 @@ public class TestCertificatePrintController {
     @Autowired
     private SqlProcedureController sqlProcedureController;
 
-    @CrossOrigin
-    @RequestMapping(value = "covid/test/certificate/print", produces = {MediaType.APPLICATION_PDF_VALUE})
     public @ResponseBody
     byte[] getTestCertificate(Integer keyLong) throws Exception {
         val testCertificateReportXml = testCertificateReportXml(keyLong);
@@ -68,6 +66,20 @@ public class TestCertificatePrintController {
             }
         }
         throw new RuntimeException("Could not generate test certificate.");
+    }
+
+    public void xpctsInsertTestErgebnis(Table inputTable) {
+        if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
+            val testErgebnisValueKey = inputTable
+                    .getRows()
+                    .get(0)
+                    .getValues()
+                    .get(3)
+                    .getIntegerValue();
+            if (testErgebnisValueKey == 1) {
+
+            }
+        }
     }
 
     private void sleep() {

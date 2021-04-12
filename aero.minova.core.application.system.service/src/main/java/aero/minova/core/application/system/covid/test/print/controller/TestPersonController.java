@@ -35,7 +35,7 @@ public class TestPersonController {
 	private final Pattern emailpattern = Pattern.compile("^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
 	private final Pattern postalcodepattern = Pattern.compile("^0[1-9]\\d\\d(?<!0100)0|0[1-9]\\d\\d[1-9]|[1-9]\\d{3}[0-8]|[1-9]\\d{3}(?<!9999)9$");
 
-	@PostMapping(value = "/public/testPerson/register", produces = "application/json")
+	@PostMapping(value = "public/testPerson/register", produces = "application/json")
 	public void registerTestPerson(@RequestBody TestPersonInformation input) throws Exception {
 
 		// Überprüft die Angaben auf Format und Länge
@@ -97,7 +97,7 @@ public class TestPersonController {
 
 	}
 
-	@PostMapping(value = "/public/testPerson/login", produces = "application/json")
+	@PostMapping(value = "public/testPerson/login", produces = "application/json")
 	public long loginTestPerson(@RequestBody UserInfo info) throws Exception {
 
 		if (info.getEmail().isEmpty()) {

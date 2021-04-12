@@ -14,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,10 +28,10 @@ public class TestCertificatePrintController {
     private String xmlPrinterServicePort;
 
     @Value("${testTargetPdf:../../tmp/}")
-    private String testTargetPdf;
+    private String temporaryFolder;
 
     @Value("${testReport:../reports/CTSTestZertifikat.xsl}")
-    private String testReport;
+    private String testReportStylesheet;
 
     @Autowired
     private SqlProcedureController sqlProcedureController;
@@ -49,28 +46,30 @@ public class TestCertificatePrintController {
 
     private Path getTestCertificatePath(Integer keyLong) throws Exception {
         val testCertificateReportXml = testCertificateReportXml(keyLong);
-        val folder = Paths.get(testTargetPdf);
-        Files.createDirectories(folder);
-        val path = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml").toAbsolutePath();
-        if (Files.exists(path)) {
-            Files.delete(path);
+        val printContainer = Paths.get(temporaryFolder);
+        Files.createDirectories(printContainer);
+        val inputFile = printContainer.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml").toAbsolutePath();
+        if (Files.exists(inputFile)) {
+            Files.delete(inputFile);
         }
-        Files.write(path, testCertificateReportXml.getBytes(StandardCharsets.UTF_8));
-        val targetPath = folder.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
-        if (Files.exists(targetPath)) {
-            Files.delete(targetPath);
+        Files.write(inputFile, testCertificateReportXml.getBytes(StandardCharsets.UTF_8));
+        val outputPath = printContainer.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
+        if (Files.exists(outputPath)) {
+            Files.delete(outputPath);
         }
-        new XMLServiceEvent(path.toString(), Paths.get(testReport).toAbsolutePath().toString(), targetPath.toString())//
+        new XMLServiceEvent(inputFile.toString()
+                , Paths.get(testReportStylesheet).toAbsolutePath().toString()
+                , outputPath.toString())
                 .send(new Socket("localhost", Integer.valueOf(xmlPrinterServicePort)));
         for (int i = 0; i < 10; ++i) {
             sleep();
-            if (Files.exists(targetPath)) {
+            if (Files.exists(outputPath)) {
                 /*
                  * Falls die Datei gerade erstellt wurde, wollen wir hiermit sicherstellen, dass die Schreiboperationen mit erhöhter Wahrscheinlichkeit durch
                  * sind.
                  */
                 sleep();
-                return targetPath;
+                return outputPath;
             }
         }
         throw new RuntimeException("Could not generate test certificate.");

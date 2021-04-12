@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import aero.minova.core.application.system.covid.test.print.MailService;
 import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -63,6 +64,9 @@ public class SqlProcedureController {
     @Autowired
     Gson gson;
 
+    @Autowired
+    MailService mailService;
+
     // , produces = "application/json"
     @SuppressWarnings("unchecked")
     @PostMapping(value = "data/procedure")
@@ -102,6 +106,9 @@ public class SqlProcedureController {
             List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
             if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
                 throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+            }
+            if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
+                mailService.xpctsInsertTestErgebnis(inputTable);
             }
             return new ResponseEntity(calculateSqlProcedureResult(inputTable), HttpStatus.ACCEPTED);
         } catch (Exception e) {

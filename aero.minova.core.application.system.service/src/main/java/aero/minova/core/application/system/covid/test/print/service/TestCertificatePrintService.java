@@ -38,8 +38,7 @@ public class TestCertificatePrintService {
     @Autowired
     TestCertificateMailService covidTestTestCertificateMailService;
 
-    public @ResponseBody
-    byte[] getTestCertificate(Integer keyLong) throws Exception {
+    public byte[] getTestCertificate(Integer keyLong) throws Exception {
         return Files.readAllBytes(getTestCertificatePath(keyLong));
     }
 

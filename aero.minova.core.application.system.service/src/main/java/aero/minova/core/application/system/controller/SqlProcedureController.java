@@ -16,8 +16,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import aero.minova.core.application.system.covid.test.print.TestCertificateMailService;
-import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
+import aero.minova.core.application.system.covid.test.print.service.TestCertificateMailService;
+import aero.minova.core.application.system.covid.test.print.service.TestCertificatePrintService;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class SqlProcedureController {
     TracController trac;
 
     @Autowired
-    TestCertificatePrintController testCertificatePrintController;
+    TestCertificatePrintService testCertificatePrintService;
 
     @Autowired
     SqlViewController svc;
@@ -75,7 +75,7 @@ public class SqlProcedureController {
             return ResponseEntity
                     .ok()
                     .contentType(MediaType.APPLICATION_PDF)
-                    .body(testCertificatePrintController
+                    .body(testCertificatePrintService
                             .getTestCertificate(
                                     inputTable
                                             .getRows()
@@ -108,7 +108,11 @@ public class SqlProcedureController {
             }
             val result = calculateSqlProcedureResult(inputTable);
             if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
-                testCertificatePrintController.xpctsInsertTestErgebnis(inputTable, result.getOutputParameters());
+                try {
+                    testCertificatePrintService.xpctsInsertTestErgebnis(inputTable, result.getOutputParameters());
+                } catch (Throwable th) {
+                    logger.error("Could not send certificate by e-mail.", th);
+                }
             }
             return new ResponseEntity(result, HttpStatus.ACCEPTED);
         } catch (Exception e) {

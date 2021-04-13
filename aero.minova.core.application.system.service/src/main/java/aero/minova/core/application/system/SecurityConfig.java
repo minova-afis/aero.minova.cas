@@ -1,6 +1,7 @@
 package aero.minova.core.application.system;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+import org.springframework.security.web.PortMapperImpl;
+import org.springframework.security.web.PortResolverImpl;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -39,6 +43,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Value("${login_dataSource:}")
 	private String dataSource;
+
+	@Value("${server.port:8084}")
+	private String serverPort;
 
 	@Autowired
 	SqlProcedureController spc;
@@ -63,6 +70,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.logout().permitAll();
 		http.requiresChannel().anyRequest().requiresSecure();
 		http.cors();
+		// TODO Die if-Bedingung ist ein Workaround für Tests, um Fehler zu verhindern.
+		if (Integer.parseInt(serverPort) > 10){
+			PortMapperImpl portMapper = new PortMapperImpl();
+			portMapper.setPortMappings(Collections.singletonMap(serverPort, serverPort));
+			PortResolverImpl portResolver = new PortResolverImpl();
+			portResolver.setPortMapper(portMapper);
+			LoginUrlAuthenticationEntryPoint entryPoint = new LoginUrlAuthenticationEntryPoint(
+					"/login");
+			entryPoint.setPortMapper(portMapper);
+			entryPoint.setPortResolver(portResolver);
+		}
 	}
 
 	@Bean

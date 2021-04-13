@@ -1,6 +1,7 @@
 package aero.minova.core.application.system.covid.test.print.controller;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -47,7 +48,7 @@ public class TestPersonController {
 	private final Pattern emailpattern = Pattern.compile("^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
 	private final Pattern postalcodepattern = Pattern.compile("^0[1-9]\\d\\d(?<!0100)0|0[1-9]\\d\\d[1-9]|[1-9]\\d{3}[0-8]|[1-9]\\d{3}(?<!9999)9$");
 
-	@PostMapping(value = "public/testPerson/register", produces = "application/json")
+	@PostMapping(value = "public/testPerson/register")
 	public void registerTestPerson(@RequestBody TestPersonInformation input) throws Exception {
 
 		// Überprüft die Angaben auf Format und Länge
@@ -55,7 +56,7 @@ public class TestPersonController {
 
 		// Überprüfen, ob die Person bereits im System registriert ist
 		Table sqlRequest = new Table();
-		sqlRequest.setName("xvctsTestPerson");
+		sqlRequest.setName("xvctsTestPersonIndex");
 		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
 		{
 			val firstRequestParams = new Row();
@@ -79,10 +80,10 @@ public class TestPersonController {
 		sqlInsertRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
 		sqlInsertRequest.addColumn(new Column("FirstName", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("LastName", DataType.STRING, OutputType.INPUT));
+		sqlInsertRequest.addColumn(new Column("Birthdate", DataType.INSTANT, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("Street", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("PostalCode", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("City", DataType.STRING, OutputType.INPUT));
-		sqlInsertRequest.addColumn(new Column("Birthdate", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("Phone", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("Phone2", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
@@ -93,10 +94,10 @@ public class TestPersonController {
 			secondRequestParams.addValue(null);
 			secondRequestParams.addValue(new Value(input.getFirstname(), null));
 			secondRequestParams.addValue(new Value(input.getLastname(), null));
+			secondRequestParams.addValue(new Value((input.getBirthdate()).atStartOfDay(ZoneId.systemDefault()).toInstant(), null));
 			secondRequestParams.addValue(new Value(input.getStreet(), null));
 			secondRequestParams.addValue(new Value(input.getPostalcode(), null));
 			secondRequestParams.addValue(new Value(input.getCity(), null));
-			secondRequestParams.addValue(new Value(Instant.from(input.getBirthdate()), null));
 			secondRequestParams.addValue(new Value(input.getPhonenumber(), null));
 			secondRequestParams.addValue(new Value(input.getPhonenumber2(), null));
 			secondRequestParams.addValue(new Value(input.getEmail(), null));
@@ -134,7 +135,7 @@ public class TestPersonController {
 		}
 
 		Table sqlRequest = new Table();
-		sqlRequest.setName("xvctsTestPerson");
+		sqlRequest.setName("xvctsTestPersonIndex");
 		sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
 		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("Password", DataType.STRING, OutputType.INPUT));
@@ -195,7 +196,7 @@ public class TestPersonController {
 		}
 
 		if (input.getBirthdate() != null) {
-			if (Instant.now().isAfter(Instant.from(input.getBirthdate()))) {
+			if (Instant.now().isBefore((input.getBirthdate()).atStartOfDay(ZoneId.systemDefault()).toInstant())) {
 				throw new RuntimeException("Der angegebene Geburtstag ist ungültig!");
 			}
 		} else {

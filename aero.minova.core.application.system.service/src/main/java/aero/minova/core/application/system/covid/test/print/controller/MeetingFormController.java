@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
@@ -24,6 +25,7 @@ import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
 import lombok.val;
 
+@RestController
 public class MeetingFormController {
 
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(ZoneId.systemDefault());
@@ -39,8 +41,8 @@ public class MeetingFormController {
 	public TestTermin bookMeeting(@RequestBody MeetingFormInformation input) throws Exception {
 
 		// Überprüfen, ob der Termin auch in der Zukunft liegt
-		if (input.getDate() != null) {
-			if (Instant.now().isAfter(Instant.from(input.getDate()))) {
+		if (input.getStarttime() != null) {
+			if (Instant.now().isAfter(Instant.from(input.getStarttime().atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
 				throw new RuntimeException("Der gewünschte Termin liegt bereits in der Vergangenheit!");
 			}
 		} else {
@@ -58,7 +60,7 @@ public class MeetingFormController {
 			sqlRequest.getRows().add(firstRequestParams);
 			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(new Value(input.getTestStreckKeyLong(), null));
-			firstRequestParams.addValue(new Value(Instant.from(input.getDate()), null));
+			firstRequestParams.addValue(new Value(Instant.from(input.getStarttime().atStartOfDay(ZoneId.systemDefault()).toInstant()), null));
 			firstRequestParams.addValue(null);
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
@@ -78,29 +80,29 @@ public class MeetingFormController {
 		Table procedureInput = new Table();
 		procedureInput.setName("xpctsUpdateTestTermin");
 		// Die Input-Variablen sind : @KeyLong des Termins, @CTSTestStreckeKey, @CTSTestPersonKey, @Starttime, @SecurityToken
-		sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("CTSTestStreckeKey", DataType.INTEGER, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("CTSTestPersonKey", DataType.INTEGER, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Starttime", DataType.INSTANT, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.INPUT));
+		procedureInput.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.INPUT));
+		procedureInput.addColumn(new Column("CTSTestStreckeKey", DataType.INTEGER, OutputType.INPUT));
+		procedureInput.addColumn(new Column("Starttime", DataType.INSTANT, OutputType.INPUT));
+		procedureInput.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.INPUT));
+		procedureInput.addColumn(new Column("CTSTestPersonKey", DataType.INTEGER, OutputType.INPUT));
 		// TeststreckenKey, Starttime und PersonenKey kommen aus dem GET.
 		// KeyLong des Testtermins und SecurityToken kommen aus der aufgerufenen View.
 		{
 			val firstRequestParams = new Row();
-			sqlRequest.getRows().add(firstRequestParams);
+			procedureInput.getRows().add(firstRequestParams);
 			firstRequestParams.addValue(viewOutput.get(0).getValues().get(0));
 			firstRequestParams.addValue(new Value(input.getTestStreckKeyLong(), null));
-			firstRequestParams.addValue(new Value(input.getTestPersonKeyLong(), null));
-			firstRequestParams.addValue(new Value(Instant.from(input.getDate()), null));
+			firstRequestParams.addValue(new Value(Instant.from(input.getStarttime().atStartOfDay(ZoneId.systemDefault()).toInstant()), null));
 			firstRequestParams.addValue(viewOutput.get(0).getValues().get(3));
+			firstRequestParams.addValue(new Value(input.getTestPersonKeyLong(), null));
 		}
-		sqlProcedureController.calculateSqlProcedureResult(sqlRequest);
+		sqlProcedureController.calculateSqlProcedureResult(procedureInput);
 
 		TestTermin termin = new TestTermin();
 		termin.setKeyLong(Long.parseLong(viewOutput.get(0).getValues().get(0).getStringValue()));
 		termin.setCTSTeststreckeKey(input.getTestStreckKeyLong());
 		termin.setCTSTestpersonKey(input.getTestPersonKeyLong());
-		termin.setStarttime(Instant.from(input.getDate()));
+		termin.setStarttime(Instant.from(input.getStarttime()));
 		return termin;
 	}
 

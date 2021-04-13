@@ -190,7 +190,7 @@ public class SqlViewController {
                     parameterOffset--;
                 }
             } catch (Exception e) {
-                logger.error("Statement could not be filled: " + sb.toString());
+                logger.error("Statement could not be filled: " + sb.toString(), e);
                 throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
             }
         }

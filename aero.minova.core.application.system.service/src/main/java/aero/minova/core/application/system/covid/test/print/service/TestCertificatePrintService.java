@@ -1,4 +1,4 @@
-package aero.minova.core.application.system.covid.test.print.controller;
+package aero.minova.core.application.system.covid.test.print.service;
 
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
-import aero.minova.core.application.system.covid.test.print.TestCertificateMailService;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
 import org.slf4j.Logger;
@@ -15,14 +14,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
 import ch.minova.xml.XMLServiceEvent;
 
-@RestController
-public class TestCertificatePrintController {
+@Service
+public class TestCertificatePrintService {
 
-    final Logger logger = LoggerFactory.getLogger(TestCertificatePrintController.class);
+    final Logger logger = LoggerFactory.getLogger(TestCertificatePrintService.class);
 
     @Value("${ch.minova.service.xmlprinter.service.port:1506}")
     private String xmlPrinterServicePort;

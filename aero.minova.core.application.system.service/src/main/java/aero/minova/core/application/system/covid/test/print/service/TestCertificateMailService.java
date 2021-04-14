@@ -71,19 +71,21 @@ public class TestCertificateMailService {
                 .stream()
                 .map(row -> row.getValues().get(0).getIntegerValue())
                 .forEach(terminKey -> {
+                    final File certificateFile;
                     try {
-                        final File certificateFile;
-                        try {
-                            certificateFile = testCertificatePrintService.getTestCertificatePath(terminKey).toFile();
-                        } catch (Exception e) {
-                            logger.error("Could not create certificate for termin: " + terminKey, e);
-                            markTerminAsSent(terminKey, -1);
-                            return;
-                        }
+                        certificateFile = testCertificatePrintService.getTestCertificatePath(terminKey).toFile();
+                    } catch (Exception e) {
+                        logger.error("Could not create certificate for termin: " + terminKey, e);
+                        markTerminAsSent(terminKey, -1);
+                        return;
+                    }
+                    try {
                         sendCertificateByMail
                                 (certificateFile, terminKey);
                         markTerminAsSent(terminKey, 1);
                     } catch (Exception e) {
+                        logger.error("Could not send certificate for termin: " + terminKey, e);
+                        markTerminAsSent(terminKey, -1);
                         throw new RuntimeException(e);
                     }
                 });

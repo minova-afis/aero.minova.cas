@@ -174,6 +174,7 @@ public class TestCertificateMailService {
             val message = mailSender.createMimeMessage();
             {
                 val helper = new MimeMessageHelper(message, true);
+                logger.info("Sending mail to: " + targetAddresses);
                 helper.setTo(targetAddresses.toArray(new String[targetAddresses.size()]));
                 helper.setFrom(mailAddress);
                 helper.setSubject("COVID-Test-Zertifikat");

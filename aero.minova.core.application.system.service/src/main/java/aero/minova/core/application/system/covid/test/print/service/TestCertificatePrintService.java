@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.domain.*;
@@ -84,10 +85,14 @@ public class TestCertificatePrintService {
                     .get(1)
                     .getIntegerValue();
             covidTestTestCertificateMailService.sendCertificateByMail
-                    (getTestCertificatePath(testTerminKeyLong).toFile(), "avots@minova.de");
+                    (getTestCertificatePath(testTerminKeyLong).toFile(), targetAddresses(testTerminKeyLong));
         } else {
             throw new IllegalArgumentException(inputTable.getName());
         }
+    }
+
+    public List<String> targetAddresses(Integer testTerminKeyLong) {
+
     }
 
     private void sleep() {

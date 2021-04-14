@@ -15,6 +15,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.List;
 
 @Service
 public class TestCertificateMailService {
@@ -29,7 +30,7 @@ public class TestCertificateMailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendCertificateByMail(File testCertificatePdf, Integer ergebnisKey) throws Exception {
+    /* TODO REMOVE public void sendCertificateByMail(File testCertificatePdf, Integer ergebnisKey) throws Exception {
         val ergebnisRequest = new Table();
         ergebnisRequest.setName("xvctsTestErgebnisCasIndex");
         ergebnisRequest.addColumn(new Column("KeyLong", DataType.INTEGER));
@@ -47,14 +48,14 @@ public class TestCertificateMailService {
                 .get(1)
                 .getStringValue();
         sendCertificateByMail(testCertificatePdf, targetEmail);
-    }
+    }*/
 
-    public void sendCertificateByMail(File testCertificatePdf, String... targetAddresses) {
+    public void sendCertificateByMail(File testCertificatePdf, List<String> targetAddresses) {
         try {
             val message = mailSender.createMimeMessage();
             {
                 val helper = new MimeMessageHelper(message, true);
-                helper.setTo(targetAddresses);
+                helper.setTo(targetAddresses.toArray(new String[targetAddresses.size()]));
                 helper.setFrom(mailAddress);
                 helper.setSubject("COVID-Test-Zertifikat");
                 helper.setText("<h1>Hallo,</h1><p>das Ergebnis des Covidtest ist im Anhang der Mail.</p>", true);

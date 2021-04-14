@@ -26,7 +26,7 @@ public class TeststeckenController {
     @GetMapping(value = "testStrecken/keyTexts", produces = "application/json")
     public List<TestStrecke> getTestStreckenKeyTexts() throws Exception {
         val sqlRequest = new Table();
-        sqlRequest.setName("xtctsTestStrecke");
+        sqlRequest.setName("xvctsTestStreckeIndex");
         sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
         sqlRequest.addColumn(new Column("KeyText", DataType.STRING, OutputType.OUTPUT));
 

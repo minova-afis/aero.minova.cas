@@ -50,7 +50,7 @@ public class TestCertificateMailService {
     @Scheduled(fixedRate = 1000 * 10)
     public void sendCertificate() throws Throwable {
         val sqlRequest = new Table();
-        sqlRequest.setName("xvctsTestTerminIndex");
+        sqlRequest.setName("xvctsTestTerminIndexWithErgebnis");
         sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
         sqlRequest.addColumn(new Column("IsSent", DataType.INTEGER, OutputType.OUTPUT));
         {

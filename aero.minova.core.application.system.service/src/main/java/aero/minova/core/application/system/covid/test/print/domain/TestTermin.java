@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TestTermin {
 	private Long keyLong;
-	private int CTSTeststreckeKey;
+	private long CTSTeststreckeKey;
 	private Long CTSTestpersonKey;
 	private String Starttime;
 }

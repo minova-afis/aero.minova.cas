@@ -104,7 +104,7 @@ public class TestPersonController {
 		}
 
 		sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
-
+//
 //		try {
 //			val message = mailSender.createMimeMessage();
 //			{

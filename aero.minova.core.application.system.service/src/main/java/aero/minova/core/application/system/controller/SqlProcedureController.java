@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import aero.minova.core.application.system.covid.test.print.service.TestCertificateMailService;
 import aero.minova.core.application.system.covid.test.print.service.TestCertificatePrintService;
+import aero.minova.core.application.system.domain.*;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +34,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.SqlProcedureResult;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import aero.minova.trac.integration.controller.TracController;
@@ -71,6 +65,10 @@ public class SqlProcedureController {
     @PostMapping(value = "data/procedure")
     public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
         logger.info("data/procedure: " + gson.toJson(inputTable));
+        if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
+            // TODO HACK
+            inputTable.getColumns().get(0).setOutputType(OUTPUT);
+        }
         if ("xpctsPrintTestergebnis".equals(inputTable.getName())) {
             return ResponseEntity
                     .ok()

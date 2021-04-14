@@ -81,16 +81,14 @@ public class TestCertificatePrintService {
                     .getValues()
                     .get(3)
                     .getIntegerValue();
-            if (testErgebnisValueKey == 1) {
-                val testCertificateKeyLong = outputTable
-                        .getRows()
-                        .get(0)
-                        .getValues()
-                        .get(0)
-                        .getIntegerValue();
-                covidTestTestCertificateMailService.sendCertificateByMail
-                        (getTestCertificatePath(testCertificateKeyLong).toFile());
-            }
+            val testCertificateKeyLong = outputTable
+                    .getRows()
+                    .get(0)
+                    .getValues()
+                    .get(0)
+                    .getIntegerValue();
+            covidTestTestCertificateMailService.sendCertificateByMail
+                    (getTestCertificatePath(testCertificateKeyLong).toFile());
         }
     }
 

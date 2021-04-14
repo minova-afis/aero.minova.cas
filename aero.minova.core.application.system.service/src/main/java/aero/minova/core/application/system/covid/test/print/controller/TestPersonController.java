@@ -10,12 +10,15 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
+import aero.minova.core.application.system.covid.test.print.MailService;
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonInformation;
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonKey;
 import aero.minova.core.application.system.covid.test.print.domain.UserInfo;
@@ -39,10 +42,10 @@ public class TestPersonController {
 
 	final Logger logger = LoggerFactory.getLogger(TestCertificatePrintController.class);
 
-//	@Autowired
-//	private JavaMailSender mailSender;
-//	@Autowired
-//	private MailService mailService;
+	@Autowired
+	private JavaMailSender mailSender;
+	@Autowired
+	private MailService mailService;
 
 	private final Pattern emailpattern = Pattern.compile("^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
 	private final Pattern postalcodepattern = Pattern.compile("^0[1-9]\\d\\d(?<!0100)0|0[1-9]\\d\\d[1-9]|[1-9]\\d{3}[0-8]|[1-9]\\d{3}(?<!9999)9$");
@@ -104,21 +107,21 @@ public class TestPersonController {
 		}
 
 		sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
-//
-//		try {
-//			val message = mailSender.createMimeMessage();
-//			{
-//				val helper = new MimeMessageHelper(message, true);
-//				helper.setTo(input.getEmail());
-//				helper.setFrom(mailService.mailAddress);
-//				helper.setSubject("COVID-Test-Account");
-//				helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", "
-//						+ "\n Sie haben sich erfolgreich registriert und können nun Termine über die App buchen.", true);
-//			}
-//			mailSender.send(message);
-//		} catch (Exception e) {
-//			logger.error("Could not send login email.", e);
-//		}
+
+		try {
+			val message = mailSender.createMimeMessage();
+			{
+				val helper = new MimeMessageHelper(message, true);
+				helper.setTo(input.getEmail());
+				helper.setFrom(mailService.mailAddress);
+				helper.setSubject("COVID-Test-Account");
+				helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", "
+						+ "\n Sie haben sich erfolgreich registriert und können nun Termine über die App buchen.", true);
+			}
+			mailSender.send(message);
+		} catch (Exception e) {
+			logger.error("Could not send login email.", e);
+		}
 
 	}
 

@@ -157,7 +157,7 @@ public class TestCertificateMailService {
         try {
             val t = sqlProcedureController
                     .calculateSqlProcedureResult(sqlRequest);
-            val rawAddresses = t
+            val rawAddressValues = t
                     .getResultSet()
                     .getRows()
                     .stream()
@@ -166,6 +166,20 @@ public class TestCertificateMailService {
                             .get(0)
                             .getStringValue())
                     .filter(e -> e != null)
+                    .collect(toList());
+
+            t
+                    .getResultSet()
+                    .getRows()
+                    .stream()
+                    .map(row -> row
+                            .getValues()
+                            .get(1)
+                            .getStringValue())
+                    .filter(e -> e != null)
+                    .forEach(e -> rawAddressValues.add(e));
+            val rawAddresses = rawAddressValues
+                    .stream()
                     .reduce("", (a, b) -> a + "; " + b)
                     .split(";");
             return Arrays.asList(rawAddresses).stream()

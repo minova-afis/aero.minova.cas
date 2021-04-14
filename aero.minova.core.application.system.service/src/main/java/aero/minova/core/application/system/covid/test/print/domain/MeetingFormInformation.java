@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class MeetingFormInformation {
-	private int testStreckKeyLong;
+	private long testStreckKeyLong;
 	private String starttime;
 	private long testPersonKeyLong;
 }

@@ -10,21 +10,20 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.covid.test.print.MailService;
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonInformation;
+import aero.minova.core.application.system.covid.test.print.domain.TestPersonKey;
 import aero.minova.core.application.system.covid.test.print.domain.UserInfo;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.Row;
+import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
 import lombok.val;
@@ -40,10 +39,10 @@ public class TestPersonController {
 
 	final Logger logger = LoggerFactory.getLogger(TestCertificatePrintController.class);
 
-	@Autowired
-	private JavaMailSender mailSender;
-	@Autowired
-	private MailService mailService;
+//	@Autowired
+//	private JavaMailSender mailSender;
+//	@Autowired
+//	private MailService mailService;
 
 	private final Pattern emailpattern = Pattern.compile("^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
 	private final Pattern postalcodepattern = Pattern.compile("^0[1-9]\\d\\d(?<!0100)0|0[1-9]\\d\\d[1-9]|[1-9]\\d{3}[0-8]|[1-9]\\d{3}(?<!9999)9$");
@@ -77,7 +76,7 @@ public class TestPersonController {
 
 		Table sqlInsertRequest = new Table();
 		sqlInsertRequest.setName("xpctsInsertTestPerson");
-		sqlInsertRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		sqlInsertRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.OUTPUT));
 		sqlInsertRequest.addColumn(new Column("FirstName", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("LastName", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("Birthdate", DataType.INSTANT, OutputType.INPUT));
@@ -106,20 +105,20 @@ public class TestPersonController {
 
 		sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
 
-		try {
-			val message = mailSender.createMimeMessage();
-			{
-				val helper = new MimeMessageHelper(message, true);
-				helper.setTo(input.getEmail());
-				helper.setFrom(mailService.mailAddress);
-				helper.setSubject("COVID-Test-Account");
-				helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", "
-						+ "\n Sie haben sich erfolgreich registriert und können nun Termine über die App buchen.", true);
-			}
-			mailSender.send(message);
-		} catch (Exception e) {
-			logger.error("Could not send login email.", e);
-		}
+//		try {
+//			val message = mailSender.createMimeMessage();
+//			{
+//				val helper = new MimeMessageHelper(message, true);
+//				helper.setTo(input.getEmail());
+//				helper.setFrom(mailService.mailAddress);
+//				helper.setSubject("COVID-Test-Account");
+//				helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", "
+//						+ "\n Sie haben sich erfolgreich registriert und können nun Termine über die App buchen.", true);
+//			}
+//			mailSender.send(message);
+//		} catch (Exception e) {
+//			logger.error("Could not send login email.", e);
+//		}
 
 	}
 
@@ -159,6 +158,61 @@ public class TestPersonController {
 			return result.get(0).getValues().get(0).getLongValue();
 		} else {
 			throw new RuntimeException("Fehler beim Login. Bitte überprüfen Sie Ihre angegebene Emailadresse und Ihr Passwort.");
+		}
+
+	}
+
+	@PostMapping(value = "public/testPerson/info", produces = "application/json")
+	public TestPersonInformation getTestPersonInformation(@RequestBody TestPersonKey key) throws Exception {
+
+		Table sqlRequest = new Table();
+		sqlRequest.setName("xpctsReadTestPerson");
+		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.INPUT));
+		sqlRequest.addColumn(new Column("FirstName", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("LastName", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Birthdate", DataType.ZONED, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Street", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("PostalCode", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("City", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Phone", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Phone2", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Password", DataType.STRING, OutputType.OUTPUT));
+		{
+			val firstRequestParams = new Row();
+			sqlRequest.getRows().add(firstRequestParams);
+			firstRequestParams.addValue(new Value(key.getCTSTestPersonKey(), null));
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(null);
+		}
+
+		SqlProcedureResult sql = sqlProcedureController.calculateSqlProcedureResult(sqlRequest);
+		Table result = sql.getOutputParameters();
+
+		// bei Fehlschlag sind alle Felder null, die Email sollte auf jeden Fall da sein, weil man sich sonst auch nicht einloggen könnte
+		if (!result.getRows().get(0).getValues().get(9).getStringValue().equals(null)) {
+			TestPersonInformation tpi = new TestPersonInformation();
+			tpi.setFirstname(result.getRows().get(0).getValues().get(1).getStringValue());
+			tpi.setLastname(result.getRows().get(0).getValues().get(2).getStringValue());
+			tpi.setBirthdate(result.getRows().get(0).getValues().get(3).getZonedDateTimeValue().toLocalDate());
+			tpi.setStreet(result.getRows().get(0).getValues().get(4).getStringValue());
+			tpi.setPostalcode(result.getRows().get(0).getValues().get(5).getStringValue());
+			tpi.setCity(result.getRows().get(0).getValues().get(6).getStringValue());
+			tpi.setPhonenumber(result.getRows().get(0).getValues().get(7).getStringValue());
+			tpi.setPhonenumber2(result.getRows().get(0).getValues().get(8).getStringValue());
+			tpi.setEmail(result.getRows().get(0).getValues().get(9).getStringValue());
+			tpi.setPassword("*****");
+			return tpi;
+		} else {
+			throw new RuntimeException("Fehler beim Laden der Nutzerdaten.");
 		}
 
 	}

@@ -28,10 +28,10 @@ public class TestCertificateMailService {
     @Value("${spring.mail.username:}")
     public String mailAddress;
 
-    @Value("${TestErgebnisPositiveKey}")
+    @Value("${testErgebnisPositiveKey}")
     public String testErgebnisPositiveKey;
 
-    @Value("${TestErgebnisNegativeKey}")
+    @Value("${testErgebnisNegativeKey}")
     public String testErgebnisNegativeKey;
 
     @Autowired

@@ -57,7 +57,7 @@ public class TestCertificateMailService {
             val firstRequestParams = new Row();
             sqlRequest.getRows().add(firstRequestParams);
             firstRequestParams.addValue(null);
-            firstRequestParams.addValue(new aero.minova.core.application.system.domain.Value(0, null));
+            firstRequestParams.addValue(new aero.minova.core.application.system.domain.Value((Integer) 0, null));
         }
         // Hiermit wird der unsichere Zugriff ermöglicht.
         val requestingAuthority = new Row();
@@ -72,23 +72,33 @@ public class TestCertificateMailService {
                 .map(row -> row.getValues().get(0).getIntegerValue())
                 .forEach(terminKey -> {
                     try {
+                        final File certificateFile;
+                        try {
+                            certificateFile = testCertificatePrintService.getTestCertificatePath(terminKey).toFile();
+                        } catch (Exception e) {
+                            logger.error("Could not create certificate for termin: " + terminKey, e);
+                            markTerminAsSent(terminKey, -1);
+                            return;
+                        }
                         sendCertificateByMail
-                                (testCertificatePrintService.getTestCertificatePath(terminKey).toFile(), terminKey);
-                        markTerminAsSent(terminKey);
+                                (certificateFile, terminKey);
+                        markTerminAsSent(terminKey, 1);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 });
     }
 
-    private void markTerminAsSent(Integer terminKey) {
+    private void markTerminAsSent(Integer terminKey, Integer sendStatus) {
         val sqlRequest = new Table();
         sqlRequest.setName("xpctsUpdateTestTerminAsSent");
         sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER));
+        sqlRequest.addColumn(new Column("IsSent", DataType.INTEGER));
         {
             val requestParam = new Row();
             sqlRequest.getRows().add(requestParam);
             requestParam.addValue(new aero.minova.core.application.system.domain.Value(terminKey, null));
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(sendStatus, null));
         }
         // Hiermit wird der unsichere Zugriff ermöglicht.
         val requestingAuthority = new Row();

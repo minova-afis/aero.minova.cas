@@ -107,7 +107,7 @@ public class SqlProcedureController {
             val result = calculateSqlProcedureResult(inputTable);
             if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
                 try {
-                    testCertificatePrintService.xpctsInsertTestErgebnis(inputTable, result.getOutputParameters());
+                    //testCertificatePrintService.xpctsInsertTestErgebnis(inputTable, result.getOutputParameters());
                 } catch (Throwable th) {
                     logger.error("Could not send certificate by e-mail.", th);
                 }

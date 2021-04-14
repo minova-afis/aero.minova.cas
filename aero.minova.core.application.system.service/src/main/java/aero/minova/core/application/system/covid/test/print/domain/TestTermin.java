@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TestTermin {
 	private Long keyLong;
-	private Integer CTSTeststreckeKey;
-	private Integer CTSTestpersonKey;
+	private int CTSTeststreckeKey;
+	private Long CTSTestpersonKey;
 	private Instant Starttime;
 }

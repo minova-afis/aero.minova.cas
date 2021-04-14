@@ -15,7 +15,11 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class TestCertificateMailService {
@@ -23,6 +27,12 @@ public class TestCertificateMailService {
 
     @Value("${spring.mail.username:}")
     public String mailAddress;
+
+    @Value("${TestErgebnisPositiveKey}")
+    public String testErgebnisPositiveKey;
+
+    @Value("${TestErgebnisNegativeKey}")
+    public String testErgebnisNegativeKey;
 
     @Autowired
     private SqlProcedureController sqlProcedureController;
@@ -50,8 +60,51 @@ public class TestCertificateMailService {
         sendCertificateByMail(testCertificatePdf, targetEmail);
     }*/
 
-    public void sendCertificateByMail(File testCertificatePdf, List<String> targetAddresses) {
+    public List<String> targetAddresses(Integer testTerminKeyLong) {
+        val sqlRequest = new Table();
+        sqlRequest.setName("xpctsReadCertificateTargetAddresses");
+        sqlRequest.addColumn(new Column("TerminKey", DataType.INTEGER));
+        sqlRequest.addColumn(new Column("TestErgebnisPositiveKey", DataType.INTEGER));
+        sqlRequest.addColumn(new Column("TestErgebnisNegativeKey", DataType.INTEGER));
+        {
+            val requestParam = new Row();
+            sqlRequest.getRows().add(requestParam);
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(testTerminKeyLong, null));
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(Integer.parseInt(testErgebnisNegativeKey), null));
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(Integer.parseInt(testErgebnisPositiveKey), null));
+        }
+        // Hiermit wird der unsichere Zugriff ermöglicht.
+        val requestingAuthority = new Row();
+        requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "1"));
+        requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "2"));
+        requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
+        final String reportBody;
         try {
+            val t = sqlProcedureController
+                    .calculateSqlProcedureResult(sqlRequest);
+            val rawAddresses = t
+                    .getResultSet()
+                    .getRows()
+                    .stream()
+                    .map(row -> row
+                            .getValues()
+                            .get(0)
+                            .getStringValue())
+                    .reduce("", (a, b) -> a + "; " + b)
+                    .split(";");
+            return Arrays.asList(rawAddresses).stream()
+                    .map(e -> e.trim())
+                    .filter(e -> !e.isEmpty())
+                    .distinct()
+                    .collect(toList());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendCertificateByMail(File testCertificatePdf, Integer testTerminKeyLong) {
+        try {
+            val targetAddresses = targetAddresses(testTerminKeyLong);
             val message = mailSender.createMimeMessage();
             {
                 val helper = new MimeMessageHelper(message, true);

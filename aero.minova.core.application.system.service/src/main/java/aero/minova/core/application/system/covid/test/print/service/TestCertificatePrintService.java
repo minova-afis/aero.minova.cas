@@ -85,14 +85,10 @@ public class TestCertificatePrintService {
                     .get(1)
                     .getIntegerValue();
             covidTestTestCertificateMailService.sendCertificateByMail
-                    (getTestCertificatePath(testTerminKeyLong).toFile(), targetAddresses(testTerminKeyLong));
+                    (getTestCertificatePath(testTerminKeyLong).toFile(), testTerminKeyLong);
         } else {
             throw new IllegalArgumentException(inputTable.getName());
         }
-    }
-
-    public List<String> targetAddresses(Integer testTerminKeyLong) {
-
     }
 
     private void sleep() {

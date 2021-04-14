@@ -55,7 +55,7 @@ public class MeetingFormController {
 		val sqlRequest = new Table();
 		sqlRequest.setName("xvctsTestTerminBuchung");
 		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.OUTPUT));
-		sqlRequest.addColumn(new Column("ctsTestStreckeKey", DataType.INTEGER, OutputType.INPUT));
+		sqlRequest.addColumn(new Column("ctsTestStreckeKey", DataType.LONG, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("Starttime", DataType.INSTANT, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.INPUT));
 		{
@@ -84,7 +84,7 @@ public class MeetingFormController {
 		procedureInput.setName("xpctsUpdateTestTermin");
 		// Die Input-Variablen sind : @KeyLong des Termins, @CTSTestStreckeKey, @CTSTestPersonKey, @Starttime, @SecurityToken
 		procedureInput.addColumn(new Column("KeyLong", DataType.LONG, OutputType.INPUT));
-		procedureInput.addColumn(new Column("CTSTestStreckeKey", DataType.INTEGER, OutputType.INPUT));
+		procedureInput.addColumn(new Column("CTSTestStreckeKey", DataType.LONG, OutputType.INPUT));
 		procedureInput.addColumn(new Column("Starttime", DataType.INSTANT, OutputType.INPUT));
 		procedureInput.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.INPUT));
 		procedureInput.addColumn(new Column("CTSTestPersonKey", DataType.LONG, OutputType.INPUT));

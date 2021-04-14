@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class MeetingFormInformation {
 	private int testStreckKeyLong;
 	private LocalDate starttime;
-	private int testPersonKeyLong;
+	private long testPersonKeyLong;
 }

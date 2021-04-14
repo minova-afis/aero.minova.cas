@@ -136,7 +136,7 @@ public class TestPersonController {
 
 		Table sqlRequest = new Table();
 		sqlRequest.setName("xvctsTestPersonIndex");
-		sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.OUTPUT));
 		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("Password", DataType.STRING, OutputType.INPUT));
 		{
@@ -154,9 +154,9 @@ public class TestPersonController {
 
 		List<Row> result = sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows();
 
-		if (result.get(0).getValues().size() > 0) {
+		if (result.size() > 0) {
 			// Zurückgeben des KeyLongs
-			return Long.valueOf(result.get(0).getValues().get(0).getIntegerValue());
+			return result.get(0).getValues().get(0).getLongValue();
 		} else {
 			throw new RuntimeException("Fehler beim Login. Bitte überprüfen Sie Ihre angegebene Emailadresse und Ihr Passwort.");
 		}

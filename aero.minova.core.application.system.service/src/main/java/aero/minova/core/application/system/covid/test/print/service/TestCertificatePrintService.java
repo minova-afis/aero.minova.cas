@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import ch.minova.xml.XMLServiceEvent;
 
+import static aero.minova.core.application.system.domain.OutputType.OUTPUT;
+
 @Service
 public class TestCertificatePrintService {
 
@@ -42,16 +44,16 @@ public class TestCertificatePrintService {
         return Files.readAllBytes(getTestCertificatePath(keyLong));
     }
 
-    private Path getTestCertificatePath(Integer keyLong) throws Exception {
-        val testCertificateReportXml = testCertificateReportXml(keyLong);
+    private Path getTestCertificatePath(Integer testTerminKeyLong) throws Exception {
+        val testCertificateReportXml = testCertificateReportXml(testTerminKeyLong);
         val printContainer = Paths.get(temporaryFolder);
         Files.createDirectories(printContainer);
-        val inputFile = printContainer.resolve("xpctsXMLTestzertifikat." + keyLong + ".xml").toAbsolutePath();
+        val inputFile = printContainer.resolve("xpctsXMLTestzertifikat." + testTerminKeyLong + ".xml").toAbsolutePath();
         if (Files.exists(inputFile)) {
             Files.delete(inputFile);
         }
         Files.write(inputFile, testCertificateReportXml.getBytes(StandardCharsets.UTF_8));
-        val outputPath = printContainer.resolve("xpctsXMLTestzertifikat." + keyLong + ".pdf").toAbsolutePath();
+        val outputPath = printContainer.resolve("xpctsXMLTestzertifikat." + testTerminKeyLong + ".pdf").toAbsolutePath();
         if (Files.exists(outputPath)) {
             Files.delete(outputPath);
         }
@@ -75,20 +77,16 @@ public class TestCertificatePrintService {
 
     public void xpctsInsertTestErgebnis(Table inputTable, Table outputTable) throws Exception {
         if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
-            val testErgebnisValueKey = inputTable
+            val testTerminKeyLong = outputTable
                     .getRows()
                     .get(0)
                     .getValues()
-                    .get(3)
-                    .getIntegerValue();
-            val testCertificateKeyLong = outputTable
-                    .getRows()
-                    .get(0)
-                    .getValues()
-                    .get(0)
+                    .get(1)
                     .getIntegerValue();
             covidTestTestCertificateMailService.sendCertificateByMail
-                    (getTestCertificatePath(testCertificateKeyLong).toFile());
+                    (getTestCertificatePath(testTerminKeyLong).toFile(), "avots@minova.de");
+        } else {
+            throw new IllegalArgumentException(inputTable.getName());
         }
     }
 

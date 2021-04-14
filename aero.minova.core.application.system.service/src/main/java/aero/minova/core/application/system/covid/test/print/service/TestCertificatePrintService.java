@@ -8,12 +8,14 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +47,7 @@ public class TestCertificatePrintService {
         return Files.readAllBytes(getTestCertificatePath(keyLong));
     }
 
-    private Path getTestCertificatePath(Integer testTerminKeyLong) throws Exception {
+    public Path getTestCertificatePath(Integer testTerminKeyLong) throws Exception {
         val testCertificateReportXml = testCertificateReportXml(testTerminKeyLong);
         val printContainer = Paths.get(temporaryFolder);
         Files.createDirectories(printContainer);
@@ -76,6 +78,7 @@ public class TestCertificatePrintService {
         throw new RuntimeException("Could not generate test certificate.");
     }
 
+    // TODO Wird nie aufgerufen.
     public void xpctsInsertTestErgebnis(Table inputTable, Table outputTable) throws Exception {
         if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
             val testTerminKeyLong = outputTable

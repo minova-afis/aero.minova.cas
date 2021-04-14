@@ -61,7 +61,9 @@ public class MeetingController {
 		requestingAuthority.addValue(new Value(false, "3"));
 
 		return sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows().stream()
-				.map(row -> new Timeslot(row.getValues().get(1).getZonedDateTimeValue(), null, row.getValues().get(3).getIntegerValue())).collect(toList());
+				.map(row -> new Timeslot(row.getValues().get(1).getZonedDateTimeValue().toLocalDateTime().atZone(ZoneId.of("Europe/Berlin")), null,
+						row.getValues().get(3).getIntegerValue()))
+				.collect(toList());
 	}
 
 	@PostMapping(value = "public/meeting/date/available", produces = "application/json")

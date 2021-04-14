@@ -212,7 +212,7 @@ public class TestPersonController {
 			tpi.setPhonenumber(result.getRows().get(0).getValues().get(7).getStringValue());
 			tpi.setPhonenumber2(result.getRows().get(0).getValues().get(8).getStringValue());
 			tpi.setEmail(result.getRows().get(0).getValues().get(9).getStringValue());
-			tpi.setPassword("*****");
+			tpi.setPassword(result.getRows().get(0).getValues().get(10).getStringValue());
 			return tpi;
 		} else {
 			throw new RuntimeException("Fehler beim Laden der Nutzerdaten.");

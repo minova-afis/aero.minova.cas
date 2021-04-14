@@ -109,6 +109,7 @@ public class SqlViewController {
             val viewQuery = pagingWithSeek(inputTable, false, -1, false, 1, requestingAuthorities);
             val preparedStatement = connection.prepareCall(viewQuery);
             val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+            logger.info("Executing statements: " + sb.toString());
             ResultSet resultSet = preparedViewStatement.executeQuery();
 
             result = convertSqlResultToTable(inputTable, resultSet);
@@ -253,7 +254,7 @@ public class SqlViewController {
             val result = convertSqlResultToTable(inputTable, resultSet);
             return result;
         } catch (Exception e) {
-            logger.error("Statement could not be executed: " + sb.toString());
+            logger.error("Statement could not be executed: " + sb.toString(), e);
             throw new RuntimeException(e);
         }
     }

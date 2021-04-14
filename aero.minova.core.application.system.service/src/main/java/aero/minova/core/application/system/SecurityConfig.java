@@ -35,98 +35,87 @@ import aero.minova.core.application.system.sql.SystemDatabase;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Value("${security_ldap_domain:minova.com}")
-	private String domain;
+    @Value("${security_ldap_domain:minova.com}")
+    private String domain;
 
-	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
-	private String ldapServerAddress;
+    @Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
+    private String ldapServerAddress;
 
-	@Value("${login_dataSource:}")
-	private String dataSource;
+    @Value("${login_dataSource:}")
+    private String dataSource;
 
-	@Value("${server.port:8084}")
-	private String serverPort;
+    @Value("${server.port:8084}")
+    private String serverPort;
 
-	@Autowired
-	SqlProcedureController spc;
+    @Autowired
+    SqlProcedureController spc;
 
-	@Autowired
-	SystemDatabase systemDatabase;
+    @Autowired
+    SystemDatabase systemDatabase;
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
-				.antMatchers("/", "testPerson/register", "testPerson/finishregistration", "testPerson/login", "/testStrecken/keyTexts",
-						"/meeting/time/available", "/meeting/date/available", "/meeting/book", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
-				.permitAll();
-		http.authorizeRequests().anyRequest().fullyAuthenticated();
-		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
-		http.formLogin()//
-				.loginPage("/login")//
-				.defaultSuccessUrl("/")//
-				.permitAll();
-		http.httpBasic();
-		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
-		http.logout().permitAll();
-		http.requiresChannel().anyRequest().requiresSecure();
-		http.cors();
-		// TODO Die if-Bedingung ist ein Workaround für Tests, um Fehler zu verhindern.
-		if (Integer.parseInt(serverPort) > 10){
-			PortMapperImpl portMapper = new PortMapperImpl();
-			portMapper.setPortMappings(Collections.singletonMap(serverPort, serverPort));
-			PortResolverImpl portResolver = new PortResolverImpl();
-			portResolver.setPortMapper(portMapper);
-			LoginUrlAuthenticationEntryPoint entryPoint = new LoginUrlAuthenticationEntryPoint(
-					"/login");
-			entryPoint.setPortMapper(portMapper);
-			entryPoint.setPortResolver(portResolver);
-		}
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/", "testPerson/register", "testPerson/finishregistration", "testPerson/login", "/testStrecken/keyTexts",
+                        "/meeting/time/available", "/meeting/date/available", "/meeting/book", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
+                .permitAll();
+        http.authorizeRequests().anyRequest().fullyAuthenticated();
+        http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
+        http.formLogin()//
+                .loginPage("/login")//
+                .defaultSuccessUrl("/")//
+                .permitAll();
+        http.httpBasic();
+        http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
+        http.logout().permitAll();
+        http.requiresChannel().anyRequest().requiresSecure();
+        http.cors();
+    }
 
-	@Bean
-	public SpringSecurityDialect springSecurityDialect() {
-		return new SpringSecurityDialect();
-	}
+    @Bean
+    public SpringSecurityDialect springSecurityDialect() {
+        return new SpringSecurityDialect();
+    }
 
-	@Override
-	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		if (dataSource.equals("ldap")) {
-			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
-			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
-			auth.authenticationProvider(acldap);
-		} else if (dataSource.equals("database")) {
-			auth.jdbcAuthentication()//
-					.dataSource(systemDatabase.getDataSource())//
-					.usersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?")//
-					.authoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
-		} else if (dataSource.equals("admin")) {
-			auth.inMemoryAuthentication()//
-					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
-		}
-	}
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        if (dataSource.equals("ldap")) {
+            ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
+            acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
+            auth.authenticationProvider(acldap);
+        } else if (dataSource.equals("database")) {
+            auth.jdbcAuthentication()//
+                    .dataSource(systemDatabase.getDataSource())//
+                    .usersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?")//
+                    .authoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
+        } else if (dataSource.equals("admin")) {
+            auth.inMemoryAuthentication()//
+                    .withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
+        }
+    }
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean("ldapUser")
-	public UserDetailsContextMapper userDetailsContextMapper() throws RuntimeException {
-		return new LdapUserDetailsMapper() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
-					throws RuntimeException {
-				List<GrantedAuthority> grantedAuthorities = spc.loadPrivileges(username, (List<GrantedAuthority>) authorities);
-				return super.mapUserFromContext(ctx, username, grantedAuthorities);
-			}
-		};
-	}
+    @Bean("ldapUser")
+    public UserDetailsContextMapper userDetailsContextMapper() throws RuntimeException {
+        return new LdapUserDetailsMapper() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
+                    throws RuntimeException {
+                List<GrantedAuthority> grantedAuthorities = spc.loadPrivileges(username, (List<GrantedAuthority>) authorities);
+                return super.mapUserFromContext(ctx, username, grantedAuthorities);
+            }
+        };
+    }
 
-	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
-		return source;
-	}
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return source;
+    }
 }

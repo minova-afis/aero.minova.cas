@@ -147,7 +147,6 @@ public class MeetingFormController {
 		if (termin.isAfter(Instant.now())) {
 			ter.setType("Termin");
 			ter.setDescription("Test ist noch ausstehend");
-			ter.setTestequipment("");
 		} else {
 			ter.setType("Testergebnis");
 			String ergebnis = results.get(0).getValues().get(3).getStringValue();
@@ -156,12 +155,12 @@ public class MeetingFormController {
 			} else {
 				ter.setDescription(ergebnis);
 			}
-			String kit = results.get(0).getValues().get(4).getStringValue();
-			if (kit != null) {
-				ter.setTestequipment(kit);
-			} else {
-				ter.setTestequipment("Kein Testkit angegeben");
-			}
+		}
+		String kit = results.get(0).getValues().get(4).getStringValue();
+		if (kit != null) {
+			ter.setTestequipment(kit);
+		} else {
+			ter.setTestequipment("Kein Testkit angegeben");
 		}
 		ter.setBookingdate(LocalDateTime.ofInstant(termin, ZoneId.systemDefault()).format(DATE_FORMATTER));
 		return ter;

@@ -51,13 +51,15 @@ public class TestCertificateMailService {
         sqlRequest.setName("xtctsTestErgebnis");
         sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
         sqlRequest.addColumn(new Column("LastAction", DataType.INTEGER, OutputType.OUTPUT));
-        sqlRequest.addColumn(new Column("IsSent", DataType.INTEGER, OutputType.OUTPUT));
+        sqlRequest.addColumn(new Column("CTSSendStatusKey", DataType.INTEGER, OutputType.OUTPUT));
+        sqlRequest.addColumn(new Column("CTSTestTerminKey", DataType.INTEGER, OutputType.OUTPUT));
         {
             val firstRequestParams = new Row();
             sqlRequest.getRows().add(firstRequestParams);
             firstRequestParams.addValue(null);
             firstRequestParams.addValue(new aero.minova.core.application.system.domain.Value((Integer) 0, ">"));
             firstRequestParams.addValue(new aero.minova.core.application.system.domain.Value((Integer) 2, null));
+            firstRequestParams.addValue(null);
         }
         // Hiermit wird der unsichere Zugriff ermöglicht.
         val requestingAuthority = new Row();
@@ -68,17 +70,18 @@ public class TestCertificateMailService {
         sqlViewController.unsecurelyGetIndexView(sqlRequest, asList(requestingAuthority))
                 .getRows()
                 .stream()
-                .map(row -> row.getValues().get(0).getIntegerValue())
-                .forEach(terminKey -> {
+                .forEach(row -> {
                     final File certificateFile;
+                    val testErgebnisKey = row.getValues().get(0).getIntegerValue();
+                    val testTerminKey = row.getValues().get(3).getIntegerValue();
                     try {
-                        certificateFile = testCertificatePrintService.getTestCertificatePath(terminKey).toFile();
+                        certificateFile = testCertificatePrintService.getTestCertificatePath(testTerminKey).toFile();
                     } catch (Exception e) {
-                        logger.error("Could not create certificate for test ergebnis: " + terminKey, e);
-                        markErgebnisAsSentWithError(terminKey);
+                        logger.error("Could not create certificate for test termin: " + testTerminKey, e);
+                        markErgebnisAsSentWithError(testErgebnisKey);
                         return;
                     }
-                    sendCertificateByMail(certificateFile, terminKey);
+                    sendCertificateByMail(certificateFile, testErgebnisKey);
                 });
     }
 
@@ -204,7 +207,7 @@ public class TestCertificateMailService {
             mailSender.send(message);
             markErgebnisAsSent(testErgebnisKey, targetAddresses);
         } catch (Exception e) {
-            logger.error("Could not send certificate for termin: " + testErgebnisKey, e);
+            logger.error("Could not send certificate for Testergebnis: " + testErgebnisKey, e);
             markErgebnisAsSentWithError(testErgebnisKey);
             throw new RuntimeException(e);
         }

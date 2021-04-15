@@ -331,8 +331,10 @@ public class SqlViewController {
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
-			if (!where.trim().equals(""))
+			if (!where.trim().equals("")) {
 				whereClauseExists = true;
+				sb.append(")");
+			}
 		}
 
 		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
@@ -368,8 +370,10 @@ public class SqlViewController {
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
-			if (!where.trim().equals(""))
+			if (!where.trim().equals("")) {
 				whereClauseExists = true;
+				sb.append(")");
+			}
 		}
 		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
@@ -564,7 +568,6 @@ public class SqlViewController {
 				where.append('(').append(clause.toString()).append(')');
 			}
 		}
-		where.append(" )");
 		return where.toString();
 	}
 

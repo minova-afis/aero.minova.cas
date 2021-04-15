@@ -2,7 +2,6 @@ package aero.minova.core.application.system.covid.test.print.service;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.covid.test.print.domain.AvailableTestsPerDate;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
 import org.slf4j.Logger;
@@ -15,11 +14,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -50,14 +48,16 @@ public class TestCertificateMailService {
     @Scheduled(fixedRate = 1000 * 10)
     public void sendCertificate() throws Throwable {
         val sqlRequest = new Table();
-        sqlRequest.setName("xvctsTestTerminIndexWithErgebnis");
+        sqlRequest.setName("xtctsTestErgebnis");
         sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+        sqlRequest.addColumn(new Column("LastAction", DataType.INTEGER, OutputType.OUTPUT));
         sqlRequest.addColumn(new Column("IsSent", DataType.INTEGER, OutputType.OUTPUT));
         {
             val firstRequestParams = new Row();
             sqlRequest.getRows().add(firstRequestParams);
             firstRequestParams.addValue(null);
-            firstRequestParams.addValue(new aero.minova.core.application.system.domain.Value((Integer) 0, null));
+            firstRequestParams.addValue(new aero.minova.core.application.system.domain.Value((Integer) 0, ">"));
+            firstRequestParams.addValue(new aero.minova.core.application.system.domain.Value((Integer) 2, null));
         }
         // Hiermit wird der unsichere Zugriff ermöglicht.
         val requestingAuthority = new Row();
@@ -65,8 +65,7 @@ public class TestCertificateMailService {
         requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "2"));
         requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
 
-
-        sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority))
+        sqlViewController.unsecurelyGetIndexView(sqlRequest, asList(requestingAuthority))
                 .getRows()
                 .stream()
                 .map(row -> row.getValues().get(0).getIntegerValue())
@@ -75,32 +74,49 @@ public class TestCertificateMailService {
                     try {
                         certificateFile = testCertificatePrintService.getTestCertificatePath(terminKey).toFile();
                     } catch (Exception e) {
-                        logger.error("Could not create certificate for termin: " + terminKey, e);
-                        markTerminAsSent(terminKey, -1);
+                        logger.error("Could not create certificate for test ergebnis: " + terminKey, e);
+                        markErgebnisAsSentWithError(terminKey);
                         return;
                     }
-                    try {
-                        sendCertificateByMail
-                                (certificateFile, terminKey);
-                        markTerminAsSent(terminKey, 1);
-                    } catch (Exception e) {
-                        logger.error("Could not send certificate for termin: " + terminKey, e);
-                        markTerminAsSent(terminKey, -1);
-                        throw new RuntimeException(e);
-                    }
+                    sendCertificateByMail(certificateFile, terminKey);
                 });
     }
 
-    private void markTerminAsSent(Integer terminKey, Integer sendStatus) {
+    private void markErgebnisAsSent(Integer testErgebnisKey, List<String> targetAddresses) {
         val sqlRequest = new Table();
-        sqlRequest.setName("xpctsUpdateTestTerminAsSent");
+        sqlRequest.setName("xpctsUpdateTestErgebnisAsSent");
         sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER));
-        sqlRequest.addColumn(new Column("IsSent", DataType.INTEGER));
+        sqlRequest.addColumn(new Column("MailRecipients", DataType.INTEGER));
         {
             val requestParam = new Row();
             sqlRequest.getRows().add(requestParam);
-            requestParam.addValue(new aero.minova.core.application.system.domain.Value(terminKey, null));
-            requestParam.addValue(new aero.minova.core.application.system.domain.Value(sendStatus, null));
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(testErgebnisKey, null));
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(
+                    targetAddresses
+                            .stream()
+                            .reduce("", (a, b) -> a + ";" + b)
+                    , null));
+        }
+        // Hiermit wird der unsichere Zugriff ermöglicht.
+        val requestingAuthority = new Row();
+        requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "1"));
+        requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "2"));
+        requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
+        try {
+            sqlProcedureController.calculateSqlProcedureResult(sqlRequest);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void markErgebnisAsSentWithError(Integer testErgebnisKey) {
+        val sqlRequest = new Table();
+        sqlRequest.setName("xpctsUpdateTestErgebnisAsSentWithError");
+        sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER));
+        {
+            val requestParam = new Row();
+            sqlRequest.getRows().add(requestParam);
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(testErgebnisKey, null));
         }
         // Hiermit wird der unsichere Zugriff ermöglicht.
         val requestingAuthority = new Row();
@@ -115,16 +131,16 @@ public class TestCertificateMailService {
         }
     }
 
-    public List<String> targetAddresses(Integer testTerminKeyLong) {
+    public List<String> targetAddresses(Integer testErgebnisKey) {
         val sqlRequest = new Table();
         sqlRequest.setName("xpctsReadCertificateTargetAddresses");
-        sqlRequest.addColumn(new Column("TerminKey", DataType.INTEGER));
+        sqlRequest.addColumn(new Column("TestErgebnisKey", DataType.INTEGER));
         sqlRequest.addColumn(new Column("TestErgebnisPositiveKey", DataType.INTEGER));
         sqlRequest.addColumn(new Column("TestErgebnisNegativeKey", DataType.INTEGER));
         {
             val requestParam = new Row();
             sqlRequest.getRows().add(requestParam);
-            requestParam.addValue(new aero.minova.core.application.system.domain.Value(testTerminKeyLong, null));
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(testErgebnisKey, null));
             requestParam.addValue(new aero.minova.core.application.system.domain.Value(Integer.parseInt(testErgebnisNegativeKey), null));
             requestParam.addValue(new aero.minova.core.application.system.domain.Value(Integer.parseInt(testErgebnisPositiveKey), null));
         }
@@ -135,9 +151,9 @@ public class TestCertificateMailService {
         requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
         final String reportBody;
         try {
-            val t = sqlProcedureController
+            val sqlResult = sqlProcedureController
                     .calculateSqlProcedureResult(sqlRequest);
-            val rawAddressValues = t
+            val rawAddressValues = sqlResult
                     .getResultSet()
                     .getRows()
                     .stream()
@@ -147,9 +163,7 @@ public class TestCertificateMailService {
                             .getStringValue())
                     .filter(e -> e != null)
                     .collect(toList());
-
-            t
-                    .getResultSet()
+            sqlResult.getResultSet()
                     .getRows()
                     .stream()
                     .map(row -> row
@@ -162,7 +176,7 @@ public class TestCertificateMailService {
                     .stream()
                     .reduce("", (a, b) -> a + "; " + b)
                     .split(";");
-            return Arrays.asList(rawAddresses).stream()
+            return asList(rawAddresses).stream()
                     .filter(e -> e != null)
                     .map(e -> e.trim())
                     .filter(e -> !e.isEmpty())
@@ -173,19 +187,26 @@ public class TestCertificateMailService {
         }
     }
 
-    public void sendCertificateByMail(File testCertificatePdf, Integer testTerminKeyLong) throws Exception {
-        logger.info("Sending mail for termin: " + testTerminKeyLong);
-        val targetAddresses = targetAddresses(testTerminKeyLong);
-        val message = mailSender.createMimeMessage();
-        {
-            val helper = new MimeMessageHelper(message, true);
-            logger.info("Sending mail to: " + targetAddresses);
-            helper.setTo(targetAddresses.toArray(new String[targetAddresses.size()]));
-            helper.setFrom(mailAddress);
-            helper.setSubject("COVID-Test-Zertifikat");
-            helper.setText("<h1>Hallo,</h1><p>das Ergebnis des Corona-Tests ist im Anhang der Mail.</p>", true);
-            helper.addAttachment("COVID-Test-Zertifikat.pdf", testCertificatePdf);
+    public void sendCertificateByMail(File testCertificatePdf, Integer testErgebnisKey) {
+        try {
+            logger.info("Sending mail for Testergebnis: " + testErgebnisKey);
+            val targetAddresses = targetAddresses(testErgebnisKey);
+            val message = mailSender.createMimeMessage();
+            {
+                val helper = new MimeMessageHelper(message, true);
+                logger.info("Sending mail to: " + targetAddresses);
+                helper.setTo(targetAddresses.toArray(new String[targetAddresses.size()]));
+                helper.setFrom(mailAddress);
+                helper.setSubject("COVID-Test-Zertifikat");
+                helper.setText("<h1>Hallo,</h1><p>das Ergebnis des Corona-Tests ist im Anhang der Mail.</p>", true);
+                helper.addAttachment("COVID-Test-Zertifikat.pdf", testCertificatePdf);
+            }
+            mailSender.send(message);
+            markErgebnisAsSent(testErgebnisKey, targetAddresses);
+        } catch (Exception e) {
+            logger.error("Could not send certificate for termin: " + testErgebnisKey, e);
+            markErgebnisAsSentWithError(testErgebnisKey);
+            throw new RuntimeException(e);
         }
-        mailSender.send(message);
     }
 }

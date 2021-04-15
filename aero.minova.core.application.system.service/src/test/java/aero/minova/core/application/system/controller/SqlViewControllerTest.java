@@ -70,7 +70,7 @@ class SqlViewControllerTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
+				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?) )");
 		assertThat(inputTable.getRows().get(0).getValues().get(0).getStringValue()).isEqualTo("AVM%");
 	}
 
@@ -96,7 +96,7 @@ class SqlViewControllerTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ? and CustomerText like ?)");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ? and CustomerText like ?) )");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -126,8 +126,8 @@ class SqlViewControllerTest {
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 BookingDate from vWorkingTimeIndex2\r\n" //
-						+ "where (BookingDate <= ?)\r\n"//
-						+ "  and (BookingDate > ?)");
+						+ "where ((BookingDate <= ?)\r\n"//
+						+ "  and (BookingDate > ?) )");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -157,8 +157,8 @@ class SqlViewControllerTest {
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
-						+ "where (EmployeeText like ?)\r\n"//
-						+ "   or (EmployeeText like ?)");
+						+ "where ((EmployeeText like ?)\r\n"//
+						+ "   or (EmployeeText like ?) )");
 	}
 
 	@Test
@@ -200,7 +200,7 @@ class SqlViewControllerTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere (EmployeeText like ?)");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?) )");
 	}
 
 	@Test
@@ -255,7 +255,7 @@ class SqlViewControllerTest {
 		val row = new Row();
 		row.addValue(new Value("1", null));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong like ?)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong like ?) )");
 	}
 
 	@Test
@@ -266,7 +266,7 @@ class SqlViewControllerTest {
 		val row = new Row();
 		row.addValue(new Value("1,2,3", "in()"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong in(?, ?, ?))");
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong in(?, ?, ?)) )");
 	}
 
 	@Test
@@ -277,7 +277,7 @@ class SqlViewControllerTest {
 		val row = new Row();
 		row.addValue(new Value("1,2,3", "between()"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong between ? and ?)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong between ? and ?) )");
 	}
 
 	@Test
@@ -290,7 +290,7 @@ class SqlViewControllerTest {
 		row.addValue(new Value("", "is !null"));
 		row.addValue(new Value("", "is null"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere (KeyLong is not null and KeyText is null)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong is not null and KeyText is null) )");
 	}
 
 	@DisplayName("Zeige erste Seite.")
@@ -316,7 +316,7 @@ class SqlViewControllerTest {
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere (EmployeeText like ? and CustomerText like ?) ) as RowConstraintResult" + "\r\nwhere RowNum > 0"
+						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?) ) ) as RowConstraintResult" + "\r\nwhere RowNum > 0"
 						+ "\r\nand RowNum <= 3 order by RowNum");
 	}
 
@@ -360,7 +360,7 @@ class SqlViewControllerTest {
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere (EmployeeText like ? and CustomerText like ?) ) as RowConstraintResult" + "\r\nwhere RowNum > 12"
+						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?) ) ) as RowConstraintResult" + "\r\nwhere RowNum > 12"
 						+ "\r\nand RowNum <= 15 order by RowNum");
 	}
 
@@ -387,6 +387,6 @@ class SqlViewControllerTest {
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere (EmployeeText like ? and CustomerText like ?) ) as RowConstraintResult" + "\r\nwhere RowNum > 0");
+						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?) ) ) as RowConstraintResult" + "\r\nwhere RowNum > 0");
 	}
 }

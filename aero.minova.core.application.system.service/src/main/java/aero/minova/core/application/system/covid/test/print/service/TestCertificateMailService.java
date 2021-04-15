@@ -4,6 +4,7 @@ import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.*;
 import lombok.val;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,10 @@ public class TestCertificateMailService {
     @Value("${spring.mail.username:}")
     public String mailAddress;
 
-    @Value("${testErgebnisPositiveKey}")
+    @Value("${testErgebnisPositiveKey:}")
     public String testErgebnisPositiveKey;
 
-    @Value("${testErgebnisNegativeKey}")
+    @Value("${testErgebnisNegativeKey:}")
     public String testErgebnisNegativeKey;
 
     @Autowired

@@ -40,6 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${login_dataSource:}")
 	private String dataSource;
 
+	@Value("${server.port:8084}")
+	private String serverPort;
+
 	@Autowired
 	SqlProcedureController spc;
 

@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-public class TestTermin {
-	private Long keyLong;
-	private long CTSTeststreckeKey;
-	private Long CTSTestpersonKey;
-	private String Starttime;
+public class TestPersonKey {
+	private long CTSTestPersonKey;
 }

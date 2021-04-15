@@ -367,10 +367,9 @@ public class SqlViewController {
 		boolean whereClauseExists = false;
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
 			final String where = prepareWhereClause(params, autoLike);
-			if (!where.trim().equals("")) {
-				whereClauseExists = true;
-			}
 			sb.append(where);
+			if (!where.trim().equals(""))
+				whereClauseExists = true;
 		}
 		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
@@ -558,14 +557,14 @@ public class SqlViewController {
 			// Wenn es etwas gab, dann fügen wir diese Zeile der kompletten WHERE-clause hinzu
 			if (clause.length() > 0) {
 				if (where.length() == 0) {
-					where.append("\r\nwhere ( ");
+					where.append("\r\nwhere (");
 				} else {
 					where.append(and ? "\r\n  and " : "\r\n   or ");
 				}
 				where.append('(').append(clause.toString()).append(')');
 			}
 		}
-		where.append(" ) ");
+		where.append(" )");
 		return where.toString();
 	}
 

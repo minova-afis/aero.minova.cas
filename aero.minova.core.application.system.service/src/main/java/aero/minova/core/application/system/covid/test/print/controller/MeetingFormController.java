@@ -1,8 +1,9 @@
 package aero.minova.core.application.system.covid.test.print.controller;
 
+import static java.util.stream.Collectors.toList;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -18,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.covid.test.print.domain.MeetingFormInformation;
-import aero.minova.core.application.system.covid.test.print.domain.TestEvent;
 import aero.minova.core.application.system.covid.test.print.domain.TestEventResponse;
+import aero.minova.core.application.system.covid.test.print.domain.TestPersonKey;
 import aero.minova.core.application.system.covid.test.print.domain.TestTermin;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
@@ -113,7 +114,7 @@ public class MeetingFormController {
 	}
 
 	@PostMapping(value = "public/meeting/event", produces = "application/json")
-	public TestEventResponse getTestEvent(@RequestBody TestEvent event) throws Exception {
+	public List<TestEventResponse> getTestEvent(@RequestBody TestPersonKey key) throws Exception {
 		val sqlRequest = new Table();
 		sqlRequest.setName("xvctsTestTerminErgebnis");
 		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.INPUT));
@@ -124,8 +125,8 @@ public class MeetingFormController {
 		{
 			val firstRequestParams = new Row();
 			sqlRequest.getRows().add(firstRequestParams);
-			firstRequestParams.addValue(new Value(event.getKeyLong(), null));
-			firstRequestParams.addValue(new Value(event.getCTSTestPersonKeyLong(), null));
+			firstRequestParams.addValue(null);
+			firstRequestParams.addValue(new Value(key.getCTSTestPersonKey(), null));
 			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(null);
@@ -136,34 +137,11 @@ public class MeetingFormController {
 		requestingAuthority.addValue(new Value(false, "2"));
 		requestingAuthority.addValue(new Value(false, "3"));
 
-		List<Row> results = sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows();
+		return sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows().stream()//
+				.map(row -> new TestEventResponse(row.getValues().get(3).getStringValue(), row.getValues().get(4).getStringValue(),
+						row.getValues().get(2).getInstantValue()))
+				.collect(toList());
 
-		if (results.isEmpty()) {
-			throw new RuntimeException("Der Termin konnte nicht gefunden werden.");
-		}
-
-		TestEventResponse ter = new TestEventResponse();
-		Instant termin = results.get(0).getValues().get(2).getInstantValue();
-		if (termin.isAfter(Instant.now())) {
-			ter.setType("Termin");
-			ter.setDescription("Test ist noch ausstehend");
-		} else {
-			ter.setType("Testergebnis");
-			String ergebnis = results.get(0).getValues().get(3).getStringValue();
-			if (ergebnis == null) {
-				ter.setDescription("Ergebnis wird ausgewertet");
-			} else {
-				ter.setDescription(ergebnis);
-			}
-		}
-		String kit = results.get(0).getValues().get(4).getStringValue();
-		if (kit != null) {
-			ter.setTestequipment(kit);
-		} else {
-			ter.setTestequipment("Kein Testkit angegeben");
-		}
-		ter.setBookingdate(LocalDateTime.ofInstant(termin, ZoneId.systemDefault()).format(DATE_FORMATTER));
-		return ter;
 	}
 
 }

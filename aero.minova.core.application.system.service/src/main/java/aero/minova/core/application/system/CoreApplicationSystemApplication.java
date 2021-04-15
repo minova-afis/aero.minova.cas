@@ -16,11 +16,13 @@ import com.google.gson.GsonBuilder;
 import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.domain.ValueDeserializer;
 import aero.minova.core.application.system.domain.ValueSerializer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 // Der ComponentScan wird verwendet, damit alle Minova Komponenten im classpath geladen werden.
 @SpringBootApplication
 @ComponentScan("aero.minova")
 @Configuration
+@EnableScheduling
 public class CoreApplicationSystemApplication {
 	public static void main(String[] args) throws IOException {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

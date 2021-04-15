@@ -16,12 +16,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import aero.minova.core.application.system.covid.test.print.controller.TestCertificatePrintController;
+import aero.minova.core.application.system.covid.test.print.service.TestCertificateMailService;
+import aero.minova.core.application.system.covid.test.print.service.TestCertificatePrintService;
+import aero.minova.core.application.system.domain.*;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +34,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.SqlProcedureResult;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import aero.minova.trac.integration.controller.TracController;
@@ -55,7 +49,7 @@ public class SqlProcedureController {
     TracController trac;
 
     @Autowired
-    TestCertificatePrintController testCertificatePrintController;
+    TestCertificatePrintService testCertificatePrintService;
 
     @Autowired
     SqlViewController svc;
@@ -63,16 +57,23 @@ public class SqlProcedureController {
     @Autowired
     Gson gson;
 
+    @Autowired
+    TestCertificateMailService testCertificateMailService;
+
     // , produces = "application/json"
     @SuppressWarnings("unchecked")
     @PostMapping(value = "data/procedure")
     public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
         logger.info("data/procedure: " + gson.toJson(inputTable));
+        if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
+            // TODO HACK
+            inputTable.getColumns().get(0).setOutputType(OUTPUT);
+        }
         if ("xpctsPrintTestergebnis".equals(inputTable.getName())) {
             return ResponseEntity
                     .ok()
                     .contentType(MediaType.APPLICATION_PDF)
-                    .body(testCertificatePrintController
+                    .body(testCertificatePrintService
                             .getTestCertificate(
                                     inputTable
                                             .getRows()
@@ -81,9 +82,9 @@ public class SqlProcedureController {
                                             .get(0)
                                             .getIntegerValue()));
         }
-        val result = new SqlProcedureResult();
         try {
             if ("Ticket".equals(inputTable.getName())) {
+                val result = new SqlProcedureResult();
                 result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
                 // WFC erwartet einen ReturnCode, falls es abbricht, würde kein ReturnCode gesetzt werden
                 result.setReturnCode(1);
@@ -103,7 +104,15 @@ public class SqlProcedureController {
             if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
                 throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
             }
-            return new ResponseEntity(calculateSqlProcedureResult(inputTable), HttpStatus.ACCEPTED);
+            val result = calculateSqlProcedureResult(inputTable);
+            if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
+                try {
+                    //testCertificatePrintService.xpctsInsertTestErgebnis(inputTable, result.getOutputParameters());
+                } catch (Throwable th) {
+                    logger.error("Could not send certificate by e-mail.", th);
+                }
+            }
+            return new ResponseEntity(result, HttpStatus.ACCEPTED);
         } catch (Exception e) {
             logger.info("Error while trying to execute procedure: " + inputTable.getName());
             throw e;

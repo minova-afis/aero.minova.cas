@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.covid.test.print.MailService;
+import aero.minova.core.application.system.covid.test.print.service.*;
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonInformation;
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonKey;
 import aero.minova.core.application.system.covid.test.print.domain.UserInfo;
@@ -40,12 +40,12 @@ public class TestPersonController {
 	@Autowired
 	SqlProcedureController sqlProcedureController;
 
-	final Logger logger = LoggerFactory.getLogger(TestCertificatePrintController.class);
+	final Logger logger = LoggerFactory.getLogger(TestCertificatePrintService.class);
 
 	@Autowired
 	private JavaMailSender mailSender;
 	@Autowired
-	private MailService mailService;
+	private TestCertificateMailService mailService;
 
 	private final Pattern emailpattern = Pattern.compile("^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
 	private final Pattern postalcodepattern = Pattern.compile("^0[1-9]\\d\\d(?<!0100)0|0[1-9]\\d\\d[1-9]|[1-9]\\d{3}[0-8]|[1-9]\\d{3}(?<!9999)9$");

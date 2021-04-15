@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.covid.test.print.service.*;
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonInformation;
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonKey;
 import aero.minova.core.application.system.covid.test.print.domain.UserInfo;
+import aero.minova.core.application.system.covid.test.print.service.TestCertificateMailService;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.OutputType;
@@ -40,7 +40,7 @@ public class TestPersonController {
 	@Autowired
 	SqlProcedureController sqlProcedureController;
 
-	final Logger logger = LoggerFactory.getLogger(TestCertificatePrintService.class);
+	final Logger logger = LoggerFactory.getLogger(TestCertificateMailService.class);
 
 	@Autowired
 	private JavaMailSender mailSender;

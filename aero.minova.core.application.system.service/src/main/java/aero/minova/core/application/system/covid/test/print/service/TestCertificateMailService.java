@@ -115,26 +115,6 @@ public class TestCertificateMailService {
         }
     }
 
-    /* TODO REMOVE public void sendCertificateByMail(File testCertificatePdf, Integer ergebnisKey) throws Exception {
-        val ergebnisRequest = new Table();
-        ergebnisRequest.setName("xvctsTestErgebnisCasIndex");
-        ergebnisRequest.addColumn(new Column("KeyLong", DataType.INTEGER));
-        ergebnisRequest.addColumn(new Column("Email", DataType.STRING));
-        val ergebnisRequestData = new Row();
-        ergebnisRequest.addRow(ergebnisRequestData);
-        ergebnisRequestData.addValue(new aero.minova.core.application.system.domain.Value(ergebnisKey, null));
-        ergebnisRequestData.addValue(new aero.minova.core.application.system.domain.Value((String) null, null));
-        val targetEmail = sqlProcedureController
-                .calculateSqlProcedureResult(ergebnisRequest)
-                .getResultSet()
-                .getRows()
-                .get(0)
-                .getValues()
-                .get(1)
-                .getStringValue();
-        sendCertificateByMail(testCertificatePdf, targetEmail);
-    }*/
-
     public List<String> targetAddresses(Integer testTerminKeyLong) {
         val sqlRequest = new Table();
         sqlRequest.setName("xpctsReadCertificateTargetAddresses");
@@ -193,23 +173,19 @@ public class TestCertificateMailService {
         }
     }
 
-    public void sendCertificateByMail(File testCertificatePdf, Integer testTerminKeyLong) {
-        try {
-            logger.info("Sending mail for termin: " + testTerminKeyLong);
-            val targetAddresses = targetAddresses(testTerminKeyLong);
-            val message = mailSender.createMimeMessage();
-            {
-                val helper = new MimeMessageHelper(message, true);
-                logger.info("Sending mail to: " + targetAddresses);
-                helper.setTo(targetAddresses.toArray(new String[targetAddresses.size()]));
-                helper.setFrom(mailAddress);
-                helper.setSubject("COVID-Test-Zertifikat");
-                helper.setText("<h1>Hallo,</h1><p>das Ergebnis des Corona-Tests ist im Anhang der Mail.</p>", true);
-                helper.addAttachment("COVID-Test-Zertifikat.pdf", testCertificatePdf);
-            }
-            mailSender.send(message);
-        } catch (Exception e) {
-            logger.error("Could not send certificate pdf.", e);
+    public void sendCertificateByMail(File testCertificatePdf, Integer testTerminKeyLong) throws Exception {
+        logger.info("Sending mail for termin: " + testTerminKeyLong);
+        val targetAddresses = targetAddresses(testTerminKeyLong);
+        val message = mailSender.createMimeMessage();
+        {
+            val helper = new MimeMessageHelper(message, true);
+            logger.info("Sending mail to: " + targetAddresses);
+            helper.setTo(targetAddresses.toArray(new String[targetAddresses.size()]));
+            helper.setFrom(mailAddress);
+            helper.setSubject("COVID-Test-Zertifikat");
+            helper.setText("<h1>Hallo,</h1><p>das Ergebnis des Corona-Tests ist im Anhang der Mail.</p>", true);
+            helper.addAttachment("COVID-Test-Zertifikat.pdf", testCertificatePdf);
         }
+        mailSender.send(message);
     }
 }

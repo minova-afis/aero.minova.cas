@@ -51,7 +51,7 @@ public class TestPersonController {
 	private final Pattern postalcodepattern = Pattern.compile("^0[1-9]\\d\\d(?<!0100)0|0[1-9]\\d\\d[1-9]|[1-9]\\d{3}[0-8]|[1-9]\\d{3}(?<!9999)9$");
 
 	@PostMapping(value = "public/testPerson/register")
-	public void registerTestPerson(@RequestBody TestPersonInformation input) throws Exception {
+	public TestPersonKey registerTestPerson(@RequestBody TestPersonInformation input) throws Exception {
 
 		// Überprüft die Angaben auf Format und Länge
 		checkUserInput(input);
@@ -106,7 +106,7 @@ public class TestPersonController {
 			secondRequestParams.addValue(new Value(input.getPassword(), null));
 		}
 
-		sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
+		SqlProcedureResult result = sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
 
 		try {
 			val message = mailSender.createMimeMessage();
@@ -122,6 +122,10 @@ public class TestPersonController {
 		} catch (Exception e) {
 			logger.error("Could not send login email.", e);
 		}
+
+		TestPersonKey tpk = new TestPersonKey();
+		tpk.setCTSTestPersonKey(result.getOutputParameters().getRows().get(0).getValues().get(0).getLongValue());
+		return tpk;
 
 	}
 

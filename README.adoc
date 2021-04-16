@@ -1,5 +1,7 @@
 = Core Application System
 
+image::https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg[Continous Integration Status]
+
 Der Kern des Systems ist ein Dienst,
 welcher eine einfache Schnittstelle zu Daten und Prozeduren bereitstellt.
 Kombiniert mit einem Modul-System können hiermit Daten und Prozeduren einer SQL-Datenbank

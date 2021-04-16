@@ -122,11 +122,13 @@ public class MeetingFormController {
 		sqlRequest.addColumn(new Column("StartTime", DataType.INSTANT, OutputType.OUTPUT));
 		sqlRequest.addColumn(new Column("Ergebnis", DataType.STRING, OutputType.OUTPUT));
 		sqlRequest.addColumn(new Column("Kit", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Description", DataType.STRING, OutputType.OUTPUT));
 		{
 			val firstRequestParams = new Row();
 			sqlRequest.getRows().add(firstRequestParams);
 			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(new Value(key.getCTSTestPersonKey(), null));
+			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(null);
@@ -139,7 +141,7 @@ public class MeetingFormController {
 
 		return sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows().stream()//
 				.map(row -> new TestEventResponse(row.getValues().get(3).getStringValue(), row.getValues().get(4).getStringValue(),
-						row.getValues().get(2).getInstantValue()))
+						row.getValues().get(2).getInstantValue(), row.getValues().get(5).getStringValue()))
 				.collect(toList());
 
 	}

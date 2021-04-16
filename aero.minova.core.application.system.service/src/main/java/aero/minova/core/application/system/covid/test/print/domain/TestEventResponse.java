@@ -20,8 +20,9 @@ public class TestEventResponse {
 	private String testequipment;
 	private String type;
 	private String bookingdate;
+	private String teststrecke;
 
-	public TestEventResponse(String description, String testequipment, Instant bookingdate) {
+	public TestEventResponse(String description, String testequipment, Instant bookingdate, String teststrecke) {
 		if (bookingdate != null) {
 			if (bookingdate.isAfter(Instant.now())) {
 				this.setType("Termin");
@@ -46,7 +47,11 @@ public class TestEventResponse {
 			this.setBookingdate("");
 			this.setTestequipment("");
 		}
-
+		if (teststrecke != null && !teststrecke.isEmpty()) {
+			this.setTeststrecke(teststrecke);
+		} else {
+			this.setTeststrecke("Fehler bei der Erfassung des Teststreckenstandorts.");
+		}
 	}
 
 }

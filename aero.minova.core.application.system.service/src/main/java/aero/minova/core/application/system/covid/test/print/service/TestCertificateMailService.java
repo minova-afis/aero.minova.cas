@@ -202,7 +202,7 @@ public class TestCertificateMailService {
                 helper.setTo(targetAddresses.toArray(new String[targetAddresses.size()]));
                 helper.setFrom(mailAddress);
                 helper.setSubject("COVID-Test-Zertifikat");
-                helper.setText("<h1>Hallo,</h1><p>das Ergebnis des Corona-Tests ist im Anhang der Mail.</p>", true);
+                helper.setText("<h1>Hallo,</h1><p>das Ergebnis des Corona-Tests ist im Anhang der E-Mail.</p><br>Mit freundlichen Grüßen<br>Ihr Testteam", true);
                 helper.addAttachment("COVID-Test-Zertifikat.pdf", testCertificatePdf);
             }
             mailSender.send(message);

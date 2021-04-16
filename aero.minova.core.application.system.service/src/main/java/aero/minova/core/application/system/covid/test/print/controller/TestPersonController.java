@@ -275,7 +275,7 @@ public class TestPersonController {
 		}
 
 		// Die alternative Telefonnummer darf auch leer sein
-		if (input.getPhonenumber2() != null) {
+		if (!input.getPhonenumber2().isEmpty()) {
 			if (!input.getPhonenumber2().matches("[0-9]+")) {
 				throw new RuntimeException("Die angegebene alternative Telefonnummer ist nicht gültig!");
 			} else if (input.getPhonenumber2().length() > 20) {

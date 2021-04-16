@@ -145,8 +145,8 @@ public class TestCertificateMailService {
             val requestParam = new Row();
             sqlRequest.getRows().add(requestParam);
             requestParam.addValue(new aero.minova.core.application.system.domain.Value(testErgebnisKey, null));
-            requestParam.addValue(new aero.minova.core.application.system.domain.Value(Integer.parseInt(testErgebnisNegativeKey), null));
             requestParam.addValue(new aero.minova.core.application.system.domain.Value(Integer.parseInt(testErgebnisPositiveKey), null));
+            requestParam.addValue(new aero.minova.core.application.system.domain.Value(Integer.parseInt(testErgebnisNegativeKey), null));
         }
         // Hiermit wird der unsichere Zugriff ermöglicht.
         val requestingAuthority = new Row();

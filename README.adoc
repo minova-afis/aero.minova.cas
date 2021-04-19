@@ -1,6 +1,6 @@
 = Core Application System
 
-image::https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg[Continous Integration Status]
+image::https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg[Continous Integration Status] image::https://img.shields.io/badge/license-EPL%202.0-green[EPL 2.0]
 
 == Beschreibung
 
@@ -15,10 +15,6 @@ Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
 == Sturktur
 
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
-* xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
-
-== Maske für das Editieren von Rechten
-
-* Source Code: http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic
-* Installierbare Modul: acode/snapshot/aero.minova.cas.logic.jar
-* Alternativ: xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
+* xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
+* xref:./aero.minova.cas.logic/doc/adoc/index.adoc#[Maske für das Editieren von Rechten]
+* xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]

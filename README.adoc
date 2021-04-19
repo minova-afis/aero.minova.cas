@@ -2,8 +2,8 @@
 
 [.float-group]
 --
-image::https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg[CI Status, float="left"]
-image::https://img.shields.io/badge/license-EPL%202.0-green[License ,float="left"]
+image::https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg[float="left"]
+image::https://img.shields.io/badge/license-EPL%202.0-green[float="left"]
 --
 
 == Beschreibung

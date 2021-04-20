@@ -23,6 +23,7 @@ import aero.minova.core.application.system.covid.test.print.domain.TestEventResp
 import aero.minova.core.application.system.covid.test.print.domain.TestPersonKey;
 import aero.minova.core.application.system.covid.test.print.domain.TestTermin;
 import aero.minova.core.application.system.domain.Column;
+import aero.minova.core.application.system.domain.CovidException;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.Row;
@@ -50,10 +51,10 @@ public class MeetingFormController {
 		if (!input.getStarttime().isEmpty()) {
 			datetime = LocalDateTime.parse(input.getStarttime(), DATE_FORMATTER);
 			if (Instant.now().isAfter(datetime.toInstant(ZoneOffset.UTC))) {
-				throw new RuntimeException("Der gewünschte Termin liegt bereits in der Vergangenheit!");
+				throw new CovidException("Der gewünschte Termin liegt bereits in der Vergangenheit!");
 			}
 		} else {
-			throw new RuntimeException("Bitte geben Sie Ihren gewünschten Termin an.");
+			throw new CovidException("Bitte geben Sie Ihren gewünschten Termin an.");
 		}
 
 		val sqlRequest = new Table();
@@ -80,7 +81,7 @@ public class MeetingFormController {
 
 		// Falls der gewünschte Termin in der Zwischenzeit doch belegt wurde, ist die Liste leer
 		if (viewOutput.isEmpty()) {
-			throw new RuntimeException("Der gewünschte Zeitslot ist leider bereits belegt!");
+			throw new CovidException("Der gewünschte Zeitslot ist leider bereits belegt!");
 		}
 
 		// Falls der Termin noch frei ist, muss er nun mit der xpctsUpdateTestTermin Prozedur geändert werden

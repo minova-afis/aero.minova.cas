@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Column;
+import aero.minova.core.application.system.domain.CovidException;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.ErrorMessage;
 import aero.minova.core.application.system.domain.ProcedureException;
@@ -52,6 +53,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(TableException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public Table tableException(TableException ex, WebRequest request) {
+		return prepareExceptionReturnTable(ex);
+	}
+
+	@ExceptionHandler(CovidException.class)
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+	public Table covidException(CovidException ex, WebRequest request) {
 		return prepareExceptionReturnTable(ex);
 	}
 

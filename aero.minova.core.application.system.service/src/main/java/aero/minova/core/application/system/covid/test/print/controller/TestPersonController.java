@@ -143,7 +143,7 @@ public class TestPersonController {
 		}
 
 		Table sqlRequest = new Table();
-		sqlRequest.setName("xvctsTestPersonIndex");
+		sqlRequest.setName("xvctsMobileTestPersonIndex");
 		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.OUTPUT));
 		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("Password", DataType.STRING, OutputType.INPUT));
@@ -218,7 +218,7 @@ public class TestPersonController {
 			tpi.setPhonenumber(result.getRows().get(0).getValues().get(7).getStringValue());
 			tpi.setPhonenumber2(result.getRows().get(0).getValues().get(8).getStringValue());
 			tpi.setEmail(result.getRows().get(0).getValues().get(9).getStringValue());
-			tpi.setPassword(result.getRows().get(0).getValues().get(10).getStringValue());
+			tpi.setPassword("******");
 			return tpi;
 		} else {
 			throw new RuntimeException("Fehler beim Laden der Nutzerdaten.");

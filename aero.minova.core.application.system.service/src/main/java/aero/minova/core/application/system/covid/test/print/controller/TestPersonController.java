@@ -23,6 +23,7 @@ import aero.minova.core.application.system.covid.test.print.domain.TestPersonKey
 import aero.minova.core.application.system.covid.test.print.domain.UserInfo;
 import aero.minova.core.application.system.covid.test.print.service.TestCertificateMailService;
 import aero.minova.core.application.system.domain.Column;
+import aero.minova.core.application.system.domain.CovidException;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.Row;
@@ -76,7 +77,7 @@ public class TestPersonController {
 		// Überprüfen, ob der Benutzer bereits exisitert, da keine Doppelteneiträge vorhanden sein sollten
 		List<Row> viewOutput = sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows();
 		if (!viewOutput.isEmpty()) {
-			throw new RuntimeException("Ein Benutzer mit dieser Emailadresse existiert bereits!");
+			throw new CovidException("Ein Benutzer mit dieser Emailadresse existiert bereits!");
 		}
 
 		Table sqlInsertRequest = new Table();
@@ -135,11 +136,11 @@ public class TestPersonController {
 	public long loginTestPerson(@RequestBody UserInfo info) throws Exception {
 
 		if (info.getEmail().isEmpty()) {
-			throw new RuntimeException("Bitte geben Sie Ihre Emailadresse ein.");
+			throw new CovidException("Bitte geben Sie Ihre Emailadresse ein.");
 		}
 
 		if (info.getPassword().isEmpty()) {
-			throw new RuntimeException("Bitte geben Sie Ihr Passwort ein.");
+			throw new CovidException("Bitte geben Sie Ihr Passwort ein.");
 		}
 
 		Table sqlRequest = new Table();
@@ -166,7 +167,7 @@ public class TestPersonController {
 			// Zurückgeben des KeyLongs
 			return result.get(0).getValues().get(0).getLongValue();
 		} else {
-			throw new RuntimeException("Fehler beim Login. Bitte überprüfen Sie Ihre angegebene Emailadresse und Ihr Passwort.");
+			throw new CovidException("Fehler beim Login. Bitte überprüfen Sie Ihre angegebene Emailadresse und Ihr Passwort.");
 		}
 
 	}
@@ -221,90 +222,90 @@ public class TestPersonController {
 			tpi.setPassword("******");
 			return tpi;
 		} else {
-			throw new RuntimeException("Fehler beim Laden der Nutzerdaten.");
+			throw new CovidException("Fehler beim Laden der Nutzerdaten.");
 		}
 
 	}
 
-	private void checkUserInput(TestPersonInformation input) {
+	private void checkUserInput(TestPersonInformation input) throws Exception {
 
 		if (input.getFirstname() == null || input.getLastname() == null || input.getFirstname().isEmpty() || input.getLastname().isEmpty()) {
-			throw new RuntimeException("Bitte geben Sie Ihren Vor- und Nachnamen an.");
+			throw new CovidException("Bitte geben Sie Ihren Vor- und Nachnamen an.");
 		} else if (input.getFirstname().length() > 50) {
-			throw new RuntimeException("Der angegebene Vorname übersteigt das Zeichenlimit!");
+			throw new CovidException("Der angegebene Vorname übersteigt das Zeichenlimit!");
 		} else if (input.getLastname().length() > 50) {
-			throw new RuntimeException("Der angegebene Nachname übersteigt das Zeichenlimit!");
+			throw new CovidException("Der angegebene Nachname übersteigt das Zeichenlimit!");
 		}
 
 		if (input.getStreet() == null || input.getStreet().isEmpty()) {
-			throw new RuntimeException("Bitte geben Sie Ihre Adresse an.");
+			throw new CovidException("Bitte geben Sie Ihre Adresse an.");
 		}
 		if (input.getStreet().length() > 50) {
-			throw new RuntimeException("Die angegebene Straße übersteigt das Zeichenlimit!");
+			throw new CovidException("Die angegebene Straße übersteigt das Zeichenlimit!");
 		}
 
 		if (input.getCity() == null || input.getCity().isEmpty()) {
-			throw new RuntimeException("Bitte geben Sie Ihren Wohnort an.");
+			throw new CovidException("Bitte geben Sie Ihren Wohnort an.");
 		} else if (input.getCity().length() > 20) {
-			throw new RuntimeException("Der angegebene Wohnort übersteigt das Zeichenlimit!");
+			throw new CovidException("Der angegebene Wohnort übersteigt das Zeichenlimit!");
 		}
 
 		if (input.getPostalcode() != null && !input.getPostalcode().isEmpty()) {
 			Matcher matcher = postalcodepattern.matcher(input.getPostalcode());
 			if (!matcher.find()) {
-				throw new RuntimeException("Die angegebene Postleitzahl hat kein gültiges Format!");
+				throw new CovidException("Die angegebene Postleitzahl hat kein gültiges Format!");
 			}
 		} else {
-			throw new RuntimeException("Bitte geben Sie Ihre Postleitzahl an.");
+			throw new CovidException("Bitte geben Sie Ihre Postleitzahl an.");
 		}
 
 		if (input.getBirthdate() != null) {
 			if (Instant.now().isBefore((input.getBirthdate()).atStartOfDay(ZoneId.systemDefault()).toInstant())) {
-				throw new RuntimeException("Der angegebene Geburtstag ist ungültig!");
+				throw new CovidException("Der angegebene Geburtstag ist ungültig!");
 			}
 		} else {
-			throw new RuntimeException("Bitte geben Sie Ihren Geburtstag an.");
+			throw new CovidException("Bitte geben Sie Ihren Geburtstag an.");
 		}
 
 		if (input.getPhonenumber() != null && !input.getPhonenumber().isEmpty()) {
 			if (!input.getPhonenumber().matches("[0-9]+")) {
-				throw new RuntimeException("Die angegebene Telefonnummer ist nicht gültig!");
+				throw new CovidException("Die angegebene Telefonnummer ist nicht gültig!");
 			} else if (input.getPhonenumber().length() > 20) {
-				throw new RuntimeException("Die angegebene Telefonnummer übersteigt das Zeichenlimit!");
+				throw new CovidException("Die angegebene Telefonnummer übersteigt das Zeichenlimit!");
 			}
 		} else {
-			throw new RuntimeException("Bitte geben Sie Ihre Telefonnummer an.");
+			throw new CovidException("Bitte geben Sie Ihre Telefonnummer an.");
 		}
 
 		// Die alternative Telefonnummer darf auch leer sein
 		if (input.getPhonenumber2() != null && !input.getPhonenumber2().isEmpty()) {
 			if (!input.getPhonenumber2().matches("[0-9]+")) {
-				throw new RuntimeException("Die angegebene alternative Telefonnummer ist nicht gültig!");
+				throw new CovidException("Die angegebene alternative Telefonnummer ist nicht gültig!");
 			} else if (input.getPhonenumber2().length() > 20) {
-				throw new RuntimeException("Die angegebene alternative Telefonnummer übersteigt das Zeichenlimit!");
+				throw new CovidException("Die angegebene alternative Telefonnummer übersteigt das Zeichenlimit!");
 			}
 		}
 
 		if (input.getEmail() != null && !input.getEmail().isEmpty()) {
 			Matcher matcher = emailpattern.matcher(input.getEmail());
 			if (!matcher.find()) {
-				throw new RuntimeException("Die angegebene E-Mail Adresse hat kein gültiges Format!");
+				throw new CovidException("Die angegebene E-Mail Adresse hat kein gültiges Format!");
 			} else {
 				if (input.getEmail().length() > 50) {
-					throw new RuntimeException("Die angegebene Email-Adresse übersteigt das Zeichenlimit!");
+					throw new CovidException("Die angegebene Email-Adresse übersteigt das Zeichenlimit!");
 				}
 			}
 		} else {
-			throw new RuntimeException("Bitte geben Sie Ihre E-Mailadresse an.");
+			throw new CovidException("Bitte geben Sie Ihre E-Mailadresse an.");
 		}
 
 		if (input.getPassword() == null || input.getPassword().isEmpty()) {
-			throw new RuntimeException("Bitte geben Sie ein Passwort an.");
+			throw new CovidException("Bitte geben Sie ein Passwort an.");
 		} else {
 			if (input.getPassword().length() <= 5) {
-				throw new RuntimeException("Bitte geben Sie ein Passwort mit mindestesn 6 Zeichen an.");
+				throw new CovidException("Bitte geben Sie ein Passwort mit mindestesn 6 Zeichen an.");
 			} else if (input.getPassword().length() > 20) {
-				throw new RuntimeException("Das angegebene Passwort übersteigt das Zeichenlimit!");
+				throw new CovidException("Das angegebene Passwort übersteigt das Zeichenlimit!");
 			}
 		}
 

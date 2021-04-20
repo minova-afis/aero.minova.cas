@@ -58,7 +58,7 @@ public class TestPersonController {
 
 		// Überprüfen, ob die Person bereits im System registriert ist
 		Table sqlRequest = new Table();
-		sqlRequest.setName("xvctsTestPersonIndex");
+		sqlRequest.setName("xvctsMobileTestPersonIndex");
 		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("Password", DataType.STRING, OutputType.INPUT));
 		{
@@ -80,7 +80,7 @@ public class TestPersonController {
 		}
 
 		Table sqlInsertRequest = new Table();
-		sqlInsertRequest.setName("xpctsInsertTestPerson");
+		sqlInsertRequest.setName("xpctsInsertTestPersonApp");
 		sqlInsertRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.OUTPUT));
 		sqlInsertRequest.addColumn(new Column("FirstName", DataType.STRING, OutputType.INPUT));
 		sqlInsertRequest.addColumn(new Column("LastName", DataType.STRING, OutputType.INPUT));

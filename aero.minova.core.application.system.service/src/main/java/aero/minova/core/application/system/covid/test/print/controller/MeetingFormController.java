@@ -81,7 +81,7 @@ public class MeetingFormController {
 
 		// Falls der gewünschte Termin in der Zwischenzeit doch belegt wurde, ist die Liste leer
 		if (viewOutput.isEmpty()) {
-			throw new CovidException("Der gewünschte Zeitslot ist leider bereits belegt!");
+			throw new CovidException("Der gewünschte Termin ist leider bereits belegt!");
 		}
 
 		// Falls der Termin noch frei ist, muss er nun mit der xpctsUpdateTestTermin Prozedur geändert werden

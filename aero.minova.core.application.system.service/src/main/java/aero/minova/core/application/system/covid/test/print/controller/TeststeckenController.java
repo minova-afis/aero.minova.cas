@@ -42,4 +42,21 @@ public class TeststeckenController {
 		return sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows().stream()
 				.map(row -> new TestStrecke(row.getValues().get(1).getStringValue(), row.getValues().get(0).getIntegerValue())).collect(toList());
 	}
+
+	@CrossOrigin
+	@GetMapping(value = "public/orte", produces = "application/json")
+	public List<TestStrecke> getTestOrte() throws Exception {
+		val sqlRequest = new Table();
+		sqlRequest.setName("xvctsTestOrte");
+		sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("KeyText", DataType.STRING, OutputType.OUTPUT));
+
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		val requestingAuthority = new Row();
+		requestingAuthority.addValue(new Value(false, "1"));
+		requestingAuthority.addValue(new Value(false, "2"));
+		requestingAuthority.addValue(new Value(false, "3"));
+		return sqlViewController.unsecurelyGetIndexView(sqlRequest, Arrays.asList(requestingAuthority)).getRows().stream()
+				.map(row -> new TestStrecke(row.getValues().get(1).getStringValue(), row.getValues().get(0).getIntegerValue())).collect(toList());
+	}
 }

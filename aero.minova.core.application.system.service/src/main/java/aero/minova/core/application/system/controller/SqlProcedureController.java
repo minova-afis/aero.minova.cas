@@ -227,7 +227,7 @@ public class SqlProcedureController {
                                 }
                             }
                         } catch (Exception e) {
-                            throw new RuntimeException("msg.ParseError %" + i);
+                            throw new RuntimeException("msg.ParseError %" + i, e);
                         }
                     });
             preparedStatement.registerOutParameter(1, Types.INTEGER);

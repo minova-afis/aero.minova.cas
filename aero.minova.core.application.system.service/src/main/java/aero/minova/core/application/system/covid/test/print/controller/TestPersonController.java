@@ -60,10 +60,12 @@ public class TestPersonController {
 		Table sqlRequest = new Table();
 		sqlRequest.setName("xvctsTestPersonIndex");
 		sqlRequest.addColumn(new Column("Email", DataType.STRING, OutputType.INPUT));
+		sqlRequest.addColumn(new Column("Password", DataType.STRING, OutputType.INPUT));
 		{
 			val firstRequestParams = new Row();
 			sqlRequest.getRows().add(firstRequestParams);
 			firstRequestParams.addValue(new Value(input.getEmail(), null));
+			firstRequestParams.addValue(new Value("", "!null"));
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		val requestingAuthority = new Row();

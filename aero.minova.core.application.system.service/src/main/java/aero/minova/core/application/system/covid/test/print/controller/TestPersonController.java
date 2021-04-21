@@ -284,6 +284,9 @@ public class TestPersonController {
 			} else if (input.getPhonenumber2().length() > 20) {
 				throw new CovidException("Die angegebene alternative Telefonnummer übersteigt das Zeichenlimit!");
 			}
+		} else {
+			// falls die Phonenumber2 null ist, gibt es einen ParseError im SqlProcedureController
+			input.setPhonenumber2("");
 		}
 
 		if (input.getEmail() != null && !input.getEmail().isEmpty()) {

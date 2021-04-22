@@ -61,7 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
-		http.requiresChannel().anyRequest().requiresSecure();
+		//http.requiresChannel().anyRequest().requiresSecure();
 		http.cors();
 	}
 

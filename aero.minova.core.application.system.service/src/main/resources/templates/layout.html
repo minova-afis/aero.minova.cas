@@ -27,10 +27,10 @@
 			<div class="mr-auto"></div>
 			<a role="button" th:href="${@environment.getProperty('aero.afis.host.url.http')}" class="btn btn-primary">Root</a>
 			<div sec:authorize="isAnonymous()">
-				<a role="button" href="/login" class="btn btn-primary">Login</a>
+				<a role="button" href="/cas/login" class="btn btn-primary">Login</a>
 			</div>
 			<div sec:authorize="isAuthenticated()">
-				<a role="button" href="/logout" class="btn btn-primary">Logout</a>
+				<a role="button" href="/cas/logout" class="btn btn-primary">Logout</a>
 			</div>
 		</nav>
 	</header>

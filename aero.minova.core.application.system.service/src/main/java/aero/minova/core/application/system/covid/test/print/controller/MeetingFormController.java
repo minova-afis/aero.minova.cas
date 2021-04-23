@@ -104,7 +104,11 @@ public class MeetingFormController {
 			secondRequestParams.addValue(viewOutput.get(0).getValues().get(3));
 			secondRequestParams.addValue(new Value(input.getTestPersonKeyLong(), null));
 		}
-		sqlProcedureController.calculateSqlProcedureResult(procedureInput);
+		try {
+			sqlProcedureController.calculateSqlProcedureResult(procedureInput);
+		} catch (Exception e) {
+			throw new CovidException(e.getMessage());
+		}
 
 		TestTermin termin = new TestTermin();
 		termin.setKeyLong(viewOutput.get(0).getValues().get(0).getLongValue());

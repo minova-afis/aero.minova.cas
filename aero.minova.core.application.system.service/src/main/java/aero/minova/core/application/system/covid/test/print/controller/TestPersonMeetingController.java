@@ -123,31 +123,31 @@ public class TestPersonMeetingController {
 		}
 		try {
 			sqlProcedureController.calculateSqlProcedureResult(procedureInput);
+
+			try {
+				val message = mailSender.createMimeMessage();
+				{
+					val helper = new MimeMessageHelper(message, true);
+					helper.setTo(input.getEmail());
+					helper.setFrom(mailService.mailAddress);
+					helper.setSubject("COVID-Test-Terminbestätigung");
+					helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", " + " Sie haben erfolgreich ihren Terminen am "
+							+ input.getStarttime() + " in " + viewOutput.get(0).getValues().get(4).getStringValue() + " gebucht.", true);
+				}
+				mailSender.send(message);
+			} catch (Exception e) {
+				logger.error("Could not send booking email.", e);
+			}
+
+			TestTermin termin = new TestTermin();
+			termin.setKeyLong(viewOutput.get(0).getValues().get(0).getLongValue());
+			termin.setCTSTeststreckeKey(input.getTestStreckKeyLong());
+			termin.setCTSTestpersonKey(testPersonKey);
+			termin.setStarttime(input.getStarttime());
+			return termin;
 		} catch (Exception e) {
 			throw new CovidException(e.getMessage());
 		}
-
-		try {
-			val message = mailSender.createMimeMessage();
-			{
-				val helper = new MimeMessageHelper(message, true);
-				helper.setTo(input.getEmail());
-				helper.setFrom(mailService.mailAddress);
-				helper.setSubject("COVID-Test-Terminbestätigung");
-				helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", " + " Sie haben erfolgreich ihren Terminen am "
-						+ input.getStarttime() + " in " + viewOutput.get(0).getValues().get(4).getStringValue() + " gebucht.", true);
-			}
-			mailSender.send(message);
-		} catch (Exception e) {
-			logger.error("Could not send booking email.", e);
-		}
-
-		TestTermin termin = new TestTermin();
-		termin.setKeyLong(viewOutput.get(0).getValues().get(0).getLongValue());
-		termin.setCTSTeststreckeKey(input.getTestStreckKeyLong());
-		termin.setCTSTestpersonKey(testPersonKey);
-		termin.setStarttime(input.getStarttime());
-		return termin;
 	}
 
 	private Long checkTestPerson(TestPersonMeetingInformation input) throws Exception {

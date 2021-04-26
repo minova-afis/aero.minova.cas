@@ -109,26 +109,30 @@ public class TestPersonController {
 			secondRequestParams.addValue(new Value(input.getPassword(), null));
 		}
 
-		SqlProcedureResult result = sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
-
 		try {
-			val message = mailSender.createMimeMessage();
-			{
-				val helper = new MimeMessageHelper(message, true);
-				helper.setTo(input.getEmail());
-				helper.setFrom(mailService.mailAddress);
-				helper.setSubject("COVID-Test-Account");
-				helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", "
-						+ "\n Sie haben sich erfolgreich registriert und können nun Termine über die App buchen.", true);
-			}
-			mailSender.send(message);
-		} catch (Exception e) {
-			logger.error("Could not send login email.", e);
-		}
+			SqlProcedureResult result = sqlProcedureController.calculateSqlProcedureResult(sqlInsertRequest);
 
-		TestPersonKey tpk = new TestPersonKey();
-		tpk.setCTSTestPersonKey(result.getOutputParameters().getRows().get(0).getValues().get(0).getLongValue());
-		return tpk;
+			try {
+				val message = mailSender.createMimeMessage();
+				{
+					val helper = new MimeMessageHelper(message, true);
+					helper.setTo(input.getEmail());
+					helper.setFrom(mailService.mailAddress);
+					helper.setSubject("COVID-Test-Account");
+					helper.setText("Guten Tag " + input.getFirstname() + " " + input.getLastname() + ", "
+							+ "\n Sie haben sich erfolgreich registriert und können nun Termine über die App buchen.", true);
+				}
+				mailSender.send(message);
+			} catch (Exception e) {
+				logger.error("Could not send login email.", e);
+			}
+
+			TestPersonKey tpk = new TestPersonKey();
+			tpk.setCTSTestPersonKey(result.getOutputParameters().getRows().get(0).getValues().get(0).getLongValue());
+			return tpk;
+		} catch (Exception e) {
+			throw new CovidException("Fehler bei der Registrierung, bitte überprüfen Sie Ihre angegebenen Informationen.");
+		}
 
 	}
 
@@ -204,24 +208,28 @@ public class TestPersonController {
 			firstRequestParams.addValue(null);
 		}
 
-		SqlProcedureResult sql = sqlProcedureController.calculateSqlProcedureResult(sqlRequest);
-		Table result = sql.getOutputParameters();
+		try {
+			SqlProcedureResult sql = sqlProcedureController.calculateSqlProcedureResult(sqlRequest);
+			Table result = sql.getOutputParameters();
 
-		// bei Fehlschlag sind alle Felder null, die Email sollte auf jeden Fall da sein, weil man sich sonst auch nicht einloggen könnte
-		if (!result.getRows().get(0).getValues().get(9).getStringValue().equals(null)) {
-			TestPersonInformation tpi = new TestPersonInformation();
-			tpi.setFirstname(result.getRows().get(0).getValues().get(1).getStringValue());
-			tpi.setLastname(result.getRows().get(0).getValues().get(2).getStringValue());
-			tpi.setBirthdate(result.getRows().get(0).getValues().get(3).getZonedDateTimeValue().toLocalDate());
-			tpi.setStreet(result.getRows().get(0).getValues().get(4).getStringValue());
-			tpi.setPostalcode(result.getRows().get(0).getValues().get(5).getStringValue());
-			tpi.setCity(result.getRows().get(0).getValues().get(6).getStringValue());
-			tpi.setPhonenumber(result.getRows().get(0).getValues().get(7).getStringValue());
-			tpi.setPhonenumber2(result.getRows().get(0).getValues().get(8).getStringValue());
-			tpi.setEmail(result.getRows().get(0).getValues().get(9).getStringValue());
-			tpi.setPassword("******");
-			return tpi;
-		} else {
+			// bei Fehlschlag sind alle Felder null, die Email sollte auf jeden Fall da sein, weil man sich sonst auch nicht einloggen könnte
+			if (!result.getRows().get(0).getValues().get(9).getStringValue().equals(null)) {
+				TestPersonInformation tpi = new TestPersonInformation();
+				tpi.setFirstname(result.getRows().get(0).getValues().get(1).getStringValue());
+				tpi.setLastname(result.getRows().get(0).getValues().get(2).getStringValue());
+				tpi.setBirthdate(result.getRows().get(0).getValues().get(3).getZonedDateTimeValue().toLocalDate());
+				tpi.setStreet(result.getRows().get(0).getValues().get(4).getStringValue());
+				tpi.setPostalcode(result.getRows().get(0).getValues().get(5).getStringValue());
+				tpi.setCity(result.getRows().get(0).getValues().get(6).getStringValue());
+				tpi.setPhonenumber(result.getRows().get(0).getValues().get(7).getStringValue());
+				tpi.setPhonenumber2(result.getRows().get(0).getValues().get(8).getStringValue());
+				tpi.setEmail(result.getRows().get(0).getValues().get(9).getStringValue());
+				tpi.setPassword("******");
+				return tpi;
+			} else {
+				throw new CovidException("Fehler beim Laden der Nutzerdaten.");
+			}
+		} catch (Exception e) {
 			throw new CovidException("Fehler beim Laden der Nutzerdaten.");
 		}
 

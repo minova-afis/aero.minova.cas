@@ -54,6 +54,8 @@ public class TestPersonController {
 	@PostMapping(value = "public/testPerson/register")
 	public TestPersonKey registerTestPerson(@RequestBody TestPersonInformation input) throws Exception {
 
+		logger.info("Trying to register testperson with the following input:" + input.toString());
+
 		// Überprüft die Angaben auf Format und Länge
 		checkUserInput(input);
 
@@ -137,13 +139,15 @@ public class TestPersonController {
 	}
 
 	@PostMapping(value = "public/testPerson/login", produces = "application/json")
-	public long loginTestPerson(@RequestBody UserInfo info) throws Exception {
+	public long loginTestPerson(@RequestBody UserInfo userInfo) throws Exception {
 
-		if (info.getEmail().isEmpty()) {
+		logger.info("Trying to log in with input: " + userInfo.toString());
+
+		if (userInfo.getEmail().isEmpty()) {
 			throw new CovidException("Bitte geben Sie Ihre Emailadresse ein.");
 		}
 
-		if (info.getPassword().isEmpty()) {
+		if (userInfo.getPassword().isEmpty()) {
 			throw new CovidException("Bitte geben Sie Ihr Passwort ein.");
 		}
 
@@ -156,8 +160,8 @@ public class TestPersonController {
 			val firstRequestParams = new Row();
 			sqlRequest.getRows().add(firstRequestParams);
 			firstRequestParams.addValue(null);
-			firstRequestParams.addValue(new Value(info.getEmail(), null));
-			firstRequestParams.addValue(new Value(info.getPassword(), null));
+			firstRequestParams.addValue(new Value(userInfo.getEmail(), null));
+			firstRequestParams.addValue(new Value(userInfo.getPassword(), null));
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		val requestingAuthority = new Row();
@@ -178,6 +182,8 @@ public class TestPersonController {
 
 	@PostMapping(value = "public/testPerson/info", produces = "application/json")
 	public TestPersonInformation getTestPersonInformation(@RequestBody TestPersonKey key) throws Exception {
+
+		logger.info("Requesting information of Key: " + key.toString());
 
 		Table sqlRequest = new Table();
 		sqlRequest.setName("xpctsReadTestPerson");

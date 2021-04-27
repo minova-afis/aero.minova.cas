@@ -56,6 +56,8 @@ public class TestPersonMeetingController {
 	@PostMapping(value = "public/meeting/noaccount/book", produces = "application/json")
 	public TestTermin bookMeeting(@RequestBody TestPersonMeetingInformation input) throws Exception {
 
+		logger.info("Trying to book a meeting for unregistered testperson with input: " + input.toString());
+
 		// Überprüfen, ob der Termin auch in der Zukunft liegt
 		LocalDateTime datetime = null;
 		if (!input.getStarttime().isEmpty()) {

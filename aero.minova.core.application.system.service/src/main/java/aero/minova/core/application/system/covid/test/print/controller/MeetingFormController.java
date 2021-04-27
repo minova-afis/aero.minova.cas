@@ -46,6 +46,8 @@ public class MeetingFormController {
 	@PostMapping(value = "public/meeting/book", produces = "application/json")
 	public TestTermin bookMeeting(@RequestBody MeetingFormInformation input) throws Exception {
 
+		logger.info("Trying to book the meeting: " + input.toString());
+
 		// Überprüfen, ob der Termin auch in der Zukunft liegt
 		LocalDateTime datetime = null;
 		if (!input.getStarttime().isEmpty()) {
@@ -120,6 +122,9 @@ public class MeetingFormController {
 
 	@PostMapping(value = "public/meeting/event", produces = "application/json")
 	public List<TestEventResponse> getTestEvent(@RequestBody TestPersonKey key) throws Exception {
+
+		logger.info("Requesting events of person with key " + key.toString());
+
 		val sqlRequest = new Table();
 		sqlRequest.setName("xvctsTestTerminErgebnis");
 		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.INPUT));

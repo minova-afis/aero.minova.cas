@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,13 +65,15 @@ public class MeetingFormController {
 		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.OUTPUT));
 		sqlRequest.addColumn(new Column("ctsTestStreckeKey", DataType.LONG, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("Starttime", DataType.INSTANT, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.INPUT));
+		sqlRequest.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Anmeldezeitraum", DataType.INTEGER, OutputType.OUTPUT));
 		{
 			val firstRequestParams = new Row();
 			sqlRequest.getRows().add(firstRequestParams);
 			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(new Value(input.getTestStreckKeyLong(), null));
 			firstRequestParams.addValue(new Value((datetime.toInstant(ZoneOffset.UTC)), null));
+			firstRequestParams.addValue(null);
 			firstRequestParams.addValue(null);
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
@@ -84,6 +87,12 @@ public class MeetingFormController {
 		// Falls der gewünschte Termin in der Zwischenzeit doch belegt wurde, ist die Liste leer
 		if (viewOutput.isEmpty()) {
 			throw new CovidException("Der gewünschte Termin ist leider bereits belegt!");
+		}
+
+		int hoursBeforeMeeting = viewOutput.get(0).getValues().get(4).getIntegerValue();
+		if (Instant.now().plus(hoursBeforeMeeting, ChronoUnit.HOURS).isAfter(datetime.toInstant(ZoneOffset.UTC))) {
+			throw new CovidException("Termine für diese Teststrecke müssen " + hoursBeforeMeeting
+					+ " Stunden vor Terminbeginn vereinbart werden. Bitte wählen Sie einen Termin zu einem späteren Zeitpunkt aus.");
 		}
 
 		// Falls der Termin noch frei ist, muss er nun mit der xpctsUpdateTestTermin Prozedur geändert werden

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +55,7 @@ public class TestPersonMeetingController {
 	@Autowired
 	private TestCertificateMailService mailService;
 
+	@CrossOrigin
 	@PostMapping(value = "public/meeting/noaccount/book", produces = "application/json")
 	public TestTermin bookMeeting(@RequestBody TestPersonMeetingInformation input) throws Exception {
 
@@ -77,8 +80,8 @@ public class TestPersonMeetingController {
 		sqlRequest.addColumn(new Column("KeyLong", DataType.LONG, OutputType.OUTPUT));
 		sqlRequest.addColumn(new Column("ctsTestStreckeKey", DataType.LONG, OutputType.INPUT));
 		sqlRequest.addColumn(new Column("Starttime", DataType.INSTANT, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.INPUT));
-		sqlRequest.addColumn(new Column("Teststrecke", DataType.STRING, OutputType.INPUT));
+		sqlRequest.addColumn(new Column("SecurityToken", DataType.STRING, OutputType.OUTPUT));
+		sqlRequest.addColumn(new Column("Anmeldezeitraum", DataType.INTEGER, OutputType.OUTPUT));
 		{
 			val firstRequestParams = new Row();
 			sqlRequest.getRows().add(firstRequestParams);
@@ -99,6 +102,12 @@ public class TestPersonMeetingController {
 		// Falls der gewünschte Termin in der Zwischenzeit doch belegt wurde, ist die Liste leer
 		if (viewOutput.isEmpty()) {
 			throw new CovidException("Der gewünschte Termin ist leider bereits belegt!");
+		}
+
+		int hoursBeforeMeeting = viewOutput.get(0).getValues().get(4).getIntegerValue();
+		if (Instant.now().plus(hoursBeforeMeeting, ChronoUnit.HOURS).isAfter(datetime.toInstant(ZoneOffset.UTC))) {
+			throw new CovidException("Termine für diese Teststrecke müssen " + hoursBeforeMeeting
+					+ " Stunden vor Terminbeginn vereinbart werden. Bitte wählen Sie einen Termin zu einem späteren Zeitpunkt aus.");
 		}
 
 		// Falls der Termin noch frei ist, muss er nun mit der xpctsUpdateTestTermin Prozedur geändert werden

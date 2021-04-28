@@ -105,7 +105,8 @@ public class TestPersonMeetingController {
 		}
 
 		int hoursBeforeMeeting = viewOutput.get(0).getValues().get(4).getIntegerValue();
-		if (Instant.now().plus(hoursBeforeMeeting, ChronoUnit.HOURS).isAfter(datetime.toInstant(ZoneOffset.UTC))) {
+		LocalDateTime tmp = LocalDateTime.now(ZoneId.of("Europe/Berlin"));
+		if (tmp.plus(hoursBeforeMeeting, ChronoUnit.HOURS).isAfter(datetime)) {
 			throw new CovidException("Termine für diese Teststrecke müssen " + hoursBeforeMeeting
 					+ " Stunden vor Terminbeginn vereinbart werden. Bitte wählen Sie einen Termin zu einem späteren Zeitpunkt aus.");
 		}

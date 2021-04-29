@@ -46,7 +46,12 @@ public class TestCertificateMailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Scheduled(fixedRate = 1000 * 10)
+    /**
+     * Standardmäßig wird diese Methode jede Minute ausgeführt.
+     *
+     * @throws Throwable
+     */
+    @Scheduled(cron = "${test.certificate.mail.service.cron:0 * * * * *}")
     public void sendCertificate() throws Throwable {
         val sqlRequest = new Table();
         sqlRequest.setName("xtctsTestErgebnis");

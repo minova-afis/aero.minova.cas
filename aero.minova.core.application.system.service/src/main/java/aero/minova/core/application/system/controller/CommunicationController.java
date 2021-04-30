@@ -30,11 +30,13 @@ public class CommunicationController {
 
 	@PostMapping(value = "loadPrivileges")
 	public void loadPrivileges() throws Exception {
-		// Abfrage mur für jUnit-Tests, da dabei Authentication = null
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication != null) {
-			procedureController.loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
-		} else {
+		try {
+			// Abfrage mur für jUnit-Tests, da dabei Authentication = null
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (authentication != null) {
+				procedureController.loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
+			}
+		} catch (Exception e) {
 			throw new IllegalArgumentException("No User found, please login");
 		}
 	}

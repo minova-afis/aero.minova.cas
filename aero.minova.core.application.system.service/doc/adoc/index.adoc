@@ -20,7 +20,7 @@ Der Dienst wurde mit dem Ticket #42940 ins leben gerufen.
 
 == Installation
 
-* Inhalt von lib und die gebaut jar in einen Ordner bringen.
+* Inhalt von lib und die gebaute jar in einen Ordner bringen.
 * `application-production.properties` und `aero.minova.core.application.system.xml` an das System anpassen.
 * Als Windows Dienst mithilfe von `aero.minova.core.application.system.exe install` via cmd installieren.
 * Das Projekt aero.minova.cas.logic muss gebaut werden und als Modul im

@@ -189,35 +189,3 @@ where x.KeyLong is null
 
 IMPORTANT: Falls zu Beginn ein neuer Datenbank-User angelegt wurde,
 darf der 'grant select' nicht fehlen.
-
-[source,sql]
-----
-create user cas
-
-[...]
-
-grant select on xvcasWorkingTimeIndex2 to cas
-grant select on xtcasColumnSecurity to cas
-
-grant insert on xtcasError to cas
-
-grant select on tService to cas
-grant select on tServiceObject to cas
-grant select on tServiceContract to cas
-grant select on tOrderReceiver to cas
-
-grant execute on xpcasWorkingTimeOrderReceiverList to cas
-grant execute on xpcasWorkingTimeOrderReceiverResolve to cas
-grant execute on xpcasWorkingTimeServiceContractList to cas
-grant execute on xpcasWorkingTimeServiceContractResolve to cas
-grant execute on xpcasWorkingTimeServiceObjectList to cas
-grant execute on xpcasWorkingTimeServiceObjectResolve to cas
-grant execute on xpcasWorkingTimeServiceList to cas
-grant execute on xpcasWorkingTimeServiceResolve to cas
-
-grant execute on xpcasDeleteWorkingTime to cas
-grant execute on xpcasInsertWorkingTime to cas
-grant execute on xpcasReadWorkingTime to cas
-grant execute on xpcasUpdateWorkingTime to cas
-----
-

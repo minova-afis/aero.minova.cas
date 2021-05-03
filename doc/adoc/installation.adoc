@@ -1,0 +1,128 @@
+= Installation
+
+== Kundensystem aufsetzen.
+
+* Einen Ordner für das Kundensystem bestimmen und erstellen.
+* Log-Ordner einrichten: `minova\logs`
+* Deploy-Orner einrichten: `Shared Data\deploy`
+** Minimale benötigte Jars kopieren: `\\acode\current\install-JARs`
+** Benötigte Module kopieren (bspw. cts.jar).
+
+== SQL-Server und Datenbank einrichten.
+* SQL-Server installieren.
+* Datenbank erstellen.
+* SQL-Benutzer und SQL-Anmeldung für Datenbank einrichten.
+* `Connection.xbs` mit SIS(name="servicesinvoicingsystem") als Application erstellen.
+* TCP-Verbindungen für SQL-Server freischalten.
+
+image::images/sql-server-tcp-config.jpg[]
+
+* Anmeldung testen.
+* xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Tabellen und Prozeduren] aufspielen.
+
+== CAS-Dienst installieren.
+
+* Dienst-Ordner erstellen: `Shared Data\Program Files\cas`
+* `application.properties` erstellen:
+
+[source]
+.Vorlage
+--------
+aero_minova_core_application_root_path=<Pfad zum Kundensystem>/Shared Data/Program Files/SIS
+aero_minova_database_url=<URL aus der Connection.xbs ohne Benutzername und Passwort>
+aero_minova_database_user_name=<SQL-Benutzer aus der Connection.xbs>
+aero_minova_database_user_password=<Passwort aus der Connection.xbs>
+
+server.port=<Gewünschter Server-Port des CAS>
+ch.minova.service.xmlprinter.service.port=<Port des XMLPrinters>
+
+login_dataSource=<database|admin|ldap>
+
+spring.mail.host=<E-Mailserver>
+spring.mail.username=<Sende-Nutzer von E-Mails>
+spring.mail.properties.mail.smtp.auth=false
+spring.mail.properties.mail.smtp.starttls.enable=false
+
+testErgebnisPositiveKey=<KeyLong aus der xtctsTestErgebnisValue für das positive Testergebnis>
+testErgebnisNegativeKey=<KeyLong aus der xtctsTestErgebnisValue für das negative Testergebnis>
+--------
+
+=== Keystore einrichten.
+
+Standardmäßig wird ein Test-Keystore verwendet, welcher in der Jar des CAS gespeichert.
+Dieser ist nur für localhost gültig und sollte nur für die Entwicklung verwendet werden.
+
+[source]
+.Default-Werte
+----
+server.ssl.key-store-type=PKCS12
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=password
+server.ssl.key-alias=localhost
+----
+
+Um einen eigenen Keystore zu verwenden, muss die `application.properties` erweitert werden.
+
+[source]
+.Eigener Keystore
+----
+server.ssl.key-store-type=<Typ des Keystores>
+server.ssl.key-store=<Pfad zum Keystore>
+server.ssl.key-alias=<Alias im Keystore>
+server.ssl.key-store-password=<Passwort des Keystores>
+----
+
+=== lib-Ordner erstellen.
+
+** Release verwenden: Die Release Jar in den lib-Ordner kopieren.
+** Entwickler-Version verwenden:
+CAS-Dienst mit `mvn clean verify` bauen.
+`target/libs/*` in den lib Ordner kopieren.
+`target/aero.minova.core.application.system.service.jar.original` kopieren und `original` Suffix entfernen.
+
+
+* Windows-Dienst erstellen:
+** Letzten stabilen Release der Wrapper-Exe kopieren: https://github.com/winsw/winsw/releases
+** Die Exe in den Dienst Ordner kopieren und passend umbennen.
+** XML-Konfigurations-Datei für den Wrapper erstellen.
+Der Prefix der Konfigurations-Datei muss mit der Wrapper-Exe übereinstimmen.
+Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml`
+
+[source,xml]
+--------
+<?xml version="1.0" encoding="UTF-8"?>
+<service>
+	<id>ID des Windows-Dienstes ohne Leerzeichen</id>
+	<name>Name des Windows-Dienstes</name>
+	<description>Beschreibung des Windows-Dienstes</description>
+	<executable>Pfad zum verwendeten java</executable>
+	<!-- Nur eines der beiden Argumente verwenden. -->
+	<!-- Die erste Variante ist für den Fall, dass die Release-Version verwendet wird. -->
+	<arguments>-Dloader.path="lib/" -jar aero.minova.core.application.system.service.jar</arguments>
+	<!-- Die zweite Variante ist für den Fall, dass die Entwickler-Version verwendet wird. -->
+	<arguments>-cp "lib/*" aero.minova.core.application.system.CoreApplicationSystemApplication</arguments>
+	<logmode>rotate</logmode>
+</service>
+--------
+
+== XMLPrinter installieren.
+
+* XMLPrinter-Modul und dessen Abhängigkeiten in den deploy-Ordner verschieben.
+* XMLPrinter installieren: `java -jar ch.minova.service.xmlprinter.jar -app=sis -is`
+* Konfigurationen in `Shared Data\Program Files\xmlprinter\conf` anpassen:
+** `log4j.properties`
+** `wrapper.conf`
+** Windows-Dienst installieren: `Shared Data\Program Files\xmlprinter\bin`: `xmlprinter.bat install`
+
+== WFC-Module installieren.
+
+* `cts.jar` in den deploy-Ordner verschieben.
+* `cts.jar -app=sis -us -ud -cf -writemdi -writebxs`
+* Umbennante Kopie der XBS und MDI-Dateien aus der erstellen:
+** `ServicesInvoicingSystem.xbs` -> `application.xbs`
+** `ServicesInvoicingSystem_MDI.xml` -> `application.mdi`
+
+== Ports freigeben.
+
+Der `server.port` Port aus der `application.properties` muss freigeben werden,
+wenn remote Clients auf den Server Zugriff haben sollen.

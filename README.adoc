@@ -9,13 +9,15 @@ Der Fokus liegt hierbei auf das Backend und die Infrastruktur für Eclipse-Anwen
 Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
 
 == Sturktur
-
-* xref:./doc/adoc/installation.adoc#[Installation]
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
+
+== Installation
+
+* xref:./doc/adoc/installation.adoc#[Installation des Dienstes]
+* xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
 
 == Maske für das Editieren von Rechten
 
 * Source Code: http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic
 * Installierbare Modul: acode/snapshot/aero.minova.cas.logic.jar
-* Alternativ: xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]

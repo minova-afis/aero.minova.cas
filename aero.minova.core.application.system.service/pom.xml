@@ -35,11 +35,6 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>ch.minova</groupId>
-            <artifactId>ch.minova.service.events</artifactId>
-            <version>10.8.4</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>

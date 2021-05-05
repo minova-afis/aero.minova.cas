@@ -42,7 +42,6 @@ import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import aero.minova.trac.integration.controller.TracController;
 import lombok.val;
 
 @RestController
@@ -50,9 +49,6 @@ public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
-
-	@Autowired
-	TracController trac;
 
 	@Autowired
 	SqlViewController svc;
@@ -82,13 +78,6 @@ public class SqlProcedureController {
 			inputTable.getColumns().get(0).setOutputType(OUTPUT);
 		}
 		try {
-			if ("Ticket".equals(inputTable.getName())) {
-				val result = new SqlProcedureResult();
-				result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
-				// WFC erwartet einen ReturnCode, falls es abbricht, würde kein ReturnCode gesetzt werden
-				result.setReturnCode(1);
-				return new ResponseEntity(result, HttpStatus.ACCEPTED);
-			}
 			// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
 			List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {

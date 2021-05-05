@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,7 +75,7 @@ public class SqlProcedureController {
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		logger.info("data/procedure: " + gson.toJson(inputTable));
 		if (extension.containsKey(inputTable.getName())) {
-			return new ResponseEntity(extension.get(inputTable), HttpStatus.ACCEPTED);
+			return new ResponseEntity(extension.get(inputTable.getName()).apply(inputTable), HttpStatus.ACCEPTED);
 		}
 		if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
 			// TODO HACK

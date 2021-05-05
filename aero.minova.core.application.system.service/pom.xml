@@ -36,11 +36,6 @@
         </dependency>
         <dependency>
             <groupId>ch.minova</groupId>
-            <artifactId>ch.minova.ncore</artifactId>
-            <version>10.38.2</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.minova</groupId>
             <artifactId>ch.minova.service.events</artifactId>
             <version>10.8.4</version>
         </dependency>

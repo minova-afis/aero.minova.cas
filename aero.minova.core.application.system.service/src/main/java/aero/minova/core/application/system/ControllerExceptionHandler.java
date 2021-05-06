@@ -91,7 +91,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return prepareExceptionReturnTable(ex);
 	}
 
-	private Table prepareExceptionReturnTable(Exception ex) {
+	protected Table prepareExceptionReturnTable(Exception ex) {
 		Table outputTable = new Table();
 		outputTable.setName("Error");
 		outputTable.addColumn(new Column("International Message", DataType.STRING));
@@ -142,7 +142,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return outputTable;
 	}
 
-	private SqlProcedureResult prepareExceptionReturnSqlProcedureResult(Exception ex) {
+	protected SqlProcedureResult prepareExceptionReturnSqlProcedureResult(Exception ex) {
 		SqlProcedureResult result = new SqlProcedureResult();
 		Table resultSetTable = new Table();
 		resultSetTable.setName("Error");

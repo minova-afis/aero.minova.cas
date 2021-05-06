@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -63,6 +64,7 @@ public class FileControllerTest {
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		testSubject.hashFile(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"));
 		assertThat(testSubject.getHash("Shared Data/Program Files/AFIS/AFIS.xbs"))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 	}
@@ -98,7 +100,7 @@ public class FileControllerTest {
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
-		Assertions.assertThrows(IllegalAccessException.class, () -> assertThat(testSubject.getHash("../Shared Data/Program Files/AFIS/AFIS.xbs")));
+		Assertions.assertThrows(NoSuchFileException.class, () -> testSubject.hashFile(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs")));
 	}
 
 	@Test

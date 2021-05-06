@@ -119,6 +119,9 @@ public class FilesController {
 		}
 	}
 
+	/*
+	 * Vorsicht! getZip ist nicht determinstisch
+	 */
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam Path path) throws Exception {
 		val inputPath = files.checkLegalPath(path.toString());

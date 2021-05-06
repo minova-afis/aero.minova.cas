@@ -54,11 +54,15 @@ public class FilesController {
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
-		val inputPath = files.checkLegalPath(path);
-		return hashFile(inputPath);
+		files.checkLegalPath(path);
+		logger.info("checking Hash for file: " + path);
+		if (!path.contains(".") || !path.substring(path.lastIndexOf(".") + 1, path.length()).equals("md5")) {
+			path = path + ".md5";
+		}
+		return getFile(path);
 	}
 
-	private static byte[] hashFile(Path p) throws IOException {
+	public static void hashFile(Path p) throws IOException {
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("MD5");
@@ -67,7 +71,12 @@ public class FilesController {
 		}
 		md.update(readAllBytes(p));
 		String fx = "%0" + (md.getDigestLength() * 2) + "x";
-		return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
+		byte[] hashOfFile = String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
+
+		File hashedFile = new File(p + ".md5");
+		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
+		logger.info("Hashing: " + hashedFile.getAbsolutePath());
+		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
 
 	// je höher die Zahl bei @Order, desto später wird die Methode ausgeführt
@@ -85,11 +94,7 @@ public class FilesController {
 			}
 			// wir wollen nicht noch einen Hash von einer gehashten Datei und auch keinen Hash von einem Directory ( zips allerdings schon)
 			if ((!fileSuffix.toLowerCase().contains("md5")) && (!path.toFile().isDirectory())) {
-				byte[] hashOfFile = hashFile(path);
-				File hashedFile = new File(path + ".md5");
-				// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
-				logger.info("Hashing: " + hashedFile.getAbsolutePath());
-				Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
+				hashFile(path);
 			}
 
 		}

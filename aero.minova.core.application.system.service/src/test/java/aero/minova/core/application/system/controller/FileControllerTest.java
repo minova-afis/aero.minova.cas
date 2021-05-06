@@ -267,6 +267,7 @@ public class FileControllerTest {
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isNotEmpty();
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo(testSubject.getHash(programFilesFolder.resolve("AFIS.zip").toString()));
 
+		// das zippen ist nicht deterministisch und würde auf github dazu führen, dass der Test abbricht, obwohl er local funktioniert
 		// assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo("51a1713197b136586344905c9847daff".getBytes(StandardCharsets.UTF_8));
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5")))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));

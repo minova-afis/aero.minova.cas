@@ -72,10 +72,6 @@ public class SqlProcedureController {
 		if (extension.containsKey(inputTable.getName())) {
 			return new ResponseEntity(extension.get(inputTable.getName()).apply(inputTable), HttpStatus.ACCEPTED);
 		}
-		if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
-			// TODO HACK
-			inputTable.getColumns().get(0).setOutputType(OUTPUT);
-		}
 		try {
 			// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
 			List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
@@ -83,13 +79,6 @@ public class SqlProcedureController {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
 			val result = calculateSqlProcedureResult(inputTable);
-			if ("xpctsInsertTestErgebnis".equals(inputTable.getName())) {
-				try {
-					// testCertificatePrintService.xpctsInsertTestErgebnis(inputTable, result.getOutputParameters());
-				} catch (Throwable th) {
-					logger.error("Could not send certificate by e-mail.", th);
-				}
-			}
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			logger.info("Error while trying to execute procedure: " + inputTable.getName());

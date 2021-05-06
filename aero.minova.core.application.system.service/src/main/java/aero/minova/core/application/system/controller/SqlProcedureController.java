@@ -65,7 +65,6 @@ public class SqlProcedureController {
 		extension.put(name, ext);
 	}
 
-	// , produces = "application/json"
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {

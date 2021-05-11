@@ -9,13 +9,10 @@
 
 == Beschreibung
 
-Der Kern des Systems ist ein Dienst,
-welcher eine einfache Schnittstelle zu Daten und Prozeduren bereitstellt.
-Kombiniert mit einem Modul-System können hiermit Daten und Prozeduren einer SQL-Datenbank
-sowie eines Dateisystems eingerichtet, gepflegt und zugegriffen werden.
+Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank sowie einem Dateisystem bereit.
 
-Der Fokus liegt hierbei auf das Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.
-Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
+Der Fokus liegt hierbei ein Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.
+Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.
 
 == Sturktur
 

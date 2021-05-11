@@ -9,7 +9,7 @@
 
 == Beschreibung
 
-Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank sowie einem Dateisystem bereit.
+Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank sowie einem Read-Only-Dateisystem bereit.
 
 Der Fokus liegt hierbei ein Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.
 Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.

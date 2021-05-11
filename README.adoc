@@ -14,7 +14,7 @@ Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank s
 Der Fokus liegt hierbei ein Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.
 Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.
 
-== Sturktur
+== Weiterführende Dokumentation
 
 * xref:./doc/adoc/installation.adoc#[Installation]
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]

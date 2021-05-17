@@ -1,23 +1,31 @@
 = Core Application System
 
-Der Kern des Systems ist ein Dienst,
-welcher eine einfache Schnittstelle zu Daten und Prozeduren bereitstellt.
-Kombiniert mit einem Modul-System können hiermit Daten und Prozeduren einer SQL-Datenbank
-sowie eines Dateisystems eingerichtet, gepflegt und zugegriffen werden.
+++++
+<p align="left">
+  <img src="https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg">
+  <img src="https://img.shields.io/badge/license-EPL%202.0-green">
+</p>
+++++
 
-Der Fokus liegt hierbei auf das Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.
-Das Ganze kann durch die Integration mit weiteren Systemen verfeinert werden.
+== Beschreibung
 
 == Sturktur
+
+Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank sowie einem Read-Only-Dateisystem bereit.
+
+Der Fokus liegt hierbei ein Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.
+Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.
+
+== Weiterführende Dokumentation
+
+* xref:./doc/adoc/installation.adoc#[Installation]
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
+* xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
+* xref:./aero.minova.cas.logic/doc/adoc/index.adoc#[Maske für das Editieren von Rechten]
+* xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 
 == Installation
 
 * xref:./doc/adoc/installation.adoc#[Installation des Dienstes]
 * xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
-
-== Maske für das Editieren von Rechten
-
-* Source Code: http://trac.minova.com/svn/minova/zehn/aero.minova.cas.logic
-* Installierbare Modul: acode/snapshot/aero.minova.cas.logic.jar

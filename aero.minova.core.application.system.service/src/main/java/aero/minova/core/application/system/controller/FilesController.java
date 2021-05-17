@@ -48,7 +48,7 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		val inputPath = files.checkLegalPath(path);
-		logger.info(path);
+		logger.info("files/read: " + path);
 		return readAllBytes(inputPath);
 	}
 
@@ -119,6 +119,9 @@ public class FilesController {
 		}
 	}
 
+	/*
+	 * Vorsicht! getZip ist nicht determinstisch
+	 */
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam Path path) throws Exception {
 		val inputPath = files.checkLegalPath(path.toString());
@@ -143,7 +146,7 @@ public class FilesController {
 
 				// noch mehr zipps in einer zip sind sinnlos
 				if (filePath.toFile().isFile() && (!filePath.toString().contains("zip"))) {
-					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()));
+					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()).replace('\\', '/'));
 
 					// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,
 					// wenn die Zip erstellt wird.

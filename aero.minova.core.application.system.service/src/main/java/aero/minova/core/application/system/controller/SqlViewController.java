@@ -1,10 +1,11 @@
 package aero.minova.core.application.system.controller;
 
+import static java.util.Arrays.asList;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.gson.Gson;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
@@ -37,8 +40,12 @@ public class SqlViewController {
 	SystemDatabase systemDatabase;
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
+	@Autowired
+	Gson gson;
+
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
+		logger.info("data/view: " + gson.toJson(inputTable));
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
@@ -94,9 +101,30 @@ public class SqlViewController {
 		return result;
 	}
 
+	public Table unsecurelyGetIndexView(@RequestBody Table inputTable, List<Row> requestingAuthorities) throws Exception {
+		final val connection = systemDatabase.getConnection();
+		Table result = new Table();
+		StringBuilder sb = new StringBuilder();
+		try {
+			val viewQuery = pagingWithSeek(inputTable, false, -1, false, 1, requestingAuthorities);
+			val preparedStatement = connection.prepareCall(viewQuery);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			logger.info("Executing statements: " + sb.toString());
+			ResultSet resultSet = preparedViewStatement.executeQuery();
+
+			result = convertSqlResultToTable(inputTable, resultSet);
+		} catch (Exception e) {
+			logger.error("Statement could not be executed: " + e.getMessage(), e);
+			throw new TableException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
+		}
+		return result;
+	}
+
 	/**
 	 * das Prepared Statement wird mit den dafür vorgesehenen Parametern befüllt
-	 * 
+	 *
 	 * @param inputTable
 	 *            die Table, welche vom getIndexView aufgerufen wurde
 	 * @param preparedStatement
@@ -165,7 +193,7 @@ public class SqlViewController {
 					parameterOffset--;
 				}
 			} catch (Exception e) {
-				logger.error("Statement could not be filled: " + sb.toString());
+				logger.error("Statement could not be filled: " + sb.toString(), e);
 				throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
 			}
 		}
@@ -175,7 +203,7 @@ public class SqlViewController {
 
 	/**
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt.
-	 * 
+	 *
 	 * @param securityTokens
 	 *            Die Gruppen, die dem anfordenden gehören.
 	 * @param privilegeName
@@ -199,7 +227,7 @@ public class SqlViewController {
 
 		for (String s : userTokens) {
 			Row tableNameAndUserToken = new Row();
-			tableNameAndUserToken.setValues(Arrays.asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
+			tableNameAndUserToken.setValues(asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
 		return getTableForSecurityCheck(userPrivileges);
@@ -208,7 +236,7 @@ public class SqlViewController {
 	/**
 	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage, um die maximale Länge zu erhalten Ist nur für die Sicherheitsabfragen gedacht,
 	 * um nicht zu viele unnötige SQL-Abfrgane zu machen.
-	 * 
+	 *
 	 * @param inputTable
 	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
 	 * @return Das Ergebnis der Abfrage.
@@ -231,7 +259,7 @@ public class SqlViewController {
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + sb.toString());
+			logger.error("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -260,7 +288,7 @@ public class SqlViewController {
 	/**
 	 * Diese Methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String vor und berücksichtigt eine evtl.
 	 * angegebene Maximalanzahl Ergebnisse
-	 * 
+	 *
 	 * @param params
 	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
 	 * @param autoLike
@@ -270,8 +298,8 @@ public class SqlViewController {
 	 * @param count
 	 *            Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
 	 * @return Präparierter View-String, der ausgeführt werden kann
-	 * @author wild
 	 * @throws IllegalArgumentException
+	 * @author wild
 	 */
 	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuffer sb = new StringBuffer();
@@ -303,8 +331,10 @@ public class SqlViewController {
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
-			if (!where.trim().equals(""))
+			if (!where.trim().equals("")) {
 				whereClauseExists = true;
+				sb.append(")");
+			}
 		}
 
 		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
@@ -340,8 +370,10 @@ public class SqlViewController {
 		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
-			if (!where.trim().equals(""))
+			if (!where.trim().equals("")) {
 				whereClauseExists = true;
+				sb.append(")");
+			}
 		}
 		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
@@ -362,7 +394,7 @@ public class SqlViewController {
 	 * <p>
 	 * TODO Idee: Mann sollte eine neue Tabelle erstellen, statt die eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht
 	 * geändert wird.
-	 * 
+	 *
 	 * @param inputTable
 	 *            Enthält den Tabellen-Namen und die Spalten, welche von einem Nutzer angefragt werden.
 	 * @param userGroups
@@ -383,8 +415,7 @@ public class SqlViewController {
 		for (Row row : userGroups) {
 			if (row.getValues().get(0).getStringValue().equals(inputTable.getName())) {
 				Row bar = new Row();
-				bar.setValues(
-						Arrays.asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
+				bar.setValues(asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
 				List<Row> checkRow = new ArrayList<>();
 				checkRow.add(bar);
 				columnSec.setRows(checkRow);
@@ -530,20 +561,19 @@ public class SqlViewController {
 			// Wenn es etwas gab, dann fügen wir diese Zeile der kompletten WHERE-clause hinzu
 			if (clause.length() > 0) {
 				if (where.length() == 0) {
-					where.append("\r\nwhere ");
+					where.append("\r\nwhere (");
 				} else {
 					where.append(and ? "\r\n  and " : "\r\n   or ");
 				}
 				where.append('(').append(clause.toString()).append(')');
 			}
 		}
-
 		return where.toString();
 	}
 
 	/**
 	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an
-	 * 
+	 *
 	 * @param isFirstWhereClause
 	 *            Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
 	 * @param requestingAtuhorities

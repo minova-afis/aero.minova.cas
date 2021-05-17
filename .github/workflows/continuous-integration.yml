@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
         with:
+          distribution: 'adopt'
           java-version: ${{ matrix.java-version }}
           java-package: 'jdk'
       - name: Build

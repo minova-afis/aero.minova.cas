@@ -17,7 +17,7 @@ jobs:
       - name: Build
         run: |
           cd $GITHUB_WORKSPACE
-          mvn clean verify -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml
+          mvn clean verify -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}

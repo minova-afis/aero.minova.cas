@@ -19,9 +19,6 @@ jobs:
           cd $GITHUB_WORKSPACE
           mvn clean verify -P repo-github -Dusername=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml
         env:
-          MAVEN_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}

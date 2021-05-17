@@ -18,7 +18,7 @@ public class Value {
 	public Value(Integer integerValue, String rule) {
 		type = DataType.INTEGER;
 		this.rule = rule;
-		setValue(requireNonNull(integerValue));
+		setValue(integerValue);
 	}
 
 	public Value(Long longValue, String rule) {

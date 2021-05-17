@@ -19,6 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
@@ -37,6 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${login_dataSource:}")
 	private String dataSource;
 
+	@Value("${server.port:8084}")
+	private String serverPort;
+
 	@Autowired
 	SqlProcedureController spc;
 
@@ -45,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll();
+		http.authorizeRequests().antMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll();
 		http.authorizeRequests().anyRequest().fullyAuthenticated();
 		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
 		http.formLogin()//
@@ -55,7 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
-		http.requiresChannel().anyRequest().requiresSecure();
+		http.cors();
 	}
 
 	@Bean
@@ -98,4 +104,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		};
 	}
 
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+		return source;
+	}
 }

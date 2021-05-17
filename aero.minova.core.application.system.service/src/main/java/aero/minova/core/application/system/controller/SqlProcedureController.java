@@ -10,22 +10,28 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.gson.Gson;
 
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
@@ -36,7 +42,6 @@ import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import aero.minova.trac.integration.controller.TracController;
 import lombok.val;
 
 @RestController
@@ -46,43 +51,50 @@ public class SqlProcedureController {
 	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@Autowired
-	TracController trac;
-
-	@Autowired
 	SqlViewController svc;
 
-	@SuppressWarnings("unchecked")
-	@PostMapping(value = "data/procedure", produces = "application/json")
-	public SqlProcedureResult executeProcedure(@RequestBody Table inputTable) throws Exception {
-		val result = new SqlProcedureResult();
-		try {
-			if ("Ticket".equals(inputTable.getName())) {
-				result.setResultSet(trac.getTicket(inputTable.getRows().get(0).getValues().get(0).getStringValue()));
-				// WFC erwartet einen ReturnCode, falls es abbricht, würde kein ReturnCode gesetzt werden
-				result.setReturnCode(1);
-				return result;
-			} else if ("loadPrivilege".equals(inputTable.getName())) {
-				// Abfrage mur für jUnit-Tests, da dabei Authentication = null
-				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				if (authentication != null) {
-					loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
-				} else {
-					throw new ProcedureException("No User found, please login");
-				}
-			}
+	@Autowired
+	Gson gson;
 
+	private Map<String, Function<Table, ResponseEntity>> extension = new HashMap<>();
+
+	public void registerExctension(String name, Function<Table, ResponseEntity> ext) {
+		if (extension.containsKey(name)) {
+			throw new IllegalArgumentException(name);
+		}
+		extension.put(name, ext);
+	}
+
+	@SuppressWarnings("unchecked")
+	@PostMapping(value = "data/procedure")
+	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
+		logger.info("data/procedure: " + gson.toJson(inputTable));
+		if (extension.containsKey(inputTable.getName())) {
+			return new ResponseEntity(extension.get(inputTable.getName()).apply(inputTable), HttpStatus.ACCEPTED);
+		}
+		try {
 			// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
 			List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 			if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
-			return calculateSqlProcedureResult(inputTable);
+			val result = calculateSqlProcedureResult(inputTable);
+			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			logger.info("Error while trying to execute procedure: " + inputTable.getName());
 			throw e;
 		}
 	}
 
+	/**
+	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
+	 *
+	 * @param inputTable
+	 *            Ausfüjhrungs-Parameter
+	 * @return Resultat der Ausführung
+	 * @throws Exception
+	 *             Fehler bei der Ausführung
+	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws Exception {
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
@@ -183,12 +195,12 @@ public class SqlProcedureController {
 								}
 							}
 						} catch (Exception e) {
-							throw new RuntimeException("msg.ParseError %" + i);
+							throw new RuntimeException("msg.ParseError %" + i, e);
 						}
 					});
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			if (null != preparedStatement.getResultSet()) {
+			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
 				result.setResultSet(resultSet);
@@ -273,7 +285,7 @@ public class SqlProcedureController {
 			connection.commit();
 			logger.info("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
-			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage());
+			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage(), e);
 			try {
 				connection.rollback();
 			} catch (Exception e1) {

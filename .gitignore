@@ -8,4 +8,4 @@ target/
 ### Intellji
 *.iml
 .idea/
-
+.DS_Store

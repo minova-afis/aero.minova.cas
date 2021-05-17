@@ -29,7 +29,7 @@ jobs:
             -Dpassword=$GITHUB_ACCESS_TOKEN \
             -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
             -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
-            --settings .github/settings.xml
+            --settings ../.github/settings.xml
           mvn package spring-boot:repackage
           docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas:${{ github.event.inputs.releaseVersion }} .
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}

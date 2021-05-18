@@ -16,6 +16,7 @@ import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -54,15 +55,16 @@ public class FilesController {
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
-		files.checkLegalPath(path);
 		logger.info("checking Hash for file: " + path);
 		if (!path.contains(".") || !path.substring(path.lastIndexOf(".") + 1, path.length()).equals("md5")) {
 			path = path + ".md5";
 		}
-		return getFile(path);
+		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getRootPath(), "");
+		files.checkLegalPath(md5FilePath);
+		return getFile(md5FilePath);
 	}
 
-	public static void hashFile(Path p) throws IOException {
+	public void hashFile(Path p) throws IOException {
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("MD5");
@@ -73,9 +75,28 @@ public class FilesController {
 		String fx = "%0" + (md.getDigestLength() * 2) + "x";
 		byte[] hashOfFile = String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 
-		File hashedFile = new File(p + ".md5");
+		// erstmal Ordnertiefe herausfinden
+		String md5FolderStructure = p.toString().replace(files.getRootPath(), "").replace('\\', '/');
+		List<String> folders = Arrays.asList(md5FolderStructure.split("/"));
+
+		// alle MD5-Dateien sollen in den MD5-Ordner wandern
+		Path folderPath = Paths.get(files.getMd5Folder());
+		// in der Schleife wird die Ordnerstruktur der zu hashenden Datei im MD5-Ordner nachgestellt,
+		// damit keine gleichnamigen Dateien überschrieben werden
+		for (String f : folders) {
+			folderPath = Paths.get(folderPath.toString() + "/" + f);
+			// für jeden Ordner überprüfen, ob er im MD5-Ordner exisitert und falls nicht, erstellen
+			if ((!Files.exists(folderPath)) && (!f.contains("."))) {
+				Files.createDirectories(folderPath);
+			}
+		}
+
+		// nachdem sichergestellt wurde, dass alle Unterordner vorhanden sind, wird die MD5-Datei in den MD5-Ordner geschrieben
+		String mdDataName = p.toString().replace(files.getRootPath(), files.getMd5Folder().toString()).replace('\\', '/');
+		File hashedFile = new File(mdDataName + ".md5");
 		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
 		logger.info("Hashing: " + hashedFile.getAbsolutePath());
+
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
 
@@ -86,6 +107,9 @@ public class FilesController {
 	public void hashAll() throws IOException {
 		List<Path> programFiles = files.populateFilesList(files.getSystemFolder());
 		for (Path path : programFiles) {
+			if (path.toString().contains(files.getMd5Folder())) {
+				continue;
+			}
 			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
 			// bevor die Dateien gehashed werden, werden sie gezipped (siehe @Order)
 			if (fileSuffix.toLowerCase().equals("zip")) {

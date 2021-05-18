@@ -26,6 +26,7 @@ public class FilesService {
 	private Path programFilesFolder;
 	private Path sharedDataFolder;
 	private Path systemFolder;
+	private Path md5Folder;
 	private final Logger logger = LoggerFactory.getLogger(FilesService.class);
 
 	public FilesService() {}
@@ -41,29 +42,45 @@ public class FilesService {
 	 */
 	@PostConstruct
 	public void setUp() throws IOException {
-		if (rootPath == null || rootPath.isEmpty()) {
+		if (getRootPath() == null || getRootPath().isEmpty()) {
 			rootPath = Paths.get(".").toAbsolutePath().normalize().toString();
 		}
-		systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
+		systemFolder = Paths.get(getRootPath()).toAbsolutePath().normalize();
 		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
-		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
+		md5Folder = getSharedDataFolder().resolve("MD5").toAbsolutePath().normalize();
+		programFilesFolder = getSharedDataFolder().resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
 			logger.error("msg.SystemFolder %" + systemFolder);
 		}
-		if (!isDirectory(sharedDataFolder)) {
-			logger.error("msg.SharedFolder %" + sharedDataFolder);
+		if (!isDirectory(getSharedDataFolder())) {
+			logger.error("msg.SharedFolder %" + getSharedDataFolder());
 		}
 		if (!isDirectory(programFilesFolder)) {
 			logger.error("msg.ProgramFilesFolder %" + programFilesFolder);
 		}
+		if (!isDirectory(md5Folder)) {
+			logger.error("msg.md5Folder %" + md5Folder);
+		}
+	}
+
+	public String getRootPath() {
+		return rootPath;
 	}
 
 	public Path applicationFolder(String application) {
 		return programFilesFolder.resolve(application);
 	}
 
+	public Path getSharedDataFolder() {
+		return sharedDataFolder;
+	}
+
 	public Path getSystemFolder() {
 		return systemFolder;
+	}
+
+	public String getMd5Folder() {
+		return md5Folder.toString();
 	}
 
 	/**

@@ -42,10 +42,10 @@ public class FilesService {
 	 */
 	@PostConstruct
 	public void setUp() throws IOException {
-		if (getRootPath() == null || getRootPath().isEmpty()) {
+		if (rootPath == null || rootPath.isEmpty()) {
 			rootPath = Paths.get(".").toAbsolutePath().normalize().toString();
 		}
-		systemFolder = Paths.get(getRootPath()).toAbsolutePath().normalize();
+		systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
 		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
 		md5Folder = getSharedDataFolder().resolve("MD5").toAbsolutePath().normalize();
 		programFilesFolder = getSharedDataFolder().resolve("Program Files").toAbsolutePath().normalize();
@@ -61,10 +61,6 @@ public class FilesService {
 		if (!isDirectory(md5Folder)) {
 			logger.error("msg.md5Folder %" + md5Folder);
 		}
-	}
-
-	public String getRootPath() {
-		return rootPath;
 	}
 
 	public Path applicationFolder(String application) {

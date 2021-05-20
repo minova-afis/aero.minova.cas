@@ -58,7 +58,7 @@ public class FilesController {
 		if (!path.contains(".") || !path.substring(path.lastIndexOf(".") + 1, path.length()).equals("md5")) {
 			path = path + ".md5";
 		}
-		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getRootPath(), "");
+		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getSystemFolder().toString(), "");
 		files.checkLegalPath(md5FilePath);
 		return getFile(md5FilePath);
 	}
@@ -75,11 +75,13 @@ public class FilesController {
 		byte[] hashOfFile = String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 
 		// Path für die neue MD5-Datei zusammenbauen
-		String mdDataName = p.toString().replace(files.getRootPath(), files.getMd5Folder().toString()).replace('\\', '/');
+		String mdDataName = p.toString().replace(files.getSystemFolder().toString(), files.getMd5Folder()).replace('\\', '/');
 
 		// Alle benötigten Ordner erstellen
 		File md5DirectoryStructure = new File(mdDataName.substring(0, mdDataName.lastIndexOf('/')));
-		md5DirectoryStructure.mkdirs();
+		if (md5DirectoryStructure.mkdirs()) {
+			logger.info("Creating directory " + md5DirectoryStructure);
+		}
 
 		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
 		File hashedFile = new File(mdDataName + ".md5");

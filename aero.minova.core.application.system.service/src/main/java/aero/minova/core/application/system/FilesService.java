@@ -47,13 +47,13 @@ public class FilesService {
 		}
 		systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
 		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
-		md5Folder = getSharedDataFolder().resolve("MD5").toAbsolutePath().normalize();
-		programFilesFolder = getSharedDataFolder().resolve("Program Files").toAbsolutePath().normalize();
+		md5Folder = sharedDataFolder.resolve("MD5").toAbsolutePath().normalize();
+		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
 			logger.error("msg.SystemFolder %" + systemFolder);
 		}
-		if (!isDirectory(getSharedDataFolder())) {
-			logger.error("msg.SharedFolder %" + getSharedDataFolder());
+		if (!isDirectory(sharedDataFolder)) {
+			logger.error("msg.SharedFolder %" + sharedDataFolder);
 		}
 		if (!isDirectory(programFilesFolder)) {
 			logger.error("msg.ProgramFilesFolder %" + programFilesFolder);
@@ -65,10 +65,6 @@ public class FilesService {
 
 	public Path applicationFolder(String application) {
 		return programFilesFolder.resolve(application);
-	}
-
-	public Path getSharedDataFolder() {
-		return sharedDataFolder;
 	}
 
 	public Path getSystemFolder() {

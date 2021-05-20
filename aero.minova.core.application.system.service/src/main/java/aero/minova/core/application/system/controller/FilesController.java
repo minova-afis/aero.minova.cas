@@ -97,17 +97,12 @@ public class FilesController {
 	public void hashAll() throws IOException {
 		List<Path> programFiles = files.populateFilesList(files.getSystemFolder());
 		for (Path path : programFiles) {
+			// Mit dieser If-Abfrage wird verhindert, dass es .md5-Dateiketten gibt
 			if (path.toString().contains(files.getMd5Folder())) {
 				continue;
 			}
-			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
-			// bevor die Dateien gehashed werden, werden sie gezipped (siehe @Order)
-			if (fileSuffix.toLowerCase().equals("zip")) {
-				String filePrefix = path.toString().substring(0, path.toString().lastIndexOf("."));
-				fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1, path.toString().length());
-			}
-			// wir wollen nicht noch einen Hash von einer gehashten Datei und auch keinen Hash von einem Directory ( zips allerdings schon)
-			if ((!fileSuffix.toLowerCase().contains("md5")) && (!path.toFile().isDirectory())) {
+			// wir wollen nicht keinen Hash von einem Directory ( zips allerdings schon)
+			if (!path.toFile().isDirectory()) {
 				hashFile(path);
 			}
 

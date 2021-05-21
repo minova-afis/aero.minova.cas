@@ -55,7 +55,7 @@ public class FilesController {
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		logger.info("checking Hash for file: " + path);
-		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getSystemFolder().toString(), "");
+		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getSystemFolder().toString(), "") + ".md5";
 		files.checkLegalPath(md5FilePath);
 		return getFile(md5FilePath);
 	}

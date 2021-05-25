@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -54,15 +55,18 @@ public class FileControllerTest {
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
+		final val md5Folder = sharedDataFolder.resolve("MD5");
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
 
 		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		testSubject.hashFile(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"));
 		assertThat(testSubject.getHash("Shared Data/Program Files/AFIS/AFIS.xbs"))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 	}
@@ -98,7 +102,7 @@ public class FileControllerTest {
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
-		Assertions.assertThrows(IllegalAccessException.class, () -> assertThat(testSubject.getHash("../Shared Data/Program Files/AFIS/AFIS.xbs")));
+		Assertions.assertThrows(NoSuchFileException.class, () -> testSubject.hashFile(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs")));
 	}
 
 	@Test
@@ -246,9 +250,11 @@ public class FileControllerTest {
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
+		final val md5Folder = sharedDataFolder.resolve("MD5");
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
 
 		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
@@ -262,14 +268,15 @@ public class FileControllerTest {
 		testSubject.zipAll();
 		testSubject.hashAll();
 
-		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"))).isNotEqualTo(old);
-		assertThat(Files.exists(programFilesFolder.resolve("AFIS.zip.md5"))).isTrue();
-		assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isNotEmpty();
-		assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo(testSubject.getHash(programFilesFolder.resolve("AFIS.zip").toString()));
+		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs.md5"))).isNotEqualTo(old);
+		assertThat(Files.exists(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5"))).isTrue();
+		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5"))).isNotEmpty();
+		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
+				.isEqualTo(testSubject.getHash(programFilesFolder.resolve("AFIS.zip").toString()));
 
 		// das zippen ist nicht deterministisch und würde auf github dazu führen, dass der Test abbricht, obwohl er local funktioniert
 		// assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo("51a1713197b136586344905c9847daff".getBytes(StandardCharsets.UTF_8));
-		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5")))
+		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs.md5")))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 
 		testSubject.hashAll();

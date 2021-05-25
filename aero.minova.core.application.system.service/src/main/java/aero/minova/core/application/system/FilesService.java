@@ -26,6 +26,7 @@ public class FilesService {
 	private Path programFilesFolder;
 	private Path sharedDataFolder;
 	private Path systemFolder;
+	private Path md5Folder;
 	private final Logger logger = LoggerFactory.getLogger(FilesService.class);
 
 	public FilesService() {}
@@ -46,6 +47,7 @@ public class FilesService {
 		}
 		systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
 		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
+		md5Folder = sharedDataFolder.resolve("MD5").toAbsolutePath().normalize();
 		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
 			logger.error("msg.SystemFolder %" + systemFolder);
@@ -56,6 +58,9 @@ public class FilesService {
 		if (!isDirectory(programFilesFolder)) {
 			logger.error("msg.ProgramFilesFolder %" + programFilesFolder);
 		}
+		if (!isDirectory(md5Folder)) {
+			logger.error("msg.md5Folder %" + md5Folder);
+		}
 	}
 
 	public Path applicationFolder(String application) {
@@ -64,6 +69,10 @@ public class FilesService {
 
 	public Path getSystemFolder() {
 		return systemFolder;
+	}
+
+	public String getMd5Folder() {
+		return md5Folder.toString();
 	}
 
 	/**

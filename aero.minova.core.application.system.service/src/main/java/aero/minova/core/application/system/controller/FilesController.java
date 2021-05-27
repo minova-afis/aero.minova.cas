@@ -16,6 +16,7 @@ import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -56,6 +57,15 @@ public class FilesController {
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		val inputPath = files.checkLegalPath(path);
 		return hashFile(inputPath);
+	}
+
+	@RequestMapping(value = "upload/logs", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	public @ResponseBody void getLogs(@RequestParam byte[] log) throws Exception {
+		String logPath = files.getLogsFolder().toString() + "/Log-" + LocalDateTime.now();
+
+		// upgeloadeten Log in eingenem Ordner ablegen
+		logger.info("Uploading Log: " + logPath);
+		Files.write(Paths.get(logPath), log);
 	}
 
 	private static byte[] hashFile(Path p) throws IOException {

@@ -62,6 +62,7 @@ public class FilesService {
 		}
 		if (!isDirectory(programFilesFolder)) {
 			logger.error("msg.LogsFolder %" + logsFolder);
+		}
 		if (!isDirectory(md5Folder)) {
 			logger.error("msg.md5Folder %" + md5Folder);
 		}

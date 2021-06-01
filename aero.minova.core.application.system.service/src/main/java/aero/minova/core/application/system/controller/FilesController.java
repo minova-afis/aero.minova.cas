@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.slf4j.Logger;
@@ -63,12 +64,16 @@ public class FilesController {
 
 	@RequestMapping(value = "upload/logs", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody void getLogs(@RequestParam byte[] log) throws Exception {
-		String logPath = files.getLogsFolder().toString() + "/Log-" + LocalDateTime.now() + ".zip";
-		File logFileFolder = new File(logPath);
+		File logFileFolder = new File(files.getLogsFolder().toString() + "/Log-" + LocalDateTime.now());
+		File logPath = new File(logFileFolder.toString() + ".zip");
 		logFileFolder.mkdirs();
 		// upgeloadeten Log in eingenem Ordner ablegen
 		logger.info("Uploading Log: " + logPath);
-		Files.write(Paths.get(logPath), log);
+		Files.write(logPath.toPath(), log);
+
+		// hochgeladenes File unzippen
+		logger.info("Unzipping File: " + logPath);
+		unzipFile(logPath, logFileFolder.getAbsolutePath().toString());
 	}
 
 	public void hashFile(Path p) throws IOException {
@@ -195,4 +200,36 @@ public class FilesController {
 		}
 	}
 
+	public static void unzipFile(File fileZip, String destDirName) throws IOException {
+		File destDir = new File(destDirName);
+		byte[] buffer = new byte[1024];
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream(fileZip);
+			ZipInputStream zis = new ZipInputStream(fis);
+			ZipEntry ze = zis.getNextEntry();
+			while (ze != null) {
+				String zippedFileEntry = ze.getName();
+				File newFile = new File(destDirName + File.separator + zippedFileEntry);
+				System.out.println("Unzipping to " + newFile.getAbsolutePath());
+				// create directories for sub directories in zip
+				new File(newFile.getParent()).mkdirs();
+				FileOutputStream fos = new FileOutputStream(newFile);
+				int len;
+				while ((len = zis.read(buffer)) > 0) {
+					fos.write(buffer, 0, len);
+				}
+				fos.close();
+				// close this ZipEntry
+				zis.closeEntry();
+				ze = zis.getNextEntry();
+			}
+			// close last ZipEntry
+			zis.closeEntry();
+			zis.close();
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

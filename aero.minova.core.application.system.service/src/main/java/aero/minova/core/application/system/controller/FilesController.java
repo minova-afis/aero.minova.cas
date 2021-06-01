@@ -64,7 +64,8 @@ public class FilesController {
 	@RequestMapping(value = "upload/logs", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody void getLogs(@RequestParam byte[] log) throws Exception {
 		String logPath = files.getLogsFolder().toString() + "/Log-" + LocalDateTime.now() + ".zip";
-
+		File logFileFolder = new File(logPath);
+		logFileFolder.mkdirs();
 		// upgeloadeten Log in eingenem Ordner ablegen
 		logger.info("Uploading Log: " + logPath);
 		Files.write(Paths.get(logPath), log);

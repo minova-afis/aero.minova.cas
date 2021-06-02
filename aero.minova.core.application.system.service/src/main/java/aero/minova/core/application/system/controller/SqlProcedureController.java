@@ -70,7 +70,7 @@ public class SqlProcedureController {
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		logger.info("data/procedure: " + gson.toJson(inputTable));
 		if (extension.containsKey(inputTable.getName())) {
-			return new ResponseEntity(extension.get(inputTable.getName()).apply(inputTable), HttpStatus.ACCEPTED);
+			return extension.get(inputTable.getName()).apply(inputTable);
 		}
 		try {
 			// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt

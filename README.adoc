@@ -4,6 +4,9 @@
 <p align="left">
   <img src="https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg">
   <img src="https://img.shields.io/badge/license-EPL%202.0-green">
+  <a href="https://hub.docker.com/repository/docker/minova/aero.minova.cas">
+    <img alt="Docker Images" src=https://img.shields.io/badge/Docker%20images-blue">
+  </a>
 </p>
 ++++
 
@@ -29,7 +32,3 @@ Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeiner
 
 * xref:./doc/adoc/installation.adoc#[Installation des Dienstes]
 * xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
-
-== Veröffentlichungen
-
-* xref:https://hub.docker.com/repository/docker/minova/aero.minova.cas[Docker Images]

@@ -20,6 +20,7 @@
 		<module>aero.minova.core.application.system.service</module>
 		<!-- TODO Wird erst wieder aktiviert, wenn wir das Install-Tool auf Github haben. -->
 		<!-->module>aero.minova.cas.logic</module -->
+		<module>aero.minova.core.application.system.app</module>
 	</modules>
 	<repositories>
 		<repository>

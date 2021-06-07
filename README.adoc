@@ -12,8 +12,6 @@
 
 == Beschreibung
 
-== Sturktur
-
 Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank sowie einem Read-Only-Dateisystem bereit.
 
 Der Fokus liegt hierbei ein Backend und die Infrastruktur für Eclipse-Anwendungen bereitzustellen.

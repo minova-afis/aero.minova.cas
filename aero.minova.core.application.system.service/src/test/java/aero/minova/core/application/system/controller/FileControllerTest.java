@@ -72,6 +72,32 @@ public class FileControllerTest {
 	}
 
 	@Test
+	public void testLegalLog() throws Exception {
+		final val rootPath = new TemporaryFolder();
+		rootPath.create();
+		final val rootFolder = rootPath.getRoot().toPath();
+		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
+		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
+		final val serviceFolder = programFilesFolder.resolve(".metadata");
+		createDirectories(serviceFolder);
+
+		final val testSubject = new FilesController();
+		testSubject.files = new FilesService(rootFolder.toString());
+		testSubject.files.setUp();
+
+		write(serviceFolder.resolve("beispielLog.log"), new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
+		byte[] randomByteStream = testSubject.getZip(programFilesFolder.resolve(".metadata"));
+
+		// dabei wird der Logs Ordner erzeugt
+		testSubject.getLogs(randomByteStream);
+
+		File found = findFile("beispielLog.log", sharedDataFolder.resolve("Logs").toFile());
+		assertThat(found).isNotEqualTo(null);
+		assertThat(Files.readAllBytes(found.toPath()))
+				.isEqualTo(new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
+	}
+
+	@Test
 	public void testIllegal() throws Exception {
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
@@ -282,4 +308,22 @@ public class FileControllerTest {
 		testSubject.hashAll();
 	}
 
+	// Hilfsmethode
+	private File findFile(String file, File directory) {
+		File[] list = directory.listFiles();
+		File found = null;
+		if (list != null) {
+			for (File fil : list) {
+				if (fil.isDirectory()) {
+					found = findFile(file, fil);
+				} else if (file.equalsIgnoreCase(fil.getName())) {
+					found = fil;
+				}
+				if (found != null) {
+					return found;
+				}
+			}
+		}
+		return found;
+	}
 }

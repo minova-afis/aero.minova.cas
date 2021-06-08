@@ -308,7 +308,7 @@ public class FileControllerTest {
 		testSubject.hashAll();
 	}
 
-	// Hilsmethode
+	// Hilfsmethode
 	private File findFile(String file, File directory) {
 		File[] list = directory.listFiles();
 		File found = null;

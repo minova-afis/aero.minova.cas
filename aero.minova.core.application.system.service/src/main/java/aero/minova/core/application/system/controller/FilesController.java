@@ -230,7 +230,6 @@ public class FilesController {
 			fis.close();
 		} catch (IOException e) {
 			logger.error("Error while unzipping File: " + fileZip + " to directory " + destDirName);
-			e.printStackTrace();
 		}
 	}
 }

@@ -49,6 +49,7 @@ public class FilesController {
 
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
+		path = path.replace('\\', '/');
 		val inputPath = files.checkLegalPath(path);
 		logger.info("files/read: " + path);
 		return readAllBytes(inputPath);
@@ -56,6 +57,7 @@ public class FilesController {
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+		path = path.replace('\\', '/');
 		logger.info("checking Hash for file: " + path);
 		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getSystemFolder().toString(), "") + ".md5";
 		files.checkLegalPath(md5FilePath);

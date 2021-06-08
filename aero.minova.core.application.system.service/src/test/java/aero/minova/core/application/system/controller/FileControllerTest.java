@@ -91,8 +91,10 @@ public class FileControllerTest {
 		// dabei wird der Logs Ordner erzeugt
 		testSubject.getLogs(randomByteStream);
 
-		boolean found = findFile("beispielLog.log", sharedDataFolder.resolve("Logs").toFile());
-		assertThat(found).isTrue();
+		File found = findFile("beispielLog.log", sharedDataFolder.resolve("Logs").toFile());
+		assertThat(found).isNotEqualTo(null);
+		assertThat(Files.readAllBytes(found.toPath()))
+				.isEqualTo(new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
@@ -307,18 +309,17 @@ public class FileControllerTest {
 	}
 
 	// Hilsmethode
-	private boolean findFile(String file, File directory) {
+	private File findFile(String file, File directory) {
 		File[] list = directory.listFiles();
-		boolean found = false;
-		;
+		File found = null;
 		if (list != null) {
 			for (File fil : list) {
 				if (fil.isDirectory()) {
 					found = findFile(file, fil);
 				} else if (file.equalsIgnoreCase(fil.getName())) {
-					found = true;
+					found = fil;
 				}
-				if (found) {
+				if (found != null) {
 					return found;
 				}
 			}

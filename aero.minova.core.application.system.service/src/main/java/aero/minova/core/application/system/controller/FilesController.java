@@ -64,11 +64,11 @@ public class FilesController {
 
 	@RequestMapping(value = "upload/logs", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody void getLogs(@RequestParam byte[] log) throws Exception {
-		File logFileFolder = new File(files.getLogsFolder().toString() + "/Log-" + LocalDateTime.now());
+		File logFileFolder = Paths.get(files.getLogsFolder() + "/Log-" + LocalDateTime.now()).toFile();
 		File logPath = new File(logFileFolder.toString() + ".zip");
 		logFileFolder.mkdirs();
-		// upgeloadeten Log in eingenem Ordner ablegen
-		logger.info("Uploading Log: " + logPath);
+
+		logger.info("Storing: " + logPath);
 		Files.write(logPath.toPath(), log);
 
 		// hochgeladenes File unzippen
@@ -220,15 +220,14 @@ public class FilesController {
 					fos.write(buffer, 0, len);
 				}
 				fos.close();
-				// close this ZipEntry
 				zis.closeEntry();
 				ze = zis.getNextEntry();
 			}
-			// close last ZipEntry
 			zis.closeEntry();
 			zis.close();
 			fis.close();
 		} catch (IOException e) {
+			logger.error("Error while unzipping File: " + fileZip + " to directory " + destDirName);
 			e.printStackTrace();
 		}
 	}

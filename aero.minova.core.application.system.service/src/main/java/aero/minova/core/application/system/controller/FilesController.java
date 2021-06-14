@@ -29,10 +29,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.FilesService;
@@ -65,8 +68,11 @@ public class FilesController {
 	}
 
 	@RequestMapping(value = "upload/logs", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody void getLogs(@RequestParam byte[] log) throws Exception {
-		File logFileFolder = Paths.get(files.getLogsFolder() + "/Log-" + LocalDateTime.now()).toFile();
+	@ResponseStatus(value = HttpStatus.OK)
+	public @ResponseBody void getLogs(@RequestBody byte[] log) throws Exception {
+		// Doppelpunkte müssen raus, da Sonderzeichen im Filenamen nicht erlaubt sind
+		String logFolderName = ("/Log-" + LocalDateTime.now()).replace(":", "-");
+		File logFileFolder = Paths.get((files.getLogsFolder() + logFolderName)).toFile();
 		File logPath = new File(logFileFolder.toString() + ".zip");
 		logFileFolder.mkdirs();
 
@@ -203,7 +209,6 @@ public class FilesController {
 	}
 
 	public static void unzipFile(File fileZip, String destDirName) throws IOException {
-		File destDir = new File(destDirName);
 		byte[] buffer = new byte[1024];
 		FileInputStream fis;
 		try {

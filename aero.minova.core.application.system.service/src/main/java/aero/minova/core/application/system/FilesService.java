@@ -48,7 +48,7 @@ public class FilesService {
 		}
 		systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
 		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
-		logsFolder = sharedDataFolder.resolve("Logs").toAbsolutePath().normalize();
+		logsFolder = sharedDataFolder.resolve("UserLogs").toAbsolutePath().normalize();
 		md5Folder = sharedDataFolder.resolve("MD5").toAbsolutePath().normalize();
 		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {

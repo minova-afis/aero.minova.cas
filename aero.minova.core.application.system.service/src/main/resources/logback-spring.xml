@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="5 seconds">
+	<property name="APP_LOG_ROOT" value="./logs"/>
+	<property name="LOG_PATTERN" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %m%n"/>
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	<appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/error.log</file>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/archived/error_%d{dd-MM-yyyy}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>100MB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	<appender name="privilegeLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/privilege.log</file>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${APP_LOG_ROOT}/privilege_%d{dd-MM-yyyy}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>100MB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	<appender name="springLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/springLog.log</file>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/archived/springLog_%d{dd-MM-yyyy}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>100MB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	<appender name="userLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/userRequests.log</file>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/archived/userRequests_%d{dd-MM-yyyy}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>100MB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	<logger name="ErrorLogger" level="trace" additivity="false">
+		<appender-ref ref="errorLog"/>
+		<appender-ref ref="console"/>
+	</logger>
+	<logger name="PrivilegeLogger" level="trace" additivity="false">
+		<appender-ref ref="privilegeLog"/>
+	</logger>
+	<logger name="SqlLogger" level="trace" additivity="false">
+		<appender-ref ref="springLog"/>
+		<appender-ref ref="console"/>
+	</logger>
+	<logger name="UserLogger" level="trace" additivity="false">
+		<appender-ref ref="userLog"/>
+		<appender-ref ref="console"/>
+	</logger>
+	<root level="info">
+		<appender-ref ref="console"/>
+	</root>
+</configuration>

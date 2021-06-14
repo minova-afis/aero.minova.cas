@@ -38,14 +38,17 @@ public class SqlViewController {
 
 	@Autowired
 	SystemDatabase systemDatabase;
-	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	Logger logger = LoggerFactory.getLogger("SqlLogger");
+	Logger privilegeLogger = LoggerFactory.getLogger("PrivilegeLogger");
+	Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
+	Logger userLogger = LoggerFactory.getLogger("UserLogger");
 
 	@Autowired
 	Gson gson;
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
-		logger.info("data/view: " + gson.toJson(inputTable));
+		userLogger.info("data/view: " + gson.toJson(inputTable));
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
@@ -93,7 +96,7 @@ public class SqlViewController {
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + e.getMessage());
+			errorLogger.error("Statement could not be executed: " + e.getMessage());
 			throw new TableException(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
@@ -109,12 +112,12 @@ public class SqlViewController {
 			val viewQuery = pagingWithSeek(inputTable, false, -1, false, 1, requestingAuthorities);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			logger.info("Executing statements: " + sb.toString());
+			privilegeLogger.info("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + e.getMessage(), e);
+			errorLogger.error("Statement could not be executed: " + e.getMessage(), e);
 			throw new TableException(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
@@ -193,7 +196,7 @@ public class SqlViewController {
 					parameterOffset--;
 				}
 			} catch (Exception e) {
-				logger.error("Statement could not be filled: " + sb.toString(), e);
+				errorLogger.error("Statement could not be filled: " + sb.toString(), e);
 				throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
 			}
 		}
@@ -254,12 +257,12 @@ public class SqlViewController {
 			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			logger.info("Executing statement: " + sb.toString());
+			privilegeLogger.info("Executing statement: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + sb.toString(), e);
+			errorLogger.error("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
 		}
 	}

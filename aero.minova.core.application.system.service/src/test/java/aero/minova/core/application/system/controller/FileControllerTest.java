@@ -91,7 +91,7 @@ public class FileControllerTest {
 		// dabei wird der Logs Ordner erzeugt
 		testSubject.getLogs(randomByteStream);
 
-		File found = findFile("beispielLog.log", sharedDataFolder.resolve("Logs").toFile());
+		File found = findFile("beispielLog.log", sharedDataFolder.resolve("UserLogs").toFile());
 		assertThat(found).isNotEqualTo(null);
 		assertThat(Files.readAllBytes(found.toPath()))
 				.isEqualTo(new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));

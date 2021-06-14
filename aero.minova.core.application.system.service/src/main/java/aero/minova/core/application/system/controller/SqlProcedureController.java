@@ -48,7 +48,12 @@ import lombok.val;
 public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
-	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	// Log für alle ausgeführten SQL Queries, außer die Privilegien
+	Logger logger = LoggerFactory.getLogger("SqlLogger");
+	// Log für Fehlermeldungen
+	Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
+	// Log für die Anfragen der User ohne SQL
+	Logger userLogger = LoggerFactory.getLogger("UserLogger");
 
 	@Autowired
 	SqlViewController svc;
@@ -68,7 +73,7 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		logger.info("data/procedure: " + gson.toJson(inputTable));
+		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": data/procedure: " + gson.toJson(inputTable));
 		if (extension.containsKey(inputTable.getName())) {
 			return extension.get(inputTable.getName()).apply(inputTable);
 		}
@@ -81,7 +86,8 @@ public class SqlProcedureController {
 			val result = calculateSqlProcedureResult(inputTable);
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
-			logger.info("Error while trying to execute procedure: " + inputTable.getName());
+			errorLogger.info(
+					SecurityContextHolder.getContext().getAuthentication().getName() + ": Error while trying to execute procedure: " + inputTable.getName());
 			throw e;
 		}
 	}
@@ -283,13 +289,15 @@ public class SqlProcedureController {
 						});
 			}
 			connection.commit();
-			logger.info("Procedure succesfully executed: " + sb.toString());
+			logger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
-			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage(), e);
+			errorLogger.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": Procedure could not be executed: " + sb.toString() + "\n"
+					+ e.getMessage(), e);
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
-				logger.error("Couldn't roll back procedure execution: " + e.getMessage());
+				errorLogger.error(
+						SecurityContextHolder.getContext().getAuthentication().getName() + ": Couldn't roll back procedure execution: " + e.getMessage());
 			}
 			throw new ProcedureException(e);
 		} finally {

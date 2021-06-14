@@ -2,13 +2,16 @@
 <configuration debug="true" scan="true" scanPeriod="5 seconds">
 	<property name="APP_LOG_ROOT" value="./logs"/>
 	<property name="LOG_PATTERN" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %m%n"/>
+	
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 	</appender>
+	
 	<appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${APP_LOG_ROOT}/error.log</file>
+		<append>true</append>
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
@@ -20,6 +23,7 @@
 	</appender>
 	<appender name="privilegeLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${APP_LOG_ROOT}/privilege.log</file>
+		<append>true</append>
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
@@ -31,6 +35,7 @@
 	</appender>
 	<appender name="springLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${APP_LOG_ROOT}/springLog.log</file>
+		<append>true</append>
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
@@ -42,6 +47,7 @@
 	</appender>
 	<appender name="userLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${APP_LOG_ROOT}/userRequests.log</file>
+		<append>true</append>
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
@@ -51,9 +57,21 @@
 			<totalSizeCap>100MB</totalSizeCap>
 		</rollingPolicy>
 	</appender>
+	<appender name="filesLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/files.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/archived/files_%d{dd-MM-yyyy}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>100MB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+	
 	<logger name="ErrorLogger" level="trace" additivity="false">
 		<appender-ref ref="errorLog"/>
-		<appender-ref ref="console"/>
 	</logger>
 	<logger name="PrivilegeLogger" level="trace" additivity="false">
 		<appender-ref ref="privilegeLog"/>
@@ -64,6 +82,10 @@
 	</logger>
 	<logger name="UserLogger" level="trace" additivity="false">
 		<appender-ref ref="userLog"/>
+		<appender-ref ref="console"/>
+	</logger>
+		<logger name="FilesLogger" level="trace" additivity="false">
+		<appender-ref ref="filesLog"/>
 		<appender-ref ref="console"/>
 	</logger>
 	<root level="info">

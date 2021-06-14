@@ -31,6 +31,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,20 +49,24 @@ public class FilesController {
 
 	@Autowired
 	FilesService files;
-	static Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	// Log für Fehlermeldungen
+	static Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
+	// Log für die Anfragen der User ohne SQL
+	Logger userLogger = LoggerFactory.getLogger("UserLogger");
+	Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
 		val inputPath = files.checkLegalPath(path);
-		logger.info("files/read: " + path);
+		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": files/read: " + path);
 		return readAllBytes(inputPath);
 	}
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
-		logger.info("checking Hash for file: " + path);
+		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": checking Hash for file: " + path);
 		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getSystemFolder().toString(), "") + ".md5";
 		files.checkLegalPath(md5FilePath);
 		return getFile(md5FilePath);
@@ -76,11 +81,11 @@ public class FilesController {
 		File logPath = new File(logFileFolder.toString() + ".zip");
 		logFileFolder.mkdirs();
 
-		logger.info("Storing: " + logPath);
+		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": Storing: " + logPath);
 		Files.write(logPath.toPath(), log);
 
 		// hochgeladenes File unzippen
-		logger.info("Unzipping File: " + logPath);
+		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": Unzipping File: " + logPath);
 		unzipFile(logPath, logFileFolder.getAbsolutePath().toString());
 	}
 
@@ -101,12 +106,12 @@ public class FilesController {
 		// Alle benötigten Ordner erstellen
 		File md5DirectoryStructure = new File(mdDataName.substring(0, mdDataName.lastIndexOf('/')));
 		if (md5DirectoryStructure.mkdirs()) {
-			logger.info("Creating directory " + md5DirectoryStructure);
+			filesLogger.info("Creating directory " + md5DirectoryStructure);
 		}
 
 		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
 		File hashedFile = new File(mdDataName + ".md5");
-		logger.info("Hashing: " + hashedFile.getAbsolutePath());
+		filesLogger.info("CAS: Hashing: " + hashedFile.getAbsolutePath());
 
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
@@ -147,7 +152,7 @@ public class FilesController {
 			if ((!fileSuffix.toLowerCase().contains("zip")) && (path.toFile().isDirectory())) {
 				byte[] zipDataOfFile = getZip(path);
 				File zippedFile = new File(path + ".zip");
-				logger.info("Zipping: " + zippedFile.getAbsolutePath());
+				filesLogger.info("CAS: Zipping: " + zippedFile.getAbsolutePath());
 				// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
 				Files.write(Paths.get(zippedFile.getAbsolutePath()), zipDataOfFile);
 			}
@@ -218,7 +223,6 @@ public class FilesController {
 			while (ze != null) {
 				String zippedFileEntry = ze.getName();
 				File newFile = new File(destDirName + File.separator + zippedFileEntry);
-				System.out.println("Unzipping to " + newFile.getAbsolutePath());
 				// create directories for sub directories in zip
 				new File(newFile.getParent()).mkdirs();
 				FileOutputStream fos = new FileOutputStream(newFile);
@@ -234,7 +238,7 @@ public class FilesController {
 			zis.close();
 			fis.close();
 		} catch (IOException e) {
-			logger.error("Error while unzipping File: " + fileZip + " to directory " + destDirName);
+			throw new RuntimeException("msg.UnZipErrorError %" + fileZip + " %" + destDirName);
 		}
 	}
 }

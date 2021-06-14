@@ -50,9 +50,10 @@ public class FilesController {
 	@Autowired
 	FilesService files;
 	// Log für Fehlermeldungen
-	static Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
+	Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
 	// Log für die Anfragen der User ohne SQL
 	Logger userLogger = LoggerFactory.getLogger("UserLogger");
+	// Log für File Hashes und Zipps
 	Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })

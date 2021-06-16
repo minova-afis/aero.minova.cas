@@ -1,7 +1,5 @@
 package aero.minova.core.application.system.domain;
 
-import static java.util.Objects.requireNonNull;
-
 import java.time.Instant;
 import java.time.ZonedDateTime;
 
@@ -14,6 +12,10 @@ public class Value {
 	private DataType type;
 	private Object value;
 	private String rule;
+
+	public Value() {
+
+	}
 
 	public Value(Integer integerValue, String rule) {
 		type = DataType.INTEGER;

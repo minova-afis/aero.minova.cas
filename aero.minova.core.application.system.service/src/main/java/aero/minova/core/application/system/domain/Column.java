@@ -7,11 +7,15 @@ public class Column {
 	private DataType type;
 	private OutputType outputType;
 
+	public Column() {
+
+	}
+
 	public Column(String name, DataType type) {
 		setName(name);
 		setType(type);
 	}
-	
+
 	public Column(String name, DataType type, OutputType outputType) {
 		setName(name);
 		setType(type);

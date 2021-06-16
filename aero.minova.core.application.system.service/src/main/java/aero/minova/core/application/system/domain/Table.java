@@ -1,9 +1,11 @@
 package aero.minova.core.application.system.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Table {
+public class Table implements Serializable {
+	private static final long serialVersionUID = 202106161633L;
 	private String name;
 	private TableMetaData metaData;
 	private List<Column> columns = new ArrayList<>();

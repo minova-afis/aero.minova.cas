@@ -571,6 +571,26 @@ public class SqlViewController {
 		return where.toString();
 	}
 
+	protected List<String> checkUserTokens(List<Row> requestingAtuhorities) {
+		List<String> requestingRoles = new ArrayList<>();
+		boolean checkNeeded = true;
+
+		for (Row authority : requestingAtuhorities) {
+			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
+			if (!authority.getValues().get(2).getBooleanValue()) {
+				checkNeeded = false;
+			}
+			if (checkNeeded) {
+				// hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
+				String value = authority.getValues().get(1).getStringValue().trim();
+				if ((!value.equals("")) && (!requestingRoles.contains(value))) {
+					requestingRoles.add(authority.getValues().get(1).getStringValue());
+				}
+			}
+		}
+		return requestingRoles;
+	}
+
 	/**
 	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an
 	 *
@@ -582,18 +602,10 @@ public class SqlViewController {
 	 */
 	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
 
-		List<String> requestingRoles = new ArrayList<>();
-
-		for (Row authority : requestingAtuhorities) {
-			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
-			if (!authority.getValues().get(2).getBooleanValue()) {
-				return "";
-			}
-			// hier sind die Rolen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
-			String value = authority.getValues().get(1).getStringValue().trim();
-			if ((!value.equals("")) && (!requestingRoles.contains(value))) {
-				requestingRoles.add(authority.getValues().get(1).getStringValue());
-			}
+		List<String> requestingRoles = checkUserTokens(requestingAtuhorities);
+		// falls die Liste leer ist, darf der User alle Spalten sehen
+		if (requestingRoles.isEmpty()) {
+			return "";
 		}
 
 		final StringBuffer rowSec = new StringBuffer();

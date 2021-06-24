@@ -579,6 +579,8 @@ public class SqlViewController {
 			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
 			if (!authority.getValues().get(2).getBooleanValue()) {
 				checkNeeded = false;
+				// Nach den requestingRoles würde später gefilter werden, wenn welche vorhanden wären, deshalb alle löschen
+				requestingRoles = new ArrayList<>();
 			}
 			if (checkNeeded) {
 				// hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen

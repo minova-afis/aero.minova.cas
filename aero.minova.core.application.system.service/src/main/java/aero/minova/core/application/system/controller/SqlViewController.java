@@ -603,11 +603,13 @@ public class SqlViewController {
 	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
 	 */
 	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
-
-		List<String> requestingRoles = checkUserTokens(requestingAtuhorities);
-		// falls die Liste leer ist, darf der User alle Spalten sehen
-		if (requestingRoles.isEmpty()) {
-			return "";
+		List<String> requestingRoles = new ArrayList<>();
+		if (!requestingAtuhorities.isEmpty()) {
+			requestingRoles = checkUserTokens(requestingAtuhorities);
+			// falls die Liste leer ist, darf der User alle Spalten sehen
+			if (requestingRoles.isEmpty()) {
+				return "";
+			}
 		}
 
 		final StringBuffer rowSec = new StringBuffer();

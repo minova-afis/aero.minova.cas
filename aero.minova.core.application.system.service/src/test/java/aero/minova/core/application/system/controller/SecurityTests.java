@@ -84,12 +84,7 @@ class SecurityTests {
 	@WithMockUser(username = "user", roles = {})
 	@Test
 	void test_rowLevelSecurityWithNoRoles() {
-		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(true, null));
-		userGroups.add(inputRow);
 
 		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL ) )");

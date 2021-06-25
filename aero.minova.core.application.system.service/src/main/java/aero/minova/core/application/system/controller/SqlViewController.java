@@ -51,8 +51,7 @@ public class SqlViewController {
 		StringBuilder sb = new StringBuilder();
 		try {
 			@SuppressWarnings("unchecked")
-			List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-			List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
+			List<Row> authoritiesForThisTable = getPrivilegePermissions(inputTable.getName()).getRows();
 			if (authoritiesForThisTable.isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
@@ -210,7 +209,8 @@ public class SqlViewController {
 	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
 	 **/
-	public Table getPrivilegePermissions(List<GrantedAuthority> securityTokens, String privilegeName) {
+	public Table getPrivilegePermissions(String privilegeName) {
+		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		Table userPrivileges = new Table();
 		userPrivileges.setName("xvcasUserPrivileges");
 		List<Column> columns = new ArrayList<>();
@@ -221,7 +221,7 @@ public class SqlViewController {
 		userPrivileges.setColumns(columns);
 
 		List<String> userTokens = new ArrayList<>();
-		for (GrantedAuthority ga : securityTokens) {
+		for (GrantedAuthority ga : allUserAuthorities) {
 			userTokens.add(ga.getAuthority());
 		}
 

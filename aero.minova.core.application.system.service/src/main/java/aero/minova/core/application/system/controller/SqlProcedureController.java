@@ -26,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,8 +72,7 @@ public class SqlProcedureController {
 			return extension.get(inputTable.getName()).apply(inputTable);
 		}
 		try {
-			List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-			List<Row> privilegeRequest = svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows();
+			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName()).getRows();
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}

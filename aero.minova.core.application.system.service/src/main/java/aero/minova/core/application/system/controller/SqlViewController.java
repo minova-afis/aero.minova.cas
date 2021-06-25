@@ -584,9 +584,9 @@ public class SqlViewController {
 			}
 			if (checkNeeded) {
 				// hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
-				String value = authority.getValues().get(1).getStringValue().trim();
+				String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
 				if ((!value.equals("")) && (!requestingRoles.contains(value))) {
-					requestingRoles.add(authority.getValues().get(1).getStringValue());
+					requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
 				}
 			}
 		}

@@ -97,6 +97,7 @@ public class SqlProcedureController {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest) throws Exception {
+		List<String> userSecurityTokensToBeChecked = svc.checkUserTokens(privilegeRequest);
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
@@ -239,8 +240,6 @@ public class SqlProcedureController {
 						securityTokenInColumn = i;
 					}
 				}
-				List<String> userSecurityTokensToBeChecked = svc.checkUserTokens(privilegeRequest);
-
 				resultSet.setMetaData(new TableMetaData());
 				while (sqlResultSet.next()) {
 					Row rowToBeAdded = null;
@@ -262,7 +261,7 @@ public class SqlProcedureController {
 					// falls die Row-Level-Security für diese Prozedur eingeschalten ist (Einträge in der Liste vorhanden),
 					// sollten die Rows nach dem Ausführen der Prozedur gefiltert werden
 					if (!userSecurityTokensToBeChecked.isEmpty()) {
-						if (userSecurityTokensToBeChecked.contains(rowToBeAdded.getValues().get(securityTokenInColumn).getStringValue())) {
+						if (userSecurityTokensToBeChecked.contains(rowToBeAdded.getValues().get(securityTokenInColumn).getStringValue().toLowerCase())) {
 							resultSet.addRow(rowToBeAdded);
 							totalResults++;
 						}
@@ -291,8 +290,16 @@ public class SqlProcedureController {
 						.stream()//
 						.map(c -> c.getOutputType() == OUTPUT)//
 						.collect(toList());
+
+				int securityTokenInColumn = 0;
+				// Herausfinden an welcher Stelle die Spalte mit den SecurityTokens ist
+				for (int i = 0; i < inputTable.getColumns().size(); i++) {
+					if (inputTable.getColumns().get(i).getName().equals("SecurityToken")) {
+						securityTokenInColumn = i;
+					}
+				}
+
 				val outputValues = new Row();
-				outputParameters.addRow(outputValues);
 				outputParameters.setColumns(inputTable.getColumns());
 				range(0, inputTable.getColumns().size())//
 						.forEach(i -> {
@@ -302,6 +309,21 @@ public class SqlProcedureController {
 								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 							}
 						});
+				Row resultRow = new Row();
+				if (!userSecurityTokensToBeChecked.isEmpty()) {
+					String securityTokenValue = outputValues.getValues().get(securityTokenInColumn).getStringValue();
+					if (securityTokenValue == null || userSecurityTokensToBeChecked.contains(securityTokenValue.toLowerCase())) {
+						resultRow = outputValues;
+					} else {
+						for (int i = 0; i < outputValues.getValues().size(); i++) {
+							resultRow.addValue(null);
+						}
+					}
+				} else {
+					resultRow = outputValues;
+				}
+
+				outputParameters.addRow(resultRow);
 			}
 			connection.commit();
 			logger.info("Procedure succesfully executed: " + sb.toString());

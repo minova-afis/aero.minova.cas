@@ -16,9 +16,10 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/error_%d{dd-MM-yyyy}.log</fileNamePattern>
-			<maxHistory>30</maxHistory>
-			<totalSizeCap>100MB</totalSizeCap>
+			<fileNamePattern>${LOG_PATH}/archived/error_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
 	<appender name="privilegeLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -28,9 +29,10 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/privilege_%d{dd-MM-yyyy}.log</fileNamePattern>
-			<maxHistory>30</maxHistory>
-			<totalSizeCap>100MB</totalSizeCap>
+			<fileNamePattern>${APP_LOG_ROOT}/privilege_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
 	<appender name="springLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -40,9 +42,10 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/springLog_%d{dd-MM-yyyy}.log</fileNamePattern>
-			<maxHistory>30</maxHistory>
-			<totalSizeCap>100MB</totalSizeCap>
+			<fileNamePattern>${LOG_PATH}/archived/springLog_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
 	<appender name="userLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -52,9 +55,10 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/userRequests_%d{dd-MM-yyyy}.log</fileNamePattern>
-			<maxHistory>30</maxHistory>
-			<totalSizeCap>100MB</totalSizeCap>
+			<fileNamePattern>${LOG_PATH}/archived/userRequests_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
 	<appender name="filesLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -64,9 +68,10 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/files_%d{dd-MM-yyyy}.log</fileNamePattern>
-			<maxHistory>30</maxHistory>
-			<totalSizeCap>100MB</totalSizeCap>
+			<fileNamePattern>${LOG_PATH}/archived/files_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
 	

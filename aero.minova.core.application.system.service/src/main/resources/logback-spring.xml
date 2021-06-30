@@ -16,7 +16,7 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/error_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<fileNamePattern>${APP_LOG_ROOT}/archived/error_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 			<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
@@ -29,7 +29,7 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/privilege_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<fileNamePattern>${APP_LOG_ROOT}/archived/privilege_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 			<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
@@ -42,7 +42,7 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/springLog_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<fileNamePattern>${APP_LOG_ROOT}/archived/springLog_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 			<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
@@ -55,7 +55,7 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/userRequests_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<fileNamePattern>${APP_LOG_ROOT}/archived/userRequests_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 			<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
@@ -68,7 +68,7 @@
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_PATH}/archived/files_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<fileNamePattern>${APP_LOG_ROOT}/archived/files_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 			<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>

@@ -22,8 +22,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,12 +39,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.FilesService;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.SqlProcedureResult;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
 import lombok.val;
 
 @RestController
@@ -56,92 +47,91 @@ import lombok.val;
 public class FilesController {
 
 	@Autowired
-	SqlViewController svc;
-
-	@Autowired
 	FilesService files;
 	static Logger logger = LoggerFactory.getLogger(SqlViewController.class);
 
 	@Autowired
 	SqlProcedureController spc;
 
-	@PostConstruct
-	public void setup() throws Exception {
-		// fügt Extension hinzu
-		spc.registerExctension("files/read", inputTable -> {
-			try {
-				SqlProcedureResult result = new SqlProcedureResult();
-				result.setResultSet(getFiles(inputTable.getRows()));
-				result.setReturnCode(1);
-				return new ResponseEntity(result, HttpStatus.ACCEPTED);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		});
-		spc.registerExctension("files/hash", inputTable -> {
-			try {
-				SqlProcedureResult result = new SqlProcedureResult();
-				result.setResultSet(getHashes(inputTable.getRows()));
-				result.setReturnCode(1);
-				return new ResponseEntity(result, HttpStatus.ACCEPTED);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		});
-	}
-
-	public Table getFiles(@RequestParam List<Row> pathList) throws Exception {
-		Table fileBytesTable = new Table();
-		fileBytesTable.addColumn(new Column("FileName", DataType.STRING));
-		fileBytesTable.addColumn(new Column("FileBytes", DataType.STRING));
-
-		for (Row row : pathList) {
-			Row fileBytesRow = new Row();
-			String fileName = row.getValues().get(0).getStringValue().replace('\\', '/');
-
-			// Überprüfen, ob File existiert und überprüfen, ob Berechtigung für dieses File gegeben sind
-			val filePath = files.checkLegalPath(fileName);
-			List<Row> privileges = svc.getPrivilegePermissions(fileName).getRows();
-
-			if (!privileges.isEmpty()) {
-				logger.info("files/read: " + filePath);
-				fileBytesRow.addValue(new Value(fileName, null));
-				fileBytesRow.addValue(new Value(readAllBytes(filePath).toString(), null));
-				fileBytesTable.addRow(fileBytesRow);
-			} else {
-				throw new RuntimeException("msg.PrivilegeError %" + fileName);
-			}
-		}
-		return fileBytesTable;
-	}
-
-	public Table getHashes(@RequestParam List<Row> pathList) throws Exception {
-		Table fileBytesTable = new Table();
-		fileBytesTable.addColumn(new Column("FileName", DataType.STRING));
-		fileBytesTable.addColumn(new Column("FileBytes", DataType.STRING));
-
-		for (Row row : pathList) {
-			Row fileBytesRow = new Row();
-			String fileName = row.getValues().get(0).getStringValue().replace('\\', '/');
-			String md5FilePath = files.getMd5Folder() + "/" + fileName.replace(files.getSystemFolder().toString(), "") + ".md5";
-
-			// Überprüfen, ob File existiert und überprüfen, ob Berechtigung für dieses File gegeben sind
-			val filePath = files.checkLegalPath(md5FilePath);
-
-			// Beim Überprüfen der Berechtigung schauen wir, ob die Berechtigung für die Datei, zu welcher der Hash gehört, freigegeben ist
-			List<Row> privileges = svc.getPrivilegePermissions(fileName).getRows();
-
-			if (!privileges.isEmpty()) {
-				logger.info("checking Hash for file: " + fileName);
-				fileBytesRow.addValue(new Value(fileName, null));
-				fileBytesRow.addValue(new Value(readAllBytes(filePath).toString(), null));
-				fileBytesTable.addRow(fileBytesRow);
-			} else {
-				throw new RuntimeException("msg.PrivilegeError %" + fileName);
-			}
-		}
-		return fileBytesTable;
-	}
+	// TODO Extension vorerst entfernt, aber für später aufheben
+	// TODO Bytes effizient in JSON durch BASE64 darstellen
+//	@PostConstruct
+//	public void setup() throws Exception {
+//		// fügt Extension hinzu
+//		spc.registerExctension("files/read", inputTable -> {
+//			try {
+//				SqlProcedureResult result = new SqlProcedureResult();
+//				result.setResultSet(getFiles(inputTable.getRows()));
+//				result.setReturnCode(1);
+//				return new ResponseEntity(result, HttpStatus.ACCEPTED);
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//		});
+//		spc.registerExctension("files/hash", inputTable -> {
+//			try {
+//				SqlProcedureResult result = new SqlProcedureResult();
+//				result.setResultSet(getHashes(inputTable.getRows()));
+//				result.setReturnCode(1);
+//				return new ResponseEntity(result, HttpStatus.ACCEPTED);
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//		});
+//	}
+//
+//	public Table getFiles(@RequestParam List<Row> pathList) throws Exception {
+//		Table fileBytesTable = new Table();
+//		fileBytesTable.addColumn(new Column("FileName", DataType.STRING));
+//		fileBytesTable.addColumn(new Column("FileBytes", DataType.STRING));
+//
+//		for (Row row : pathList) {
+//			Row fileBytesRow = new Row();
+//			String fileName = row.getValues().get(0).getStringValue().replace('\\', '/');
+//
+//			// Überprüfen, ob File existiert und überprüfen, ob Berechtigung für dieses File gegeben sind
+//			val filePath = files.checkLegalPath(fileName);
+//			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + fileName).getRows();
+//
+//			if (!privileges.isEmpty()) {
+//				logger.info("files/read: " + filePath);
+//				fileBytesRow.addValue(new Value(fileName, null));
+//				fileBytesRow.addValue(new Value(readAllBytes(filePath).toString(), null));
+//				fileBytesTable.addRow(fileBytesRow);
+//			} else {
+//				throw new RuntimeException("msg.PrivilegeError %" + fileName);
+//			}
+//		}
+//		return fileBytesTable;
+//	}
+//
+//	public Table getHashes(@RequestParam List<Row> pathList) throws Exception {
+//		Table fileBytesTable = new Table();
+//		fileBytesTable.addColumn(new Column("FileName", DataType.STRING));
+//		fileBytesTable.addColumn(new Column("FileBytes", DataType.STRING));
+//
+//		for (Row row : pathList) {
+//			Row fileBytesRow = new Row();
+//			String fileName = row.getValues().get(0).getStringValue().replace('\\', '/');
+//			String md5FilePath = files.getMd5Folder() + "/" + fileName.replace(files.getSystemFolder().toString(), "") + ".md5";
+//
+//			// Überprüfen, ob File existiert und überprüfen, ob Berechtigung für dieses File gegeben sind
+//			val filePath = files.checkLegalPath(md5FilePath);
+//
+//			// Beim Überprüfen der Berechtigung schauen wir, ob die Berechtigung für die Datei, zu welcher der Hash gehört, freigegeben ist
+//			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + fileName).getRows();
+//
+//			if (!privileges.isEmpty()) {
+//				logger.info("checking Hash for file: " + fileName);
+//				fileBytesRow.addValue(new Value(fileName, null));
+//				fileBytesRow.addValue(new Value(readAllBytes(filePath).toString(), null));
+//				fileBytesTable.addRow(fileBytesRow);
+//			} else {
+//				throw new RuntimeException("msg.PrivilegeError %" + fileName);
+//			}
+//		}
+//		return fileBytesTable;
+//	}
 
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {

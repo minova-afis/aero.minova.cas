@@ -14,14 +14,24 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import aero.minova.core.application.system.controller.SqlViewController;
+import aero.minova.core.application.system.domain.Row;
 
 @Service
 public class FilesService {
 
 	@Value("${aero_minova_core_application_root_path:../../..}")
 	private String rootPath;
+
+	@Value("${files.permission.check:false}")
+	boolean permissionCheck;
+
+	@Autowired
+	SqlViewController svc;
 
 	private Path programFilesFolder;
 	private Path sharedDataFolder;
@@ -103,6 +113,12 @@ public class FilesService {
 	}
 
 	public Path checkLegalPath(String path) throws Exception {
+		if (permissionCheck) {
+			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + path).getRows();
+			if (privileges.isEmpty()) {
+				throw new RuntimeException("msg.PrivilegeError %" + "files/read:" + path);
+			}
+		}
 		Path inputPath = getSystemFolder().resolve(path).toAbsolutePath().normalize();
 		File f = inputPath.toFile();
 		if (!inputPath.startsWith(getSystemFolder())) {

@@ -1,7 +1,6 @@
 package aero.minova.core.application.system.domain;
 
-import static java.util.Objects.requireNonNull;
-
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 
@@ -10,10 +9,15 @@ import java.time.ZonedDateTime;
  * 
  * @author avots
  */
-public class Value {
+public class Value implements Serializable {
+	private static final long serialVersionUID = 202106161639L;
 	private DataType type;
 	private Object value;
 	private String rule;
+
+	public Value() {
+
+	}
 
 	public Value(Integer integerValue, String rule) {
 		type = DataType.INTEGER;

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -40,10 +38,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Autowired
 	SystemDatabase systemDatabase;
-	// Log für alle ausgeführten SQL Queries, außer die Privilegien
-	Logger logger = LoggerFactory.getLogger("SqlLogger");
-	// Log für Fehlermeldungen
-	static Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
+	CustomLogger customLogger = new CustomLogger();
 
 	@ExceptionHandler(ProcedureException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -218,11 +213,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			callableErrorStatement.setString(1, username);
 			callableErrorStatement.setString(2, e.getMessage());
 			callableErrorStatement.setTimestamp(3, timeOfError);
-			logger.info("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
+			logger.info(
+					"CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError + "/n" + e.getStackTrace());
 			callableErrorStatement.executeUpdate();
 			connection.commit();
 		} catch (SQLException e1) {
-			errorLogger.error("CAS : Error could not be saved in database.");
+			customLogger.errorLogger.error("CAS : Error could not be saved in database." + "/n" + e1.getStackTrace());
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

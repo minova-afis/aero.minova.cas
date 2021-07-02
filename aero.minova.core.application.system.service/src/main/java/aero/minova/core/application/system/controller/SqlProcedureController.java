@@ -19,8 +19,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.ProcedureException;
@@ -48,12 +47,7 @@ import lombok.val;
 public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
-	// Log für alle ausgeführten SQL Queries, außer die Privilegien
-	Logger logger = LoggerFactory.getLogger("SqlLogger");
-	// Log für Fehlermeldungen
-	Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
-	// Log für die Anfragen der User ohne SQL
-	Logger userLogger = LoggerFactory.getLogger("UserLogger");
+	CustomLogger customLogger = new CustomLogger();
 
 	@Autowired
 	SqlViewController svc;
@@ -73,7 +67,7 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": data/procedure: " + gson.toJson(inputTable));
+		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
 		if (extension.containsKey(inputTable.getName())) {
 			try {
 				return extension.get(inputTable.getName()).apply(inputTable);
@@ -90,8 +84,7 @@ public class SqlProcedureController {
 			val result = calculateSqlProcedureResult(inputTable);
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
-			errorLogger.info(
-					SecurityContextHolder.getContext().getAuthentication().getName() + ": Error while trying to execute procedure: " + inputTable.getName());
+			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
 			throw e;
 		}
 	}
@@ -248,14 +241,14 @@ public class SqlProcedureController {
 							resultSet.addRow(//
 									convertSqlResultToRow(resultSet//
 											, sqlResultSet//
-											, logger//
+											, customLogger.logger//
 											, this));
 						}
 					} else {
 						resultSet.addRow(//
 								convertSqlResultToRow(resultSet//
 										, sqlResultSet//
-										, logger//
+										, customLogger.logger//
 										, this));
 					}
 					totalResults++;
@@ -293,15 +286,13 @@ public class SqlProcedureController {
 						});
 			}
 			connection.commit();
-			logger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": Procedure succesfully executed: " + sb.toString());
+			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
-			errorLogger.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": Procedure could not be executed: " + sb.toString() + "\n"
-					+ e.getMessage(), e);
+			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
-				errorLogger.error(
-						SecurityContextHolder.getContext().getAuthentication().getName() + ": Couldn't roll back procedure execution: " + e.getMessage());
+				customLogger.logError("Couldn't roll back procedure execution", e);
 			}
 			throw new ProcedureException(e);
 		} finally {

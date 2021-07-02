@@ -22,8 +22,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -31,7 +29,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.FilesService;
 import lombok.val;
 
@@ -49,25 +47,20 @@ public class FilesController {
 
 	@Autowired
 	FilesService files;
-	// Log für Fehlermeldungen
-	Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
-	// Log für die Anfragen der User ohne SQL
-	Logger userLogger = LoggerFactory.getLogger("UserLogger");
-	// Log für File Hashes und Zipps
-	Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
+	static CustomLogger customLogger = new CustomLogger();
 
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
 		val inputPath = files.checkLegalPath(path);
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": files/read: " + path);
+		customLogger.logUserRequest("files/read: " + path);
 		return readAllBytes(inputPath);
 	}
 
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": checking Hash for file: " + path);
+		customLogger.logUserRequest("files/hash: " + path);
 		String md5FilePath = files.getMd5Folder() + "/" + path.replace(files.getSystemFolder().toString(), "") + ".md5";
 		files.checkLegalPath(md5FilePath);
 		return getFile(md5FilePath);
@@ -82,11 +75,11 @@ public class FilesController {
 		File logPath = new File(logFileFolder.toString() + ".zip");
 		logFileFolder.mkdirs();
 
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": Storing: " + logPath);
+		customLogger.logUserRequest("Storing: " + logPath);
 		Files.write(logPath.toPath(), log);
 
 		// hochgeladenes File unzippen
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": Unzipping File: " + logPath);
+		customLogger.logUserRequest("Unzipping File: " + logPath);
 		unzipFile(logPath, logFileFolder.getAbsolutePath().toString());
 	}
 
@@ -107,12 +100,12 @@ public class FilesController {
 		// Alle benötigten Ordner erstellen
 		File md5DirectoryStructure = new File(mdDataName.substring(0, mdDataName.lastIndexOf('/')));
 		if (md5DirectoryStructure.mkdirs()) {
-			filesLogger.info("Creating directory " + md5DirectoryStructure);
+			customLogger.logFiles("Creating directory " + md5DirectoryStructure);
 		}
 
 		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
 		File hashedFile = new File(mdDataName + ".md5");
-		filesLogger.info("CAS: Hashing: " + hashedFile.getAbsolutePath());
+		customLogger.logFiles("Hashing: " + hashedFile.getAbsolutePath());
 
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
@@ -153,7 +146,7 @@ public class FilesController {
 			if ((!fileSuffix.toLowerCase().contains("zip")) && (path.toFile().isDirectory())) {
 				byte[] zipDataOfFile = getZip(path);
 				File zippedFile = new File(path + ".zip");
-				filesLogger.info("CAS: Zipping: " + zippedFile.getAbsolutePath());
+				customLogger.logFiles("Zipping: " + zippedFile.getAbsolutePath());
 				// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
 				Files.write(Paths.get(zippedFile.getAbsolutePath()), zipDataOfFile);
 			}
@@ -210,6 +203,7 @@ public class FilesController {
 			zos.close();
 			fos.close();
 		} catch (Exception e) {
+			customLogger.logFiles("Error while zipping file " + ze.getName());
 			throw new RuntimeException("msg.ZipError %" + ze.getName());
 		}
 	}
@@ -239,7 +233,9 @@ public class FilesController {
 			zis.close();
 			fis.close();
 		} catch (IOException e) {
+			customLogger.logFiles("Error while unzipping file " + fileZip + " into directory " + destDirName);
 			throw new RuntimeException("msg.UnZipErrorError %" + fileZip + " %" + destDirName);
+
 		}
 	}
 }

@@ -20,8 +20,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -54,42 +52,14 @@ class SecurityTests {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		spyController = spy(testSubject);
-	}
 
-	@Test
-	void test_checkPrivilege() {
-		String tableName = "tEmployee";
-		List<GrantedAuthority> ga = new ArrayList<>();
-		ga.add(new SimpleGrantedAuthority("admin"));
-		Table user = new Table();
-		user.addColumn(new Column("", DataType.STRING));
-		Row r = new Row();
-		r.addValue(new Value("admin", null));
-		user.addRow(r);
-
-		doReturn(user).when(spyController).getTableForSecurityCheck(Mockito.any());
-
-		assertThat(spyController.getPrivilegePermissions(ga, tableName).getRows().isEmpty())//
-				.isEqualTo(false);
-		ga.clear();
-		ga.add(new SimpleGrantedAuthority("dispatcher"));
-
-		doReturn(new Table()).when(spyController).getTableForSecurityCheck(Mockito.any());
-
-		assertThat(spyController.getPrivilegePermissions(ga, tableName).getRows().isEmpty())//
-				.isEqualTo(true);
 	}
 
 	@DisplayName("Row-Level-Security ohne Rollen")
 	@WithMockUser(username = "user", roles = {})
 	@Test
 	void test_rowLevelSecurityWithNoRoles() {
-		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(true, null));
-		userGroups.add(inputRow);
 
 		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL ) )");

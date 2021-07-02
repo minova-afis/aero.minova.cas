@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,12 +75,11 @@ public class SqlProcedureController {
 			}
 		}
 		try {
-			// bei Prozeduren ist es nur wichtig, dass es eine Erlaubnis gibt
-			List<GrantedAuthority> userAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-			if (svc.getPrivilegePermissions(userAuthorities, inputTable.getName()).getRows().isEmpty()) {
+			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName()).getRows();
+			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
-			val result = calculateSqlProcedureResult(inputTable);
+			val result = calculateSqlProcedureResult(inputTable, privilegeRequest);
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
@@ -94,11 +92,13 @@ public class SqlProcedureController {
 	 *
 	 * @param inputTable
 	 *            Ausfüjhrungs-Parameter
+	 * @param privilegeRequest
 	 * @return Resultat der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */
-	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable) throws Exception {
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest) throws Exception {
+		List<String> userSecurityTokensToBeChecked = svc.checkUserTokens(privilegeRequest);
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
@@ -233,25 +233,43 @@ public class SqlProcedureController {
 							}
 						}).collect(toList()));
 				int totalResults = 0;
+
+				int securityTokenInColumn = 0;
+				// Herausfinden an welcher Stelle die Spalte mit den SecurityTokens ist
+				for (int i = 0; i < resultSet.getColumns().size(); i++) {
+					if (resultSet.getColumns().get(i).getName().equals("SecurityToken")) {
+						securityTokenInColumn = i;
+					}
+				}
 				resultSet.setMetaData(new TableMetaData());
 				while (sqlResultSet.next()) {
+					Row rowToBeAdded = null;
 					if (limit > 0) {
 						// nur die Menge an Rows, welche auf der gewünschten Page liegen
 						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
-							resultSet.addRow(//
-									convertSqlResultToRow(resultSet//
-											, sqlResultSet//
-											, customLogger.logger//
-											, this));
+							rowToBeAdded = convertSqlResultToRow(resultSet//
+									, sqlResultSet//
+									, customLogger.logger////
+									, this);
 						}
 					} else {
-						resultSet.addRow(//
-								convertSqlResultToRow(resultSet//
-										, sqlResultSet//
-										, customLogger.logger//
-										, this));
+						rowToBeAdded = convertSqlResultToRow(resultSet//
+								, sqlResultSet//
+								, customLogger.logger////
+								, this);
 					}
-					totalResults++;
+
+					// falls die Row-Level-Security für diese Prozedur eingeschalten ist (Einträge in der Liste vorhanden),
+					// sollten die Rows nach dem Ausführen der Prozedur gefiltert werden
+					if (!userSecurityTokensToBeChecked.isEmpty()) {
+						if (userSecurityTokensToBeChecked.contains(rowToBeAdded.getValues().get(securityTokenInColumn).getStringValue().toLowerCase())) {
+							resultSet.addRow(rowToBeAdded);
+							totalResults++;
+						}
+					} else {
+						resultSet.addRow(rowToBeAdded);
+						totalResults++;
+					}
 				}
 				resultSet.fillMetaData(resultSet, limit, totalResults, page);
 			}
@@ -273,8 +291,16 @@ public class SqlProcedureController {
 						.stream()//
 						.map(c -> c.getOutputType() == OUTPUT)//
 						.collect(toList());
+
+				int securityTokenInColumn = 0;
+				// Herausfinden an welcher Stelle die Spalte mit den SecurityTokens ist
+				for (int i = 0; i < inputTable.getColumns().size(); i++) {
+					if (inputTable.getColumns().get(i).getName().equals("SecurityToken")) {
+						securityTokenInColumn = i;
+					}
+				}
+
 				val outputValues = new Row();
-				outputParameters.addRow(outputValues);
 				outputParameters.setColumns(inputTable.getColumns());
 				range(0, inputTable.getColumns().size())//
 						.forEach(i -> {
@@ -284,6 +310,21 @@ public class SqlProcedureController {
 								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 							}
 						});
+				Row resultRow = new Row();
+				if (!userSecurityTokensToBeChecked.isEmpty()) {
+					String securityTokenValue = outputValues.getValues().get(securityTokenInColumn).getStringValue();
+					if (securityTokenValue == null || userSecurityTokensToBeChecked.contains(securityTokenValue.toLowerCase())) {
+						resultRow = outputValues;
+					} else {
+						for (int i = 0; i < outputValues.getValues().size(); i++) {
+							resultRow.addValue(null);
+						}
+					}
+				} else {
+					resultRow = outputValues;
+				}
+
+				outputParameters.addRow(resultRow);
 			}
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());

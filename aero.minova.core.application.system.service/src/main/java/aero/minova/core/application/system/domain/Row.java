@@ -1,9 +1,11 @@
 package aero.minova.core.application.system.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Row {
+public class Row implements Serializable {
+	private static final long serialVersionUID = 202106161638L;
 	private List<Value> values = new ArrayList<>();
 
 	public void addValue(Value v) {

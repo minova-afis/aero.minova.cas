@@ -50,8 +50,7 @@ public class SqlViewController {
 		StringBuilder sb = new StringBuilder();
 		try {
 			@SuppressWarnings("unchecked")
-			List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-			List<Row> authoritiesForThisTable = getPrivilegePermissions(allUserAuthorities, inputTable.getName()).getRows();
+			List<Row> authoritiesForThisTable = getPrivilegePermissions(inputTable.getName()).getRows();
 			if (authoritiesForThisTable.isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
@@ -208,7 +207,8 @@ public class SqlViewController {
 	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
 	 **/
-	public Table getPrivilegePermissions(List<GrantedAuthority> securityTokens, String privilegeName) {
+	public Table getPrivilegePermissions(String privilegeName) {
+		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		Table userPrivileges = new Table();
 		userPrivileges.setName("xvcasUserPrivileges");
 		List<Column> columns = new ArrayList<>();
@@ -219,7 +219,7 @@ public class SqlViewController {
 		userPrivileges.setColumns(columns);
 
 		List<String> userTokens = new ArrayList<>();
-		for (GrantedAuthority ga : securityTokens) {
+		for (GrantedAuthority ga : allUserAuthorities) {
 			userTokens.add(ga.getAuthority());
 		}
 
@@ -571,6 +571,28 @@ public class SqlViewController {
 		return where.toString();
 	}
 
+	protected List<String> checkUserTokens(List<Row> requestingAtuhorities) {
+		List<String> requestingRoles = new ArrayList<>();
+		boolean checkNeeded = true;
+
+		for (Row authority : requestingAtuhorities) {
+			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
+			if (!authority.getValues().get(2).getBooleanValue()) {
+				checkNeeded = false;
+				// Nach den requestingRoles würde später gefilter werden, wenn welche vorhanden wären, deshalb alle löschen
+				requestingRoles = new ArrayList<>();
+			}
+			if (checkNeeded) {
+				// hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
+				String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
+				if ((!value.equals("")) && (!requestingRoles.contains(value))) {
+					requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
+				}
+			}
+		}
+		return requestingRoles;
+	}
+
 	/**
 	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an
 	 *
@@ -581,18 +603,12 @@ public class SqlViewController {
 	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
 	 */
 	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
-
 		List<String> requestingRoles = new ArrayList<>();
-
-		for (Row authority : requestingAtuhorities) {
-			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
-			if (!authority.getValues().get(2).getBooleanValue()) {
+		if (!requestingAtuhorities.isEmpty()) {
+			requestingRoles = checkUserTokens(requestingAtuhorities);
+			// falls die Liste leer ist, darf der User alle Spalten sehen
+			if (requestingRoles.isEmpty()) {
 				return "";
-			}
-			// hier sind die Rolen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
-			String value = authority.getValues().get(1).getStringValue().trim();
-			if ((!value.equals("")) && (!requestingRoles.contains(value))) {
-				requestingRoles.add(authority.getValues().get(1).getStringValue());
 			}
 		}
 

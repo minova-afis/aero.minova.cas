@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.core.application.system.FilesService;
+import aero.minova.core.application.system.service.FilesService;
 import lombok.val;
 
 @RestController

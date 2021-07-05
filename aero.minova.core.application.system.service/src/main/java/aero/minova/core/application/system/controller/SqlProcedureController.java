@@ -203,6 +203,7 @@ public class SqlProcedureController {
 			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
+				resultSet.setName(inputTable.getName());
 				result.setResultSet(resultSet);
 				val metaData = sqlResultSet.getMetaData();
 				resultSet.setColumns(//

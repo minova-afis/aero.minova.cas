@@ -24,7 +24,7 @@ import org.junit.rules.TemporaryFolder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import aero.minova.core.application.system.FilesService;
+import aero.minova.core.application.system.service.FilesService;
 import lombok.val;
 
 @SpringBootTest

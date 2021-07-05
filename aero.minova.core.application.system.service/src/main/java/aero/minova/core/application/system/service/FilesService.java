@@ -1,4 +1,4 @@
-package aero.minova.core.application.system;
+package aero.minova.core.application.system.service;
 
 import static java.nio.file.Files.isDirectory;
 

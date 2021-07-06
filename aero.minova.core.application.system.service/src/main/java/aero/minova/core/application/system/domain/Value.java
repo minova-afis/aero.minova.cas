@@ -1,6 +1,7 @@
 package aero.minova.core.application.system.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 
@@ -61,6 +62,12 @@ public class Value implements Serializable {
 		setValue(zonedDateTimeValue);
 	}
 
+	public Value(BigDecimal decimalValue, String rule) {
+		type = DataType.BIGDECIMAL;
+		this.rule = rule;
+		setValue(decimalValue);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> T getValue(Class<T> type) {
 		return (T) value;
@@ -96,6 +103,10 @@ public class Value implements Serializable {
 
 	public Double getDoubleValue() {
 		return type == DataType.DOUBLE ? (Double) value : null;
+	}
+
+	public BigDecimal getBigDecimalValue() {
+		return type == DataType.BIGDECIMAL ? (BigDecimal) value : null;
 	}
 
 	public Long getLongValue() {

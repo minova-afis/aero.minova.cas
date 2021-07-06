@@ -152,6 +152,8 @@ public class SqlProcedureController {
 									preparedStatement.setObject(i + parameterOffset, null, Types.NVARCHAR);
 								} else if (type == DataType.ZONED) {
 									preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
+								} else if (type == DataType.BIGDECIMAL) {
+									preparedStatement.setObject(i + parameterOffset, null, Types.DECIMAL);
 								} else {
 									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
@@ -171,6 +173,8 @@ public class SqlProcedureController {
 									preparedStatement.setString(i + parameterOffset, iVal.getStringValue());
 								} else if (type == DataType.ZONED) {
 									preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
+								} else if (type == DataType.BIGDECIMAL) {
+									preparedStatement.setBigDecimal(i + parameterOffset, iVal.getBigDecimalValue());
 								} else {
 									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
@@ -179,7 +183,7 @@ public class SqlProcedureController {
 								if (type == DataType.BOOLEAN) {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.BOOLEAN);
 								} else if (type == DataType.DOUBLE) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.DOUBLE);
+									preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 								} else if (type == DataType.INSTANT) {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
 								} else if (type == DataType.INTEGER) {
@@ -190,6 +194,8 @@ public class SqlProcedureController {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.NVARCHAR);
 								} else if (type == DataType.ZONED) {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
+								} else if (type == DataType.BIGDECIMAL) {
+									preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 								} else {
 									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 								}
@@ -211,7 +217,7 @@ public class SqlProcedureController {
 							try {
 								val type = metaData.getColumnType(i + resultSetOffset);
 								val name = metaData.getColumnName(i + resultSetOffset);
-								if (type == Types.BOOLEAN) {
+								if (type == Types.BOOLEAN || Types.BIT == type) {
 									return new Column(name, DataType.BOOLEAN);
 								} else if (type == Types.DOUBLE) {
 									return new Column(name, DataType.DOUBLE);
@@ -223,6 +229,8 @@ public class SqlProcedureController {
 									return new Column(name, DataType.STRING);
 								} else if (type == Types.NVARCHAR) {
 									return new Column(name, DataType.STRING);
+								} else if (type == Types.DECIMAL) {
+									return new Column(name, DataType.BIGDECIMAL);
 								} else {
 									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}

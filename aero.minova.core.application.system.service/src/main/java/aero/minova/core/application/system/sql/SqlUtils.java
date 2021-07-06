@@ -46,6 +46,8 @@ public class SqlUtils {
 					row.addValue(new Value(sqlSet.getInt(column.getName()), null));
 				} else if (column.getType() == DataType.BOOLEAN) {
 					row.addValue(new Value(sqlSet.getBoolean(column.getName()), null));
+				} else if (column.getType() == DataType.BIGDECIMAL) {
+					row.addValue(new Value(sqlSet.getBigDecimal(column.getName()), null));
 				} else if (column.getType() == DataType.DOUBLE) {
 					row.addValue(new Value(sqlSet.getDouble(column.getName()), null));
 				} else if (column.getType() == DataType.INSTANT) {
@@ -84,6 +86,8 @@ public class SqlUtils {
 				return new Value(statement.getBoolean(index), null);
 			} else if (column.getType() == DataType.DOUBLE) {
 				return new Value(statement.getDouble(index), null);
+			} else if (column.getType() == DataType.BIGDECIMAL) {
+				return new Value(statement.getBigDecimal(index), null);
 			} else if (column.getType() == DataType.INSTANT) {
 				return new Value(//
 						Optional.ofNullable(statement.getTimestamp(index))//

@@ -571,6 +571,13 @@ public class SqlViewController {
 		return where.toString();
 	}
 
+	/**
+	 * @param requestingAuthorities
+	 *            eine Liste an Rows im Format: eine Row = ("ProzedurName","UserSecurityToken","RowLevelSecurity-Bit").
+	 * @return Eine Liste an Strings, welche alle relevanten UserSecurityTokens beinhaltet oder eine leere Liste, falls ein SecurityToken die Berechtigung hat
+	 *         alle Rows zu sehen.
+	 * @author weber
+	 */
 	protected List<String> extractUserTokens(List<Row> requestingAuthorities) {
 		List<String> requestingRoles = new ArrayList<>();
 

@@ -54,7 +54,7 @@ public class FilesController {
 	SqlProcedureController spc;
 
 	// TODO Extension vorerst entfernt, aber für später aufheben
-	// TODO Bytes effizient in JSON durch BASE64 darstellen
+	// TODO Bytes in JSON durch BASE64 darstellen
 //	@PostConstruct
 //	public void setup() throws Exception {
 //		// fügt Extension hinzu

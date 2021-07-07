@@ -183,7 +183,7 @@ public class SqlProcedureController {
 								if (type == DataType.BOOLEAN) {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.BOOLEAN);
 								} else if (type == DataType.DOUBLE) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
+									preparedStatement.registerOutParameter(i + parameterOffset, Types.DOUBLE);
 								} else if (type == DataType.INSTANT) {
 									preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
 								} else if (type == DataType.INTEGER) {

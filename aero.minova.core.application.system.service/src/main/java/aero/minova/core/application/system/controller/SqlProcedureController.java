@@ -19,8 +19,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.ProcedureException;
@@ -47,7 +46,7 @@ import lombok.val;
 public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
-	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	CustomLogger customLogger = new CustomLogger();
 
 	@Autowired
 	SqlViewController svc;
@@ -67,9 +66,13 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		logger.info("data/procedure: " + gson.toJson(inputTable));
+		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
 		if (extension.containsKey(inputTable.getName())) {
-			return extension.get(inputTable.getName()).apply(inputTable);
+			try {
+				return extension.get(inputTable.getName()).apply(inputTable);
+			} catch (Exception e) {
+				throw new ProcedureException(e.getMessage());
+			}
 		}
 		try {
 			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName()).getRows();
@@ -79,7 +82,7 @@ public class SqlProcedureController {
 			val result = calculateSqlProcedureResult(inputTable, privilegeRequest);
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
-			logger.info("Error while trying to execute procedure: " + inputTable.getName());
+			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
 			throw e;
 		}
 	}
@@ -247,13 +250,13 @@ public class SqlProcedureController {
 						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
 							rowToBeAdded = convertSqlResultToRow(resultSet//
 									, sqlResultSet//
-									, logger//
+									, customLogger.logger////
 									, this);
 						}
 					} else {
 						rowToBeAdded = convertSqlResultToRow(resultSet//
 								, sqlResultSet//
-								, logger//
+								, customLogger.logger////
 								, this);
 					}
 
@@ -325,13 +328,13 @@ public class SqlProcedureController {
 				outputParameters.addRow(resultRow);
 			}
 			connection.commit();
-			logger.info("Procedure succesfully executed: " + sb.toString());
+			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
-			logger.error("Procedure could not be executed: " + sb.toString() + "\n" + e.getMessage(), e);
+			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
-				logger.error("Couldn't roll back procedure execution: " + e.getMessage());
+				customLogger.logError("Couldn't roll back procedure execution", e);
 			}
 			throw new ProcedureException(e);
 		} finally {

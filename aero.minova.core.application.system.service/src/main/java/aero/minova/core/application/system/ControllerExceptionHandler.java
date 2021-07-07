@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.ErrorMessage;
@@ -41,7 +38,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Autowired
 	SystemDatabase systemDatabase;
-	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	CustomLogger customLogger = new CustomLogger();
 
 	@ExceptionHandler(ProcedureException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -216,11 +213,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			callableErrorStatement.setString(1, username);
 			callableErrorStatement.setString(2, e.getMessage());
 			callableErrorStatement.setTimestamp(3, timeOfError);
-			logger.info("Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
+			logger.info(
+					"CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError + "/n" + e.getStackTrace());
 			callableErrorStatement.executeUpdate();
 			connection.commit();
 		} catch (SQLException e1) {
-			logger.error("Error could not be saved in database");
+			customLogger.errorLogger.error("CAS : Error could not be saved in database." + "/n" + e1.getStackTrace());
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

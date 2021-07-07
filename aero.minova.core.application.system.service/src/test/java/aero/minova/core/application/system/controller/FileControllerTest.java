@@ -21,7 +21,11 @@ import java.util.zip.ZipInputStream;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
 import aero.minova.core.application.system.FilesService;
@@ -33,6 +37,12 @@ public class FileControllerTest {
 
 	@Test
 	public void testLegal() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
@@ -51,6 +61,12 @@ public class FileControllerTest {
 
 	@Test
 	public void testLegalHash() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
@@ -73,6 +89,12 @@ public class FileControllerTest {
 
 	@Test
 	public void testLegalLog() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
@@ -272,6 +294,12 @@ public class FileControllerTest {
 
 	@Test
 	public void testZipAllAndHashAll() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();

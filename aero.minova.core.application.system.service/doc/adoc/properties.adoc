@@ -37,5 +37,5 @@ Das Interval wird als Cron-Ausdruck beschrieben: https://crontab.cronhub.io
 
 ** *Default*: 'false'
 
-Schalter, welcher bestimmt, 
+Schalter für die files/read- und files/hash-Anfragen, welcher bestimmt, 
 ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.

@@ -3,7 +3,9 @@ package aero.minova.core.application.system;
 import static java.nio.file.Files.isDirectory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,6 +95,9 @@ public class FilesService {
 	public List<Path> populateFilesList(Path dir) throws IOException {
 		List<Path> filesListInDir = new ArrayList<>();
 		File[] files = dir.toFile().listFiles();
+		if (files == null) {
+			throw new FileNotFoundException("Cannot access sub folder: " + dir);
+		}
 		for (File file : files) {
 			filesListInDir.add(Paths.get(file.getAbsolutePath()));
 			if (file.isDirectory()) {

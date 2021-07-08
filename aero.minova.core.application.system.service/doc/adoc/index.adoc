@@ -7,7 +7,6 @@
 * xref:api.adoc#[API]
 * xref:build-and-release.adoc#[Build und Release]
 * xref:mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
-* xref:init.adoc#[Initialisieren und manuelles Befüllen der benötigten CAS Tabellen]
 * xref:properties.adoc#[Properties]
 * xref:versions.adoc#[Versionen]
 * xref:security.adoc#[Sicherheitsmechanismen]

@@ -1,8 +1,9 @@
 ++++
-<a href="https://www.minova.de/">
-<img src="https://www.minova.de/files/cto_layout/themedesigner/uploads/MINOVA-Logo.png" alt="logo" align="right" style="height: 3em;" />
+<a href="https://www.minova.de/" >
+<img src="https://www.minova.de/files/Minova/Ueber_uns/minova-logo-105.svg" alt="logo" align="right"/>
 </a>
 ++++
+
 = Core Application System
 
 ++++

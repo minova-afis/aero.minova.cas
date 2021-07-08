@@ -5,7 +5,6 @@
 * Zurück zur link:..[Übersicht]
 
 * xref:api.adoc#[API]
-* xref:build-and-release.adoc#[Build und Release]
 * xref:properties.adoc#[Properties]
 * xref:versions.adoc#[Versionen]
 

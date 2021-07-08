@@ -13,8 +13,3 @@
 * xref:security.adoc#[Sicherheitsmechanismen]
 * xref:security-code.adoc#[Konzept der Sicherheitsmethoden]
 * xref:rowlevelexample.adoc#[Beispiel zum Aktivieren der RowLevelSecurity]
-
-== Beschreibung
-
-Dieser Dienst soll in Zukunft die erste Anlaufstelle für andere Dienste sein.
-Der Dienst wurde mit dem Ticket #42940 ins leben gerufen.

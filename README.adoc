@@ -19,7 +19,7 @@ Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeiner
 
 == Weiterführende Dokumentation
 
-* xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
+* xref:./aero.minova.core.application.system.service/doc/adoc/index.adoc#[CAS-Dienst]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
 * xref:./aero.minova.cas.logic/doc/adoc/index.adoc#[Maske für das Editieren von Rechten]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]

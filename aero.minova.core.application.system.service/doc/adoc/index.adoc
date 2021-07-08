@@ -18,15 +18,3 @@
 
 Dieser Dienst soll in Zukunft die erste Anlaufstelle für andere Dienste sein.
 Der Dienst wurde mit dem Ticket #42940 ins leben gerufen.
-
-== Installation
-
-* Inhalt von lib und die gebaute jar in einen Ordner bringen.
-* `application-production.properties` und `aero.minova.core.application.system.xml` an das System anpassen.
-* Als Windows Dienst mithilfe von `aero.minova.core.application.system.exe install` via cmd installieren.
-* Das Projekt aero.minova.cas.logic muss gebaut werden und als Modul im
-  Deploy-Ordner installiert werden: `java -jar aero.minova.cas.logic -app=afis -us -ud -cf -mo -writemdi`.
-  Das Projekt befindet sich in diesem Repository.
-
-NOTE: Es gibt die Möglichkeit diesen Dienst in Zukunft mit dem Installtool zu installieren.
-Siehe ch.minova.service.afis.dispatch.restriction.loader.plot oder frage AVM)

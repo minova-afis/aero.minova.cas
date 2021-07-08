@@ -1,6 +1,6 @@
 ++++
 <a href="https://www.minova.de/">
-<img src="https://www.minova.de/files/cto_layout/themedesigner/uploads/MINOVA-Logo.png" alt="logo" align="right" style="height: 3em" />
+<img src="https://www.minova.de/files/cto_layout/themedesigner/uploads/MINOVA-Logo.png" alt="logo" align="right" style="height: 3em;" />
 </a>
 ++++
 = Core Application System

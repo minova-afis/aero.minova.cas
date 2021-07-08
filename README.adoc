@@ -23,7 +23,6 @@ Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeiner
 * xref:./aero.minova.core.application.system.service/README.adoc#[CAS-Dienst]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
 * xref:./aero.minova.cas.logic/doc/adoc/index.adoc#[Maske für das Editieren von Rechten]
-* xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 
 == Installation

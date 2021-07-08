@@ -1,15 +1,19 @@
 package aero.minova.core.application.system.controller;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
+import com.mysql.cj.jdbc.CallableStatement;
 
 import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.service.SetupService;
@@ -19,7 +23,8 @@ public class SetupServiceTest {
 
 	@Mock
 	private SystemDatabase database;
-
+	@Mock
+	private Connection connection;
 	@Mock
 	private FilesService service;
 
@@ -35,16 +40,24 @@ public class SetupServiceTest {
 
 	@Test
 	public void testReadSetups() throws Exception {
-		Path testPath = Paths.get(getClass().getClassLoader().getResource("Setup.xml").toURI());
-		Mockito.when(service.getSystemFolder()).thenReturn(testPath);
+		MockitoAnnotations.initMocks(this);
+
+		// Die Setup-Dateien liegen im setup-Ordner.
+		String url = getClass().getClassLoader().getResource("setup").toURI().getPath();
+		Path setupPath = new File(url.substring(0, url.lastIndexOf("/"))).toPath();
+		Mockito.when(service.getSystemFolder()).thenReturn(setupPath);
+		Mockito.when(database.getConnection()).thenReturn(connection);
+		Mockito.when(connection.prepareCall(Mockito.any())).thenReturn(Mockito.mock(CallableStatement.class));
 
 		SetupService testSubject = new SetupService();
+		testSubject.service = service;
+		testSubject.database = database;
 		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("exampleDependencyList.txt");
 		String text = null;
 		try (Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8.name())) {
 			text = scanner.useDelimiter("\\A").next();
 		}
-		System.out.println(text);
+
 		List<String> dependencies = testSubject.parseDependencyList(text);
 		testSubject.readSetups(dependencies);
 	}

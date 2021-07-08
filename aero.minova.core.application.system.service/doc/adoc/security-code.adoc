@@ -1,0 +1,68 @@
+= Security Methoden
+
+In diesem Dokument wird beschrieben, wie speziell die Methode,
+welche die Sicherheitsmechanismen implementieren, funktionieren.
+
+=== getPrivilegePermissions (String privilegeName) [[anchor-1]]
+Die Methode erwartet den Namen des Privileges (Prozedur/View) und holt sich dazu noch die UserGruppen/UserSecurityToken aus dem SecurityContext,
+um dann mithilfe einer SQL Abfrage alle relevanten UserSecurityToken zu erhalten.
+
+Die Abfrage sieht folgendermaßen aus: 
+[source,sql]
+----
+select PrivilegeKeyText,KeyText,RowLevelSecurity 
+from xvcasUserPrivileges
+where (PrivilegeKeyText = privilegeName and KeyText = UserSecurityToken1)
+or (PrivilegeKeyText = privilegeName and KeyText = UserSecurityToken2)
+or ...
+
+----
+
+Als Return-Parameter wird dann eine Tabelle in demselben Format zurückgeliefert, welche nur die SecurityTokens beinhaltet,
+welche einen Eintrag in xvcasUserPrivileges in Verbindung mit dem Privilegnamen haben.
+
+
+=== getTableForSecurityCheck(Table inputTable)
+Diese Methode kann genutzt werden, um den SecurityToken-Check zu umgehen und wird genutzt, 
+um ungehindert Zugriff auf die xvcasUserPrivileges zu erhalten und somit überhaupt erst die UserSecurityToken bekommen zu können.
+
+Die *inputTable* ist die Tabelle, welche ohne Prüfung als SQL-Query ausgeführt werden soll.
+
+=== columnSecurity(Table inputTable, List<Row> userGroups)
+Filtert die Spalten, welche der Benutzer sehen darf.
+Die Inputparameter bestehen aus:
+
+* *inputTable*: die vom Benutzer gesendete Table
+* *userGroups*: die vorher ermittelten UserSecurityToken passend zur angefragten Prozedur/View (siehe xref:anchor-1[getPrivilegePermissions])
+
+Die Sql-Abfrage hat folgendes Format:
+[source, sql]
+-----
+select TableName, ColumnName, SecurityToken
+from xtcasColumnSecurity
+where (TableName = inputTableName and SecurityToken = UserSecurityToken1) 
+or (TableName = inputTableName and SecurityToken = UserSecurityToken2)
+or ...
+-----
+
+Aus der daraus ermittelten Table werden dann alle Spaltennamen entnommen,
+und die inputTable wird nach diesen gefiltert für die weitere Verarbeitung.
+
+Falls es keinen Eintrag in der xtcasColumnSecurity für die vorhandenen UserSecurityToken gibt,
+wird die gesamte inputTable unverändert zurückgegeben.
+
+=== extractUserTokens(List<Row> requestingAuthorities)
+Extrahiert die UserTokens als eine Liste von Strings,
+ welche zuvor durch die xref:anchor-1[getPrivilegePermissions-Methode] gefiltert wurden,  z.B. für die rowLevelSecurity-Methode.
+ 
+=== rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities)
+Die rowLevelSecurity-Methode erweitert die where-Klausel der Sql-Abfrage und benötigt deshalb einen boolean *isFirstWhereClause*,
+um zu signalisieren, ob der Anfang der where-Bedingung bereits exisitert oder diese erst begonnen werden muss.
+Außerdem wird die Liste der relevanten UserTokens benötigt, welche durch extractUserTokens in eine Liste von String umgewandelt wird.
+Aus diesen wird dann folgende where-Bedingung zusammen gebaut:
+[source, sql]
+-----
+[and/where] ((SecurityToken IS NULL) 
+or (SecurityToken IN (UserSecurityToken1, UserSecurityToken2, ...))
+-----
+Am Ende wird die fertige where-Bedingung als String zurück gegeben.

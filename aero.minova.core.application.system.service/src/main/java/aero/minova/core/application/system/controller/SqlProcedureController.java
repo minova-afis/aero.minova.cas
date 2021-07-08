@@ -98,7 +98,7 @@ public class SqlProcedureController {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		List<String> userSecurityTokensToBeChecked = svc.checkUserTokens(privilegeRequest);
+		List<String> userSecurityTokensToBeChecked = svc.extractUserTokens(privilegeRequest);
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
@@ -243,13 +243,7 @@ public class SqlProcedureController {
 						}).collect(toList()));
 				int totalResults = 0;
 
-				int securityTokenInColumn = 0;
-				// Herausfinden an welcher Stelle die Spalte mit den SecurityTokens ist
-				for (int i = 0; i < resultSet.getColumns().size(); i++) {
-					if (resultSet.getColumns().get(i).getName().equals("SecurityToken")) {
-						securityTokenInColumn = i;
-					}
-				}
+				int securityTokenInColumn = findSecurityTokenColumn(resultSet);
 				resultSet.setMetaData(new TableMetaData());
 				while (sqlResultSet.next()) {
 					Row rowToBeAdded = null;
@@ -268,19 +262,15 @@ public class SqlProcedureController {
 								, this);
 					}
 
-					// falls die Row-Level-Security für diese Prozedur eingeschalten ist (Einträge in der Liste vorhanden),
-					// sollten die Rows nach dem Ausführen der Prozedur gefiltert werden
-					if (!userSecurityTokensToBeChecked.isEmpty()) {
-						if (userSecurityTokensToBeChecked.contains(rowToBeAdded.getValues().get(securityTokenInColumn).getStringValue().toLowerCase())) {
-							resultSet.addRow(rowToBeAdded);
-							totalResults++;
-						}
-					} else {
+					/*
+					 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
+					 */
+					if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
 						resultSet.addRow(rowToBeAdded);
 						totalResults++;
 					}
+					resultSet.fillMetaData(resultSet, limit, totalResults, page);
 				}
-				resultSet.fillMetaData(resultSet, limit, totalResults, page);
 			}
 			// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
 			val returnCode = preparedStatement.getObject(1);
@@ -301,14 +291,6 @@ public class SqlProcedureController {
 						.map(c -> c.getOutputType() == OUTPUT)//
 						.collect(toList());
 
-				int securityTokenInColumn = 0;
-				// Herausfinden an welcher Stelle die Spalte mit den SecurityTokens ist
-				for (int i = 0; i < inputTable.getColumns().size(); i++) {
-					if (inputTable.getColumns().get(i).getName().equals("SecurityToken")) {
-						securityTokenInColumn = i;
-					}
-				}
-
 				val outputValues = new Row();
 				outputParameters.setColumns(inputTable.getColumns());
 				range(0, inputTable.getColumns().size())//
@@ -319,20 +301,16 @@ public class SqlProcedureController {
 								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 							}
 						});
-				Row resultRow = new Row();
-				if (!userSecurityTokensToBeChecked.isEmpty()) {
-					String securityTokenValue = outputValues.getValues().get(securityTokenInColumn).getStringValue();
-					if (securityTokenValue == null || userSecurityTokensToBeChecked.contains(securityTokenValue.toLowerCase())) {
-						resultRow = outputValues;
-					} else {
-						for (int i = 0; i < outputValues.getValues().size(); i++) {
-							resultRow.addValue(null);
-						}
-					}
-				} else {
-					resultRow = outputValues;
-				}
+				int securityTokenInColumn = findSecurityTokenColumn(inputTable);
 
+				Row resultRow = new Row();
+				if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
+					resultRow = outputValues;
+				} else {
+					for (int i = 0; i < outputValues.getValues().size(); i++) {
+						resultRow.addValue(null);
+					}
+				}
 				outputParameters.addRow(resultRow);
 			}
 			connection.commit();
@@ -351,8 +329,39 @@ public class SqlProcedureController {
 		return result;
 	}
 
+	/*
+	 * Findet die SecurityToken-Spalte der übergebenen Table.
+	 */
+	int findSecurityTokenColumn(Table inputTable) {
+		int securityTokenInColumn = 0;
+		// Herausfinden an welcher Stelle die Spalte mit den SecurityTokens ist
+		for (int i = 0; i < inputTable.getColumns().size(); i++) {
+			if (inputTable.getColumns().get(i).getName().equals("SecurityToken")) {
+				securityTokenInColumn = i;
+			}
+		}
+		return securityTokenInColumn;
+	}
+
 	String prepareProcedureString(Table params) {
 		return prepareProcedureString(params, ExecuteStrategy.STANDARD);
+	}
+
+	/*
+	 * Falls die Row-Level-Security für die Prozedur eingeschalten ist (Einträge in der Liste vorhanden), sollten die Rows nach dem Ausführen der Prozedur
+	 * gefiltert werden. Überprüft, ob der SecurityToken der rowToBeChecked mit mind. 1 SecurityToken des Users übereinstimmt.
+	 */
+	boolean checkRowForValidSecurityToken(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn) {
+		if (!userSecurityTokens.isEmpty()) {
+			String securityTokenValue = rowToBeChecked.getValues().get(securityTokenInColumn).getStringValue();
+			if (securityTokenValue == null || userSecurityTokens.contains(securityTokenValue.toLowerCase())) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	/**

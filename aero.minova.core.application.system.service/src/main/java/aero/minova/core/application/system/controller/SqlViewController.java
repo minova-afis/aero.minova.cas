@@ -558,7 +558,7 @@ public class SqlViewController {
 				}
 			}
 
-			// Wenn es etwas gab, dann fügen wir diese Zeile der kompletten WHERE-clause hinzu
+			// Wenn es etwas gab, dann fügen wir diese Zeile der kompletten WHERE-clause hinzu.
 			if (clause.length() > 0) {
 				if (where.length() == 0) {
 					where.append("\r\nwhere (");
@@ -571,23 +571,28 @@ public class SqlViewController {
 		return where.toString();
 	}
 
-	protected List<String> checkUserTokens(List<Row> requestingAtuhorities) {
+	/**
+	 * @param requestingAuthorities
+	 *            eine Liste an Rows im Format: eine Row = ("ProzedurName","UserSecurityToken","RowLevelSecurity-Bit").
+	 * @return Eine Liste an Strings, welche alle relevanten UserSecurityTokens beinhaltet oder eine leere Liste, falls ein SecurityToken die Berechtigung hat
+	 *         alle Rows zu sehen.
+	 * @author weber
+	 */
+	protected List<String> extractUserTokens(List<Row> requestingAuthorities) {
 		List<String> requestingRoles = new ArrayList<>();
-		boolean checkNeeded = true;
 
-		for (Row authority : requestingAtuhorities) {
-			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
+		for (Row authority : requestingAuthorities) {
+			/*
+			 * Falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen. Ist dies der Fall, können wir
+			 * ruhig eine leere Liste zurückgeben, da deren Inhalt die UserSecurityTokens wären, nach welchen gefiltert werden würde.
+			 */
 			if (!authority.getValues().get(2).getBooleanValue()) {
-				checkNeeded = false;
-				// Nach den requestingRoles würde später gefilter werden, wenn welche vorhanden wären, deshalb alle löschen
-				requestingRoles = new ArrayList<>();
+				return new ArrayList<>();
 			}
-			if (checkNeeded) {
-				// hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
-				String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
-				if ((!value.equals("")) && (!requestingRoles.contains(value))) {
-					requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
-				}
+			// Hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen.
+			String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
+			if (!value.equals("") && !requestingRoles.contains(value)) {
+				requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
 			}
 		}
 		return requestingRoles;
@@ -605,7 +610,7 @@ public class SqlViewController {
 	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
 		List<String> requestingRoles = new ArrayList<>();
 		if (!requestingAtuhorities.isEmpty()) {
-			requestingRoles = checkUserTokens(requestingAtuhorities);
+			requestingRoles = extractUserTokens(requestingAtuhorities);
 			// falls die Liste leer ist, darf der User alle Spalten sehen
 			if (requestingRoles.isEmpty()) {
 				return "";

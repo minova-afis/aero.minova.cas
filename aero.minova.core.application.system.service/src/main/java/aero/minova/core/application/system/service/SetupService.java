@@ -27,10 +27,10 @@ import lombok.val;
 public class SetupService {
 
 	@Autowired
-	SystemDatabase database;
+	public SystemDatabase database;
 
 	@Autowired
-	FilesService service;
+	public FilesService service;
 
 	Logger logger = LoggerFactory.getLogger(SetupService.class);
 
@@ -58,11 +58,13 @@ public class SetupService {
 		// Danach durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
 			String setupFile = dependency + ".setup.xml";
-			logger.info("Reading setup-file: " + setupFile);
+			logger.info("Lese Setup-File: " + setupFile);
 
 			File dependencySetupFile = dependencySetupsDir.resolve(setupFile).toFile();
 			if (dependencySetupFile.exists()) {
 				runProcedures(dependencySetupFile);
+			} else {
+				logger.error("Kein Setup-File mit dem Namen " + setupFile + " gefunden!");
 			}
 		}
 	}
@@ -77,30 +79,33 @@ public class SetupService {
 			// Jeden Eintrag im sql-code-Tag auslesen und ausführen.
 			for (int i = 0; n.getChildNodes().getLength() > i; i++) {
 				Element s = (Element) ((Element) n).getElementsByTagName("script").item(i);
-				String procedureName = s.getAttribute("name") + ".sql";
+				if (s != null) {
+					String procedureName = s.getAttribute("name") + ".sql";
 
-				Path sqlFile = dependencySqlDir.resolve(procedureName);
-				if (sqlFile.toFile().exists()) {
-					// Den Sql-Code aus der Datei auslesen und ausführen.
-					String procedure = Files.readString(sqlFile);
-					final val connection = database.getConnection();
+					Path sqlFile = dependencySqlDir.resolve(procedureName);
+					if (sqlFile.toFile().exists()) {
+						// Den Sql-Code aus der Datei auslesen und ausführen.
+						String procedure = Files.readString(sqlFile);
+						final val connection = database.getConnection();
 
-					logger.info("Ausführen der Prozedur/View " + procedureName);
-					try {
-						connection.prepareCall(procedure).execute();
-					} catch (Exception e) {
-						logger.info("Prozedur/View " + procedureName + " existiert noch nicht und wird angelegt.");
-						// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
-						procedure.replace("alter", "create");
-						connection.prepareCall(procedure).execute();
+						logger.info("Ausführen der Prozedur/View " + procedureName);
+						try {
+							connection.prepareCall(procedure).execute();
+						} catch (Exception e) {
+							logger.info("Prozedur/View " + procedureName + " existiert noch nicht und wird angelegt.");
+							// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
+							procedure.replace("alter", "create");
+							connection.prepareCall(procedure).execute();
+						}
+					} else {
+						logger.error("Keine Datei mit dem Namen " + procedureName + " gefunden!");
 					}
-				} else {
-					logger.info("Keine Datei mit dem Namen " + procedureName + " gefunden!");
 				}
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Fehler in einer der Prozeduren in " + dependencySetupFile);
+			e.getStackTrace();
 		}
 	}
 }

@@ -28,4 +28,4 @@ Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeiner
 
 * xref:./doc/adoc/installation.adoc#[Installation des Dienstes im alten Format]
 * xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
-* xref:mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
+* xref:./doc/adoc/mindockerqnap-setup.adoc#[Installation auf mindockerqnap]

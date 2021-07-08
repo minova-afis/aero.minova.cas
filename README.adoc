@@ -1,9 +1,14 @@
+++++
+<a href="https://www.minova.de/">
+<img src="https://www.minova.de/files/cto_layout/themedesigner/uploads/MINOVA-Logo.png" alt="logo" align="right" style="height: 3em" />
+</a>
+++++
 = Core Application System
 
 ++++
 <p align="left">
   <a href="https://hub.docker.com/repository/docker/minova/aero.minova.cas">
-    <img alt="Docker Images" src=https://img.shields.io/badge/Docker%20images-blue">
+    <img alt="Docker Images" src="https://img.shields.io/badge/Docker%20images-blue">
   </a>
   <img src="https://img.shields.io/badge/license-EPL%202.0-green">
   <img src="https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg">

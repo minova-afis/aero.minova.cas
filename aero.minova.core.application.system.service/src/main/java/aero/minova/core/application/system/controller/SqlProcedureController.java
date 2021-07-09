@@ -91,8 +91,9 @@ public class SqlProcedureController {
 	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
 	 *
 	 * @param inputTable
-	 *            Ausfüjhrungs-Parameter
+	 *            Ausführungs-Parameter
 	 * @param privilegeRequest
+	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
 	 * @return Resultat der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung

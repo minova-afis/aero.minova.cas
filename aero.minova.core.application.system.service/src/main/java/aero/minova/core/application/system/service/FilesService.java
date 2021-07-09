@@ -96,12 +96,16 @@ public class FilesService {
 	}
 
 	/**
-	 * This method populates all the files in a directory to a List
+	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory. Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
+	 * ebenfalls aufgelistet
 	 * 
 	 * @param dir
-	 * @throws IOException
+	 *            das zu durchsuchende Directory
+	 * @return eine Liste an allen Files in dem übergebenen Directory
+	 * @throws FileNotFoundException
+	 *             Falls das Directory nicht existiert oder der übergebene Pfad nicht auf ein Directory zeigt.
 	 */
-	public List<Path> populateFilesList(Path dir) throws IOException {
+	public List<Path> populateFilesList(Path dir) throws FileNotFoundException {
 		List<Path> filesListInDir = new ArrayList<>();
 		File[] files = dir.toFile().listFiles();
 		if (files == null) {

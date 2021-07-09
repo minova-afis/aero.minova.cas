@@ -201,8 +201,6 @@ public class SqlViewController {
 	/**
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt.
 	 *
-	 * @param securityTokens
-	 *            Die Gruppen, die dem anfordenden gehören.
 	 * @param privilegeName
 	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.

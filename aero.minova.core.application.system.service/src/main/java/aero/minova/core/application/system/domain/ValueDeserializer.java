@@ -1,6 +1,7 @@
 package aero.minova.core.application.system.domain;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Locale;
@@ -60,6 +61,8 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 			return new Value(ZonedDateTime.parse(value), rule);
 		case "b":
 			return new Value(Boolean.valueOf(value), rule);
+		case "m":
+			return new Value(BigDecimal.valueOf(Double.parseDouble(value)), rule);
 		default:
 			break;
 		}

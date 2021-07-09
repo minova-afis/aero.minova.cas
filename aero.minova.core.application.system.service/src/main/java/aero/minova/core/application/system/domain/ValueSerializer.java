@@ -26,6 +26,8 @@ public class ValueSerializer implements JsonSerializer<Value> {
 			return new JsonPrimitive("z-" + value.getZonedDateTimeValue().toString());
 		case BOOLEAN:
 			return new JsonPrimitive("b-" + value.getBooleanValue().toString());
+		case BIGDECIMAL:
+			return new JsonPrimitive("m-" + value.getBigDecimalValue().toString());
 		default:
 			return null;
 		}

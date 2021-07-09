@@ -11,8 +11,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
@@ -38,14 +37,14 @@ public class SqlViewController {
 
 	@Autowired
 	SystemDatabase systemDatabase;
-	Logger logger = LoggerFactory.getLogger(SqlViewController.class);
+	CustomLogger customLogger = new CustomLogger();
 
 	@Autowired
 	Gson gson;
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
-		logger.info("data/view: " + gson.toJson(inputTable));
+		customLogger.logUserRequest(": data/view: " + gson.toJson(inputTable));
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
@@ -81,7 +80,7 @@ public class SqlViewController {
 			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			logger.info("Executing statements: " + sb.toString());
+			customLogger.logSql("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
@@ -92,7 +91,7 @@ public class SqlViewController {
 			result.fillMetaData(result, limit, viewCount, page);
 
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + e.getMessage());
+			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
@@ -108,12 +107,11 @@ public class SqlViewController {
 			val viewQuery = pagingWithSeek(inputTable, false, -1, false, 1, requestingAuthorities);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			logger.info("Executing statements: " + sb.toString());
+			customLogger.logPrivilege("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + e.getMessage(), e);
 			throw new TableException(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
@@ -192,7 +190,7 @@ public class SqlViewController {
 					parameterOffset--;
 				}
 			} catch (Exception e) {
-				logger.error("Statement could not be filled: " + sb.toString(), e);
+				customLogger.logError("Statement could not be filled: " + sb.toString(), e);
 				throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
 			}
 		}
@@ -254,12 +252,12 @@ public class SqlViewController {
 			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			logger.info("Executing statement: " + sb.toString());
+			customLogger.logPrivilege("Executing statement: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			val result = convertSqlResultToTable(inputTable, resultSet);
 			return result;
 		} catch (Exception e) {
-			logger.error("Statement could not be executed: " + sb.toString(), e);
+			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -273,7 +271,7 @@ public class SqlViewController {
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
 							.collect(Collectors.toList()));
 			while (sqlSet.next()) {
-				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, logger, this));
+				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, customLogger.logger, this));
 			}
 			return outputTable;
 		} catch (Throwable e) {
@@ -455,8 +453,10 @@ public class SqlViewController {
 
 		// falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
 		if (inputTable.getColumns().isEmpty()) {
-			throw new RuntimeException(
+			RuntimeException exception = new RuntimeException(
 					"msg.ColumnSecurityError %" + SecurityContextHolder.getContext().getAuthentication().getName() + " %" + inputTable.getName());
+			customLogger.logError("No columns available for this user", exception);
+			throw exception;
 		}
 		return inputTable;
 	}
@@ -558,7 +558,7 @@ public class SqlViewController {
 				}
 			}
 
-			// Wenn es etwas gab, dann fügen wir diese Zeile der kompletten WHERE-clause hinzu
+			// Wenn es etwas gab, dann fügen wir diese Zeile der kompletten WHERE-clause hinzu.
 			if (clause.length() > 0) {
 				if (where.length() == 0) {
 					where.append("\r\nwhere (");
@@ -571,23 +571,28 @@ public class SqlViewController {
 		return where.toString();
 	}
 
-	protected List<String> checkUserTokens(List<Row> requestingAtuhorities) {
+	/**
+	 * @param requestingAuthorities
+	 *            eine Liste an Rows im Format: eine Row = ("ProzedurName","UserSecurityToken","RowLevelSecurity-Bit").
+	 * @return Eine Liste an Strings, welche alle relevanten UserSecurityTokens beinhaltet oder eine leere Liste, falls ein SecurityToken die Berechtigung hat
+	 *         alle Rows zu sehen.
+	 * @author weber
+	 */
+	protected List<String> extractUserTokens(List<Row> requestingAuthorities) {
 		List<String> requestingRoles = new ArrayList<>();
-		boolean checkNeeded = true;
 
-		for (Row authority : requestingAtuhorities) {
-			// falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen
+		for (Row authority : requestingAuthorities) {
+			/*
+			 * Falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen. Ist dies der Fall, können wir
+			 * ruhig eine leere Liste zurückgeben, da deren Inhalt die UserSecurityTokens wären, nach welchen gefiltert werden würde.
+			 */
 			if (!authority.getValues().get(2).getBooleanValue()) {
-				checkNeeded = false;
-				// Nach den requestingRoles würde später gefilter werden, wenn welche vorhanden wären, deshalb alle löschen
-				requestingRoles = new ArrayList<>();
+				return new ArrayList<>();
 			}
-			if (checkNeeded) {
-				// hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen
-				String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
-				if ((!value.equals("")) && (!requestingRoles.contains(value))) {
-					requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
-				}
+			// Hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen.
+			String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
+			if (!value.equals("") && !requestingRoles.contains(value)) {
+				requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
 			}
 		}
 		return requestingRoles;
@@ -605,7 +610,7 @@ public class SqlViewController {
 	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
 		List<String> requestingRoles = new ArrayList<>();
 		if (!requestingAtuhorities.isEmpty()) {
-			requestingRoles = checkUserTokens(requestingAtuhorities);
+			requestingRoles = extractUserTokens(requestingAtuhorities);
 			// falls die Liste leer ist, darf der User alle Spalten sehen
 			if (requestingRoles.isEmpty()) {
 				return "";

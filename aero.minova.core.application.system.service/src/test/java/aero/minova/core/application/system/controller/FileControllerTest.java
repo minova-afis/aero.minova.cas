@@ -98,6 +98,7 @@ public class FileControllerTest {
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve(".metadata");
@@ -113,7 +114,7 @@ public class FileControllerTest {
 		// dabei wird der Logs Ordner erzeugt
 		testSubject.getLogs(randomByteStream);
 
-		File found = findFile("beispielLog.log", sharedDataFolder.resolve("UserLogs").toFile());
+		File found = findFile("beispielLog.log", internalFolder.resolve("UserLogs").toFile());
 		assertThat(found).isNotEqualTo(null);
 		assertThat(Files.readAllBytes(found.toPath()))
 				.isEqualTo(new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
@@ -304,7 +305,8 @@ public class FileControllerTest {
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
-		final val md5Folder = sharedDataFolder.resolve("MD5");
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);

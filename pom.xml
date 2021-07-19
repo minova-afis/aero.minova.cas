@@ -1,32 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>core.application.system</artifactId>
-	<groupId>aero.minova</groupId>
-	<version>12.8.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<parent>
-		<groupId>aero.minova</groupId>
-		<artifactId>spring.maven.root</artifactId>
-		<version>1.2.1</version>
-		<relativePath />
-	</parent>
-	<scm>
-		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
-		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
-	<modules>
-		<module>aero.minova.core.application.system.service</module>
-		<!-- TODO Wird erst wieder aktiviert, wenn wir das Install-Tool auf Github haben. -->
-		<!-->module>aero.minova.cas.logic</module -->
-		<module>aero.minova.core.application.system.app</module>
-	</modules>
-	<repositories>
-		<repository>
-			<id>github</id>
-			<name>GitHub Minova Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
-		</repository>
-	</repositories>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>core.application.system</artifactId>
+    <groupId>aero.minova</groupId>
+    <version>12.8.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <parent>
+        <groupId>aero.minova</groupId>
+        <artifactId>spring.maven.root</artifactId>
+        <version>1.2.1</version>
+        <relativePath/>
+    </parent>
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
+        <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    <modules>
+        <module>aero.minova.core.application.system.service</module>
+        <!-- TODO Wird erst wieder aktiviert, wenn wir das Install-Tool auf Github haben. -->
+        <!-->module>aero.minova.cas.logic</module -->
+        <module>aero.minova.core.application.system.app</module>
+    </modules>
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub Minova Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+        </repository>
+    </repositories>
+    <build>
+        <!-- Define Maven Plugin Settings that should be inherited to ALL submodule POMs.
+             (NOTE: individual POMs can override specific settings). -->
+        <plugins>
+            <!-- Use to enforce particular versions of Java and Maven,
+                 and to ensure no conflicting dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>${java.version}</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>[3.0.5,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

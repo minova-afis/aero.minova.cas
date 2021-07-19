@@ -32,6 +32,14 @@ Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeiner
 
 == Installation
 
+Jede Installation besteht aus 3 Teilen:
+
+* Dienst:
+** Ausführung in der Entwicklungsumgebung
+** Auslieferung als Docker-Image
+* Datenbank: xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
+* Dateisystem: Einbinden des lokalen Dateisystems
+
+=== Installation für Spezifische Umgebungen
 * xref:./doc/adoc/installation.adoc#[Installation des Dienstes im alten Format]
-* xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbanktabellen]
 * xref:./doc/adoc/mindockerqnap-setup.adoc#[Installation auf mindockerqnap]

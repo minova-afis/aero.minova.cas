@@ -1,5 +1,7 @@
 package aero.minova.core.application.system.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -58,7 +60,9 @@ public class SetupServiceTest {
 			text = scanner.useDelimiter("\\A").next();
 		}
 
-		List<String> dependencies = testSubject.parseDependencyList(text);
-		testSubject.readSetups(dependencies);
+		List<String> procedureList = testSubject.readSetups(text);
+
+		assertThat(procedureList).hasSize(1);
+		assertThat(procedureList).contains("xvxmpExampleIndex.sql");
 	}
 }

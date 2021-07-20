@@ -105,8 +105,6 @@ public class SqlProcedureController {
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
 		val result = new SqlProcedureResult();
-		result.setOutputParameters(new Table());
-		result.setResultSet(new Table());
 
 		StringBuffer sb = new StringBuffer();
 
@@ -252,11 +250,23 @@ public class SqlProcedureController {
 					}
 					outputParameters.addRow(resultRow);
 				}
+
+				// Endresult-OutputParameter erweitern um RowResult-OutputParameter.
 				if (resultForThisRow.getOutputParameters() != null && resultForThisRow.getOutputParameters().getRows() != null) {
-					result.getOutputParameters().getRows().addAll(resultForThisRow.getOutputParameters().getRows());
+					if (result.getOutputParameters() == null) {
+						result.setOutputParameters(resultForThisRow.getOutputParameters());
+					} else {
+						result.getOutputParameters().getRows().addAll(resultForThisRow.getOutputParameters().getRows());
+					}
 				}
+
+				// Endresult-ResultSet erweitern um RowResult-ResultSet.
 				if (resultForThisRow.getResultSet() != null && resultForThisRow.getResultSet().getRows() != null) {
-					result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
+					if (result.getResultSet() == null) {
+						result.setResultSet(resultForThisRow.getResultSet());
+					} else {
+						result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
+					}
 				}
 			}
 			connection.commit();

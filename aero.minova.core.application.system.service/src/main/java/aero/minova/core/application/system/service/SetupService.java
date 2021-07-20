@@ -16,11 +16,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
@@ -33,8 +37,41 @@ public class SetupService {
 	@Autowired
 	public FilesService service;
 
+	@Autowired
+	SqlProcedureController spc;
+
 	Logger logger = LoggerFactory.getLogger(SetupService.class);
 
+	/**
+	 * Fügt die Erweiterung hinzu.
+	 */
+	private void setup() {
+		// Fügt Extension hinzu.
+		spc.registerExctension("setup", inputTable -> {
+			try {
+				SqlProcedureResult result = new SqlProcedureResult();
+				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
+				if (dependencyList.toFile().exists()) {
+					List<String> procedures = readSetups(Files.readString(service.getSystemFolder().resolve("setup").resolve("dependencyList.txt")));
+					runDependencyProcedures(procedures);
+				} else {
+					throw new NoSuchFileException("No dependencyList.txt found!");
+				}
+				return new ResponseEntity(result, HttpStatus.ACCEPTED);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+	}
+
+	/**
+	 * Die Methode überspringt die erste Zeile (bis nach \n) und schneidet alles ab dem String "The following files have NOT been resolved:" ab. Danach wird
+	 * jede Zeile als ein Eintrag in der Rückgabe-Liste gesetzt. Dabei wird noch die Endung :jar entfernt und alle : durch . ersetzt.
+	 * 
+	 * @param arg
+	 *            Ein String, in welchem die benötigten Dependencies stehen.
+	 * @return Gibt eine Liste an String zurück, welche die benötigten Prozedur-Dateinamen beinhalten: prozedur.sql.
+	 */
 	public List<String> parseDependencyList(String arg) {
 		List<String> dependencies = new ArrayList<>();
 		// Die obere Zeile und die die Zeilen mit den nicht resolvten Dateien abschneiden.
@@ -49,6 +86,15 @@ public class SetupService {
 		return dependencies;
 	}
 
+	/**
+	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
+	 * 
+	 * @param arg
+	 *            Ein String, in welchem die benötigten Dependencies stehen.
+	 * @return Die Liste an SQL-Dateien als Strings.
+	 * @throws IOException
+	 *             Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
+	 */
 	public List<String> readSetups(String arg) throws IOException {
 		List<String> dependencies = parseDependencyList(arg);
 		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
@@ -79,6 +125,13 @@ public class SetupService {
 		return procedures;
 	}
 
+	/**
+	 * Liest ein einzelnes Setup-File und gibt eine Liste von benötigten SQl-Dateien zurück.
+	 * 
+	 * @param dependencySetupFile
+	 *            Das Setup-File, welches gescannt werden soll.
+	 * @return Die Liste an SQL-Dateinamen für das gescannte Setup-File.
+	 */
 	public List<String> readProceduresToList(File dependencySetupFile) {
 		List<String> procedures = new ArrayList<>();
 		// Dokument auslesen
@@ -100,6 +153,14 @@ public class SetupService {
 		return procedures;
 	}
 
+	/**
+	 * Liest die übergebene Liste an SQL-Dateinamen und installiert die jeweils dazugehörige Datei.
+	 * 
+	 * @param procedures
+	 *            Die Liste an SQL-Dateinamen.
+	 * @throws NoSuchFileException
+	 *             Falls die Datei passend zum Namen nicht existiert.
+	 */
 	public void runDependencyProcedures(List<String> procedures) throws NoSuchFileException {
 		Path dependencySqlDir = service.getSystemFolder().resolve("sql");
 		for (String procedureName : procedures) {

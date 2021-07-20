@@ -105,6 +105,8 @@
 			<groupId>org.apache.ws.commons.util</groupId>
 			<artifactId>ws-commons-util</artifactId>
 			<version>1.0.2</version>
+			<!-- ohne die Exclusion würde die DocumentBuilderFactory-Klasse und die Document-Klasse nicht importiert werden können,
+			 da das falsche/ ein veraltetes Paket genommen werden würde. -->
 			<exclusions>
 				<exclusion>
 					<groupId>xml-apis</groupId>

@@ -49,8 +49,11 @@ public class SetupService {
 		return dependencies;
 	}
 
-	public void readSetups(List<String> dependencies) throws IOException {
+	public List<String> readSetups(String arg) throws IOException {
+		List<String> dependencies = parseDependencyList(arg);
 		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
+
+		List<String> procedures = new ArrayList<>();
 
 		// Zuerst durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
@@ -59,58 +62,72 @@ public class SetupService {
 
 			File dependencySetupFile = dependencySetupsDir.resolve(setupFile).toFile();
 			if (dependencySetupFile.exists()) {
-				runProcedures(dependencySetupFile);
+				procedures.addAll(readProceduresToList(dependencySetupFile));
 			} else {
-				throw new NoSuchFileException("No Setup File found with the name " + setupFile);
+				throw new NoSuchFileException("No setup file found with the name " + setupFile);
 			}
 		}
 
 		// Danach muss das Hauptsetup-File ausgelesen werden.
 		File mainSetupFile = dependencySetupsDir.resolve("Setup.xml").toFile();
 		if (mainSetupFile.exists()) {
-			runProcedures(mainSetupFile);
+			procedures.addAll(readProceduresToList(mainSetupFile));
 		} else {
-			throw new NoSuchFileException("No Main-Setup File found!");
+			throw new NoSuchFileException("No main-setup file found!");
 		}
+
+		return procedures;
 	}
 
-	public void runProcedures(File dependencySetupFile) {
-		Path dependencySqlDir = service.getSystemFolder().resolve("sql");
+	public List<String> readProceduresToList(File dependencySetupFile) {
+		List<String> procedures = new ArrayList<>();
 		// Dokument auslesen
 		try {
 			Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(dependencySetupFile);
 			Node n = d.getDocumentElement().getElementsByTagName("sql-code").item(0);
 
-			// Jeden Eintrag im sql-code-Tag auslesen und ausführen.
+			// Jeden Eintrag im sql-code-Tag auslesen und in eine List packen.
 			for (int i = 0; n.getChildNodes().getLength() > i; i++) {
 				Element s = (Element) ((Element) n).getElementsByTagName("script").item(i);
 				if (s != null) {
 					String procedureName = s.getAttribute("name") + ".sql";
-
-					Path sqlFile = dependencySqlDir.resolve(procedureName);
-					if (sqlFile.toFile().exists()) {
-						// Den Sql-Code aus der Datei auslesen und ausführen.
-						String procedure = Files.readString(sqlFile);
-						final val connection = database.getConnection();
-
-						logger.info("Executing Procedure/View " + procedureName);
-						try {
-							connection.prepareCall(procedure).execute();
-						} catch (Exception e) {
-							logger.info("Prozedur/View " + procedureName + " is beeing installed.");
-							// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
-							procedure = procedure.substring(4);
-							procedure = "create" + procedure;
-
-							connection.prepareCall(procedure).execute();
-						}
-					} else {
-						throw new NoSuchFileException("No File found with the name " + procedureName);
-					}
+					procedures.add(procedureName);
 				}
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Error in  " + dependencySetupFile + ". The File could not be red.");
+			throw new RuntimeException("Error in  " + dependencySetupFile + ". The file could not be red.");
+		}
+		return procedures;
+	}
+
+	public void runDependencyProcedures(List<String> procedures) throws NoSuchFileException {
+		Path dependencySqlDir = service.getSystemFolder().resolve("sql");
+		for (String procedureName : procedures) {
+			Path sqlFile = dependencySqlDir.resolve(procedureName);
+			if (sqlFile.toFile().exists()) {
+				try {
+					// Den Sql-Code aus der Datei auslesen und ausführen.
+					String procedure = Files.readString(sqlFile);
+					final val connection = database.getConnection();
+
+					logger.info("Executing Procedure/View " + procedureName);
+					try {
+						connection.prepareCall(procedure).execute();
+					} catch (Exception e) {
+						logger.info("Prozedur/View " + procedureName + " is being installed.");
+						// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
+						procedure = procedure.substring(5);
+						procedure = "create" + procedure;
+
+						connection.prepareCall(procedure).execute();
+					}
+				} catch (Exception e) {
+					throw new RuntimeException("Error in " + procedureName + ". The file could not be red.");
+				}
+
+			} else {
+				throw new NoSuchFileException("No File found with the name " + procedureName);
+			}
 		}
 	}
 }

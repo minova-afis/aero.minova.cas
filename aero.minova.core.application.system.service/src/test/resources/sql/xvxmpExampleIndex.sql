@@ -1,3 +1,3 @@
 alter View xvxmpExampleIndex
 as
-select * from tExample
+select * from xtxmpExample

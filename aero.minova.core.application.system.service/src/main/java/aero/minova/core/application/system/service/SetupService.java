@@ -58,13 +58,13 @@ public class SetupService {
 		// Danach durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
 			String setupFile = dependency + ".setup.xml";
-			logger.info("Lese Setup-File: " + setupFile);
+			logger.info("Reading Setup-File: " + setupFile);
 
 			File dependencySetupFile = dependencySetupsDir.resolve(setupFile).toFile();
 			if (dependencySetupFile.exists()) {
 				runProcedures(dependencySetupFile);
 			} else {
-				logger.error("Kein Setup-File mit dem Namen " + setupFile + " gefunden!");
+				logger.error("No Setup File found with the name " + setupFile);
 			}
 		}
 	}
@@ -88,23 +88,23 @@ public class SetupService {
 						String procedure = Files.readString(sqlFile);
 						final val connection = database.getConnection();
 
-						logger.info("Ausführen der Prozedur/View " + procedureName);
+						logger.info("Executing Procedure/View " + procedureName);
 						try {
 							connection.prepareCall(procedure).execute();
 						} catch (Exception e) {
-							logger.info("Prozedur/View " + procedureName + " existiert noch nicht und wird angelegt.");
+							logger.info("Prozedur/View " + procedureName + " is beeing installed.");
 							// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
 							procedure.replace("alter", "create");
 							connection.prepareCall(procedure).execute();
 						}
 					} else {
-						logger.error("Keine Datei mit dem Namen " + procedureName + " gefunden!");
+						logger.error("No File found with the name " + procedureName);
 					}
 				}
 			}
 
 		} catch (Exception e) {
-			logger.error("Fehler in einer der Prozeduren in " + dependencySetupFile);
+			logger.error("Error in  " + dependencySetupFile + ". The File could not be red.");
 			e.getStackTrace();
 		}
 	}

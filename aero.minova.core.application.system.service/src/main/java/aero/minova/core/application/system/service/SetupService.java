@@ -3,6 +3,7 @@ package aero.minova.core.application.system.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,11 +52,7 @@ public class SetupService {
 	public void readSetups(List<String> dependencies) throws IOException {
 		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
 
-		// Zuerst muss das Hauptsetup-File ausgelesen werden.
-		File mainSetupFile = dependencySetupsDir.resolve("Setup.xml").toFile();
-		runProcedures(mainSetupFile);
-
-		// Danach durch alle Dependencies durchgehen.
+		// Zuerst durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
 			String setupFile = dependency + ".setup.xml";
 			logger.info("Reading Setup-File: " + setupFile);
@@ -64,8 +61,16 @@ public class SetupService {
 			if (dependencySetupFile.exists()) {
 				runProcedures(dependencySetupFile);
 			} else {
-				logger.error("No Setup File found with the name " + setupFile);
+				throw new NoSuchFileException("No Setup File found with the name " + setupFile);
 			}
+		}
+
+		// Danach muss das Hauptsetup-File ausgelesen werden.
+		File mainSetupFile = dependencySetupsDir.resolve("Setup.xml").toFile();
+		if (mainSetupFile.exists()) {
+			runProcedures(mainSetupFile);
+		} else {
+			throw new NoSuchFileException("No Main-Setup File found!");
 		}
 	}
 
@@ -94,18 +99,18 @@ public class SetupService {
 						} catch (Exception e) {
 							logger.info("Prozedur/View " + procedureName + " is beeing installed.");
 							// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
-							procedure.replace("alter", "create");
+							procedure = procedure.substring(4);
+							procedure = "create" + procedure;
+
 							connection.prepareCall(procedure).execute();
 						}
 					} else {
-						logger.error("No File found with the name " + procedureName);
+						throw new NoSuchFileException("No File found with the name " + procedureName);
 					}
 				}
 			}
-
 		} catch (Exception e) {
-			logger.error("Error in  " + dependencySetupFile + ". The File could not be red.");
-			e.getStackTrace();
+			throw new RuntimeException("Error in  " + dependencySetupFile + ". The File could not be red.");
 		}
 	}
 }

@@ -1,5 +1,9 @@
 == Sicherheitsmechanismen
 
+Es wird standardmäßig HTTP und Basic Authentication verwendet.
+Der Zugriff auf das CAS *muss* über ein Proxy erfolgen,
+welches den Traffic entsprechend verschlüsselt.
+Zudem sollten keine weiteren Teilnehmer Zugriff auf das Netzwerk vom CAS haben.
  
 === SecurityToken
 

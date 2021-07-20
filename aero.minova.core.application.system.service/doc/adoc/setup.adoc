@@ -1,0 +1,30 @@
+== Setup Service
+
+Der Setup Service dient zur automatischen Installation benötigter Prozeduren und Views.
+Diese Funktion ist als Extension für den SqlProcedureController integriert und kann über folgenden Input aktiviert werden:
+
+[source,java]
+----
+{
+	"name": "setup"
+}
+----
+
+Dabei wird die Datei *"dependencyList.txt"* im setup Ordner ausgelesen.
+Ist diese nicht vorhanden, wird eine NoSuchFileException geworfen.
+
+=== parseDependencyList
+Liest die dependencyList.txt als einen langen String ein und zerteilt dann die einzelnen Dependencies zu einer Liste an Strings.
+
+=== readSetups
+Geht zuerst alle Dependencies durch und extrahiert durch *readProceduresToList* deren benötigte Prozeduren und liest dann das Haupt-Setupfile.
+Alle Sql-Dateien werden dann durch *runDependencyProcedures* nacheinander ausgeführt (erst die Dependency-, dann die Haupt-Sql-Dateien).
+
+=== readProceduresToList
+Liest eine einzelnde Dependency-Setup-Datei und gibt eine Liste an Sql-Dateinamen zurück, welche ausgeführt werden müssen,
+damit die Dependency erfüllt ist.
+
+=== runDependencyProcedures
+Geht die Liste an Sql-Dateinamen durch, holt sich die dazugehörige Sql-Datei und führt diese aus.
+Falls sie das erste mal scheitert, wird der Anfang der Sql-Datei durch "create" ersetzt, 
+in der Vermutung, dass sich davor ein "alter" dort befunden hat.

@@ -6,6 +6,7 @@ import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
+import java.sql.CallableStatement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -104,6 +105,9 @@ public class SqlProcedureController {
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
 		val result = new SqlProcedureResult();
+		result.setOutputParameters(new Table());
+		result.setResultSet(new Table());
+
 		StringBuffer sb = new StringBuffer();
 
 		try {
@@ -135,184 +139,125 @@ public class SqlProcedureController {
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
 			sb.append(procedureCall);
 			final val preparedStatement = connection.prepareCall(procedureCall);
-			range(0, inputTable.getColumns().size())//
-					.forEach(i -> {
-						try {
-							val iVal = inputTable.getRows().get(0).getValues().get(i);
-							val type = inputTable.getColumns().get(i).getType();
-							if (iVal == null) {
-								sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal);
-								if (type == DataType.BOOLEAN) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.BOOLEAN);
-								} else if (type == DataType.DOUBLE) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.DOUBLE);
-								} else if (type == DataType.INSTANT) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
-								} else if (type == DataType.INTEGER) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.INTEGER);
-								} else if (type == DataType.LONG) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.DOUBLE);
-								} else if (type == DataType.STRING) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.NVARCHAR);
-								} else if (type == DataType.ZONED) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
-								} else if (type == DataType.BIGDECIMAL) {
-									preparedStatement.setObject(i + parameterOffset, null, Types.DECIMAL);
-								} else {
-									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
-								}
-							} else {
-								sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal.getValue().toString());
-								if (type == DataType.BOOLEAN) {
-									preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
-								} else if (type == DataType.DOUBLE) {
-									preparedStatement.setDouble(i + parameterOffset, iVal.getDoubleValue());
-								} else if (type == DataType.INSTANT) {
-									preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getInstantValue()));
-								} else if (type == DataType.INTEGER) {
-									preparedStatement.setInt(i + parameterOffset, iVal.getIntegerValue());
-								} else if (type == DataType.LONG) {
-									preparedStatement.setDouble(i + parameterOffset, Double.valueOf(iVal.getLongValue()));
-								} else if (type == DataType.STRING) {
-									preparedStatement.setString(i + parameterOffset, iVal.getStringValue());
-								} else if (type == DataType.ZONED) {
-									preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
-								} else if (type == DataType.BIGDECIMAL) {
-									preparedStatement.setBigDecimal(i + parameterOffset, iVal.getBigDecimalValue());
-								} else {
-									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
-								}
-							}
-							if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
-								if (type == DataType.BOOLEAN) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.BOOLEAN);
-								} else if (type == DataType.DOUBLE) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.DOUBLE);
-								} else if (type == DataType.INSTANT) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
-								} else if (type == DataType.INTEGER) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.INTEGER);
-								} else if (type == DataType.LONG) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.DOUBLE);
-								} else if (type == DataType.STRING) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.NVARCHAR);
-								} else if (type == DataType.ZONED) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
-								} else if (type == DataType.BIGDECIMAL) {
-									preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
-								} else {
-									throw new IllegalArgumentException("msg.UnknownType %" + type.name());
-								}
-							}
-						} catch (Exception e) {
-							throw new RuntimeException("msg.ParseError %" + i, e);
-						}
-					});
-			preparedStatement.registerOutParameter(1, Types.INTEGER);
-			preparedStatement.execute();
-			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
-				val sqlResultSet = preparedStatement.getResultSet();
-				val resultSet = new Table();
-				resultSet.setName(inputTable.getName());
-				result.setResultSet(resultSet);
-				val metaData = sqlResultSet.getMetaData();
-				resultSet.setColumns(//
-						range(0, metaData.getColumnCount()).mapToObj(i -> {
-							try {
-								val type = metaData.getColumnType(i + resultSetOffset);
-								val name = metaData.getColumnName(i + resultSetOffset);
-								if (type == Types.BOOLEAN || Types.BIT == type) {
-									return new Column(name, DataType.BOOLEAN);
-								} else if (type == Types.DOUBLE) {
-									return new Column(name, DataType.DOUBLE);
-								} else if (type == Types.TIMESTAMP) {
-									return new Column(name, DataType.INSTANT);
-								} else if (type == Types.INTEGER) {
-									return new Column(name, DataType.INTEGER);
-								} else if (type == Types.VARCHAR) {
-									return new Column(name, DataType.STRING);
-								} else if (type == Types.NVARCHAR) {
-									return new Column(name, DataType.STRING);
-								} else if (type == Types.DECIMAL) {
-									return new Column(name, DataType.BIGDECIMAL);
-								} else {
-									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
-								}
-							} catch (Exception e) {
-								throw new RuntimeException("msg.ParseResultSetError");
-							}
-						}).collect(toList()));
-				int totalResults = 0;
 
-				int securityTokenInColumn = findSecurityTokenColumn(resultSet);
-				resultSet.setMetaData(new TableMetaData());
-				while (sqlResultSet.next()) {
-					Row rowToBeAdded = null;
-					if (limit > 0) {
-						// nur die Menge an Rows, welche auf der gewünschten Page liegen
-						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
+			// Jede Row ist eine Abfrage.
+			for (int j = 0; j < inputTable.getRows().size(); j++) {
+				SqlProcedureResult resultForThisRow = new SqlProcedureResult();
+
+				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
+
+				preparedStatement.registerOutParameter(1, Types.INTEGER);
+				preparedStatement.execute();
+				if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
+					val sqlResultSet = preparedStatement.getResultSet();
+					val resultSet = new Table();
+					resultSet.setName(inputTable.getName());
+					resultForThisRow.setResultSet(resultSet);
+					val metaData = sqlResultSet.getMetaData();
+					resultSet.setColumns(//
+							range(0, metaData.getColumnCount()).mapToObj(i -> {
+								try {
+									val type = metaData.getColumnType(i + resultSetOffset);
+									val name = metaData.getColumnName(i + resultSetOffset);
+									if (type == Types.BOOLEAN || Types.BIT == type) {
+										return new Column(name, DataType.BOOLEAN);
+									} else if (type == Types.DOUBLE) {
+										return new Column(name, DataType.DOUBLE);
+									} else if (type == Types.TIMESTAMP) {
+										return new Column(name, DataType.INSTANT);
+									} else if (type == Types.INTEGER) {
+										return new Column(name, DataType.INTEGER);
+									} else if (type == Types.VARCHAR) {
+										return new Column(name, DataType.STRING);
+									} else if (type == Types.NVARCHAR) {
+										return new Column(name, DataType.STRING);
+									} else if (type == Types.DECIMAL) {
+										return new Column(name, DataType.BIGDECIMAL);
+									} else {
+										throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
+									}
+								} catch (Exception e) {
+									throw new RuntimeException("msg.ParseResultSetError");
+								}
+							}).collect(toList()));
+					int totalResults = 0;
+
+					int securityTokenInColumn = findSecurityTokenColumn(resultSet);
+					resultSet.setMetaData(new TableMetaData());
+					while (sqlResultSet.next()) {
+						Row rowToBeAdded = null;
+						if (limit > 0) {
+							// nur die Menge an Rows, welche auf der gewünschten Page liegen
+							if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
+								rowToBeAdded = convertSqlResultToRow(resultSet//
+										, sqlResultSet//
+										, customLogger.logger////
+										, this);
+							}
+						} else {
 							rowToBeAdded = convertSqlResultToRow(resultSet//
 									, sqlResultSet//
 									, customLogger.logger////
 									, this);
 						}
-					} else {
-						rowToBeAdded = convertSqlResultToRow(resultSet//
-								, sqlResultSet//
-								, customLogger.logger////
-								, this);
-					}
 
-					/*
-					 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
-					 */
-					if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
-						resultSet.addRow(rowToBeAdded);
-						totalResults++;
+						/*
+						 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
+						 */
+						if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
+							resultSet.addRow(rowToBeAdded);
+							totalResults++;
+						}
+						resultSet.fillMetaData(resultSet, limit, totalResults, page);
 					}
-					resultSet.fillMetaData(resultSet, limit, totalResults, page);
 				}
-			}
-			// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
-			val returnCode = preparedStatement.getObject(1);
-			if (returnCode != null) {
-				result.setReturnCode(preparedStatement.getInt(1));
-			}
-			val hasOutputParameters = inputTable//
-					.getColumns()//
-					.stream()//
-					.anyMatch(c -> c.getOutputType() == OUTPUT);
-			if (hasOutputParameters) {
-				val outputParameters = new Table();
-				result.setOutputParameters(outputParameters);
-				outputParameters.setName("outputParameters");
-				val outputColumnsMapping = inputTable//
+				// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
+				val returnCode = preparedStatement.getObject(1);
+				if (returnCode != null) {
+					result.setReturnCode(preparedStatement.getInt(1));
+				}
+				val hasOutputParameters = inputTable//
 						.getColumns()//
 						.stream()//
-						.map(c -> c.getOutputType() == OUTPUT)//
-						.collect(toList());
+						.anyMatch(c -> c.getOutputType() == OUTPUT);
+				if (hasOutputParameters) {
+					val outputParameters = new Table();
+					resultForThisRow.setOutputParameters(outputParameters);
+					outputParameters.setName("outputParameters");
+					val outputColumnsMapping = inputTable//
+							.getColumns()//
+							.stream()//
+							.map(c -> c.getOutputType() == OUTPUT)//
+							.collect(toList());
 
-				val outputValues = new Row();
-				outputParameters.setColumns(inputTable.getColumns());
-				range(0, inputTable.getColumns().size())//
-						.forEach(i -> {
-							if (outputColumnsMapping.get(i)) {
-								outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
-							} else {
-								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
-							}
-						});
-				int securityTokenInColumn = findSecurityTokenColumn(inputTable);
+					val outputValues = new Row();
+					outputParameters.setColumns(inputTable.getColumns());
+					range(0, inputTable.getColumns().size())//
+							.forEach(i -> {
+								if (outputColumnsMapping.get(i)) {
+									outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
+								} else {
+									outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
+								}
+							});
+					int securityTokenInColumn = findSecurityTokenColumn(inputTable);
 
-				Row resultRow = new Row();
-				if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
-					resultRow = outputValues;
-				} else {
-					for (int i = 0; i < outputValues.getValues().size(); i++) {
-						resultRow.addValue(null);
+					Row resultRow = new Row();
+					if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
+						resultRow = outputValues;
+					} else {
+						for (int i = 0; i < outputValues.getValues().size(); i++) {
+							resultRow.addValue(null);
+						}
 					}
+					outputParameters.addRow(resultRow);
 				}
-				outputParameters.addRow(resultRow);
+				if (resultForThisRow.getOutputParameters() != null && resultForThisRow.getOutputParameters().getRows() != null) {
+					result.getOutputParameters().getRows().addAll(resultForThisRow.getOutputParameters().getRows());
+				}
+				if (resultForThisRow.getResultSet() != null && resultForThisRow.getResultSet().getRows() != null) {
+					result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
+				}
 			}
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
@@ -328,6 +273,82 @@ public class SqlProcedureController {
 			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
+	}
+
+	private void fillCallableSqlProcedureStatement(CallableStatement preparedStatement, Table inputTable, int parameterOffset, StringBuffer sb, int row) {
+		range(0, inputTable.getColumns().size())//
+				.forEach(i -> {
+					try {
+						val iVal = inputTable.getRows().get(row).getValues().get(i);
+						val type = inputTable.getColumns().get(i).getType();
+						if (iVal == null) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal);
+							if (type == DataType.BOOLEAN) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.BOOLEAN);
+							} else if (type == DataType.DOUBLE) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.DOUBLE);
+							} else if (type == DataType.INSTANT) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
+							} else if (type == DataType.INTEGER) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.INTEGER);
+							} else if (type == DataType.LONG) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.DOUBLE);
+							} else if (type == DataType.STRING) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.NVARCHAR);
+							} else if (type == DataType.ZONED) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
+							} else if (type == DataType.BIGDECIMAL) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.DECIMAL);
+							} else {
+								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
+							}
+						} else {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal.getValue().toString());
+							if (type == DataType.BOOLEAN) {
+								preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
+							} else if (type == DataType.DOUBLE) {
+								preparedStatement.setDouble(i + parameterOffset, iVal.getDoubleValue());
+							} else if (type == DataType.INSTANT) {
+								preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getInstantValue()));
+							} else if (type == DataType.INTEGER) {
+								preparedStatement.setInt(i + parameterOffset, iVal.getIntegerValue());
+							} else if (type == DataType.LONG) {
+								preparedStatement.setDouble(i + parameterOffset, Double.valueOf(iVal.getLongValue()));
+							} else if (type == DataType.STRING) {
+								preparedStatement.setString(i + parameterOffset, iVal.getStringValue());
+							} else if (type == DataType.ZONED) {
+								preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
+							} else if (type == DataType.BIGDECIMAL) {
+								preparedStatement.setBigDecimal(i + parameterOffset, iVal.getBigDecimalValue());
+							} else {
+								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
+							}
+						}
+						if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
+							if (type == DataType.BOOLEAN) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.BOOLEAN);
+							} else if (type == DataType.DOUBLE) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.DOUBLE);
+							} else if (type == DataType.INSTANT) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
+							} else if (type == DataType.INTEGER) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.INTEGER);
+							} else if (type == DataType.LONG) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.DOUBLE);
+							} else if (type == DataType.STRING) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.NVARCHAR);
+							} else if (type == DataType.ZONED) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
+							} else if (type == DataType.BIGDECIMAL) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
+							} else {
+								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
+							}
+						}
+					} catch (Exception e) {
+						throw new RuntimeException("msg.ParseError %" + i, e);
+					}
+				});
 	}
 
 	/*

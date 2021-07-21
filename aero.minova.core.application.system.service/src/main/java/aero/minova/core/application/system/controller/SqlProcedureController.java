@@ -76,7 +76,7 @@ public class SqlProcedureController {
 			}
 		}
 		try {
-			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName()).getRows();
+			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName());
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}

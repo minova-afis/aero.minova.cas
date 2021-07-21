@@ -127,7 +127,7 @@ public class FilesService {
 
 	public Path checkLegalPath(String path) throws Exception {
 		if (permissionCheck) {
-			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + path).getRows();
+			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + path);
 			if (privileges.isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + "files/read:" + path);
 			}

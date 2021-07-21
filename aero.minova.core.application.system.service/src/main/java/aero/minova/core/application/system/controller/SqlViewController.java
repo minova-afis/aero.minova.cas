@@ -50,7 +50,7 @@ public class SqlViewController {
 		StringBuilder sb = new StringBuilder();
 		try {
 			@SuppressWarnings("unchecked")
-			List<Row> authoritiesForThisTable = getPrivilegePermissions(inputTable.getName()).getRows();
+			List<Row> authoritiesForThisTable = getPrivilegePermissions(inputTable.getName());
 			if (authoritiesForThisTable.isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
@@ -205,7 +205,7 @@ public class SqlViewController {
 	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
 	 **/
-	public Table getPrivilegePermissions(String privilegeName) {
+	public List<Row> getPrivilegePermissions(String privilegeName) {
 		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		Table userPrivileges = new Table();
 		userPrivileges.setName("xvcasUserPrivileges");
@@ -226,7 +226,7 @@ public class SqlViewController {
 			tableNameAndUserToken.setValues(asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
-		return getTableForSecurityCheck(userPrivileges);
+		return getTableForSecurityCheck(userPrivileges).getRows();
 	}
 
 	/**
@@ -245,6 +245,7 @@ public class SqlViewController {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
+		Table result = new Table();
 		final val connection = systemDatabase.getConnection();
 		try {
 			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
@@ -252,12 +253,14 @@ public class SqlViewController {
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logPrivilege("Executing statement: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
-			val result = convertSqlResultToTable(inputTable, resultSet);
-			return result;
+			result = convertSqlResultToTable(inputTable, resultSet);
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
+		return result;
 	}
 
 	protected Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {

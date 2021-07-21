@@ -18,7 +18,7 @@ or ...
 
 ----
 
-Als Return-Parameter wird dann eine Tabelle in demselben Format zurückgeliefert, welche nur die SecurityTokens beinhaltet,
+Als Return-Parameter wird dann eine Liste an Rows in demselben Format zurückgeliefert, welche nur die SecurityTokens beinhaltet,
 welche einen Eintrag in xvcasUserPrivileges in Verbindung mit dem Privilegnamen haben.
 
 

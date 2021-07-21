@@ -99,26 +99,6 @@ public class SqlViewController {
 		return result;
 	}
 
-	public Table unsecurelyGetIndexView(@RequestBody Table inputTable, List<Row> requestingAuthorities) throws Exception {
-		final val connection = systemDatabase.getConnection();
-		Table result = new Table();
-		StringBuilder sb = new StringBuilder();
-		try {
-			val viewQuery = pagingWithSeek(inputTable, false, -1, false, 1, requestingAuthorities);
-			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			customLogger.logPrivilege("Executing statements: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-
-			result = convertSqlResultToTable(inputTable, resultSet);
-		} catch (Exception e) {
-			throw new TableException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
-		}
-		return result;
-	}
-
 	/**
 	 * das Prepared Statement wird mit den dafür vorgesehenen Parametern befüllt
 	 *

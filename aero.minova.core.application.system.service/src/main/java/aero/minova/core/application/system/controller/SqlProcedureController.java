@@ -265,7 +265,10 @@ public class SqlProcedureController {
 					if (result.getResultSet() == null) {
 						result.setResultSet(resultForThisRow.getResultSet());
 					} else {
+						TableMetaData metaData = result.getResultSet().getMetaData();
 						result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
+						result.getResultSet().fillMetaData(inputTable, limit, metaData.getTotalResults() + resultForThisRow.getResultSet().getRows().size(),
+								page);
 					}
 				}
 			}

@@ -52,7 +52,7 @@ public class SetupService {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
 				if (dependencyList.toFile().exists()) {
-					List<String> procedures = readSetups(Files.readString(service.getSystemFolder().resolve("setup").resolve("dependencyList.txt")));
+					List<String> procedures = readSetups(Files.readString(dependencyList));
 					runDependencyProcedures(procedures);
 				} else {
 					throw new NoSuchFileException("No dependencyList.txt found!");
@@ -73,13 +73,11 @@ public class SetupService {
 	 * @return Gibt eine Liste an String zurück, welche die benötigten Prozedur-Dateinamen beinhalten: prozedur.sql.
 	 */
 	public List<String> parseDependencyList(String arg) {
-		List<String> dependencies = new ArrayList<>();
 		// Die obere Zeile und die die Zeilen mit den nicht resolvten Dateien abschneiden.
-		arg = arg.substring(arg.indexOf("\n") + 1);
-		arg = arg.substring(0, arg.indexOf("The following files have NOT been resolved:"));
+		arg = arg.substring(0, arg.indexOf("The following files have NOT been resolved:")).substring(arg.indexOf("\n") + 1);
 
 		// Am Zeilenumbruch trennen und störende Leerzeichen entfernen.
-		dependencies = Stream.of(arg.split("\n"))//
+		List<String> dependencies = Stream.of(arg.split("\n"))//
 				.map(s -> s.substring(0 + 1, s.indexOf(":jar")).replace(":", ".").strip())//
 				.collect(Collectors.toList());
 		Collections.reverse(dependencies);

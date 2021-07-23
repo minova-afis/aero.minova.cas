@@ -1,4 +1,4 @@
-package aero.minova.core.application.system;
+package aero.minova.core.application.system.service;
 
 import static java.nio.file.Files.isDirectory;
 
@@ -37,6 +37,7 @@ public class FilesService {
 	private Path programFilesFolder;
 	private Path sharedDataFolder;
 	private Path systemFolder;
+	private Path internalFolder;
 	private Path logsFolder;
 	private Path md5Folder;
 	private final Logger logger = LoggerFactory.getLogger(FilesService.class);
@@ -59,8 +60,9 @@ public class FilesService {
 		}
 		systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
 		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
-		logsFolder = sharedDataFolder.resolve("UserLogs").toAbsolutePath().normalize();
-		md5Folder = sharedDataFolder.resolve("MD5").toAbsolutePath().normalize();
+		internalFolder = systemFolder.resolve("Internal").toAbsolutePath().normalize();
+		logsFolder = internalFolder.resolve("UserLogs").toAbsolutePath().normalize();
+		md5Folder = internalFolder.resolve("MD5").toAbsolutePath().normalize();
 		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
 			logger.error("msg.SystemFolder %" + systemFolder);
@@ -70,6 +72,9 @@ public class FilesService {
 		}
 		if (!isDirectory(programFilesFolder)) {
 			logger.error("msg.ProgramFilesFolder %" + programFilesFolder);
+		}
+		if (!isDirectory(internalFolder)) {
+			logger.error("msg.InternalFolder %" + internalFolder);
 		}
 		if (!isDirectory(programFilesFolder)) {
 			logger.error("msg.LogsFolder %" + logsFolder);

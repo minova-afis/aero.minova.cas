@@ -105,6 +105,18 @@
 			<groupId>org.apache.ws.commons.util</groupId>
 			<artifactId>ws-commons-util</artifactId>
 			<version>1.0.2</version>
+			<!-- ohne die Exclusion würde die DocumentBuilderFactory-Klasse und die Document-Klasse nicht importiert werden können,
+			 da das falsche/ ein veraltetes Paket genommen werden würde. -->
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.w3c</groupId>
+					<artifactId>dom</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlrpc</groupId>
@@ -114,15 +126,15 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
-			</dependency>
-			<dependency>
-				<groupId>javax.cache</groupId>
-				<artifactId>cache-api</artifactId>
-			</dependency>
-			<dependency>
-				<groupId>org.ehcache</groupId>
-				<artifactId>ehcache</artifactId>
-			</dependency>
+		</dependency>
+		<dependency>
+			<groupId>javax.cache</groupId>
+			<artifactId>cache-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>aero.minova.core.application.system.service</finalName>

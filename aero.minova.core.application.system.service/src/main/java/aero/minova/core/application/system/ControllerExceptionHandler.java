@@ -7,6 +7,7 @@ import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -190,6 +191,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		saveErrorInDatabase(ex);
 
 		result.setResultSet(resultSetTable);
+		List<Integer> errorReturnCode = new ArrayList<>();
+		errorReturnCode.add(-1);
+		result.setReturnCodes(errorReturnCode);
 		result.setReturnCode(-1);
 		return result;
 	}

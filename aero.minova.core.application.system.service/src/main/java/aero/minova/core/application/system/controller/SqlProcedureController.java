@@ -105,6 +105,8 @@ public class SqlProcedureController {
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
 		val result = new SqlProcedureResult();
+		result.setReturnCodes(new ArrayList<Integer>());
+		result.setReturnCode(0);
 
 		StringBuffer sb = new StringBuffer();
 
@@ -209,11 +211,7 @@ public class SqlProcedureController {
 						resultSet.fillMetaData(resultSet, limit, totalResults, page);
 					}
 				}
-				// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
-				val returnCode = preparedStatement.getObject(1);
-				if (returnCode != null) {
-					result.setReturnCode(preparedStatement.getInt(1));
-				}
+
 				val hasOutputParameters = inputTable//
 						.getColumns()//
 						.stream()//
@@ -270,6 +268,17 @@ public class SqlProcedureController {
 						result.getResultSet().fillMetaData(inputTable, limit, metaData.getTotalResults() + resultForThisRow.getResultSet().getRows().size(),
 								page);
 					}
+				}
+				// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
+				val returnCode = preparedStatement.getObject(1);
+				if (returnCode != null) {
+					int reCode = preparedStatement.getInt(1);
+					resultForThisRow.setReturnCode(reCode);
+					// Falls nicht alle ReturnCodes gleich sind, wird 1 als endgültiger ReturnCode rein geschrieben.
+					if (!result.getReturnCodes().isEmpty() && !result.getReturnCodes().contains(reCode) && result.getReturnCode() != 1) {
+						result.setReturnCode(1);
+					}
+					result.getReturnCodes().add(resultForThisRow.getReturnCode());
 				}
 			}
 			connection.commit();

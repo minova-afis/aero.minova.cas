@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.Logger;
@@ -45,6 +46,7 @@ public class SetupService {
 	/**
 	 * Fügt die Erweiterung hinzu.
 	 */
+	@PostConstruct
 	private void setup() {
 		// Fügt Extension hinzu.
 		spc.registerExctension("setup", inputTable -> {

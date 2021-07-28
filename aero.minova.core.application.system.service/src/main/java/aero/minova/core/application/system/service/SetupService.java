@@ -79,7 +79,7 @@ public class SetupService {
 		arg = arg.substring(0, arg.indexOf("The following files have NOT been resolved:")).substring(arg.indexOf("\n") + 1);
 
 		// Am Zeilenumbruch trennen und störende Leerzeichen entfernen.
-		List<String> dependencies = Stream.of(arg.split("\n"))//
+		List<String> dependencies = Stream.of(arg.split("\\R"))//
 				.filter(s -> s.isEmpty())
 				.map(s -> s.substring(0 + 1, s.indexOf(":jar")).replace(":", ".").strip())//
 				.collect(Collectors.toList());

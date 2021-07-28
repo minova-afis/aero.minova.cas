@@ -80,6 +80,7 @@ public class SetupService {
 
 		// Am Zeilenumbruch trennen und störende Leerzeichen entfernen.
 		List<String> dependencies = Stream.of(arg.split("\n"))//
+				.filter(s -> s.isEmpty())
 				.map(s -> s.substring(0 + 1, s.indexOf(":jar")).replace(":", ".").strip())//
 				.collect(Collectors.toList());
 		Collections.reverse(dependencies);

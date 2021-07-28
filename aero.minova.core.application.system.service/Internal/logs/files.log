@@ -21,3 +21,26 @@
 2021-07-28T17:33:12.344 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit5816811764712046248\Internal\MD5\Shared Data\Program Files\AFIS.zip.md5
 2021-07-28T17:33:12.346 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit5816811764712046248\Internal\MD5\Shared Data\Program Files.zip.md5
 2021-07-28T17:33:12.349 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit5816811764712046248\Internal\MD5\Shared Data.zip.md5
+2021-07-28T17:34:38.380 CAS Creating directory C:\Users\avots\AppData\Local\Temp\junit15619861083069418503\Internal\MD5\Shared Data\Program Files\AFIS
+2021-07-28T17:34:38.381 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit15619861083069418503\Internal\MD5\Shared Data\Program Files\AFIS\AFIS.xbs.md5
+2021-07-28T17:34:38.421 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit12348308528791496536\Shared Data.zip
+2021-07-28T17:34:38.430 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit12348308528791496536\Shared Data\Program Files.zip
+2021-07-28T17:34:38.440 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit12348308528791496536\Shared Data\Program Files\AFIS.zip
+2021-07-28T17:34:38.472 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal.zip
+2021-07-28T17:34:38.477 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5.zip
+2021-07-28T17:34:38.491 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Shared Data.zip
+2021-07-28T17:34:38.502 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Shared Data\Program Files.zip
+2021-07-28T17:34:38.510 CAS Zipping: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Shared Data\Program Files\AFIS.zip
+2021-07-28T17:34:38.515 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Internal.zip.md5
+2021-07-28T17:34:38.521 CAS Creating directory C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files\AFIS
+2021-07-28T17:34:38.521 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files\AFIS\AFIS.xbs.md5
+2021-07-28T17:34:38.523 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files\AFIS\AFIS.xbs.md5.md5
+2021-07-28T17:34:38.526 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files\AFIS.zip.md5
+2021-07-28T17:34:38.529 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files.zip.md5
+2021-07-28T17:34:38.532 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data.zip.md5
+2021-07-28T17:34:38.540 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Internal.zip.md5
+2021-07-28T17:34:38.542 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files\AFIS\AFIS.xbs.md5
+2021-07-28T17:34:38.545 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files\AFIS\AFIS.xbs.md5.md5
+2021-07-28T17:34:38.548 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files\AFIS.zip.md5
+2021-07-28T17:34:38.550 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data\Program Files.zip.md5
+2021-07-28T17:34:38.553 CAS Hashing: C:\Users\avots\AppData\Local\Temp\junit10031219721238805227\Internal\MD5\Shared Data.zip.md5

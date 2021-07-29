@@ -140,10 +140,10 @@ public class SetupService {
 		try {
 			Optional<Path> result = Files.walk(dependencySetupsDir, 1)
 					.map(dir -> {
-						if (dir.getFileName().startsWith(adjustedDependency)) {
+						if (dir.getFileName().toString().startsWith(adjustedDependency)) {
 							try {
 								Optional<Path> setup = Files.walk(dir)//
-										.filter(f -> f.getFileName().equals("Setup.xml"))//
+										.filter(f -> f.getFileName().toString().equals("Setup.xml"))//
 										.findFirst();
 								return setup;
 							} catch (IOException e) {
@@ -186,7 +186,7 @@ public class SetupService {
 				}
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Error in  " + dependencySetupFile + ". The file could not be red.");
+			throw new RuntimeException("Error in  " + dependencySetupFile + ". The file could not be red.", e);
 		}
 		return procedures;
 	}

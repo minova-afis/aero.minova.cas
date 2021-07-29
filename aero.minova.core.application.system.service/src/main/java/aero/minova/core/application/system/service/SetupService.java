@@ -223,7 +223,7 @@ public class SetupService {
 						connection.prepareCall(procedure).execute();
 					}
 				} catch (Exception e) {
-					throw new RuntimeException("Error in " + procedureName + ". The file could not be red.");
+					throw new RuntimeException("Error in " + procedureName + ". The file could not be red.", e);
 				}
 
 			} else {

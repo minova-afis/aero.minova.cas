@@ -177,6 +177,10 @@ public class SetupService {
 			Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(dependencySetupFile);
 			Node n = d.getDocumentElement().getElementsByTagName("sql-code").item(0);
 
+			if (n == null) {
+				return procedures;
+			}
+
 			// Jeden Eintrag im sql-code-Tag auslesen und in eine List packen.
 			for (int i = 0; n.getChildNodes().getLength() > i; i++) {
 				Element s = (Element) ((Element) n).getElementsByTagName("script").item(i);

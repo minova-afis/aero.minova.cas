@@ -213,12 +213,20 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			callableErrorStatement.setString(1, username);
 			callableErrorStatement.setString(2, e.getMessage());
 			callableErrorStatement.setTimestamp(3, timeOfError);
-			logger.info(
-					"CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError + "/n" + e.getStackTrace());
+			{
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				logger.info(
+						"CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError + "/n" + sw.toString());
+			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();
 		} catch (SQLException e1) {
-			customLogger.errorLogger.error("CAS : Error could not be saved in database." + "/n" + e1.getStackTrace());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e1.printStackTrace(pw);
+			customLogger.errorLogger.error("CAS : Error could not be saved in database." + "/n" + sw.toString());
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

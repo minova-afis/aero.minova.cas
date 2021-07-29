@@ -71,7 +71,7 @@ public class SqlProcedureController {
 			try {
 				return extension.get(inputTable.getName()).apply(inputTable);
 			} catch (Exception e) {
-				throw new ProcedureException(e.getMessage());
+				throw new ProcedureException(e);
 			}
 		}
 		try {
@@ -90,13 +90,10 @@ public class SqlProcedureController {
 	/**
 	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
 	 *
-	 * @param inputTable
-	 *            Ausführungs-Parameter
-	 * @param privilegeRequest
-	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
+	 * @param inputTable       Ausführungs-Parameter
+	 * @param privilegeRequest eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
 	 * @return Resultat der Ausführung
-	 * @throws Exception
-	 *             Fehler bei der Ausführung
+	 * @throws Exception Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest) throws Exception {
 		List<String> userSecurityTokensToBeChecked = svc.extractUserTokens(privilegeRequest);
@@ -368,13 +365,10 @@ public class SqlProcedureController {
 	/**
 	 * Bereitet einen Prozedur-String vor
 	 *
-	 * @param params
-	 *            SQL-Call-Parameter
-	 * @param strategy
-	 *            SQL-Execution-Strategie
+	 * @param params   SQL-Call-Parameter
+	 * @param strategy SQL-Execution-Strategie
 	 * @return SQL-Code
-	 * @throws IllegalArgumentException
-	 *             Fehler, wenn die Daten in params nicht richtig sind.
+	 * @throws IllegalArgumentException Fehler, wenn die Daten in params nicht richtig sind.
 	 */
 	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {

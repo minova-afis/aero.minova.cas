@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @Component
 public class CustomLogger {
 	// Log für alle ausgeführten SQL Queries, außer die Privilegien
@@ -19,8 +22,11 @@ public class CustomLogger {
 	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 
 	public void logError(String logMessage, Exception e) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
 		errorLogger
-				.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + e.getStackTrace());
+				.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
 	}
 
 	public void logPrivilege(String logMessage) {

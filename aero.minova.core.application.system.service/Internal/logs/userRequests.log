@@ -1,0 +1,20 @@
+2021-07-29T17:04:57.609 test: Storing: C:\Users\avots\AppData\Local\Temp\junit14836851410640865282\Internal\UserLogs\Log-2021-07-29T17-04-57.604417500.zip
+2021-07-29T17:04:57.612 test: Unzipping File: C:\Users\avots\AppData\Local\Temp\junit14836851410640865282\Internal\UserLogs\Log-2021-07-29T17-04-57.604417500.zip
+2021-07-29T17:04:57.685 test: files/hash: Shared Data/Program Files/AFIS/AFIS.xbs
+2021-07-29T17:04:57.689 test: files/read: C:/Users/avots/AppData/Local/Temp/junit2459869383187272159/Internal/MD5/Shared Data/Program Files/AFIS/AFIS.xbs.md5
+2021-07-29T17:04:57.698 test: files/read: Shared Data/Program Files/AFIS/AFIS.xbs
+2021-07-29T17:04:57.851 test: files/hash: C:/Users/avots/AppData/Local/Temp/junit10981416687094252648/Shared Data/Program Files/AFIS.zip
+2021-07-29T17:06:34.343 test: Storing: C:\Users\avots\AppData\Local\Temp\junit6370535394279874572\Internal\UserLogs\Log-2021-07-29T17-06-34.340036700.zip
+2021-07-29T17:06:34.345 test: Unzipping File: C:\Users\avots\AppData\Local\Temp\junit6370535394279874572\Internal\UserLogs\Log-2021-07-29T17-06-34.340036700.zip
+2021-07-29T17:06:34.413 test: files/hash: Shared Data/Program Files/AFIS/AFIS.xbs
+2021-07-29T17:06:34.417 test: files/read: C:/Users/avots/AppData/Local/Temp/junit11863546520508584414/Internal/MD5/Shared Data/Program Files/AFIS/AFIS.xbs.md5
+2021-07-29T17:06:34.426 test: files/read: Shared Data/Program Files/AFIS/AFIS.xbs
+2021-07-29T17:06:34.609 test: files/hash: Shared Data/Program Files/AFIS.zip
+2021-07-29T17:06:34.610 test: files/read: C:/Users/avots/AppData/Local/Temp/junit17669582744835574674/Internal/MD5/Shared Data/Program Files/AFIS.zip.md5
+2021-07-29T17:07:50.225 test: Storing: C:\Users\avots\AppData\Local\Temp\junit3474592454594380442\Internal\UserLogs\Log-2021-07-29T17-07-50.221084400.zip
+2021-07-29T17:07:50.231 test: Unzipping File: C:\Users\avots\AppData\Local\Temp\junit3474592454594380442\Internal\UserLogs\Log-2021-07-29T17-07-50.221084400.zip
+2021-07-29T17:07:50.380 test: files/hash: Shared Data/Program Files/AFIS/AFIS.xbs
+2021-07-29T17:07:50.388 test: files/read: C:/Users/avots/AppData/Local/Temp/junit14074051355895214274/Internal/MD5/Shared Data/Program Files/AFIS/AFIS.xbs.md5
+2021-07-29T17:07:50.431 test: files/read: Shared Data/Program Files/AFIS/AFIS.xbs
+2021-07-29T17:07:50.773 test: files/hash: Shared Data/Program Files/AFIS.zip
+2021-07-29T17:07:50.781 test: files/read: C:/Users/avots/AppData/Local/Temp/junit15395396391567894810/Internal/MD5/Shared Data/Program Files/AFIS.zip.md5

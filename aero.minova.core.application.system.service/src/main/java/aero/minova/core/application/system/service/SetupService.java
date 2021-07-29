@@ -69,18 +69,18 @@ public class SetupService {
 	/**
 	 * Die Methode überspringt die erste Zeile (bis nach \n) und schneidet alles ab dem String "The following files have NOT been resolved:" ab. Danach wird
 	 * jede Zeile als ein Eintrag in der Rückgabe-Liste gesetzt. Dabei wird noch die Endung :jar entfernt und alle : durch . ersetzt.
-	 * 
-	 * @param arg
-	 *            Ein String, in welchem die benötigten Dependencies stehen.
+	 *
+	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
 	 * @return Gibt eine Liste an String zurück, welche die benötigten Prozedur-Dateinamen beinhalten: prozedur.sql.
 	 */
 	public List<String> parseDependencyList(String arg) {
 		// Die obere Zeile und die die Zeilen mit den nicht resolvten Dateien abschneiden.
-		arg = arg.substring(0, arg.indexOf("The following files have NOT been resolved:")).substring(arg.indexOf("\n") + 1);
+		String filteredArg = arg.substring(0, arg.indexOf("The following files have NOT been resolved:")).substring(arg.indexOf("\n") + 1);
 
 		// Am Zeilenumbruch trennen und störende Leerzeichen entfernen.
-		List<String> dependencies = Stream.of(arg.split("\\R"))//
-				.filter(s -> !s.isEmpty())
+		List<String> dependencies = Stream.of(filteredArg.split("\\R"))//
+				.filter(s -> !s.contains("The following files have been resolved:"))//
+				.filter(s -> !s.isBlank())//
 				.map(s -> s.substring(0 + 1, s.indexOf(":jar")).replace(":", ".").strip())//
 				.collect(Collectors.toList());
 		Collections.reverse(dependencies);
@@ -89,12 +89,10 @@ public class SetupService {
 
 	/**
 	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
-	 * 
-	 * @param arg
-	 *            Ein String, in welchem die benötigten Dependencies stehen.
+	 *
+	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
 	 * @return Die Liste an SQL-Dateien als Strings.
-	 * @throws IOException
-	 *             Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
+	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
 	public List<String> readSetups(String arg) throws IOException {
 		List<String> dependencies = parseDependencyList(arg);
@@ -128,9 +126,8 @@ public class SetupService {
 
 	/**
 	 * Liest ein einzelnes Setup-File und gibt eine Liste von benötigten SQl-Dateien zurück.
-	 * 
-	 * @param dependencySetupFile
-	 *            Das Setup-File, welches gescannt werden soll.
+	 *
+	 * @param dependencySetupFile Das Setup-File, welches gescannt werden soll.
 	 * @return Die Liste an SQL-Dateinamen für das gescannte Setup-File.
 	 */
 	public List<String> readProceduresToList(File dependencySetupFile) {
@@ -156,11 +153,9 @@ public class SetupService {
 
 	/**
 	 * Liest die übergebene Liste an SQL-Dateinamen und installiert die jeweils dazugehörige Datei.
-	 * 
-	 * @param procedures
-	 *            Die Liste an SQL-Dateinamen.
-	 * @throws NoSuchFileException
-	 *             Falls die Datei passend zum Namen nicht existiert.
+	 *
+	 * @param procedures Die Liste an SQL-Dateinamen.
+	 * @throws NoSuchFileException Falls die Datei passend zum Namen nicht existiert.
 	 */
 	public void runDependencyProcedures(List<String> procedures) throws NoSuchFileException {
 		Path dependencySqlDir = service.getSystemFolder().resolve("sql");

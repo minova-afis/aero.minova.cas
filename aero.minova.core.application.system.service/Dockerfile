@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11.0.12-jre
 COPY target/aero.minova.core.application.system.service.jar /opt/aero.minova.cas/lib/
 ENV SPRING_APPLICATION_JSON='{}'
 ENTRYPOINT ["/usr/bin/java"]

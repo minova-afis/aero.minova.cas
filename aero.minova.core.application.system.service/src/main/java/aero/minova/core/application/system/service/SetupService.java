@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -102,15 +103,7 @@ public class SetupService {
 
 		// Zuerst durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
-			String setupFile = dependency + ".setup.xml";
-			logger.info("Reading Setup-File: " + setupFile);
-
-			File dependencySetupFile = dependencySetupsDir.resolve(setupFile).toFile();
-			if (dependencySetupFile.exists()) {
-				procedures.addAll(readProceduresToList(dependencySetupFile));
-			} else {
-				throw new NoSuchFileException("No setup file found with the name " + setupFile);
-			}
+			procedures.addAll(readProceduresToList(findSetupXml(dependency, dependencySetupsDir).toFile()));
 		}
 
 		// Danach muss das Hauptsetup-File ausgelesen werden.
@@ -122,6 +115,53 @@ public class SetupService {
 		}
 
 		return procedures;
+	}
+
+	/**
+	 * Das ist ein Hack, wil wir Probleme haben über Maven die gewünschte Ordnerstruktur zu bekommen.
+	 * Wir wollen, dass es erstmal grundsätzlich läuft.
+	 *
+	 * @param dependency Name der Abhängigkeit.
+	 * @return Setup.xml der Abhängigkeit.
+	 */
+	private Path findSetupXml(String dependency, Path dependencySetupsDir) {
+		String niceSetupFile = dependency + ".setup.xml";
+		Path dependencySetupFile = dependencySetupsDir.resolve(niceSetupFile);
+		if (Files.exists(dependencySetupFile)) {
+			logger.info("Reading Setup-File: " + niceSetupFile);
+			return dependencySetupFile;
+		}
+		/* Wenn dies kein Hack wäre, würde es hiermit enden.
+		 * else {
+		 * throw new NoSuchFileException("No setup file found with the name " + setupFile);
+		 *}
+		 */
+		String adjustedDependency = dependency.substring("aero.minova.".length());
+		try {
+			Optional<Path> result = Files.walk(dependencySetupsDir, 1)
+					.map(dir -> {
+						if (dir.getFileName().startsWith(adjustedDependency)) {
+							try {
+								Optional<Path> setup = Files.walk(dir)//
+										.filter(f -> f.getFileName().equals("Setup.xml"))//
+										.findFirst();
+								return setup;
+							} catch (IOException e) {
+								throw new RuntimeException(e);
+							}
+						}
+						return Optional.<Path>empty();
+					})
+					.filter(setup -> !setup.isEmpty())
+					.map(setup -> setup.get())
+					.findFirst();
+			if (result.isEmpty()) {
+				throw new NoSuchFileException("No setup file found with the name " + niceSetupFile);
+			}
+			return result.get();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

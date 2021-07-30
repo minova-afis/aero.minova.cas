@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>core.application.system.service</artifactId>
 	<version>12.18.0-SNAPSHOT</version>
@@ -6,7 +7,7 @@
 		<groupId>aero.minova</groupId>
 		<artifactId>spring.maven.root</artifactId>
 		<version>1.2.1</version>
-		<relativePath />
+		<relativePath/>
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,10 +19,15 @@
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git
-        </developerConnection>
+		</developerConnection>
 		<tag>v12.5.0</tag>
 	</scm>
 	<dependencies>
+		<dependency>
+			<groupId>aero.minova</groupId>
+			<artifactId>core.application.system.setup</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<!-- Wird für Java 16 benötigt. -->
 			<groupId>org.projectlombok</groupId>
@@ -159,7 +165,7 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory> ${project.build.directory}/libs 
+							<outputDirectory>${project.build.directory}/libs
 							</outputDirectory>
 						</configuration>
 					</execution>

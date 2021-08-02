@@ -390,7 +390,7 @@ public class SqlViewController {
 		columns.add(new Column("SecurityToken", DataType.STRING));
 		columnSec.setColumns(columns);
 
-		List<Row> result = new ArrayList<>();
+		List<Row> columnRestrictionsForThisUserAndThisTable = new ArrayList<>();
 		for (Row row : userGroups) {
 			if (row.getValues().get(0).getStringValue().equals(inputTable.getName())) {
 				Row bar = new Row();
@@ -402,13 +402,13 @@ public class SqlViewController {
 				// wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
 				if (tokenSpecificAuthorities.isEmpty())
 					return inputTable;
-				result.addAll(tokenSpecificAuthorities);
+				columnRestrictionsForThisUserAndThisTable.addAll(tokenSpecificAuthorities);
 			}
 		}
 		List<String> grantedColumns = new ArrayList<String>();
 		// die Spaltennamen, welche wir durch den Select erhalten haben in eine List packen, dabei darauf achten,
 		// dass verschiedene SecurityTokens dieselbe Erlaubnis haben können, deshalb Doppelte rausfiltern
-		for (Row row : result) {
+		for (Row row : columnRestrictionsForThisUserAndThisTable) {
 			String grantedColumnFromtColumnSecurity = row.getValues().get(1).getStringValue();
 			if (!grantedColumns.contains(grantedColumnFromtColumnSecurity)) {
 				grantedColumns.add(grantedColumnFromtColumnSecurity);

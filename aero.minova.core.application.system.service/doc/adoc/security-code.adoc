@@ -3,6 +3,40 @@
 In diesem Dokument wird beschrieben, wie speziell die Methode,
 welche die Sicherheitsmechanismen implementieren, funktionieren.
 
+== Temporäre Tabellen im Code
+
+=== List<Row> authoritiesForThisTable
+
+Diese Liste an Rows wird an vielen Stellen im Programm benötigt. 
+Die beinhalteten Rows haben folgende Form:
+
+[source, java]
+----
+Row r = [Tabellenname,UserSecurityToken,RowLevelSecurity]
+----
+.Beispiel:
+----
+Row r = ["tTestTabelle","User1",1]
+Row r2 = ["tTestTabelle","User2",0]
+----
+
+Die Liste der Rows wird in der  xref:anchor-1[getPrivilegePermissions-Methode] ausgegeben.
+
+=== List<Row> columnRestrictionsForThisUserAndThisTable
+Diese Liste an Rows wird in der xref:anchor-2[columnSecurity-Methode] erstellt und auch verwendet.
+
+[source, java]
+----
+Row r = [Tabellenname,ColumnName,SecurityToken]
+----
+.Beispiel:
+----
+Row r = ["tTestTabelle","Spalte1","User1"]
+Row r = ["tTestTabelle","Spalte2","User1"]
+----
+
+
+== Security Methoden erklärt
 === getPrivilegePermissions (String privilegeName) [[anchor-1]]
 Die Methode erwartet den Namen des Privileges (Prozedur/View) und holt sich dazu noch die UserGruppen/UserSecurityToken aus dem SecurityContext,
 um dann mithilfe einer SQL Abfrage alle relevanten UserSecurityToken zu erhalten.
@@ -28,7 +62,7 @@ um ungehindert Zugriff auf die xvcasUserPrivileges zu erhalten und somit überha
 
 Die *inputTable* ist die Tabelle, welche ohne Prüfung als SQL-Query ausgeführt werden soll.
 
-=== columnSecurity(Table inputTable, List<Row> userGroups)
+=== columnSecurity(Table inputTable, List<Row> userGroups) [[anchor-2]]
 Filtert die Spalten, welche der Benutzer sehen darf.
 Die Inputparameter bestehen aus:
 

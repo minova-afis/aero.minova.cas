@@ -33,7 +33,7 @@ import lombok.val;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class FileControllerTest {
+public class FilesControllerTest {
 
 	@Test
 	public void testLegal() throws Exception {

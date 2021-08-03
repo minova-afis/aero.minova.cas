@@ -19,13 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Row;
 
 @Service
 public class FilesService {
 
-	@Value("${aero_minova_core_application_root_path:../../..}")
+	@Value("${aero_minova_core_application_root_path:.}")
 	private String rootPath;
 
 	@Value("${files.permission.check:false}")
@@ -39,8 +40,11 @@ public class FilesService {
 	private Path systemFolder;
 	private Path internalFolder;
 	private Path logsFolder;
+	private Path zipsFolder;
 	private Path md5Folder;
+
 	private final Logger logger = LoggerFactory.getLogger(FilesService.class);
+	static CustomLogger customLogger = new CustomLogger();
 
 	public FilesService() {}
 
@@ -63,6 +67,7 @@ public class FilesService {
 		internalFolder = systemFolder.resolve("Internal").toAbsolutePath().normalize();
 		logsFolder = internalFolder.resolve("UserLogs").toAbsolutePath().normalize();
 		md5Folder = internalFolder.resolve("MD5").toAbsolutePath().normalize();
+		zipsFolder = internalFolder.resolve("Zips").toAbsolutePath().normalize();
 		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
 			logger.error("msg.SystemFolder %" + systemFolder);
@@ -79,9 +84,14 @@ public class FilesService {
 		if (!isDirectory(programFilesFolder)) {
 			logger.error("msg.LogsFolder %" + logsFolder);
 		}
-		if (!isDirectory(md5Folder)) {
-			logger.error("msg.md5Folder %" + md5Folder);
+
+		if (md5Folder.toFile().mkdirs()) {
+			customLogger.logFiles("Creating directory " + md5Folder);
 		}
+		if (zipsFolder.toFile().mkdirs()) {
+			customLogger.logFiles("Creating directory " + zipsFolder);
+		}
+
 	}
 
 	public Path applicationFolder(String application) {
@@ -96,8 +106,12 @@ public class FilesService {
 		return logsFolder;
 	}
 
-	public String getMd5Folder() {
-		return md5Folder.toString();
+	public Path getMd5Folder() {
+		return md5Folder;
+	}
+
+	public Path getZipsFolder() {
+		return zipsFolder;
 	}
 
 	/**
@@ -125,7 +139,7 @@ public class FilesService {
 		return filesListInDir;
 	}
 
-	public Path checkLegalPath(String path) throws Exception {
+	public Path checkLegalPath(Path path) throws Exception {
 		if (permissionCheck) {
 			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + path).getRows();
 			if (privileges.isEmpty()) {

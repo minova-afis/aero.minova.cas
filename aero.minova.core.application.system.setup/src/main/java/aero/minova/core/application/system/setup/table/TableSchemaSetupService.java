@@ -1,12 +1,18 @@
 package aero.minova.core.application.system.setup.table;
 
+import ch.minova.core.install.SetupDocument;
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
 import org.springframework.stereotype.Service;
 
+import javax.sql.rowset.RowSetWarning;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +25,16 @@ import java.util.HashMap;
  */
 @Service
 public class TableSchemaSetupService {
+
+	public void setupTableSchemas(Path setupXml) {
+		try {
+			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
+			SetupDocument.Factory.parse(is, null);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * Diese methode liest die Tabelle aus der XML-Datei aus. Danach wird sie mit der Tabelle , falls diese bereits in der DB besteht, verglichen. Ansonsten
 	 * wird die Tabelle neu angelegt. Im nächsten Schritt werden die Constraints der Tabelle vergliochen. Dabei werden zunächst alle PK und UK_Constraints
@@ -32,13 +48,13 @@ public class TableSchemaSetupService {
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	private boolean readoutSchema(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
+	private boolean readoutSchema(final Connection con, final SetupDocument doc)
+			throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
 		checktVersion10(con);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
 		SqlDatabaseTable sqlTable = null;
 		String sqlCode = null;
-		SetupDocument doc = getSetupDocument();
 		if (doc.getSetup().getSchema() == null) {
 			return false;
 		}

@@ -4,7 +4,6 @@ import static java.nio.file.Files.isDirectory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,12 +52,10 @@ public class FilesService {
 	}
 
 	/**
-	 * Mit {@link Path#toAbsolutePath()} und {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
-	 * 
-	 * @throws IOException
+	 * Initialisiert alle nötigen Ordner. Mit {@link Path#toAbsolutePath()} und {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
 	 */
 	@PostConstruct
-	public void setUp() throws IOException {
+	public void setUp() {
 		if (rootPath == null || rootPath.isEmpty()) {
 			rootPath = Paths.get(".").toAbsolutePath().normalize().toString();
 		}
@@ -94,22 +91,38 @@ public class FilesService {
 
 	}
 
-	public Path applicationFolder(String application) {
-		return programFilesFolder.resolve(application);
-	}
-
+	/**
+	 * Gibt den Pfad zum Systems-Ordner zurück.
+	 * 
+	 * @return Pfad zum System-Ordner.
+	 */
 	public Path getSystemFolder() {
 		return systemFolder;
 	}
 
+	/**
+	 * Gibt den Pfad zum UserLogs-Ordner zurück.
+	 * 
+	 * @return Pfad zum UserLogs-Ordner.
+	 */
 	public Path getLogsFolder() {
 		return logsFolder;
 	}
 
+	/**
+	 * Gibt den Pfad zum MD5-Ordner zurück.
+	 * 
+	 * @return Pfad zum MD5-Ordner.
+	 */
 	public Path getMd5Folder() {
 		return md5Folder;
 	}
 
+	/**
+	 * Gibt den Pfad zum Zips-Ordner zurück.
+	 * 
+	 * @return Pfad zum Zip-Ordner.
+	 */
 	public Path getZipsFolder() {
 		return zipsFolder;
 	}
@@ -139,7 +152,16 @@ public class FilesService {
 		return filesListInDir;
 	}
 
-	public Path checkLegalPath(Path path) throws Exception {
+	/**
+	 * Überprüft, ob die angeforderte Datei existiert und ob der Pfad dorthin innerhalb des dedizierten Dateisystems liegt.
+	 * 
+	 * @param path
+	 *            Pfad zur gewünschten Datei.
+	 * @throws Exception
+	 *             RuntimeException, falls User nicht erforderliche Privilegien besitzt, IllegalAccessException, falls der Pfad nicht in das abgegrenzte
+	 *             Dateisystem zeigt, NoSuchFileException, falls gewünschte Datei nicht existiert.
+	 */
+	public void checkLegalPath(Path path) throws Exception {
 		if (permissionCheck) {
 			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + path).getRows();
 			if (privileges.isEmpty()) {
@@ -154,7 +176,6 @@ public class FilesService {
 		if (!f.exists()) {
 			throw new NoSuchFileException("msg.FileError %" + path);
 		}
-		return inputPath;
 	}
 
 }

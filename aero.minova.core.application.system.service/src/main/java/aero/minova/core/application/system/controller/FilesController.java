@@ -133,14 +133,36 @@ public class FilesController {
 //		return fileBytesTable;
 //	}
 
+	/**
+	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
+	 * FileNotFoundException oder eine IllegalAccessException geworfen.
+	 * 
+	 * @param path
+	 *            Der Pfad des Files, welches der User anfragt, als String.
+	 * @return byte[] des angefragten Files.
+	 * @throws Exception
+	 *             Entweder eine IllegalAccessException, falls der Pfad außerhalb des System-Ordner liegt, oder FileNotFoundException, falls es keine Datei mit
+	 *             diesem Namen in dem gewünschten Pfad gibt.
+	 */
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
-		val inputPath = files.checkLegalPath(Paths.get(path));
+		val inputPath = Paths.get(path);
+		files.checkLegalPath(inputPath);
 		customLogger.logUserRequest("files/read: " + path);
 		return readAllBytes(inputPath);
 	}
 
+	/**
+	 * Sucht die MD5-Datei bestimmten Files im Internal/MD5-Verzeichnis und gibt diese zurück.
+	 * 
+	 * @param path
+	 *            Der Pfad des Files, zu welchem der User die MD5 Datei möchte, als String.
+	 * @return Der MD5 Wert des angefragten Files als byte[].
+	 * @throws Exception
+	 *             Entweder eine IllegalAccessException, falls der Pfad außerhalb des System-Ordner liegt, oder FileNotFoundException, falls es keine Datei mit
+	 *             diesem Namen in dem gewünschten Pfad gibt.
+	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
@@ -152,9 +174,28 @@ public class FilesController {
 		return getFile(md5FilePath.toString());
 	}
 
+	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
+		path = path.replace('\\', '/');
+		customLogger.logUserRequest("files/zip: " + path);
+		// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im MD5 Ordner nachgestellt.
+		String toBeResolved = path.replace(files.getSystemFolder().toString() + "/", "") + ".zip";
+		Path zipFilePath = files.getZipsFolder().resolve(toBeResolved);
+		files.checkLegalPath(zipFilePath);
+		return getFile(zipFilePath.toString());
+	}
+
+	/**
+	 * Die User-Anfrage zum Uploaden einer Log-Datei des Users. Der User schickt diese Datei als Zip. Die Datei wird dann im Internal/UserLogs gespeichert.
+	 * 
+	 * @param log
+	 *            Die gezippte Log-Datei als byte[].
+	 * @throws IOException
+	 *             Falls die Datei nicht geschrieben oder entpackt werden kann.
+	 */
 	@RequestMapping(value = "upload/logs", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	@ResponseStatus(value = HttpStatus.OK)
-	public @ResponseBody void getLogs(@RequestBody byte[] log) throws Exception {
+	public @ResponseBody void getLogs(@RequestBody byte[] log) throws IOException {
 		// Doppelpunkte müssen raus, da Sonderzeichen im Filenamen nicht erlaubt sind
 		String logFolderName = ("Log-" + LocalDateTime.now()).replace(":", "-");
 		File logFileFolder = (files.getLogsFolder().resolve(logFolderName)).toFile();
@@ -169,6 +210,14 @@ public class FilesController {
 		unzipFile(logPath, logFileFolder.toPath());
 	}
 
+	/**
+	 * Erzeugt eine MD5-Datei im Internal/MD5-Directory zu der übergebenen Datei.
+	 * 
+	 * @param p
+	 *            Der Pfad der Datei, welche gehashed werden soll.
+	 * @throws IOException
+	 *             Falls die Datei nicht geschrieben oder gelesen werden kann.
+	 */
 	public void hashFile(Path p) throws IOException {
 		MessageDigest md;
 		try {
@@ -196,6 +245,12 @@ public class FilesController {
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
 
+	/**
+	 * Hashed beim Starten des CAS alle Dateien und speichert deren MD5-Dateien im Internal/MD5-Ordner.
+	 * 
+	 * @throws IOException
+	 *             Falls die MD5-Dateien nicht geschrieben werden können.
+	 */
 	// je höher die Zahl bei @Order, desto später wird die Methode ausgeführt
 	@EventListener(ApplicationReadyEvent.class)
 	@Order(2)
@@ -215,6 +270,12 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Zipped beim Starten des CAS alle Dateien und speichert deren Zip-Dateien im Internal/Zips.
+	 * 
+	 * @throws Exception
+	 *             Falls Dateien nicht gezipped werden konnten oder der Dateipfad außerhalb des Root-Directories zeigt.
+	 */
 	// je niedriger die Zahl bei @Order, desto früher wird die Methode ausgeführt
 	@EventListener(ApplicationReadyEvent.class)
 	@Order(1)
@@ -235,13 +296,30 @@ public class FilesController {
 		}
 	}
 
-	/*
-	 * Vorsicht! getZip ist nicht determinstisch
+	/**
+	 * Erstellt eine Zip-Datei und speichert diese im Internal/Zips-Ordner.
+	 * 
+	 * @param path
+	 *            Die Datei, zu welcher eine Zip-Datei erstellt werden soll.
+	 * @throws Exception
+	 *             Falls gewünschte Datei außerhalb des Dateisystems liegt, sie nicht existiert oder ein Fehler beim Zippen auftritt.
 	 */
-	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	/*
+	 * Vorsicht! createZip ist nicht determinstisch
+	 */
+	@RequestMapping(value = "files/createZip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public void createZip(@RequestParam Path path) throws Exception {
 		List<Path> fileList = files.populateFilesList(path);
-		File zipFile = files.getZipsFolder().resolve(path.getFileName() + ".zip").toFile();
+
+		// Path für die neue ZIP-Datei zusammenbauen
+		String zipDataName = path.toString().replace(files.getSystemFolder().toString(), files.getZipsFolder().toString()).replace('\\', '/');
+		// Alle benötigten Ordner erstellen
+		File zipDirectoryStructure = new File(zipDataName.substring(0, zipDataName.lastIndexOf('/')));
+		if (zipDirectoryStructure.mkdirs()) {
+			customLogger.logFiles("Creating directory " + zipDirectoryStructure);
+		}
+
+		File zipFile = new File(zipDataName + ".zip");
 		// erzeugt Datei, falls sie noch nicht existiert, macht ansonsten nichts
 		zipFile.createNewFile();
 
@@ -251,6 +329,18 @@ public class FilesController {
 		zip(sourcePath, zipFile, fileList);
 	}
 
+	/**
+	 * Methode zum Zippen einer Datei.
+	 * 
+	 * @param source
+	 *            String, Teil des ursprünglichen Pfades, welcher abgeschnitten werden muss.
+	 * @param zipFile
+	 *            File, gewünschtes finales Zip-File.
+	 * @param fileList
+	 *            List<Path>, Pfade zu Dateien, welche gezipped werden sollen.
+	 * @throws RuntimeException
+	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
+	 */
 	public void zip(String source, File zipFile, List<Path> fileList) throws RuntimeException {
 		ZipEntry ze = null;
 		try {
@@ -289,7 +379,17 @@ public class FilesController {
 		}
 	}
 
-	public static void unzipFile(File fileZip, Path destDirName) throws IOException {
+	/**
+	 * Methode zum Entpacken einer Datei.
+	 * 
+	 * @param fileZip
+	 *            File, die gepackte Datei.
+	 * @param destDirName
+	 *            Path, Pfad im Dateisystem, an welchem der Inhalt des Zips gespeichert werden soll.
+	 * @throws IOException
+	 *             Falls das Directory nicht existiert oder kein Directory ist oder falls die Datei nicht entpackt werden kann.
+	 */
+	public void unzipFile(File fileZip, Path destDirName) throws IOException {
 		byte[] buffer = new byte[1024];
 		FileInputStream fis;
 		try {

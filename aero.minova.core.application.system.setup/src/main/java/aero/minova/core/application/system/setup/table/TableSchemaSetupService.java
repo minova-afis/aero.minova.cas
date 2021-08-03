@@ -57,9 +57,9 @@ public class TableSchemaSetupService {
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	private boolean readoutSchema(final Connection con, final SetupDocument doc)
+	private boolean readoutSchema(final Connection connection, final SetupDocument doc)
 			throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
-		checktVersion10(con);
+		checktVersion10(connection);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
 		SqlDatabaseTable sqlTable = null;
@@ -69,12 +69,12 @@ public class TableSchemaSetupService {
 		}
 		try {
 			final String PK_UK_FKs = "select CONSTRAINT_NAME as constraintname,COLUMN_NAME as columnname from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where TABLE_CATALOG = '";
-			final ResultSet rs = this.connection.createStatement().executeQuery(PK_UK_FKs + this.connection.getCatalog() + "'");
+			final ResultSet rs = connection.createStatement().executeQuery(PK_UK_FKs + connection.getCatalog() + "'");
 			this.mymap = new HashMap<String, String>();
 			if (rs.next()) {
 				this.mymap.put(rs.getString("constraintname"), rs.getString("columnname"));
 			}
-			sqldatabase.readDataBase(this.connection);
+			sqldatabase.readDataBase(connection);
 			log(MessageFormat.format("Tabellenspalten und Tabellen werden aktualisiert. \n", ""), true);
 			for (int i = 0; i < tablevector.size(); i++) {
 				// Table aus der ausgelesenen Datenbank
@@ -121,7 +121,7 @@ public class TableSchemaSetupService {
 		sqlCode = null;
 		xmlTable = null;
 		try {
-			sqldatabase.readDataBase(this.connection);
+			sqldatabase.readDataBase(connection);
 		} catch (final SQLException e1) {
 			log(MessageFormat.format("Die Tabelle erstellt SQLException \n {0}", e1.getMessage()), true);
 		} catch (final InstantiationException e1) {
@@ -151,7 +151,7 @@ public class TableSchemaSetupService {
 					// xmlTable.getName()), true);
 					if (sqlCode != null) {
 						log(sqlCode);
-						this.connection.createStatement().execute(sqlCode);
+						connection.createStatement().execute(sqlCode);
 						sqlCode = null;
 						log(MessageFormat.format("Die UK_/PK_Constraints für {0} wurden ausgeführt", xmlTable.getName()), true);
 					}
@@ -181,7 +181,7 @@ public class TableSchemaSetupService {
 					sqlCode = generateUpdateTableConstraintsFK(sqlTable, xmlTable);
 					if (sqlCode != null) {
 						log(sqlCode);
-						this.connection.createStatement().execute(sqlCode);
+						connection.createStatement().execute(sqlCode);
 						sqlCode = null;
 						log(MessageFormat.format("Die FK_Constraints für {0} wurden ausgeführt.", xmlTable.getName()), true);
 					} else {
@@ -211,7 +211,7 @@ public class TableSchemaSetupService {
 					sqlCode = xmlTable.generateUpdateValues();
 					if (sqlCode != null) {
 						log(sqlCode);
-						this.connection.createStatement().execute(sqlCode);
+						connection.createStatement().execute(sqlCode);
 						sqlCode = null;
 						log(MessageFormat.format("Alle Values wurden für {0} eingepflegt", xmlTable.getName()));
 					}

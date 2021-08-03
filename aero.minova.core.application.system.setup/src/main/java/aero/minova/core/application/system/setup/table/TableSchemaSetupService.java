@@ -1,9 +1,11 @@
 package aero.minova.core.application.system.setup.table;
 
+import aero.minova.core.application.system.sql.SystemDatabase;
 import ch.minova.core.install.SetupDocument;
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.sql.rowset.RowSetWarning;
@@ -26,10 +28,17 @@ import java.util.HashMap;
 @Service
 public class TableSchemaSetupService {
 
+	@Autowired SystemDatabase systemDatabase;
+
 	public void setupTableSchemas(Path setupXml) {
 		try {
 			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
-			SetupDocument.Factory.parse(is, null);
+			final Connection connection = systemDatabase.getConnection();
+			try {
+				readoutSchema(connection, (SetupDocument) SetupDocument.Factory.parse(is, null));
+			} finally {
+				systemDatabase.freeUpConnection(connection);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

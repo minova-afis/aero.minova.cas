@@ -1,5 +1,6 @@
 package aero.minova.core.application.system.setup.table;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import ch.minova.core.install.SetupDocument;
 import ch.minova.install.setup.schema.SqlDatabase;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 public class TableSchemaSetupService {
 
 	@Autowired SystemDatabase systemDatabase;
+	@Autowired CustomLogger logger;
 
 	public void setupTableSchemas(Path setupXml) {
 		try {
@@ -70,12 +72,13 @@ public class TableSchemaSetupService {
 		try {
 			final String PK_UK_FKs = "select CONSTRAINT_NAME as constraintname,COLUMN_NAME as columnname from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where TABLE_CATALOG = '";
 			final ResultSet rs = connection.createStatement().executeQuery(PK_UK_FKs + connection.getCatalog() + "'");
-			this.mymap = new HashMap<String, String>();
+			// TODO Kann das entfernt werden?
+			final HashMap<String, String> mymap = new HashMap<>();
 			if (rs.next()) {
-				this.mymap.put(rs.getString("constraintname"), rs.getString("columnname"));
+				mymap.put(rs.getString("constraintname"), rs.getString("columnname"));
 			}
 			sqldatabase.readDataBase(connection);
-			log(MessageFormat.format("Tabellenspalten und Tabellen werden aktualisiert. \n", ""), true);
+			logger.logSql("Tabellenspalten und Tabellen werden aktualisiert.");
 			for (int i = 0; i < tablevector.size(); i++) {
 				// Table aus der ausgelesenen Datenbank
 				if (tablevector.get(i).getType().equalsIgnoreCase("script")) {

@@ -1,5 +1,8 @@
 package aero.minova.core.application.system.setup.table;
 
+import ch.minova.install.setup.schema.SqlDatabase;
+import ch.minova.install.setup.schema.SqlDatabaseTable;
+import ch.minova.install.setup.schema.XmlDatabaseTable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

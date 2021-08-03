@@ -107,7 +107,7 @@ public class FilesControllerTest {
 		testSubject.createZip(programFilesFolder.resolve(".metadata"));
 
 		// dabei wird der Logs Ordner erzeugt
-		testSubject.getLogs(readAllBytes(zipsFolder.toFile().listFiles()[0].toPath()));
+		testSubject.getLogs(readAllBytes(zipsFolder.resolve("Shared Data").resolve("Program Files").toFile().listFiles()[0].toPath()));
 
 		File found = findFile("beispielLog.log", internalFolder.resolve("UserLogs").toFile());
 		assertThat(found).isNotEqualTo(null);
@@ -172,7 +172,9 @@ public class FilesControllerTest {
 		createDirectories(tempFolder);
 		assertThat(Files.exists(tempFolder.resolve("AFIS"))).isFalse();
 
-		testSubject.unzipFile(zipsFolder.resolve("AFIS.zip").toFile(), tempFolder);
+		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
+		Files.write(tempFile.toPath(), testSubject.getZip(programFilesFolder.resolve("AFIS").toString()));
+		testSubject.unzipFile(tempFile, tempFolder);
 
 		assertThat(Files.exists(tempFolder.resolve("AFIS"))).isTrue();
 		assertThat(Files.exists(tempFolder.resolve("AFIS").resolve("AFIS.xbs"))).isTrue();
@@ -182,6 +184,12 @@ public class FilesControllerTest {
 
 	@Test
 	public void testLegalZipExists() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
@@ -204,13 +212,16 @@ public class FilesControllerTest {
 		final val tempFolder = programFilesFolder.resolve("temp");
 		createDirectories(tempFolder);
 
-		testSubject.unzipFile(zipsFolder.resolve("AFIS.zip").toFile(), tempFolder);
+		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
+		Files.write(tempFile.toPath(), testSubject.getZip(programFilesFolder.resolve("AFIS").toString()));
+		testSubject.unzipFile(tempFile, tempFolder);
 
 		assertThat(tempFolder.resolve("AFIS").toFile().exists()).isTrue();
 
 		byte[] unzipped = readAllBytes(findFile("AFIS.xbs", tempFolder.toFile()).toPath());
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"))).isEqualTo(unzipped);
-		assertThat(readAllBytes(zipsFolder.resolve("AFIS.zip"))).isNotEqualTo(new String("").getBytes(StandardCharsets.UTF_8));
+		assertThat(readAllBytes(zipsFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip")))
+				.isNotEqualTo(new String("").getBytes(StandardCharsets.UTF_8));
 		assertThat(unzipped).isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 

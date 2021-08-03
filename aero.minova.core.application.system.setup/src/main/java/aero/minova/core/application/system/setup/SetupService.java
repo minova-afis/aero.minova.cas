@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import aero.minova.core.application.system.service.FilesService;
+import aero.minova.core.application.system.setup.table.TableSchemaSetupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ import lombok.val;
 
 @Service
 public class SetupService {
+
+	@Autowired TableSchemaSetupService tableSchemaSetupService;
 
 	@Autowired
 	public SystemDatabase database;

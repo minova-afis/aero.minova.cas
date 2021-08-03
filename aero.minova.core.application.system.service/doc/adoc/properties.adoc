@@ -25,14 +25,6 @@ Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 
 ** *Default*: `password`
 
-* test.certificate.mail.service.cron
-
-** *Default*: `0 * * * * *` = Jeder Anfang einer Minute
-
-Bestimmt in welchen Intervall die Testresultate per E-Mail verschickt werden.
-Um das Verschicken zu deaktiveren, kann der Wert `-` verwendet werden.
-Das Interval wird als Cron-Ausdruck beschrieben: https://crontab.cronhub.io
-
 * files.permission.check
 
 ** *Default*: 'false'

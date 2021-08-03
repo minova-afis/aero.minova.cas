@@ -107,11 +107,15 @@ public class SetupService {
 
 		// Zuerst durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
-			procedures.addAll(readProceduresToList(findSetupXml(dependency, dependencySetupsDir).toFile()));
+			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
+			tableSchemaSetupService.setupTableSchemas(setupXml);
+			procedures.addAll(readProceduresToList(setupXml.toFile()));
 		}
 
 		// Danach muss das Hauptsetup-File ausgelesen werden.
-		File mainSetupFile = dependencySetupsDir.resolve("Setup.xml").toFile();
+		final Path mainSetupXml = dependencySetupsDir.resolve("Setup.xml");
+		File mainSetupFile = mainSetupXml.toFile();
+		tableSchemaSetupService.setupTableSchemas(mainSetupXml);
 		if (mainSetupFile.exists()) {
 			procedures.addAll(readProceduresToList(mainSetupFile));
 		} else {

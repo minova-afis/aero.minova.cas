@@ -59,7 +59,7 @@ public class SetupServiceTest {
 			text = scanner.useDelimiter("\\A").next();
 		}
 
-		List<String> procedureList = testSubject.readSetups(text);
+		List<String> procedureList = testSubject.readSetups(text, false);
 
 		assertThat(procedureList).hasSize(1);
 		assertThat(procedureList).contains("xvxmpExampleIndex.sql");

@@ -59,7 +59,7 @@ public class SetupService {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
 				if (dependencyList.toFile().exists()) {
-					List<String> procedures = readSetups(Files.readString(dependencyList));
+					List<String> procedures = readSetups(Files.readString(dependencyList), true);
 					runDependencyProcedures(procedures);
 				} else {
 					throw new NoSuchFileException("No dependencyList.txt found!");
@@ -99,7 +99,7 @@ public class SetupService {
 	 * @return Die Liste an SQL-Dateien als Strings.
 	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
-	public List<String> readSetups(String arg) throws IOException {
+	public List<String> readSetups(String arg, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = parseDependencyList(arg);
 		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
 
@@ -108,14 +108,18 @@ public class SetupService {
 		// Zuerst durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
 			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
-			tableSchemaSetupService.setupTableSchemas(setupXml);
+			if (setupTableSchemas) {
+				tableSchemaSetupService.setupTableSchemas(setupXml);
+			}
 			procedures.addAll(readProceduresToList(setupXml.toFile()));
 		}
 
 		// Danach muss das Hauptsetup-File ausgelesen werden.
 		final Path mainSetupXml = dependencySetupsDir.resolve("Setup.xml");
 		File mainSetupFile = mainSetupXml.toFile();
-		tableSchemaSetupService.setupTableSchemas(mainSetupXml);
+		if (setupTableSchemas) {
+			tableSchemaSetupService.setupTableSchemas(mainSetupXml);
+		}
 		if (mainSetupFile.exists()) {
 			procedures.addAll(readProceduresToList(mainSetupFile));
 		} else {

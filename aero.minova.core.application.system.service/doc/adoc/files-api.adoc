@@ -47,14 +47,3 @@ Auch hier muss nur der Dateipfad des Ordners angegeben werden und das CAS sucht 
 Zur Fehleranalyse können User ihre Logs als Zip-Datei an das CAS senden. 
 Diese werden dann unter Internal/UserLogs gespeichert. 
 Der Name des Zips wird hierbei zum Datum des Empfangens geändert.
-
-
-== FilesService
-
-=== Beim Start des CAS
-Der FilesService überprüft, ob das Dateisystem ordnungsgemäß angelegt ist und generiert wenn nötig den Internal-Ordner und die dazugehörigen Unterordner.
-
-=== Weitere Funktionalität
-Wenn eine der oben genannten Anfragen an das CAS gesendet werden, 
-überprüft der FilesService die Anfragen, 
-ob die angefragten Dateien innerhalb des dedizierten Dateisystems liegen und ob sie überhaupt existieren.

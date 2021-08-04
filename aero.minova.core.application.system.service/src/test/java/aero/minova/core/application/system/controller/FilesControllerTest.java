@@ -317,6 +317,35 @@ public class FilesControllerTest {
 		testSubject.hashAll();
 	}
 
+	@Test
+	public void getZipBackCompatability() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
+		final val rootPath = new TemporaryFolder();
+		rootPath.create();
+		final val rootFolder = rootPath.getRoot().toPath();
+		final val internal = rootPath.newFolder("Internal").toPath();
+		final val zipsFolder = internal.resolve("Zips");
+		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
+		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
+		final val serviceFolder = programFilesFolder.resolve("AFIS");
+		createDirectories(serviceFolder);
+
+		final val testSubject = new FilesController();
+		testSubject.files = new FilesService(rootFolder.toString());
+		testSubject.files.setUp();
+
+		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		testSubject.createZip(serviceFolder);
+
+		assertThat(testSubject.getFile("Shared Data/Program Files/AFIS.zip")).isEqualTo(testSubject.getZip("Shared Data/Program Files/AFIS"));
+
+	}
+
 	// Hilfsmethode
 	private File findFile(String file, File directory) {
 		File[] list = directory.listFiles();

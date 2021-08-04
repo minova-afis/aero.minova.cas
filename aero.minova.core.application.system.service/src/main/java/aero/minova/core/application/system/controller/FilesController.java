@@ -147,6 +147,9 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
+		if (path.substring(path.lastIndexOf("/")).contains(".zip")) {
+			return getZip(path);
+		}
 		val inputPath = files.checkLegalPath(Paths.get(path));
 		customLogger.logUserRequest("files/read: " + path);
 		return readAllBytes(inputPath);
@@ -167,7 +170,7 @@ public class FilesController {
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/hash: " + path);
 		// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im MD5 Ordner nachgestellt.
-		String toBeResolved = path.replace(files.getSystemFolder().toString() + "/", "") + ".md5";
+		String toBeResolved = path + ".md5";
 		Path md5FilePath = files.getMd5Folder().resolve(toBeResolved);
 		files.checkLegalPath(md5FilePath);
 		return getFile(md5FilePath.toString());
@@ -177,11 +180,14 @@ public class FilesController {
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/zip: " + path);
-		// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im MD5 Ordner nachgestellt.
-		String toBeResolved = path.replace(files.getSystemFolder().toString() + "/", "") + ".zip";
+		String toBeResolved = path;
+		if (!path.substring(path.lastIndexOf("/")).contains(".zip")) {
+			// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im Zips Ordner nachgestellt.
+			toBeResolved = toBeResolved + ".zip";
+		}
 		Path zipFilePath = files.getZipsFolder().resolve(toBeResolved);
 		files.checkLegalPath(zipFilePath);
-		return getFile(zipFilePath.toString());
+		return readAllBytes(zipFilePath);
 	}
 
 	/**

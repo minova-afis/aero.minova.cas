@@ -7,6 +7,9 @@
  * Automatically generated - do not modify.
  */
 package ch.minova.core.install.impl;
+
+import org.apache.xmlbeans.StringEnumAbstractBase;
+
 /**
  * A document containing one static(@) element.
  *
@@ -529,7 +532,8 @@ public class StaticDocumentImpl extends org.apache.xmlbeans.impl.values.XmlCompl
             {
                 super(sType, b);
             }
-        }
+            
+		}
         /**
          * An XML lang(@).
          *

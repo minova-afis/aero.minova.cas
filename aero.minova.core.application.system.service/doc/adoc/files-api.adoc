@@ -1,0 +1,60 @@
+== FilesController
+
+Im Folgenden wird die Funktionalität des FilesControllers und des FilesServices behandelt.
+
+=== Beim Start des CAS
+Beim Start des CAS werden zuerst alle Dateien gezippt und danach alle Ordner gehasht.
+
+==== zipAll
+Die Methode geht alle Ordner und deren Unterordner ab dem Systems-Ordner 
+durch und erzeugt für jeden eine Zip-Datei im Ordner Internal/Zips. 
+
+Diese Methode könnte theoretisch durch einen HTTP-Request angestoßen werden,
+falls man das CAS nicht neustarten möchte.
+
+==== hashAll
+Die Methode geht alle Ordner und deren Unterordner ab dem Systems-Ordner 
+durch und erzeugt für jeden eine MD5-Datei im Ordner Internal/MD5. 
+
+Diese Methode könnte theoretisch durch einen HTTP-Request angestoßen werden,
+falls man das CAS nicht neustarten möchte.
+
+=== User-Anfragen
+
+In diesem Abschnitt werden alle Nutzer-Anfragen beschrieben und welche Auswirkungen diese auf das CAS haben.
+
+==== files/read
+Mit diesem HTTP-Request können User Dateien vom Dateisystem herunterladen.
+Zur Sicherheit wird in dieser Methode außerdem geprüft, 
+ob sich die angeforderte Datei überhaupt innerhalb des Dateisystems befindet.
+
+Falls dies nicht der Fall ist, wird eine IllegalAccessException geworfen. 
+Falls die Datei nicht existiert wird eine FileNotFoundException geworfen.
+
+Ist die Datei vorhanden und innerhalb des Dateisystems wird sie als byte[] an den User geschickt.
+
+==== files/hash
+Wenn der User eine Datei anfordern möchte ist es sinnvoll, zuerst anhand des MD5-Wertes seine Version mit der Version des Servers zu vergleichen.
+Hierfür dient die files/hash-Methode. 
+Der Nutzer gibt denselben Dateipfad wie beim Anfragen einer Datei an und das CAS sucht die dazugehörige MD5-Datei aus dem Verzeichnis heraus.
+
+==== files/zip
+Nachdem die Version der gewünschten Datei überprüft wurde, ist es sinnvoll, 
+den Ordner der Datei als Zip herunterzuladen, da sich möglicherweise mehr Dateien als nur die Angefragte geändert haben.
+Auch hier muss nur der Dateipfad des Ordners angegeben werden und das CAS sucht aus dem Internal/Zips-Ordner das richtige Zip heraus.
+
+==== upload/logs
+Zur Fehleranalyse können User ihre Logs als Zip-Datei an das CAS senden. 
+Diese werden dann unter Internal/UserLogs gespeichert. 
+Der Name des Zips wird hierbei zum Datum des Empfangens geändert.
+
+
+== FilesService
+
+=== Beim Start des CAS
+Der FilesService überprüft, ob das Dateisystem ordnungsgemäß angelegt ist und generiert wenn nötig den Internal-Ordner und die dazugehörigen Unterordner.
+
+=== Weitere Funktionalität
+Wenn eine der oben genannten Anfragen an das CAS gesendet werden, 
+überprüft der FilesService die Anfragen, 
+ob die angefragten Dateien innerhalb des dedizierten Dateisystems liegen und ob sie überhaupt existieren.

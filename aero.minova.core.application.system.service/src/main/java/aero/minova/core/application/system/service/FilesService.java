@@ -161,7 +161,7 @@ public class FilesService {
 	 *             RuntimeException, falls User nicht erforderliche Privilegien besitzt, IllegalAccessException, falls der Pfad nicht in das abgegrenzte
 	 *             Dateisystem zeigt, NoSuchFileException, falls gewünschte Datei nicht existiert.
 	 */
-	public void checkLegalPath(Path path) throws Exception {
+	public Path checkLegalPath(Path path) throws Exception {
 		if (permissionCheck) {
 			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + path).getRows();
 			if (privileges.isEmpty()) {
@@ -176,6 +176,6 @@ public class FilesService {
 		if (!f.exists()) {
 			throw new NoSuchFileException("msg.FileError %" + path);
 		}
+		return inputPath;
 	}
-
 }

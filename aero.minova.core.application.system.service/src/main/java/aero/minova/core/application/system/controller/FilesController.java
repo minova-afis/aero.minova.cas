@@ -147,8 +147,7 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
-		val inputPath = Paths.get(path);
-		files.checkLegalPath(inputPath);
+		val inputPath = files.checkLegalPath(Paths.get(path));
 		customLogger.logUserRequest("files/read: " + path);
 		return readAllBytes(inputPath);
 	}

@@ -21,6 +21,23 @@
 					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/libs
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<parent>
@@ -42,8 +59,8 @@
 		<dependency>
 			<groupId>aero.minova</groupId>
 			<artifactId>core.application.system.service</artifactId>
-			<version>12.17.3</version>
-			<scope>provided</scope>
+			<version>12.18.0-SNAPSHOT</version>
+			<!--scope>provided</scope-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

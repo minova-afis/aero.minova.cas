@@ -12,8 +12,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,6 +32,9 @@ public class FilesService {
 	@Autowired
 	SqlViewController svc;
 
+	@Autowired
+	CustomLogger customLogger;
+
 	private Path programFilesFolder;
 	private Path sharedDataFolder;
 	private Path systemFolder;
@@ -41,9 +42,6 @@ public class FilesService {
 	private Path logsFolder;
 	private Path zipsFolder;
 	private Path md5Folder;
-
-	private final Logger logger = LoggerFactory.getLogger(FilesService.class);
-	static CustomLogger customLogger = new CustomLogger();
 
 	public FilesService() {}
 
@@ -67,19 +65,19 @@ public class FilesService {
 		zipsFolder = internalFolder.resolve("Zips").toAbsolutePath().normalize();
 		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
-			logger.error("msg.SystemFolder %" + systemFolder);
+			customLogger.logFiles("msg.SystemFolder %" + systemFolder);
 		}
 		if (!isDirectory(sharedDataFolder)) {
-			logger.error("msg.SharedFolder %" + sharedDataFolder);
+			customLogger.logFiles("msg.SharedFolder %" + sharedDataFolder);
 		}
 		if (!isDirectory(programFilesFolder)) {
-			logger.error("msg.ProgramFilesFolder %" + programFilesFolder);
+			customLogger.logFiles("msg.ProgramFilesFolder %" + programFilesFolder);
 		}
 		if (!isDirectory(internalFolder)) {
-			logger.error("msg.InternalFolder %" + internalFolder);
+			customLogger.logFiles("msg.InternalFolder %" + internalFolder);
 		}
 		if (!isDirectory(programFilesFolder)) {
-			logger.error("msg.LogsFolder %" + logsFolder);
+			customLogger.logFiles("msg.LogsFolder %" + logsFolder);
 		}
 
 		if (md5Folder.toFile().mkdirs()) {

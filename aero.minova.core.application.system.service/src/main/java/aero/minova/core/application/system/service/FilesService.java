@@ -33,7 +33,7 @@ public class FilesService {
 	SqlViewController svc;
 
 	@Autowired
-	CustomLogger customLogger;
+	public CustomLogger customLogger;
 
 	private Path programFilesFolder;
 	private Path sharedDataFolder;

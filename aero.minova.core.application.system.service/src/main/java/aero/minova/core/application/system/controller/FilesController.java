@@ -47,7 +47,9 @@ public class FilesController {
 
 	@Autowired
 	FilesService files;
-	static CustomLogger customLogger = new CustomLogger();
+
+	@Autowired
+	public CustomLogger customLogger;
 
 	@Autowired
 	SqlProcedureController spc;
@@ -228,27 +230,27 @@ public class FilesController {
 	 * 
 	 * @param p
 	 *            Der Pfad der Datei, welche gehashed werden soll.
-	 * @throws IOException
+	 * @throws Exception
 	 *             Falls die Datei nicht geschrieben oder gelesen werden kann.
 	 */
-	public void hashFile(Path p) throws IOException {
+	public void hashFile(Path p) throws Exception {
+		final val filePath = files.checkLegalPath(p);
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException("msg.MD5Error");
 		}
-		md.update(readAllBytes(p));
+		md.update(readAllBytes(filePath));
 		String fx = "%0" + (md.getDigestLength() * 2) + "x";
 		byte[] hashOfFile = String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 
 		// Path für die neue MD5-Datei zusammenbauen
-		String mdDataName = p.toString().replace(files.getSystemFolder().toString(), files.getMd5Folder().toString()).replace('\\', '/');
+		Path mdDataName = files.getMd5Folder().resolve(p);
 
 		// Alle benötigten Ordner erstellen
-		File md5DirectoryStructure = new File(mdDataName.substring(0, mdDataName.lastIndexOf('/')));
-		if (md5DirectoryStructure.mkdirs()) {
-			customLogger.logFiles("Creating directory " + md5DirectoryStructure);
+		if (mdDataName.getParent().toFile().mkdirs()) {
+			customLogger.logFiles("Creating directory " + mdDataName);
 		}
 
 		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
@@ -261,23 +263,23 @@ public class FilesController {
 	/**
 	 * Hashed beim Starten des CAS alle Dateien und speichert deren MD5-Dateien im Internal/MD5-Ordner.
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 *             Falls die MD5-Dateien nicht geschrieben werden können.
 	 */
 	// je höher die Zahl bei @Order, desto später wird die Methode ausgeführt
 	@EventListener(ApplicationReadyEvent.class)
 	@Order(2)
 	@RequestMapping(value = "files/hashAll")
-	public void hashAll() throws IOException {
+	public void hashAll() throws Exception {
 		List<Path> programFiles = files.populateFilesList(files.getSystemFolder());
 		for (Path path : programFiles) {
 			// Mit dieser If-Abfrage wird verhindert, dass es .md5-Dateiketten gibt
-			if (path.toString().contains(files.getMd5Folder().toString())) {
+			if (path.startsWith(files.getMd5Folder())) {
 				continue;
 			}
 			// wir wollen nicht keinen Hash von einem Directory ( zips allerdings schon)
 			if (!path.toFile().isDirectory()) {
-				hashFile(path);
+				hashFile(path.subpath(files.getSystemFolder().getNameCount(), path.getNameCount()));
 			}
 
 		}
@@ -327,7 +329,7 @@ public class FilesController {
 		// Path für die neue ZIP-Datei zusammenbauen
 		String zipDataName = path.toString().replace(files.getSystemFolder().toString(), files.getZipsFolder().toString()).replace('\\', '/');
 		// Alle benötigten Ordner erstellen
-		File zipDirectoryStructure = new File(zipDataName.substring(0, zipDataName.lastIndexOf('/')));
+		File zipDirectoryStructure = new File(zipDataName).getParentFile();
 		if (zipDirectoryStructure.mkdirs()) {
 			customLogger.logFiles("Creating directory " + zipDirectoryStructure);
 		}

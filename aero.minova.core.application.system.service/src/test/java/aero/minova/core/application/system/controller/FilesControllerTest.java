@@ -173,7 +173,7 @@ public class FilesControllerTest {
 		assertThat(Files.exists(tempFolder.resolve("AFIS"))).isFalse();
 
 		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
-		Files.write(tempFile.toPath(), testSubject.getZip(programFilesFolder.resolve("AFIS").toString()));
+		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
 		testSubject.unzipFile(tempFile, tempFolder);
 
 		assertThat(Files.exists(tempFolder.resolve("AFIS"))).isTrue();
@@ -213,7 +213,7 @@ public class FilesControllerTest {
 		createDirectories(tempFolder);
 
 		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
-		Files.write(tempFile.toPath(), testSubject.getZip(programFilesFolder.resolve("AFIS").toString()));
+		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
 		testSubject.unzipFile(tempFile, tempFolder);
 
 		assertThat(tempFolder.resolve("AFIS").toFile().exists()).isTrue();
@@ -296,7 +296,7 @@ public class FilesControllerTest {
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		write(zipsFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		write(serviceFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"), new String("").getBytes(StandardCharsets.UTF_8));
 		byte[] old = readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"));
 
@@ -304,10 +304,12 @@ public class FilesControllerTest {
 		testSubject.hashAll();
 
 		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs.md5"))).isNotEqualTo(old);
-		assertThat(Files.exists(md5Folder.resolve("Internal").resolve("Zips").resolve("AFIS.zip.md5"))).isTrue();
-		assertThat(readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("AFIS.zip.md5"))).isNotEmpty();
-		assertThat(readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("AFIS.zip.md5")))
-				.isEqualTo(testSubject.getHash(zipsFolder.resolve("AFIS.zip").toString()));
+		assertThat(Files.exists(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
+				.isTrue();
+		assertThat(readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
+				.isNotEmpty();
+		assertThat(readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
+				.isEqualTo(testSubject.getHash("Shared Data/Program Files/AFIS.zip"));
 
 		// das zippen ist nicht deterministisch und würde auf github dazu führen, dass der Test abbricht, obwohl er local funktioniert
 		// assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo("51a1713197b136586344905c9847daff".getBytes(StandardCharsets.UTF_8));

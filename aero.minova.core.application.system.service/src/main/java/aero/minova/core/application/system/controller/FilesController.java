@@ -171,9 +171,17 @@ public class FilesController {
 		customLogger.logUserRequest("files/hash: " + path);
 		// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im MD5 Ordner nachgestellt.
 		String toBeResolved = path + ".md5";
-		Path md5FilePath = files.getMd5Folder().resolve(toBeResolved);
+
+		Path md5FilePath;
+
+		// Falls man den Hash eines Zip-Files möchte, liegen diese jetzt im Internal-Ordner
+		if (path.substring(path.lastIndexOf("/")).contains(".zip")) {
+			md5FilePath = files.getMd5Folder().resolve("Internal").resolve("Zips").resolve(toBeResolved);
+		} else {
+			md5FilePath = files.getMd5Folder().resolve(toBeResolved);
+		}
 		files.checkLegalPath(md5FilePath);
-		return getFile(md5FilePath.toString());
+		return readAllBytes(md5FilePath);
 	}
 
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
@@ -203,7 +211,7 @@ public class FilesController {
 	public @ResponseBody void getLogs(@RequestBody byte[] log) throws IOException {
 		// Doppelpunkte müssen raus, da Sonderzeichen im Filenamen nicht erlaubt sind
 		String logFolderName = ("Log-" + LocalDateTime.now()).replace(":", "-");
-		File logFileFolder = (files.getLogsFolder().resolve(logFolderName)).toFile();
+		File logFileFolder = files.getLogsFolder().resolve(logFolderName).toFile();
 		File logPath = new File(logFileFolder + ".zip");
 		logFileFolder.mkdirs();
 

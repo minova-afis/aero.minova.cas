@@ -5,6 +5,7 @@ import aero.minova.core.application.system.setup.ModuleNotFoundException;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import ch.minova.core.install.SetupDocument;
 import ch.minova.core.install.TableschemaDocument;
+import ch.minova.install.setup.BaseSetup;
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
@@ -41,6 +42,8 @@ public class TableSchemaSetupService {
 			final Connection connection = systemDatabase.getConnection();
 			try {
 				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
+				final BaseSetup setup = new BaseSetup();
+				setupDocument.getSetup().getName();
 			} finally {
 				systemDatabase.freeUpConnection(connection);
 			}

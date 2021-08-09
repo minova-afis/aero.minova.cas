@@ -306,7 +306,7 @@ public class FilesController {
 			}
 			// wir wollen nicht noch einen zip von einer zip Datei, wir wollen allerdings hier NUR Directories haben
 			if ((!fileSuffix.toLowerCase().contains("zip")) && (path.toFile().isDirectory())) {
-				createZip(path);
+				createZip(path.subpath(files.getSystemFolder().getNameCount(), path.getNameCount()));
 			}
 		}
 	}
@@ -324,12 +324,12 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/createZip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public void createZip(@RequestParam Path path) throws Exception {
-		List<Path> fileList = files.populateFilesList(path);
+		List<Path> fileList = files.populateFilesList(files.getSystemFolder().resolve(path));
 
 		// Path für die neue ZIP-Datei zusammenbauen
-		String zipDataName = path.toString().replace(files.getSystemFolder().toString(), files.getZipsFolder().toString()).replace('\\', '/');
+		Path zipDataName = files.getZipsFolder().resolve(path);
 		// Alle benötigten Ordner erstellen
-		File zipDirectoryStructure = new File(zipDataName).getParentFile();
+		File zipDirectoryStructure = zipDataName.toFile().getParentFile();
 		if (zipDirectoryStructure.mkdirs()) {
 			customLogger.logFiles("Creating directory " + zipDirectoryStructure);
 		}
@@ -339,7 +339,7 @@ public class FilesController {
 		zipFile.createNewFile();
 
 		// dadurch bekommt man beim entpacken auch den Ordner, in dem der Inhalt ist, und nicht nur den Inhalt
-		String sourcePath = path.toString().substring(0, path.toString().lastIndexOf(File.separator));
+		String sourcePath = zipDataName.getParent().subpath(0, files.getSystemFolder().getNameCount()).toString();
 		customLogger.logFiles("Zipping: " + zipFile);
 		zip(sourcePath, zipFile, fileList);
 	}
@@ -413,6 +413,9 @@ public class FilesController {
 			ZipEntry ze = zis.getNextEntry();
 			while (ze != null) {
 				String zippedFileEntry = ze.getName();
+				if (zippedFileEntry.startsWith(File.separator)) {
+					zippedFileEntry = zippedFileEntry.substring(1);
+				}
 				File newFile = destDirName.resolve(zippedFileEntry).toFile();
 				// create directories for sub directories in zip
 				new File(newFile.getParent()).mkdirs();

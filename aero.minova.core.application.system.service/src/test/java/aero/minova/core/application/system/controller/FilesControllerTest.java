@@ -128,7 +128,7 @@ public class FilesControllerTest {
 		testSubject.files.setUp();
 
 		write(serviceFolder.resolve("beispielLog.log"), new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
-		testSubject.createZip(programFilesFolder.resolve(".metadata"));
+		testSubject.createZip(Paths.get("Shared Data/Program Files/.metadata"));
 
 		// dabei wird der Logs Ordner erzeugt
 		testSubject.getLogs(readAllBytes(zipsFolder.resolve("Shared Data").resolve("Program Files").toFile().listFiles()[0].toPath()));
@@ -215,7 +215,7 @@ public class FilesControllerTest {
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		testSubject.createZip(serviceFolder);
+		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
 		final val tempFolder = programFilesFolder.resolve("temp");
 		createDirectories(tempFolder);
@@ -225,9 +225,9 @@ public class FilesControllerTest {
 		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
 		testSubject.unzipFile(tempFile, tempFolder);
 
-		assertThat(Files.exists(tempFolder.resolve("AFIS"))).isTrue();
-		assertThat(Files.exists(tempFolder.resolve("AFIS").resolve("AFIS.xbs"))).isTrue();
-		assertThat(readAllBytes(tempFolder.resolve("AFIS").resolve("AFIS.xbs")))
+		assertThat(Files.exists(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS"))).isTrue();
+		assertThat(Files.exists(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs"))).isTrue();
+		assertThat(readAllBytes(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs")))
 				.isEqualTo(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs")));
 	}
 
@@ -263,7 +263,7 @@ public class FilesControllerTest {
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
 
-		testSubject.createZip(serviceFolder);
+		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
 		final val tempFolder = programFilesFolder.resolve("temp");
 		createDirectories(tempFolder);
@@ -272,7 +272,7 @@ public class FilesControllerTest {
 		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
 		testSubject.unzipFile(tempFile, tempFolder);
 
-		assertThat(tempFolder.resolve("AFIS").toFile().exists()).isTrue();
+		assertThat(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").toFile().exists()).isTrue();
 
 		byte[] unzipped = readAllBytes(findFile("AFIS.xbs", tempFolder.toFile()).toPath());
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"))).isEqualTo(unzipped);
@@ -426,7 +426,7 @@ public class FilesControllerTest {
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		testSubject.createZip(serviceFolder);
+		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
 		assertThat(testSubject.getFile("Shared Data/Program Files/AFIS.zip")).isEqualTo(testSubject.getZip("Shared Data/Program Files/AFIS"));
 

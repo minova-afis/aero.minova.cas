@@ -21,7 +21,7 @@ import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.service.SetupService;
 import aero.minova.core.application.system.sql.SystemDatabase;
 
-public class SetupServiceTest {
+public class SetupServiceTest extends BaseTest {
 
 	@Mock
 	private SystemDatabase database;

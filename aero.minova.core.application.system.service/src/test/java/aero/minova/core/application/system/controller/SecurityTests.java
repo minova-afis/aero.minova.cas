@@ -37,7 +37,7 @@ import lombok.val;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 @WebAppConfiguration
-class SecurityTests {
+class SecurityTests extends BaseTest {
 
 	@Autowired
 	SqlViewController testSubject;

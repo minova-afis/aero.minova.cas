@@ -28,7 +28,7 @@ import lombok.val;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class FilesControllerTest {
+public class FilesControllerTest extends BaseTest {
 
 	@Test
 	public void testLegal() throws Exception {

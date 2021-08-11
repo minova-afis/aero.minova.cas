@@ -15,7 +15,7 @@ import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
-public class SqlProcedureControllerTest {
+public class SqlProcedureControllerTest extends BaseTest {
 	@Autowired
 	SqlProcedureController testSubject;
 

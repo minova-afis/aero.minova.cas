@@ -24,24 +24,26 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
+import aero.minova.core.application.system.service.SecurityService;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
 @ContextConfiguration
 @WebAppConfiguration
-class SecurityTests {
+class SecurityServiceTests {
 
 	@Autowired
-	SqlViewController testSubject;
+	SecurityService testSubject;
 
 	@Spy
-	SqlViewController spyController;
+	SecurityService spyController;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -275,6 +277,9 @@ class SecurityTests {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		Table mockResult = new Table();
+
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
+		spyController.customLogger = logger;
 
 		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
 

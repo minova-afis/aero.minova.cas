@@ -39,6 +39,7 @@ import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
+import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
@@ -50,7 +51,7 @@ public class SqlProcedureController {
 	CustomLogger customLogger = new CustomLogger();
 
 	@Autowired
-	SqlViewController svc;
+	SecurityService securityService;
 
 	@Autowired
 	Gson gson;
@@ -76,7 +77,7 @@ public class SqlProcedureController {
 			}
 		}
 		try {
-			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName());
+			List<Row> privilegeRequest = securityService.getPrivilegePermissions(inputTable.getName());
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
@@ -100,7 +101,7 @@ public class SqlProcedureController {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		List<String> userSecurityTokensToBeChecked = svc.extractUserTokens(privilegeRequest);
+		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
 		final val connection = systemDatabase.getConnection();
@@ -182,7 +183,7 @@ public class SqlProcedureController {
 							}).collect(toList()));
 					int totalResults = 0;
 
-					int securityTokenInColumn = findSecurityTokenColumn(resultSet);
+					int securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
 					resultSet.setMetaData(new TableMetaData());
 					while (sqlResultSet.next()) {
 						Row rowToBeAdded = null;
@@ -204,7 +205,7 @@ public class SqlProcedureController {
 						/*
 						 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
 						 */
-						if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
+						if (securityService.checkRowForValidSecurityToken(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
 							resultSet.addRow(rowToBeAdded);
 							totalResults++;
 						}
@@ -236,10 +237,10 @@ public class SqlProcedureController {
 									outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 								}
 							});
-					int securityTokenInColumn = findSecurityTokenColumn(inputTable);
+					int securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
 
 					Row resultRow = new Row();
-					if (checkRowForValidSecurityToken(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
+					if (securityService.checkRowForValidSecurityToken(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 						resultRow = outputValues;
 					} else {
 						for (int i = 0; i < outputValues.getValues().size(); i++) {
@@ -373,39 +374,8 @@ public class SqlProcedureController {
 				});
 	}
 
-	/*
-	 * Findet die SecurityToken-Spalte der übergebenen Table.
-	 */
-	int findSecurityTokenColumn(Table inputTable) {
-		int securityTokenInColumn = 0;
-		// Herausfinden an welcher Stelle die Spalte mit den SecurityTokens ist
-		for (int i = 0; i < inputTable.getColumns().size(); i++) {
-			if (inputTable.getColumns().get(i).getName().equals("SecurityToken")) {
-				securityTokenInColumn = i;
-			}
-		}
-		return securityTokenInColumn;
-	}
-
 	String prepareProcedureString(Table params) {
 		return prepareProcedureString(params, ExecuteStrategy.STANDARD);
-	}
-
-	/*
-	 * Falls die Row-Level-Security für die Prozedur eingeschalten ist (Einträge in der Liste vorhanden), sollten die Rows nach dem Ausführen der Prozedur
-	 * gefiltert werden. Überprüft, ob der SecurityToken der rowToBeChecked mit mind. 1 SecurityToken des Users übereinstimmt.
-	 */
-	boolean checkRowForValidSecurityToken(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn) {
-		if (!userSecurityTokens.isEmpty()) {
-			String securityTokenValue = rowToBeChecked.getValues().get(securityTokenInColumn).getStringValue();
-			if (securityTokenValue == null || userSecurityTokens.contains(securityTokenValue.toLowerCase())) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
 	}
 
 	/**
@@ -452,7 +422,7 @@ public class SqlProcedureController {
 		tUser.addRow(userEntry);
 
 		// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-		Table membershipsFromUser = svc.getTableForSecurityCheck(tUser);
+		Table membershipsFromUser = securityService.getTableForSecurityCheck(tUser);
 		List<String> userSecurityTokens = new ArrayList<>();
 
 		if (membershipsFromUser.getRows().size() > 0) {
@@ -493,7 +463,7 @@ public class SqlProcedureController {
 			}
 		}
 		if (groups.getRows().size() > 0) {
-			List<Row> groupTokens = svc.getTableForSecurityCheck(groups).getRows();
+			List<Row> groupTokens = securityService.getTableForSecurityCheck(groups).getRows();
 			List<String> groupSecurityTokens = new ArrayList<>();
 			for (Row r : groupTokens) {
 				String memberships = r.getValues().get(1).getStringValue();

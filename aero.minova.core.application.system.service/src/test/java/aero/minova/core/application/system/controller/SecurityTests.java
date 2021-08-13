@@ -405,4 +405,58 @@ class SecurityTests {
 
 	}
 
+	@DisplayName("ExtractUserTokens keine Ausnahmen")
+	@WithMockUser(username = "user", roles = {})
+	@Test
+	void test_extractUserTokens() {
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("user", null));
+		inputRow.addValue(new Value(true, null));
+		userGroups.add(inputRow);
+
+		inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("dispatcher", null));
+		inputRow.addValue(new Value(true, null));
+		userGroups.add(inputRow);
+
+		inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("codemonkey", null));
+		inputRow.addValue(new Value(true, null));
+		userGroups.add(inputRow);
+		List<String> resultList = testSubject.extractUserTokens(userGroups);
+		assertThat(resultList).hasSize(3);
+		assertThat(resultList.get(2)).isEqualTo("codemonkey");
+		assertThat(resultList.get(1)).isEqualTo("dispatcher");
+		assertThat(resultList.get(0)).isEqualTo("user");
+	}
+
+	@DisplayName("ExtractUserTokens eine Ausnahmen")
+	@WithMockUser(username = "user", roles = { "user", "dispatcher", "codemonkey" })
+	@Test
+	void test_extractUserTokensGetEmptyStringBack() {
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("user", null));
+		inputRow.addValue(new Value(false, null));
+		userGroups.add(inputRow);
+
+		inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("dispatcher", null));
+		inputRow.addValue(new Value(true, null));
+		userGroups.add(inputRow);
+
+		inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("codemonkey", null));
+		inputRow.addValue(new Value(true, null));
+		userGroups.add(inputRow);
+		List<String> resultList = testSubject.extractUserTokens(userGroups);
+		assertThat(resultList).hasSize(0);
+	}
 }

@@ -3,6 +3,7 @@ package aero.minova.core.application.system.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
@@ -14,7 +15,6 @@ import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import aero.minova.core.application.system.domain.Column;
@@ -34,7 +33,6 @@ import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 @WebAppConfiguration
 class SecurityTests {
@@ -459,4 +457,41 @@ class SecurityTests {
 		List<String> resultList = testSubject.extractUserTokens(userGroups);
 		assertThat(resultList).hasSize(0);
 	}
+
+	@DisplayName("getPrivilegePermission-Rows überprüfen, ob alle Privilegien übernommen werden")
+	@WithMockUser(username = "user", roles = { "user", "dispatcher", "codemonkey" })
+	@Test
+	void test_getPrivilegePermission() {
+
+		List<Row> mockResult = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("test", null));
+		inputRow.addValue(new Value("ROLE_user", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
+		mockResult.add(inputRow);
+
+		inputRow = new Row();
+		inputRow.addValue(new Value("test", null));
+		inputRow.addValue(new Value("ROLE_dispatcher", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(true, null));
+		mockResult.add(inputRow);
+
+		inputRow = new Row();
+		inputRow.addValue(new Value("test", null));
+		inputRow.addValue(new Value("ROLE_codemonkey", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(true, null));
+		mockResult.add(inputRow);
+
+		Mockito.doAnswer(returnsFirstArg()).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		List<Row> result = spyController.getPrivilegePermissions("test");
+		assertThat(result).hasSize(3);
+		assertThat(result.get(2).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(0).getValues().get(1).getStringValue());
+		assertThat(result.get(1).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(1).getValues().get(1).getStringValue());
+		assertThat(result.get(0).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(2).getValues().get(1).getStringValue());
+	}
+
 }

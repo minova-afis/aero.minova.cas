@@ -100,3 +100,11 @@ Aus diesen wird dann folgende where-Bedingung zusammen gebaut:
 or (SecurityToken IN (UserSecurityToken1, UserSecurityToken2, ...))
 -----
 Am Ende wird die fertige where-Bedingung als String zurück gegeben.
+
+=== findSecurityTokenColumn(Table inputTable)
+Gibt die Position der Spalte, in welcher "SecurityToken" steht, in der übergebenen Table als int zurück.
+Falls keine solche Spalte gefunden werden kann, wird eine ProcedureException geworfen.
+
+=== checkRowForValidSecurityToken(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn)
+Überprüft, ob der UserSecurityToken in der rowToBeChecked an der Position mit dem Wert des securityTokenInColumn mit mindestens einem Wert aus der übergebenen userSecurityTokens-Liste übereinstimmt.
+Falls dies der Fall ist wird `true` zurück gegeben, andernfalls `false`.

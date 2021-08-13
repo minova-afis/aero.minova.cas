@@ -2,6 +2,8 @@ package aero.minova.core.application.system.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.doReturn;
@@ -27,6 +29,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.Value;
@@ -499,4 +502,84 @@ class SecurityServiceTests {
 		assertThat(result.get(0).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(2).getValues().get(1).getStringValue());
 	}
 
+	@DisplayName("Finde Spalte mit SecurityToken per findSecurityTokenColumn")
+	@WithMockUser(username = "user", roles = {})
+	@Test
+	void test_findSecurityTokenColumn() {
+		val inputTable = new Table();
+		inputTable.setName("spTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("SecurityToken", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
+
+		int result = 0;
+		try {
+			result = spyController.findSecurityTokenColumn(inputTable);
+		} catch (ProcedureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertThat(result).isEqualTo(3);
+	}
+
+	@DisplayName("Wirf ProcedureException, wenn SecurityTokenSpalte nicht vorhanden")
+	@WithMockUser(username = "user", roles = {})
+	@Test
+	void test_findSecurityTokenColumnNoSecurityTokenColumn() {
+		val inputTable = new Table();
+		inputTable.setName("spTest");
+		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
+		inputTable.addColumn(new Column("ServiceKey", DataType.STRING));
+		inputTable.addColumn(new Column("ChargedQuantity", DataType.STRING));
+		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
+
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
+		spyController.customLogger = logger;
+
+		Throwable exception = assertThrows(ProcedureException.class, () -> spyController.findSecurityTokenColumn(inputTable));
+		thrown.expect(ProcedureException.class);
+		assertEquals("msg.MissingSecurityTokenColumn", exception.getMessage());
+	}
+
+	@DisplayName("Überprüfe, ob SecurityToken in Row übereinstimmt mit vorhandenen SecurityTokens")
+	@WithMockUser(username = "user", roles = {})
+	@Test
+	void test_checkRowForValidSecurityToken() {
+
+		List<String> userGroups = new ArrayList<>();
+		userGroups.add("tester");
+		userGroups.add("user");
+		userGroups.add("dispatcher");
+		userGroups.add("codemonkey");
+
+		Row rowToBeChecked = new Row();
+		rowToBeChecked.addValue(new Value("", null));
+		rowToBeChecked.addValue(new Value("dispatcher", null));
+		rowToBeChecked.addValue(new Value("", null));
+		rowToBeChecked.addValue(new Value(true, null));
+
+		assertTrue(spyController.checkRowForValidSecurityToken(userGroups, rowToBeChecked, 1));
+	}
+
+	@DisplayName("Überprüfe, ob SecurityToken in Row übereinstimmt mit vorhandenen SecurityTokens")
+	@WithMockUser(username = "user", roles = {})
+	@Test
+	void test_checkRowForValidSecurityTokenNoMatch() {
+
+		List<String> userGroups = new ArrayList<>();
+		userGroups.add("tester");
+		userGroups.add("user");
+		userGroups.add("dispatcher");
+		userGroups.add("codemonkey");
+
+		Row rowToBeChecked = new Row();
+		rowToBeChecked.addValue(new Value("", null));
+		rowToBeChecked.addValue(new Value("admin", null));
+		rowToBeChecked.addValue(new Value("", null));
+		rowToBeChecked.addValue(new Value(true, null));
+
+		assertFalse(spyController.checkRowForValidSecurityToken(userGroups, rowToBeChecked, 1));
+	}
 }

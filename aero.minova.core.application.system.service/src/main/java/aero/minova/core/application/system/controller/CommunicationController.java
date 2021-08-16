@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.domain.PingResponse;
+import aero.minova.core.application.system.service.SecurityService;
 
 @RestController
 public class CommunicationController {
 
 	@Autowired
-	SqlProcedureController procedureController;
+	SecurityService securityService;
 
 	/**
 	 * Hiermit kann geprüft werden, ob die Kommunikation mit und die Anmeldung an den CAS funktioniert.
@@ -34,7 +35,7 @@ public class CommunicationController {
 			// Abfrage mur für jUnit-Tests, da dabei Authentication = null
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			if (authentication != null) {
-				procedureController.loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
+				securityService.loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
 			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("No User found, please login");

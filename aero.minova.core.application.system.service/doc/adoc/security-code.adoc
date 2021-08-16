@@ -108,3 +108,16 @@ Falls keine solche Spalte gefunden werden kann, wird eine ProcedureException gew
 === checkRowForValidSecurityToken(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn)
 Überprüft, ob der UserSecurityToken in der rowToBeChecked an der Position mit dem Wert des securityTokenInColumn mit mindestens einem Wert aus der übergebenen userSecurityTokens-Liste übereinstimmt.
 Falls dies der Fall ist wird `true` zurück gegeben, andernfalls `false`.
+
+
+=== List<GrantedAuthority> loadPrivileges(String username, List<GrantedAuthority> authorities)
+Anhand folgender Abfrage, werden die GrantedAuthorities/Privilegien für den übergebenen User aus der Datenbank geladen:
+[source,sql]
+----
+select KeyText,UserSecurityToken,Memberships 
+from xtcasUser
+where KeyText = username
+----
+
+Die bereits vorhandenen GrantedAuthorities authorities werden beim Auswerten mit hinzugefügt,
+sodass am Ende eine zusammengefügte Liste aus dem Sql-Ergebnis und den vorher übergebenen GrantedAuthorities zurück gegeben wird.

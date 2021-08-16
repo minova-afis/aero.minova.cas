@@ -10,21 +10,16 @@ import java.sql.CallableStatement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -403,90 +398,5 @@ public class SqlProcedureController {
 		}
 		sb.append(")}");
 		return sb.toString();
-	}
-
-	/*
-	 * Updatet die Rollen, welche momentan im SecurityContext für den eingeloggten User hinterlegt sind
-	 */
-	public List<GrantedAuthority> loadPrivileges(String username, List<GrantedAuthority> authorities) {
-		Table tUser = new Table();
-		tUser.setName("xtcasUser");
-		List<Column> columns = new ArrayList<>();
-		columns.add(new Column("KeyText", DataType.STRING));
-		columns.add(new Column("UserSecurityToken", DataType.STRING));
-		columns.add(new Column("Memberships", DataType.STRING));
-		tUser.setColumns(columns);
-		Row userEntry = new Row();
-		userEntry.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username, null),
-				new aero.minova.core.application.system.domain.Value("", null), new aero.minova.core.application.system.domain.Value("", null)));
-		tUser.addRow(userEntry);
-
-		// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-		Table membershipsFromUser = securityService.getTableForSecurityCheck(tUser);
-		List<String> userSecurityTokens = new ArrayList<>();
-
-		if (membershipsFromUser.getRows().size() > 0) {
-			String result = membershipsFromUser.getRows().get(0).getValues().get(2).getStringValue();
-
-			// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
-			userSecurityTokens = Stream.of(result.split("#"))//
-					.map(String::trim)//
-					.collect(Collectors.toList());
-
-			// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
-			String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().replace("#", "").trim();
-			if (!userSecurityTokens.contains(uniqueUserToken))
-				userSecurityTokens.add(uniqueUserToken);
-		} else {
-			// falls der User nicht in der Datenbank gefunden wurde, wird sein Benutzername als einzigartiger userSecurityToken verwendet
-			userSecurityTokens.add(username);
-		}
-
-		// füge die authorities hinzu, welche aus dem Active Directory kommen
-		for (GrantedAuthority ga : authorities) {
-			userSecurityTokens.add(ga.getAuthority());
-		}
-
-		// die Berechtigungen der Gruppen noch herausfinden
-		Table groups = new Table();
-		groups.setName("xtcasUserGroup");
-		List<Column> groupcolumns = new ArrayList<>();
-		groupcolumns.add(new Column("KeyText", DataType.STRING));
-		groupcolumns.add(new Column("SecurityToken", DataType.STRING));
-		groups.setColumns(groupcolumns);
-		for (String s : userSecurityTokens) {
-			if (!s.trim().equals("")) {
-				Row tokens = new Row();
-				tokens.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(s.trim(), null),
-						new aero.minova.core.application.system.domain.Value("", "!null")));
-				groups.addRow(tokens);
-			}
-		}
-		if (groups.getRows().size() > 0) {
-			List<Row> groupTokens = securityService.getTableForSecurityCheck(groups).getRows();
-			List<String> groupSecurityTokens = new ArrayList<>();
-			for (Row r : groupTokens) {
-				String memberships = r.getValues().get(1).getStringValue();
-				// alle SecurityToken einer Gruppe der Liste hinzufügen
-				val membershipsAsList = Stream.of(memberships.split("#"))//
-						.map(String::trim)//
-						.collect(Collectors.toList());
-				groupSecurityTokens.addAll(membershipsAsList);
-			}
-
-			// verschiedene Rollen/Gruppen können dieselbe Berechtigung haben, deshalb rausfiltern
-			for (String string : groupSecurityTokens) {
-				if (!userSecurityTokens.contains(string))
-					userSecurityTokens.add(string);
-			}
-		}
-
-		List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-		for (String string : userSecurityTokens) {
-			if (!string.equals(""))
-				grantedAuthorities.add(new SimpleGrantedAuthority(string));
-		}
-
-		return grantedAuthorities;
 	}
 }

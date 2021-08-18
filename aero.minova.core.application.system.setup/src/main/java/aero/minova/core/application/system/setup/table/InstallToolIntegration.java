@@ -39,7 +39,7 @@ public class InstallToolIntegration {
 	@Autowired CustomLogger logger;
 	@Autowired FilesService files;
 
-	public void setupTableSchemas(Path setupXml) {
+	public void installSetuo(Path setupXml) {
 		try {
 			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
 			final Connection connection = systemDatabase.getConnection();

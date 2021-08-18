@@ -13,3 +13,18 @@ Dazu wird die `setup/Setup.xml` des APP-Servers mithilfe des Install-Tools ausge
 
 Die Jar des target-Ordners und des libs-Ordners
 in den lib-Ordner vom CAS kopieren.
+
+## API
+
+Das Plugin ist eine Erweiterung des `data/procedure`-Pfades.
+Um die Installation zu starten, muss man die entsprechende Prozedur aufrufen:
+
+[source,json]
+.Body des Post-Requests
+--------
+{
+    "name": "setup",
+    "columns": [],
+    "rows": []
+}
+--------

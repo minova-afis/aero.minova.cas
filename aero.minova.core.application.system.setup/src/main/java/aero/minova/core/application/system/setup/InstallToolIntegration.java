@@ -2,30 +2,18 @@ package aero.minova.core.application.system.setup;
 
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.setup.ModuleNotFoundException;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import ch.minova.core.install.SetupDocument;
-import ch.minova.core.install.TableschemaDocument;
 import ch.minova.install.setup.BaseSetup;
-import ch.minova.install.setup.schema.SqlDatabase;
-import ch.minova.install.setup.schema.SqlDatabaseTable;
-import ch.minova.install.setup.schema.XmlDatabaseTable;
-import org.apache.xmlbeans.XmlException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.sql.rowset.RowSetWarning;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Optional;
 
 /**

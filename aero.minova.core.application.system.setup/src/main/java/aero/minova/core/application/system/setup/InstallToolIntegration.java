@@ -17,8 +17,8 @@ import java.sql.ResultSet;
 import java.util.Optional;
 
 /**
- * Das ist dr Table-Schema-Installer,
- * welcher auf dem internen Install-Tool der Minova basiert.
+ * Diese Klasse installiert SQL-Code, Procedure und Schemas aus den "Setup.xml"s mithilfe des Install-Tools.
+ * Dabei wurde gesorgt, dass der Code des Install-Tools möglichst wenige geändert wurde.
  */
 @Service
 public class InstallToolIntegration {

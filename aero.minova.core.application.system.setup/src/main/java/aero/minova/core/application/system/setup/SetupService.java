@@ -31,6 +31,9 @@ import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
+/**
+ * Installiert sämtliche Komponenten und Abhängigkeiten des APP-Servers (aero.minova.app.parent).
+ */
 @Service
 public class SetupService {
 
@@ -53,7 +56,7 @@ public class SetupService {
 	@PostConstruct
 	private void setup() {
 		// Fügt Extension hinzu.
-		spc.registerExctension("setup-database", inputTable -> {
+		spc.registerExctension("setup", inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");

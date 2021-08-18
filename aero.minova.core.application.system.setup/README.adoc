@@ -1,0 +1,8 @@
+# Setup-Plugin für das CAS
+
+Hiermit werden die Komponenten des link:https://github.com/minova-afis/aero.minova.app.parent[APP-Servers] installiert.
+Dazu wird die `setup/Setup.xml` des APP-Servers mithilfe des Install-Tools ausgewertet:
+
+* Die `Setup.xml`\`s der Abhängigkeiten der `Setup.xml` werden in dem setup-Ordner rekursiv installiert.
+* Die Schema-Definitionen werden zuerst aufgespielt.
+* Anschließend wird SQL-Code ausgeführt, welche Initialisierungs-Skripte durchführen und Prozeduren und Views erstellen.

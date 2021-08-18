@@ -1,4 +1,4 @@
-package aero.minova.core.application.system.setup;
+package ch.minova.install.setup;
 
 @SuppressWarnings("serial")
 public class ModuleNotFoundException extends Exception {

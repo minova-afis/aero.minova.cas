@@ -42,7 +42,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import aero.minova.core.application.system.setup.ModuleNotFoundException;
-import aero.minova.core.application.system.setup.table.BaseSetupException;
 import org.apache.commons.io.FileUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
@@ -5544,7 +5543,7 @@ public class BaseSetup {
 
 				try {
 					mainmdi.writeMenu(mainDoc.getMain().getMenu(), mainmdi.getMenues().get(i));
-				} catch (ch.minova.install.setup.BaseSetupException e) {
+				} catch (BaseSetupException e) {
 					throw new RuntimeException(e);
 				}
 			} else {
@@ -5552,7 +5551,7 @@ public class BaseSetup {
 				menu.setId("main");
 				try {
 					mainmdi.writeMenu(mainDoc.getMain().getMenu(), mainmdi.getMenues().get(i));
-				} catch (ch.minova.install.setup.BaseSetupException e) {
+				} catch (BaseSetupException e) {
 					throw new RuntimeException(e);
 				}
 			}

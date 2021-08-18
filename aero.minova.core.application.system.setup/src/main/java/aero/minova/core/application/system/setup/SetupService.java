@@ -33,6 +33,8 @@ import lombok.val;
 
 /**
  * Installiert sämtliche Komponenten und Abhängigkeiten des APP-Servers (aero.minova.app.parent).
+ *
+ * TODO SQL-Code (nicht Schema) wird doppelt ausgeführt.
  */
 @Service
 public class SetupService {

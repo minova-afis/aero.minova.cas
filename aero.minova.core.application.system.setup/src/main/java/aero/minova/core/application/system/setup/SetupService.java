@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.setup.table.TableSchemaSetupService;
+import ch.minova.install.setup.BaseSetup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class SetupService {
 	@PostConstruct
 	private void setup() {
 		// Fügt Extension hinzu.
-		spc.registerExctension("setup", inputTable -> {
+		spc.registerExctension("setup-database", inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
@@ -78,7 +79,7 @@ public class SetupService {
 	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
 	 * @return Gibt eine Liste an String zurück, welche die benötigten Prozedur-Dateinamen beinhalten: prozedur.sql.
 	 */
-	public List<String> parseDependencyList(String arg) {
+	List<String> parseDependencyList(String arg) {
 		// Die obere Zeile und die die Zeilen mit den nicht resolvten Dateien abschneiden.
 		String filteredArg = arg.substring(0, arg.indexOf("The following files have NOT been resolved:")).substring(arg.indexOf("\n") + 1);
 
@@ -99,10 +100,10 @@ public class SetupService {
 	 * @return Die Liste an SQL-Dateien als Strings.
 	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
-	public List<String> readSetups(String arg, boolean setupTableSchemas) throws IOException {
+	List<String> readSetups(String arg, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = parseDependencyList(arg);
 		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
-
+		
 		List<String> procedures = new ArrayList<>();
 
 		// Zuerst durch alle Dependencies durchgehen.
@@ -182,7 +183,7 @@ public class SetupService {
 	 * @param dependencySetupFile Das Setup-File, welches gescannt werden soll.
 	 * @return Die Liste an SQL-Dateinamen für das gescannte Setup-File.
 	 */
-	public List<String> readProceduresToList(File dependencySetupFile) {
+	List<String> readProceduresToList(File dependencySetupFile) {
 		List<String> procedures = new ArrayList<>();
 		// Dokument auslesen
 		try {
@@ -213,19 +214,20 @@ public class SetupService {
 	 * @param procedures Die Liste an SQL-Dateinamen.
 	 * @throws NoSuchFileException Falls die Datei passend zum Namen nicht existiert.
 	 */
-	public void runDependencyProcedures(List<String> procedures) throws NoSuchFileException {
+	void runDependencyProcedures(List<String> procedures) throws NoSuchFileException {
 		Path dependencySqlDir = service.getSystemFolder().resolve("sql");
 		for (String procedureName : procedures) {
 			Path sqlFile = dependencySqlDir.resolve(procedureName);
 			if (sqlFile.toFile().exists()) {
+				final val connection = database.getConnection();
 				try {
 					// Den Sql-Code aus der Datei auslesen und ausführen.
 					String procedure = Files.readString(sqlFile);
-					final val connection = database.getConnection();
 
 					logger.info("Executing Procedure/View " + procedureName);
 					try {
 						connection.prepareCall(procedure).execute();
+						connection.commit();
 					} catch (Exception e) {
 						logger.info("Prozedur/View " + procedureName + " is being installed.");
 						// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
@@ -233,9 +235,12 @@ public class SetupService {
 						procedure = "create" + procedure;
 
 						connection.prepareCall(procedure).execute();
+						connection.commit();
 					}
 				} catch (Exception e) {
 					throw new RuntimeException("Error in " + procedureName + ". The file could not be red.", e);
+				} finally {
+					database.freeUpConnection(connection);
 				}
 
 			} else {

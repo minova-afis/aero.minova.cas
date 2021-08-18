@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.setup.table.InstallToolIntegration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

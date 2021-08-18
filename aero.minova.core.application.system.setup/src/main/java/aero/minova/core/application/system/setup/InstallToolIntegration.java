@@ -1,4 +1,4 @@
-package aero.minova.core.application.system.setup.table;
+package aero.minova.core.application.system.setup;
 
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.FilesService;

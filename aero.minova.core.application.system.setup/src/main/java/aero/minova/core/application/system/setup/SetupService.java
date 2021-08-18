@@ -16,8 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.setup.table.TableSchemaSetupService;
-import ch.minova.install.setup.BaseSetup;
+import aero.minova.core.application.system.setup.table.InstallToolIntegration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ import lombok.val;
 @Service
 public class SetupService {
 
-	@Autowired TableSchemaSetupService tableSchemaSetupService;
+	@Autowired InstallToolIntegration installToolIntegration;
 
 	@Autowired
 	public SystemDatabase database;
@@ -110,7 +109,7 @@ public class SetupService {
 		for (String dependency : dependencies) {
 			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
 			if (setupTableSchemas) {
-				tableSchemaSetupService.setupTableSchemas(setupXml);
+				installToolIntegration.setupTableSchemas(setupXml);
 			}
 			procedures.addAll(readProceduresToList(setupXml.toFile()));
 		}
@@ -119,7 +118,7 @@ public class SetupService {
 		final Path mainSetupXml = dependencySetupsDir.resolve("Setup.xml");
 		File mainSetupFile = mainSetupXml.toFile();
 		if (setupTableSchemas) {
-			tableSchemaSetupService.setupTableSchemas(mainSetupXml);
+			installToolIntegration.setupTableSchemas(mainSetupXml);
 		}
 		if (mainSetupFile.exists()) {
 			procedures.addAll(readProceduresToList(mainSetupFile));

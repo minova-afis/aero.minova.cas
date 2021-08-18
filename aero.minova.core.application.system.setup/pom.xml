@@ -87,5 +87,12 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/libs/ch.minova.setuppropertiesbean-10.0.2.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>ch.minova</groupId>
+			<artifactId>ch.minova.tablebean</artifactId>
+			<version>10.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/ch.minova.tablebean.jar</systemPath>
+		</dependency>
 	</dependencies>
 </project>

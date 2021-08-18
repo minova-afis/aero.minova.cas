@@ -1,6 +1,7 @@
 package aero.minova.core.application.system.setup.table;
 
 import aero.minova.core.application.system.CustomLogger;
+import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.setup.ModuleNotFoundException;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import ch.minova.core.install.SetupDocument;
@@ -25,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * Das ist dr Table-Schema-Installer,
@@ -35,15 +37,28 @@ public class TableSchemaSetupService {
 
 	@Autowired SystemDatabase systemDatabase;
 	@Autowired CustomLogger logger;
+	@Autowired FilesService files;
 
 	public void setupTableSchemas(Path setupXml) {
 		try {
 			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
 			final Connection connection = systemDatabase.getConnection();
+			BaseSetup.parameter = System.getProperties();
 			try {
 				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
 				final BaseSetup setup = new BaseSetup();
-				setupDocument.getSetup().getName();
+				setup.setSetupDocument(setupDocument);
+				setup.readSchema();
+				final ResultSet rs = connection.createStatement()
+						.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'");
+				rs.next();
+				if (rs.getInt("Anzahl") == 0) {
+					setup.readoutSchemaCreate(connection);
+					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getSetup().getName());
+				} else {
+					setup.readoutSchema(connection, Optional.of(files.getSystemFolder().resolve("tables")));
+					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getSetup().getName());
+				}
 			} finally {
 				systemDatabase.freeUpConnection(connection);
 			}

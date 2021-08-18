@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,6 +29,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.jar.JarEntry;
@@ -149,13 +152,15 @@ public class BaseSetup {
 	private static Hashtable<String, Integer> hashModulesActive = new Hashtable<String, Integer>();
 	// verwendet für das Abfangen zirkulärer Abhängigkeiten
 
-	private static Properties parameter = null;
+	public static Properties parameter = null;
 	private static String sqldialect = "sql";
 	private static String xbsName;
 	private static String connectiondb = "";
 
 	// #22872
 	private String Language = "";
+
+	private SetupDocument setupDocument;
 
 	/**
 	 * eine Enum für die Parameter der Ausführung von Javacode in der Setup.xml
@@ -2056,13 +2061,16 @@ public class BaseSetup {
 	 * @throws BaseSetupException
 	 */
 	private SetupDocument getSetupDocument() throws XmlException, IOException, BaseSetupException {
+		if (setupDocument != null) {
+			return setupDocument;
+		}
 		final String setupxml = "Setup.xml";
 		final InputStream isSetupXmlpfad = this.getClass().getResourceAsStream(setupxml);
 		if (isSetupXmlpfad == null) {
 			throw new BaseSetupException(MessageFormat.format(MISSINGFILE, setupxml));
 		}
 		final SetupDocument doc = SetupDocument.Factory.parse(isSetupXmlpfad, null);
-		// setjavacall(doc);
+		// setjavacall(doc); 
 		return doc;
 	}
 
@@ -3070,7 +3078,7 @@ public class BaseSetup {
 		return sw.toString();
 	}
 
-	private boolean readoutSchemaCreate(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
+	public boolean readoutSchemaCreate(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
 		checktVersion10(con);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
@@ -3285,6 +3293,22 @@ public class BaseSetup {
 		return "null";
 	}
 
+	public boolean readoutSchema(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
+		return readoutSchema(con, Optional.empty());
+	}
+
+	private InputStream readTableXml(String tableName, Optional<Path> tableLibrary) {
+		if (tableLibrary.isEmpty()) {
+			return readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tableName + ".table.xml");
+		} else {
+			try {
+				return Files.newInputStream(tableLibrary.get().resolve(tableName + ".xml"));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 	/**
 	 * Diese methode liest die Tabelle aus der XML-Datei aus. Danach wird sie mit der Tabelle , falls diese bereits in der DB besteht, verglichen. Ansonsten
 	 * wird die Tabelle neu angelegt. Im nächsten Schritt werden die Constraints der Tabelle vergliochen. Dabei werden zunächst alle PK und UK_Constraints
@@ -3298,7 +3322,7 @@ public class BaseSetup {
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	private boolean readoutSchema(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
+	public boolean readoutSchema(final Connection con, Optional<Path> tableLibrary) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
 		checktVersion10(con);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
@@ -3331,7 +3355,7 @@ public class BaseSetup {
 					sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
 					log(MessageFormat.format("{0} - Tabelle wird ueberprueft", tablevector.get(i).getName().toString()), true);
 
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					// hier wird die Datei aus der Setup.xml eingelesen und kann
 					// mit
 					// der in der Datenbank vorhandenen Datei verglichen
@@ -3384,7 +3408,7 @@ public class BaseSetup {
 					// Table aus der ausgelesenen Datenbank
 					log(MessageFormat.format("Tabelle {0} aus der DB!", tablevector.get(i)));
 					sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					xmlTable = new XmlDatabaseTable(is, getCollation());
 					is.close();
 					sqlCode = generateUpdateTableConstraintsPK_UK(sqlTable, xmlTable);
@@ -3416,7 +3440,7 @@ public class BaseSetup {
 				sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
 
 				try {
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					xmlTable = new XmlDatabaseTable(is, getCollation());
 					is.close();
 					sqlCode = generateUpdateTableConstraintsFK(sqlTable, xmlTable);
@@ -3446,7 +3470,7 @@ public class BaseSetup {
 				// }
 				sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
 				try {
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					xmlTable = new XmlDatabaseTable(is, getCollation());
 					is.close();
 					sqlCode = xmlTable.generateUpdateValues();
@@ -3667,7 +3691,7 @@ public class BaseSetup {
 	 * @throws ModuleNotFoundException
 	 * @throws SQLException
 	 */
-	private boolean readSchema() throws XmlException, IOException, BaseSetupException, ModuleNotFoundException, SQLException {
+	public boolean readSchema() throws XmlException, IOException, BaseSetupException, ModuleNotFoundException, SQLException {
 		final SetupDocument doc = getSetupDocument();
 		if (doc.getSetup().getSchema() != null) {
 			final Tableschema[] tables = doc.getSetup().getSchema().getTableschemaArray();
@@ -5761,5 +5785,9 @@ public class BaseSetup {
 	 */
 	public static Vector<BaseSetup> getOrderedModule() {
 		return orderedDependingModules;
+	}
+
+	public void setSetupDocument(SetupDocument setupDocument) {
+		this.setupDocument = setupDocument;
 	}
 }

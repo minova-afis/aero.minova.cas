@@ -33,7 +33,7 @@ import java.util.Optional;
  * welcher auf dem internen Install-Tool der Minova basiert.
  */
 @Service
-public class TableSchemaSetupService {
+public class InstallToolIntegration {
 
 	@Autowired SystemDatabase systemDatabase;
 	@Autowired CustomLogger logger;

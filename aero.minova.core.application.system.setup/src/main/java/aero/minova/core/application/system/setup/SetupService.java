@@ -113,7 +113,7 @@ public class SetupService {
 		for (String dependency : dependencies) {
 			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
 			if (setupTableSchemas) {
-				installToolIntegration.installSetuo(setupXml);
+				installToolIntegration.installSetup(setupXml);
 			}
 			procedures.addAll(readProceduresToList(setupXml.toFile()));
 		}
@@ -122,7 +122,7 @@ public class SetupService {
 		final Path mainSetupXml = dependencySetupsDir.resolve("Setup.xml");
 		File mainSetupFile = mainSetupXml.toFile();
 		if (setupTableSchemas) {
-			installToolIntegration.installSetuo(mainSetupXml);
+			installToolIntegration.installSetup(mainSetupXml);
 		}
 		if (mainSetupFile.exists()) {
 			procedures.addAll(readProceduresToList(mainSetupFile));

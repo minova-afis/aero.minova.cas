@@ -126,7 +126,9 @@ public class BaseSetup {
 	private static Hashtable<String, String> hashtables = new Hashtable<String, String>();
 	private static Vector<TableVector> tablevector = new Vector<TableVector>();
 
-	/** Modulname des Moduls welches im Abhängigkeitsbaum zum Schluss */
+	/**
+	 * Modulname des Moduls welches im Abhängigkeitsbaum zum Schluss
+	 */
 	private static String LastMdiModu;
 	// key sollte der Name der Maske oder Optionpage sein
 	// private static Hashtable<String, String> ModuleInfoHash = new
@@ -174,15 +176,14 @@ public class BaseSetup {
 	 *
 	 * @param name
 	 * @return boolean <br>
-	 *         sobald eine der Versionen uebereinstimmt, wird true zurueckgegeben.
+	 * sobald eine der Versionen uebereinstimmt, wird true zurueckgegeben.
 	 */
 	private static boolean checkActive(final String name) {
 		if (hashModulesActive.isEmpty()) {
 			return true;
 		}
 		try {
-			@SuppressWarnings("unused")
-			final int i = hashModulesActive.get(name);
+			@SuppressWarnings("unused") final int i = hashModulesActive.get(name);
 		} catch (final NullPointerException e) {
 			return true;
 		}
@@ -190,13 +191,11 @@ public class BaseSetup {
 	}
 
 	/**
-	 * @param moduleName
-	 *            Name des zu prüfenden Moduls (z.B.:"ch.minova.data")
-	 * @param versionInfo
-	 *            Die ???
-	 * @function Ueberpruefung des angegebenen Strings und der angegebenen VersionInfo von dem Module() StringnameModule ob dieser in der gegebenen version
-	 *           vorhanden ist bzw. kompatiblen Version vorhanden
+	 * @param moduleName  Name des zu prüfenden Moduls (z.B.:"ch.minova.data")
+	 * @param versionInfo Die ???
 	 * @return
+	 * @function Ueberpruefung des angegebenen Strings und der angegebenen VersionInfo von dem Module() StringnameModule ob dieser in der gegebenen version
+	 * vorhanden ist bzw. kompatiblen Version vorhanden
 	 */
 	public static boolean checkKey(final String moduleName, final VersionInfo versionInfo) {
 		final VersionInfo verinfo = hashModules.get(moduleName);
@@ -205,9 +204,9 @@ public class BaseSetup {
 
 	/**
 	 * @param module
-	 * @function gibt mit dem Rueckgabeparameter an, ob das angegebene Module bereits in dem Hashtable aufgenommen, und somit bereits ueberprueft worden ist
 	 * @return
 	 * @throws IncompatibleVersionException
+	 * @function gibt mit dem Rueckgabeparameter an, ob das angegebene Module bereits in dem Hashtable aufgenommen, und somit bereits ueberprueft worden ist
 	 */
 	public static boolean checkKeyModule(final Module module) throws IncompatibleVersionException {
 		VersionInfo verinfo;
@@ -283,8 +282,8 @@ public class BaseSetup {
 
 	/**
 	 * @param nameModul
-	 * @function entfernt einen Eintrag aus dem Hashtable
 	 * @return boolean
+	 * @function entfernt einen Eintrag aus dem Hashtable
 	 */
 	public static boolean deleteModuleActive(final String nameModul) {
 		try {
@@ -303,8 +302,7 @@ public class BaseSetup {
 	/**
 	 * Auslesen des Modulenamen inlusive der zugehoerigen Versionsnummer
 	 *
-	 * @param clazz
-	 *            BaseSetup
+	 * @param clazz BaseSetup
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
@@ -591,8 +589,7 @@ public class BaseSetup {
 	/**
 	 * @param moduleName
 	 * @param vinfo
-	 * @param setup
-	 *            (wird derzeit nicht verwendet)
+	 * @param setup      (wird derzeit nicht verwendet)
 	 */
 	public static void setValue(final String moduleName, final VersionInfo vinfo, final BaseSetup setup) {
 		hashModules.put(moduleName, vinfo);
@@ -1395,8 +1392,7 @@ public class BaseSetup {
 	/**
 	 * @param sqlScript
 	 * @param name
-	 * @param versionInfo2
-	 *            (wird derzeit nicht verwendet)
+	 * @param versionInfo2 (wird derzeit nicht verwendet)
 	 * @param type
 	 * @param con
 	 * @throws SQLException
@@ -2087,10 +2083,8 @@ public class BaseSetup {
 	/**
 	 * überprüfung der SQL-Einträge in der Setup.xml Datei
 	 *
-	 * @param bs
-	 *            BaseSetup
-	 * @param doc
-	 *            SetupDocument
+	 * @param bs  BaseSetup
+	 * @param doc SetupDocument
 	 * @throws IOException
 	 * @throws SQLException
 	 * @throws BaseSetupException
@@ -2722,8 +2716,7 @@ public class BaseSetup {
 	/**
 	 * Übergeben wird ein SetupDocument. Es wird der java-call Teil ausgelesen und aufgeführt.
 	 *
-	 * @param setup
-	 *            ch.minova.core.install.SetupDocument
+	 * @param setup    ch.minova.core.install.SetupDocument
 	 * @param execjava
 	 * @throws ClassNotFoundException
 	 * @throws IllegalAccessException
@@ -2805,8 +2798,7 @@ public class BaseSetup {
 	/**
 	 * Überprüft einen angegebenen String auf einen zu eretztenden Wert und gibt diesen wieder zurück Wenn
 	 *
-	 * @param appshort
-	 *            true steht für die Ausgabe eines Pfades
+	 * @param appshort true steht für die Ausgabe eines Pfades
 	 * @param name
 	 * @return
 	 */
@@ -3300,7 +3292,21 @@ public class BaseSetup {
 			return readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tableName + ".table.xml");
 		} else {
 			try {
-				return Files.newInputStream(tableLibrary.get().resolve(tableName + ".xml"));
+				final Optional<Path> tableXml = Files.walk(tableLibrary.get())
+						.map(path -> {
+							// TODO Einheitliche XML-Namen verwenden.
+							if (Files.isRegularFile(path) && path.getFileName().equals(tableName + ".table.xml") ||path.getFileName().equals(tableName + ".xml")) {
+								return Optional.of(path);
+							}
+							return Optional.<Path>empty();
+						})//
+						.filter(path -> !path.isEmpty())
+						.map(path -> path.get())
+						.findFirst();
+				if (tableXml.isEmpty()) {
+					throw new RuntimeException("Table xml " + tableName + "not found.");
+				}
+				return Files.newInputStream(tableXml.get());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -3320,7 +3326,8 @@ public class BaseSetup {
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	public boolean readoutSchema(final Connection con, Optional<Path> tableLibrary) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
+	public boolean readoutSchema(final Connection con, Optional<Path> tableLibrary)
+			throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
 		checktVersion10(con);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
@@ -3877,14 +3884,10 @@ public class BaseSetup {
 	 * stellt sicher, dass ein Knoten mit dem angegebenen Name unter dem parent-Knoten existiert<br>
 	 * (wenn nicht vorhanden, wird er angelegt)
 	 *
-	 * @param nodeName
-	 *            Name des benötigten Knotens
-	 * @param parent
-	 *            parent-Knoten
-	 * @param setNull
-	 *            wenn es einen Knoten ohne Name gibt, benenne den um
-	 * @param fixLowerCase
-	 *            korrigiere die Schreibweise auf lower case
+	 * @param nodeName     Name des benötigten Knotens
+	 * @param parent       parent-Knoten
+	 * @param setNull      wenn es einen Knoten ohne Name gibt, benenne den um
+	 * @param fixLowerCase korrigiere die Schreibweise auf lower case
 	 * @return den gewünschten Knoten
 	 */
 	private Node ensureNode(final String nodeName, final Node parent, final boolean setNull, final boolean fixLowerCase) {
@@ -3917,12 +3920,9 @@ public class BaseSetup {
 	/**
 	 * noch mal das selbe wie {@link #ensureNode(String, Node, boolean)}, aber für Root-Node
 	 *
-	 * @param nodeName
-	 *            Name des benötigten Knotens
-	 * @param parent
-	 *            parent-Knoten
-	 * @param setNull
-	 *            wenn es einen Knoten ohne Name gibt, benenne den um
+	 * @param nodeName Name des benötigten Knotens
+	 * @param parent   parent-Knoten
+	 * @param setNull  wenn es einen Knoten ohne Name gibt, benenne den um
 	 * @return den gewünschten Knoten
 	 */
 	private Node ensureNode(final String nodeName, final Root parent, final boolean setNull) {
@@ -4059,25 +4059,23 @@ public class BaseSetup {
 	 * Diese Methode liest die übergebene xbs-Datei aus und speichert sie mit in dem globalen Object rootNodeRoot aus BaseSetup. Des weiteren wird, falls nicht
 	 * bereits vorhanden, der "minova" node mit mit Kind "name der Software" (disposition) angelegt. Zusätzlich wird für den Fall, dass die xbs-Datei nicht
 	 * besteht, diese angelegt mit den StandardKnoten: <code>
-	 * 	<root type="system">
-	 * 		<map/>
-	 * 		<node name="minova">
-	 * 			<map/>
-	 * 			<node name="disposition">
-	 * 				<map>
-	 * 					<entry key="import.1" value="license.xbs"/>
-	 * 					<entry key="import.2" value="connection.xbs"/>
-	 * 				</map>
-	 * 			</node>
-	 * 		</node>
-	 * 	</root>
+	 * <root type="system">
+	 * <map/>
+	 * <node name="minova">
+	 * <map/>
+	 * <node name="disposition">
+	 * <map>
+	 * <entry key="import.1" value="license.xbs"/>
+	 * <entry key="import.2" value="connection.xbs"/>
+	 * </map>
+	 * </node>
+	 * </node>
+	 * </root>
 	 * <br>
 	 * </code> WIS 08.05.2014: die beiden Standard-Importe liegen jetzt zwei Ebenen weiter unten (#16618)
 	 *
-	 * @param xbspath
-	 *            der Pfad zur auszulesenden Datei wird hier angegeben.
-	 * @param xbsfile
-	 *            die auszulesende Datei
+	 * @param xbspath der Pfad zur auszulesenden Datei wird hier angegeben.
+	 * @param xbsfile die auszulesende Datei
 	 * @return
 	 * @throws XmlException
 	 * @throws IOException
@@ -4162,9 +4160,7 @@ public class BaseSetup {
 					}
 				}
 			}
-		}
-
-		catch (final EntryCompareMDIException e) {
+		} catch (final EntryCompareMDIException e) {
 			log(MessageFormat.format("EntryPositionException: {0}", maindocument.getClass().getName()));
 		} catch (final MenuCompareMDIException e) {
 			log(MessageFormat.format("MenuPositionException: {0}", maindocument.getClass().getName()));
@@ -4204,8 +4200,7 @@ public class BaseSetup {
 	}
 
 	/**
-	 * @param path
-	 *            -Pfad
+	 * @param path        -Pfad
 	 * @param file
 	 * @param servicename
 	 * @param dataending
@@ -4848,12 +4843,9 @@ public class BaseSetup {
 	}
 
 	/**
-	 * @param xbsfile
-	 *            - Name des zu Schreibenden Files.
-	 * @param outputdir
-	 *            - Verzeichnis, in das geschreiben werden muss
-	 * @param xbspath
-	 *            - Pfad zur xbs-Datei
+	 * @param xbsfile   - Name des zu Schreibenden Files.
+	 * @param outputdir - Verzeichnis, in das geschreiben werden muss
+	 * @param xbspath   - Pfad zur xbs-Datei
 	 * @throws XmlException
 	 * @throws IOException
 	 * @throws BaseSetupException
@@ -4909,8 +4901,7 @@ public class BaseSetup {
 	/**
 	 * Auslesen des RequiredService[] aus dem SetupDokument des übergebendenen Klassennamens
 	 *
-	 * @param reflectionclassname
-	 *            Name der Reflectionklasse
+	 * @param reflectionclassname Name der Reflectionklasse
 	 * @return Service[]
 	 */
 	private Service[] getServiceClassSetup(final String reflectionclassname) {
@@ -4939,7 +4930,7 @@ public class BaseSetup {
 	private WrapperConf.Entry[] getWrapperConfArray(final String reflectionclassname) {
 		final Service[] service = getServiceClassSetup(reflectionclassname);
 		WrapperConf.Entry[] wrapperconfentry = null;
-		for (final int j = 0; j < service.length;) {
+		for (final int j = 0; j < service.length; ) {
 			if (service[j].getWrapperConf() != null) {
 				if (service[j].getWrapperConf().getEntryArray() != null) {
 					wrapperconfentry = service[j].getWrapperConf().getEntryArray();
@@ -4954,7 +4945,7 @@ public class BaseSetup {
 	private Log4JConf.Entry[] getLog4JConfArray(final String reflectionclassname) {
 		final Service[] service = getServiceClassSetup(reflectionclassname);
 		Log4JConf.Entry[] log4Jconfentry = null;
-		for (final int j = 0; j < service.length;) {
+		for (final int j = 0; j < service.length; ) {
 			if (service[j].getLog4JConf() != null) {
 				if (service[j].getLog4JConf().getEntryArray() != null) {
 					log4Jconfentry = service[j].getLog4JConf().getEntryArray();
@@ -5561,8 +5552,7 @@ public class BaseSetup {
 	 * Methode zur Sortierung der Menues<br>
 	 * Behandlung von Menus die keine Positionsangabe haben, werden wie die größte Zahl behandelt. (Alles andere kommt vorher)
 	 *
-	 * @param mainmdi2
-	 *            Menus die zuvor eingelesen wurden. Enthalten uch Einträge
+	 * @param mainmdi2 Menus die zuvor eingelesen wurden. Enthalten uch Einträge
 	 * @throws MenuCompareMDIException
 	 */
 	private void sortmenues(final ch.minova.install.setup.mdi.Main mainmdi2) throws MenuCompareMDIException {
@@ -5647,9 +5637,8 @@ public class BaseSetup {
 	/**
 	 * @throws EntryCompareMDIException
 	 * @throws MenuCompareMDIException
-	 * @throws BaseSetupException
-	 *             schreibt die Knoten und einträge aus dem Main und speichert diese dann in der angegebnenen Datei (file) @param mainDoc @param file @throws
-	 *             NodeException @throws
+	 * @throws BaseSetupException       schreibt die Knoten und einträge aus dem Main und speichert diese dann in der angegebnenen Datei (file) @param mainDoc @param file @throws
+	 *                                  NodeException @throws
 	 */
 	public void writeMdiToDocument(final MainDocument mainDoc, final File file)
 			throws NodeException, BaseSetupException, MenuCompareMDIException, EntryCompareMDIException {

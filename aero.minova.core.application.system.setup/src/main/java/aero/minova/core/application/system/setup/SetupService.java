@@ -152,9 +152,9 @@ public class SetupService {
 		 * throw new NoSuchFileException("No setup file found with the name " + setupFile);
 		 *}
 		 */
-		String adjustedDependency = dependency.substring("aero.minova.".length());
+		final String adjustedDependency = dependency.substring("aero.minova.".length());
 		try {
-			Optional<Path> result = Files.walk(dependencySetupsDir, 1)
+			final Optional<Path> result = Files.walk(dependencySetupsDir, 1)
 					.map(dir -> {
 						if (dir.getFileName().toString().startsWith(adjustedDependency)) {
 							try {

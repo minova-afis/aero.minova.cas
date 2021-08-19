@@ -27,7 +27,7 @@ public class InstallToolIntegration {
 	@Autowired CustomLogger logger;
 	@Autowired FilesService files;
 
-	public void installSetuo(Path setupXml) {
+	public void installSetup(Path setupXml) {
 		try {
 			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
 			final Connection connection = systemDatabase.getConnection();

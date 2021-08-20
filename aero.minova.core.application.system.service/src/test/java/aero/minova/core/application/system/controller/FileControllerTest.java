@@ -328,7 +328,7 @@ public class FileControllerTest {
 		assertThat(Files.exists(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5"))).isTrue();
 		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5"))).isNotEmpty();
 		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
-				.isEqualTo(testSubject.getHash(programFilesFolder.resolve("AFIS.zip").toString()));
+				.isEqualTo(testSubject.getHash(Paths.get("Shared Data/Program Files/AFIS.zip").toString()));
 
 		// das zippen ist nicht deterministisch und würde auf github dazu führen, dass der Test abbricht, obwohl er local funktioniert
 		// assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo("51a1713197b136586344905c9847daff".getBytes(StandardCharsets.UTF_8));

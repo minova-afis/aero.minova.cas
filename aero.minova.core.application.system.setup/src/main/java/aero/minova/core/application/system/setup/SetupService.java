@@ -32,7 +32,11 @@ import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
 /**
- * Installiert sämtliche Komponenten und Abhängigkeiten des APP-Servers (aero.minova.app.parent).
+ * Installiert sämtliche Komponenten und Abhängigkeiten des APP-Servers (aero.minova.app.parent)
+ * anhand der "Setup.xml"s aus "{@link FilesService#rootPath}/setup/**".
+ * Dabei werden zuerst die Abhängigkeiten aus "{@link FilesService#rootPath}/setup/dependencyList.txt"
+ * ausgelesen und die entsprechenden "Setup.xml"s in "{@link FilesService#rootPath}/setup/**" installiert.
+ * Anschließend wird die Hauptkomponente anhand der "{@link FilesService#rootPath}/setup/Setup.xml" installiert.
  *
  * TODO SQL-Code (nicht Schema) wird doppelt ausgeführt.
  */
@@ -52,9 +56,6 @@ public class SetupService {
 
 	Logger logger = LoggerFactory.getLogger(SetupService.class);
 
-	/**
-	 * Fügt die Erweiterung hinzu.
-	 */
 	@PostConstruct
 	private void setup() {
 		// Fügt Extension hinzu.

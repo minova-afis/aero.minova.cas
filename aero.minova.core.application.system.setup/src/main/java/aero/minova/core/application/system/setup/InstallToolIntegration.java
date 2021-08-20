@@ -27,6 +27,16 @@ public class InstallToolIntegration {
 	@Autowired CustomLogger logger;
 	@Autowired FilesService files;
 
+	/**
+	 * Installiert eine gegebene "Setup.xml" mit dem Install-Tool.
+	 * Es wird der Code möglichst so ausgeführt,
+	 * als würde man das Tool mit update schema (us),
+	 * update database (ud) und module only (mo).
+	 *
+	 * Es wird also nur die SQL-Datenbank der "Setup.xml" installiert und die Abhängkeiten ignoriert.
+	 *
+	 * @param setupXml Die "Setup.xml" welche installiert wird.
+	 */
 	public void installSetup(Path setupXml) {
 		try {
 			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));

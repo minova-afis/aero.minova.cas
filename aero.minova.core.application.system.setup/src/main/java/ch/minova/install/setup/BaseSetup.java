@@ -3295,7 +3295,7 @@ public class BaseSetup {
 				final Optional<Path> tableXml = Files.walk(tableLibrary.get())
 						.map(path -> {
 							// TODO Einheitliche XML-Namen verwenden.
-							if (Files.isRegularFile(path) && path.getFileName().equals(tableName + ".table.xml") ||path.getFileName().equals(tableName + ".xml")) {
+							if (Files.isRegularFile(path) && path.getFileName().toString().equals(tableName + ".table.xml") ||path.getFileName().toString().equals(tableName + ".xml")) {
 								return Optional.of(path);
 							}
 							return Optional.<Path>empty();

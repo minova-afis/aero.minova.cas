@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 mvn clean verify
-mvn package spring-boot:repackage
 docker build --tag=$docker_user/aero.minova.cas:latest .
 exit
 

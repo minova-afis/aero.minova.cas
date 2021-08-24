@@ -502,10 +502,21 @@ class SecurityServiceTests {
 		assertThat(result.get(0).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(2).getValues().get(1).getStringValue());
 	}
 
+	@DisplayName("getPrivilegePermission-Rows überprüfen, aber es gibt keine UserGruppen")
+	@WithMockUser(username = "user", roles = {})
+	@Test
+	void test_getPrivilegePermissionNoPermissions() {
+
+		Mockito.doAnswer(returnsFirstArg()).when(spyController).getTableForSecurityCheck(Mockito.any());
+
+		List<Row> result = spyController.getPrivilegePermissions("test");
+		assertThat(result).hasSize(0);
+	}
+
 	@DisplayName("Finde Spalte mit SecurityToken per findSecurityTokenColumn")
 	@WithMockUser(username = "user", roles = {})
 	@Test
-	void test_findSecurityTokenColumn() {
+	void test_findSecurityTokenColumn() throws ProcedureException {
 		val inputTable = new Table();
 		inputTable.setName("spTest");
 		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
@@ -514,13 +525,7 @@ class SecurityServiceTests {
 		inputTable.addColumn(new Column("SecurityToken", DataType.STRING));
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 
-		int result = 0;
-		try {
-			result = spyController.findSecurityTokenColumn(inputTable);
-		} catch (ProcedureException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		int result = spyController.findSecurityTokenColumn(inputTable);
 		assertThat(result).isEqualTo(3);
 	}
 
@@ -560,7 +565,7 @@ class SecurityServiceTests {
 		rowToBeChecked.addValue(new Value("", null));
 		rowToBeChecked.addValue(new Value(true, null));
 
-		assertTrue(spyController.checkRowForValidSecurityToken(userGroups, rowToBeChecked, 1));
+		assertTrue(spyController.isRowAccessValid(userGroups, rowToBeChecked, 1));
 	}
 
 	@DisplayName("Überprüfe, ob SecurityToken in Row übereinstimmt mit vorhandenen SecurityTokens")
@@ -580,6 +585,6 @@ class SecurityServiceTests {
 		rowToBeChecked.addValue(new Value("", null));
 		rowToBeChecked.addValue(new Value(true, null));
 
-		assertFalse(spyController.checkRowForValidSecurityToken(userGroups, rowToBeChecked, 1));
+		assertFalse(spyController.isRowAccessValid(userGroups, rowToBeChecked, 1));
 	}
 }

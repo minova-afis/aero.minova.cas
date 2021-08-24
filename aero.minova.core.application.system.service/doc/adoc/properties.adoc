@@ -9,9 +9,25 @@ Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 == Minova Properties
 * aero_minova_core_application_root_path
 
-** *Default*: `../../..`
+** *Default*: `.`
 
 ** *Wertebereich*: Absolute Pfade und relative Pfade zum Ausführungsort
+
+* security_ldap_domain
+
+** *Default* `minova.comminova.com`
+
+* security_ldap_address
+
+** *Default* `ldap:Minova Ldap Adresse`
+
+* server.port
+
+** *Default*: `8084`
+
+* login_dataSource
+
+** *Wertebereich*: `admin/database/ldap` Jeweils einen dieser drei Werte für einen anderen Login-Modus
 
 * aero_minova_database_url
 
@@ -25,17 +41,9 @@ Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 
 ** *Default*: `password`
 
-* test.certificate.mail.service.cron
-
-** *Default*: `0 * * * * *` = Jeder Anfang einer Minute
-
-Bestimmt in welchen Intervall die Testresultate per E-Mail verschickt werden.
-Um das Verschicken zu deaktiveren, kann der Wert `-` verwendet werden.
-Das Interval wird als Cron-Ausdruck beschrieben: https://crontab.cronhub.io
-
 * files.permission.check
 
 ** *Default*: 'false'
 
-Schalter für die files/read- und files/hash-Anfragen, welcher bestimmt, 
+** *Wertebereich*: `true/false` Schalter für die files/read- und files/hash-Anfragen, welcher bestimmt, 
 ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.

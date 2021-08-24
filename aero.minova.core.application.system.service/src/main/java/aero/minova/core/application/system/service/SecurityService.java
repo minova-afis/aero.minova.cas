@@ -284,7 +284,7 @@ public class SecurityService {
 	 *            Die Spalte als int, in welcher der SecurityToken liegt.
 	 * @return True, falls einer der SecurityTokens übereinstimmt, andernfalls False.
 	 */
-	public boolean checkRowForValidSecurityToken(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn) {
+	public boolean isRowAccessValid(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn) {
 		if (!userSecurityTokens.isEmpty()) {
 			String securityTokenValue = rowToBeChecked.getValues().get(securityTokenInColumn).getStringValue();
 			if (securityTokenValue == null || userSecurityTokens.contains(securityTokenValue.toLowerCase())) {

@@ -279,7 +279,7 @@ public class FilesController {
 			}
 			// wir wollen nicht keinen Hash von einem Directory ( zips allerdings schon)
 			if (!path.toFile().isDirectory()) {
-				hashFile(path.subpath(files.getSystemFolder().getNameCount(), path.getNameCount()));
+				hashFile(files.getSystemFolder().toAbsolutePath().relativize(path.toAbsolutePath()));
 			}
 
 		}
@@ -306,7 +306,7 @@ public class FilesController {
 			}
 			// wir wollen nicht noch einen zip von einer zip Datei, wir wollen allerdings hier NUR Directories haben
 			if ((!fileSuffix.toLowerCase().contains("zip")) && (path.toFile().isDirectory())) {
-				createZip(path.subpath(files.getSystemFolder().getNameCount(), path.getNameCount()));
+				createZip(files.getSystemFolder().toAbsolutePath().relativize(path.toAbsolutePath()));
 			}
 		}
 	}

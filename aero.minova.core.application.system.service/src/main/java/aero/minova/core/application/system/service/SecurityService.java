@@ -39,8 +39,11 @@ public class SecurityService {
 	public CustomLogger customLogger;
 
 	/**
-	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt.
-	 *
+	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt. Die Abfrage sieht
+	 * folgendermaßen aus: select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserPrivileges where (PrivilegeKeyText = privilegeName and KeyText =
+	 * UserSecurityToken1) or (PrivilegeKeyText = privilegeName and KeyText = UserSecurityToken2) or ... Die erzeugten Rows haben folgendes Format: Row r =
+	 * [Tabellenname,UserSecurityToken,RowLevelSecurity], Beispiel: Row r = ["tTestTabelle","User1",1], Row r2 = ["tTestTabelle","User2",0]
+	 * 
 	 * @param privilegeName
 	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
@@ -104,7 +107,10 @@ public class SecurityService {
 	 * Entfernt alle Spalten der Eingabe-Tabelle, auf die der Nutzer keinen Zugriff hat.
 	 * <p>
 	 * TODO Idee: Mann sollte eine neue Tabelle erstellen, statt die eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht
-	 * geändert wird.
+	 * geändert wird. Die Sql-Abfrage hat folgendes Format: select TableName, ColumnName, SecurityToken from xtcasColumnSecurity where (TableName =
+	 * inputTableName and SecurityToken = UserSecurityToken1) or (TableName = inputTableName and SecurityToken = UserSecurityToken2) or ... Die Rows der
+	 * zurückgelieferten Table haben folgendes Format: Row r = [Tabellenname,ColumnName,SecurityToken], Beispiel: Row r = ["tTestTabelle","Spalte1","User1"] Row
+	 * r = ["tTestTabelle","Spalte2","User1"]
 	 *
 	 * @param inputTable
 	 *            Enthält den Tabellen-Namen und die Spalten, welche von einem Nutzer angefragt werden.
@@ -175,8 +181,9 @@ public class SecurityService {
 	}
 
 	/**
-	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an
-	 *
+	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an Der resultierende String hat
+	 * dann folgendes Format: [and/where] ((SecurityToken IS NULL) or (SecurityToken IN (UserSecurityToken1, UserSecurityToken2, ...))
+	 * 
 	 * @param isFirstWhereClause
 	 *            Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
 	 * @param requestingAtuhorities
@@ -291,7 +298,8 @@ public class SecurityService {
 	}
 
 	/**
-	 * Updatet die Rollen, welche momentan im SecurityContext für den eingeloggten User hinterlegt sind.
+	 * Updatet die Rollen, welche momentan im SecurityContext für den eingeloggten User hinterlegt sind, anhand folgender Abfrage: select
+	 * KeyText,UserSecurityToken,Memberships from xtcasUser where KeyText = username
 	 * 
 	 * @param username
 	 *            Der Username dessen Rollen geladen werden sollen.

@@ -20,7 +20,7 @@ import com.mysql.cj.jdbc.CallableStatement;
 import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.sql.SystemDatabase;
 
-public class SetupServiceTest {
+public class SetupServiceTest extends BaseTest {
 
 	@Mock
 	private SystemDatabase database;

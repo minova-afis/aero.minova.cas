@@ -200,7 +200,7 @@ public class SqlProcedureController {
 						/*
 						 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
 						 */
-						if (securityService.checkRowForValidSecurityToken(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
+						if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
 							resultSet.addRow(rowToBeAdded);
 							totalResults++;
 						}
@@ -235,7 +235,7 @@ public class SqlProcedureController {
 					int securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
 
 					Row resultRow = new Row();
-					if (securityService.checkRowForValidSecurityToken(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
+					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 						resultRow = outputValues;
 					} else {
 						for (int i = 0; i < outputValues.getValues().size(); i++) {

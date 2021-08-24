@@ -36,7 +36,7 @@ public class SqlViewController {
 	SystemDatabase systemDatabase;
 
 	@Autowired
-	SecurityService securityUtils;
+	SecurityService securityService;
 
 	@Autowired
 	CustomLogger customLogger;
@@ -51,11 +51,11 @@ public class SqlViewController {
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
 		try {
-			List<Row> authoritiesForThisTable = securityUtils.getPrivilegePermissions(inputTable.getName());
+			List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
 			if (authoritiesForThisTable.isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
-			inputTable = securityUtils.columnSecurity(inputTable, authoritiesForThisTable);
+			inputTable = securityService.columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {
 				inputMetaData = new TableMetaData();
@@ -252,7 +252,7 @@ public class SqlViewController {
 			}
 		}
 
-		final String onlyAuthorizedRows = securityUtils.rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 
 		return sb.toString();
@@ -290,7 +290,7 @@ public class SqlViewController {
 				sb.append(")");
 			}
 		}
-		final String onlyAuthorizedRows = securityUtils.rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 		sb.append(" ) as RowConstraintResult");
 

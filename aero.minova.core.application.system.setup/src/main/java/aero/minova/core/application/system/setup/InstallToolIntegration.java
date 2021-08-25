@@ -50,13 +50,17 @@ public class InstallToolIntegration {
 				final ResultSet rs = connection.createStatement()
 						.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'");
 				rs.next();
+				final Optional<Path> tableLibrary = Optional.of(files.getSystemFolder().resolve("tables"));
+				final Optional<Path> sqlLibrary = Optional.of(files.getSystemFolder().resolve("sql"));
+				setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
 				if (rs.getInt("Anzahl") == 0) {
-					setup.readoutSchemaCreate(connection);
+					setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
 					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getSetup().getName());
 				} else {
-					setup.readoutSchema(connection, Optional.of(files.getSystemFolder().resolve("tables")));
+					setup.readoutSchema(connection, tableLibrary, sqlLibrary);
 					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getSetup().getName());
 				}
+				connection.commit();
 			} finally {
 				systemDatabase.freeUpConnection(connection);
 			}

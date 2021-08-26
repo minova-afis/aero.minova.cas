@@ -19,6 +19,8 @@ select @UserGroupKey = KeyLong from xtcasUserGroup where KeyText = 'admin'
 DECLARE temp_cursor CURSOR FOR 
 SELECT KeyLong FROM #temp
 
+open temp_cursor
+
 FETCH NEXT FROM temp_cursor INTO @UserPrivilegeKey  
 
 WHILE @@FETCH_STATUS = 0  

@@ -1,0 +1,73 @@
+
+
+== Tabelle xtcasColumnSecurity ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== TableName
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.TableName[]
+
+// end::column.TableName[]
+
+
+==== ColumnName
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.ColumnName[]
+
+// end::column.ColumnName[]
+
+
+==== SecurityToken
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.SecurityToken[]
+
+// end::column.SecurityToken[]
+
+
+==== LastUser
+
+Datentyp: nvarchar(50) not null +
+Default: `system_user` +
+
+// tag::column.LastUser[]
+
+// end::column.LastUser[]
+
+
+==== LastDate
+
+Datentyp: datetime not null +
+Default: `getdate()` +
+
+// tag::column.LastDate[]
+
+// end::column.LastDate[]
+
+
+==== LastAction
+
+Datentyp: integer not null +
+Default: `1` +
+
+// tag::column.LastAction[]
+
+// end::column.LastAction[]

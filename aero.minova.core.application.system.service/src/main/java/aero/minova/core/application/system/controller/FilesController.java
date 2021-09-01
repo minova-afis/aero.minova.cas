@@ -352,7 +352,7 @@ public class FilesController {
 	 * @param zipFile
 	 *            File, gewünschtes finales Zip-File.
 	 * @param fileList
-	 *            List<Path>, Pfade zu Dateien, welche gezipped werden sollen.
+	 *            List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden sollen.
 	 * @throws RuntimeException
 	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
 	 */

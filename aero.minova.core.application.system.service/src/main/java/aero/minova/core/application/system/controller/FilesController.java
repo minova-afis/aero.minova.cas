@@ -278,7 +278,7 @@ public class FilesController {
 			if (path.startsWith(files.getMd5Folder())) {
 				continue;
 			}
-			// wir wollen nicht keinen Hash von einem Directory ( zips allerdings schon)
+			// wir wollen keine Hashes von einem Directory ( zips allerdings schon)
 			if (!path.toFile().isDirectory()) {
 				hashFile(files.getSystemFolder().toAbsolutePath().relativize(path.toAbsolutePath()));
 			}

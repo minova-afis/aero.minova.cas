@@ -149,7 +149,7 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
-		if (path.substring(path.lastIndexOf("/")).contains(".zip")) {
+		if ((path.contains("/") && path.substring(path.lastIndexOf("/")).contains(".zip")) || !path.contains("/") && path.contains(".zip")) {
 			return getZip(path);
 		}
 		val inputPath = files.checkLegalPath(Paths.get(path));
@@ -177,11 +177,12 @@ public class FilesController {
 		Path md5FilePath;
 
 		// Falls man den Hash eines Zip-Files möchte, liegen diese jetzt im Internal-Ordner
-		if (path.substring(path.lastIndexOf("/")).contains(".zip")) {
+		if ((path.contains("/") && path.substring(path.lastIndexOf("/")).contains(".zip")) || !path.contains("/") && path.contains(".zip")) {
 			md5FilePath = files.getMd5Folder().resolve("Internal").resolve("Zips").resolve(toBeResolved);
 		} else {
 			md5FilePath = files.getMd5Folder().resolve(toBeResolved);
 		}
+
 		files.checkLegalPath(md5FilePath);
 		return readAllBytes(md5FilePath);
 	}
@@ -191,7 +192,7 @@ public class FilesController {
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/zip: " + path);
 		String toBeResolved = path;
-		if (!path.substring(path.lastIndexOf("/")).contains(".zip")) {
+		if ((path.contains("/") && !path.substring(path.lastIndexOf("/")).contains(".zip")) || !path.contains(".zip")) {
 			// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im Zips Ordner nachgestellt.
 			toBeResolved = toBeResolved + ".zip";
 		}

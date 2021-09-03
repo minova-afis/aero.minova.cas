@@ -4,19 +4,13 @@ import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.write;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -28,30 +22,40 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.FilesService;
 import lombok.val;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class FileControllerTest {
+public class FilesControllerTest extends BaseTest {
 
 	@Test
 	public void testLegal() throws Exception {
 		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
 		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 		Mockito.when(authentication.getName()).thenReturn("test");
 
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
-		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
@@ -63,26 +67,33 @@ public class FileControllerTest {
 	public void testLegalHash() throws Exception {
 		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
 		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 		Mockito.when(authentication.getName()).thenReturn("test");
 
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
-		final val md5Folder = sharedDataFolder.resolve("MD5");
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
 		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
-		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		testSubject.hashFile(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"));
+		testSubject.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.xbs"));
 		assertThat(testSubject.getHash("Shared Data/Program Files/AFIS/AFIS.xbs"))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 	}
@@ -91,28 +102,36 @@ public class FileControllerTest {
 	public void testLegalLog() throws Exception {
 		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
 		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 		Mockito.when(authentication.getName()).thenReturn("test");
+
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
 
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
 		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve(".metadata");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
-		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
 		write(serviceFolder.resolve("beispielLog.log"), new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
-		byte[] randomByteStream = testSubject.getZip(programFilesFolder.resolve(".metadata"));
+		testSubject.createZip(Paths.get("Shared Data/Program Files/.metadata"));
 
 		// dabei wird der Logs Ordner erzeugt
-		testSubject.getLogs(randomByteStream);
+		testSubject.getLogs(readAllBytes(zipsFolder.resolve("Shared Data").resolve("Program Files").toFile().listFiles()[0].toPath()));
 
 		File found = findFile("beispielLog.log", internalFolder.resolve("UserLogs").toFile());
 		assertThat(found).isNotEqualTo(null);
@@ -125,10 +144,16 @@ public class FileControllerTest {
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
 		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
@@ -142,10 +167,16 @@ public class FileControllerTest {
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
 		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
@@ -156,99 +187,97 @@ public class FileControllerTest {
 
 	@Test
 	public void testLegalZip() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
-		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		byte[] zipped = testSubject.getZip(serviceFolder);
-		File zippedFile = new File(serviceFolder + ".zip");
-		Files.write(Paths.get(zippedFile.getAbsolutePath()), zipped);
+		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
-		String fileName = programFilesFolder + File.separator + "AFIS2";
+		final val tempFolder = programFilesFolder.resolve("temp");
+		createDirectories(tempFolder);
+		assertThat(Files.exists(tempFolder.resolve("AFIS"))).isFalse();
 
-		File dir = new File(fileName);
-		FileInputStream fis;
-		byte[] buffer = new byte[1024];
-		try {
-			fis = new FileInputStream(zippedFile);
-			ZipInputStream zis = new ZipInputStream(fis);
-			ZipEntry ze = zis.getNextEntry();
-			while (ze != null) {
-				String zippedFileEntry = ze.getName();
-				File newFile = new File(fileName + File.separator + zippedFileEntry);
-				System.out.println("Unzipping to " + newFile.getAbsolutePath());
-				// create directories for sub directories in zip
-				new File(newFile.getParent()).mkdirs();
-				FileOutputStream fos = new FileOutputStream(newFile);
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
-				}
-				fos.close();
-				// close this ZipEntry
-				zis.closeEntry();
-				ze = zis.getNextEntry();
-			}
-			// close last ZipEntry
-			zis.closeEntry();
-			zis.close();
-			fis.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
+		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
+		testSubject.unzipFile(tempFile, tempFolder);
 
-		assertThat(Files.exists(programFilesFolder.resolve("AFIS2"))).isTrue();
-		assertThat(Files.exists(programFilesFolder.resolve("AFIS2").resolve("AFIS"))).isTrue();
-		assertThat(Files.exists(programFilesFolder.resolve("AFIS2").resolve("AFIS").resolve("AFIS.xbs"))).isTrue();
-		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs")))
-				.isEqualTo(readAllBytes(programFilesFolder.resolve("AFIS2").resolve("AFIS").resolve("AFIS.xbs")));
+		assertThat(Files.exists(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS"))).isTrue();
+		assertThat(Files.exists(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs"))).isTrue();
+		assertThat(readAllBytes(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs")))
+				.isEqualTo(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs")));
 	}
 
 	@Test
 	public void testLegalZipExists() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
-		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
 
-		byte[] zipped = testSubject.getZip(serviceFolder);
+		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
-		final byte[] buffer = new byte[1024];
-		ByteArrayInputStream bais = new ByteArrayInputStream(zipped);
-		int i = zipped.length;
-		final ZipInputStream zip = new ZipInputStream(bais);
-		final ByteArrayOutputStream out = new ByteArrayOutputStream(zipped.length);
-		ZipEntry ze = null;
-		int len = 0;
-		if ((ze = zip.getNextEntry()) != null) {
-			while ((len = zip.read(buffer)) != -1) {
-				out.write(buffer, 0, len);
-			}
-		}
-		zip.close();
-		out.close();
-		byte[] unzipped = out.toByteArray();
+		final val tempFolder = programFilesFolder.resolve("temp");
+		createDirectories(tempFolder);
+
+		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
+		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
+		testSubject.unzipFile(tempFile, tempFolder);
+
+		assertThat(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").toFile().exists()).isTrue();
+
+		byte[] unzipped = readAllBytes(findFile("AFIS.xbs", tempFolder.toFile()).toPath());
 		assertThat(readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"))).isEqualTo(unzipped);
-		assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip"))).isNotEqualTo(new String("").getBytes(StandardCharsets.UTF_8));
+		assertThat(readAllBytes(zipsFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip")))
+				.isNotEqualTo(new String("").getBytes(StandardCharsets.UTF_8));
 		assertThat(unzipped).isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -257,29 +286,50 @@ public class FileControllerTest {
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
 		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
-		Assertions.assertThrows(IllegalAccessException.class, () -> assertThat(testSubject.getZip(Paths.get("../Shared Data/Program Files/AFIS/AFIS.xbs"))));
+		assertThrows(java.io.FileNotFoundException.class, () -> testSubject.createZip(serviceFolder.resolve("AFIS.xbs")));
 	}
 
 	@Test
 	public void testLegalZipAll() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
 		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
-		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
@@ -297,27 +347,33 @@ public class FileControllerTest {
 	public void testZipAllAndHashAll() throws Exception {
 		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
 		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
 		SecurityContextHolder.setContext(securityContext);
 		Mockito.when(authentication.getName()).thenReturn("test");
 
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
+
 		final val rootPath = new TemporaryFolder();
 		rootPath.create();
 		final val rootFolder = rootPath.getRoot().toPath();
-		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val internalFolder = rootPath.newFolder("Internal").toPath();
 		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
+		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
 		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
 		final val serviceFolder = programFilesFolder.resolve("AFIS");
 		createDirectories(serviceFolder);
 		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
 
-		final val testSubject = new FilesController();
 		testSubject.files = new FilesService(rootFolder.toString());
 		testSubject.files.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		write(serviceFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"), new String("").getBytes(StandardCharsets.UTF_8));
 		byte[] old = readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"));
 
@@ -325,10 +381,12 @@ public class FileControllerTest {
 		testSubject.hashAll();
 
 		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs.md5"))).isNotEqualTo(old);
-		assertThat(Files.exists(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5"))).isTrue();
-		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5"))).isNotEmpty();
-		assertThat(readAllBytes(md5Folder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
-				.isEqualTo(testSubject.getHash(programFilesFolder.resolve("AFIS.zip").toString()));
+		assertThat(Files.exists(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
+				.isTrue();
+		assertThat(readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
+				.isNotEmpty();
+		assertThat(readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
+				.isEqualTo(testSubject.getHash("Shared Data/Program Files/AFIS.zip"));
 
 		// das zippen ist nicht deterministisch und würde auf github dazu führen, dass der Test abbricht, obwohl er local funktioniert
 		// assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo("51a1713197b136586344905c9847daff".getBytes(StandardCharsets.UTF_8));
@@ -336,6 +394,42 @@ public class FileControllerTest {
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 
 		testSubject.hashAll();
+	}
+
+	@Test
+	public void getZipBackCompatability() throws Exception {
+		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+		Authentication authentication = Mockito.mock(Authentication.class);
+		CustomLogger logger = Mockito.mock(CustomLogger.class);
+		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+		Mockito.when(authentication.getName()).thenReturn("test");
+
+		final val testSubject = new FilesController();
+		testSubject.customLogger = logger;
+
+		final val rootPath = new TemporaryFolder();
+		rootPath.create();
+		final val rootFolder = rootPath.getRoot().toPath();
+		final val internalFolder = rootPath.newFolder("Internal").toPath();
+		final val md5Folder = internalFolder.resolve("MD5");
+		final val zipsFolder = internalFolder.resolve("Zips");
+		final val logsFolder = internalFolder.resolve("UserLogs");
+		final val sharedDataFolder = rootPath.newFolder("Shared Data").toPath();
+		final val programFilesFolder = sharedDataFolder.resolve("Program Files");
+		final val serviceFolder = programFilesFolder.resolve("AFIS");
+		createDirectories(serviceFolder);
+		createDirectories(md5Folder);
+		createDirectories(zipsFolder);
+
+		testSubject.files = new FilesService(rootFolder.toString());
+		testSubject.files.setUp();
+
+		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));
+
+		assertThat(testSubject.getFile("Shared Data/Program Files/AFIS.zip")).isEqualTo(testSubject.getZip("Shared Data/Program Files/AFIS"));
+
 	}
 
 	// Hilfsmethode

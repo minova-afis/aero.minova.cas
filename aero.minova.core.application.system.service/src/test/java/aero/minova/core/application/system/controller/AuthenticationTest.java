@@ -25,7 +25,7 @@ import aero.minova.core.application.system.SecurityConfig;
 @SpringBootTest
 @Import(SecurityConfig.class)
 @AutoConfigureDataLdap
-public class AuthenticationTest {
+public class AuthenticationTest extends BaseTest {
 
 	@Autowired
 	@Qualifier("ldapUser")

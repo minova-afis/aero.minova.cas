@@ -1,4 +1,4 @@
-package aero.minova.core.application.system.controller;
+package aero.minova.core.application.system.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,10 +18,9 @@ import org.mockito.MockitoAnnotations;
 import com.mysql.cj.jdbc.CallableStatement;
 
 import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.service.SetupService;
 import aero.minova.core.application.system.sql.SystemDatabase;
 
-public class SetupServiceTest {
+public class SetupServiceTest{
 
 	@Mock
 	private SystemDatabase database;
@@ -60,7 +59,7 @@ public class SetupServiceTest {
 			text = scanner.useDelimiter("\\A").next();
 		}
 
-		List<String> procedureList = testSubject.readSetups(text);
+		List<String> procedureList = testSubject.readSetups(text, false);
 
 		assertThat(procedureList).hasSize(1);
 		assertThat(procedureList).contains("xvxmpExampleIndex.sql");

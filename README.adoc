@@ -20,7 +20,7 @@
 
 Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank sowie einem Read-Only-Dateisystem bereit.
 
-Der Fokus liegt hierbei das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.
+Der Fokus liegt hierbei darauf, das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.
 Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.
 
 == Weiterführende Dokumentation
@@ -40,7 +40,7 @@ Jede Installation besteht aus 4 Teilen:
 * Datenbank: xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
 * Dateisystem: Einbinden des lokalen Dateisystems
 * xref:./aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
-* Prägung des System über die erste Ausführung der Installations-Prozedur.
+* Prägung des Systems über die erste Ausführung der Installations-Prozedur.
 
 === Installation für Spezifische Umgebungen
 * xref:./doc/adoc/installation.adoc#[Installation des Dienstes im alten Format]

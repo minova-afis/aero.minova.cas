@@ -6,7 +6,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<parent>
 		<groupId>aero.minova</groupId>
-		<artifactId>spring.maven.root</artifactId>
+		<artifactId>spring.maven.root</artifactId>g
 		<version>1.2.1</version>
 		<relativePath/>
 	</parent>

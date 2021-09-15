@@ -29,6 +29,7 @@ jobs:
                       -Dpassword=$GITHUB_ACCESS_TOKEN \
                       -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
                       -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
+                      -Darguments="-Dmaven.javadoc.skip=true" \
                       --settings .github/settings.xml
                     git pull
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.service

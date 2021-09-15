@@ -339,10 +339,8 @@ public class FilesController {
 		// erzeugt Datei, falls sie noch nicht existiert, macht ansonsten nichts
 		zipFile.createNewFile();
 
-		// dadurch bekommt man beim entpacken auch den Ordner, in dem der Inhalt ist, und nicht nur den Inhalt
-		String sourcePath = zipDataName.getParent().subpath(0, files.getSystemFolder().getNameCount()).toString();
 		customLogger.logFiles("Zipping: " + zipFile);
-		zip(sourcePath, zipFile, fileList);
+		zip(files.getSystemFolder().toString(), zipFile, fileList);
 	}
 
 	/**

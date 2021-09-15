@@ -1,4 +1,4 @@
-FROM avotz/aero.minova.cas:latest
+FROM minova/aero.minova.cas:latest
 COPY target/classes /opt/aero.minova.cas/system-files/
 ENTRYPOINT ["/opt/java/openjdk/bin/java"]
 WORKDIR '/opt/aero.minova.cas'

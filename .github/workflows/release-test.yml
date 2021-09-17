@@ -25,8 +25,8 @@ jobs:
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE/aero.minova.core.application.system.app
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}
-          echo docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }} --build-arg casVersion={{ github.event.inputs.releaseVersion }} .
-          docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }} --build-arg casVersion={{ github.event.inputs.releaseVersion }} .
+          echo docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }} --build-arg casVersion=${{ github.event.inputs.releaseVersion }} .
+          docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }} --build-arg casVersion=${{ github.event.inputs.releaseVersion }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }}
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}

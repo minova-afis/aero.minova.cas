@@ -299,6 +299,9 @@ public class FilesController {
 	public void zipAll() throws Exception {
 		List<Path> programFiles = files.populateFilesList(files.getSystemFolder());
 		for (Path path : programFiles) {
+			if (path.startsWith(files.getZipsFolder().getParent().toString())) {
+				continue;
+			}
 			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
 			// es kann sein, dass von einem vorherigen Start bereits gezippte Dateien vorhanden sind, welche schon gehashed wurden
 			if (fileSuffix.toLowerCase().equals("md5")) {
@@ -325,6 +328,7 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/createZip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public void createZip(@RequestParam Path path) throws Exception {
+
 		List<Path> fileList = files.populateFilesList(files.getSystemFolder().resolve(path));
 
 		// Path für die neue ZIP-Datei zusammenbauen

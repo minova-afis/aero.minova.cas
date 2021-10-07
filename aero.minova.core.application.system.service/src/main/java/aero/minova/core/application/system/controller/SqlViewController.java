@@ -229,38 +229,7 @@ public class SqlViewController {
 			tableNameAndUserToken.setValues(asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
-		try {
-			return getTableForSecurityCheck(userPrivileges);
-		} catch (RuntimeException e) {
-			if (!privilegeName.equals("setup")) {
-				throw e;
-			}
-			final Connection connection = systemDatabase.getConnection();
-			try {
-				ResultSet tables = connection.getMetaData().getTables(null, null, "xvcasUserPrivileges", null);
-				if (!tables.next()) {
-					final Table permissions = new Table();
-					permissions.setName("setupPermissions");
-					permissions.addColumn(new Column("ProzedurName", DataType.STRING));
-					permissions.addColumn(new Column("UserSecurityToken", DataType.STRING));
-					permissions.addColumn(new Column("RowLevelSecurityBit", DataType.BOOLEAN));
-					allUserAuthorities.forEach(a -> {
-						final Row row = new Row();
-						row.addValue(new Value("setup", null));
-						row.addValue(new Value(a.getAuthority(), null));
-						row.addValue(new Value(false, null));
-						permissions.addRow(row);
-					});
-					return permissions;
-				} else {
-					throw e;
-				}
-			} catch (SQLException e1) {
-				throw new RuntimeException(e1);
-			} finally {
-				systemDatabase.freeUpConnection(connection);
-			}
-		}
+		return getTableForSecurityCheck(userPrivileges);
 	}
 
 	/**

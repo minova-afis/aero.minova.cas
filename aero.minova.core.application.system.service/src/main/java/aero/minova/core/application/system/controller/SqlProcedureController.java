@@ -8,7 +8,6 @@ import static java.util.stream.IntStream.range;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,14 +56,18 @@ public class SqlProcedureController {
 	@Autowired
 	Gson gson;
 
-	private final Map<String, Function<Table, ResponseEntity>> extension = new HashMap<>();
-	private final Map<String, Function<Table, Boolean>> extensionCheck = new HashMap<>();
+	private final Map<String, Function<Table, ResponseEntity>> extensions = new HashMap<>();
+	/**
+	 * Wird nur verwendet, falls die Tabelle "xvcasUserPrivileges" nicht vorhanden ist.
+	 * In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt ist.
+	 */
+	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
 
 	public void registerExctension(String name, Function<Table, ResponseEntity> ext) {
-		if (extension.containsKey(name)) {
+		if (extensions.containsKey(name)) {
 			throw new IllegalArgumentException(name);
 		}
-		extension.put(name, ext);
+		extensions.put(name, ext);
 	}
 
 	private boolean isDatabaseSetup() throws Exception {
@@ -92,17 +94,17 @@ public class SqlProcedureController {
 					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 				}
 			} else {
-				if (extensionCheck.containsKey(inputTable.getName())) {
-					if (!extensionCheck.get(inputTable.getName()).apply(inputTable)) {
+				if (extensionBootstrapChecks.containsKey(inputTable.getName())) {
+					if (!extensionBootstrapChecks.get(inputTable.getName()).apply(inputTable)) {
 						throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 					}
 				} else {
 					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 				}
 			}
-			if (extension.containsKey(inputTable.getName())) {
+			if (extensions.containsKey(inputTable.getName())) {
 				try {
-					return extension.get(inputTable.getName()).apply(inputTable);
+					return extensions.get(inputTable.getName()).apply(inputTable);
 				} catch (Exception e) {
 					throw new ProcedureException(e);
 				}

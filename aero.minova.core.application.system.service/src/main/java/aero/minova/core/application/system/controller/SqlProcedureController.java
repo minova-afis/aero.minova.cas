@@ -7,6 +7,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,7 +58,8 @@ public class SqlProcedureController {
 	@Autowired
 	Gson gson;
 
-	private Map<String, Function<Table, ResponseEntity>> extension = new HashMap<>();
+	private final Map<String, Function<Table, ResponseEntity>> extension = new HashMap<>();
+	private final Map<String, Function<Table, Boolean>> extensionCheck = new HashMap<>();
 
 	public void registerExctension(String name, Function<Table, ResponseEntity> ext) {
 		if (extension.containsKey(name)) {
@@ -64,14 +68,37 @@ public class SqlProcedureController {
 		extension.put(name, ext);
 	}
 
+	private boolean isDatabaseSetup() throws Exception {
+		return isTablePresent("xvcasUserPrivileges");
+	}
+
+	private boolean isTablePresent(String tableName) throws Exception {
+		try (final Connection connection = systemDatabase.getConnection()) {
+			return connection.getMetaData()//
+					.getTables(null, null, tableName, null)//
+					.next();
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
+		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
-			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName()).getRows();
-			if (privilegeRequest.isEmpty()) {
-				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+			if (isDatabaseSetup()) {
+				privilegeRequest.addAll(svc.getPrivilegePermissions(inputTable.getName()).getRows());
+				if (privilegeRequest.isEmpty()) {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
+			} else {
+				if (extensionCheck.containsKey(inputTable.getName())) {
+					if (!extensionCheck.get(inputTable.getName()).apply(inputTable)) {
+						throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+					}
+				} else {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
 			}
 			if (extension.containsKey(inputTable.getName())) {
 				try {
@@ -79,6 +106,9 @@ public class SqlProcedureController {
 				} catch (Exception e) {
 					throw new ProcedureException(e);
 				}
+			}
+			if (privilegeRequest.isEmpty()) {
+				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
 			val result = calculateSqlProcedureResult(inputTable, privilegeRequest);
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);

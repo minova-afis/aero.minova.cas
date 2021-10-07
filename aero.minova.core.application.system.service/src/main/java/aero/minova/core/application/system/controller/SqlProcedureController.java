@@ -68,17 +68,17 @@ public class SqlProcedureController {
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
-		if (extension.containsKey(inputTable.getName())) {
-			try {
-				return extension.get(inputTable.getName()).apply(inputTable);
-			} catch (Exception e) {
-				throw new ProcedureException(e);
-			}
-		}
 		try {
 			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName()).getRows();
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+			}
+			if (extension.containsKey(inputTable.getName())) {
+				try {
+					return extension.get(inputTable.getName()).apply(inputTable);
+				} catch (Exception e) {
+					throw new ProcedureException(e);
+				}
 			}
 			val result = calculateSqlProcedureResult(inputTable, privilegeRequest);
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);

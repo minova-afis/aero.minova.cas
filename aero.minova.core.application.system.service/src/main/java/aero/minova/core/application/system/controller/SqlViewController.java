@@ -3,8 +3,10 @@ package aero.minova.core.application.system.controller;
 import static java.util.Arrays.asList;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -199,6 +201,10 @@ public class SqlViewController {
 	/**
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt.
 	 *
+	 * Das Privileg setup ist hier eine Außnahme,
+	 * da jeder Nutzer diese Methode ausführen darf,
+	 * falls setup noch niemals vorher aufgerufen wurde.
+	 *
 	 * @param privilegeName Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
 	 **/
@@ -226,21 +232,34 @@ public class SqlViewController {
 		try {
 			return getTableForSecurityCheck(userPrivileges);
 		} catch (RuntimeException e) {
-			// TODO Zusätzlich prüfen, ob das die erste Ausführung von setup ist.
-			if ("setup".equals(privilegeName)) {
-				final Table permissions = new Table();
-				permissions.setName("setupPermissions");
-				permissions.addColumn(new Column("ProzedurName", DataType.STRING));
-				permissions.addColumn(new Column("UserSecurityToken", DataType.STRING));
-				permissions.addColumn(new Column("RowLevelSecurityBit", DataType.BOOLEAN));
-				final Row row = new Row();
-				row.addValue(new Value("setup", null));
-				row.addValue(new Value("admin", null));
-				row.addValue(new Value(false, null));
-				permissions.addRow(row);
-				return permissions;
+			if (!privilegeName.equals("setup")) {
+				throw e;
 			}
-			throw e;
+			final Connection connection = systemDatabase.getConnection();
+			try {
+				ResultSet tables = connection.getMetaData().getTables(null, null, "xvcasUserPrivileges", null);
+				if (!tables.next()) {
+					final Table permissions = new Table();
+					permissions.setName("setupPermissions");
+					permissions.addColumn(new Column("ProzedurName", DataType.STRING));
+					permissions.addColumn(new Column("UserSecurityToken", DataType.STRING));
+					permissions.addColumn(new Column("RowLevelSecurityBit", DataType.BOOLEAN));
+					allUserAuthorities.forEach(a -> {
+						final Row row = new Row();
+						row.addValue(new Value("setup", null));
+						row.addValue(new Value(a.getAuthority(), null));
+						row.addValue(new Value(false, null));
+						permissions.addRow(row);
+					});
+					return permissions;
+				} else {
+					throw e;
+				}
+			} catch (SQLException e1) {
+				throw new RuntimeException(e1);
+			} finally {
+				systemDatabase.freeUpConnection(connection);
+			}
 		}
 	}
 

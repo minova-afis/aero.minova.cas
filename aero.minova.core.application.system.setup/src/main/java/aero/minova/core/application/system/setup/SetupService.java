@@ -59,7 +59,7 @@ public class SetupService {
 	@PostConstruct
 	private void setup() {
 		// Fügt Extension hinzu.
-		spc.registerExctension("setup", inputTable -> {
+		spc.registerExtension("setup", inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");

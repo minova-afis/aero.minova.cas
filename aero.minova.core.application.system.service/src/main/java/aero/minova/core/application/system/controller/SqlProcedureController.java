@@ -63,7 +63,7 @@ public class SqlProcedureController {
 	 */
 	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
 
-	public void registerExctension(String name, Function<Table, ResponseEntity> ext) {
+	public void registerExtension(String name, Function<Table, ResponseEntity> ext) {
 		if (extensions.containsKey(name)) {
 			throw new IllegalArgumentException(name);
 		}

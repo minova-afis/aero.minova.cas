@@ -17,7 +17,16 @@ in den lib-Ordner vom CAS kopieren.
 ## API
 
 Das Plugin ist eine Erweiterung des `data/procedure`-Pfades.
-Um die Installation zu starten, muss man die entsprechende Prozedur aufrufen:
+
+Wenn diese Erweiterung aufgerufen wurde und die Tabelle `tVersion10` nicht existiert,
+wird angenommen, dass es der erste Aufruf der Prozedur für diese Datenbank ist.
+In diesem Fall darf jeder Nutzer diese Prozedur aufrufen.
+Für nachfolgende Aufrufe gilt diese Sonderregel nicht.
+Dieses Verfahren wird dazu genutzt, um das System initial aufzusetzen.
+Wäre dies nicht der Fall müsste bei der Installation die entsprechenden Tabellen manuel aufgesetzt werden.
+
+Um die Installation zu starten, muss man die entsprechende Prozedur aufrufen.
+Argumente werden dabei ignoriert:
 
 [source,json]
 .Body des Post-Requests

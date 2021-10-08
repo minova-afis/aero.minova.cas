@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -55,28 +56,59 @@ public class SqlProcedureController {
 	@Autowired
 	Gson gson;
 
-	private Map<String, Function<Table, ResponseEntity>> extension = new HashMap<>();
+	private final Map<String, Function<Table, ResponseEntity>> extensions = new HashMap<>();
+	/**
+	 * Wird nur verwendet, falls die Tabelle "xvcasUserPrivileges" nicht vorhanden ist.
+	 * In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt ist.
+	 */
+	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
 
-	public void registerExctension(String name, Function<Table, ResponseEntity> ext) {
-		if (extension.containsKey(name)) {
+	public void registerExtension(String name, Function<Table, ResponseEntity> ext) {
+		if (extensions.containsKey(name)) {
 			throw new IllegalArgumentException(name);
 		}
-		extension.put(name, ext);
+		extensions.put(name, ext);
+	}
+
+	private boolean isDatabaseSetup() throws Exception {
+		return isTablePresent("xvcasUserPrivileges");
+	}
+
+	private boolean isTablePresent(String tableName) throws Exception {
+		try (final Connection connection = systemDatabase.getConnection()) {
+			return connection.getMetaData()//
+					.getTables(null, null, tableName, null)//
+					.next();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
-		if (extension.containsKey(inputTable.getName())) {
-			try {
-				return extension.get(inputTable.getName()).apply(inputTable);
-			} catch (Exception e) {
-				throw new ProcedureException(e);
-			}
-		}
+		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
-			List<Row> privilegeRequest = svc.getPrivilegePermissions(inputTable.getName()).getRows();
+			if (isDatabaseSetup()) {
+				privilegeRequest.addAll(svc.getPrivilegePermissions(inputTable.getName()).getRows());
+				if (privilegeRequest.isEmpty()) {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
+			} else {
+				if (extensionBootstrapChecks.containsKey(inputTable.getName())) {
+					if (!extensionBootstrapChecks.get(inputTable.getName()).apply(inputTable)) {
+						throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+					}
+				} else {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
+			}
+			if (extensions.containsKey(inputTable.getName())) {
+				try {
+					return extensions.get(inputTable.getName()).apply(inputTable);
+				} catch (Exception e) {
+					throw new ProcedureException(e);
+				}
+			}
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}

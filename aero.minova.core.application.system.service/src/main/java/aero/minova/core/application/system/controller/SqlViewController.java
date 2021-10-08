@@ -3,8 +3,10 @@ package aero.minova.core.application.system.controller;
 import static java.util.Arrays.asList;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -223,25 +225,7 @@ public class SqlViewController {
 			tableNameAndUserToken.setValues(asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
-		try {
-			return getTableForSecurityCheck(userPrivileges);
-		} catch (RuntimeException e) {
-			// TODO Zusätzlich prüfen, ob das die erste Ausführung von setup ist.
-			if ("setup".equals(privilegeName)) {
-				final Table permissions = new Table();
-				permissions.setName("setupPermissions");
-				permissions.addColumn(new Column("ProzedurName", DataType.STRING));
-				permissions.addColumn(new Column("UserSecurityToken", DataType.STRING));
-				permissions.addColumn(new Column("RowLevelSecurityBit", DataType.BOOLEAN));
-				final Row row = new Row();
-				row.addValue(new Value("setup", null));
-				row.addValue(new Value("admin", null));
-				row.addValue(new Value(false, null));
-				permissions.addRow(row);
-				return permissions;
-			}
-			throw e;
-		}
+		return getTableForSecurityCheck(userPrivileges);
 	}
 
 	/**

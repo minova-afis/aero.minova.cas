@@ -91,6 +91,7 @@ public class SetupService {
 		List<String> dependencies = Stream.of(filteredArg.split("\\R"))//
 				.filter(s -> !s.contains("The following files have been resolved:"))//
 				.filter(s -> !s.isBlank())//
+				.filter(s -> s.contains("jar"))//
 				.map(s -> s.substring(0 + 1, s.indexOf(":jar")).replace(":", ".").strip())//
 				.collect(Collectors.toList());
 		Collections.reverse(dependencies);

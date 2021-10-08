@@ -87,6 +87,7 @@
 						</goals>
 						<configuration>
 							<outputDirectory>${project.build.directory}/libs</outputDirectory>
+							<excludeScope>provided</excludeScope>
 						</configuration>
 					</execution>
 				</executions>

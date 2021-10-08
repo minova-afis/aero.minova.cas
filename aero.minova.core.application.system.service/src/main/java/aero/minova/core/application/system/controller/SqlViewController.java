@@ -201,10 +201,6 @@ public class SqlViewController {
 	/**
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt.
 	 *
-	 * Das Privileg setup ist hier eine Außnahme,
-	 * da jeder Nutzer diese Methode ausführen darf,
-	 * falls setup noch niemals vorher aufgerufen wurde.
-	 *
 	 * @param privilegeName Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
 	 **/

@@ -1,5 +1,7 @@
 = Installation/Update von CAS auf dem mindockerqnap für die Stundenerfassung
 
+WARN: TODO Es sollte ein eigenes Kunden-Projekt für unsere Stundenerfassung erstellt und verwendet werden.
+
 CAS für die Stunderfassung ist unter link:https://stunden.minova.com:8084[https://mincas.minova.com:8084] erreichbar.
 Der Keystore mit dem öffentlichen Zertifikat kan link:../../keystore.p12[hier] geladen werden.
 Das Passwort lautet `geheim`.

@@ -70,6 +70,13 @@ public class SqlProcedureController {
 		extensions.put(name, ext);
 	}
 
+	public void registerExtensionBootstrapCheck(String name, Function<Table, Boolean> extCheck) {
+		if (extensionBootstrapChecks.containsKey(name)) {
+			throw new IllegalArgumentException(name);
+		}
+		extensionBootstrapChecks.put(name, extCheck);
+	}
+
 	private boolean isDatabaseSetup() throws Exception {
 		return isTablePresent("xvcasUserPrivileges");
 	}

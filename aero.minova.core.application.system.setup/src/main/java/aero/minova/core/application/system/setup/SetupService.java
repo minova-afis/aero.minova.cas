@@ -164,7 +164,7 @@ public class SetupService {
 						if (dir.getFileName().toString().startsWith(adjustedDependency)) {
 							try {
 								Optional<Path> setup = Files.walk(dir)//
-										.filter(f -> f.getFileName().toString().equals("Setup.xml"))//
+										.filter(f -> f.getFileName().toString().toLowerCase().equals("setup.xml"))//
 										.findFirst();
 								return setup;
 							} catch (IOException e) {

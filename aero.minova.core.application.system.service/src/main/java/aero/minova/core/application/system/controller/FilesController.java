@@ -22,6 +22,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -149,7 +150,10 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
-		if ((path.contains("/") && path.substring(path.lastIndexOf("/")).contains(".zip")) || !path.contains("/") && path.contains(".zip")) {
+
+		String extension = FilenameUtils.getExtension(path);
+		// Zur Abwertskompatibilität Dateieindung überprüfen und, falls diese Zip ist, getZip aufrufen.
+		if (extension.equals("zip")) {
 			return getZip(path);
 		}
 		val inputPath = files.checkLegalPath(Paths.get(path));
@@ -175,9 +179,10 @@ public class FilesController {
 		String toBeResolved = path + ".md5";
 
 		Path md5FilePath;
+		String extension = FilenameUtils.getExtension(path);
 
 		// Falls man den Hash eines Zip-Files möchte, liegen diese jetzt im Internal-Ordner
-		if ((path.contains("/") && path.substring(path.lastIndexOf("/")).contains(".zip")) || !path.contains("/") && path.contains(".zip")) {
+		if (extension.equals("zip")) {
 			md5FilePath = files.getMd5Folder().resolve("Internal").resolve("Zips").resolve(toBeResolved);
 		} else {
 			md5FilePath = files.getMd5Folder().resolve(toBeResolved);
@@ -192,7 +197,9 @@ public class FilesController {
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/zip: " + path);
 		String toBeResolved = path;
-		if ((path.contains("/") && !path.substring(path.lastIndexOf("/")).contains(".zip")) || !path.contains(".zip")) {
+		String extension = FilenameUtils.getExtension(path);
+
+		if (!extension.equals("zip")) {
 			// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im Zips Ordner nachgestellt.
 			toBeResolved = toBeResolved + ".zip";
 		}

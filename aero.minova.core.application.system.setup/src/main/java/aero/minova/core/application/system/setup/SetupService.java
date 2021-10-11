@@ -43,6 +43,8 @@ import lombok.val;
 @Service
 public class SetupService {
 
+	private static final String PROCEDURE_NAME ="setup";
+
 	@Autowired InstallToolIntegration installToolIntegration;
 
 	@Autowired
@@ -59,7 +61,7 @@ public class SetupService {
 	@PostConstruct
 	private void setup() {
 		// Fügt Extension hinzu.
-		spc.registerExtension("setup", inputTable -> {
+		spc.registerExtension(PROCEDURE_NAME, inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
@@ -74,6 +76,7 @@ public class SetupService {
 				throw new RuntimeException(e);
 			}
 		});
+		spc.registerExtensionBootstrapCheck(PROCEDURE_NAME, inputTable -> true);
 	}
 
 	/**

@@ -22,6 +22,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -149,7 +150,10 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
-		if (path.substring(path.lastIndexOf("/")).contains(".zip")) {
+
+		String extension = FilenameUtils.getExtension(path);
+		// Zur Abwertskompatibilität Dateieindung überprüfen und, falls diese Zip ist, getZip aufrufen.
+		if (extension.equals("zip")) {
 			return getZip(path);
 		}
 		val inputPath = files.checkLegalPath(Paths.get(path));
@@ -175,13 +179,15 @@ public class FilesController {
 		String toBeResolved = path + ".md5";
 
 		Path md5FilePath;
+		String extension = FilenameUtils.getExtension(path);
 
 		// Falls man den Hash eines Zip-Files möchte, liegen diese jetzt im Internal-Ordner
-		if (path.substring(path.lastIndexOf("/")).contains(".zip")) {
+		if (extension.equals("zip")) {
 			md5FilePath = files.getMd5Folder().resolve("Internal").resolve("Zips").resolve(toBeResolved);
 		} else {
 			md5FilePath = files.getMd5Folder().resolve(toBeResolved);
 		}
+
 		files.checkLegalPath(md5FilePath);
 		return readAllBytes(md5FilePath);
 	}
@@ -191,7 +197,9 @@ public class FilesController {
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/zip: " + path);
 		String toBeResolved = path;
-		if (!path.substring(path.lastIndexOf("/")).contains(".zip")) {
+		String extension = FilenameUtils.getExtension(path);
+
+		if (!extension.equals("zip")) {
 			// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im Zips Ordner nachgestellt.
 			toBeResolved = toBeResolved + ".zip";
 		}
@@ -277,7 +285,7 @@ public class FilesController {
 			if (path.startsWith(files.getMd5Folder())) {
 				continue;
 			}
-			// wir wollen nicht keinen Hash von einem Directory ( zips allerdings schon)
+			// wir wollen keine Hashes von einem Directory ( zips allerdings schon)
 			if (!path.toFile().isDirectory()) {
 				hashFile(files.getSystemFolder().toAbsolutePath().relativize(path.toAbsolutePath()));
 			}
@@ -298,6 +306,9 @@ public class FilesController {
 	public void zipAll() throws Exception {
 		List<Path> programFiles = files.populateFilesList(files.getSystemFolder());
 		for (Path path : programFiles) {
+			if (path.startsWith(files.getZipsFolder().getParent().toString())) {
+				continue;
+			}
 			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
 			// es kann sein, dass von einem vorherigen Start bereits gezippte Dateien vorhanden sind, welche schon gehashed wurden
 			if (fileSuffix.toLowerCase().equals("md5")) {
@@ -324,6 +335,7 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/createZip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public void createZip(@RequestParam Path path) throws Exception {
+
 		List<Path> fileList = files.populateFilesList(files.getSystemFolder().resolve(path));
 
 		// Path für die neue ZIP-Datei zusammenbauen
@@ -338,10 +350,8 @@ public class FilesController {
 		// erzeugt Datei, falls sie noch nicht existiert, macht ansonsten nichts
 		zipFile.createNewFile();
 
-		// dadurch bekommt man beim entpacken auch den Ordner, in dem der Inhalt ist, und nicht nur den Inhalt
-		String sourcePath = zipDataName.getParent().subpath(0, files.getSystemFolder().getNameCount()).toString();
 		customLogger.logFiles("Zipping: " + zipFile);
-		zip(sourcePath, zipFile, fileList);
+		zip(files.getSystemFolder().toString(), zipFile, fileList);
 	}
 
 	/**

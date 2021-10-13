@@ -8,6 +8,7 @@ import static java.util.stream.IntStream.range;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -127,6 +129,12 @@ public class SqlProcedureController {
 		}
 	}
 
+	private void setUserContextFor(Connection connection) throws SQLException {
+		final val userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
+		userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
+		userContextSetter.execute();
+	}
+
 	/**
 	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
 	 *
@@ -174,6 +182,8 @@ public class SqlProcedureController {
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
 			sb.append(procedureCall);
+			setUserContextFor(connection);
+
 			final val preparedStatement = connection.prepareCall(procedureCall);
 
 			// Jede Row ist eine Abfrage.
@@ -460,7 +470,11 @@ public class SqlProcedureController {
 		final boolean returnRequired = ExecuteStrategy.returnRequired(strategy);
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append('{').append(returnRequired ? "? = call " : "call ").append(params.getName()).append("(");
+		sb.append('{')//
+				.append("")//
+				.append(returnRequired ? "? = call " : "call ")//
+				.append(params.getName())//
+				.append("(");
 		for (int i = 0; i < paramCount; i++) {
 			sb.append(i == 0 ? "?" : ",?");
 		}

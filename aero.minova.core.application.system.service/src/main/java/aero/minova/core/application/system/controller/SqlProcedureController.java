@@ -58,6 +58,9 @@ public class SqlProcedureController {
 	@Autowired
 	Gson gson;
 
+	/**
+	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
+	 */
 	private final Map<String, Function<Table, ResponseEntity>> extensions = new HashMap<>();
 	/**
 	 * Wird nur verwendet, falls die Tabelle "xvcasUserPrivileges" nicht vorhanden ist.
@@ -65,6 +68,13 @@ public class SqlProcedureController {
 	 */
 	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
 
+	/**
+	 * Hiermit lassen sich Erweiterungen registrieren,
+	 * die ausgeführt werden, wenn eine Prozedur mit der Namen der Registrierung ausgeführt werden soll.
+	 *
+	 * @param name Name der Erweiterung
+	 * @param ext Erweiterung
+	 */
 	public void registerExtension(String name, Function<Table, ResponseEntity> ext) {
 		if (extensions.containsKey(name)) {
 			throw new IllegalArgumentException(name);
@@ -72,6 +82,13 @@ public class SqlProcedureController {
 		extensions.put(name, ext);
 	}
 
+	/**
+	 * Registriert eine alternative Privilegien-Prüfung für Erweiterungen.
+	 * Diese wird nur verwendet, wenn {@link #arePrivilegeStoresSetup} gilt.
+	 *
+	 * @param name Name der Erweiterung
+	 * @param extCheck Alternative Privilegien-Prüfung
+	 */
 	public void registerExtensionBootstrapCheck(String name, Function<Table, Boolean> extCheck) {
 		if (extensionBootstrapChecks.containsKey(name)) {
 			throw new IllegalArgumentException(name);

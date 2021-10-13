@@ -79,7 +79,14 @@ public class SqlProcedureController {
 		extensionBootstrapChecks.put(name, extCheck);
 	}
 
-	private boolean isDatabaseSetup() throws Exception {
+	/**
+	 * Prüft, ob die minimal notwendigen Datenbank-Objekte für die Privileg-Prüfung in der Datenbank aufgesetzt wurden.
+	 * Dazu prüft man, ob die `xvcasUserPrivileges` vorhanden ist.
+	 *
+	 * @return Dies ist wahr, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
+	 * @throws Exception Fehler bei der Ermittelung
+	 */
+	private boolean arePrivilegeStoresSetup() throws Exception {
 		return isTablePresent("xvcasUserPrivileges");
 	}
 
@@ -91,13 +98,24 @@ public class SqlProcedureController {
 		}
 	}
 
+	/**
+	 * Führt eine CAS-Erweiterung falls vorhanden oder eine SQL-Prozedur im anderen Fall aus.
+	 *
+	 * Falls {@link #arePrivilegeStoresSetup} nicht gilt und es für die Eingabe eine passende Prozedur gibt,
+	 * wird geprüft, ob es für die Erweiterung eine passende alternative-Rechteprüfung gibt.
+	 * Dieser Mechanismus wird verwendet, um das Initialisieren der Datenbank über das CAS zu triggern.
+	 *
+	 * @param inputTable Name der Prozedur und Aufruf Parameter
+	 * @return Ergebnis des Prozeduren-Aufrufs
+	 * @throws Exception Fehler bei der Ausführung
+	 */
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
 		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
-			if (isDatabaseSetup()) {
+			if (arePrivilegeStoresSetup()) {
 				privilegeRequest.addAll(svc.getPrivilegePermissions(inputTable.getName()).getRows());
 				if (privilegeRequest.isEmpty()) {
 					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
@@ -129,6 +147,12 @@ public class SqlProcedureController {
 		}
 	}
 
+	/**
+	 * Speichert im SQl-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
+	 *
+	 * @param connection Das ist die Session.
+	 * @throws SQLException Fehler beim setzen des Kontextes für die connection.
+	 */
 	private void setUserContextFor(Connection connection) throws SQLException {
 		final val userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
 		userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());

@@ -52,6 +52,7 @@ public class SystemDatabase {
 	private synchronized void freeUpConnectionSynchronously(Connection connection) {
 		if (!freeConnections.contains(connection)) {
 			try {
+				connection.setAutoCommit(false);
 				if (connection.isValid(10)) {
 					freeConnections.add(connection);
 				} else {

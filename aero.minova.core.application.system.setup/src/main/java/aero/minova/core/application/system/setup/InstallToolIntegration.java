@@ -41,8 +41,9 @@ public class InstallToolIntegration {
 		try {
 			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
 			final Connection connection = systemDatabase.getConnection();
-			BaseSetup.parameter = System.getProperties();
 			try {
+				connection.setAutoCommit(true);
+				BaseSetup.parameter = System.getProperties();
 				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
 				final BaseSetup setup = new BaseSetup();
 				setup.setSetupDocument(setupDocument);

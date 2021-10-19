@@ -1,6 +1,6 @@
 
 
-== Tabelle xtcasUserPrivilege ()
+== Tabelle xtCasUserPrivilege ()
 
 
 === Spalten

@@ -1,0 +1,44 @@
+
+
+== Tabelle xtcasError ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== Username
+
+Datentyp: nvarchar(10) not null +
+
+// tag::column.Username[]
+
+// end::column.Username[]
+
+
+==== ErrorMessage
+
+Datentyp: nvarchar(250) not null +
+
+// tag::column.ErrorMessage[]
+
+// end::column.ErrorMessage[]
+
+
+==== Date
+
+Datentyp: datetime not null +
+Default: `getdate()` +
+
+// tag::column.Date[]
+
+// end::column.Date[]

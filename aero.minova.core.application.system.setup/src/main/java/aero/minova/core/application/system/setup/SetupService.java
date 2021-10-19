@@ -37,13 +37,12 @@ import lombok.val;
  * Dabei werden zuerst die Abhängigkeiten aus "{@link FilesService#rootPath}/setup/dependencyList.txt"
  * ausgelesen und die entsprechenden "Setup.xml"s in "{@link FilesService#rootPath}/setup/**" installiert.
  * Anschließend wird die Hauptkomponente anhand der "{@link FilesService#rootPath}/setup/Setup.xml" installiert.
- *
  * TODO SQL-Code (nicht Schema) wird doppelt ausgeführt.
  */
 @Service
 public class SetupService {
 
-	private static final String PROCEDURE_NAME ="setup";
+	private static final String PROCEDURE_NAME = "setup";
 
 	@Autowired InstallToolIntegration installToolIntegration;
 
@@ -66,8 +65,7 @@ public class SetupService {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
 				if (dependencyList.toFile().exists()) {
-					List<String> procedures = readSetups(Files.readString(dependencyList), true);
-					runDependencyProcedures(procedures);
+					readSetups(Files.readString(dependencyList), true);
 				} else {
 					throw new NoSuchFileException("No dependencyList.txt found!");
 				}
@@ -105,13 +103,12 @@ public class SetupService {
 	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
 	 *
 	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
-	 * @return Die Liste an SQL-Dateien als Strings.
 	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
-	List<String> readSetups(String arg, boolean setupTableSchemas) throws IOException {
+	void readSetups(String arg, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = parseDependencyList(arg);
 		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
-		
+
 		List<String> procedures = new ArrayList<>();
 
 		// Zuerst durch alle Dependencies durchgehen.
@@ -120,7 +117,7 @@ public class SetupService {
 			if (setupTableSchemas) {
 				installToolIntegration.installSetup(setupXml);
 			}
-			procedures.addAll(readProceduresToList(setupXml.toFile()));
+			runScripts(readProceduresToList(setupXml.toFile()));
 		}
 
 		// Danach muss das Hauptsetup-File ausgelesen werden.
@@ -130,12 +127,10 @@ public class SetupService {
 			installToolIntegration.installSetup(mainSetupXml);
 		}
 		if (mainSetupFile.exists()) {
-			procedures.addAll(readProceduresToList(mainSetupFile));
+			runScripts(readProceduresToList(mainSetupFile));
 		} else {
 			throw new NoSuchFileException("No main-setup file found!");
 		}
-
-		return procedures;
 	}
 
 	/**
@@ -222,7 +217,7 @@ public class SetupService {
 	 * @param procedures Die Liste an SQL-Dateinamen.
 	 * @throws NoSuchFileException Falls die Datei passend zum Namen nicht existiert.
 	 */
-	void runDependencyProcedures(List<String> procedures) throws NoSuchFileException {
+	void runScripts(List<String> procedures) throws NoSuchFileException {
 		Path dependencySqlDir = service.getSystemFolder().resolve("sql");
 		for (String procedureName : procedures) {
 			Path sqlFile = dependencySqlDir.resolve(procedureName);
@@ -232,15 +227,17 @@ public class SetupService {
 					// Den Sql-Code aus der Datei auslesen und ausführen.
 					String procedure = Files.readString(sqlFile);
 
-					logger.info("Executing Procedure/View " + procedureName);
+					logger.info("Executing Script " + procedureName);
 					try {
 						connection.prepareCall(procedure).execute();
 						connection.commit();
 					} catch (Exception e) {
-						logger.info("Prozedur/View " + procedureName + " is being installed.");
+						logger.info("Script " + procedureName + " is being executed.");
 						// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
-						procedure = procedure.substring(5);
-						procedure = "create" + procedure;
+						if (procedure.startsWith("alter ")) {
+							procedure = procedure.substring(5);
+							procedure = "create" + procedure;
+						}
 
 						connection.prepareCall(procedure).execute();
 						connection.commit();

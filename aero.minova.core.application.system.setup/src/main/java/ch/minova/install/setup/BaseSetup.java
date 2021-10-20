@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
@@ -1349,7 +1350,7 @@ public class BaseSetup {
 		log(MessageFormat.format("Module wird bearbeitet: {0}", this.getVersionInfo().getModulName() + this.getVersionInfo().toString()), true);
 		Hashtable<String, TVersion> tVersionHash = new Hashtable<String, TVersion>();
 		tVersionHash = getTVersion(connection, table);
-		checktVersion10(con);
+		checktVersion10(con, Optional.empty());
 		tVersionHash = getTVersion(connection, table);
 		// Einlesen der Daten aus tVersion
 		if (doc.getSetup().getSqlCode() != null) {
@@ -1647,6 +1648,14 @@ public class BaseSetup {
 		} catch (final SQLException e) {
 			log(MessageFormat.format("Error SQLException: {0}", e.getMessage()));
 			e.printStackTrace();
+		}
+	}
+
+	private String readSqlScript(String name, Path sqlLibrary) {
+		try {
+			return new String(Files.readAllBytes(sqlLibrary.resolve(name + ".sql")), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -2952,7 +2961,7 @@ public class BaseSetup {
 	}
 
 	private boolean readoutSchemaCreateLogDB(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
-		checktVersion10(con);
+		checktVersion10(con, Optional.empty());
 		final SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
 		SqlDatabaseTable sqlTable = null;
@@ -3069,7 +3078,11 @@ public class BaseSetup {
 	}
 
 	public boolean readoutSchemaCreate(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
-		checktVersion10(con);
+		return readoutSchemaCreate(con, Optional.empty(), Optional.empty());
+	}
+
+	public boolean readoutSchemaCreate(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
+		checktVersion10(con, sqlLibrary);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
 		SqlDatabaseTable sqlTable = null;
@@ -3088,7 +3101,7 @@ public class BaseSetup {
 				if (tablevector.get(i).getType().equalsIgnoreCase("table")) {
 					sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
 					log(MessageFormat.format("Tabelle {0} aus der DB!", tablevector.get(i)));
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					// hier wird die Datei aus der Setup.xml eingelesen und kann
 					// mit
 					// der ind der Datenbank vorhandenen Datei verglichen
@@ -3142,7 +3155,7 @@ public class BaseSetup {
 					// Table aus der ausgelesenen Datenbank
 					log(MessageFormat.format("Tabelle {0} aus der DB!", tablevector.get(i)));
 					sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					xmlTable = new XmlDatabaseTable(is, getCollation());
 					is.close();
 					sqlCode = generateUpdateTableConstraintsPK_UK(sqlTable, xmlTable);
@@ -3167,7 +3180,7 @@ public class BaseSetup {
 				log(MessageFormat.format("Tabelle {0} aus der DB!", tablevector.get(i)));
 				sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
 				try {
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					xmlTable = new XmlDatabaseTable(is, getCollation());
 					is.close();
 					sqlCode = xmlTable.generateUpdateValues();
@@ -3191,7 +3204,7 @@ public class BaseSetup {
 				log(MessageFormat.format("Tabelle {0} aus der DB!", tablevector.get(i)));
 				sqlTable = SqlDatabaseTable.getTable(tablevector.get(i).getName());
 				try {
-					final InputStream is = readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tablevector.get(i).getName() + ".table.xml");
+					final InputStream is = readTableXml(tablevector.get(i).getName(), tableLibrary);
 					xmlTable = new XmlDatabaseTable(is, getCollation());
 					is.close();
 					sqlCode = generateUpdateTableConstraintsFK(sqlTable, xmlTable);
@@ -3238,13 +3251,18 @@ public class BaseSetup {
 	/**
 	 * Überprüfung ob die Tabelle tVersion10 besteht. Ansonsten wird diese erstellt.
 	 */
-	private void checktVersion10(final Connection con) {
+	private void checktVersion10(final Connection con, Optional<Path> sqlLibrary) {
 		final String tversion10 = "tVersion10";
 		this.connection = con;
 		Hashtable<String, TVersion> tVersionHash = getTVersion(this.connection, tversion10);
 		if (tVersionHash == null) {
 			try {
-				final String sqlScript = readSqlFromJarFileToString("ch.minova.install", sqldialect, "initVersionTable" + ".sql");
+				final String sqlScript;
+				if (sqlLibrary.isPresent()) {
+					sqlScript = readSqlScript("initVersionTable", sqlLibrary.get());
+				} else {
+					sqlScript = readSqlFromJarFileToString("ch.minova.install", sqldialect, "initVersionTable" + ".sql");
+				}
 				log(MessageFormat.format("Die {0} Tabelle wurde nicht gefunden", tversion10));
 				executeSqlScript(sqlScript);
 				tVersionHash = getTVersion(this.connection, tversion10);
@@ -3284,7 +3302,7 @@ public class BaseSetup {
 	}
 
 	public boolean readoutSchema(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
-		return readoutSchema(con, Optional.empty());
+		return readoutSchema(con, Optional.empty(), Optional.empty());
 	}
 
 	private InputStream readTableXml(String tableName, Optional<Path> tableLibrary) {
@@ -3326,9 +3344,9 @@ public class BaseSetup {
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
-	public boolean readoutSchema(final Connection con, Optional<Path> tableLibrary)
+	public boolean readoutSchema(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary)
 			throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
-		checktVersion10(con);
+		checktVersion10(con, sqlLibrary);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
 		SqlDatabaseTable sqlTable = null;

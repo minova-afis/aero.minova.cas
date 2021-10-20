@@ -43,6 +43,8 @@ import lombok.val;
 @Service
 public class SetupService {
 
+	private static final String PROCEDURE_NAME ="setup";
+
 	@Autowired InstallToolIntegration installToolIntegration;
 
 	@Autowired
@@ -59,7 +61,7 @@ public class SetupService {
 	@PostConstruct
 	private void setup() {
 		// Fügt Extension hinzu.
-		spc.registerExctension("setup", inputTable -> {
+		spc.registerExtension(PROCEDURE_NAME, inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
 				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
@@ -74,6 +76,7 @@ public class SetupService {
 				throw new RuntimeException(e);
 			}
 		});
+		spc.registerExtensionBootstrapCheck(PROCEDURE_NAME, inputTable -> true);
 	}
 
 	/**
@@ -91,6 +94,7 @@ public class SetupService {
 		List<String> dependencies = Stream.of(filteredArg.split("\\R"))//
 				.filter(s -> !s.contains("The following files have been resolved:"))//
 				.filter(s -> !s.isBlank())//
+				.filter(s -> s.contains("jar"))//
 				.map(s -> s.substring(0 + 1, s.indexOf(":jar")).replace(":", ".").strip())//
 				.collect(Collectors.toList());
 		Collections.reverse(dependencies);
@@ -160,7 +164,7 @@ public class SetupService {
 						if (dir.getFileName().toString().startsWith(adjustedDependency)) {
 							try {
 								Optional<Path> setup = Files.walk(dir)//
-										.filter(f -> f.getFileName().toString().equals("Setup.xml"))//
+										.filter(f -> f.getFileName().toString().toLowerCase().equals("setup.xml"))//
 										.findFirst();
 								return setup;
 							} catch (IOException e) {

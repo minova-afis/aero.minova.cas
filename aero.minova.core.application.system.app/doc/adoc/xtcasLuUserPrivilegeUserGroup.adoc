@@ -1,0 +1,74 @@
+
+
+== Tabelle xtcasLuUserPrivilegeUserGroup ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== UserPrivilegeKey
+
+Datentyp: integer not null +
+
+// tag::column.UserPrivilegeKey[]
+
+// end::column.UserPrivilegeKey[]
+
+
+==== UserGroupKey
+
+Datentyp: integer not null +
+
+// tag::column.UserGroupKey[]
+
+// end::column.UserGroupKey[]
+
+
+==== RowLevelSecurity
+
+Datentyp: bit not null +
+Default: `0` +
+
+// tag::column.RowLevelSecurity[]
+
+// end::column.RowLevelSecurity[]
+
+
+==== LastUser
+
+Datentyp: nvarchar(50) not null +
+Default: `system_user` +
+
+// tag::column.LastUser[]
+
+// end::column.LastUser[]
+
+
+==== LastDate
+
+Datentyp: datetime not null +
+Default: `getdate()` +
+
+// tag::column.LastDate[]
+
+// end::column.LastDate[]
+
+
+==== LastAction
+
+Datentyp: integer not null +
+Default: `1` +
+
+// tag::column.LastAction[]
+
+// end::column.LastAction[]

@@ -7,6 +7,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,28 +54,104 @@ public class SqlProcedureController {
 	@Autowired
 	Gson gson;
 
-	private Map<String, Function<Table, ResponseEntity>> extension = new HashMap<>();
+	/**
+	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
+	 */
+	private final Map<String, Function<Table, ResponseEntity>> extensions = new HashMap<>();
+	/**
+	 * Wird nur verwendet, falls die Tabelle "xvcasUserPrivileges" nicht vorhanden ist. In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt
+	 * ist.
+	 */
+	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
 
-	public void registerExctension(String name, Function<Table, ResponseEntity> ext) {
-		if (extension.containsKey(name)) {
+	/**
+	 * Hiermit lassen sich Erweiterungen registrieren, die ausgeführt werden, wenn eine Prozedur mit der Namen der Registrierung ausgeführt werden soll.
+	 *
+	 * @param name
+	 *            Name der Erweiterung
+	 * @param ext
+	 *            Erweiterung
+	 */
+	public void registerExtension(String name, Function<Table, ResponseEntity> ext) {
+		if (extensions.containsKey(name)) {
 			throw new IllegalArgumentException(name);
 		}
-		extension.put(name, ext);
+		extensions.put(name, ext);
 	}
 
+	/**
+	 * Registriert eine alternative Privilegien-Prüfung für Erweiterungen. Diese wird nur verwendet, wenn {@link #arePrivilegeStoresSetup} gilt.
+	 *
+	 * @param name
+	 *            Name der Erweiterung
+	 * @param extCheck
+	 *            Alternative Privilegien-Prüfung
+	 */
+	public void registerExtensionBootstrapCheck(String name, Function<Table, Boolean> extCheck) {
+		if (extensionBootstrapChecks.containsKey(name)) {
+			throw new IllegalArgumentException(name);
+		}
+		extensionBootstrapChecks.put(name, extCheck);
+	}
+
+	/**
+	 * Prüft, ob die minimal notwendigen Datenbank-Objekte für die Privileg-Prüfung in der Datenbank aufgesetzt wurden. Dazu prüft man, ob die
+	 * `xvcasUserPrivileges` vorhanden ist.
+	 *
+	 * @return Dies ist wahr, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
+	 * @throws Exception
+	 *             Fehler bei der Ermittelung
+	 */
+	private boolean arePrivilegeStoresSetup() throws Exception {
+		return isTablePresent("xvcasUserPrivileges");
+	}
+
+	private boolean isTablePresent(String tableName) throws Exception {
+		try (final Connection connection = systemDatabase.getConnection()) {
+			return connection.getMetaData()//
+					.getTables(null, null, tableName, null)//
+					.next();
+		}
+	}
+
+	/**
+	 * Führt eine CAS-Erweiterung falls vorhanden oder eine SQL-Prozedur im anderen Fall aus. Falls {@link #arePrivilegeStoresSetup} nicht gilt und es für die
+	 * Eingabe eine passende Prozedur gibt, wird geprüft, ob es für die Erweiterung eine passende alternative-Rechteprüfung gibt. Dieser Mechanismus wird
+	 * verwendet, um das Initialisieren der Datenbank über das CAS zu triggern.
+	 *
+	 * @param inputTable
+	 *            Name der Prozedur und Aufruf Parameter
+	 * @return Ergebnis des Prozeduren-Aufrufs
+	 * @throws Exception
+	 *             Fehler bei der Ausführung
+	 */
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
-		if (extension.containsKey(inputTable.getName())) {
-			try {
-				return extension.get(inputTable.getName()).apply(inputTable);
-			} catch (Exception e) {
-				throw new ProcedureException(e);
-			}
-		}
+		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
-			List<Row> privilegeRequest = securityService.getPrivilegePermissions(inputTable.getName());
+			if (arePrivilegeStoresSetup()) {
+				privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
+				if (privilegeRequest.isEmpty()) {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
+			} else {
+				if (extensionBootstrapChecks.containsKey(inputTable.getName())) {
+					if (!extensionBootstrapChecks.get(inputTable.getName()).apply(inputTable)) {
+						throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+					}
+				} else {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
+			}
+			if (extensions.containsKey(inputTable.getName())) {
+				try {
+					return extensions.get(inputTable.getName()).apply(inputTable);
+				} catch (Exception e) {
+					throw new ProcedureException(e);
+				}
+			}
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
@@ -85,12 +164,29 @@ public class SqlProcedureController {
 	}
 
 	/**
+	 * Speichert im SQl-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
+	 *
+	 * @param connection
+	 *            Das ist die Session.
+	 * @throws SQLException
+	 *             Fehler beim setzen des Kontextes für die connection.
+	 */
+	private void setUserContextFor(Connection connection) throws SQLException {
+		final val userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
+		userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
+		userContextSetter.execute();
+	}
+
+	/**
 	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
 	 *
-	 * @param inputTable       Ausführungs-Parameter
-	 * @param privilegeRequest eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
+	 * @param inputTable
+	 *            Ausführungs-Parameter
+	 * @param privilegeRequest
+	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
 	 * @return Resultat der Ausführung
-	 * @throws Exception Fehler bei der Ausführung
+	 * @throws Exception
+	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest) throws Exception {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
@@ -131,6 +227,8 @@ public class SqlProcedureController {
 			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
 			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
 			sb.append(procedureCall);
+			setUserContextFor(connection);
+
 			final val preparedStatement = connection.prepareCall(procedureCall);
 
 			// Jede Row ist eine Abfrage.
@@ -373,10 +471,13 @@ public class SqlProcedureController {
 	/**
 	 * Bereitet einen Prozedur-String vor
 	 *
-	 * @param params   SQL-Call-Parameter
-	 * @param strategy SQL-Execution-Strategie
+	 * @param params
+	 *            SQL-Call-Parameter
+	 * @param strategy
+	 *            SQL-Execution-Strategie
 	 * @return SQL-Code
-	 * @throws IllegalArgumentException Fehler, wenn die Daten in params nicht richtig sind.
+	 * @throws IllegalArgumentException
+	 *             Fehler, wenn die Daten in params nicht richtig sind.
 	 */
 	String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
 		if (params.getName() == null || params.getName().trim().length() == 0) {
@@ -386,7 +487,11 @@ public class SqlProcedureController {
 		final boolean returnRequired = ExecuteStrategy.returnRequired(strategy);
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append('{').append(returnRequired ? "? = call " : "call ").append(params.getName()).append("(");
+		sb.append('{')//
+				.append("")//
+				.append(returnRequired ? "? = call " : "call ")//
+				.append(params.getName())//
+				.append("(");
 		for (int i = 0; i < paramCount; i++) {
 			sb.append(i == 0 ? "?" : ",?");
 		}

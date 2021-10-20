@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 mvn clean verify
-mvn package spring-boot:repackage
-docker build --tag=$docker_user/aero.minova.cas:latest .
+cd ../aero.minova.core.application.system.setup
+  mvn clean verify
+  cp ./target/*.jar ../aero.minova.core.application.system.service/target/libs/
+  cp ./target/libs/*.jar ../aero.minova.core.application.system.service/target/libs/
+  cp ./libs/*.jar ../aero.minova.core.application.system.service/target/libs/
+cd ../aero.minova.core.application.system.service
+  docker build --tag=$docker_user/aero.minova.cas:latest .
 exit
 
 echo Stop and remove container: docker rm -f <container id>

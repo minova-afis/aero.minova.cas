@@ -1,8 +1,26 @@
 == Initialisieren und Manuelles Befüllen der Datenbanktabellen
 
-Die SQL-Skripte zum Initialisieren und befüllen der Tabellen können in folgender Reihenfolge augeführt werden.
+Die Datenbank kann mit dem folgenden `data/procedure`-Befehl initialisiert werden:
+
+[source,json]
+.Body des Post-Requests
+--------
+{
+    "name": "setup",
+    "columns": [],
+    "rows": []
+}
+--------
+
+Jeder Nutzer darf diesen Befehl beim ersten mal ausführen.
+Bei den nachfolgenden Ausführungen muss der Nutzer das entsprechende Recht haben.
 
 === Tabellen
+
+NOTE: TODO Dies brauchen wir nicht mehr.
+Wir lassen es noch ein kurze Weile, für den Fall,
+dass jemand noch was manuel aufsetzen muss.
+
 [source,sql]
 ----
 

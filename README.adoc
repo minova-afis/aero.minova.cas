@@ -4,11 +4,11 @@
 </a>
 ++++
 
-= Core Application System
+= CAS - Core Application System
 
 ++++
 <p align="left">
-  <a href="https://hub.docker.com/r/minova/aero.minova.cas/tags?page=1&ordering=last_updated">
+  <a href="https://hub.docker.com/r/minova/aero.minova.cas.app/tags?page=1&ordering=last_updated">
     <img alt="Docker Images" src="https://img.shields.io/badge/Docker%20images-blue">
   </a>
   <img src="https://img.shields.io/badge/license-EPL%202.0-green">
@@ -20,11 +20,12 @@
 
 Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank sowie einem Read-Only-Dateisystem bereit.
 
-Der Fokus liegt hierbei das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.
+Der Fokus liegt hierbei darauf, das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.
 Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.
 
 == Weiterführende Dokumentation
 
+* xref:./CHANGELOG.md#[Changelog]
 * xref:./aero.minova.core.application.system.service/doc/adoc/index.adoc#[CAS-Dienst]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
 * xref:./aero.minova.cas.logic/doc/adoc/index.adoc#[Maske für das Editieren von Rechten]

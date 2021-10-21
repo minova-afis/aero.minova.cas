@@ -64,6 +64,7 @@ public class InstallToolIntegration {
 					setup.readoutSchema(connection, tableLibrary, sqlLibrary);
 					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getSetup().getName());
 				}
+				setup.handleSqlScripts(connection, sqlLibrary);
 				connection.commit();
 			} finally {
 				systemDatabase.freeUpConnection(connection);

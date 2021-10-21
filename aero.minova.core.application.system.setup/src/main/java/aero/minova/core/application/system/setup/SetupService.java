@@ -118,7 +118,7 @@ public class SetupService {
 				installToolIntegration.installSetup(setupXml);
 			}
 			final List<String> newProcedures = readProceduresToList(setupXml.toFile());
-			runScripts(newProcedures);
+			//runScripts(newProcedures);
 			procedures.addAll(newProcedures);
 		}
 
@@ -130,7 +130,7 @@ public class SetupService {
 		}
 		if (mainSetupFile.exists()) {
 			List<String> newProcedures = readProceduresToList(mainSetupFile);
-			runScripts(newProcedures);
+			//runScripts(newProcedures);
 			procedures.addAll(newProcedures);
 		} else {
 			throw new NoSuchFileException("No main-setup file found!");

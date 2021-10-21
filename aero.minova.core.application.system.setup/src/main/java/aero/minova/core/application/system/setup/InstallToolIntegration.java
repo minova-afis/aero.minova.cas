@@ -5,6 +5,7 @@ import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import ch.minova.core.install.SetupDocument;
 import ch.minova.install.setup.BaseSetup;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,6 @@ public class InstallToolIntegration {
 	 * Es wird der Code möglichst so ausgeführt,
 	 * als würde man das Tool mit update schema (us),
 	 * update database (ud) und module only (mo).
-	 *
 	 * Es wird also nur die SQL-Datenbank der "Setup.xml" installiert und die Abhängkeiten ignoriert.
 	 *
 	 * @param setupXml Die "Setup.xml" welche installiert wird.
@@ -45,6 +45,9 @@ public class InstallToolIntegration {
 				connection.setAutoCommit(true);
 				BaseSetup.parameter = System.getProperties();
 				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
+				BaseSetup.hashModules.clear();
+				BaseSetup.hashtables.clear();
+				BaseSetup.tablevector.clear();
 				final BaseSetup setup = new BaseSetup();
 				setup.setSetupDocument(setupDocument);
 				setup.readSchema();

@@ -1342,7 +1342,12 @@ public class BaseSetup {
 	 * @throws SQLException
 	 * @throws SQLExeption
 	 */
-	private void handleSqlScripts(final Connection con) throws XmlException, IOException, BaseSetupException, SQLException, SQLExeption {
+	public void handleSqlScripts(final Connection con) throws XmlException, IOException, BaseSetupException, SQLException, SQLExeption {
+		handleSqlScripts(con, Optional.empty());
+	}
+
+	public void handleSqlScripts(final Connection con, final Optional<Path> sqlLibrary)
+			throws XmlException, IOException, BaseSetupException, SQLException, SQLExeption {
 		SetupDocument doc;
 		final String table = "tVersion10";
 		final boolean forceSql = parameter.containsKey("fs");
@@ -1364,7 +1369,7 @@ public class BaseSetup {
 				log(MessageFormat.format("Script: {0}, Type= {1}", name, type.toString()));
 				// connection = checkConnection(null);
 				// falls es Versions gibt wird überprüft!
-				final String sqlScript = readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, name + ".sql");
+				final String sqlScript = readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, name + ".sql", sqlLibrary);
 				log(sqlScript, false);
 				if (type == Type.SCRIPT) {
 					executeSqlScript(sqlScript);
@@ -1600,8 +1605,7 @@ public class BaseSetup {
 		} catch (final SQLException e) {
 			log(sqlScript, true);
 			log("Fehler beim Ausfuehren des Skripts: " + name + " in dem Modul: " + getVersionInfo().getModulName(), true);
-			e.printStackTrace();
-			throw new SQLException(e.getMessage());
+			throw new SQLException(e);
 		}
 	}
 
@@ -1668,7 +1672,7 @@ public class BaseSetup {
 		}
 		final String completeName = moduleName.replaceAll("\\.", "/") + "/" + folderPath + "/" + fileName;
 		try {
-			final InputStream inputStream = readFromJarFileToInputStream(moduleName, folderPath, fileName);
+			final InputStream inputStream = readFromJarFileToInputStream(moduleName, folderPath, fileName, sqlLibrary);
 			if (inputStream == null) {
 				// Fehler wurde schon abgefangen und behandelt - gib einfach null zurück
 			} else {
@@ -1717,7 +1721,28 @@ public class BaseSetup {
 	 * @param fileName
 	 * @return
 	 */
+
+	/**
+	 * Diese Methode liest aus einem übergebenen JarFile eine bestimmte Datei aus! Die ausgelesene Datei muss mit Ordner angegeben werden, unter dem sie zu
+	 * finden ist. Vorgesehen sind 3 Übergabeparameter!
+	 *
+	 * @param moduleName
+	 * @param folderPath
+	 * @param fileName
+	 * @return
+	 */
 	private InputStream readFromJarFileToInputStream(final String moduleName, final String folderPath, final String fileName) {
+		return readFromJarFileToInputStream(moduleName, folderPath, fileName, Optional.empty());
+	}
+
+	private InputStream readFromJarFileToInputStream(final String moduleName, final String folderPath, final String fileName, Optional<Path> sqlLibrary) {
+		if (sqlLibrary.isPresent()) {
+			try {
+				return new FileInputStream(sqlLibrary.get().resolve(moduleName).toString());
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		}
 		InputStream sqlIn = null;
 		final File basedir = new File("");
 		log(MessageFormat.format("aktuelles Verzeichnis: {0}", basedir.getAbsolutePath()));

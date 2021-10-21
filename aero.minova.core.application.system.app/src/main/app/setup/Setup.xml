@@ -6,6 +6,11 @@
 		<!-- TODO "ch.minova.i18n" -->
 	</required-modules>
 	<sql-code>
+		<script name="spMinovaCheckData" type="procedure"/>
+		<script name="spMinovaCheckFunction" type="procedure"/>
+		<script name="spMinovaCheckProcedure" type="procedure"/>
+		<script name="spMinovaCheckTable" type="procedure"/>
+		<script name="spMinovaCheckView" type="procedure"/>
 		<script name="xvcasUserPrivileges" type="view"/>
 		<script name="xfCasUser" type="function"/>
 		<script name="xpcasReadUser" type="procedure"/>

@@ -105,11 +105,11 @@ public class SetupService {
 	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
 	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
-	void readSetups(String arg, boolean setupTableSchemas) throws IOException {
+	List<String> readSetups(String arg, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = parseDependencyList(arg);
 		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
 
-		List<String> procedures = new ArrayList<>();
+		final List<String> procedures = new ArrayList<>();
 
 		// Zuerst durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
@@ -117,7 +117,9 @@ public class SetupService {
 			if (setupTableSchemas) {
 				installToolIntegration.installSetup(setupXml);
 			}
-			runScripts(readProceduresToList(setupXml.toFile()));
+			final List<String> newProcedures = readProceduresToList(setupXml.toFile());
+			runScripts(newProcedures);
+			procedures.addAll(newProcedures);
 		}
 
 		// Danach muss das Hauptsetup-File ausgelesen werden.
@@ -127,10 +129,13 @@ public class SetupService {
 			installToolIntegration.installSetup(mainSetupXml);
 		}
 		if (mainSetupFile.exists()) {
-			runScripts(readProceduresToList(mainSetupFile));
+			List<String> newProcedures = readProceduresToList(mainSetupFile);
+			runScripts(newProcedures);
+			procedures.addAll(newProcedures);
 		} else {
 			throw new NoSuchFileException("No main-setup file found!");
 		}
+		return procedures;
 	}
 
 	/**

@@ -125,9 +125,9 @@ public class BaseSetup {
 	/**
 	 * In dieser Tabelle werden die VersionInfo-Objekte alle geladenen Module gespeichert. Als Schlüssel wird der Modulename verwendet (z.B. ch.minova.install)
 	 */
-	private static Hashtable<String, VersionInfo> hashModules = new Hashtable<String, VersionInfo>();
-	private static Hashtable<String, String> hashtables = new Hashtable<String, String>();
-	private static Vector<TableVector> tablevector = new Vector<TableVector>();
+	public static Hashtable<String, VersionInfo> hashModules = new Hashtable<String, VersionInfo>();
+	public static Hashtable<String, String> hashtables = new Hashtable<String, String>();
+	public static Vector<TableVector> tablevector = new Vector<TableVector>();
 
 	/**
 	 * Modulname des Moduls welches im Abhängigkeitsbaum zum Schluss

@@ -3290,8 +3290,8 @@ public class BaseSetup {
 		}
 	}
 
-	private void execSqlScripts(final String tablename, Optional<Path> sql) throws IOException, SQLException {
-		final String sqlScript = readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, tablename + ".sql");
+	private void execSqlScripts(final String tablename, Optional<Path> sqlLibrary) throws IOException, SQLException {
+		final String sqlScript = readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, tablename + ".sql", sqlLibrary);
 		log(MessageFormat.format("{0} Ausführen des Scripts: \n {1}", tablename, sqlScript));
 		executeSqlScript(sqlScript);
 	}
@@ -3383,7 +3383,7 @@ public class BaseSetup {
 					if (doc.getSetup().getSchema().getTableschemaArray(i).getName().equalsIgnoreCase(tablevector.get(i).getName())) {
 						// soll das script vorher ausgeführt werden
 						if (doc.getSetup().getSchema().getTableschemaArray(i).getExecute().toString().equalsIgnoreCase("before")) {
-							execSqlScripts(tablevector.get(i).getName());
+							execSqlScripts(tablevector.get(i).getName(), sqlLibrary);
 						}
 					}
 				} else {
@@ -3532,7 +3532,7 @@ public class BaseSetup {
 					// soll das script vorher ausgeführt werden
 					if (doc.getSetup().getSchema().getTableschemaArray(i).getExecute().toString().equalsIgnoreCase("after")) {
 						try {
-							execSqlScripts(tablevector.get(i).getName());
+							execSqlScripts(tablevector.get(i).getName(), sqlLibrary);
 						} catch (final SQLException e) {
 							log(MessageFormat.format("SQLException execute Sqlprocedure: \n" + e.getMessage(), ""), true);
 							throw new RuntimeException(e.getMessage());

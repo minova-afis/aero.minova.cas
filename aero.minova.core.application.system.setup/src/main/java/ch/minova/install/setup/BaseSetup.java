@@ -82,6 +82,8 @@ import ch.minova.install.setup.xbs.NodeException;
 import ch.minova.install.sql.TVersion;
 import net.sourceforge.jtds.util.SSPIJNIClient;
 
+import static java.nio.file.Files.readAllBytes;
+
 /**
  * Basisklasse für die Installer der Module
  *
@@ -1653,23 +1655,17 @@ public class BaseSetup {
 
 	private String readSqlScript(String name, Path sqlLibrary) {
 		try {
-			return new String(Files.readAllBytes(sqlLibrary.resolve(name + ".sql")), StandardCharsets.UTF_8);
+			return new String(readAllBytes(sqlLibrary.resolve(name + ".sql")), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	/**
-	 * Diese Methode liest aus einem übergebenen JarFile eine bestimmte SQL-Datei aus! Die ausgelesene Datei muss mit Ordner angegeben werden, unter dem sie zu
-	 * finden ist. Vorgesehen sind 3 Übergabeparameter!
-	 *
-	 * @param moduleName
-	 * @param folderPath
-	 * @param fileName
-	 * @return
-	 * @throws IOException
-	 */
-	private String readSqlFromJarFileToString(final String moduleName, final String folderPath, final String fileName) throws IOException {
+	private String readSqlFromJarFileToString(final String moduleName, final String folderPath, final String fileName, Optional<Path> sqlLibrary)
+			throws IOException {
+		if (sqlLibrary.isPresent()) {
+			return new String(readAllBytes(sqlLibrary.get().resolve(fileName)), StandardCharsets.UTF_8);
+		}
 		final String completeName = moduleName.replaceAll("\\.", "/") + "/" + folderPath + "/" + fileName;
 		try {
 			final InputStream inputStream = readFromJarFileToInputStream(moduleName, folderPath, fileName);
@@ -1696,6 +1692,20 @@ public class BaseSetup {
 			// e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Diese Methode liest aus einem übergebenen JarFile eine bestimmte SQL-Datei aus! Die ausgelesene Datei muss mit Ordner angegeben werden, unter dem sie zu
+	 * finden ist. Vorgesehen sind 3 Übergabeparameter!
+	 *
+	 * @param moduleName
+	 * @param folderPath
+	 * @param fileName
+	 * @return
+	 * @throws IOException
+	 */
+	private String readSqlFromJarFileToString(final String moduleName, final String folderPath, final String fileName) throws IOException {
+		return readSqlFromJarFileToString(moduleName, folderPath, fileName, Optional.empty());
 	}
 
 	/**
@@ -3081,7 +3091,8 @@ public class BaseSetup {
 		return readoutSchemaCreate(con, Optional.empty(), Optional.empty());
 	}
 
-	public boolean readoutSchemaCreate(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
+	public boolean readoutSchemaCreate(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary)
+			throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
 		checktVersion10(con, sqlLibrary);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
@@ -3279,7 +3290,7 @@ public class BaseSetup {
 		}
 	}
 
-	private void execSqlScripts(final String tablename) throws IOException, SQLException {
+	private void execSqlScripts(final String tablename, Optional<Path> sql) throws IOException, SQLException {
 		final String sqlScript = readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, tablename + ".sql");
 		log(MessageFormat.format("{0} Ausführen des Scripts: \n {1}", tablename, sqlScript));
 		executeSqlScript(sqlScript);
@@ -3313,7 +3324,8 @@ public class BaseSetup {
 				final Optional<Path> tableXml = Files.walk(tableLibrary.get())
 						.map(path -> {
 							// TODO Einheitliche XML-Namen verwenden.
-							if (Files.isRegularFile(path) && path.getFileName().toString().equals(tableName + ".table.xml") ||path.getFileName().toString().equals(tableName + ".xml")) {
+							if (Files.isRegularFile(path) && path.getFileName().toString().equals(tableName + ".table.xml") || path.getFileName().toString()
+									.equals(tableName + ".xml")) {
 								return Optional.of(path);
 							}
 							return Optional.<Path>empty();

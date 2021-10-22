@@ -6,11 +6,15 @@
 		<!-- TODO "ch.minova.i18n" -->
 	</required-modules>
 	<sql-code>
-		<script name="spMinovaCheckData" type="procedure"/>
-		<script name="spMinovaCheckFunction" type="procedure"/>
-		<script name="spMinovaCheckProcedure" type="procedure"/>
-		<script name="spMinovaCheckTable" type="procedure"/>
+		<script name="initDebug" type="script"/>
+		<script name="initVersionTable" type="script"/>
+		<script name="initVersionTable1" type="script"/>
+		<script name="spMinovaUpdateVersion" type="script"/>
+		<script name="spMinovaCheckProcedure" type="script"/>
 		<script name="spMinovaCheckView" type="procedure"/>
+		<script name="spMinovaCheckFunction" type="procedure"/>
+		<script name="spMinovaCheckTable" type="procedure"/>
+		<script name="spMinovaCheckData" type="procedure"/>
 		<script name="xvcasUserPrivileges" type="view"/>
 		<script name="xfCasUser" type="function"/>
 		<script name="xpcasReadUser" type="procedure"/>
@@ -38,42 +42,6 @@
 		<script name="xpcasDeleteUserPrivilege" type="procedure"/>
 		<script name="xvcasUserPrivilegeIndex" type="view"/>
 	</sql-code>
-	<mdi-code>
-		<action id="User" generic="true" action="User.xml" icon="User" text="@User"/>
-		<action id="UserGroup" generic="true" action="UserGroup.xml" icon="UserGroup" text="@UserGroup"/>
-		<action id="ColumnSecurity" generic="true" action="ColumnSecurity.xml" icon="ColumnSecurity" text="@ColumnSecurity"/>
-		<action id="UserPrivilege" generic="true" action="UserPrivilege.xml" icon="UserPrivilege" text="@UserPrivilege"/>
-		<menu id="cas" text="CAS" position="12">
-			<entry id="User" position="10" type="action"/>
-			<entry id="UserGroup" position="20" type="action"/>
-			<entry id="ColumnSecurity" position="30" type="action"/>
-			<entry id="UserPrivilege" position="40" type="action"/>
-		</menu>
-	</mdi-code>
-	<xbs-code>
-		<node name="UserGroup.xml">
-			<map/>
-			<node name="OptionPages">
-				<map/>
-				<node name="LuUserPrivilegeUserGroup.op.xml">
-					<map>
-						<entry key="Key0" value="UserGroupKey"/>
-					</map>
-				</node>
-			</node>
-		</node>
-		<node name="UserPrivilege.xml">
-			<map/>
-			<node name="OptionPages">
-				<map/>
-				<node name="LuUserPrivilegeUserGroup.op.xml">
-					<map>
-						<entry key="Key0" value="UserPrivilegeKey"/>
-					</map>
-				</node>
-			</node>
-		</node>
-	</xbs-code>
 	<copy-file>
 		<filecopy filename="User.xml" todir="${application}"/>
 		<filecopy filename="UserGroup.xml" todir="${application}"/>

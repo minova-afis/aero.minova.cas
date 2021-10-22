@@ -6,7 +6,6 @@ alter procedure spMinovaCheckFunction
 	@MinorVersion int,
 	@PatchLevel int,
 	@BuildNumber int
-	@Dataname nvarchar(255) = null
 ) with encryption as
 	if not exists (select * from tVersion10 where KeyText = @FunctionName and ModuleName = @ModuleName)
 	begin

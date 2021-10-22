@@ -1548,7 +1548,7 @@ public class BaseSetup {
 				try {
 					pscp.executeUpdate();
 				} catch (final SQLException e) {
-					log(MessageFormat.format("{0}", e.getMessage()), true);
+					log(MessageFormat.format("Could not check tVersion10 via {0}: {1}", sqlScript, e.getMessage()), true);
 					executeSql = true;
 				}
 				final int result = pscp.getInt(1); // 1 -> muss ausgeführt werden, 2

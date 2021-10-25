@@ -21,7 +21,7 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
-import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SystemDatabase;
 
 @EnableWebSecurity
@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private String serverPort;
 
 	@Autowired
-	SqlProcedureController spc;
+	SecurityService securityService;
 
 	@Autowired
 	SystemDatabase systemDatabase;
@@ -94,7 +94,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			@Override
 			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
 					throws RuntimeException {
-				List<GrantedAuthority> grantedAuthorities = spc.loadPrivileges(username, (List<GrantedAuthority>) authorities);
+				List<GrantedAuthority> grantedAuthorities = securityService.loadPrivileges(username, (List<GrantedAuthority>) authorities);
 				return super.mapUserFromContext(ctx, username, grantedAuthorities);
 			}
 		};

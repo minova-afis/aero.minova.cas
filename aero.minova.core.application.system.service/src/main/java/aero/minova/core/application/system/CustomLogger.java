@@ -38,7 +38,7 @@ public class CustomLogger {
 	}
 
 	public void logPrivilege(String logMessage) {
-		logger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+		privilegeLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
 	}
 
 	public void logSql(String logMessage) {

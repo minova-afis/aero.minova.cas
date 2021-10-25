@@ -1,12 +1,8 @@
 package aero.minova.core.application.system.controller;
 
-import static java.util.Arrays.asList;
-
 import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,8 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +24,7 @@ import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableException;
 import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.domain.Value;
+import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
@@ -39,7 +34,12 @@ public class SqlViewController {
 
 	@Autowired
 	SystemDatabase systemDatabase;
-	CustomLogger customLogger = new CustomLogger();
+
+	@Autowired
+	SecurityService securityService;
+
+	@Autowired
+	CustomLogger customLogger;
 
 	@Autowired
 	Gson gson;
@@ -51,12 +51,11 @@ public class SqlViewController {
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
 		try {
-			@SuppressWarnings("unchecked")
-			List<Row> authoritiesForThisTable = getPrivilegePermissions(inputTable.getName()).getRows();
+			List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
 			if (authoritiesForThisTable.isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
-			inputTable = columnSecurity(inputTable, authoritiesForThisTable);
+			inputTable = securityService.columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {
 				inputMetaData = new TableMetaData();
@@ -101,34 +100,16 @@ public class SqlViewController {
 		return result;
 	}
 
-	public Table unsecurelyGetIndexView(@RequestBody Table inputTable, List<Row> requestingAuthorities) throws Exception {
-		final val connection = systemDatabase.getConnection();
-		Table result = new Table();
-		StringBuilder sb = new StringBuilder();
-		try {
-			val viewQuery = pagingWithSeek(inputTable, false, -1, false, 1, requestingAuthorities);
-			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			customLogger.logPrivilege("Executing statements: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-
-			result = convertSqlResultToTable(inputTable, resultSet);
-		} catch (Exception e) {
-			throw new TableException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
-		}
-		return result;
-	}
-
 	/**
 	 * das Prepared Statement wird mit den dafür vorgesehenen Parametern befüllt
 	 *
-	 * @param inputTable        die Table, welche vom getIndexView aufgerufen wurde
-	 * @param preparedStatement das Prepared Statement, welches nur noch befüllt werden muss
+	 * @param inputTable
+	 *            die Table, welche vom getIndexView aufgerufen wurde
+	 * @param preparedStatement
+	 *            das Prepared Statement, welches nur noch befüllt werden muss
 	 * @return das befüllte, ausführbare Prepared Statement
 	 */
-	private PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
+	public PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
 		int parameterOffset = 1;
 		sb.append(query);
 
@@ -198,67 +179,7 @@ public class SqlViewController {
 		return preparedStatement;
 	}
 
-	/**
-	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt.
-	 *
-	 * @param privilegeName Das Privilege, für das ein Recht eingefordert wird.
-	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
-	 **/
-	public Table getPrivilegePermissions(String privilegeName) {
-		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		Table userPrivileges = new Table();
-		userPrivileges.setName("xvcasUserPrivileges");
-		List<Column> columns = new ArrayList<>();
-		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
-		columns.add(new Column("KeyText", DataType.STRING));
-		columns.add(new Column("RowLevelSecurity", DataType.BOOLEAN));
-		columns.add(Column.AND_FIELD);
-		userPrivileges.setColumns(columns);
-
-		List<String> userTokens = new ArrayList<>();
-		for (GrantedAuthority ga : allUserAuthorities) {
-			userTokens.add(ga.getAuthority());
-		}
-
-		for (String s : userTokens) {
-			Row tableNameAndUserToken = new Row();
-			tableNameAndUserToken.setValues(asList(new Value(privilegeName, null), new Value(s, null), new Value("", null), new Value(false, null)));
-			userPrivileges.addRow(tableNameAndUserToken);
-		}
-		return getTableForSecurityCheck(userPrivileges);
-	}
-
-	/**
-	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage, um die maximale Länge zu erhalten Ist nur für die Sicherheitsabfragen gedacht,
-	 * um nicht zu viele unnötige SQL-Abfrgane zu machen.
-	 *
-	 * @param inputTable Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
-	 * @return Das Ergebnis der Abfrage.
-	 */
-	public Table getTableForSecurityCheck(Table inputTable) {
-		StringBuilder sb = new StringBuilder();
-		List<Row> userGroups = new ArrayList<>();
-		Row inputRow = new Row();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		final val connection = systemDatabase.getConnection();
-		try {
-			final val viewQuery = prepareViewString(inputTable, false, 1000, false, userGroups);
-			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			customLogger.logPrivilege("Executing statement: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-			val result = convertSqlResultToTable(inputTable, resultSet);
-			return result;
-		} catch (Exception e) {
-			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
+	public Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
 		try {
 			Table outputTable = new Table();
 			outputTable.setName(inputTable.getName());
@@ -283,15 +204,19 @@ public class SqlViewController {
 	 * Diese Methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String vor und berücksichtigt eine evtl.
 	 * angegebene Maximalanzahl Ergebnisse
 	 *
-	 * @param params   Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
-	 * @param autoLike wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
-	 * @param maxRows  maximale Anzahl Ergebnisse (Zeilen), die die Abfrage liefern soll, 0 für unbegrenzt
-	 * @param count    Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
+	 * @param params
+	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
+	 * @param autoLike
+	 *            wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
+	 * @param maxRows
+	 *            maximale Anzahl Ergebnisse (Zeilen), die die Abfrage liefern soll, 0 für unbegrenzt
+	 * @param count
+	 *            Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
 	 * @return Präparierter View-String, der ausgeführt werden kann
 	 * @throws IllegalArgumentException
 	 * @author wild
 	 */
-	String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
+	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuffer sb = new StringBuffer();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
 			throw new IllegalArgumentException("msg.ViewNullName");
@@ -327,7 +252,7 @@ public class SqlViewController {
 			}
 		}
 
-		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 
 		return sb.toString();
@@ -365,7 +290,7 @@ public class SqlViewController {
 				sb.append(")");
 			}
 		}
-		final String onlyAuthorizedRows = rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 		sb.append(" ) as RowConstraintResult");
 
@@ -380,80 +305,10 @@ public class SqlViewController {
 	}
 
 	/**
-	 * Entfernt alle spalten der Eingabe-Tabelle, auf die der Nutzer keinen Zugriff hat.
-	 * <p>
-	 * TODO Idee: Mann sollte eine neue Tabelle erstellen, statt die eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht
-	 * geändert wird.
-	 *
-	 * @param inputTable Enthält den Tabellen-Namen und die Spalten, welche von einem Nutzer angefragt werden.
-	 * @param userGroups Die Nutzer-Gruppen/Rollen, welche Zugriff auf die Tabelle haben wollen.
-	 * @return Diese Tabelle enhtält die Spalten, welche für die Index-View von diesem User verwendet werden dürfen.
-	 * @author weber
-	 */
-	public Table columnSecurity(Table inputTable, List<Row> userGroups) {
-		Table columnSec = new Table();
-		columnSec.setName("xtcasColumnSecurity");
-		List<Column> columns = new ArrayList<>();
-		columns.add(new Column("TableName", DataType.STRING));
-		columns.add(new Column("ColumnName", DataType.STRING));
-		columns.add(new Column("SecurityToken", DataType.STRING));
-		columnSec.setColumns(columns);
-
-		List<Row> result = new ArrayList<>();
-		for (Row row : userGroups) {
-			if (row.getValues().get(0).getStringValue().equals(inputTable.getName())) {
-				Row bar = new Row();
-				bar.setValues(asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
-				List<Row> checkRow = new ArrayList<>();
-				checkRow.add(bar);
-				columnSec.setRows(checkRow);
-				List<Row> tokenSpecificAuthorities = getTableForSecurityCheck(columnSec).getRows();
-				// wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
-				if (tokenSpecificAuthorities.isEmpty())
-					return inputTable;
-				result.addAll(tokenSpecificAuthorities);
-			}
-		}
-		List<String> grantedColumns = new ArrayList<String>();
-		// die Spaltennamen, welche wir durch den Select erhalten haben in eine List packen, dabei darauf achten,
-		// dass verschiedene SecurityTokens dieselbe Erlaubnis haben können, deshalb Doppelte rausfiltern
-		for (Row row : result) {
-			String grantedColumnFromtColumnSecurity = row.getValues().get(1).getStringValue();
-			if (!grantedColumns.contains(grantedColumnFromtColumnSecurity)) {
-				grantedColumns.add(grantedColumnFromtColumnSecurity);
-			}
-		}
-
-		// wenn SELECT *, dann ist wantedColumns leer
-		List<Column> wantedColumns = new ArrayList<Column>(inputTable.getColumns());
-		if (wantedColumns.isEmpty())
-			for (String s : grantedColumns) {
-				inputTable.addColumn(new Column(s, DataType.STRING));
-			}
-
-		// Hier wird herausgefiltert, welche der angeforderten Spalten(wantedColumns) genehmigt werden können(grantedColumns)
-		for (Column column : wantedColumns) {
-			if (!grantedColumns.contains(column.getName())) {
-				for (Row r : inputTable.getRows()) {
-					r.getValues().remove(inputTable.getColumns().indexOf(column));
-				}
-				inputTable.getColumns().remove(column);
-			}
-		}
-
-		// falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
-		if (inputTable.getColumns().isEmpty()) {
-			RuntimeException exception = new RuntimeException(
-					"msg.ColumnSecurityError %" + SecurityContextHolder.getContext().getAuthentication().getName() + " %" + inputTable.getName());
-			customLogger.logError("No columns available for this user", exception);
-			throw exception;
-		}
-		return inputTable;
-	}
-
-	/**
-	 * @param params   Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
-	 * @param autoLike wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
+	 * @param params
+	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
+	 * @param autoLike
+	 *            wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
 	 * @return die Where-Klausel für die angegebenen Parameter
 	 * @author wild
 	 */
@@ -485,8 +340,7 @@ public class SqlViewController {
 
 			// Eine where Zeile aufbauen
 			final StringBuffer clause = new StringBuffer();
-			COLS:
-			for (int colI = 0; colI < r.getValues().size(); ++colI) {
+			COLS: for (int colI = 0; colI < r.getValues().size(); ++colI) {
 				val def = r.getValues().get(colI);
 				val col = params.getColumns().get(colI);
 				if (Column.AND_FIELD_NAME.equalsIgnoreCase(col.getName())) {
@@ -558,70 +412,5 @@ public class SqlViewController {
 			}
 		}
 		return where.toString();
-	}
-
-	/**
-	 * @param requestingAuthorities eine Liste an Rows im Format: eine Row = ("ProzedurName","UserSecurityToken","RowLevelSecurity-Bit").
-	 * @return Eine Liste an Strings, welche alle relevanten UserSecurityTokens beinhaltet oder eine leere Liste, falls ein SecurityToken die Berechtigung hat
-	 * alle Rows zu sehen.
-	 * @author weber
-	 */
-	protected List<String> extractUserTokens(List<Row> requestingAuthorities) {
-		List<String> requestingRoles = new ArrayList<>();
-
-		for (Row authority : requestingAuthorities) {
-			/*
-			 * Falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen. Ist dies der Fall, können wir
-			 * ruhig eine leere Liste zurückgeben, da deren Inhalt die UserSecurityTokens wären, nach welchen gefiltert werden würde.
-			 */
-			if (!authority.getValues().get(2).getBooleanValue()) {
-				return new ArrayList<>();
-			}
-			// Hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen.
-			String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
-			if (!value.equals("") && !requestingRoles.contains(value)) {
-				requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
-			}
-		}
-		return requestingRoles;
-	}
-
-	/**
-	 * Fügt an das Ende der Where-Klausel die Abfrage nach den SecurityTokens des momentan eingeloggten Users und dessen Gruppen an
-	 *
-	 * @param isFirstWhereClause    Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
-	 * @param requestingAtuhorities Die Rollen des Nutzers, welche ein Recht auf einen Zugriff haben.
-	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
-	 */
-	protected String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
-		List<String> requestingRoles = new ArrayList<>();
-		if (!requestingAtuhorities.isEmpty()) {
-			requestingRoles = extractUserTokens(requestingAtuhorities);
-			// falls die Liste leer ist, darf der User alle Spalten sehen
-			if (requestingRoles.isEmpty()) {
-				return "";
-			}
-		}
-
-		final StringBuffer rowSec = new StringBuffer();
-		// Falls where-Klausel bereits vorhanden 'and' anfügen, wenn nicht, dann 'where'
-		if (isFirstWhereClause) {
-			rowSec.append("\r\nand (");
-		} else {
-			rowSec.append("\r\nwhere (");
-		}
-		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen
-		rowSec.append(" ( SecurityToken IS NULL )");
-
-		if (requestingRoles.size() > 0) {
-			rowSec.append("\r\nor ( SecurityToken IN (");
-			for (String r : requestingRoles) {
-				rowSec.append("'").append(r.trim()).append("',");
-			}
-			rowSec.deleteCharAt(rowSec.length() - 1);
-			rowSec.append(") )");
-		}
-		rowSec.append(" )");
-		return rowSec.toString();
 	}
 }

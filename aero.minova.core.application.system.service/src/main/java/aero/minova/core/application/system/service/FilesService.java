@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.Row;
 
 @Service
@@ -30,7 +29,7 @@ public class FilesService {
 	boolean permissionCheck;
 
 	@Autowired
-	SqlViewController svc;
+	SecurityService securityUtils;
 
 	@Autowired
 	public CustomLogger customLogger;
@@ -161,7 +160,7 @@ public class FilesService {
 	 */
 	public Path checkLegalPath(Path path) throws Exception {
 		if (permissionCheck) {
-			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + path).getRows();
+			List<Row> privileges = securityUtils.getPrivilegePermissions("files/read:" + path);
 			if (privileges.isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError %" + "files/read:" + path);
 			}

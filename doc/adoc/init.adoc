@@ -198,7 +198,7 @@ insert into xtCasUserPrivilege (KeyText) VALUES ('xtctsSendStatus')
 Nachdem diese Rechte in die xtCasUserPrivilege-Tabelle eingefügt wurden, können mit folgender Query die fehlenden Berechtigungen für den Admin bereit gestellt werden.
 
 .Diese SQL-Query generiert die xtcasLuUserPrivilegeUserGroup-Query für alle (UserPrivilegeKey des Admin-Users, UserGroupKey)-Kombinationen, welche noch nicht vorhanden sind. Es ist sinnvoll, diese zu verwenden, wenn viele Privilegien auf einmal freigeschalten werden sollen.
-[source::sql]
+[source,sql]
 ----
 select 'insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey) VALUES ('+cast(tu.KeyLong as nvarchar)+','+ (select cast(KeyLong as nvarchar) from xtcasUserGroup where KeyText = 'admin') +')'
 from xtCasUserPrivilege tu
@@ -208,3 +208,21 @@ where x.KeyLong is null
 
 IMPORTANT: Falls zu Beginn ein neuer Datenbank-User angelegt wurde,
 darf der 'grant select' nicht fehlen.
+
+=== Alle Berechtigungen an Admin vergeben.
+
+[source,sql]
+----
+insert into xtCasUserPrivilege (
+        KeyText)
+    SELECT SPECIFIC_NAME FROM INFORMATION_SCHEMA.ROUTINES
+insert into xtCasUserPrivilege (
+        KeyText)
+    SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+insert into xtcasUserGroup (KeyText,SecurityToken) VALUES ('admin','#admin')
+
+select 'insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey) VALUES ('+cast(tu.KeyLong as nvarchar)+','+ (select cast(KeyLong as nvarchar) from xtcasUserGroup where KeyText = 'admin') +')'
+    from xtCasUserPrivilege tu
+    left join xtcasLuUserPrivilegeUserGroup x on x.UserPrivilegeKey = tu.KeyLong
+    where x.KeyLong is null
+----

@@ -4,6 +4,7 @@ COPY aero.minova.core.application.system.service/target/*.jar /opt/aero.minova.c
 COPY aero.minova.core.application.system.setup/target/libs /opt/aero.minova.cas/lib/
 COPY aero.minova.core.application.system.setup/target/*.jar /opt/aero.minova.cas/lib/
 COPY aero.minova.core.application.system.app/target/classes /opt/aero.minova.cas/system-files/
+COPY aero.minova.core.application.system.app/target/classes/forms /opt/aero.minova.cas/system-files/
 
 ENV login_dataSource='admin'
 ENV aero_minova_database_url='jdbc:sqlserver://host.docker.internal;databaseName=AFIS_GDN'

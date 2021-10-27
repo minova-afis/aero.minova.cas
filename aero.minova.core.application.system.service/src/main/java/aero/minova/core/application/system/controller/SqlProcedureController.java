@@ -273,7 +273,10 @@ public class SqlProcedureController {
 							}).collect(toList()));
 					int totalResults = 0;
 
-					int securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
+					int securityTokenInColumn = -1;
+					if (!userSecurityTokensToBeChecked.isEmpty()) {
+						securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
+					}
 					resultSet.setMetaData(new TableMetaData());
 					while (sqlResultSet.next()) {
 						Row rowToBeAdded = null;

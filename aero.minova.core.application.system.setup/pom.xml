@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova</groupId>
 	<artifactId>core.application.system.setup</artifactId>
-	<version>12.24.5</version>
+	<version>12.24.6-SNAPSHOT</version>
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>spring.maven.root</artifactId>
@@ -16,7 +16,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova..core.application.system</developerConnection>
-		<tag>v12.24.5</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<dependencies>
 		<dependency>

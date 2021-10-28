@@ -107,7 +107,8 @@ Der Nutzer innerhalb der SQL-Prozedur sollte nicht über `user_name()` bestimmt 
 da damit nur der SQL-Nutzer vom CAS ermittelt wird.
 Dieser ist immer derselbe.
 Stattdessen wird der Nutzer vor jedem Prozeduraufruf im SQL-Session-Context abgespeichert
-und kann mit der entsprechenden Funktion abgerufen werden: `xfCasUser()`
+und kann mit der entsprechenden Funktion abgerufen werden: `dbo.xfCasUser()`
+(ohne dbo kommt der Fehler, dass die Prozedur nicht gefunden wurde).
 
 === Eingabe
 

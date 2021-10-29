@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <setup name="aero.minova.core.application.system.app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
-	<required-modules>
-		<module name="ch.minova.install" major="10" minor="27"/>
-		<!-- TODO "ch.minova.i18n" -->
-	</required-modules>
 	<sql-code>
 		<script name="initDebug" type="script"/>
 		<script name="initVersionTable" type="script"/>
@@ -38,17 +34,11 @@
 		<script name="xpcasDeleteLuUserPrivilegeUserGroup" type="procedure"/>
 		<script name="xpcasReadUserPrivilege" type="procedure"/>
 		<script name="xpcasInsertUserPrivilege" type="procedure"/>
+		<script name="xpcasInsertAllPrivilegesToUser" type="procedure"/>
 		<script name="xpcasUpdateUserPrivilege" type="procedure"/>
 		<script name="xpcasDeleteUserPrivilege" type="procedure"/>
 		<script name="xvcasUserPrivilegeIndex" type="view"/>
 	</sql-code>
-	<copy-file>
-		<filecopy filename="User.xml" todir="${application}"/>
-		<filecopy filename="UserGroup.xml" todir="${application}"/>
-		<filecopy filename="UserPrivilege.xml" todir="${application}"/>
-		<filecopy filename="ColumnSecurity.xml" todir="${application}"/>
-		<filecopy filename="LuUserPrivilegeUserGroup.op.xml" todir="${application}"/>
-	</copy-file>
 	<schema>
 		<tableschema name="xtcasError" type="table"/>
 		<tableschema name="xtcasUser" type="table"/>

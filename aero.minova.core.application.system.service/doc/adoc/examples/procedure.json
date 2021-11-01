@@ -1,0 +1,46 @@
+{
+  "name" : "spInsertWorkingTime",
+  "columns" : [ {
+    "name" : "KeyLong",
+    "type" : "INTEGER"
+  }, {
+    "name" : "EmployeeKey",
+    "type" : "INTEGER"
+  }, {
+    "name" : "ServiceContractKey",
+    "type" : "INTEGER"
+  }, {
+    "name" : "OrderReceiverrKey",
+    "type" : "INTEGER"
+  }, {
+    "name" : "ServiceObjectKey",
+    "type" : "INTEGER"
+  }, {
+    "name" : "ServiceKey",
+    "type" : "INTEGER"
+  }, {
+    "name" : "BookingDate",
+    "type" : "INSTANT"
+  }, {
+    "name" : "StartDate",
+    "type" : "INSTANT"
+  }, {
+    "name" : "EndDate",
+    "type" : "INSTANT"
+  }, {
+    "name" : "RenderedQuantity",
+    "type" : "DOUBLE"
+  }, {
+    "name" : "ChargedQuantity",
+    "type" : "INTEGER"
+  }, {
+    "name" : "Description",
+    "type" : "STRING"
+  }, {
+    "name" : "Spelling",
+    "type" : "BOOLEAN"
+  } ],
+  "rows" : [ {
+    "values" : [ null, "n-1", "n-1", "n-1", "n-1", "n-2", "i-2020-10-06T00:00:00.00Z", "i-2020-10-06T16:00:00.00Z", "i-2020-10-06T17:00:00.00Z", "d-1.0", "n-5", "s-Test via CAS", "b-0" ]
+  } ]
+}

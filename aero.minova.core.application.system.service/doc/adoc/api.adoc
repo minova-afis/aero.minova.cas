@@ -244,6 +244,8 @@ und im SQL-Server.
 }
 ----
 
+include::api-xprocedure.adoc[]
+
 == data/view
 
 Selektiert Objekte (View, Tabelle, etc.) des SQL-Servers.

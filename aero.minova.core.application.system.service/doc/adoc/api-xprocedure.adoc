@@ -1,0 +1,79 @@
+== data/x-procedure
+
+Dieser Einstiegspunkt führt mehrere Prozeduren auf dem Server innerhalb einer Transaktion aus.
+Häufig sind dies SQL-Prozeduren, die innerhalb einer Maske über OptionPages oder ein integriertes Grid zusammenhängen.
+
+Für den Benutzernamen gelten die gleichen Regeln wie für <<data/procedure>>.
+
+=== Eingabe
+
+Als Eingabe wird ein Array von benannten Prozeduren übergeben.
+
+[source,json]
+.Sample.json
+----
+include::examples/xprocedure.json[]
+----
+
+Jedes Arrayelement enthält eine `id`.
+Sie muss eindeutig über alle Arrayelemente des Aufrufs sein.
+Über sie werden die Result-Tabellen und die Referenzwerte bestimmt.
+
+Das 2. Element ist das die `table`.
+Es entspricht der oben beschriebenen <<table>>, wie sie auch für <<data/procedure>> Aufrufe verwendet wird.
+
+[TIP]
+====
+Es ist zu überlegen, ob man bei den Werten auch mehrere `rows` übergeben darf. 
+Dies würde dann mehreren Aufrufen der Prozedur mit den Werten entsprechen.
+
+Die Frage ist dann, wie die Rückgabewerte für einen Aufruf identifiziert werden.
+Man könnte sich den Array-Index-Operator (`[]`) verwenden.
+====
+
+==== columns/values/reference
+
+Neben den üblichen <<column/values/*>> gibt es noch einen speziellen Wert.
+Die Referenz definiert einen Wert, der in einem verherigen Aufruf beschrieben wurde.
+Damit können auch OUTPUT-Werte aus zuvor ausgeführten Prozeduren als Wert angegeben werden.
+
+Der Typ wird anhand des Prefixes des Values angegeben:
+
+* *"r"*: Referenz: 
+Nach dem ersten Bindestrich folgt die `id` der Procedure.
+Nach dem zweiten Bindestrich folgt der `name` des Parameters.
+
+Daraus ergibt sich auch, das `id`-Werte keine Bindestriche enthalten dürfen.
+Dies führt zum Abbruch der Prozedur mit einer entsprechenden Meldung.
+
+Der Name des Parameters kann `-` enthalten. 
+Es handelt sich aj dabei um den Rest des Wertes.
+
+=== Ausgabe
+
+Die Antwort besteht dann auch aus einem Array von Elementen.
+Jedes Element besitzt wieder eine `id` mit dem Namen des entsprechenden Aufrufs und ein `result` mit dem Ausgabe-Daten wie beim <<data/procedure>>-Aufruf.
+
+Die Antwort hat bei Erfolg folgendes Format:
+
+[source,json]
+----
+include::examples/xprocedure-result.json[]
+----
+
+Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
+
+==== resultSet
+
+Gibt im Table-Format alle selektierten Werte zurück.
+Werden keine Werte selektiert, wird die Tabelle in der Antwort nicht angegeben.
+
+==== outputParameters
+
+Gibt im Table-Format alle Input und Output-Parameter-Werte zurück, wenn es einen Output-Parameter in der Eingabe gab.
+Diese Tabelle enthält nur 1 Zeile.
+
+==== returnCode
+
+Der Return Code der SQL-Prozedur, falls vorhanden.
+Bei Erfolg ist er entweder 0 oder positiv. Bei Misserfolg negativ.

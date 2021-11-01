@@ -14,6 +14,7 @@ Als Eingabe wird ein Array von benannten Prozeduren übergeben.
 ----
 include::examples/xprocedure.json[]
 ----
+(xref:examples/xprocedure.json#[Example for xprocedure-Call])
 
 Jedes Arrayelement enthält eine `id`.
 Sie muss eindeutig über alle Arrayelemente des Aufrufs sein.
@@ -60,6 +61,7 @@ Die Antwort hat bei Erfolg folgendes Format:
 ----
 include::examples/xprocedure-result.json[]
 ----
+(xref:examples/xprocedure-result.json#[Example for xprocedure-result])
 
 Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
 

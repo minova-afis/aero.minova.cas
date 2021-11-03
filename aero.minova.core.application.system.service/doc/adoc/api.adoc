@@ -30,6 +30,7 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 		{
 			"values": [
 				"(f-Operator-(b|d|i|n|s|z)-Value)|"
+				"(r-ReferenzId-ReferenzColumn)|"
 				"(b|d|i|n|s|z-Value)|"
 				"null",...
 			]
@@ -90,8 +91,10 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 * *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
 * *"s"*: String
 * *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
-* *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
- 
+* *"m"*: Money: Entspricht dem Format von "java.math.BigDecimal.valueOf(Double.parseDouble(String))".
+* *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde.
+* *"r"*: Referenz: Zeigt an, dass eine Referenz auf das Ergebnis einer anderen Prozedur innerhalb der Anfrage besteht.
+  
 Durch den Prefix "f-" können die Operatoren *<> , <=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.
 
 === rows

@@ -1,0 +1,165 @@
+{
+  "graphName" : "oiltanking.swb",
+  "artifacts" : [ {
+    "id" : "aero.minova:core.application.system.app:jar:app",
+    "numericId" : 1,
+    "groupId" : "aero.minova",
+    "artifactId" : "core.application.system.app",
+    "version" : "12.24.7",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:app.build:jar",
+    "numericId" : 2,
+    "groupId" : "aero.minova",
+    "artifactId" : "app.build",
+    "version" : "0.2.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.minova:oiltanking.swb:jar",
+    "numericId" : 3,
+    "groupId" : "com.minova",
+    "artifactId" : "oiltanking.swb",
+    "version" : "0.1.0-SNAPSHOT",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:data.schema.app:jar:app",
+    "numericId" : 4,
+    "groupId" : "aero.minova",
+    "artifactId" : "data.schema.app",
+    "version" : "0.1.0",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:app.i18n:jar:app",
+    "numericId" : 5,
+    "groupId" : "aero.minova",
+    "artifactId" : "app.i18n",
+    "version" : "0.1.6",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:invoice:jar:app",
+    "numericId" : 6,
+    "groupId" : "aero.minova",
+    "artifactId" : "invoice",
+    "version" : "12.0.12",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:contact:jar:app",
+    "numericId" : 7,
+    "groupId" : "aero.minova",
+    "artifactId" : "contact",
+    "version" : "12.0.0",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  } ],
+  "dependencies" : [ {
+    "from" : "aero.minova:core.application.system.app:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 0,
+    "numericTo" : 1,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:oiltanking.swb:jar",
+    "to" : "aero.minova:core.application.system.app:jar:app",
+    "numericFrom" : 2,
+    "numericTo" : 0,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:data.schema.app:jar:app",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 4,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:data.schema.app:jar:app",
+    "to" : "aero.minova:core.application.system.app:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 0,
+    "version" : "12.21.28",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:data.schema.app:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 3,
+    "numericTo" : 1,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:oiltanking.swb:jar",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 2,
+    "numericTo" : 3,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:app.i18n:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 4,
+    "numericTo" : 1,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:oiltanking.swb:jar",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 2,
+    "numericTo" : 4,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:invoice:jar:app",
+    "to" : "aero.minova:core.application.system.app:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 0,
+    "version" : "12.24.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:contact:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 6,
+    "numericTo" : 3,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:contact:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 6,
+    "numericTo" : 1,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:invoice:jar:app",
+    "to" : "aero.minova:contact:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 6,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:invoice:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 5,
+    "numericTo" : 1,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:oiltanking.swb:jar",
+    "to" : "aero.minova:invoice:jar:app",
+    "numericFrom" : 2,
+    "numericTo" : 5,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "com.minova:oiltanking.swb:jar",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 2,
+    "numericTo" : 1,
+    "resolution" : "INCLUDED"
+  } ]
+}

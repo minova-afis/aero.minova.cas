@@ -2,9 +2,22 @@
 All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [12.25.0] - 2021-11-02
+
+Die Reihenfolge in welcher Dependencies über die `data/procedure` Setup installiert werden,
+wurde an die Version 12.5.0 von
+link:https://github.com/minova-afis/aero.minova.app.parent/blob/main/CHANGELOG.md#1250---2021-11-03[aero.minova.app.parent]
+angepasst.
+Ab dieser CAS-Version,
+müssen folglich alle Kundenprojekte auf diese `app.parent`-Version umgestellt werden.
+
 ## [12.24.1] - 2021-10-25
+
 Setup-Fehler beheben.
+
 ## [12.24.0] - 2021-10-13
+
 * #149: Der Nutzer von Prozedur-Aufrufen über `data/procedure` wird im SQL-Session-Context `casUser` abgelegt
   und kann mit der Funktion `dbo.xfCasUser()` ermittelt werden.
   Der Nutzer der SQL-Session kann nicht genutzt werden, da dies immer der SQL-Nutzer des CAS-Dienstes ist.

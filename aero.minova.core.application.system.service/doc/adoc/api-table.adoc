@@ -24,8 +24,8 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"rows": [
 		{
 			"values": [
-				"(f-Operator-(b|d|i|n|s|z)-Value)|"
-				"(b|d|i|n|s|z-Value)|"
+				"(f-Operator-(b|d|i|n|s|z|m)-Value)|"
+				"(b|d|i|n|s|z|m-Value)|"
 				"null",...
 			]
 		}
@@ -85,6 +85,7 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 * *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
 * *"s"*: String
 * *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"m"*: Money: Entspricht dem Format von "java.math.BigDecimal.valueOf(Double.parseDouble(String))".
 * *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
 
 Durch den Prefix "f-" können die Operatoren *<> , <=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.

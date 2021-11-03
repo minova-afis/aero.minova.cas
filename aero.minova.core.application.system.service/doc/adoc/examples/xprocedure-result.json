@@ -1,0 +1,29 @@
+[ {
+  "id" : "parent_call",
+  "result" : {
+    "resultset" : <Table>,
+ 	"outputParameters": <Table>,
+	"returnCode": <Integer>
+ }
+}, {
+  "id" : "option_page_call",
+  "result" : {
+    "resultset" : <Table>,
+ 	"outputParameters": <Table>,
+	"returnCode": <Integer>
+  }
+}, {
+  "id" : "option_grid_call_1",
+  "result" : {
+    "resultset" : <Table>,
+ 	"outputParameters": <Table>,
+	"returnCode": <Integer>
+  }
+}, {
+  "id" : "option_grid_call_2",
+  "result" : {
+    "resultset" : <Table>,
+ 	"outputParameters": <Table>,
+	"returnCode": <Integer>
+  }
+} ]

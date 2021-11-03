@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import aero.minova.core.application.system.service.FilesService;
+import aero.minova.core.application.system.setup.dependency.DependencyOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,15 @@ import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
+import static aero.minova.core.application.system.setup.dependency.DependencyOrder.determineDependencyOrder;
+
 /**
  * Installiert sämtliche Komponenten und Abhängigkeiten des APP-Servers (aero.minova.app.parent)
  * anhand der "Setup.xml"s aus "{@link FilesService#rootPath}/setup/**".
- * Dabei werden zuerst die Abhängigkeiten aus "{@link FilesService#rootPath}/setup/dependencyList.txt"
+ * Dabei werden zuerst die Abhängigkeiten aus "{@link FilesService#rootPath}/setup/dependency-graph.json"
  * ausgelesen und die entsprechenden "Setup.xml"s in "{@link FilesService#rootPath}/setup/**" installiert.
  * Anschließend wird die Hauptkomponente anhand der "{@link FilesService#rootPath}/setup/Setup.xml" installiert.
+ * 
  * TODO SQL-Code (nicht Schema) wird doppelt ausgeführt.
  */
 @Service
@@ -59,16 +63,13 @@ public class SetupService {
 
 	@PostConstruct
 	private void setup() {
-		// Fügt Extension hinzu.
 		spc.registerExtension(PROCEDURE_NAME, inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
-				Path dependencyList = service.getSystemFolder().resolve("setup").resolve("dependencyList.txt");
-				if (dependencyList.toFile().exists()) {
-					readSetups(Files.readString(dependencyList), true);
-				} else {
-					throw new NoSuchFileException("No dependencyList.txt found!");
-				}
+				readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
+						, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
+						, service.getSystemFolder().resolve("setup")//
+						, true);
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -78,59 +79,29 @@ public class SetupService {
 	}
 
 	/**
-	 * Die Methode überspringt die erste Zeile (bis nach \n) und schneidet alles ab dem String "The following files have NOT been resolved:" ab. Danach wird
-	 * jede Zeile als ein Eintrag in der Rückgabe-Liste gesetzt. Dabei wird noch die Endung :jar entfernt und alle : durch . ersetzt.
-	 *
-	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
-	 * @return Gibt eine Liste an String zurück, welche die benötigten Prozedur-Dateinamen beinhalten: prozedur.sql.
-	 */
-	List<String> parseDependencyList(String arg) {
-		// Die obere Zeile und die die Zeilen mit den nicht resolvten Dateien abschneiden.
-		String filteredArg = arg.substring(0, arg.indexOf("The following files have NOT been resolved:")).substring(arg.indexOf("\n") + 1);
-
-		// Am Zeilenumbruch trennen und störende Leerzeichen entfernen.
-		List<String> dependencies = Stream.of(filteredArg.split("\\R"))//
-				.filter(s -> !s.contains("The following files have been resolved:"))//
-				.filter(s -> !s.isBlank())//
-				.filter(s -> s.contains("jar"))//
-				.map(s -> s.substring(0 + 1, s.indexOf(":jar")).replace(":", ".").strip())//
-				.collect(Collectors.toList());
-		Collections.reverse(dependencies);
-		return dependencies;
-	}
-
-	/**
 	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
 	 *
 	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
 	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
-	List<String> readSetups(String arg, boolean setupTableSchemas) throws IOException {
-		List<String> dependencies = parseDependencyList(arg);
-		Path dependencySetupsDir = service.getSystemFolder().resolve("setup");
-
+	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
+		List<String> dependencies = determineDependencyOrder(Files.readString(dependencyList));
+		logger.info("Dependency Installation Order: " + dependencies);
 		final List<String> procedures = new ArrayList<>();
-
-		// Zuerst durch alle Dependencies durchgehen.
 		for (String dependency : dependencies) {
 			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
 			if (setupTableSchemas) {
 				installToolIntegration.installSetup(setupXml);
 			}
 			final List<String> newProcedures = readProceduresToList(setupXml.toFile());
-			//runScripts(newProcedures);
 			procedures.addAll(newProcedures);
 		}
-
-		// Danach muss das Hauptsetup-File ausgelesen werden.
-		final Path mainSetupXml = dependencySetupsDir.resolve("Setup.xml");
-		File mainSetupFile = mainSetupXml.toFile();
-		if (setupTableSchemas) {
-			installToolIntegration.installSetup(mainSetupXml);
-		}
-		if (mainSetupFile.exists()) {
-			List<String> newProcedures = readProceduresToList(mainSetupFile);
-			//runScripts(newProcedures);
+		File setupFile = setupPath.toFile();
+		if (setupFile.exists()) {
+			if (setupTableSchemas) {
+				installToolIntegration.installSetup(setupPath);
+			}
+			List<String> newProcedures = readProceduresToList(setupFile);
 			procedures.addAll(newProcedures);
 		} else {
 			throw new NoSuchFileException("No main-setup file found!");
@@ -217,11 +188,13 @@ public class SetupService {
 	}
 
 	/**
+	 * TODO Entfernen
 	 * Liest die übergebene Liste an SQL-Dateinamen und installiert die jeweils dazugehörige Datei.
 	 *
 	 * @param procedures Die Liste an SQL-Dateinamen.
 	 * @throws NoSuchFileException Falls die Datei passend zum Namen nicht existiert.
 	 */
+	@Deprecated
 	void runScripts(List<String> procedures) throws NoSuchFileException {
 		Path dependencySqlDir = service.getSystemFolder().resolve("sql");
 		for (String procedureName : procedures) {

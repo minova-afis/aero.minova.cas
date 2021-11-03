@@ -213,6 +213,7 @@ darf der 'grant select' nicht fehlen.
 
 [source,sql]
 ----
+insert into xtCasUserPrivilege (KeyText) values ('setup')
 insert into xtCasUserPrivilege (
         KeyText)
     SELECT SPECIFIC_NAME FROM INFORMATION_SCHEMA.ROUTINES

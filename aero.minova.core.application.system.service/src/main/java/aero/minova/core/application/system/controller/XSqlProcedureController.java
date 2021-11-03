@@ -95,7 +95,7 @@ public class XSqlProcedureController {
 	 *            Die Liste an bereits ausgeführten xSqlProcedureResults. Diese beinhalten die Referenz-Values.
 	 * @return Eine Table, in welcher der Value bereits ersetzt wurde.
 	 */
-	private Table fillInDependencies(XTable xtable, List<XSqlProcedureResult> resultsets) {
+	Table fillInDependencies(XTable xtable, List<XSqlProcedureResult> resultsets) {
 
 		Table workingTable = xtable.getTable();
 
@@ -106,7 +106,7 @@ public class XSqlProcedureController {
 				if (v != null && v.getRule() != null) {
 					XSqlProcedureResult dependency = findxSqlResultSet(v.getRule(), resultsets);
 					aero.minova.core.application.system.domain.Value newValue = findValue(dependency.getResultSet(), v.getStringValue());
-					// Tauche Value mit dem Ergebnis aus einem der ResultSets aus.
+					// Tausche Value mit dem Ergebnis aus einem der ResultSets aus.
 					r.getValues().remove(i);
 					r.getValues().add(i, newValue);
 				}
@@ -125,7 +125,7 @@ public class XSqlProcedureController {
 	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
 	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen.
 	 */
-	private aero.minova.core.application.system.domain.Value findValue(SqlProcedureResult dependency, String columnName) {
+	aero.minova.core.application.system.domain.Value findValue(SqlProcedureResult dependency, String columnName) {
 		int position = -1;
 		for (int i = 0; i < dependency.getOutputParameters().getColumns().size(); i++) {
 			if (dependency.getOutputParameters().getColumns().get(i).getName().toLowerCase().equals(columnName.toLowerCase())) {
@@ -149,7 +149,7 @@ public class XSqlProcedureController {
 	 *            Die Liste an xSqlProcedureResults, welche zur Verfügung stehen.
 	 * @return Das xSqlProcedureResult, welches die gewünschte Id hat.
 	 */
-	private XSqlProcedureResult findxSqlResultSet(String idToFind, List<XSqlProcedureResult> resultsets) {
+	XSqlProcedureResult findxSqlResultSet(String idToFind, List<XSqlProcedureResult> resultsets) {
 		for (XSqlProcedureResult xSqlResult : resultsets) {
 			if (xSqlResult.getId().equals(idToFind)) {
 				return xSqlResult;

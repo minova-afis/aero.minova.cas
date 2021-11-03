@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
@@ -38,9 +36,6 @@ public class XSqlProcedureController {
 	@Autowired
 	SqlProcedureController sqlProcedureController;
 
-	@Autowired
-	Gson gson;
-
 	/**
 	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Wir können davon ausgehen, dass die Liste der Prozeduren auch in der richtigen
 	 * Reihenfolge sind.
@@ -53,8 +48,8 @@ public class XSqlProcedureController {
 	 */
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/x-procedure")
-	public ResponseEntity executeProcedure(@RequestBody List<XTable> inputTables) throws Exception {
-		customLogger.logUserRequest("data/x-procedure: " + gson.toJson(inputTables));
+	public ResponseEntity executeProcedures(@RequestBody List<XTable> inputTables) throws Exception {
+		customLogger.logJson("data/x-procedure: " + inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
 		for (XTable xt : inputTables) {

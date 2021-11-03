@@ -1,0 +1,94 @@
+== Table
+
+Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
+
+Generell gilt, dass jedes Feld bis auf metaData ein Pflichtfeld ist.
+Die jeweiligen values müssen genauso viele Werte haben wie columns.
+
+[source,json]
+--------
+{
+	"name": "ProcedureName",
+	"metaData":
+		{
+        	"limited": 10,
+        	...
+    	},
+	"columns": [
+		{
+			"name": "ParameterName",
+			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED",
+			"outputType": "INPUT|OUTPUT"
+		},...
+	],
+	"rows": [
+		{
+			"values": [
+				"(f-Operator-(b|d|i|n|s|z)-Value)|"
+				"(b|d|i|n|s|z-Value)|"
+				"null",...
+			]
+		}
+	]
+}
+--------
+
+<<Im Fehlerfall>> erweitert sich die Ausgabe-Table um einen weiteren Parameter.
+
+=== name
+
+Der Name der Prozedur, die ausgeführt wird.
+
+=== metaData
+
+----
+	"metaData":
+		{
+        	"limited": 10,
+        	"page": 1,
+        	"totalResults": 10,
+        	"totalPages": 1,
+        	"resultsLeft": 0
+    	},
+----
+
+Anhand von metaData kann man die sichtbare Ergebnissemenge einschränken.
+Dies ist durch die Parameter limited und page möglich.
+
+.veränderbare Parameter:
+* *limited*: Anzahl an Treffern, welche bei der Anfrage zurückgegeben werden sollen.
+Ist der Wert 0, werden alle Treffer zurückgegeben und der Wert der totalResults angezeigt.
+* *page*: die n-te Seite der totalPages basierend auf limited.
+Ist kein Wert für page gesetzt, werden die Ergebnisse von 0 bis limited,
+also die 1.Seite, ausgegeben.
+
+.unveränderbare/vom Service berechnete Parameter:
+* *totalResults*: Anzahl an Rows, welche für die angegebenen Suchparameter gefunden wurden.
+* *totalPages*: Anzahl an Seiten, welche basierend auf den totalResults und limited errechnet wurden.
+* *resultsLeft*: Anzahl an Rows, welche nach der momentanen Seite noch übrig sind.
+
+=== columns
+
+Die Parameter-Typen das Aufrufes.
+
+==== columns/values/*
+
+Die Werte dürfen prinzipiell von einem beliebigen Typ sein,
+müssen aber mit dem Typ der jeweiligen Spalte kompatibel sein.
+Im einfachsten Fall ist der Typ eines Values gleich dem Typ der jeweiligen Spalte (columns/*/type).
+
+Der Typ wird anhand des Prefixes des Values angegeben:
+
+* *"b"*: boolean: false|true
+* *"d"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
+* *"i"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
+* *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
+* *"s"*: String
+* *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
+* *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
+
+Durch den Prefix "f-" können die Operatoren *<> , <=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.
+
+=== rows
+
+Die Parameter der Prozedur.

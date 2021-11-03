@@ -1,7 +1,13 @@
 package aero.minova.core.application.system;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.stream.StreamSupport;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.AbstractEnvironment;
@@ -11,10 +17,7 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.stream.StreamSupport;
+import com.google.gson.Gson;
 
 @Component
 public class CustomLogger {
@@ -29,12 +32,14 @@ public class CustomLogger {
 	// Log für File Hashes und Zipps
 	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 
+	@Autowired
+	Gson gson;
+
 	public void logError(String logMessage, Exception e) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
-		errorLogger
-				.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
+		errorLogger.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
 	}
 
 	public void logPrivilege(String logMessage) {
@@ -47,6 +52,10 @@ public class CustomLogger {
 
 	public void logUserRequest(String logMessage) {
 		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+	}
+
+	public void logJson(String logMessage) {
+		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + gson.toJson(logMessage));
 	}
 
 	public void logFiles(String logMessage) {

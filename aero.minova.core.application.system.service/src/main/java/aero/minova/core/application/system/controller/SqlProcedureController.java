@@ -27,8 +27,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
@@ -52,9 +50,6 @@ public class SqlProcedureController {
 
 	@Autowired
 	SecurityService securityService;
-
-	@Autowired
-	Gson gson;
 
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
@@ -130,7 +125,7 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		customLogger.logUserRequest("data/procedure: " + gson.toJson(inputTable));
+		customLogger.logJson("data/procedure: " + inputTable);
 		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
 			if (arePrivilegeStoresSetup()) {

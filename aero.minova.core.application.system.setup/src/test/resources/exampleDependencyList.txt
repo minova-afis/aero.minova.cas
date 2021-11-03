@@ -1,6 +1,0 @@
-The following files have been resolved:
-   aero.minova:example.app:jar:app:0.1.1-SNAPSHOT
-   aero.minova:app.i18n:jar:app:0.1.4
-
-The following files have NOT been resolved:
-   aero.minova:app.build:jar:0.2.1:compile

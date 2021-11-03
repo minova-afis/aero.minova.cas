@@ -39,7 +39,42 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 }
 --------
 
+
 <<Im Fehlerfall>> erweitert sich die Ausgabe-Table um einen weiteren Parameter.
+
+== XTable
+
+Die XTable ist eigentlich dasselbe wie eine normale Table mit dem Unterschied,
+ dass sie noch eine Id beinhaltet. Diese ist wird immer als String behandelt.
+[source,json]
+--------
+{
+	"id" : "IdName",
+	"name": "ProcedureName",
+	"metaData": 
+		{
+        	"limited": 10,
+        	...
+    	},
+	"columns": [
+		{
+			"name": "ParameterName",
+			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED",
+			"outputType": "INPUT|OUTPUT"
+		},...
+	],
+	"rows": [
+		{
+			"values": [
+				"(f-Operator-(b|d|i|n|s|z)-Value)|"
+				"(r-ReferenzId-ReferenzColumn)|"
+				"(b|d|i|n|s|z-Value)|"
+				"null",...
+			]
+		}
+	]
+}
+--------
 
 === name
 
@@ -150,101 +185,48 @@ Diese Tabelle enthält nur 1 Zeile.
 Der Return Code der SQL-Prozedur, falls vorhanden.
 Bei Erfolg ist er entweder 0 oder positiv. Bei Misserfolg negativ.
 
-=== Spezielle Prozeduren
+== data/x-procedure
 
-Es gibt die Prozedur `Ticket`, welche durch das CAS bereitgestellt wird.
-Diese sucht anhand der Ticketnummer nach den Daten des Tickets im Trac
-und im SQL-Server.
+Führt eine List an voneinander abhängenden Prozeduren auf dem Server aus.
+Hierbei wird dieselbe Funktionalität wie bei data/procedure verwendet.
+Zusätzlich werden jeodch vor dem Ausführen der einzelnen Prozeduren 
+die Platzhalter-Values durch die referenzierten Values aus den Rückgabe-Werten ersetzt.
 
-[source,json]
-.Als Parameter muss die `TicketNumber` übergeben werden, wobei das Ticket -123 ein nicht existierendes Test-Ticket ist, welches immer abrufbar ist:
---------
-{
-    "name": "Ticket",
-    "columns": [
-        {
-            "name": "TicketNumber",
-            "type": "INTEGER",
-            "outputType": "OUTPUT"
-        }
-    ],
-    "rows": [
-        {
-            "values": [
-                "s--123"
-            ]
-        }
-    ]
-}
---------
+=== Eingabe
+
+Als Eingabe wird eine Liste an xTables im Body der Get-Anfrage erwartet.
+
+Jede xTable enthält eine Id, die Parameter für die SQL-Prozedur und optional Metadaten.
+Die columns beschreiben den Namen und den Typ der Argumente.
+Die rows enthalten eine Zeile, in der die Argumente gelistet sind.
+
+=== Ausgabe
+
+Die Antwort ist eine Liste an xSqlProcedureResults und hat bei Erfolg folgendes Format:
 
 [source,json]
-.Als Antwort bekommt man die Details des Tickets zurück.
-----
+--------
+[
 {
-    "resultSet": {
-        "name": "Ticket",
-        "columns": [
-            {
-                "name": "TicketKey",
-                "type": "INTEGER"
-            },
-            {
-                "name": "OrderReceiver",
-                "type": "STRING"
-            },
-            {
-                "name": "ServiceContract",
-                "type": "STRING"
-            },
-            {
-                "name": "ServiceObject",
-                "type": "STRING"
-            },
-            {
-                "name": "Service",
-                "type": "STRING"
-            },
-            {
-                "name": "Description",
-                "type": "STRING"
-            },
-            {
-                "name": "OrderReceiverKey",
-                "type": "INTEGER"
-            },
-            {
-                "name": "ServiceContractKey",
-                "type": "INTEGER"
-            },
-            {
-                "name": "ServiceObjectKey",
-                "type": "INTEGER"
-            },
-            {
-                "name": "ServiceKey",
-                "type": "INTEGER"
-            }
-        ],
-        "rows": [
-            {
-                "values": [
-                    "n--123",
-                    "s-MIN",
-                    "s-WFC",
-                    "s-LOHN",
-                    "s-ZPROGRAM",
-                    "s-#37: Trac-Ticket Dummy Implementierung auf publictest bereitstellen.",
-                    null,
-                    null,
-                    null,
-                    null
-                ]
-            }
-        ]
-    }
-}
-----
+	"id": "parent_call",
+	"resultSet": <Table>,
+	"outputParameters": <Table>,
+	"returnCode": <Integer>
+}, 
+{
+	"id": "option_page_call",
+	"resultSet": <Table>,
+	...
+},
+]
+--------
+
+Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
+
+==== resultSet, outputParameters, returnCode
+
+Das ResultSet, die outputParameters und das Verhalten des ReturnCodes ist dasselbe wir beim Ausführen von <<CAS API,data/procedure>>.
+
 
 == data/view
 

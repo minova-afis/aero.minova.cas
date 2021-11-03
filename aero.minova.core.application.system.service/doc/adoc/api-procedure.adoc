@@ -1,0 +1,49 @@
+== data/procedure
+
+Führt eine Prozedur auf dem Server aus.
+Häufig ist dies eine SQL-Prozedur auf dem SQL-Server.
+
+Der Nutzer innerhalb der SQL-Prozedur sollte nicht über `user_name()` bestimmt werden,
+da damit nur der SQL-Nutzer vom CAS ermittelt wird.
+Dieser ist immer derselbe.
+Stattdessen wird der Nutzer vor jedem Prozeduraufruf im SQL-Session-Context abgespeichert
+und kann mit der entsprechenden Funktion abgerufen werden: `dbo.xfCasUser()`
+(ohne dbo kommt der Fehler, dass die Prozedur nicht gefunden wurde).
+
+=== Eingabe
+
+Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
+
+Diese Table enthält die Parameter für die SQL-Prozedur und optional Metadaten.
+Die columns beschreiben den Namen und den Typ der Argumente.
+Die rows enthalten eine Zeile, in der die Argumente gelistet sind.
+
+=== Ausgabe
+
+Die Antwort hat bei Erfolg folgendes Format:
+
+[source,json]
+--------
+{
+	"resultSet": <Table>,
+	"outputParameters": <Table>,
+	"returnCode": <Integer>
+}
+--------
+
+Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
+
+==== resultSet
+
+Gibt im Table-Format alle selektierten Werte zurück.
+Werden keine Werte selektiert, wird die Tabelle in der Antwort nicht angegeben.
+
+==== outputParameters
+
+Gibt im Table-Format alle Input und Output-Parameter-Werte zurück, wenn es einen Output-Parameter in der Eingabe gab.
+Diese Tabelle enthält nur 1 Zeile.
+
+==== returnCode
+
+Der Return Code der SQL-Prozedur, falls vorhanden.
+Bei Erfolg ist er entweder 0 oder positiv. Bei Misserfolg negativ.

@@ -3,12 +3,13 @@
 Konkrete Beispiele sind in einer xref:../../aero.minova.service.core.application.system.postman_collection.json#[Postman Collection] gelistet.
 Die Authentifizierung findet über Basic Auth statt.
 
-== Table
+NOTE: Vielleicht sollten wir das Dokument verkürzen, indem wir verlinken und nicht inkludieren?
 
-Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
+include::api-table.adoc[Tabellen-Format]
 
-Generell gilt, dass jedes Feld bis auf metaData ein Pflichtfeld ist.
-Die jeweiligen values müssen genauso viele Werte haben wie columns.
+include::api-procedure.adoc[data/procedure]
+
+include::api-xprocedure.adoc[data/x-procedure]
 
 [source,json]
 --------
@@ -227,7 +228,6 @@ Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
 
 Das ResultSet, die outputParameters und das Verhalten des ReturnCodes ist dasselbe wir beim Ausführen von <<CAS API,data/procedure>>.
 
-
 == data/view
 
 Selektiert Objekte (View, Tabelle, etc.) des SQL-Servers.
@@ -251,68 +251,4 @@ wenn alles gut gelaufen ist.
 }
 --------
 
-== Im Fehlerfall
-
-Ist die Eingabe fehlerhaft oder treten sonstige Fehler bei der Verarbeitung des Services auf,
-wird an den Client ein *Internal Server Error*, bzw. *Server Code 500*, gesendet.
-
-Auf dem *Server* wird in der Tabelle xtcasError ein Eintrag mit dem Username, dem genauen Zeitpunkt und dem aufgetretenen Fehler erstellt.
-[source,sql]
-----
-insert into xtcasError (Username, ErrorMessage, Date) values (username,errorMessage,date)
-----
-
-
-Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, ändert sich wie folgt: 
-
-[source,sql]
-----
-{
-	"name": "Error",
-    "columns": [
-        {
-            "name": "International Message",
-            "type": "STRING"
-        }
-        [,{
-        	"name": "MessageInputParam1",
-            "type": "STRING"
-            }]
-    ],
-    "rows": [
-        {
-            "values": [
-                "s-msg.Error",["s-InputParameter",...]
-            ]
-        }
-    ],
-	"returnErrorMessage": {
-		"detailsMessage": "ExceptionMessage",
-		"cause": "ExceptionCause",
-		"trace": [ 
-			"StackTraceMessages",
-			...
-		]
-	} 
-----
-Der Name der zurückgegebenen Tabele wird auf "Error" geändert und es wird nur eine Row zurückgegeben,
-in welcher der übersetzbare MessageCode hinterlegt ist, welcher beim Client in die Sprache des Users übersetzt wird.
-Falls die Nachricht einen oder mehrere Inputparameter benötigt, folgen weitere String-Values, welche die einzelnen Parameter enthalten.
-
-Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.
-
-Sie wird nur befüllt, falls ein Fehler auftritt. 
-Ansonsten ist dieses Objekt *null*.
-
-==== returnErrorMessage/detailsMessage
-
-Die DetailsMessage der Exception, die geworfen wurde.
-
-==== returnErrorMessage/cause
-
-Der Grund, weshalb die Exception geworfen wurde, z.b.:
-_java.lang.NullPointerException_.
-
-==== returnErrorMessage/trace
-
-Der StackTrace der geworfenen Exception nach jedem Abatz getrennt.
+include::api-error.adoc[data/x-procedure]

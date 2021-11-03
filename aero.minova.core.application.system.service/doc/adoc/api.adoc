@@ -5,7 +5,7 @@ Die Authentifizierung findet über Basic Auth statt.
 
 NOTE: Vielleicht sollten wir das Dokument verkürzen, indem wir verlinken und nicht inkludieren?
 
-include::api-table.adoc[Tabelle-Format]
+include::api-table.adoc[Tabellen-Format]
 
 include::api-procedure.adoc[data/procedure]
 

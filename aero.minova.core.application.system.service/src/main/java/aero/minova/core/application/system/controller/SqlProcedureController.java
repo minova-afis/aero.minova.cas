@@ -46,7 +46,9 @@ import lombok.val;
 public class SqlProcedureController {
 	@Autowired
 	SystemDatabase systemDatabase;
-	CustomLogger customLogger = new CustomLogger();
+
+	@Autowired
+	CustomLogger customLogger;
 
 	@Autowired
 	SecurityService securityService;
@@ -102,7 +104,7 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler bei der Ermittelung
 	 */
-	private boolean arePrivilegeStoresSetup() throws Exception {
+	boolean arePrivilegeStoresSetup() throws Exception {
 		return isTablePresent("xvcasUserPrivileges");
 	}
 
@@ -330,8 +332,10 @@ public class SqlProcedureController {
 									outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 								}
 							});
-					int securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
-
+					int securityTokenInColumn = -1;
+					if (!userSecurityTokensToBeChecked.isEmpty()) {
+						securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
+					}
 					Row resultRow = new Row();
 					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 						resultRow = outputValues;

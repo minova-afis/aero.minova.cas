@@ -3,104 +3,13 @@
 Konkrete Beispiele sind in einer xref:../../aero.minova.service.core.application.system.postman_collection.json#[Postman Collection] gelistet.
 Die Authentifizierung findet über Basic Auth statt.
 
-== Table
+NOTE: Vielleicht sollten wir das Dokument verkürzen, indem wir verlinken und nicht inkludieren?
 
-Die Table ist eine grundsätzliche Datenstruktur und wird als Teil der Eingabe und Ausgabe verwendet.
+include::api-table.adoc[Tabelle-Format]
 
-Generell gilt, dass jedes Feld bis auf metaData ein Pflichtfeld ist.
-Die jeweiligen values müssen genauso viele Werte haben wie columns.
+include::api-procedure.adoc[data/procedure]
 
-[source,json]
---------
-{
-	"name": "ProcedureName",
-	"metaData": 
-		{
-        	"limited": 10,
-        	...
-    	},
-	"columns": [
-		{
-			"name": "ParameterName",
-			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED",
-			"outputType": "INPUT|OUTPUT"
-		},...
-	],
-	"rows": [
-		{
-			"values": [
-				"(f-Operator-(b|d|i|n|s|z)-Value)|"
-				"(b|d|i|n|s|z-Value)|"
-				"null",...
-			]
-		}
-	]
-}
---------
-
-<<Im Fehlerfall>> erweitert sich die Ausgabe-Table um einen weiteren Parameter.
-
-=== name
-
-Der Name der Prozedur, die ausgeführt wird.
-
-=== metaData
-
-----
-	"metaData": 
-		{
-        	"limited": 10,
-        	"page": 1,
-        	"totalResults": 10,
-        	"totalPages": 1,
-        	"resultsLeft": 0
-    	},
-----
-
-Anhand von metaData kann man die sichtbare Ergebnissemenge einschränken.
-Dies ist durch die Parameter limited und page möglich.
-
-.veränderbare Parameter:
-* *limited*: Anzahl an Treffern, welche bei der Anfrage zurückgegeben werden sollen.
-Ist der Wert 0, werden alle Treffer zurückgegeben und der Wert der totalResults angezeigt.
-* *page*: die n-te Seite der totalPages basierend auf limited.
-Ist kein Wert für page gesetzt, werden die Ergebnisse von 0 bis limited,
-also die 1.Seite, ausgegeben.
-
-.unveränderbare/vom Service berechnete Parameter:
-* *totalResults*: Anzahl an Rows, welche für die angegebenen Suchparameter gefunden wurden.
-* *totalPages*: Anzahl an Seiten, welche basierend auf den totalResults und limited errechnet wurden.
-* *resultsLeft*: Anzahl an Rows, welche nach der momentanen Seite noch übrig sind.
-
-=== columns
-
-Die Parameter-Typen das Aufrufes.
-
-==== columns/values/*
-
-Die Werte dürfen prinzipiell von einem beliebigen Typ sein,
-müssen aber mit dem Typ der jeweiligen Spalte kompatibel sein.
-Im einfachsten Fall ist der Typ eines Values gleich dem Typ der jeweiligen Spalte (columns/*/type).
-
-Der Typ wird anhand des Prefixes des Values angegeben:
-
-* *"b"*: boolean: false|true
-* *"d"*: double: Entspricht dem Format von "java.lang.Double.parseDouble(String)".
-* *"i"*: Instant (UTC-Zeit): Entspricht dem Format von "java.time.Instant.parse(String)".
-* *"n"*: Integer: Entspricht dem Format von "java.lang.Integer.parseInt(String)".
-* *"s"*: String
-* *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
-* *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
- 
-Durch den Prefix "f-" können die Operatoren *<> , <=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.
-
-=== rows
-
-Die Parameter der Prozedur.
-
-include::api-procedure.adoc[]
-
-include::api-xprocedure.adoc[]
+include::api-xprocedure.adoc[data/x-procedure]
 
 == data/view
 
@@ -125,68 +34,4 @@ wenn alles gut gelaufen ist.
 }
 --------
 
-== Im Fehlerfall
-
-Ist die Eingabe fehlerhaft oder treten sonstige Fehler bei der Verarbeitung des Services auf,
-wird an den Client ein *Internal Server Error*, bzw. *Server Code 500*, gesendet.
-
-Auf dem *Server* wird in der Tabelle xtcasError ein Eintrag mit dem Username, dem genauen Zeitpunkt und dem aufgetretenen Fehler erstellt.
-[source,sql]
-----
-insert into xtcasError (Username, ErrorMessage, Date) values (username,errorMessage,date)
-----
-
-
-Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, ändert sich wie folgt: 
-
-[source,sql]
-----
-{
-	"name": "Error",
-    "columns": [
-        {
-            "name": "International Message",
-            "type": "STRING"
-        }
-        [,{
-        	"name": "MessageInputParam1",
-            "type": "STRING"
-            }]
-    ],
-    "rows": [
-        {
-            "values": [
-                "s-msg.Error",["s-InputParameter",...]
-            ]
-        }
-    ],
-	"returnErrorMessage": {
-		"detailsMessage": "ExceptionMessage",
-		"cause": "ExceptionCause",
-		"trace": [ 
-			"StackTraceMessages",
-			...
-		]
-	} 
-----
-Der Name der zurückgegebenen Tabele wird auf "Error" geändert und es wird nur eine Row zurückgegeben,
-in welcher der übersetzbare MessageCode hinterlegt ist, welcher beim Client in die Sprache des Users übersetzt wird.
-Falls die Nachricht einen oder mehrere Inputparameter benötigt, folgen weitere String-Values, welche die einzelnen Parameter enthalten.
-
-Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.
-
-Sie wird nur befüllt, falls ein Fehler auftritt. 
-Ansonsten ist dieses Objekt *null*.
-
-==== returnErrorMessage/detailsMessage
-
-Die DetailsMessage der Exception, die geworfen wurde.
-
-==== returnErrorMessage/cause
-
-Der Grund, weshalb die Exception geworfen wurde, z.b.:
-_java.lang.NullPointerException_.
-
-==== returnErrorMessage/trace
-
-Der StackTrace der geworfenen Exception nach jedem Abatz getrennt.
+include::api-error.adoc[data/x-procedure]

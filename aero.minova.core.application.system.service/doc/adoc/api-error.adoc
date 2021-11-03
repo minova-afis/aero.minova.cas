@@ -1,0 +1,65 @@
+== Im Fehlerfall
+
+Ist die Eingabe fehlerhaft oder treten sonstige Fehler bei der Verarbeitung des Services auf,
+wird an den Client ein *Internal Server Error*, bzw. *Server Code 500*, gesendet.
+
+Auf dem *Server* wird in der Tabelle xtcasError ein Eintrag mit dem Username, dem genauen Zeitpunkt und dem aufgetretenen Fehler erstellt.
+[source,sql]
+----
+insert into xtcasError (Username, ErrorMessage, Date) values (username,errorMessage,date)
+----
+
+
+Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, ändert sich wie folgt:
+
+[source,sql]
+----
+{
+	"name": "Error",
+    "columns": [
+        {
+            "name": "International Message",
+            "type": "STRING"
+        }
+        [,{
+        	"name": "MessageInputParam1",
+            "type": "STRING"
+            }]
+    ],
+    "rows": [
+        {
+            "values": [
+                "s-msg.Error",["s-InputParameter",...]
+            ]
+        }
+    ],
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [
+			"StackTraceMessages",
+			...
+		]
+	}
+----
+Der Name der zurückgegebenen Tabele wird auf "Error" geändert und es wird nur eine Row zurückgegeben,
+in welcher der übersetzbare MessageCode hinterlegt ist, welcher beim Client in die Sprache des Users übersetzt wird.
+Falls die Nachricht einen oder mehrere Inputparameter benötigt, folgen weitere String-Values, welche die einzelnen Parameter enthalten.
+
+Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.
+
+Sie wird nur befüllt, falls ein Fehler auftritt.
+Ansonsten ist dieses Objekt *null*.
+
+==== returnErrorMessage/detailsMessage
+
+Die DetailsMessage der Exception, die geworfen wurde.
+
+==== returnErrorMessage/cause
+
+Der Grund, weshalb die Exception geworfen wurde, z.b.:
+_java.lang.NullPointerException_.
+
+==== returnErrorMessage/trace
+
+Der StackTrace der geworfenen Exception nach jedem Abatz getrennt.

@@ -1,13 +1,5 @@
 = Installation
 
-== Kundensystem aufsetzen.
-
-* Einen Ordner für das Kundensystem bestimmen und erstellen.
-* Log-Ordner einrichten: `minova\logs`
-* Deploy-Orner einrichten: `Shared Data\deploy`
-** Minimale benötigte Jars kopieren: `\\acode\current\install-JARs`
-** Benötigte Module kopieren (bspw. cts.jar).
-
 == SQL-Server und Datenbank einrichten.
 * SQL-Server installieren.
 * Datenbank erstellen.
@@ -22,49 +14,24 @@ image::images/sql-server-tcp-config.jpg[]
 
 == CAS-Dienst installieren.
 
-* Dienst-Ordner erstellen: `Shared Data\Program Files\cas`
-* `application.properties` erstellen:
+* Dienst-Ordner erstellen (bspw. `Shared Data\Program Files\cas`).
+* `application.properties` im Dienst-Ordner erstellen:
 
 [source]
-.Vorlage
+.Minimal-Vorlage
 --------
 aero_minova_core_application_root_path=<Pfad zum Kundensystem>/Shared Data/Program Files/SIS
 aero_minova_database_url=<URL aus der Connection.xbs ohne Benutzername und Passwort>
 aero_minova_database_user_name=<SQL-Benutzer aus der Connection.xbs>
 aero_minova_database_user_password=<Passwort aus der Connection.xbs>
 
-server.port=<Gewünschter Server-Port des CAS>
-ch.minova.service.xmlprinter.service.port=<Port des XMLPrinters>
-
 login_dataSource=<database|admin|ldap>
-
-spring.mail.host=<E-Mailserver>
-spring.mail.username=<Sende-Nutzer von E-Mails>
-spring.mail.properties.mail.smtp.auth=false
-spring.mail.properties.mail.smtp.starttls.enable=false
-
-testErgebnisPositiveKey=<KeyLong aus der xtctsTestErgebnisValue für das positive Testergebnis>
-testErgebnisNegativeKey=<KeyLong aus der xtctsTestErgebnisValue für das negative Testergebnis>
 --------
 
-=== Keystore einrichten.
-
-Standardmäßig wird ein Test-Keystore verwendet, welcher in der Jar des CAS gespeichert.
-Dieser ist nur für localhost gültig und sollte nur für die Entwicklung verwendet werden.
+=== Optional Keystore für HTTPS einrichten.
 
 [source]
-.Default-Werte
-----
-server.ssl.key-store-type=PKCS12
-server.ssl.key-store=classpath:keystore.p12
-server.ssl.key-store-password=password
-server.ssl.key-alias=localhost
-----
-
-Um einen eigenen Keystore zu verwenden, muss die `application.properties` erweitert werden.
-
-[source]
-.Eigener Keystore
+.Keystore-Einstellungen
 ----
 server.ssl.key-store-type=<Typ des Keystores>
 server.ssl.key-store=<Pfad zum Keystore>
@@ -74,7 +41,7 @@ server.ssl.key-store-password=<Passwort des Keystores>
 
 === lib-Ordner erstellen.
 
-** Release verwenden: Die Release Jar in den lib-Ordner kopieren.
+** Release verwenden: Die Release Jars aus einem Docker-Image kopieren.
 ** Entwickler-Version verwenden:
 CAS-Dienst mit `mvn clean verify` bauen.
 `target/libs/*` in den lib Ordner kopieren.
@@ -108,8 +75,3 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 Wenn alles bereit steht,
 kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
 Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
-
-== Ports freigeben.
-
-Der `server.port` Port aus der `application.properties` muss freigeben werden,
-wenn remote Clients auf den Server Zugriff haben sollen.

@@ -105,22 +105,9 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 </service>
 --------
 
-== XMLPrinter installieren.
-
-* XMLPrinter-Modul und dessen Abhängigkeiten in den deploy-Ordner verschieben.
-* XMLPrinter installieren: `java -jar ch.minova.service.xmlprinter.jar -app=sis -is`
-* Konfigurationen in `Shared Data\Program Files\xmlprinter\conf` anpassen:
-** `log4j.properties`
-** `wrapper.conf`
-** Windows-Dienst installieren: `Shared Data\Program Files\xmlprinter\bin`: `xmlprinter.bat install`
-
-== WFC-Module installieren.
-
-* `cts.jar` in den deploy-Ordner verschieben.
-* `cts.jar -app=sis -us -ud -cf -writemdi -writebxs`
-* Umbennante Kopie der XBS und MDI-Dateien aus der erstellen:
-** `ServicesInvoicingSystem.xbs` -> `application.xbs`
-** `ServicesInvoicingSystem_MDI.xml` -> `application.mdi`
+Wenn alles bereit steht,
+kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
+Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
 
 == Ports freigeben.
 

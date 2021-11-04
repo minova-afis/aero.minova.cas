@@ -4,13 +4,9 @@
 * SQL-Server installieren.
 * Datenbank erstellen.
 * SQL-Benutzer und SQL-Anmeldung für Datenbank einrichten.
-* `Connection.xbs` mit SIS(name="servicesinvoicingsystem") als Application erstellen.
 * TCP-Verbindungen für SQL-Server freischalten.
 
 image::images/sql-server-tcp-config.jpg[]
-
-* Anmeldung testen.
-* xref:./aero.minova.core.application.system.service/doc/adoc/init.adoc#[Tabellen und Prozeduren] aufspielen.
 
 == CAS-Dienst installieren.
 
@@ -75,3 +71,5 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 Wenn alles bereit steht,
 kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
 Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
+
+Windows-Dienst starten und die `data/procedure` Setup ausführen.

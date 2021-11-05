@@ -100,7 +100,16 @@ public class XSqlProcedureController {
 				// Die Referenz-Id steht in der Rule des Values. Im Value des Values steht, in welcher Column das der gewünschte Parameter steht.
 				if (v != null && v.getRule() != null) {
 					XSqlProcedureResult dependency = findxSqlResultSet(v.getRule(), resultsets);
-					aero.minova.core.application.system.domain.Value newValue = findValue(dependency.getResultSet(), v.getStringValue());
+					int position = 0;
+
+					String stringValue = v.getStringValue();
+					// Bei mehreren Rows in einer Referenztabelle, wird mit - die Position angegeben, z.B. r-parent_call-0-KeyLong
+					if (stringValue.contains("-")) {
+						position = Integer.parseInt(stringValue.substring(0, stringValue.indexOf("-")));
+						stringValue = stringValue.substring(stringValue.indexOf("-") + 1, stringValue.length());
+					}
+
+					aero.minova.core.application.system.domain.Value newValue = findValue(dependency.getResultSet(), stringValue, position);
 					// Tausche Value mit dem Ergebnis aus einem der ResultSets aus.
 					r.getValues().remove(i);
 					r.getValues().add(i, newValue);
@@ -120,7 +129,7 @@ public class XSqlProcedureController {
 	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
 	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen.
 	 */
-	aero.minova.core.application.system.domain.Value findValue(SqlProcedureResult dependency, String columnName) {
+	aero.minova.core.application.system.domain.Value findValue(SqlProcedureResult dependency, String columnName, int row) {
 		int position = -1;
 		for (int i = 0; i < dependency.getOutputParameters().getColumns().size(); i++) {
 			if (dependency.getOutputParameters().getColumns().get(i).getName().toLowerCase().equals(columnName.toLowerCase())) {
@@ -129,7 +138,7 @@ public class XSqlProcedureController {
 			}
 		}
 		if (position > -1) {
-			return dependency.getOutputParameters().getRows().get(0).getValues().get(position);
+			return dependency.getOutputParameters().getRows().get(row).getValues().get(position);
 		} else {
 			throw new RuntimeException("Cannot find Column with name " + columnName);
 		}

@@ -46,8 +46,8 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 			}
 		} else if (typeString.contains("r")) {
 			typeString = "s";
-			rule = value.substring(0, value.lastIndexOf("-"));
-			value = value.substring(value.lastIndexOf("-") + 1, value.length());
+			rule = value.substring(0, value.indexOf("-"));
+			value = value.substring(value.indexOf("-") + 1, value.length());
 		} else {
 			rule = null;
 		}

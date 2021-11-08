@@ -33,6 +33,20 @@ include::examples/xprocedure-multiRow.json[]
 ----
 (xref:examples/xprocedure-multiRow.json#[Example for xprocedure-Call mit mehrerem Rows])
 
+Um ein Referenz-Wert aus einer anderen Row als der ersten zu holen,
+gibt man den Value in folgendem Format: 
+
+[source]
+----
+Value: r-<ID>-<Row Number>-<Column>
+----
+
+* *r*: Zeigt an, dass es ein Referenz-Wert ist.
+* *ID*: Die ID der Table, aus welcher der Referenz-Wert kommen soll.
+* *Row Number*: Beginnend bei 0 für die erste Zeile, die Row aus welcher der Wert kommen soll.
+* *Column*: Der Name der Spalte, in welcher der Wert in der Referenz-Table steht.
+
+Diese vier Werte müssen mit einem *-* voneinander getrennt werden.
 
 ==== columns/values/reference
 

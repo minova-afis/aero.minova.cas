@@ -37,8 +37,7 @@ public class XSqlProcedureController {
 	SqlProcedureController sqlProcedureController;
 
 	/**
-	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Wir können davon ausgehen, dass die Liste der Prozeduren auch in der richtigen
-	 * Reihenfolge sind.
+	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden.
 	 *
 	 * @param inputTables
 	 *            Liste der Tables mit Namen der Prozeduren und deren Aufruf Parameter

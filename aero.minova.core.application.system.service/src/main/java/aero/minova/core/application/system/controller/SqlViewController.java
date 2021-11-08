@@ -41,7 +41,7 @@ public class SqlViewController {
 
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
-		customLogger.logJson(": data/view: " + inputTable);
+		customLogger.logJson(": data/view: ", inputTable);
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();

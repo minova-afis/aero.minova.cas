@@ -61,7 +61,7 @@ public class XSqlProcedureController {
 
 				// Rechteprüfung
 				final List<Row> privilegeRequest = new ArrayList<>();
-				if (sqlProcedureController.arePrivilegeStoresSetup()) {
+				if (securityService.arePrivilegeStoresSetup()) {
 					privilegeRequest.addAll(securityService.getPrivilegePermissions(filledTable.getName()));
 					if (privilegeRequest.isEmpty()) {
 						throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());

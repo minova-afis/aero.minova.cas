@@ -92,26 +92,6 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Prüft, ob die minimal notwendigen Datenbank-Objekte für die Privileg-Prüfung in der Datenbank aufgesetzt wurden. Dazu prüft man, ob die
-	 * `xvcasUserPrivileges` vorhanden ist.
-	 *
-	 * @return Dies ist wahr, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
-	 * @throws Exception
-	 *             Fehler bei der Ermittelung
-	 */
-	boolean arePrivilegeStoresSetup() throws Exception {
-		return isTablePresent("xvcasUserPrivileges");
-	}
-
-	private boolean isTablePresent(String tableName) throws Exception {
-		try (final Connection connection = systemDatabase.getConnection()) {
-			return connection.getMetaData()//
-					.getTables(null, null, tableName, null)//
-					.next();
-		}
-	}
-
-	/**
 	 * Führt eine CAS-Erweiterung falls vorhanden oder eine SQL-Prozedur im anderen Fall aus. Falls {@link #arePrivilegeStoresSetup} nicht gilt und es für die
 	 * Eingabe eine passende Prozedur gibt, wird geprüft, ob es für die Erweiterung eine passende alternative-Rechteprüfung gibt. Dieser Mechanismus wird
 	 * verwendet, um das Initialisieren der Datenbank über das CAS zu triggern.
@@ -128,7 +108,7 @@ public class SqlProcedureController {
 		customLogger.logJson("data/procedure: ", inputTable);
 		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
-			if (arePrivilegeStoresSetup()) {
+			if (securityService.arePrivilegeStoresSetup()) {
 				privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
 				if (privilegeRequest.isEmpty()) {
 					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());

@@ -43,13 +43,13 @@ public class XSqlProcedureControllerTest extends BaseTest {
 			inputRow.addValue(null);
 			inputTable.addRow(inputRow);
 		}
-		SqlProcedureResult sqlres = new SqlProcedureResult();
-		sqlres.setOutputParameters(inputTable);
-		XSqlProcedureResult xRes = new XSqlProcedureResult("test", sqlres);
+		SqlProcedureResult sqlRes = new SqlProcedureResult();
+		sqlRes.setOutputParameters(inputTable);
+		XSqlProcedureResult xRes = new XSqlProcedureResult("test", sqlRes);
 		results.add(xRes);
 
-		sqlres.setOutputParameters(inputTable);
-		xRes = new XSqlProcedureResult("test3", sqlres);
+		sqlRes.setOutputParameters(inputTable);
+		xRes = new XSqlProcedureResult("test3", sqlRes);
 		results.add(xRes);
 
 		// In test2 steht der Value, den wir dann haben wollen.
@@ -61,8 +61,8 @@ public class XSqlProcedureControllerTest extends BaseTest {
 			inputRow.addValue(new Value("TestString", null));
 			testTable.addRow(inputRow);
 		}
-		sqlres.setOutputParameters(testTable);
-		xRes = new XSqlProcedureResult("test2", sqlres);
+		sqlRes.setOutputParameters(testTable);
+		xRes = new XSqlProcedureResult("test2", sqlRes);
 		results.add(xRes);
 
 		// XTable zum Aufrufen der Methode
@@ -82,7 +82,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testFindxSqlResultSetValid() {
+	public void testFindxsqlResultSetValid() {
 		List<XSqlProcedureResult> results = new ArrayList<>();
 
 		Table inputTable = new Table();
@@ -93,13 +93,13 @@ public class XSqlProcedureControllerTest extends BaseTest {
 			inputRow.addValue(null);
 			inputTable.addRow(inputRow);
 		}
-		SqlProcedureResult sqlres = new SqlProcedureResult();
-		sqlres.setOutputParameters(inputTable);
-		XSqlProcedureResult xRes = new XSqlProcedureResult("test", sqlres);
+		SqlProcedureResult sqlRes = new SqlProcedureResult();
+		sqlRes.setOutputParameters(inputTable);
+		XSqlProcedureResult xRes = new XSqlProcedureResult("test", sqlRes);
 		results.add(xRes);
-		xRes = new XSqlProcedureResult("test2", sqlres);
+		xRes = new XSqlProcedureResult("test2", sqlRes);
 		results.add(xRes);
-		xRes = new XSqlProcedureResult("test3", sqlres);
+		xRes = new XSqlProcedureResult("test3", sqlRes);
 		results.add(xRes);
 		XSqlProcedureResult testres = testSubject.findxSqlResultSet("test2", results);
 
@@ -107,7 +107,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testFindxSqlResultSetInvalid() {
+	public void testFindxsqlResultSetInvalid() {
 		List<XSqlProcedureResult> results = new ArrayList<>();
 
 		Table inputTable = new Table();
@@ -118,13 +118,13 @@ public class XSqlProcedureControllerTest extends BaseTest {
 			inputRow.addValue(null);
 			inputTable.addRow(inputRow);
 		}
-		SqlProcedureResult sqlres = new SqlProcedureResult();
-		sqlres.setOutputParameters(inputTable);
-		XSqlProcedureResult xRes = new XSqlProcedureResult("test", sqlres);
+		SqlProcedureResult sqlRes = new SqlProcedureResult();
+		sqlRes.setOutputParameters(inputTable);
+		XSqlProcedureResult xRes = new XSqlProcedureResult("test", sqlRes);
 		results.add(xRes);
-		xRes = new XSqlProcedureResult("test2", sqlres);
+		xRes = new XSqlProcedureResult("test2", sqlRes);
 		results.add(xRes);
-		xRes = new XSqlProcedureResult("test3", sqlres);
+		xRes = new XSqlProcedureResult("test3", sqlRes);
 		results.add(xRes);
 
 		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.findxSqlResultSet("test100", results));
@@ -142,10 +142,10 @@ public class XSqlProcedureControllerTest extends BaseTest {
 			inputRow.addValue(new Value("Test", null));
 			inputTable.addRow(inputRow);
 		}
-		SqlProcedureResult sqlres = new SqlProcedureResult();
-		sqlres.setOutputParameters(inputTable);
+		SqlProcedureResult sqlRes = new SqlProcedureResult();
+		sqlRes.setOutputParameters(inputTable);
 
-		Value resval = testSubject.findValue(sqlres, "TestText", 0);
+		Value resval = testSubject.findValue(sqlRes, "TestText", 0);
 		assertThat(resval.getStringValue()).isEqualTo("Test");
 	}
 
@@ -159,10 +159,10 @@ public class XSqlProcedureControllerTest extends BaseTest {
 			inputRow.addValue(new Value("Test", null));
 			inputTable.addRow(inputRow);
 		}
-		SqlProcedureResult sqlres = new SqlProcedureResult();
-		sqlres.setOutputParameters(inputTable);
+		SqlProcedureResult sqlRes = new SqlProcedureResult();
+		sqlRes.setOutputParameters(inputTable);
 
-		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.findValue(sqlres, "TestText", 0));
+		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.findValue(sqlRes, "TestText", 0));
 		thrown.expect(RuntimeException.class);
 		assertEquals("Cannot find Column with name TestText", exception.getMessage());
 	}

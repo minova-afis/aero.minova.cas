@@ -54,8 +54,8 @@ public class CustomLogger {
 		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
 	}
 
-	public void logJson(String logMessage) {
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + gson.toJson(logMessage));
+	public void logJson(String logMessage, Object gsonObject) {
+		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + " " + gson.toJson(gsonObject));
 	}
 
 	public void logFiles(String logMessage) {

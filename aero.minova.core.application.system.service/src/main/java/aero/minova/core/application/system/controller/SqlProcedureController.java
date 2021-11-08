@@ -125,7 +125,7 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		customLogger.logJson("data/procedure: " + inputTable);
+		customLogger.logJson("data/procedure: ", inputTable);
 		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
 			if (arePrivilegeStoresSetup()) {

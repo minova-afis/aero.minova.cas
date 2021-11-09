@@ -1,0 +1,89 @@
+[
+{
+	"id" : "test1",
+	"table" :
+	{
+	    "name":"spTest",
+	    "columns":
+	        [
+				{
+					"name":"TestText","type":"STRING","outputType":"OUTPUT"
+				}
+			]
+			,
+	    "rows":
+		[
+			{
+				"values":
+				[null]
+			}
+		]
+	},
+	"ints": [0],
+	"returnCode" : 0
+},
+{
+	"id" : "test2",
+	"table" :
+	{
+	    "name":"resultSet",
+	    "columns":
+	        [
+				{
+					"name":"TestText","type":"STRING","outputType":"OUTPUT"
+				}
+			]
+			,
+	    "rows":
+		[
+			{
+				"values":
+				["TestString"]
+			}
+		]
+	},
+	"table" :
+	{
+	    "name":"output",
+	    "columns":
+	        [
+				{
+					"name":"TestText","type":"STRING","outputType":"OUTPUT"
+				}
+			]
+			,
+	    "rows":
+		[
+			{
+				"values":
+				["TestString"]
+			}
+		]
+	},
+	"ints": [0],
+	"returnCode" : 0
+},
+{
+	"id" : "test3",
+	"table" :
+	{
+	    "name":"spTest",
+	    "columns":
+	        [
+				{
+					"name":"TestText","type":"STRING","outputType":"OUTPUT"
+				}
+			]
+			,
+	    "rows":
+		[
+			{
+				"values":
+				[null]
+			}
+		]
+	},
+	"ints": [0],
+	"returnCode" : 0
+}
+]

@@ -53,6 +53,11 @@ public class CustomLogger {
 		filesLogger.info("CAS " + logMessage);
 	}
 
+	/**
+	 * TODO Das loggen funktioniert zur Zeit nicht.
+	 *
+	 * @param event Das Event, bei dem die Methode ausgeführt werden soll.
+	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		final Environment env = event.getApplicationContext().getEnvironment();

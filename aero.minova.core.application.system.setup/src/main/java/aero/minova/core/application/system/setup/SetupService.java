@@ -1,22 +1,19 @@
 package aero.minova.core.application.system.setup;
 
+import static aero.minova.core.application.system.setup.dependency.DependencyOrder.determineDependencyOrder;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.setup.dependency.DependencyOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,26 +26,23 @@ import org.w3c.dom.Node;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
+import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
-import static aero.minova.core.application.system.setup.dependency.DependencyOrder.determineDependencyOrder;
-
 /**
- * Installiert sämtliche Komponenten und Abhängigkeiten des APP-Servers (aero.minova.app.parent)
- * anhand der "Setup.xml"s aus "{@link FilesService#rootPath}/setup/**".
- * Dabei werden zuerst die Abhängigkeiten aus "{@link FilesService#rootPath}/setup/dependency-graph.json"
- * ausgelesen und die entsprechenden "Setup.xml"s in "{@link FilesService#rootPath}/setup/**" installiert.
- * Anschließend wird die Hauptkomponente anhand der "{@link FilesService#rootPath}/setup/Setup.xml" installiert.
- * 
- * TODO SQL-Code (nicht Schema) wird doppelt ausgeführt.
+ * Installiert sämtliche Komponenten und Abhängigkeiten des APP-Servers (aero.minova.app.parent) anhand der "Setup.xml"s aus
+ * "{@link FilesService#rootPath}/setup/**". Dabei werden zuerst die Abhängigkeiten aus "{@link FilesService#rootPath}/setup/dependency-graph.json" ausgelesen
+ * und die entsprechenden "Setup.xml"s in "{@link FilesService#rootPath}/setup/**" installiert. Anschließend wird die Hauptkomponente anhand der
+ * "{@link FilesService#rootPath}/setup/Setup.xml" installiert. TODO SQL-Code (nicht Schema) wird doppelt ausgeführt.
  */
 @Service
 public class SetupService {
 
 	private static final String PROCEDURE_NAME = "setup";
 
-	@Autowired InstallToolIntegration installToolIntegration;
+	@Autowired
+	InstallToolIntegration installToolIntegration;
 
 	@Autowired
 	public SystemDatabase database;
@@ -67,9 +61,9 @@ public class SetupService {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
 				readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
-						, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
-						, service.getSystemFolder().resolve("setup")//
-						, true);
+				, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
+				, service.getSystemFolder().resolve("setup")//
+				, true);
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -81,8 +75,10 @@ public class SetupService {
 	/**
 	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
 	 *
-	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
-	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
+	 * @param arg
+	 *            Ein String, in welchem die benötigten Dependencies stehen.
+	 * @throws IOException
+	 *             Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
 	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = determineDependencyOrder(Files.readString(dependencyList));
@@ -90,6 +86,7 @@ public class SetupService {
 		final List<String> procedures = new ArrayList<>();
 		for (String dependency : dependencies) {
 			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
+			logger.info("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);
 			if (setupTableSchemas) {
 				installToolIntegration.installSetup(setupXml);
 			}
@@ -110,10 +107,10 @@ public class SetupService {
 	}
 
 	/**
-	 * Das ist ein Hack, wil wir Probleme haben über Maven die gewünschte Ordnerstruktur zu bekommen.
-	 * Wir wollen, dass es erstmal grundsätzlich läuft.
+	 * Das ist ein Hack, wil wir Probleme haben über Maven die gewünschte Ordnerstruktur zu bekommen. Wir wollen, dass es erstmal grundsätzlich läuft.
 	 *
-	 * @param dependency Name der Abhängigkeit.
+	 * @param dependency
+	 *            Name der Abhängigkeit.
 	 * @return Setup.xml der Abhängigkeit.
 	 */
 	private Path findSetupXml(String dependency, Path dependencySetupsDir) {
@@ -123,30 +120,24 @@ public class SetupService {
 			logger.info("Reading Setup-File: " + niceSetupFile);
 			return dependencySetupFile;
 		}
-		/* Wenn dies kein Hack wäre, würde es hiermit enden.
-		 * else {
-		 * throw new NoSuchFileException("No setup file found with the name " + setupFile);
-		 *}
+		/*
+		 * Wenn dies kein Hack wäre, würde es hiermit enden. else { throw new NoSuchFileException("No setup file found with the name " + setupFile); }
 		 */
 		final String adjustedDependency = dependency.substring("aero.minova.".length());
 		try {
-			final Optional<Path> result = Files.walk(dependencySetupsDir, 1)
-					.map(dir -> {
-						if (dir.getFileName().toString().startsWith(adjustedDependency)) {
-							try {
-								Optional<Path> setup = Files.walk(dir)//
-										.filter(f -> f.getFileName().toString().toLowerCase().equals("setup.xml"))//
-										.findFirst();
-								return setup;
-							} catch (IOException e) {
-								throw new RuntimeException(e);
-							}
-						}
-						return Optional.<Path>empty();
-					})
-					.filter(setup -> !setup.isEmpty())
-					.map(setup -> setup.get())
-					.findFirst();
+			final Optional<Path> result = Files.walk(dependencySetupsDir, 1).map(dir -> {
+				if (dir.getFileName().toString().startsWith(adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency)) {
+					try {
+						Optional<Path> setup = Files.walk(dir)//
+								.filter(f -> f.getFileName().toString().toLowerCase().equals("setup.xml"))//
+								.findFirst();
+						return setup;
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				return Optional.<Path> empty();
+			}).filter(setup -> !setup.isEmpty()).map(setup -> setup.get()).findFirst();
 			if (result.isEmpty()) {
 				throw new NoSuchFileException("No setup file found with the name " + niceSetupFile);
 			}
@@ -159,7 +150,8 @@ public class SetupService {
 	/**
 	 * Liest ein einzelnes Setup-File und gibt eine Liste von benötigten SQl-Dateien zurück.
 	 *
-	 * @param dependencySetupFile Das Setup-File, welches gescannt werden soll.
+	 * @param dependencySetupFile
+	 *            Das Setup-File, welches gescannt werden soll.
 	 * @return Die Liste an SQL-Dateinamen für das gescannte Setup-File.
 	 */
 	List<String> readProceduresToList(File dependencySetupFile) {
@@ -188,11 +180,12 @@ public class SetupService {
 	}
 
 	/**
-	 * TODO Entfernen
-	 * Liest die übergebene Liste an SQL-Dateinamen und installiert die jeweils dazugehörige Datei.
+	 * TODO Entfernen Liest die übergebene Liste an SQL-Dateinamen und installiert die jeweils dazugehörige Datei.
 	 *
-	 * @param procedures Die Liste an SQL-Dateinamen.
-	 * @throws NoSuchFileException Falls die Datei passend zum Namen nicht existiert.
+	 * @param procedures
+	 *            Die Liste an SQL-Dateinamen.
+	 * @throws NoSuchFileException
+	 *             Falls die Datei passend zum Namen nicht existiert.
 	 */
 	@Deprecated
 	void runScripts(List<String> procedures) throws NoSuchFileException {

@@ -330,8 +330,10 @@ public class SqlProcedureController {
 									outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
 								}
 							});
-					int securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
-
+					int securityTokenInColumn = -1;
+					if (!userSecurityTokensToBeChecked.isEmpty()) {
+						securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
+					}
 					Row resultRow = new Row();
 					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 						resultRow = outputValues;

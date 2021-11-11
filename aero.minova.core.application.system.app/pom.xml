@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>app.parent</artifactId>
-		<version>12.5.1</version>
+		<version>12.5.2</version>
 	</parent>
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>

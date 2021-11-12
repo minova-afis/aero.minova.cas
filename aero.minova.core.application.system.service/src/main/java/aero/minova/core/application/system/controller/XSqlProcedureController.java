@@ -48,7 +48,7 @@ public class XSqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/x-procedure")
 	public ResponseEntity executeProcedures(@RequestBody List<XTable> inputTables) throws Exception {
-		customLogger.logJson("data/x-procedure: ", inputTables);
+		customLogger.logUserRequest("data/x-procedure: ", inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
 		for (XTable xt : inputTables) {

@@ -93,22 +93,22 @@ public class XSqlProcedureController {
 	/**
 	 * Falls es einen Verweis auf ein OutputParameter einer anderen Prozedur gibt, wird der Value hier ersetzt.
 	 * 
-	 * @param xtable
+	 * @param dependant
 	 *            Die Table, welche den potentiell-zu-ersetzenden Value enthält.
-	 * @param resultsets
+	 * @param dependencies
 	 *            Die Liste an bereits ausgeführten xSqlProcedureResults. Diese beinhalten die Referenz-Values.
 	 * @return Eine Table, in welcher der Value bereits ersetzt wurde.
 	 */
-	Table fillInDependencies(XTable xtable, List<XSqlProcedureResult> resultsets) {
+	Table fillInDependencies(XTable dependant, List<XSqlProcedureResult> dependencies) {
 
-		Table workingTable = xtable.getTable();
+		Table workingTable = dependant.getTable();
 
 		for (Row r : workingTable.getRows()) {
 			for (int i = 0; i < r.getValues().size(); i++) {
 				aero.minova.core.application.system.domain.Value v = r.getValues().get(i);
 				// Die Referenz-Id steht in der Rule des Values. Im Value des Values steht, in welcher Column das der gewünschte Parameter steht.
 				if (v != null && v.getRule() != null) {
-					XSqlProcedureResult dependency = findxSqlResultSet(v.getRule(), resultsets);
+					XSqlProcedureResult dependency = findxSqlResultSet(v.getRule(), dependencies);
 					int position = 0;
 
 					String stringValue = v.getStringValue();

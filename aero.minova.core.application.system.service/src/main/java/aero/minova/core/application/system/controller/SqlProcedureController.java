@@ -166,11 +166,12 @@ public class SqlProcedureController {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		final val connection = systemDatabase.getConnection();
 		val result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
+		Connection connection = null;
 
 		try {
+			connection = systemDatabase.getConnection();
 			calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());

@@ -53,11 +53,12 @@ public class XSqlProcedureController {
 		customLogger.logUserRequest("data/x-procedure: ", inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
-		final Connection connection = systemDatabase.getConnection();
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
+		Connection connection = null;
 
 		try {
+			connection = systemDatabase.getConnection();
 			for (XTable xt : inputTables) {
 				Table filledTable = new Table();
 				// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.

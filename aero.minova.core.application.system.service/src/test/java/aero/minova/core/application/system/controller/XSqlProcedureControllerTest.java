@@ -129,7 +129,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 		SqlProcedureResult sqlRes = new SqlProcedureResult();
 		sqlRes.setOutputParameters(inputTable);
 
-		Value resval = testSubject.findValue(sqlRes, "TestText", 0);
+		Value resval = testSubject.findValueInColumn(sqlRes, "TestText", 0);
 		assertThat(resval.getStringValue()).isEqualTo("Test");
 	}
 
@@ -146,7 +146,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 		SqlProcedureResult sqlRes = new SqlProcedureResult();
 		sqlRes.setOutputParameters(inputTable);
 
-		assertThat(catchThrowable(() -> testSubject.findValue(sqlRes, "TestText", 0))).isInstanceOf(RuntimeException.class)
+		assertThat(catchThrowable(() -> testSubject.findValueInColumn(sqlRes, "TestText", 0))).isInstanceOf(RuntimeException.class)
 				.hasMessage("Cannot find Column with name TestText");
 	}
 }

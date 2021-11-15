@@ -118,7 +118,7 @@ public class XSqlProcedureController {
 						stringValue = stringValue.substring(stringValue.indexOf("-") + 1, stringValue.length());
 					}
 
-					aero.minova.core.application.system.domain.Value newValue = findValue(dependency.getResultSet(), stringValue, position);
+					aero.minova.core.application.system.domain.Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position);
 					// Tausche Value mit dem Ergebnis aus einem der ResultSets aus.
 					r.getValues().remove(i);
 					r.getValues().add(i, newValue);
@@ -138,10 +138,10 @@ public class XSqlProcedureController {
 	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
 	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen.
 	 */
-	aero.minova.core.application.system.domain.Value findValue(SqlProcedureResult dependency, String columnName, int row) {
+	aero.minova.core.application.system.domain.Value findValueInColumn(SqlProcedureResult dependency, String columnName, int row) {
 		int position = -1;
 		for (int i = 0; i < dependency.getOutputParameters().getColumns().size(); i++) {
-			if (dependency.getOutputParameters().getColumns().get(i).getName().toLowerCase().equals(columnName.toLowerCase())) {
+			if (dependency.getOutputParameters().getColumns().get(i).getName().equals(columnName)) {
 				position = i;
 				break;
 			}

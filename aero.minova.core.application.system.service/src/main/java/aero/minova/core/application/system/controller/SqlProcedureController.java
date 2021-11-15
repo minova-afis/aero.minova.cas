@@ -464,7 +464,7 @@ public class SqlProcedureController {
 							}
 						}
 					} catch (Exception e) {
-						throw new RuntimeException("msg.ParseError %" + i, e);
+						throw new RuntimeException("msg.ParseError %" + inputTable.getName() + " %" + i, e);
 					}
 				});
 	}

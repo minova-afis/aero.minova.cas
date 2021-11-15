@@ -132,7 +132,7 @@ public class SqlProcedureController {
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
-			val result = calculateSqlProcedureResult(inputTable, privilegeRequest);
+			val result = processSqlProcedureRequest(inputTable, privilegeRequest);
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
@@ -165,195 +165,13 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */
-	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
-		val parameterOffset = 2;
-		val resultSetOffset = 1;
+	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
 		final val connection = systemDatabase.getConnection();
 		val result = new SqlProcedureResult();
-		result.setReturnCodes(new ArrayList<Integer>());
-		result.setReturnCode(0);
-
 		StringBuffer sb = new StringBuffer();
 
 		try {
-			TableMetaData inputMetaData = inputTable.getMetaData();
-			if (inputMetaData == null) {
-				inputTable.setMetaData(new TableMetaData());
-				inputMetaData = inputTable.getMetaData();
-			}
-			final int page;
-			final int limit;
-			// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
-			if (inputMetaData.getPage() == null) {
-				page = 1;
-			} else if (inputMetaData.getPage() <= 0) {
-				throw new IllegalArgumentException("msg.PageError");
-			} else {
-				page = inputMetaData.getPage();
-			}
-			// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
-			if (inputMetaData.getLimited() == null) {
-				limit = 0;
-			} else if (inputMetaData.getLimited() < 0) {
-				throw new IllegalArgumentException("msg.LimitError");
-			} else {
-				limit = inputMetaData.getLimited();
-			}
-			final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
-			executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
-			final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
-			sb.append(procedureCall);
-			setUserContextFor(connection);
-
-			final val preparedStatement = connection.prepareCall(procedureCall);
-
-			// Jede Row ist eine Abfrage.
-			for (int j = 0; j < inputTable.getRows().size(); j++) {
-				SqlProcedureResult resultForThisRow = new SqlProcedureResult();
-
-				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
-
-				preparedStatement.registerOutParameter(1, Types.INTEGER);
-				preparedStatement.execute();
-				if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
-					val sqlResultSet = preparedStatement.getResultSet();
-					val resultSet = new Table();
-					resultSet.setName(inputTable.getName());
-					resultForThisRow.setResultSet(resultSet);
-					val metaData = sqlResultSet.getMetaData();
-					resultSet.setColumns(//
-							range(0, metaData.getColumnCount()).mapToObj(i -> {
-								try {
-									val type = metaData.getColumnType(i + resultSetOffset);
-									val name = metaData.getColumnName(i + resultSetOffset);
-									if (type == Types.BOOLEAN || Types.BIT == type) {
-										return new Column(name, DataType.BOOLEAN);
-									} else if (type == Types.DOUBLE) {
-										return new Column(name, DataType.DOUBLE);
-									} else if (type == Types.TIMESTAMP) {
-										return new Column(name, DataType.INSTANT);
-									} else if (type == Types.INTEGER) {
-										return new Column(name, DataType.INTEGER);
-									} else if (type == Types.VARCHAR) {
-										return new Column(name, DataType.STRING);
-									} else if (type == Types.NVARCHAR) {
-										return new Column(name, DataType.STRING);
-									} else if (type == Types.DECIMAL) {
-										return new Column(name, DataType.BIGDECIMAL);
-									} else {
-										throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
-									}
-								} catch (Exception e) {
-									throw new RuntimeException("msg.ParseResultSetError");
-								}
-							}).collect(toList()));
-					int totalResults = 0;
-
-					int securityTokenInColumn = -1;
-					if (!userSecurityTokensToBeChecked.isEmpty()) {
-						securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
-					}
-					resultSet.setMetaData(new TableMetaData());
-					while (sqlResultSet.next()) {
-						Row rowToBeAdded = null;
-						if (limit > 0) {
-							// nur die Menge an Rows, welche auf der gewünschten Page liegen
-							if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
-								rowToBeAdded = convertSqlResultToRow(resultSet//
-										, sqlResultSet//
-										, customLogger.logger////
-										, this);
-							}
-						} else {
-							rowToBeAdded = convertSqlResultToRow(resultSet//
-									, sqlResultSet//
-									, customLogger.logger////
-									, this);
-						}
-
-						/*
-						 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
-						 */
-						if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
-							resultSet.addRow(rowToBeAdded);
-							totalResults++;
-						}
-						resultSet.fillMetaData(resultSet, limit, totalResults, page);
-					}
-				}
-
-				val hasOutputParameters = inputTable//
-						.getColumns()//
-						.stream()//
-						.anyMatch(c -> c.getOutputType() == OUTPUT);
-				if (hasOutputParameters) {
-					val outputParameters = new Table();
-					resultForThisRow.setOutputParameters(outputParameters);
-					outputParameters.setName("outputParameters");
-					val outputColumnsMapping = inputTable//
-							.getColumns()//
-							.stream()//
-							.map(c -> c.getOutputType() == OUTPUT)//
-							.collect(toList());
-
-					val outputValues = new Row();
-					outputParameters.setColumns(inputTable.getColumns());
-					range(0, inputTable.getColumns().size())//
-							.forEach(i -> {
-								if (outputColumnsMapping.get(i)) {
-									outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
-								} else {
-									outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
-								}
-							});
-					int securityTokenInColumn = -1;
-					if (!userSecurityTokensToBeChecked.isEmpty()) {
-						securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
-					}
-					Row resultRow = new Row();
-					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
-						resultRow = outputValues;
-					} else {
-						for (int i = 0; i < outputValues.getValues().size(); i++) {
-							resultRow.addValue(null);
-						}
-					}
-					outputParameters.addRow(resultRow);
-				}
-
-				// Endresult-OutputParameter erweitern um RowResult-OutputParameter.
-				if (resultForThisRow.getOutputParameters() != null && resultForThisRow.getOutputParameters().getRows() != null) {
-					if (result.getOutputParameters() == null) {
-						result.setOutputParameters(resultForThisRow.getOutputParameters());
-					} else {
-						result.getOutputParameters().getRows().addAll(resultForThisRow.getOutputParameters().getRows());
-					}
-				}
-
-				// Endresult-ResultSet erweitern um RowResult-ResultSet.
-				if (resultForThisRow.getResultSet() != null && resultForThisRow.getResultSet().getRows() != null) {
-					if (result.getResultSet() == null) {
-						result.setResultSet(resultForThisRow.getResultSet());
-					} else {
-						TableMetaData metaData = result.getResultSet().getMetaData();
-						result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
-						result.getResultSet().fillMetaData(inputTable, limit, metaData.getTotalResults() + resultForThisRow.getResultSet().getRows().size(),
-								page);
-					}
-				}
-				// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
-				val returnCode = preparedStatement.getObject(1);
-				if (returnCode != null) {
-					int reCode = preparedStatement.getInt(1);
-					resultForThisRow.setReturnCode(reCode);
-					// Falls nicht alle ReturnCodes gleich sind, wird 1 als endgültiger ReturnCode rein geschrieben.
-					if (!result.getReturnCodes().isEmpty() && !result.getReturnCodes().contains(reCode) && result.getReturnCode() != 1) {
-						result.setReturnCode(1);
-					}
-					result.getReturnCodes().add(resultForThisRow.getReturnCode());
-				}
-			}
+			calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
@@ -366,6 +184,211 @@ public class SqlProcedureController {
 			throw new ProcedureException(e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
+		}
+		return result;
+	}
+
+	/**
+	 * Führt eine SQL-Prozedur aus. Hier gibt es keinen Rollback oder Commit. Diese müssen selbst durchgeführt werden.
+	 * 
+	 * @param inputTable
+	 *            Die Table mit allen Werten zum Verarbeiten der Prozedur.
+	 * @param privilegeRequest
+	 *            Eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit).
+	 * @param connection
+	 *            Die Connection zu der Datenbank, welche die Prozedur ausführen soll.
+	 * @param result
+	 *            Das SQL-Result, welches innerhalb der Methode verändert und dann returned wird.
+	 * @param sb
+	 *            Ein StringBuffer, welcher im Fehlerfall die Fehlermeldung bis zum endgültigen Throw als String aufnimmt.
+	 * @return result Das veränderte SqlProcedureResult.
+	 * @throws SQLException
+	 *             Falls ein Fehler beim Ausführen der Prozedur auftritt.
+	 * @throws ProcedureException
+	 *             Falls generell ein Fehler geworfen wird, zum Beispiel beim Konvertieren der Typen.
+	 */
+	SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
+			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
+		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
+		result.setReturnCodes(new ArrayList<Integer>());
+		result.setReturnCode(0);
+		val parameterOffset = 2;
+		val resultSetOffset = 1;
+		TableMetaData inputMetaData = inputTable.getMetaData();
+		if (inputMetaData == null) {
+			inputTable.setMetaData(new TableMetaData());
+			inputMetaData = inputTable.getMetaData();
+		}
+		final int page;
+		final int limit;
+		// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
+		if (inputMetaData.getPage() == null) {
+			page = 1;
+		} else if (inputMetaData.getPage() <= 0) {
+			throw new IllegalArgumentException("msg.PageError");
+		} else {
+			page = inputMetaData.getPage();
+		}
+		// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
+		if (inputMetaData.getLimited() == null) {
+			limit = 0;
+		} else if (inputMetaData.getLimited() < 0) {
+			throw new IllegalArgumentException("msg.LimitError");
+		} else {
+			limit = inputMetaData.getLimited();
+		}
+		final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
+		executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
+		final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
+		sb.append(procedureCall);
+		setUserContextFor(connection);
+
+		final val preparedStatement = connection.prepareCall(procedureCall);
+
+		// Jede Row ist eine Abfrage.
+		for (int j = 0; j < inputTable.getRows().size(); j++) {
+			SqlProcedureResult resultForThisRow = new SqlProcedureResult();
+
+			fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
+
+			preparedStatement.registerOutParameter(1, Types.INTEGER);
+			preparedStatement.execute();
+			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
+				val sqlResultSet = preparedStatement.getResultSet();
+				val resultSet = new Table();
+				resultSet.setName(inputTable.getName());
+				resultForThisRow.setResultSet(resultSet);
+				val metaData = sqlResultSet.getMetaData();
+				resultSet.setColumns(//
+						range(0, metaData.getColumnCount()).mapToObj(i -> {
+							try {
+								val type = metaData.getColumnType(i + resultSetOffset);
+								val name = metaData.getColumnName(i + resultSetOffset);
+								if (type == Types.BOOLEAN || Types.BIT == type) {
+									return new Column(name, DataType.BOOLEAN);
+								} else if (type == Types.DOUBLE) {
+									return new Column(name, DataType.DOUBLE);
+								} else if (type == Types.TIMESTAMP) {
+									return new Column(name, DataType.INSTANT);
+								} else if (type == Types.INTEGER) {
+									return new Column(name, DataType.INTEGER);
+								} else if (type == Types.VARCHAR) {
+									return new Column(name, DataType.STRING);
+								} else if (type == Types.NVARCHAR) {
+									return new Column(name, DataType.STRING);
+								} else if (type == Types.DECIMAL) {
+									return new Column(name, DataType.BIGDECIMAL);
+								} else {
+									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
+								}
+							} catch (Exception e) {
+								throw new RuntimeException("msg.ParseResultSetError");
+							}
+						}).collect(toList()));
+				int totalResults = 0;
+
+				int securityTokenInColumn = -1;
+				if (!userSecurityTokensToBeChecked.isEmpty()) {
+					securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
+				}
+				resultSet.setMetaData(new TableMetaData());
+				while (sqlResultSet.next()) {
+					Row rowToBeAdded = null;
+					if (limit > 0) {
+						// nur die Menge an Rows, welche auf der gewünschten Page liegen
+						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
+							rowToBeAdded = convertSqlResultToRow(resultSet//
+									, sqlResultSet//
+									, customLogger.logger////
+									, this);
+						}
+					} else {
+						rowToBeAdded = convertSqlResultToRow(resultSet//
+								, sqlResultSet//
+								, customLogger.logger////
+								, this);
+					}
+
+					/*
+					 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
+					 */
+					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
+						resultSet.addRow(rowToBeAdded);
+						totalResults++;
+					}
+					resultSet.fillMetaData(resultSet, limit, totalResults, page);
+				}
+			}
+
+			val hasOutputParameters = inputTable//
+					.getColumns()//
+					.stream()//
+					.anyMatch(c -> c.getOutputType() == OUTPUT);
+			if (hasOutputParameters) {
+				val outputParameters = new Table();
+				resultForThisRow.setOutputParameters(outputParameters);
+				outputParameters.setName("outputParameters");
+				val outputColumnsMapping = inputTable//
+						.getColumns()//
+						.stream()//
+						.map(c -> c.getOutputType() == OUTPUT)//
+						.collect(toList());
+
+				val outputValues = new Row();
+				outputParameters.setColumns(inputTable.getColumns());
+				range(0, inputTable.getColumns().size())//
+						.forEach(i -> {
+							if (outputColumnsMapping.get(i)) {
+								outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
+							} else {
+								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
+							}
+						});
+				int securityTokenInColumn = -1;
+				if (!userSecurityTokensToBeChecked.isEmpty()) {
+					securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
+				}
+				Row resultRow = new Row();
+				if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
+					resultRow = outputValues;
+				} else {
+					for (int i = 0; i < outputValues.getValues().size(); i++) {
+						resultRow.addValue(null);
+					}
+				}
+				outputParameters.addRow(resultRow);
+			}
+
+			// Endresult-OutputParameter erweitern um RowResult-OutputParameter.
+			if (resultForThisRow.getOutputParameters() != null && resultForThisRow.getOutputParameters().getRows() != null) {
+				if (result.getOutputParameters() == null) {
+					result.setOutputParameters(resultForThisRow.getOutputParameters());
+				} else {
+					result.getOutputParameters().getRows().addAll(resultForThisRow.getOutputParameters().getRows());
+				}
+			}
+
+			// Endresult-ResultSet erweitern um RowResult-ResultSet.
+			if (resultForThisRow.getResultSet() != null && resultForThisRow.getResultSet().getRows() != null) {
+				if (result.getResultSet() == null) {
+					result.setResultSet(resultForThisRow.getResultSet());
+				} else {
+					TableMetaData metaData = result.getResultSet().getMetaData();
+					result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
+					result.getResultSet().fillMetaData(inputTable, limit, metaData.getTotalResults() + resultForThisRow.getResultSet().getRows().size(), page);
+				}
+			}
+			// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
+			val returnCode = preparedStatement.getObject(1);
+			if (returnCode != null) {
+				int reCode = preparedStatement.getInt(1);
+				resultForThisRow.setReturnCode(reCode);
+				// Falls nicht alle ReturnCodes gleich sind, wird 1 als endgültiger ReturnCode rein geschrieben.
+				if (!result.getReturnCodes().isEmpty() && !result.getReturnCodes().contains(reCode) && result.getReturnCode() != 1) {
+					result.setReturnCode(1);
+				}
+				result.getReturnCodes().add(resultForThisRow.getReturnCode());
+			}
 		}
 		return result;
 	}

@@ -1,5 +1,6 @@
 package aero.minova.core.application.system.controller;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,6 @@ import aero.minova.core.application.system.domain.XSqlProcedureResult;
 import aero.minova.core.application.system.domain.XTable;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import lombok.val;
 
 @RestController
 public class XSqlProcedureController {
@@ -37,24 +37,29 @@ public class XSqlProcedureController {
 	SqlProcedureController sqlProcedureController;
 
 	/**
-	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden.
+	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden. Erst wenn alle
+	 * Prozeduren erfolgreich ausgeführt wurden, wird ein Commit getätigt. Tritt ein Fehler auf, werden alle bereits ausgeführten Prozeduren ge-rollbacked.
 	 *
 	 * @param inputTables
 	 *            Liste der Tables mit Namen der Prozeduren und deren Aufruf Parameter
 	 * @return Ergebnis Liste der Ergebnisse der Prozeduren-Aufrufe
 	 * @throws Exception
-	 *             Fehler bei der Ausführung
+	 *             Fehler bei der Ausführung von einer der Prozeduren. Rollback.
 	 */
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/x-procedure")
 	public ResponseEntity executeProcedures(@RequestBody List<XTable> inputTables) throws Exception {
+
 		customLogger.logUserRequest("data/x-procedure: ", inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
-		for (XTable xt : inputTables) {
-			Table filledTable = new Table();
+		final Connection connection = systemDatabase.getConnection();
+		SqlProcedureResult result = new SqlProcedureResult();
+		StringBuffer sb = new StringBuffer();
 
-			try {
+		try {
+			for (XTable xt : inputTables) {
+				Table filledTable = new Table();
 				// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
 				filledTable = fillInDependencies(xt, resultSets);
 
@@ -66,17 +71,22 @@ public class XSqlProcedureController {
 						throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
 					}
 				}
-
-				val result = sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest);
+				sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
 				// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
 				resultSets.add(new XSqlProcedureResult(xt.getId(), result));
 
-			} catch (Exception e) {
-				customLogger.logError("Error while trying to execute procedure: " + xt.getTable().getName(), e);
-				throw e;
 			}
+		} catch (Exception e) {
+			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
+			try {
+				connection.rollback();
+			} catch (Exception e1) {
+				customLogger.logError("Couldn't roll back procedure execution", e);
+			}
+			throw new ProcedureException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
-
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
 	}
 

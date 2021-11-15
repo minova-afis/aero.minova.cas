@@ -39,7 +39,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 	Gson gson;
 
 	@Test
-	public void testFillDependency() {
+	public void testFillInDependencies() {
 
 		Type xSqlProcedureResultType = new TypeToken<ArrayList<XSqlProcedureResult>>() {}.getType();
 		final List<XSqlProcedureResult> xSqlProcedureResults = gson.fromJson(new Scanner(getClass()//

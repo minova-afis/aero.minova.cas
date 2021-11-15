@@ -112,10 +112,15 @@ public class XSqlProcedureController {
 					int position = 0;
 
 					String stringValue = v.getStringValue();
-					// Bei mehreren Rows in einer Referenztabelle, wird mit - die Position angegeben, z.B. r-parent_call-0-KeyLong
+					/*
+					 * Bei mehreren Rows in einer Referenztabelle, wird mit - die Position angegeben, in der geschickten Table z.B. r-parent_call-0-KeyLong Der
+					 * Value dazu würde hier folgendermaßen aussehen: Value("0-KeyLong","parent_call")
+					 */
 					if (stringValue.contains("-")) {
-						position = Integer.parseInt(stringValue.substring(0, stringValue.indexOf("-")));
-						stringValue = stringValue.substring(stringValue.indexOf("-") + 1, stringValue.length());
+						String[] valueParts = stringValue.split("-");
+
+						position = Integer.parseInt(valueParts[0]);
+						stringValue = valueParts[1];
 					}
 
 					aero.minova.core.application.system.domain.Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position);

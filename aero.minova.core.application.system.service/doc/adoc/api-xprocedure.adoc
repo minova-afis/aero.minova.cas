@@ -79,7 +79,17 @@ include::examples/xprocedure-result.json[]
 ----
 (xref:examples/xprocedure-result.json#[Example for xprocedure-result])
 
-Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
+Bei Misserfolg siehe Kapitel sieht sie folgendermaßen aus:
+
+[source,json]
+----
+include::examples/xprocedure-error.json[]
+----
+
+Die Ergebnisse der Prozeduren werden zurückgegeben bis zu der Prozedur,
+welche den Fehler verursacht hat. 
+Diese gibt eine detailierte Fehlermeldung und einen Stacktrace zurück.
+Die darauffolgenden ResultSets sind mit *null* aufgefüllt.
 
 ==== resultSet
 

@@ -31,6 +31,9 @@ import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableException;
 import aero.minova.core.application.system.domain.Value;
+import aero.minova.core.application.system.domain.XProcedureException;
+import aero.minova.core.application.system.domain.XSqlProcedureResult;
+import aero.minova.core.application.system.domain.XTable;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
 
@@ -40,6 +43,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	@Autowired
 	SystemDatabase systemDatabase;
 	CustomLogger customLogger = new CustomLogger();
+
+	@ExceptionHandler(XProcedureException.class)
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+	public List<XSqlProcedureResult> xProcedureException(XProcedureException ex, WebRequest request) {
+		return prepareExceptionReturnXSqlProcedureResult(ex);
+	}
 
 	@ExceptionHandler(ProcedureException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -196,6 +205,29 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		result.setReturnCodes(errorReturnCode);
 		result.setReturnCode(-1);
 		return result;
+	}
+
+	protected List<XSqlProcedureResult> prepareExceptionReturnXSqlProcedureResult(XProcedureException ex) {
+		List<XTable> xtables = ex.getXTables();
+		List<XSqlProcedureResult> results = ex.getResults();
+		List<XSqlProcedureResult> xsqlProcedureResults = new ArrayList<>();
+		xsqlProcedureResults.addAll(results);
+
+		// Error Eintrag an der Stelle an der der Fehler autritt machen.
+		SqlProcedureResult errorResult = prepareExceptionReturnSqlProcedureResult(ex);
+		String errorID = xtables.get(results.size()).getId();
+		XSqlProcedureResult error = new XSqlProcedureResult(errorID, errorResult);
+		xsqlProcedureResults.add(error);
+
+		// Damit das XSqlProcedureResult auf dieselbe Länge kommt, wie die XTable-Liste, restliche Einträge mit null füllen.
+		while (xsqlProcedureResults.size() < xtables.size()) {
+			SqlProcedureResult innerNullResultSet = new SqlProcedureResult();
+			innerNullResultSet.setReturnCode(-1);
+			XSqlProcedureResult nullResult = new XSqlProcedureResult(xtables.get(xsqlProcedureResults.size()).getId(), innerNullResultSet);
+			xsqlProcedureResults.add(nullResult);
+		}
+
+		return xsqlProcedureResults;
 	}
 
 	public void saveErrorInDatabase(Exception e) {

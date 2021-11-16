@@ -16,6 +16,7 @@ import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.XProcedureException;
 import aero.minova.core.application.system.domain.XSqlProcedureResult;
 import aero.minova.core.application.system.domain.XTable;
 import aero.minova.core.application.system.service.SecurityService;
@@ -78,13 +79,13 @@ public class XSqlProcedureController {
 
 			}
 		} catch (Exception e) {
-			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
+			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			try {
 				connection.rollback();
 			} catch (Exception e1) {
-				customLogger.logError("Couldn't roll back procedure execution", e);
+				customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
 			}
-			throw new ProcedureException(e);
+			throw new XProcedureException(inputTables, resultSets, e);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

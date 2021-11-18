@@ -98,6 +98,15 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return prepareExceptionReturnTable(ex);
 	}
 
+	/**
+	 * Gibt eine Table mit dem Namen "Error" zurück. Diese beinhaltet in der ersten Row eine detailierte Fehlermeldung. In allen darauffolgenden Rows werden
+	 * weitere Parameter, welche später auf der Clientseite in die Fehlermeldung eingefügt werden, aufgelistet. Diese werden mit in der Message der Exception
+	 * übergeben und werden mit '%' gekennzeichnet. Die Exception wird außerdem zusammen mit dem Username und dem Datum in derDatenbank geloggt.
+	 * 
+	 * @param ex
+	 *            Die Exception.
+	 * @return Eine Table, welche die Exception in Tabellenform beinhaltet.
+	 */
 	protected Table prepareExceptionReturnTable(Exception ex) {
 		Table outputTable = new Table();
 		outputTable.setName("Error");
@@ -149,55 +158,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return outputTable;
 	}
 
+	/**
+	 * Gibt die Exception in Form eines SqlProcedureResults zurück. Die Table, welches die detailierte Exception beinhaltet, ist hierbei das ResultSet des
+	 * SqlProcedureResults. Alle möglichen ReturnCodes werdenauf -1 gesetzt. Die Exception wird außerdem zusammen mit dem Username und dem Datum in derDatenbank
+	 * geloggt.
+	 * 
+	 * @param ex
+	 *            Die Exception.
+	 * @return Ein SqlProcedureResult, welches die Exception in Tabellenform als ResultSet beinhaltet.
+	 */
 	protected SqlProcedureResult prepareExceptionReturnSqlProcedureResult(Exception ex) {
 		SqlProcedureResult result = new SqlProcedureResult();
-		Table resultSetTable = new Table();
-		resultSetTable.setName("Error");
-		resultSetTable.addColumn(new Column("International Message", DataType.STRING));
-		String errorMessage = null;
-		try {
-			errorMessage = ex.getCause().getMessage();
-		} catch (Exception e) {
-			errorMessage = ex.getMessage();
-		}
-
-		if (errorMessage == null) {
-			errorMessage = "msg.NoErrorMessageAvailable";
-		}
-		// falls die Message in der Form 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird' ist
-		List<String> errorMessageParts = Stream.of(errorMessage.split("%"))//
-				.map(String::trim)//
-				.collect(Collectors.toList());
-
-		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
-		// Hinzufügen der Spalten für die InputParameter der Internationalierung
-		for (int i = 1; i < errorMessageParts.size(); i++) {
-			resultSetTable.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
-		}
-
-		Row internatMsg = new Row();
-
-		// Hinzufügen der International Message und der InputParameter der Internationalierung
-		for (int i = 0; i < errorMessageParts.size(); i++) {
-			Value param = new Value(errorMessageParts.get(i), null);
-			internatMsg.addValue(param);
-		}
-
-		resultSetTable.addRow(internatMsg);
-
-		Exception sqlE = new Exception(errorMessage, ex);
-		ErrorMessage error = new ErrorMessage();
-		error.setErrorMessage(sqlE);
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		ex.printStackTrace(pw);
-		String messages = sw.toString();
-		List<String> trace = Stream.of(messages.split("\n\tat|\n"))//
-				.map(String::trim)//
-				.collect(Collectors.toList());
-		error.setTrace(trace);
-		resultSetTable.setReturnErrorMessage(error);
-		saveErrorInDatabase(ex);
+		Table resultSetTable = prepareExceptionReturnTable(ex);
 
 		result.setResultSet(resultSetTable);
 		List<Integer> errorReturnCode = new ArrayList<>();
@@ -207,13 +179,26 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return result;
 	}
 
+	/**
+	 * Verarbeitet die xProcedureException. Die Liste der XSqlProcedureResult, welche zurück gegeben wird, beinhaltet erst die erfolgreich verarbeiteten
+	 * XSqlProcedureResults, dann ein XSqlProcedureResult, welches die typische Fehlermeldung beinhaltet. Dann wird die Liste der XSqlProcedureResults so lange
+	 * mit leeren XSqlProcedureResults gefüllt, bis sie dieselbe Länge hat, wie die anfagns gesendete XTable. Hierbei werden alle IDs der XTables in derselben
+	 * Reihenfolge übernommen. Die Exception wird außerdem zusammen mit dem Username und dem Datum in derDatenbank geloggt.
+	 * 
+	 * @param ex
+	 *            Eine XProcedureException. Diese beinhaltet neben der Exception, noch eine Liste an XTable, welche bei der Anfrage der Transaktion übergeben
+	 *            wurde, und die bisherigen Results als Liste.
+	 * @return Eine Liste von XSqlProcedureResults.
+	 */
 	protected List<XSqlProcedureResult> prepareExceptionReturnXSqlProcedureResult(XProcedureException ex) {
 		List<XTable> xtables = ex.getXTables();
 		List<XSqlProcedureResult> results = ex.getResults();
 		List<XSqlProcedureResult> xsqlProcedureResults = new ArrayList<>();
+
+		// Ergebnisse von erfolgreich durchgeführten Prozeduren übernehmen.
 		xsqlProcedureResults.addAll(results);
 
-		// Error Eintrag an der Stelle an der der Fehler autritt machen.
+		// Error Eintrag an der Stelle, an der der Fehler autritt, machen.
 		SqlProcedureResult errorResult = prepareExceptionReturnSqlProcedureResult(ex);
 		String errorID = xtables.get(results.size()).getId();
 		XSqlProcedureResult error = new XSqlProcedureResult(errorID, errorResult);
@@ -226,10 +211,15 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			XSqlProcedureResult nullResult = new XSqlProcedureResult(xtables.get(xsqlProcedureResults.size()).getId(), innerNullResultSet);
 			xsqlProcedureResults.add(nullResult);
 		}
-
 		return xsqlProcedureResults;
 	}
 
+	/**
+	 * Erzeugt einen Eintrag in der Tabelle xtcasError. Hierbei wird der Nutzer, die Fehlermeldung und das momentane Datum in der Datenbank eingetragen.
+	 * 
+	 * @param e
+	 *            Die Exception, welche geworfen wurde.
+	 */
 	public void saveErrorInDatabase(Exception e) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -1,0 +1,53 @@
+[ {
+  "id" : "parent_call",
+  "result" : {
+    "resultset" : <Table>,
+ 	"outputParameters": <Table>,
+	"returnCode": <Integer>
+ }
+}, {
+  "id" : "option_page_call",
+  "result" : {
+    "resultset" : {
+	"name": "Error",
+    "columns": [
+        {
+            "name": "International Message",
+            "type": "STRING"
+        }
+        [,{
+        	"name": "MessageInputParam1",
+            "type": "STRING"
+            }]
+    ],
+    "rows": [
+        {
+            "values": [
+                "s-msg.Error",["s-InputParameter",...]
+            ]
+        }
+    ],
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [
+			"StackTraceMessages",
+			...
+		]
+	}
+    "returnCodes": [
+        -1
+    ],
+    "returnCode": -1
+  }
+}, {
+  "id" : "option_grid_call_1",
+  "result" : {
+	"returnCode": -1
+  }
+}, {
+  "id" : "option_grid_call_2",
+  "result" : {
+	"returnCode": -1
+  }
+} ]

@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
@@ -41,12 +39,9 @@ public class SqlViewController {
 	@Autowired
 	CustomLogger customLogger;
 
-	@Autowired
-	Gson gson;
-
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
-		customLogger.logUserRequest(": data/view: " + gson.toJson(inputTable));
+		customLogger.logUserRequest(": data/view: ", inputTable);
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();

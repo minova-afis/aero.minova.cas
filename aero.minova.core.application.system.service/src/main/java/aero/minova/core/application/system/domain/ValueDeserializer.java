@@ -25,7 +25,7 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 		String value = json.getAsString().substring(2);
 		String rule;
 
-		if (typeString.contains("f")) {
+		if (typeString.equals("f")) {
 			int operatorPos = getOperatorEndIndex(value);
 			rule = value.substring(0, operatorPos).toLowerCase();
 			// falls die Regel is null oder is not null ist, macht es keinen Sinn, dass ein Wert weiter gegeben werden würde
@@ -44,6 +44,10 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 				typeString = value.substring(operatorPos + 1, operatorPos + 2);
 				value = value.substring(operatorPos + 3, value.length());
 			}
+		} else if (typeString.equals("r")) {
+			typeString = "s";
+			rule = value.substring(0, value.indexOf("-"));
+			value = value.substring(value.indexOf("-") + 1, value.length());
 		} else {
 			rule = null;
 		}

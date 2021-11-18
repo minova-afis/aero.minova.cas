@@ -23,14 +23,30 @@ Sie muss eindeutig über alle Arrayelemente des Aufrufs sein.
 Das 2. Element ist das die `table`.
 Es entspricht der oben beschriebenen <<table>>, wie sie auch für <<data/procedure>> Aufrufe verwendet wird.
 
-[TIP]
-====
-Es ist zu überlegen, ob man bei den Werten auch mehrere `rows` übergeben darf. 
-Dies würde dann mehreren Aufrufen der Prozedur mit den Werten entsprechen.
+Soll ein Wert aus einer anderen Row als der ersten Output-Row verwendet werden,
+wird dies durch folgendes Format signalisiert: 
 
-Die Frage ist dann, wie die Rückgabewerte für einen Aufruf identifiziert werden.
-Man könnte sich den Array-Index-Operator (`[]`) verwenden.
-====
+[source,json]
+.Sample.json
+----
+include::examples/xprocedure-multiRow.json[]
+----
+(xref:examples/xprocedure-multiRow.json#[Example for xprocedure-Call mit mehrerem Rows])
+
+Um ein Referenz-Wert aus einer anderen Row als der ersten zu holen,
+gibt man den Value in folgendem Format: 
+
+[source]
+----
+Value: r-<ID>-<Row Number>-<Column>
+----
+
+* *r*: Zeigt an, dass es ein Referenz-Wert ist.
+* *ID*: Die ID der Table, aus welcher der Referenz-Wert kommen soll.
+* *Row Number*: Beginnend bei 0 für die erste Zeile, die Row aus welcher der Wert kommen soll.
+* *Column*: Der Name der Spalte, in welcher der Wert in der Referenz-Table steht.
+
+Diese vier Werte müssen mit einem *-* voneinander getrennt werden.
 
 ==== columns/values/reference
 
@@ -63,7 +79,17 @@ include::examples/xprocedure-result.json[]
 ----
 (xref:examples/xprocedure-result.json#[Example for xprocedure-result])
 
-Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
+Bei Misserfolg siehe Kapitel sieht sie folgendermaßen aus:
+
+[source,json]
+----
+include::examples/xprocedure-error.json[]
+----
+
+Die Ergebnisse der Prozeduren werden zurückgegeben bis zu der Prozedur,
+welche den Fehler verursacht hat. 
+Diese gibt eine detailierte Fehlermeldung und einen Stacktrace zurück.
+Die darauffolgenden ResultSets sind mit *null* aufgefüllt.
 
 ==== resultSet
 

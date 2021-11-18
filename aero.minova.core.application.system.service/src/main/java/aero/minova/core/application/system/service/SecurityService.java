@@ -2,6 +2,7 @@ package aero.minova.core.application.system.service;
 
 import static java.util.Arrays.asList;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +38,26 @@ public class SecurityService {
 
 	@Autowired
 	public CustomLogger customLogger;
+
+	/**
+	 * Prüft, ob die minimal notwendigen Datenbank-Objekte für die Privileg-Prüfung in der Datenbank aufgesetzt wurden. Dazu prüft man, ob die
+	 * `xvcasUserPrivileges` vorhanden ist.
+	 *
+	 * @return Dies ist wahr, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
+	 * @throws Exception
+	 *             Fehler bei der Ermittelung
+	 */
+	public boolean arePrivilegeStoresSetup() throws Exception {
+		return isTablePresent("xvcasUserPrivileges");
+	}
+
+	private boolean isTablePresent(String tableName) throws Exception {
+		try (final Connection connection = systemDatabase.getConnection()) {
+			return connection.getMetaData()//
+					.getTables(null, null, tableName, null)//
+					.next();
+		}
+	}
 
 	/**
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt. Die Abfrage sieht

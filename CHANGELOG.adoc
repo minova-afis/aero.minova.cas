@@ -3,6 +3,11 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [12.27.0] - 2021-11-18
+
+ * (#211) Es können jetzt Transaktionen (Liste einander abhängender Prozeduren mit IDs) ausgeführt werden.
+ * Ein Bug wurde gefixed, bei welchem beim Ausführen von Prozeduren nach der SecurityToken-Spalte gesucht wurde, obwohl die RowLevelSecurity nicht aktiviert war.
+
 ## [12.25.0] - 2021-11-02
 
 Die Reihenfolge in welcher Dependencies über die `data/procedure` Setup installiert werden,

@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova</groupId>
 	<artifactId>core.application.system.setup</artifactId>
@@ -7,7 +8,7 @@
 		<groupId>aero.minova</groupId>
 		<artifactId>spring.maven.root</artifactId>
 		<version>1.2.1</version>
-		<relativePath />
+		<relativePath/>
 	</parent>
 	<properties>
 		<java.version>11</java.version>
@@ -98,4 +99,42 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>soap-dependencies</id>
+			<activation>
+				<property>
+						<name>!aero.minova.app.parent.soap-dependencies</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-frontend-jaxws</artifactId>
+					<version>3.4.1</version>
+				</dependency>
+				<dependency>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-transports-http</artifactId>
+					<version>3.4.1</version>
+				</dependency>
+				<dependency>
+					<groupId>com.sun.xml.wss</groupId>
+					<artifactId>xws-security</artifactId>
+					<version>3.0</version>
+					<exclusions>
+						<exclusion>
+							<groupId>javax.xml.crypto</groupId>
+							<artifactId>xmldsig</artifactId>
+						</exclusion>
+					</exclusions>
+				</dependency>
+				<dependency>
+					<groupId>javax.activation</groupId>
+					<artifactId>activation</artifactId>
+					<version>1.1.1</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

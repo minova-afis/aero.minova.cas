@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.CustomLogger;
+import aero.minova.core.application.system.domain.Column;
+import aero.minova.core.application.system.domain.DataType;
 import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
@@ -36,6 +38,9 @@ public class XSqlProcedureController {
 
 	@Autowired
 	SqlProcedureController sqlProcedureController;
+
+	@Autowired
+	SqlViewController sqlViewController;
 
 	/**
 	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden. Erst wenn alle
@@ -78,6 +83,9 @@ public class XSqlProcedureController {
 				resultSets.add(new XSqlProcedureResult(xt.getId(), result));
 
 			}
+
+			// TODO hier die Check-Methode ausführen
+
 		} catch (Exception e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			try {
@@ -123,6 +131,11 @@ public class XSqlProcedureController {
 
 						position = Integer.parseInt(valueParts[0]);
 						stringValue = valueParts[1];
+					}
+
+					// Ohne Outputparameter kann man nichts referenzieren
+					if (dependency.getResultSet().getOutputParameters() == null) {
+						throw new RuntimeException("No output parameters for resultset with id " + dependency.getId());
 					}
 
 					aero.minova.core.application.system.domain.Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position);
@@ -176,6 +189,32 @@ public class XSqlProcedureController {
 			}
 		}
 		throw new RuntimeException("Cannot find SqlProcedureResult with Id " + idToFind);
+	}
+
+	private void checkFollowUpProcedures(List<XTable> inputTables) {
+		for (XTable xTable : inputTables) {
+			// Die bevorzugte Sprache aus der Datenbank holen.
+			Table sqlRequest = new Table();
+			sqlRequest.setName("vcasBirtInvoiceServiceContractContact");
+			sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER));
+			sqlRequest.addColumn(new Column("Language", DataType.STRING));
+			{
+				Row requestParam = new Row();
+				sqlRequest.getRows().add(requestParam);
+				requestParam.addValue(null);
+				requestParam.addValue(null);
+			}
+			try {
+				Table viewResult = securityService.getTableForSecurityCheck(sqlRequest);
+
+				// Überprüfen, ob wir überhaupt einen Eintrag in der Datenbank dafür haben.
+				if (viewResult.getRows().size() != 0 && viewResult.getRows().get(0).getValues().get(1).getValue() != null) {}
+
+			} catch (Exception e) {
+				throw new RuntimeException("Could not find Language for InvoiceKey ", e);
+			}
+
+		}
 	}
 
 }

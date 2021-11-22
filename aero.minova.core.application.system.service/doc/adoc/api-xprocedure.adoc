@@ -58,13 +58,15 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 
 * *"r"*: Referenz: 
 Nach dem ersten Bindestrich folgt die `id` der Procedure.
-Nach dem zweiten Bindestrich folgt der `name` des Parameters.
+Nach dem zweiten Bindestrich folgt der Index der Zeile aus der der Wert übernommen werden soll (um Prozeduraufrufe mit mehreren Zeilen zu unterstützen.
+Zuletzt folgt der `name` des Parameters.
+Alle diese Werte MÜSSEN gegeben sein.
 
 Daraus ergibt sich auch, das `id`-Werte keine Bindestriche enthalten dürfen.
 Dies führt zum Abbruch der Prozedur mit einer entsprechenden Meldung.
 
 Der Name des Parameters kann `-` enthalten. 
-Es handelt sich aj dabei um den Rest des Wertes.
+Es handelt sich ja dabei um den Rest des Wertes.
 
 === Ausgabe
 

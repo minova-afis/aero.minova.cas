@@ -1,6 +1,7 @@
 package aero.minova.core.application.system.controller;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,30 +66,11 @@ public class XSqlProcedureController {
 
 		try {
 			connection = systemDatabase.getConnection();
-			for (XTable xt : inputTables) {
-				SqlProcedureResult result = new SqlProcedureResult();
-				Table filledTable = new Table();
-				// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
-				filledTable = fillInDependencies(xt, resultSets);
-
-				// Rechteprüfung
-				final List<Row> privilegeRequest = new ArrayList<>();
-				if (securityService.arePrivilegeStoresSetup()) {
-					privilegeRequest.addAll(securityService.getPrivilegePermissions(filledTable.getName()));
-					if (privilegeRequest.isEmpty()) {
-						throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
-					}
-				}
-				sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
-				// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
-				resultSets.add(new XSqlProcedureResult(xt.getId(), result));
-
-			}
+			resultSets = processXProcedures(inputTables, resultSets, sb, connection);
 
 			// TODO hier die Check-Methode ausführen
 
 			connection.commit();
-
 		} catch (Exception e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			try {
@@ -101,6 +83,29 @@ public class XSqlProcedureController {
 			systemDatabase.freeUpConnection(connection);
 		}
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
+	}
+
+	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sb, Connection connection)
+			throws Exception, ProcedureException, SQLException {
+		for (XTable xt : inputTables) {
+			SqlProcedureResult result = new SqlProcedureResult();
+			Table filledTable = new Table();
+			// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
+			filledTable = fillInDependencies(xt, resultSets);
+
+			// Rechteprüfung
+			final List<Row> privilegeRequest = new ArrayList<>();
+			if (securityService.arePrivilegeStoresSetup()) {
+				privilegeRequest.addAll(securityService.getPrivilegePermissions(filledTable.getName()));
+				if (privilegeRequest.isEmpty()) {
+					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
+				}
+			}
+			sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+			// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
+			resultSets.add(new XSqlProcedureResult(xt.getId(), result));
+		}
+		return resultSets;
 	}
 
 	/**
@@ -194,7 +199,7 @@ public class XSqlProcedureController {
 		throw new RuntimeException("Cannot find SqlProcedureResult with Id " + idToFind);
 	}
 
-	private void checkFollowUpProcedures(List<XTable> inputTables) {
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults, Connection connection, StringBuffer sb) {
 		List<String> followUpProcedures = new ArrayList<>();
 
 		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
@@ -215,6 +220,8 @@ public class XSqlProcedureController {
 		try {
 			Table viewResult = securityService.getTableForSecurityCheck(sqlRequest);
 
+			List<XTable> xtables = new ArrayList<>();
+
 			// Überprüfen, ob wir überhaupt einen Eintrag in der Datenbank dafür haben.
 			if (viewResult.getRows().size() == 0) {
 				throw new RuntimeException("msg.PrivilegeError");
@@ -222,9 +229,17 @@ public class XSqlProcedureController {
 
 			for (Row row : viewResult.getRows()) {
 				if (row.getValues().size() != 0 && row.getValues().get(1).getValue() != null) {
+					String transactionChecker = row.getValues().get(1).getStringValue();
+
+					XTable followUpTable = new XTable();
+					followUpTable.setId(null);
+					Table innerXTable = new Table();
+					innerXTable.setName(null);
 					followUpProcedures.add(row.getValues().get(1).getStringValue());
 				}
 			}
+
+			processXProcedures(inputTables, xsqlresults, sb, connection);
 
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to find follow up procedures.", e);

@@ -68,6 +68,14 @@ Dies führt zum Abbruch der Prozedur mit einer entsprechenden Meldung.
 Der Name des Parameters kann `-` enthalten. 
 Es handelt sich ja dabei um den Rest des Wertes.
 
+=== Check-Prozeduren
+
+Nachdem die Transaktionen ausgeführt wurde, müssen potentiell noch Check-Prozeduren ausgeführt werden.
+Diese werden in der `xtcasUserPrivilege` in der Spalte `TransaktionChecker` definiert.
+Damit diese Prozeduren ausgeführt werden können, muss immer der KeyLong des dazugehörigen Referenz-ResultSets verwendet werden.
+
+Erst nachdem alle Check-Prozeduren erfolgreich durchgeführt wurden, wird ein Commit auf die Datenbank gemacht. 
+
 === Ausgabe
 
 Die Antwort besteht dann auch aus einem Array von Elementen.

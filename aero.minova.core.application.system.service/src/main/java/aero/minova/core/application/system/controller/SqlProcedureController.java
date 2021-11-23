@@ -327,8 +327,8 @@ public class SqlProcedureController {
 					.anyMatch(c -> c.getOutputType() == OUTPUT);
 			if (hasOutputParameters) {
 				val outputParameters = new Table();
+				outputParameters.setName(inputTable.getName());
 				resultForThisRow.setOutputParameters(outputParameters);
-				outputParameters.setName("outputParameters");
 				val outputColumnsMapping = inputTable//
 						.getColumns()//
 						.stream()//

@@ -18,6 +18,7 @@ import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
+import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.domain.XProcedureException;
 import aero.minova.core.application.system.domain.XSqlProcedureResult;
 import aero.minova.core.application.system.domain.XTable;
@@ -59,13 +60,13 @@ public class XSqlProcedureController {
 		customLogger.logUserRequest("data/x-procedure: ", inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
-		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
 		try {
 			connection = systemDatabase.getConnection();
 			for (XTable xt : inputTables) {
+				SqlProcedureResult result = new SqlProcedureResult();
 				Table filledTable = new Table();
 				// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
 				filledTable = fillInDependencies(xt, resultSets);
@@ -133,7 +134,7 @@ public class XSqlProcedureController {
 						stringValue = valueParts[1];
 					}
 
-					// Ohne Outputparameter kann man nichts referenzieren
+					// Ohne Outputparameter kann man nichts referenzieren.
 					if (dependency.getResultSet().getOutputParameters() == null) {
 						throw new RuntimeException("No output parameters for resultset with id " + dependency.getId());
 					}
@@ -192,28 +193,39 @@ public class XSqlProcedureController {
 	}
 
 	private void checkFollowUpProcedures(List<XTable> inputTables) {
+		List<String> followUpProcedures = new ArrayList<>();
+
+		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
+		Table sqlRequest = new Table();
+		sqlRequest.setName("xtcasUserPrivilege");
+		sqlRequest.addColumn(new Column("KeyText", DataType.STRING));
+		sqlRequest.addColumn(new Column("TransactionChecker", DataType.STRING));
+
+		List<Row> inputRows = new ArrayList<>();
 		for (XTable xTable : inputTables) {
-			// Die bevorzugte Sprache aus der Datenbank holen.
-			Table sqlRequest = new Table();
-			sqlRequest.setName("vcasBirtInvoiceServiceContractContact");
-			sqlRequest.addColumn(new Column("KeyLong", DataType.INTEGER));
-			sqlRequest.addColumn(new Column("Language", DataType.STRING));
-			{
-				Row requestParam = new Row();
-				sqlRequest.getRows().add(requestParam);
-				requestParam.addValue(null);
-				requestParam.addValue(null);
-			}
-			try {
-				Table viewResult = securityService.getTableForSecurityCheck(sqlRequest);
+			Row requestParam = new Row();
+			sqlRequest.getRows().add(requestParam);
+			requestParam.addValue(new Value(xTable.getTable().getName(), null));
+			requestParam.addValue(null);
 
-				// Überprüfen, ob wir überhaupt einen Eintrag in der Datenbank dafür haben.
-				if (viewResult.getRows().size() != 0 && viewResult.getRows().get(0).getValues().get(1).getValue() != null) {}
+			inputRows.add(requestParam);
+		}
+		try {
+			Table viewResult = securityService.getTableForSecurityCheck(sqlRequest);
 
-			} catch (Exception e) {
-				throw new RuntimeException("Could not find Language for InvoiceKey ", e);
+			// Überprüfen, ob wir überhaupt einen Eintrag in der Datenbank dafür haben.
+			if (viewResult.getRows().size() == 0) {
+				throw new RuntimeException("msg.PrivilegeError");
 			}
 
+			for (Row row : viewResult.getRows()) {
+				if (row.getValues().size() != 0 && row.getValues().get(1).getValue() != null) {
+					followUpProcedures.add(row.getValues().get(1).getStringValue());
+				}
+			}
+
+		} catch (Exception e) {
+			throw new RuntimeException("Error while trying to find follow up procedures.", e);
 		}
 	}
 

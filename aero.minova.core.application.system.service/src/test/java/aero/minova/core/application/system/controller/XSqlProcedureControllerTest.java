@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -31,9 +29,6 @@ import aero.minova.core.application.system.domain.XTable;
 public class XSqlProcedureControllerTest extends BaseTest {
 	@Autowired
 	XSqlProcedureController testSubject;
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Autowired
 	Gson gson;
@@ -114,6 +109,43 @@ public class XSqlProcedureControllerTest extends BaseTest {
 
 		assertThat(catchThrowable(() -> testSubject.findxSqlResultSet("test100", results))).isInstanceOf(RuntimeException.class)
 				.hasMessage("Cannot find SqlProcedureResult with Id test100");
+	}
+
+	@Test
+	public void testFindxsqlResultSetByNameValid() {
+		List<XSqlProcedureResult> results = new ArrayList<>();
+
+		Table inputTable = new Table();
+		inputTable.setName("spTest");
+		inputTable.addColumn(new Column("TestText", DataType.STRING));
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(null);
+			inputTable.addRow(inputRow);
+		}
+		SqlProcedureResult sqlRes = new SqlProcedureResult();
+		sqlRes.setOutputParameters(inputTable);
+		XSqlProcedureResult xRes = new XSqlProcedureResult("test", sqlRes);
+		results.add(xRes);
+
+		Table secondTable = new Table();
+		secondTable.setName("Test Test");
+		secondTable.addColumn(new Column("TestText", DataType.STRING));
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(null);
+			secondTable.addRow(inputRow);
+		}
+
+		SqlProcedureResult sqlRes2 = new SqlProcedureResult();
+		sqlRes2.setOutputParameters(secondTable);
+		xRes = new XSqlProcedureResult("test2", sqlRes2);
+		results.add(xRes);
+		xRes = new XSqlProcedureResult("test3", sqlRes2);
+		results.add(xRes);
+		List<XSqlProcedureResult> testres = testSubject.findxSqlResultSetByName("Test Test", results);
+
+		assertThat(testres.size()).isEqualTo(2);
 	}
 
 	@Test

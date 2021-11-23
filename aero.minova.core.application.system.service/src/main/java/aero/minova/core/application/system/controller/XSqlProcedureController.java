@@ -139,10 +139,10 @@ public class XSqlProcedureController {
 					 * Value dazu würde hier folgendermaßen aussehen: Value("0-KeyLong","parent_call")
 					 */
 					if (stringValue.contains("-")) {
-						String[] valueParts = stringValue.split("-");
-
-						position = Integer.parseInt(valueParts[0]);
-						stringValue = valueParts[1];
+						// Spaltennamen könnten auch '-' enthalten, deshalb kein Split.
+						String positionString = stringValue.substring(0, stringValue.indexOf("-"));
+						position = Integer.valueOf(positionString);
+						stringValue = stringValue.substring(positionString.length() + 1, stringValue.length());
 					}
 
 					// Ohne Outputparameter kann man nichts referenzieren.

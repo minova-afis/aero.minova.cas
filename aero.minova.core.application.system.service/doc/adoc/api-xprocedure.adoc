@@ -72,7 +72,10 @@ Es handelt sich ja dabei um den Rest des Wertes.
 
 Nachdem die Transaktionen ausgeführt wurde, müssen potentiell noch Check-Prozeduren ausgeführt werden.
 Diese werden in der `xtcasUserPrivilege` in der Spalte `TransaktionChecker` definiert.
-Damit diese Prozeduren ausgeführt werden können, muss immer der KeyLong des dazugehörigen Referenz-ResultSets verwendet werden.
+
+Damit diese Prozeduren ausgeführt werden können, muss der KeyLong des dazugehörigen Referenz-ResultSets verwendet werden.
+Falls keine KeyLong-Spalte in dem ResultSet gefunden werden kann,
+ wird auf den KeyLong der ersten ausgeführten Prozedur (Haupt-Prozedur) der Anfrage zurück gegriffen.
 
 Erst nachdem alle Check-Prozeduren erfolgreich durchgeführt wurden, wird ein Commit auf die Datenbank gemacht. 
 

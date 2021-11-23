@@ -151,6 +151,9 @@ public class XSqlProcedureController {
 					}
 
 					aero.minova.core.application.system.domain.Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position);
+					if (newValue == null) {
+						throw new RuntimeException("No reference value found for column" + stringValue + " in row " + position + " !");
+					}
 					// Tausche Value mit dem Ergebnis aus einem der ResultSets aus.
 					r.getValues().remove(i);
 					r.getValues().add(i, newValue);
@@ -168,21 +171,15 @@ public class XSqlProcedureController {
 	 *            Das SqlProcedureResult, welches den gewünschten Value enthält.
 	 * @param columnName
 	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
-	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen.
+	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen oder null, wenn die Spalte nicht gefunden werden kann.
 	 */
 	aero.minova.core.application.system.domain.Value findValueInColumn(SqlProcedureResult dependency, String columnName, int row) {
-		int position = -1;
 		for (int i = 0; i < dependency.getOutputParameters().getColumns().size(); i++) {
 			if (dependency.getOutputParameters().getColumns().get(i).getName().equals(columnName)) {
-				position = i;
-				break;
+				return dependency.getOutputParameters().getRows().get(row).getValues().get(i);
 			}
 		}
-		if (position > -1) {
-			return dependency.getOutputParameters().getRows().get(row).getValues().get(position);
-		} else {
-			throw new RuntimeException("Cannot find Column with name " + columnName);
-		}
+		return null;
 	}
 
 	/**
@@ -215,18 +212,16 @@ public class XSqlProcedureController {
 	List<XSqlProcedureResult> findxSqlResultSetByName(String tableName, List<XSqlProcedureResult> resultsets) {
 		List<XSqlProcedureResult> resultsWithThatName = new ArrayList<>();
 		for (XSqlProcedureResult xSqlResult : resultsets) {
-			if (xSqlResult.getResultSet().getOutputParameters().equals(tableName)) {
+			if (xSqlResult.getResultSet() != null && xSqlResult.getResultSet().getOutputParameters() != null
+					&& xSqlResult.getResultSet().getOutputParameters().getName().equals(tableName)) {
 				resultsWithThatName.add(xSqlResult);
 			}
-		}
-		if (resultsWithThatName.size() == 0) {
-			throw new RuntimeException("Cannot find SqlProcedureResult with name " + tableName);
 		}
 		return resultsWithThatName;
 	}
 
 	/**
-	 * Findet andhand der übergebenen Liste an XTables und über einen Aufruf der xtcasUserPrivilege-Tabelle heraus, welche Check-Prozeduren für die gerade
+	 * Findet anhand der übergebenen Liste an XTables und über einen Aufruf der xtcasUserPrivilege-Tabelle heraus, welche Check-Prozeduren für die gerade
 	 * ausgeführten XProzeduren durchgeführt werden müssen. In dieser Methode wird noch kein Commit an die Datenbank gesendet.
 	 * 
 	 * @param inputTables
@@ -265,7 +260,7 @@ public class XSqlProcedureController {
 			// Im Prinzip den ganzen Spaß nochmal nur mit den TransactionChecker.
 			List<XTable> xtables = new ArrayList<>();
 			for (Row row : viewResult.getRows()) {
-				if (row.getValues().size() != 0 && row.getValues().get(1).getValue() != null) {
+				if (row.getValues().size() != 0 && row.getValues().get(1) != null) {
 					String dependencyTableName = row.getValues().get(0).getStringValue();
 					String transactionChecker = row.getValues().get(1).getStringValue();
 
@@ -279,11 +274,23 @@ public class XSqlProcedureController {
 					// Alle ResultSets mit diesem Namen (nicht ID) müssen gecheckt werden.
 					List<XSqlProcedureResult> resultsWithThatName = findxSqlResultSetByName(dependencyTableName, xsqlresults);
 
+					// Falls keine passenden OutputParameter gefunden werden können, muss das ResultSet des Haupt-Aufrufs (der erste in der Transaktion)
+					// verwendet werden.
+					if (resultsWithThatName.size() == 0) {
+						resultsWithThatName.add(xsqlresults.get(0));
+					}
+
 					// Und von diesen muss jede Row geprüft werden. Dabei holen wir uns jedes mal den KeyLong (siehe Doku).
 					for (XSqlProcedureResult res : resultsWithThatName) {
 						if (res.getResultSet().getOutputParameters() != null && res.getResultSet().getOutputParameters().getRows() != null) {
 							for (int i = 0; i < res.getResultSet().getOutputParameters().getRows().size(); i++) {
 								Value keyLongOfRow = findValueInColumn(res.getResultSet(), "KeyLong", i);
+
+								// Falls die Prozedur bzw. dessen ResultSet keinen KeyLong als Output hatte, greifen wir auf den KeyLong des Haupt-ResultsSets
+								// zurück.
+								if (keyLongOfRow == null) {
+									keyLongOfRow = findValueInColumn(xsqlresults.get(0).getResultSet(), "KeyLong", 0);
+								}
 								Row innerRow = new Row();
 								innerRow.addValue(keyLongOfRow);
 								innerTableRows.add(innerRow);

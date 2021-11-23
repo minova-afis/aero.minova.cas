@@ -87,6 +87,8 @@ public class XSqlProcedureController {
 
 			// TODO hier die Check-Methode ausführen
 
+			connection.commit();
+
 		} catch (Exception e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			try {

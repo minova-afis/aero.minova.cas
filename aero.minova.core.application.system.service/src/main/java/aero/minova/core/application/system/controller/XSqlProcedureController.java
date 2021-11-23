@@ -46,7 +46,8 @@ public class XSqlProcedureController {
 
 	/**
 	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden. Erst wenn alle
-	 * Prozeduren erfolgreich ausgeführt wurden, wird ein Commit getätigt. Tritt ein Fehler auf, werden alle bereits ausgeführten Prozeduren ge-rollbacked.
+	 * Prozeduren - d.h. die Anfrage und die dazugehörigen Checks - erfolgreich ausgeführt wurden, wird ein Commit getätigt. Tritt ein Fehler auf, werden alle
+	 * bereits ausgeführten Prozeduren ge-rollbacked.
 	 *
 	 * @param inputTables
 	 *            Liste der Tables mit Namen der Prozeduren und deren Aufruf Parameter
@@ -66,10 +67,13 @@ public class XSqlProcedureController {
 
 		try {
 			connection = systemDatabase.getConnection();
+			// Hier wird die Anfrage bearbeitet.
 			resultSets = processXProcedures(inputTables, resultSets, sb, connection);
 
-			// TODO hier die Check-Methode ausführen
+			// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
+			checkFollowUpProcedures(inputTables, resultSets, connection, sb);
 
+			// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
 			connection.commit();
 		} catch (Exception e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
@@ -199,9 +203,42 @@ public class XSqlProcedureController {
 		throw new RuntimeException("Cannot find SqlProcedureResult with Id " + idToFind);
 	}
 
-	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults, Connection connection, StringBuffer sb) {
-		List<String> followUpProcedures = new ArrayList<>();
+	/**
+	 * Findet die gesuchte Referenz-Tabelle in den ResultSets.
+	 * 
+	 * @param tableName
+	 *            Die Name der Tabelle, welche zurückgegeben werden soll.
+	 * @param resultsets
+	 *            Die Liste an xSqlProcedureResults, welche zur Verfügung stehen.
+	 * @return Eine Liste an xSqlProcedureResults, welche den gewünschten Namen haben.
+	 */
+	List<XSqlProcedureResult> findxSqlResultSetByName(String tableName, List<XSqlProcedureResult> resultsets) {
+		List<XSqlProcedureResult> resultsWithThatName = new ArrayList<>();
+		for (XSqlProcedureResult xSqlResult : resultsets) {
+			if (xSqlResult.getResultSet().getOutputParameters().equals(tableName)) {
+				resultsWithThatName.add(xSqlResult);
+			}
+		}
+		if (resultsWithThatName.size() == 0) {
+			throw new RuntimeException("Cannot find SqlProcedureResult with name " + tableName);
+		}
+		return resultsWithThatName;
+	}
 
+	/**
+	 * Findet andhand der übergebenen Liste an XTables und über einen Aufruf der xtcasUserPrivilege-Tabelle heraus, welche Check-Prozeduren für die gerade
+	 * ausgeführten XProzeduren durchgeführt werden müssen. In dieser Methode wird noch kein Commit an die Datenbank gesendet.
+	 * 
+	 * @param inputTables
+	 *            Die Original-Anfrage, welche an das CAS gesendet wurde.
+	 * @param xsqlresults
+	 *            Die XSqlProcedureResults, welche die ausgeführten Prozeduren geliefert haben.
+	 * @param connection
+	 *            Die Verbindung zur Datenbank.
+	 * @param sb
+	 *            Ein StringBuffer, welcher das Ausführen der Check-Prozeudren loggt.
+	 */
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults, Connection connection, StringBuffer sb) {
 		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
 		Table sqlRequest = new Table();
 		sqlRequest.setName("xtcasUserPrivilege");
@@ -220,30 +257,48 @@ public class XSqlProcedureController {
 		try {
 			Table viewResult = securityService.getTableForSecurityCheck(sqlRequest);
 
-			List<XTable> xtables = new ArrayList<>();
-
-			// Überprüfen, ob wir überhaupt einen Eintrag in der Datenbank dafür haben.
+			// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.
 			if (viewResult.getRows().size() == 0) {
 				throw new RuntimeException("msg.PrivilegeError");
 			}
 
+			// Im Prinzip den ganzen Spaß nochmal nur mit den TransactionChecker.
+			List<XTable> xtables = new ArrayList<>();
 			for (Row row : viewResult.getRows()) {
 				if (row.getValues().size() != 0 && row.getValues().get(1).getValue() != null) {
+					String dependencyTableName = row.getValues().get(0).getStringValue();
 					String transactionChecker = row.getValues().get(1).getStringValue();
 
 					XTable followUpTable = new XTable();
-					followUpTable.setId(null);
-					Table innerXTable = new Table();
-					innerXTable.setName(null);
-					followUpProcedures.add(row.getValues().get(1).getStringValue());
+					followUpTable.setId(dependencyTableName + transactionChecker);
+					Table innerTable = new Table();
+					innerTable.setName(transactionChecker);
+					innerTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+					List<Row> innerTableRows = new ArrayList<>();
+
+					// Alle ResultSets mit diesem Namen (nicht ID) müssen gecheckt werden.
+					List<XSqlProcedureResult> resultsWithThatName = findxSqlResultSetByName(dependencyTableName, xsqlresults);
+
+					// Und von diesen muss jede Row geprüft werden. Dabei holen wir uns jedes mal den KeyLong (siehe Doku).
+					for (XSqlProcedureResult res : resultsWithThatName) {
+						if (res.getResultSet().getOutputParameters() != null && res.getResultSet().getOutputParameters().getRows() != null) {
+							for (int i = 0; i < res.getResultSet().getOutputParameters().getRows().size(); i++) {
+								Value keyLongOfRow = findValueInColumn(res.getResultSet(), "KeyLong", i);
+								Row innerRow = new Row();
+								innerRow.addValue(keyLongOfRow);
+								innerTableRows.add(innerRow);
+								innerTable.setRows(innerTableRows);
+							}
+						}
+						followUpTable.setTable(innerTable);
+						xtables.add(followUpTable);
+					}
+
 				}
 			}
-
-			processXProcedures(inputTables, xsqlresults, sb, connection);
-
+			processXProcedures(xtables, xsqlresults, sb, connection);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to find follow up procedures.", e);
 		}
 	}
-
 }

@@ -132,21 +132,4 @@ public class XSqlProcedureControllerTest extends BaseTest {
 		Value resval = testSubject.findValueInColumn(sqlRes, "TestText", 0);
 		assertThat(resval.getStringValue()).isEqualTo("Test");
 	}
-
-	@Test
-	public void testFindValueInvalid() {
-		Table inputTable = new Table();
-		inputTable.setName("spTest");
-		inputTable.addColumn(new Column("Test", DataType.STRING));
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("Test", null));
-			inputTable.addRow(inputRow);
-		}
-		SqlProcedureResult sqlRes = new SqlProcedureResult();
-		sqlRes.setOutputParameters(inputTable);
-
-		assertThat(catchThrowable(() -> testSubject.findValueInColumn(sqlRes, "TestText", 0))).isInstanceOf(RuntimeException.class)
-				.hasMessage("Cannot find Column with name TestText");
-	}
 }

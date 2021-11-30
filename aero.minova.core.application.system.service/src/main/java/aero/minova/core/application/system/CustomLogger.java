@@ -39,23 +39,45 @@ public class CustomLogger {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
-		errorLogger.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			errorLogger
+					.error(null + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
+		} else {
+			errorLogger
+					.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
+		}
 	}
 
 	public void logPrivilege(String logMessage) {
-		privilegeLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			privilegeLogger.info(null + ": " + logMessage);
+		} else {
+			privilegeLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+		}
 	}
 
 	public void logSql(String logMessage) {
-		logger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			logger.info(null + ": " + logMessage);
+		} else {
+			logger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+		}
 	}
 
 	public void logUserRequest(String logMessage) {
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			userLogger.info(null + ": " + logMessage);
+		} else {
+			userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
+		}
 	}
 
 	public void logUserRequest(String logMessage, Object gsonObject) {
-		userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + " " + gson.toJson(gsonObject));
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			userLogger.info(null + ": " + logMessage + " " + gson.toJson(gsonObject));
+		} else {
+			userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + " " + gson.toJson(gsonObject));
+		}
 	}
 
 	public void logFiles(String logMessage) {

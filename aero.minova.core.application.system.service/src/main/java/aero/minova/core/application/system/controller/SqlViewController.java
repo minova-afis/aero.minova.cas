@@ -222,6 +222,8 @@ public class SqlViewController {
 		} else {
 			if (maxRows > 0) {
 				sb.append("select top ").append(maxRows).append(" ");
+			} else {
+				sb.append("select ");
 			}
 			val outputFormat = params.getColumns().stream()//
 					.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//

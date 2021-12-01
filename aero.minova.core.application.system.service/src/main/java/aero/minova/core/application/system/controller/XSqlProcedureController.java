@@ -260,16 +260,9 @@ public class XSqlProcedureController {
 			// Im Prinzip den ganzen Spaß nochmal nur mit den TransactionChecker.
 			List<XTable> xtables = new ArrayList<>();
 			for (Row row : viewResult.getRows()) {
-				if (row.getValues().size() != 0 && row.getValues().get(1) != null) {
+				if (row.getValues().size() >= 2 && row.getValues().get(1) != null) {
 					String dependencyTableName = row.getValues().get(0).getStringValue();
 					String transactionChecker = row.getValues().get(1).getStringValue();
-
-					XTable followUpTable = new XTable();
-					followUpTable.setId(dependencyTableName + transactionChecker);
-					Table innerTable = new Table();
-					innerTable.setName(transactionChecker);
-					innerTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-					List<Row> innerTableRows = new ArrayList<>();
 
 					// Alle ResultSets mit diesem Namen (nicht ID) müssen gecheckt werden.
 					List<XSqlProcedureResult> resultsWithThatName = findxSqlResultSetByName(dependencyTableName, xsqlresults);
@@ -282,6 +275,13 @@ public class XSqlProcedureController {
 
 					// Und von diesen muss jede Row geprüft werden. Dabei holen wir uns jedes mal den KeyLong (siehe Doku).
 					for (XSqlProcedureResult res : resultsWithThatName) {
+						XTable followUpTable = new XTable();
+						followUpTable.setId(dependencyTableName + transactionChecker);
+						Table innerTable = new Table();
+						innerTable.setName(transactionChecker);
+						innerTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+						List<Row> innerTableRows = new ArrayList<>();
+
 						if (res.getResultSet().getOutputParameters() != null && res.getResultSet().getOutputParameters().getRows() != null) {
 							for (int i = 0; i < res.getResultSet().getOutputParameters().getRows().size(); i++) {
 								Value keyLongOfRow = findValueInColumn(res.getResultSet(), "KeyLong", i);

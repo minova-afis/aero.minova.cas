@@ -6,9 +6,6 @@
 	<column name="KeyText">
 		<varchar length="50" nullable="false"/>
 	</column>
-	<column name="TransactionChecker">
-		<varchar length="100" nullable="true"/>
-	</column>
 	<column name="Description">
 		<varchar length="50"/>
 	</column>
@@ -20,6 +17,9 @@
 	</column>
 	<column name="LastAction" default="1">
 		<integer nullable="false"/>
+	</column>
+	<column name="TransactionChecker">
+		<varchar length="100" nullable="true"/>
 	</column>
 	<primarykey>
 		<column>KeyLong</column>

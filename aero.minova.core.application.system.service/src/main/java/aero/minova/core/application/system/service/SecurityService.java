@@ -109,7 +109,7 @@ public class SecurityService {
 		Table result = new Table();
 		final val connection = systemDatabase.getConnection();
 		try {
-			final val viewQuery = svc.prepareViewString(inputTable, false, 1000, false, userGroups);
+			final val viewQuery = svc.prepareViewString(inputTable, false, -1, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = svc.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logPrivilege("Executing statement: " + sb.toString());

@@ -3,6 +3,11 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [12.28.4] - 2021-11-30
+
+Bugfixes für das Laden von Privilegien aus der Datenbank
+für die Autorisierung.
+
 ## [12.28.0] - 2021-11-19
 
 Abhängigkeiten für SOAP-Webdienste werden durch die Setup-Extension zur Verfügung gestellt.

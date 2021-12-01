@@ -4,7 +4,7 @@
 		<integer nullable="false" identity="true"/>
 	</column>
 	<column name="KeyText">
-		<varchar length="10" nullable="false"/>
+		<varchar length="25" nullable="false"/>
 	</column>
 	<column name="Description">
 		<varchar length="50"/>

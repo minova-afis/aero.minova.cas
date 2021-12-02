@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -150,7 +151,8 @@ public class XSqlProcedureController {
 						throw new RuntimeException("No output parameters for resultset with id " + dependency.getId());
 					}
 
-					aero.minova.core.application.system.domain.Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position);
+					aero.minova.core.application.system.domain.Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position)
+							.orElse(null);
 					if (newValue == null) {
 						throw new RuntimeException("No reference value found for column" + stringValue + " in row " + position + " !");
 					}
@@ -173,10 +175,10 @@ public class XSqlProcedureController {
 	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
 	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen oder null, wenn die Spalte nicht gefunden werden kann.
 	 */
-	aero.minova.core.application.system.domain.Value findValueInColumn(SqlProcedureResult dependency, String columnName, int row) {
+	Optional<aero.minova.core.application.system.domain.Value> findValueInColumn(SqlProcedureResult dependency, String columnName, int row) {
 		for (int i = 0; i < dependency.getOutputParameters().getColumns().size(); i++) {
 			if (dependency.getOutputParameters().getColumns().get(i).getName().equals(columnName)) {
-				return dependency.getOutputParameters().getRows().get(row).getValues().get(i);
+				return Optional.ofNullable(dependency.getOutputParameters().getRows().get(row).getValues().get(i));
 			}
 		}
 		return null;
@@ -284,12 +286,12 @@ public class XSqlProcedureController {
 
 						if (res.getResultSet().getOutputParameters() != null && res.getResultSet().getOutputParameters().getRows() != null) {
 							for (int i = 0; i < res.getResultSet().getOutputParameters().getRows().size(); i++) {
-								Value keyLongOfRow = findValueInColumn(res.getResultSet(), "KeyLong", i);
+								Value keyLongOfRow = findValueInColumn(res.getResultSet(), "KeyLong", i).orElse(null);
 
 								// Falls die Prozedur bzw. dessen ResultSet keinen KeyLong als Output hatte, greifen wir auf den KeyLong des Haupt-ResultsSets
 								// zurück.
 								if (keyLongOfRow == null) {
-									keyLongOfRow = findValueInColumn(xsqlresults.get(0).getResultSet(), "KeyLong", 0);
+									keyLongOfRow = findValueInColumn(xsqlresults.get(0).getResultSet(), "KeyLong", 0).orElse(null);
 								}
 								Row innerRow = new Row();
 								innerRow.addValue(keyLongOfRow);

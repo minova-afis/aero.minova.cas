@@ -80,13 +80,13 @@ public class XSqlProcedureController {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			try {
 				connection.rollback();
+				systemDatabase.freeUpConnection(connection);
 			} catch (Exception e1) {
 				customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
 				connection.close();
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
 		}
-		systemDatabase.freeUpConnection(connection);
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
 	}
 

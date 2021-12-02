@@ -161,7 +161,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 		SqlProcedureResult sqlRes = new SqlProcedureResult();
 		sqlRes.setOutputParameters(inputTable);
 
-		Value resval = testSubject.findValueInColumn(sqlRes, "TestText", 0);
+		Value resval = testSubject.findValueInColumn(sqlRes, "TestText", 0).orElse(null);
 		assertThat(resval.getStringValue()).isEqualTo("Test");
 	}
 }

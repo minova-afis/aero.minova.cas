@@ -3,6 +3,10 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [12.28.7] - 2021-12-01
+
+Nach Transaktionen werden nun TransaktionChecker-Prozeduren ausgeführt.
+
 ## [12.28.4] - 2021-11-30
 
 Bugfixes für das Laden von Privilegien aus der Datenbank

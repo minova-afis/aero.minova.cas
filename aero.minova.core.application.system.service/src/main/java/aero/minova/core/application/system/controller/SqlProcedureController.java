@@ -179,12 +179,12 @@ public class SqlProcedureController {
 			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
 			try {
 				connection.rollback();
+				systemDatabase.freeUpConnection(connection);
 			} catch (Exception e1) {
 				customLogger.logError("Couldn't roll back procedure execution", e);
+				connection.close();
 			}
 			throw new ProcedureException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}
@@ -327,8 +327,8 @@ public class SqlProcedureController {
 					.anyMatch(c -> c.getOutputType() == OUTPUT);
 			if (hasOutputParameters) {
 				val outputParameters = new Table();
+				outputParameters.setName(inputTable.getName());
 				resultForThisRow.setOutputParameters(outputParameters);
-				outputParameters.setName("outputParameters");
 				val outputColumnsMapping = inputTable//
 						.getColumns()//
 						.stream()//

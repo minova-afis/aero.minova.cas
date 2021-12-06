@@ -26,11 +26,38 @@ alter procedure dbo.xpcasInsertAllPrivilegesToUser (
         insert into xtcasUserGroup (KeyText,SecurityToken) VALUES (@UserName, '#' + @SecurityToken)
     end
 
-    insert into xtcasLuUserPrivilegeUserGroup (
-        UserPrivilegeKey,
-        UserGroupKey
-    ) select up.KeyLong,
-        (select cast(KeyLong as nvarchar) from xtcasUserGroup where KeyText = @UserName)
-    from xtcasUserPrivilege up
-    left join xtcasLuUserPrivilegeUserGroup lp on lp.UserPrivilegeKey = up.KeyLong
-    where lp.KeyLong is null
+
+
+    CREATE TABLE #temp 
+    (  
+        KeyText NVARCHAR(50)  
+    );  
+
+    insert into #temp select KeyLong from xtCasUserPrivilege
+
+    declare @UserGroupKey int,
+    @UserPrivilegeKey int
+
+    select @UserGroupKey = KeyLong from xtcasUserGroup where KeyText = @UserName
+
+    DECLARE temp_cursor CURSOR FOR SELECT KeyText FROM #temp
+
+    open temp_cursor
+    fetch NEXT from temp_cursor into @UserPrivilegeKey
+
+
+    WHILE @@FETCH_STATUS = 0  
+        BEGIN 
+
+        if not exists (select * from xtcasLuUserPrivilegeUserGroup where UserPrivilegeKey = @UserPrivilegeKey and UserGroupKey=@UserGroupKey)
+            begin
+            insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey,UserGroupKey) values (@UserPrivilegeKey, @UserGroupKey )
+            end
+
+        fetch NEXT from temp_cursor into @UserPrivilegeKey
+        END 
+
+    CLOSE temp_cursor
+    DEALLOCATE temp_cursor 
+
+    drop table #temp

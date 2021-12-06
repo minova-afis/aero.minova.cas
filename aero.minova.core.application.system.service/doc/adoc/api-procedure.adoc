@@ -37,11 +37,13 @@ Bei Misserfolg siehe Kapitel <<Im Fehlerfall>>
 
 Gibt im Table-Format alle selektierten Werte zurück.
 Werden keine Werte selektiert, wird die Tabelle in der Antwort nicht angegeben.
+Der Name des ResultSets ist der Name der verarbeiteten Table.
 
 ==== outputParameters
 
 Gibt im Table-Format alle Input und Output-Parameter-Werte zurück, wenn es einen Output-Parameter in der Eingabe gab.
 Diese Tabelle enthält nur 1 Zeile.
+Der Name der Output-Parameter-Tabelle ist der Name der verarbeiteten Table.
 
 ==== returnCode
 

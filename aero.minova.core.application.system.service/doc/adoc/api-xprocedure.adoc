@@ -68,6 +68,18 @@ Dies führt zum Abbruch der Prozedur mit einer entsprechenden Meldung.
 Der Name des Parameters kann `-` enthalten. 
 Es handelt sich ja dabei um den Rest des Wertes.
 
+=== Check-Prozeduren
+
+Nachdem die Transaktionen ausgeführt wurde, müssen potentiell noch Check-Prozeduren ausgeführt werden.
+Diese werden in der `xtcasUserPrivilege` in der Spalte `TransaktionChecker` definiert. 
+Es kann dort *nur eine* Check-Prozedur pro KeyText eingetragen werden. Somit gibt es pro Prozedur auch nur eine Check-Prozedur.
+
+Damit diese Prozeduren ausgeführt werden können, muss der KeyLong des dazugehörigen Referenz-ResultSets verwendet werden.
+Falls keine KeyLong-Spalte in dem ResultSet gefunden werden kann,
+ wird auf den KeyLong der ersten ausgeführten Prozedur (Haupt-Prozedur) der Anfrage zurück gegriffen.
+
+Erst nachdem alle Check-Prozeduren erfolgreich durchgeführt wurden, wird ein Commit auf die Datenbank gemacht. 
+
 === Ausgabe
 
 Die Antwort besteht dann auch aus einem Array von Elementen.
@@ -97,11 +109,13 @@ Die darauffolgenden ResultSets sind mit *null* aufgefüllt.
 
 Gibt im Table-Format alle selektierten Werte zurück.
 Werden keine Werte selektiert, wird die Tabelle in der Antwort nicht angegeben.
+Der Name des ResultSets ist der Name der verarbeiteten Table.
 
 ==== outputParameters
 
 Gibt im Table-Format alle Input und Output-Parameter-Werte zurück, wenn es einen Output-Parameter in der Eingabe gab.
 Diese Tabelle enthält nur 1 Zeile.
+Der Name der Output-Parameter-Tabelle ist der Name der verarbeiteten Table.
 
 ==== returnCode
 

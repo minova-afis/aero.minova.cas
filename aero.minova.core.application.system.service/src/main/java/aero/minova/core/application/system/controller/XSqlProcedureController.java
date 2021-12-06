@@ -299,6 +299,8 @@ public class XSqlProcedureController {
 								innerTable.setRows(checkArguments);
 							}
 						}
+						// Es werden XTables verwendet, da die Prozeduren von den Ergebnissen anderer Prozeduren abhängen und so die bereits vorhandenen
+						// Methoden wiederverwendet werden können.
 						followUpCheck.setTable(innerTable);
 						checksXtables.add(followUpCheck);
 					}

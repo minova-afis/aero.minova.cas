@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -254,6 +255,19 @@ public class SqlProcedureController {
 
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
+			{
+				int i = 0;
+				while (preparedStatement.getResultSet() == null) {
+					if ((preparedStatement.getMoreResults() == false) && (preparedStatement.getUpdateCount() == -1)) {
+						// Es gibt kein nächstes Result gibt.
+						break;
+					}
+					if (++i >= 256) {
+						customLogger.logSql("Warning: too many result sets.");
+						break;
+					}
+				}
+			}
 			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();

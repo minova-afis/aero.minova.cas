@@ -3,6 +3,11 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [12.30] - 2021-12-07
+
+Bei der Ausführung von SQL-Prozeduren werden update counts ignoriert,
+um die erste ResultSet zu finden.
+
 ## [12.28.7] - 2021-12-01
 
 Nach Transaktionen werden nun TransaktionChecker-Prozeduren ausgeführt.

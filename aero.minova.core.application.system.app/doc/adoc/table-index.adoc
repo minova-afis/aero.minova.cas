@@ -9,11 +9,6 @@
     
     
         
-* link:xtcasError.adoc[]
-
-    
-    
-        
 * link:xtcasLuUserPrivilegeUserGroup.adoc[]
 
     
@@ -24,11 +19,16 @@
     
     
         
+* link:xtcasUserPrivilege.adoc[]
+
+    
+    
+        
 * link:xtcasUserGroup.adoc[]
 
     
     
         
-* link:xtcasUserPrivilege.adoc[]
+* link:xtcasError.adoc[]
 
     

@@ -3,14 +3,12 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [12.31.0] - 2021-12-08
+## [12.30.0] - 2021-12-08
 
-Die Methdoe `SqlProcedureController#calculateSqlProcedureResult` für Erweiterungen bereitstellen.
-
-## [12.30.0] - 2021-12-07
-
-Bei der Ausführung von SQL-Prozeduren werden update counts ignoriert,
+* Bei der Ausführung von SQL-Prozeduren werden update counts ignoriert,
 um die erste ResultSet zu finden.
+
+* Die Methode `SqlProcedureController#calculateSqlProcedureResult` für Erweiterungen bereitstellen.
 
 ## [12.28.7] - 2021-12-01
 

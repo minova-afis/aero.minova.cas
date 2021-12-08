@@ -133,8 +133,6 @@ public class SqlProcedureController {
 					 */
 					semaphore.acquire();
 					return extensions.get(inputTable.getName()).apply(inputTable);
-				} catch (Exception e) {
-					throw new ProcedureException(e);
 				} finally {
 					semaphore.release();
 				}

@@ -191,7 +191,11 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Führt eine SQL-Prozedur aus. Hier gibt es keinen Rollback oder Commit. Diese müssen selbst durchgeführt werden.
+	 * Führt eine SQL-Prozedur aus. Hier gibt es keinen Rollback oder Commit.
+	 * Diese müssen selbst durchgeführt werden.
+	 * Diese Methode ist public, weil diese von Erweiterungen genutzt werden,
+	 * um bei Fehlern in komplexeren Prozessen alle Änderungen in der Datenbank
+	 * rückgängig zu machen.
 	 * 
 	 * @param inputTable
 	 *            Die Table mit allen Werten zum Verarbeiten der Prozedur.
@@ -209,7 +213,7 @@ public class SqlProcedureController {
 	 * @throws ProcedureException
 	 *             Falls generell ein Fehler geworfen wird, zum Beispiel beim Konvertieren der Typen.
 	 */
-	SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
 			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
 		result.setReturnCodes(new ArrayList<Integer>());

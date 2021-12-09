@@ -52,7 +52,7 @@ public class SqlProcedureController {
 	@Autowired
 	SecurityService securityService;
 
-	Semaphore semaphore = new Semaphore(1);
+	final Object extensionSynchronizer = new Object();
 
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
@@ -126,15 +126,8 @@ public class SqlProcedureController {
 				}
 			}
 			if (extensions.containsKey(inputTable.getName())) {
-				try {
-					/*
-					 * Extensions können auch Reqeusts an Dienste beinhalten, welche sich in die Queere kommen können. Deshalb sollten diese durch eine
-					 * Semaphore nacheinander abgewickelt werden.
-					 */
-					semaphore.acquire();
+				synchronized (extensionSynchronizer) {
 					return extensions.get(inputTable.getName()).apply(inputTable);
-				} finally {
-					semaphore.release();
 				}
 			}
 			if (privilegeRequest.isEmpty()) {

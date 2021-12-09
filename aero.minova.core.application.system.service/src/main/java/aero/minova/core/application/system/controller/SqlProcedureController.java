@@ -52,6 +52,8 @@ public class SqlProcedureController {
 	@Autowired
 	SecurityService securityService;
 
+	Semaphore semaphore = new Semaphore(1);
+
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
 	 */
@@ -125,9 +127,14 @@ public class SqlProcedureController {
 			}
 			if (extensions.containsKey(inputTable.getName())) {
 				try {
+					/*
+					 * Extensions können auch Reqeusts an Dienste beinhalten, welche sich in die Queere kommen können. Deshalb sollten diese durch eine
+					 * Semaphore nacheinander abgewickelt werden.
+					 */
+					semaphore.acquire();
 					return extensions.get(inputTable.getName()).apply(inputTable);
-				} catch (Exception e) {
-					throw new ProcedureException(e);
+				} finally {
+					semaphore.release();
 				}
 			}
 			if (privilegeRequest.isEmpty()) {

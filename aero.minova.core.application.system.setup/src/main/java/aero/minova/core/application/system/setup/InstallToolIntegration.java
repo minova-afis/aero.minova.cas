@@ -1,14 +1,5 @@
 package aero.minova.core.application.system.setup;
 
-import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.sql.SystemDatabase;
-import ch.minova.core.install.SetupDocument;
-import ch.minova.install.setup.BaseSetup;
-import com.fasterxml.jackson.databind.ser.Serializers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -17,25 +8,35 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import aero.minova.core.application.system.CustomLogger;
+import aero.minova.core.application.system.service.FilesService;
+import aero.minova.core.application.system.sql.SystemDatabase;
+import ch.minova.core.install.SetupDocument;
+import ch.minova.install.setup.BaseSetup;
+
 /**
- * Diese Klasse installiert SQL-Code, Procedure und Schemas aus den "Setup.xml"s mithilfe des Install-Tools.
- * Dabei wurde gesorgt, dass der Code des Install-Tools möglichst wenige geändert wurde.
+ * Diese Klasse installiert SQL-Code, Procedure und Schemas aus den "Setup.xml"s mithilfe des Install-Tools. Dabei wurde gesorgt, dass der Code des
+ * Install-Tools möglichst wenige geändert wurde.
  */
 @Service
 public class InstallToolIntegration {
 
-	@Autowired SystemDatabase systemDatabase;
-	@Autowired CustomLogger logger;
-	@Autowired FilesService files;
+	@Autowired
+	SystemDatabase systemDatabase;
+	@Autowired
+	CustomLogger logger;
+	@Autowired
+	FilesService files;
 
 	/**
-	 * Installiert eine gegebene "Setup.xml" mit dem Install-Tool.
-	 * Es wird der Code möglichst so ausgeführt,
-	 * als würde man das Tool mit update schema (us),
-	 * update database (ud) und module only (mo).
-	 * Es wird also nur die SQL-Datenbank der "Setup.xml" installiert und die Abhängkeiten ignoriert.
+	 * Installiert eine gegebene "Setup.xml" mit dem Install-Tool. Es wird der Code möglichst so ausgeführt, als würde man das Tool mit update schema (us),
+	 * update database (ud) und module only (mo). Es wird also nur die SQL-Datenbank der "Setup.xml" installiert und die Abhängkeiten ignoriert.
 	 *
-	 * @param setupXml Die "Setup.xml" welche installiert wird.
+	 * @param setupXml
+	 *            Die "Setup.xml" welche installiert wird.
 	 */
 	public void installSetup(Path setupXml) {
 		try {
@@ -44,6 +45,9 @@ public class InstallToolIntegration {
 			try {
 				connection.setAutoCommit(true);
 				BaseSetup.parameter = System.getProperties();
+				if (!BaseSetup.parameter.containsKey("fs")) {
+					BaseSetup.parameter.put("fs", "value");
+				}
 				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
 				BaseSetup.hashModules.clear();
 				BaseSetup.hashtables.clear();

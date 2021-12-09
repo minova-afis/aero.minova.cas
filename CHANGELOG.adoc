@@ -3,6 +3,11 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [12.31.1] - 2021-12-09
+
+* Bei der Ausführung von SQL-Prozedur-Erweiterungen wird eine Semaphore verwendet, welche verhindert, dass sich die Extension beim Ausführen in die Quere kommen.
+* Beim der Setup-Extension werdend die SQL-Queries jetzt alle mit -fs ausgeführt.
+
 ## [12.30.0] - 2021-12-08
 
 * Bei der Ausführung von SQL-Prozeduren werden update counts ignoriert,

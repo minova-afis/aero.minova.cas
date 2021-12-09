@@ -62,3 +62,12 @@ Default: `1` +
 // tag::column.LastAction[]
 
 // end::column.LastAction[]
+
+
+==== TransactionChecker
+
+Datentyp: nvarchar(100) +
+
+// tag::column.TransactionChecker[]
+
+// end::column.TransactionChecker[]

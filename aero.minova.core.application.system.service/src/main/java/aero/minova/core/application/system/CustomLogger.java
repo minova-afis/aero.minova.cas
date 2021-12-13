@@ -35,6 +35,12 @@ public class CustomLogger {
 	@Autowired
 	Gson gson;
 
+	// Eclipse zeigt keinen Fehler, wenn Methode nicht vorhanden ist, sie wird aber benötigt, da sonst beim Loggen von Exceptions eine NoSuchMethodException
+	// geworfen wird und der Code abbricht.
+	public void logError(String logMessage, Exception e) {
+		logError(logMessage, (Throwable) e);
+	}
+
 	public void logError(String logMessage, Throwable e) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);

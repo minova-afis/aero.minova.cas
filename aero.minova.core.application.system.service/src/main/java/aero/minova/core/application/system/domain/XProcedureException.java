@@ -10,7 +10,7 @@ public class XProcedureException extends Exception {
 	List<XTable> xTables;
 	List<XSqlProcedureResult> results;
 
-	public XProcedureException(List<XTable> xTables, List<XSqlProcedureResult> results, Exception e) {
+	public XProcedureException(List<XTable> xTables, List<XSqlProcedureResult> results, Throwable e) {
 		super(e);
 		this.xTables = xTables;
 		this.results = results;

@@ -2,7 +2,7 @@ package aero.minova.core.application.system.domain;
 
 public class ProcedureException extends Exception {
 
-	public ProcedureException(Exception e) {
+	public ProcedureException(Throwable e) {
 		super(e);
 	}
 

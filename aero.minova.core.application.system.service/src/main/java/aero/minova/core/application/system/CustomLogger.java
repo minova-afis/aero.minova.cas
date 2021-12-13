@@ -35,13 +35,12 @@ public class CustomLogger {
 	@Autowired
 	Gson gson;
 
-	public void logError(String logMessage, Exception e) {
+	public void logError(String logMessage, Throwable e) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			errorLogger
-					.error(null + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
+			errorLogger.error(null + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
 		} else {
 			errorLogger
 					.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
@@ -87,7 +86,8 @@ public class CustomLogger {
 	/**
 	 * TODO Das loggen funktioniert zur Zeit nicht.
 	 *
-	 * @param event Das Event, bei dem die Methode ausgeführt werden soll.
+	 * @param event
+	 *            Das Event, bei dem die Methode ausgeführt werden soll.
 	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {

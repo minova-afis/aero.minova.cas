@@ -144,7 +144,8 @@ public class SqlProcedureController {
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
-			throw e;
+			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
+			throw new ProcedureException(e);
 		}
 	}
 
@@ -198,11 +199,8 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Führt eine SQL-Prozedur aus. Hier gibt es keinen Rollback oder Commit.
-	 * Diese müssen selbst durchgeführt werden.
-	 * Diese Methode ist public, weil diese von Erweiterungen genutzt werden,
-	 * um bei Fehlern in komplexeren Prozessen alle Änderungen in der Datenbank
-	 * rückgängig zu machen.
+	 * Führt eine SQL-Prozedur aus. Hier gibt es keinen Rollback oder Commit. Diese müssen selbst durchgeführt werden. Diese Methode ist public, weil diese von
+	 * Erweiterungen genutzt werden, um bei Fehlern in komplexeren Prozessen alle Änderungen in der Datenbank rückgängig zu machen.
 	 * 
 	 * @param inputTable
 	 *            Die Table mit allen Werten zum Verarbeiten der Prozedur.

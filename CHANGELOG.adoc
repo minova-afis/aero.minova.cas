@@ -1,7 +1,7 @@
 # Changelog
 All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
-Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [12.31.2] - 2021-12-09
 

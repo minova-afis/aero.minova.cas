@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="true">
-	<property name="APP_LOG_ROOT" value="./logs"/>
 	<property name="LOG_PATTERN" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %m%n"/>
-	
+	<springProperty scope="context" name="APP_LOG_ROOT" source="app.log.root" defaultValue="./logs"/>
+
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 	</appender>
-	
+
 	<appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${APP_LOG_ROOT}/error.log</file>
 		<append>true</append>

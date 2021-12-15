@@ -3,7 +3,7 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [12.32.2] - 2021-12-15
+## [12.32.0] - 2021-12-15
 
 Property `app.log.root` einführen, um die Log-Ordner für die Anwendung zu setzen.
 

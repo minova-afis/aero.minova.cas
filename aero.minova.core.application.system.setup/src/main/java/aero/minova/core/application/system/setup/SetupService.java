@@ -65,7 +65,6 @@ public class SetupService {
 				, service.getSystemFolder().resolve("setup")//
 				, true);
 				spc.setupExtensions();
-				// TODO Eintrag in tVersion10
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);

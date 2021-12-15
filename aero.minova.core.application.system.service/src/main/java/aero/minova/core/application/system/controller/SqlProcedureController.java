@@ -96,7 +96,8 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu.
+	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
+	 * werden die Extensions in die tVersion10-Tabelle eingetragen.
 	 */
 	public void setupExtensions() {
 		Table extensionSetupTable = new Table();

@@ -24,5 +24,27 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 	)
     end
 
+	if (exists (select * from tVersion10
+		where KeyText = @KeyText
+		  and LastAction < 0))
+    begin
+        update tVersion10
+        set LastAction = 1
+        where KeyText = @KeyText
+    end
+	else if (not exists(select * from tVersion10
+		where KeyText = @KeyText
+		  and LastAction > 0))
+	begin
+		insert into tVersion10 (
+		KeyText,
+		ModuleName
+	) values (
+		@KeyText,
+		'ch.minova.install'
+	)
+    end
+
+
 	select @KeyLong = @@identity
 return @@error

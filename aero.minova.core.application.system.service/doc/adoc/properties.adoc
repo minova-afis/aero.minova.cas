@@ -7,6 +7,13 @@ Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 * Zurück zur xref:index.adoc[Übersicht]
 
 == Minova Properties
+
+* app.log.root
+
+** *Default*: `./logs`
+** *Wertebereich*: Pfad zum Ordner
+** *Beschreibung*: Setzt den Log-Ordner für den Dienst.
+
 * aero_minova_core_application_root_path
 
 ** *Default*: `.`

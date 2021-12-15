@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
+import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
@@ -92,6 +93,40 @@ public class SqlProcedureController {
 			throw new IllegalArgumentException(name);
 		}
 		extensionBootstrapChecks.put(name, extCheck);
+	}
+
+	/**
+	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu.
+	 */
+	public void setupExtensions() {
+		Table extensionSetupTable = new Table();
+		extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
+		extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		extensionSetupTable.addColumn(new Column("KeyText", DataType.STRING));
+		extensionSetupTable.addColumn(new Column("Description", DataType.STRING));
+
+		for (String extensionName : extensions.keySet()) {
+			Row extensionSetupRows = new Row();
+			extensionSetupRows.addValue(null);
+			extensionSetupRows.addValue(new Value(extensionName, null));
+			extensionSetupRows.addValue(null);
+
+			extensionSetupTable.addRow(extensionSetupRows);
+		}
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		Row requestingAuthority = new Row();
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "1"));
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "2"));
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
+
+		List<Row> authority = new ArrayList<>();
+		authority.add(requestingAuthority);
+		try {
+			processSqlProcedureRequest(extensionSetupTable, authority);
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to setup extension privileges!", e);
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

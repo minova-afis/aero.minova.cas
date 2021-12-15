@@ -114,16 +114,8 @@ public class SqlProcedureController {
 
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
-		// Hiermit wird der unsichere Zugriff ermöglicht.
-		Row requestingAuthority = new Row();
-		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "1"));
-		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "2"));
-		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
-
-		List<Row> authority = new ArrayList<>();
-		authority.add(requestingAuthority);
 		try {
-			processSqlProcedureRequest(extensionSetupTable, authority);
+			unsecurelyProcessProcedure(extensionSetupTable);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);
@@ -179,6 +171,28 @@ public class SqlProcedureController {
 	}
 
 	/**
+	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben.
+	 * 
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 */
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		Row requestingAuthority = new Row();
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "1"));
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "2"));
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
+
+		List<Row> authority = new ArrayList<>();
+		authority.add(requestingAuthority);
+		return processSqlProcedureRequest(inputTable, authority);
+	}
+
+	/**
 	 * Speichert im SQl-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
 	 *
 	 * @param connection
@@ -193,13 +207,14 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
+	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
+	 * zurückgegeben.
 	 *
 	 * @param inputTable
-	 *            Ausführungs-Parameter
+	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
 	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
-	 * @return Resultat der Ausführung
+	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */

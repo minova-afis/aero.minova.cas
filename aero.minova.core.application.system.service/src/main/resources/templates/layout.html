@@ -22,10 +22,9 @@
 <body class="d-flex flex-column h-100 bg-light">
 	<header th:fragment="header">
 		<nav class="navbar navbar-dark bg-primary">
-			<a class="navbar-brand" href="/"
+			<a class="navbar-brand" href="/cas/"
 				th:text="${@environment.getProperty('spring.application.name')}"></a>
 			<div class="mr-auto"></div>
-			<a role="button" th:href="${@environment.getProperty('aero.afis.host.url.http')}" class="btn btn-primary">Root</a>
 			<div sec:authorize="isAnonymous()">
 				<a role="button" href="/cas/login" class="btn btn-primary">Login</a>
 			</div>

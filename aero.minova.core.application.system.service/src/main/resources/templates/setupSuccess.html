@@ -10,18 +10,10 @@
 <body class="d-flex flex-column h-100 bg-light">
 	<header th:replace="layout :: header"></header>
 	<main role="main" class="flex-shrink-0">
-		<div class="container" sec:authorize="isAuthenticated()">
-			<ul class="list-group" sec:authorize="isAuthenticated()">
-				<li class="list-group-item">		
-					<form action="/cas/setup" method="post">
-						<a class="nav-link" href="#" onclick="this.parentNode.submit()">Setup</a>
-					</form>
-				</li>
-			</ul>
-
-		</div>
-		<div class="container" sec:authorize="isAnonymous()">
-			<div th:replace="login.body :: login-body" />
+		<div class="container">
+			<div class="my-3 p-3 bg-white rounded shadow-sm">
+				<span>Setup successfully completed!</span>
+			</div>
 		</div>
 	</main>
 	<footer th:replace="layout :: footer"></footer>

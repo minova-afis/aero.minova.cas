@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.ProcedureException;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableMetaData;
+import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
@@ -95,6 +96,33 @@ public class SqlProcedureController {
 	}
 
 	/**
+	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
+	 * werden die Extensions in die tVersion10-Tabelle eingetragen.
+	 */
+	public void setupExtensions() {
+		Table extensionSetupTable = new Table();
+		extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
+		extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		extensionSetupTable.addColumn(new Column("KeyText", DataType.STRING));
+		extensionSetupTable.addColumn(new Column("Description", DataType.STRING));
+
+		for (String extensionName : extensions.keySet()) {
+			Row extensionSetupRows = new Row();
+			extensionSetupRows.addValue(null);
+			extensionSetupRows.addValue(new Value(extensionName, null));
+			extensionSetupRows.addValue(null);
+
+			extensionSetupTable.addRow(extensionSetupRows);
+		}
+		try {
+			unsecurelyProcessProcedure(extensionSetupTable);
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to setup extension privileges!", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
 	 * Führt eine CAS-Erweiterung falls vorhanden oder eine SQL-Prozedur im anderen Fall aus. Falls {@link #arePrivilegeStoresSetup} nicht gilt und es für die
 	 * Eingabe eine passende Prozedur gibt, wird geprüft, ob es für die Erweiterung eine passende alternative-Rechteprüfung gibt. Dieser Mechanismus wird
 	 * verwendet, um das Initialisieren der Datenbank über das CAS zu triggern.
@@ -143,6 +171,32 @@ public class SqlProcedureController {
 	}
 
 	/**
+	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben.
+	 * 
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 */
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		Row requestingAuthority = new Row();
+		/*
+		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
+		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+		 */
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "1"));
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "2"));
+		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "3"));
+
+		List<Row> authority = new ArrayList<>();
+		authority.add(requestingAuthority);
+		return processSqlProcedureRequest(inputTable, authority);
+	}
+
+	/**
 	 * Speichert im SQl-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
 	 *
 	 * @param connection
@@ -157,13 +211,14 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
+	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
+	 * zurückgegeben.
 	 *
 	 * @param inputTable
-	 *            Ausführungs-Parameter
+	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
 	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
-	 * @return Resultat der Ausführung
+	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */

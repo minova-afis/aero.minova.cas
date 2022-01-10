@@ -184,7 +184,7 @@ public class SqlProcedureController {
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
 		/*
-		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist. dass der dritte
+		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
 		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
 		 */
 		requestingAuthority.addValue(new aero.minova.core.application.system.domain.Value(false, "1"));

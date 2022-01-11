@@ -3,6 +3,10 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.34.1] - 2022-01-11
+
+Kern-Klassen in cas.client-Unterprojekt ausgelagert.
+
 ## [12.34.0] - 2022-01-11
 
 Die Extensions werden nun beim Setup-Befehl mitinstalliert.

@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.OutputType;
-import aero.minova.core.application.system.domain.Table;
+import domain.Column;
+import domain.DataType;
+import domain.OutputType;
+import domain.Table;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen

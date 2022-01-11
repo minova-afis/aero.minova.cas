@@ -1,4 +1,4 @@
-package domain;
+package cas.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

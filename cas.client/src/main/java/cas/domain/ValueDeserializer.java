@@ -1,4 +1,4 @@
-package domain;
+package cas.domain;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;

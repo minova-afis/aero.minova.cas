@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.TableException;
-import aero.minova.core.application.system.domain.TableMetaData;
-import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
+import domain.Column;
+import domain.DataType;
+import domain.Row;
+import domain.Table;
+import domain.TableException;
+import domain.TableMetaData;
+import domain.Value;
 import lombok.val;
 
 @RestController

@@ -1,4 +1,4 @@
-package aero.minova.core.application.system.domain;
+package cas.domain;
 
 public class CovidException extends Exception {
 

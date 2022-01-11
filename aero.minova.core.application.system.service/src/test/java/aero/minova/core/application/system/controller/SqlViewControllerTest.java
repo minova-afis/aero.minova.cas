@@ -19,13 +19,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SqlUtils;
+import domain.Column;
+import domain.DataType;
+import domain.ProcedureException;
+import domain.Row;
+import domain.Table;
+import domain.Value;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
@@ -170,7 +170,7 @@ class SqlViewControllerTest extends BaseTest {
 		val time = Instant.ofEpochMilli(1598613904487L).toString();
 		when(sqlSet.getString("LastDate")).thenReturn(time);
 		@val
-		aero.minova.core.application.system.domain.Row testResult = null;
+		domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 		} catch (ProcedureException e) {}
@@ -224,7 +224,7 @@ class SqlViewControllerTest extends BaseTest {
 		when(sqlSet.getString("STRING")).thenReturn("string");
 		when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
 		@val
-		aero.minova.core.application.system.domain.Row testResult = null;
+		domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 		} catch (ProcedureException e) {}

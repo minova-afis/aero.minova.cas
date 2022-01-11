@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.SqlProcedureResult;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
-import aero.minova.core.application.system.domain.XProcedureException;
-import aero.minova.core.application.system.domain.XSqlProcedureResult;
-import aero.minova.core.application.system.domain.XTable;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SystemDatabase;
+import domain.Column;
+import domain.DataType;
+import domain.ProcedureException;
+import domain.Row;
+import domain.SqlProcedureResult;
+import domain.Table;
+import domain.Value;
+import domain.XProcedureException;
+import domain.XSqlProcedureResult;
+import domain.XTable;
 
 @RestController
 public class XSqlProcedureController {
@@ -128,7 +128,7 @@ public class XSqlProcedureController {
 
 		for (Row r : workingTable.getRows()) {
 			for (int i = 0; i < r.getValues().size(); i++) {
-				aero.minova.core.application.system.domain.Value v = r.getValues().get(i);
+				Value v = r.getValues().get(i);
 				// Die Referenz-Id steht in der Rule des Values. Im Value des Values steht, in welcher Column das der gewünschte Parameter steht.
 				if (v != null && v.getRule() != null) {
 					XSqlProcedureResult dependency = findxSqlResultSet(v.getRule(), dependencies);
@@ -151,8 +151,7 @@ public class XSqlProcedureController {
 						throw new RuntimeException("No output parameters for resultset with id " + dependency.getId());
 					}
 
-					aero.minova.core.application.system.domain.Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position)
-							.orElse(null);
+					Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position).orElse(null);
 					if (newValue == null) {
 						throw new RuntimeException("No reference value found for column" + stringValue + " in row " + position + " !");
 					}
@@ -175,7 +174,7 @@ public class XSqlProcedureController {
 	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
 	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen oder null, wenn die Spalte nicht gefunden werden kann.
 	 */
-	Optional<aero.minova.core.application.system.domain.Value> findValueInColumn(SqlProcedureResult dependency, String columnName, int row) {
+	Optional<Value> findValueInColumn(SqlProcedureResult dependency, String columnName, int row) {
 		for (int i = 0; i < dependency.getOutputParameters().getColumns().size(); i++) {
 			if (dependency.getOutputParameters().getColumns().get(i).getName().equals(columnName)) {
 				return Optional.ofNullable(dependency.getOutputParameters().getRows().get(row).getValues().get(i));

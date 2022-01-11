@@ -1,6 +1,5 @@
 package aero.minova.core.application.system.controller;
 
-import static aero.minova.core.application.system.domain.OutputType.OUTPUT;
 import static aero.minova.core.application.system.sql.SqlUtils.convertSqlResultToRow;
 import static aero.minova.core.application.system.sql.SqlUtils.parseSqlParameter;
 import static java.util.stream.Collectors.toList;
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +27,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.SqlProcedureResult;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.TableMetaData;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
+import domain.Column;
+import domain.DataType;
+import domain.OutputType;
+import domain.ProcedureException;
+import domain.Row;
+import domain.SqlProcedureResult;
+import domain.Table;
+import domain.TableMetaData;
 import lombok.val;
 
 @RestController
@@ -340,7 +339,7 @@ public class SqlProcedureController {
 			val hasOutputParameters = inputTable//
 					.getColumns()//
 					.stream()//
-					.anyMatch(c -> c.getOutputType() == OUTPUT);
+					.anyMatch(c -> c.getOutputType() == OutputType.OUTPUT);
 			if (hasOutputParameters) {
 				val outputParameters = new Table();
 				outputParameters.setName(inputTable.getName());
@@ -348,7 +347,7 @@ public class SqlProcedureController {
 				val outputColumnsMapping = inputTable//
 						.getColumns()//
 						.stream()//
-						.map(c -> c.getOutputType() == OUTPUT)//
+						.map(c -> c.getOutputType() == OutputType.OUTPUT)//
 						.collect(toList());
 
 				val outputValues = new Row();
@@ -459,7 +458,7 @@ public class SqlProcedureController {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
-						if (inputTable.getColumns().get(i).getOutputType() == OUTPUT) {
+						if (inputTable.getColumns().get(i).getOutputType() == OutputType.OUTPUT) {
 							if (type == DataType.BOOLEAN) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.BOOLEAN);
 							} else if (type == DataType.DOUBLE) {

@@ -23,6 +23,11 @@
 	</scm>
 	<dependencies>
 		<dependency>
+			<groupId>aero.minova</groupId>
+			<artifactId>cas.client</artifactId>
+			<version>12.34.1</version>
+		</dependency>
+		<dependency>
 			<!-- Wird für Java 16 benötigt. -->
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

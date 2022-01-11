@@ -27,13 +27,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.service.SecurityService;
+import domain.Column;
+import domain.DataType;
+import domain.ProcedureException;
+import domain.Row;
+import domain.Table;
+import domain.Value;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen

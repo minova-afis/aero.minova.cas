@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.core.application.system.domain.PingResponse;
-import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.service.SecurityService;
+import domain.PingResponse;
+import domain.Table;
 
 @RestController
 public class CommunicationController {

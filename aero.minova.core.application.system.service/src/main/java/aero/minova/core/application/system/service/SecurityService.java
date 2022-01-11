@@ -18,13 +18,13 @@ import org.springframework.stereotype.Service;
 
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.sql.SystemDatabase;
+import domain.Column;
+import domain.DataType;
+import domain.ProcedureException;
+import domain.Row;
+import domain.Table;
+import domain.Value;
 import lombok.val;
 
 @Service
@@ -337,8 +337,7 @@ public class SecurityService {
 		columns.add(new Column("Memberships", DataType.STRING));
 		tUser.setColumns(columns);
 		Row userEntry = new Row();
-		userEntry.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(username, null),
-				new aero.minova.core.application.system.domain.Value("", null), new aero.minova.core.application.system.domain.Value("", null)));
+		userEntry.setValues(Arrays.asList(new Value(username, null), new Value("", null), new Value("", null)));
 		tUser.addRow(userEntry);
 
 		// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
@@ -377,8 +376,7 @@ public class SecurityService {
 		for (String s : userSecurityTokens) {
 			if (!s.trim().equals("")) {
 				Row tokens = new Row();
-				tokens.setValues(Arrays.asList(new aero.minova.core.application.system.domain.Value(s.trim(), null),
-						new aero.minova.core.application.system.domain.Value("", "!null")));
+				tokens.setValues(Arrays.asList(new Value(s.trim(), null), new Value("", "!null")));
 				groups.addRow(tokens);
 			}
 		}

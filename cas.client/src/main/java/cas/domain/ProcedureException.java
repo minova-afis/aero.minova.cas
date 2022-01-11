@@ -1,4 +1,4 @@
-package domain;
+package cas.domain;
 
 public class ProcedureException extends Exception {
 

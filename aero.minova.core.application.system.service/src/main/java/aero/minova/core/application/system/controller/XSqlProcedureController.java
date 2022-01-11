@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import domain.Column;
-import domain.DataType;
-import domain.ProcedureException;
-import domain.Row;
-import domain.SqlProcedureResult;
-import domain.Table;
-import domain.Value;
-import domain.XProcedureException;
-import domain.XSqlProcedureResult;
-import domain.XTable;
+import cas.domain.Column;
+import cas.domain.DataType;
+import cas.domain.ProcedureException;
+import cas.domain.Row;
+import cas.domain.SqlProcedureResult;
+import cas.domain.Table;
+import cas.domain.Value;
+import cas.domain.XProcedureException;
+import cas.domain.XSqlProcedureResult;
+import cas.domain.XTable;
 
 @RestController
 public class XSqlProcedureController {

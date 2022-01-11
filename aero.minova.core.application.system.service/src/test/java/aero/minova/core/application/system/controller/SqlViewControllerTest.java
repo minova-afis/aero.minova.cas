@@ -20,12 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import aero.minova.core.application.system.sql.SqlUtils;
-import domain.Column;
-import domain.DataType;
-import domain.ProcedureException;
-import domain.Row;
-import domain.Table;
-import domain.Value;
+import cas.domain.Column;
+import cas.domain.DataType;
+import cas.domain.ProcedureException;
+import cas.domain.Row;
+import cas.domain.Table;
+import cas.domain.Value;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
@@ -170,7 +170,7 @@ class SqlViewControllerTest extends BaseTest {
 		val time = Instant.ofEpochMilli(1598613904487L).toString();
 		when(sqlSet.getString("LastDate")).thenReturn(time);
 		@val
-		domain.Row testResult = null;
+		cas.domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 		} catch (ProcedureException e) {}
@@ -224,7 +224,7 @@ class SqlViewControllerTest extends BaseTest {
 		when(sqlSet.getString("STRING")).thenReturn("string");
 		when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
 		@val
-		domain.Row testResult = null;
+		cas.domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 		} catch (ProcedureException e) {}

@@ -15,14 +15,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import domain.Column;
-import domain.DataType;
-import domain.Row;
-import domain.SqlProcedureResult;
-import domain.Table;
-import domain.Value;
-import domain.XSqlProcedureResult;
-import domain.XTable;
+import cas.domain.Column;
+import cas.domain.DataType;
+import cas.domain.Row;
+import cas.domain.SqlProcedureResult;
+import cas.domain.Table;
+import cas.domain.Value;
+import cas.domain.XSqlProcedureResult;
+import cas.domain.XTable;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })

@@ -18,13 +18,13 @@ import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import domain.Column;
-import domain.DataType;
-import domain.Row;
-import domain.Table;
-import domain.TableException;
-import domain.TableMetaData;
-import domain.Value;
+import cas.domain.Column;
+import cas.domain.DataType;
+import cas.domain.Row;
+import cas.domain.Table;
+import cas.domain.TableException;
+import cas.domain.TableMetaData;
+import cas.domain.Value;
 import lombok.val;
 
 @RestController

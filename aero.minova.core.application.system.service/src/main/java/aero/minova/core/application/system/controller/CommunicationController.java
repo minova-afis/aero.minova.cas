@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.core.application.system.service.SecurityService;
-import domain.PingResponse;
-import domain.Table;
+import cas.domain.PingResponse;
+import cas.domain.Table;
 
 @RestController
 public class CommunicationController {

@@ -30,14 +30,14 @@ import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import domain.Column;
-import domain.DataType;
-import domain.OutputType;
-import domain.ProcedureException;
-import domain.Row;
-import domain.SqlProcedureResult;
-import domain.Table;
-import domain.TableMetaData;
+import cas.domain.Column;
+import cas.domain.DataType;
+import cas.domain.OutputType;
+import cas.domain.ProcedureException;
+import cas.domain.Row;
+import cas.domain.SqlProcedureResult;
+import cas.domain.Table;
+import cas.domain.TableMetaData;
 import lombok.val;
 
 @RestController

@@ -11,12 +11,12 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 
-import domain.Column;
-import domain.DataType;
-import domain.ProcedureException;
-import domain.Row;
-import domain.Table;
-import domain.Value;
+import cas.domain.Column;
+import cas.domain.DataType;
+import cas.domain.ProcedureException;
+import cas.domain.Row;
+import cas.domain.Table;
+import cas.domain.Value;
 
 public class SqlUtils {
 

@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import domain.Column;
-import domain.DataType;
-import domain.OutputType;
-import domain.Table;
+import cas.domain.Column;
+import cas.domain.DataType;
+import cas.domain.OutputType;
+import cas.domain.Table;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen

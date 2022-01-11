@@ -3,6 +3,14 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.34.0] - 2022-01-11
+
+Die Extensions werden nun beim Setup-Befehl mitinstalliert.
+
+## [12.33.1] - 2022-01-07
+
+Einführen einer Methode, um Prozeduren ungeprüft/ ohne Rechte ausführen zu können.
+
 ## [12.33.0] - 2021-12-17
 
 Der Setup-Befehl kann nun über die Web-Oberfläche ausgeführt werden.

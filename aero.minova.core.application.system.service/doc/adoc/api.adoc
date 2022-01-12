@@ -21,6 +21,16 @@ Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
 Die Eingabe-Tabelle schränkt die Auswahl der selektierten Werte ein.
 Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.model
 
+== data/view/count
+
+Überprüft die Anzahl an Einträgen, welche anhand der übergebenen Table gefunden werden können.
+
+Als Ausgabe wird ein int-Wert zurückgegeben, welcher die Anzahl an Einträgen angibt, welche die übergebenen Eigenschaften besitzen.
+
+Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
+Die Eingabe-Tabelle schränkt die Auswahl der selektierten Werte ein.
+Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.model
+
 == /ping
 
 Hiermit kann man die Verbindung und die Anmeldedaten prüfen.

@@ -39,9 +39,52 @@ public class SqlViewController {
 	@Autowired
 	CustomLogger customLogger;
 
+	/**
+	 * Mit dieser Anfrage lässt sich die Anzahl an Rows einer View oder Table ermitteln. Der Nutzer muss allerdings dazu berechtigt sein, auf die View oder
+	 * Table zugreifen zu dürfen.
+	 * 
+	 * @param tableName
+	 *            Der Name der Table, zu welcher die Anzahl an Rows herausgefunden werden soll.
+	 * @return Die Anzahl der Rows als int.
+	 * @throws TableException
+	 *             Falls die Table nicht existiert oder der Nutzer keine Berechtigung für die Table hat.
+	 */
+	@GetMapping(value = "data/index/count", produces = "application/json")
+	public int getIndexViewRowCount(@RequestBody String tableName) throws TableException {
+		customLogger.logUserRequest(": data/index/count: ", tableName);
+		final val connection = systemDatabase.getConnection();
+		Table result = new Table();
+		StringBuilder sb = new StringBuilder();
+		try {
+			List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(tableName);
+			if (authoritiesForThisTable.isEmpty()) {
+				throw new RuntimeException("msg.PrivilegeError %" + tableName);
+			}
+
+			// Die Query sieht folgendermaßen aus: select count(1) as Rows from tableName. Man muss eine Column einfügen, da man sonst keine Rows bekommt.
+			Table inputTable = new Table();
+			inputTable.setName(tableName);
+			inputTable.addColumn(new Column("Rows", DataType.INTEGER));
+
+			val viewQuery = prepareViewString(inputTable, false, 0, true, authoritiesForThisTable);
+			val preparedStatement = connection.prepareCall(viewQuery);
+			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			customLogger.logSql("Executing statements: " + sb.toString());
+			ResultSet resultSet = preparedViewStatement.executeQuery();
+
+			result = convertSqlResultToTable(inputTable, resultSet);
+		} catch (Throwable e) {
+			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
+			throw new TableException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
+		}
+		return result.getRows().get(0).getValues().get(0).getIntegerValue();
+	}
+
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
-		customLogger.logUserRequest(": data/view: ", inputTable);
+		customLogger.logUserRequest(": data/index: ", inputTable);
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
@@ -218,7 +261,7 @@ public class SqlViewController {
 		}
 
 		if (count) {
-			sb.append("select count(1) from ");
+			sb.append("select count(1) as Rows from ");
 		} else {
 			if (maxRows > 0) {
 				sb.append("select top ").append(maxRows).append(" ");

@@ -50,29 +50,32 @@ public class SqlViewController {
 	 *             Falls die Table nicht existiert oder der Nutzer keine Berechtigung für die Table hat.
 	 */
 	@GetMapping(value = "data/index/count", produces = "application/json")
-	public int getIndexViewRowCount(@RequestBody String tableName) throws TableException {
-		customLogger.logUserRequest(": data/index/count: ", tableName);
+	public int getIndexViewRowCount(@RequestBody Table inputTable) throws TableException {
+		customLogger.logUserRequest(": data/index/count: ", inputTable.getName());
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
 		try {
-			List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(tableName);
+			// Auch wenn nur die Spalten gezählt werden sollen, sollte der User auf diese Zugriff haben.
+			List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
 			if (authoritiesForThisTable.isEmpty()) {
-				throw new RuntimeException("msg.PrivilegeError %" + tableName);
+				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
 			}
 
-			// Die Query sieht folgendermaßen aus: select count(1) as Rows from tableName. Man muss eine Column einfügen, da man sonst keine Rows bekommt.
-			Table inputTable = new Table();
-			inputTable.setName(tableName);
-			inputTable.addColumn(new Column("Rows", DataType.INTEGER));
-
+			// Hier die Methode prepareViewString mit 4.Parameter=true verwenden. Damit werden die verfügbaren Spalten gezählt.
 			val viewQuery = prepareViewString(inputTable, false, 0, true, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logSql("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
-			result = convertSqlResultToTable(inputTable, resultSet);
+			// Die Query sieht folgendermaßen aus: select count(1) as Rows from tableName mit möglicher Where-Bedingung. Man muss die Columns mit 'Rows'
+			// ersetzen, da nur noch die Spalte Rows übrig ist und man sonst keine Rows bekommt.
+			Table countTable = new Table();
+			countTable.setName(inputTable.getName());
+			countTable.addColumn(new Column("Rows", DataType.INTEGER));
+
+			result = convertSqlResultToTable(countTable, resultSet);
 		} catch (Throwable e) {
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);

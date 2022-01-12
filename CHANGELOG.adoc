@@ -3,6 +3,11 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.34.2] - 2022-01-11
+
+core.application.system.service nutzt nun cas.client für die Kern-Klassen.
+cas.client Package-Namen angepasst. 
+
 ## [12.34.1] - 2022-01-11
 
 Kern-Klassen in cas.client-Unterprojekt ausgelagert.

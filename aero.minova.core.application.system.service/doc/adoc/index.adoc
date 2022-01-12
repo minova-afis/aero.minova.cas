@@ -14,4 +14,4 @@
 * xref:security.adoc#[Sicherheitsmechanismen]
 * xref:security-code.adoc#[Konzept der Sicherheitsmethoden]
 * xref:rowlevelexample.adoc#[Beispiel zum Aktivieren der RowLevelSecurity]
-* xref:adGroupsToUserGroups.adoc#[Vergeben von erechtigungen für AD-Gruppen]
+* xref:addGroupsToUserGroups.adoc#[Vergeben von Berechtigungen für AD-Gruppen]

@@ -152,8 +152,35 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		return outputTable;
 	}
 
+	/**
+	 * Bringt das Format 'msg.PrivilegeError %tBeispiel' in Form einer Table noch ohne Stacktrace und returnErrorMessage.
+	 * 
+	 * @param outputTable
+	 *            Die bisher gebaute Table, welche dann auch uzrückgegeben wird.
+	 * @param errorMessage
+	 *            Die Fehlermeldung, welche auseinander gebaut werden muss.
+	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
+	 */
 	private Table handleGenericErrorMessage(Table outputTable, String errorMessage) {
-		Row internatMsg = new Row();
+		Table parameters = filterForParameters(errorMessage);
+		parameters.setName(outputTable.getName());
+		return parameters;
+	}
+
+	/**
+	 * Filtert die Parameter aus einem String, welche am Ende der Nachricht mit '%' voneinander abgetrennt sind. Gibt diese in Form einer Table zurücl. Die
+	 * Anzahl der Columns und Values variiert, je nachdem wie viele %-Parameter gefunden werden. Sind keine %-Parameter vorhanden, wird eine Table mit einer
+	 * Column und einem Value zurückgegeben, in welchem sich die ursprüngliche ErrorMessage befindet.
+	 * 
+	 * @param errorMessage
+	 *            Der String, aus welchem die %-Parameter herausgefiltert werden sollen.
+	 * @return Eine Table mit mind. 1 Column und einem Value.
+	 */
+	private Table filterForParameters(String errorMessage) {
+		Table parameters = new Table();
+		Row parameterValues = new Row();
+
+		parameters.addColumn(new Column("International Message", DataType.STRING));
 
 		// Falls in der Message noch Parameter mit '%' vorkommen, z.B.: 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird', werden sie hier
 		// raus gefiltert und kommen in ihre eigene Zeile.
@@ -164,19 +191,29 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
 		// Hinzufügen der Spalten für die InputParameter der Internationalierung
 		for (int i = 1; i < errorMessageParts.size(); i++) {
-			outputTable.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
+			parameters.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
 		}
 
 		// Hinzufügen der International Message und der InputParameter der Internationalierung
 		for (int i = 0; i < errorMessageParts.size(); i++) {
 			Value param = new Value(errorMessageParts.get(i), null);
-			internatMsg.addValue(param);
+			parameterValues.addValue(param);
 		}
 
-		outputTable.addRow(internatMsg);
-		return outputTable;
+		parameters.addRow(parameterValues);
+
+		return parameters;
 	}
 
+	/**
+	 * Bringt das Format 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' in Form einer Table noch ohne Stacktrace und returnErrorMessage.
+	 * 
+	 * @param outputTable
+	 *            Die bisher gebaute Table, welche dann auch uzrückgegeben wird.
+	 * @param errorMessage
+	 *            Die Fehlermeldung, welche auseinander gebaut werden muss.
+	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
+	 */
 	private Table handleSqlErrorMessage(Table outputTable, String errorMessage) {
 
 		List<String> sqlErrorMessage = Stream.of(errorMessage.split("\\|"))//
@@ -204,9 +241,17 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			}
 		}
 
-		// Jede SqlErrorMessage hat noch eine DEFAULT Übersetzung.
-		outputTable.addColumn(new Column("DEFAULT", DataType.STRING));
-		internatMsg.addValue(new Value(sqlErrorMessage.get(1), null));
+		Table parameters = filterForParameters(errorMessage);
+
+		for (Column parameterColumn : parameters.getColumns()) {
+			outputTable.addColumn(parameterColumn);
+		}
+		// Die Column MUSS 'DEFAULT' heißen.
+		outputTable.getColumns().get(0).setName("DEFAULT");
+
+		for (Value parameterValue : parameters.getRows().get(0).getValues()) {
+			internatMsg.addValue(parameterValue);
+		}
 
 		outputTable.addRow(internatMsg);
 		return outputTable;

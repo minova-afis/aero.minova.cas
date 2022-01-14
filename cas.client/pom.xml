@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cas.client</artifactId>
 	<version>12.35.0-SNAPSHOT</version>
-	<name>aero.minova.cas.client.quickstart</name>
+	<name>aero.minova.cas.client</name>
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>core.application.system</artifactId>

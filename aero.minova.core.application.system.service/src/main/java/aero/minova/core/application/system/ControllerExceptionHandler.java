@@ -162,25 +162,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
 	 */
 	private Table handleGenericErrorMessage(Table outputTable, String errorMessage) {
-		Table parameters = filterForParameters(errorMessage);
-		parameters.setName(outputTable.getName());
-		return parameters;
-	}
-
-	/**
-	 * Filtert die Parameter aus einem String, welche am Ende der Nachricht mit '%' voneinander abgetrennt sind. Gibt diese in Form einer Table zurücl. Die
-	 * Anzahl der Columns und Values variiert, je nachdem wie viele %-Parameter gefunden werden. Sind keine %-Parameter vorhanden, wird eine Table mit einer
-	 * Column und einem Value zurückgegeben, in welchem sich die ursprüngliche ErrorMessage befindet.
-	 * 
-	 * @param errorMessage
-	 *            Der String, aus welchem die %-Parameter herausgefiltert werden sollen.
-	 * @return Eine Table mit mind. 1 Column und einem Value.
-	 */
-	private Table filterForParameters(String errorMessage) {
-		Table parameters = new Table();
 		Row parameterValues = new Row();
-
-		parameters.addColumn(new Column("International Message", DataType.STRING));
 
 		// Falls in der Message noch Parameter mit '%' vorkommen, z.B.: 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird', werden sie hier
 		// raus gefiltert und kommen in ihre eigene Zeile.
@@ -191,7 +173,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
 		// Hinzufügen der Spalten für die InputParameter der Internationalierung
 		for (int i = 1; i < errorMessageParts.size(); i++) {
-			parameters.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
+			outputTable.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
 		}
 
 		// Hinzufügen der International Message und der InputParameter der Internationalierung
@@ -200,9 +182,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			parameterValues.addValue(param);
 		}
 
-		parameters.addRow(parameterValues);
-
-		return parameters;
+		outputTable.addRow(parameterValues);
+		return outputTable;
 	}
 
 	/**
@@ -241,17 +222,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			}
 		}
 
-		Table parameters = filterForParameters(errorMessage);
-
-		for (Column parameterColumn : parameters.getColumns()) {
-			outputTable.addColumn(parameterColumn);
-		}
 		// Die Column MUSS 'DEFAULT' heißen.
-		outputTable.getColumns().get(0).setName("DEFAULT");
+		outputTable.addColumn(new Column("DEFAULT", DataType.STRING));
 
-		for (Value parameterValue : parameters.getRows().get(0).getValues()) {
-			internatMsg.addValue(parameterValue);
-		}
+		// Die Standard-Fehlermeldung hinzufügen
+		internatMsg.addValue(new Value(sqlErrorMessage.get(1), null));
 
 		outputTable.addRow(internatMsg);
 		return outputTable;

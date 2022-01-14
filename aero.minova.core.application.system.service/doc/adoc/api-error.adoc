@@ -80,13 +80,10 @@ Das CAS wird diesen in folgender Form ausgeben:
 
 
 Es wird immer im ersten Value die Kurzform der Fehlermeldung 'msg.*' stehen.
-Im letzten Value steht immer die DEFAULT Übersetzung der Fehlermeldung.
-Die letzte Column heißt außerdem immer 'DEFAULT'.
+In der letzten Spalte namens 'DEFAULT' steht immer die Standard-Übersetzung der Fehlermeldung.
 
-Falls die Default-Nachricht einen oder mehrere Inputparameter benötigt, folgen weitere String-Values, welche die einzelnen Parameter enthalten.
-
-Die Columns dazwischen sind Parameter, welche in der Original-Fehlermeldung mit '@' gekennzeichnet waren.
-Diese sind in der Regel:
+Die Columns zwischen 'International Message' und 'DEFAULT' sind Parameter, welche in der Original-Fehlermeldung mit '@[Datentyp]' gekennzeichnet waren.
+Folgende Datentypen existieren:
 
 * d = Datum in Schreibweise TTMMJJJJ
 * d.iso = Datum in ISO Schreibweise JJJJMMTT
@@ -96,7 +93,9 @@ Diese sind in der Regel:
 * p = Property aus den Properties. Wird dann genau so nachgeschlagen, wie Properties in Java-Programmen.
 * i = Integer
 
-Die Werte in den dazugehörigen Values sind die Strings, welche nach dem @d|d.iso|f|f.iso|s|p|i-Parameter kommen.
+In die Zeile wird der String-Value dann eingefügt, 
+welcher nach dem @[Datentyp]-Parameter in der Original-Fehlermeldung steht.
+
 
 .Beipiel
 [source]

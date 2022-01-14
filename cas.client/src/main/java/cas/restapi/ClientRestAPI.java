@@ -5,6 +5,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import cas.domain.SqlProcedureResult;
@@ -12,6 +13,7 @@ import cas.domain.Table;
 import cas.domain.XSqlProcedureResult;
 import cas.domain.XTable;
 
+@Component
 public class ClientRestAPI {
 
 	String username;

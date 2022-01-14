@@ -1,4 +1,4 @@
-package cas.restapi;
+package aero.minova.cas.restapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -8,10 +8,10 @@ import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import cas.domain.SqlProcedureResult;
-import cas.domain.Table;
-import cas.domain.XSqlProcedureResult;
-import cas.domain.XTable;
+import aero.minova.cas.domain.SqlProcedureResult;
+import aero.minova.cas.domain.Table;
+import aero.minova.cas.domain.XSqlProcedureResult;
+import aero.minova.cas.domain.XTable;
 
 @Component
 public class ClientRestAPI {

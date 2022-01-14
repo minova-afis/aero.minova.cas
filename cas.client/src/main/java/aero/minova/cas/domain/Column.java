@@ -1,4 +1,4 @@
-package cas.domain;
+package aero.minova.cas.domain;
 
 import java.io.Serializable;
 

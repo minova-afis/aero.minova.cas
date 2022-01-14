@@ -1,4 +1,4 @@
-package cas.domain;
+package aero.minova.cas.domain;
 
 public class TableException extends Exception {
 

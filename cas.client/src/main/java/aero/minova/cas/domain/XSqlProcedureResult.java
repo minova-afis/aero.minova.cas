@@ -1,4 +1,4 @@
-package cas.domain;
+package aero.minova.cas.domain;
 
 import lombok.Data;
 

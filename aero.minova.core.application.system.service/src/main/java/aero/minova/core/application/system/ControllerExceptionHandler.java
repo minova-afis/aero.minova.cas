@@ -209,17 +209,15 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		Row internatMsg = new Row();
 
 		// Falls es sich um die erste Art der Fehlermeldung handelt, wird hier 'msg.sql.BeispielFehlermeldung' eingefügt.
-		if (types.length > 1) {
-			internatMsg.addValue(new Value(types[0], null));
+		internatMsg.addValue(new Value(types[0], null));
 
-			// Im ersten Array ist der Part mit msg.Fehlermeldung. Den wollen wir hier nicht.
-			// Im letzten Array von types ist nur noch die Standard-Errormessage. Die brauchen wir hier auch nicht.
-			for (int i = 1; i < types.length; i++) {
-				types[i] = types[i].trim();
-				int blank = types[i].indexOf(' ');
-				outputTable.addColumn(new Column(types[i].substring(0, blank), DataType.STRING));
-				internatMsg.addValue(new Value((types[i].subSequence(blank + 1, types[i].length())).toString(), null));
-			}
+		// Im ersten Array ist der Part mit msg.Fehlermeldung. Den wollen wir hier nicht.
+		// Im letzten Array von types ist nur noch die Standard-Errormessage. Die brauchen wir hier auch nicht.
+		for (int i = 1; i < types.length; i++) {
+			types[i] = types[i].trim();
+			int blank = types[i].indexOf(' ');
+			outputTable.addColumn(new Column(types[i].substring(0, blank), DataType.STRING));
+			internatMsg.addValue(new Value((types[i].subSequence(blank + 1, types[i].length())).toString(), null));
 		}
 
 		// Die Column MUSS 'DEFAULT' heißen.

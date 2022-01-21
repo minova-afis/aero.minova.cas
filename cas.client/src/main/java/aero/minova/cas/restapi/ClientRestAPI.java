@@ -12,8 +12,11 @@ import aero.minova.cas.domain.SqlProcedureResult;
 import aero.minova.cas.domain.Table;
 import aero.minova.cas.domain.XSqlProcedureResult;
 import aero.minova.cas.domain.XTable;
+import lombok.NoArgsConstructor;
 
 @Component
+// Wird von Spring gebraucht, da sonst eine NoSuchBeanDefinitionException geworfen wird.
+@NoArgsConstructor
 public class ClientRestAPI {
 
 	String username;
@@ -29,6 +32,7 @@ public class ClientRestAPI {
 		this.password = password;
 		this.url = url;
 
+		restTemplate = new RestTemplate();
 		restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor(username, password));
 	}
 

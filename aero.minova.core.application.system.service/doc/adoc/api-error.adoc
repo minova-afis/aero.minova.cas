@@ -93,7 +93,7 @@ Folgende Datentypen existieren:
 * p = Property aus den Properties. Wird dann genau so nachgeschlagen, wie Properties in Java-Programmen.
 * i = Integer
 
-In die Zeile wird der String-Value dann eingefügt, 
+Als Value wird in der Row der String-Value eingefügt, 
 welcher nach dem @[Datentyp]-Parameter in der Original-Fehlermeldung steht.
 
 

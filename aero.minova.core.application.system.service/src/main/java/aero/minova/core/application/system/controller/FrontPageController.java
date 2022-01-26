@@ -24,4 +24,14 @@ public class FrontPageController {
 	public String login() {
 		return "index.html";
 	}
+
+	@GetMapping("setupError")
+	public String setupError() {
+		return "setupError.html";
+	}
+
+	@GetMapping("setupSuccess")
+	public String setupSuccess() {
+		return "setupSuccess.html";
+	}
 }

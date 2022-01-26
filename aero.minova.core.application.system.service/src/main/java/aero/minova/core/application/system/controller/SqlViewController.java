@@ -86,7 +86,7 @@ public class SqlViewController {
 			}
 			result.fillMetaData(result, limit, viewCount, page);
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);
 		} finally {

@@ -76,7 +76,7 @@ public class XSqlProcedureController {
 
 			// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
 			connection.commit();
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			try {
 				connection.rollback();

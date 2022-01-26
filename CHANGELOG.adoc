@@ -1,7 +1,36 @@
 # Changelog
 All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
-Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
+
+## [12.34.2] - 2022-01-11
+
+core.application.system.service nutzt nun cas.client für die Kern-Klassen.
+cas.client Package-Namen angepasst. 
+
+## [12.34.1] - 2022-01-11
+
+Kern-Klassen in cas.client-Unterprojekt ausgelagert.
+
+## [12.34.0] - 2022-01-11
+
+Die Extensions werden nun beim Setup-Befehl mitinstalliert.
+
+## [12.33.1] - 2022-01-07
+
+Einführen einer Methode, um Prozeduren ungeprüft/ ohne Rechte ausführen zu können.
+
+## [12.33.0] - 2021-12-17
+
+Der Setup-Befehl kann nun über die Web-Oberfläche ausgeführt werden.
+
+## [12.32.0] - 2021-12-15
+
+Property `app.log.root` einführen, um die Log-Ordner für die Anwendung zu setzen.
+
+## [12.31.2] - 2021-12-09
+
+* Rekursive Extensions-Aufrufe nicht mit Semaphor blockieren.
 
 ## [12.31.1] - 2021-12-09
 

@@ -1,10 +1,19 @@
 package aero.minova.cas.restapi;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.support.BasicAuthorizationInterceptor;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,17 +32,25 @@ public class ClientRestAPI {
 	String password;
 	String url;
 
-	@Autowired
 	RestTemplate restTemplate;
 
-	@SuppressWarnings("deprecation")
 	public ClientRestAPI(String username, String password, String url) {
 		this.username = username;
 		this.password = password;
 		this.url = url;
 
 		restTemplate = new RestTemplate();
-		restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor(username, password));
+	}
+
+	private HttpHeaders createHeaders(String username, String password) {
+		return new HttpHeaders() {
+			{
+				String auth = username + ":" + password;
+				byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+				String authHeader = "Basic " + new String(encodedAuth);
+				set("Authorization", authHeader);
+			}
+		};
 	}
 
 	// View Controller
@@ -45,8 +62,18 @@ public class ClientRestAPI {
 	 * @return Eine Table mit dem gesamten Inhalt der View.
 	 */
 	public Table sendViewRequest(Table inputTable) {
-		HttpEntity<Table> request = new HttpEntity<>(inputTable);
-		ResponseEntity<Table> response = restTemplate.postForEntity(url + "/data/index", request, Table.class);
+		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+		// Add the Jackson Message converter
+		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+
+		// Note: here we are making this converter to process any kind of response,
+		// not only application/*json, which is the default behaviour
+		converter.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));
+		messageConverters.add(converter);
+		restTemplate.setMessageConverters(messageConverters);
+
+		HttpEntity<Table> request = new HttpEntity<Table>(inputTable, createHeaders(username, password));
+		ResponseEntity<Table> response = restTemplate.exchange(url + "/data/index", HttpMethod.GET, request, Table.class);
 		return response.getBody();
 	}
 

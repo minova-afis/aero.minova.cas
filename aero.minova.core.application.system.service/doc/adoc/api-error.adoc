@@ -10,9 +10,123 @@ insert into xtcasError (Username, ErrorMessage, Date) values (username,errorMess
 ----
 
 
-Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, ändert sich wie folgt:
+Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, kann folgende Formate besitzen:
 
-[source,sql]
+ 1. Sql-Fehler-Format
+ 2. Programm-Fehler-Format
+
+=== Sql-Fehler-Format
+
+.Ursprünglich Fehlermeldung
+[source]
+----
+(ADO | ADO | 25 | msg.Error @p tTable.Description.7 @p tTable.Description.14 | Default Message)
+----
+
+Das Sql-Fehler Format wird dann auftreten, wenn es einen Fehler in einer oder mehreren Prozeduren gibt.
+
+Das CAS wird diesen in folgender Form ausgeben:
+
+
+.Sql-Fehler-Format
+[source,json]
+----
+{
+{
+    "resultSet": {
+        "name": "Error",
+        "columns": [
+            {
+                "name": "International Message",
+                "type": "STRING"
+            },
+            {
+                "name": "p",
+                "type": "STRING"
+            },
+            {
+                "name": "p",
+                "type": "STRING"
+            },
+            {
+                "name": "DEFAULT",
+                "type": "STRING"
+            }
+        ],
+        "rows": [
+            {
+                "values": [
+                    "s-msg.Error",
+                    "s-tTable.Description.7",
+                    "s-tTable.Description.14",
+                    "s-Default Message"
+                ]
+            }
+        ],
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [
+			"StackTraceMessages",
+			...
+		]
+	},
+    "returnCodes": [
+        -1
+    ],
+    "returnCode": -1
+}
+----
+
+
+Es wird immer im ersten Value die Kurzform der Fehlermeldung 'msg.*' stehen.
+In der letzten Spalte namens 'DEFAULT' steht immer die Standard-Übersetzung der Fehlermeldung.
+
+Die Columns zwischen 'International Message' und 'DEFAULT' sind Parameter, welche in der Original-Fehlermeldung mit '@[Datentyp]' gekennzeichnet waren.
+Folgende Datentypen existieren:
+
+* d = Datum in Schreibweise TTMMJJJJ
+* d.iso = Datum in ISO Schreibweise JJJJMMTT
+* f = Dezimalzahl
+* f.iso = Dezimalzahl im ISO Format ( # . # # #)
+* s = String
+* p = Property aus den Properties. Wird dann genau so nachgeschlagen, wie Properties in Java-Programmen.
+* i = Integer
+
+Als Value wird in der Row der String-Value eingefügt, 
+welcher nach dem @[Datentyp]-Parameter in der Original-Fehlermeldung steht.
+
+
+.Beipiel
+[source]
+----
+@p tTable.Description.7
+----
+wird zu 
+[source,json]
+----
+...
+"columns:" [
+...
+,{
+                "name": "p",
+                "type": "STRING"
+            },
+...
+"rows": [
+            {
+                "values": [
+                    ...
+                    "s-tTable.Description.7",
+                    ...
+                ]
+            }
+        ],
+----
+
+=== Programm-Fehler-Format
+.Programm-Fehler-Format
+[source,json]
 ----
 {
 	"name": "Error",
@@ -44,6 +158,7 @@ Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, ändert s
 ----
 Der Name der zurückgegebenen Tabele wird auf "Error" geändert und es wird nur eine Row zurückgegeben,
 in welcher der übersetzbare MessageCode hinterlegt ist, welcher beim Client in die Sprache des Users übersetzt wird.
+
 Falls die Nachricht einen oder mehrere Inputparameter benötigt, folgen weitere String-Values, welche die einzelnen Parameter enthalten.
 
 Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und einen trace.

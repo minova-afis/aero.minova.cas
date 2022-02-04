@@ -122,9 +122,10 @@ public class SetupService {
 			return dependencySetupFile;
 		}
 		/*
-		 * Wenn dies kein Hack wäre, würde es hiermit enden. else { throw new NoSuchFileException("No setup file found with the name " + setupFile); }
+		 * Immer ab dem zweiten Punkt die Dependency abschneiden. Bsp: aero.minova.cas.app --> cas.app oder com.minova.cas.app --> cas.app Wenn dies kein Hack
+		 * wäre, würde es hiermit enden. else { throw new NoSuchFileException("No setup file found with the name " + setupFile); }
 		 */
-		final String adjustedDependency = dependency.substring("aero.minova.".length());
+		final String adjustedDependency = dependency.substring(dependency.indexOf(".", dependency.indexOf(".") + 1) + 1);
 		try {
 			final Optional<Path> result = Files.walk(dependencySetupsDir, 1).map(dir -> {
 				if (dir.getFileName().toString().startsWith(adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency)) {

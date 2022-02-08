@@ -14,6 +14,8 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.service.FilesService;
@@ -52,8 +53,9 @@ public class SetupService {
 	@Autowired
 	SqlProcedureController spc;
 
-	@Autowired
-	CustomLogger logger;
+//	@Autowired
+//	CustomLogger logger;
+	Logger logger = LoggerFactory.getLogger(SetupService.class);
 
 	@PostConstruct
 	private void setup() {
@@ -83,12 +85,12 @@ public class SetupService {
 	 */
 	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = determineDependencyOrder(Files.readString(dependencyList));
-		logger.logSetup("Dependency Installation Order: " + dependencies);
+		logger.info("Dependency Installation Order: " + dependencies);
 		final List<String> procedures = new ArrayList<>();
 		for (String dependency : dependencies) {
-			logger.logSetup("Searching for setup.xml for dependency " + dependency);
+			logger.info("Searching for setup.xml for dependency " + dependency);
 			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
-			logger.logSetup("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);
+			logger.info("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);
 			if (setupTableSchemas) {
 				installToolIntegration.installSetup(setupXml);
 			}
@@ -119,7 +121,7 @@ public class SetupService {
 		String niceSetupFile = dependency + ".setup.xml";
 		Path dependencySetupFile = dependencySetupsDir.resolve(niceSetupFile);
 		if (Files.exists(dependencySetupFile)) {
-			logger.logSetup("Reading Setup-File: " + niceSetupFile);
+			logger.info("Reading Setup-File: " + niceSetupFile);
 			return dependencySetupFile;
 		}
 		/*
@@ -201,12 +203,12 @@ public class SetupService {
 					// Den Sql-Code aus der Datei auslesen und ausführen.
 					String procedure = Files.readString(sqlFile);
 
-					logger.logSetup("Executing Script " + procedureName);
+					logger.info("Executing Script " + procedureName);
 					try {
 						connection.prepareCall(procedure).execute();
 						connection.commit();
 					} catch (Exception e) {
-						logger.logSetup("Script " + procedureName + " is being executed.");
+						logger.info("Script " + procedureName + " is being executed.");
 						// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
 						if (procedure.startsWith("alter ")) {
 							procedure = procedure.substring(5);

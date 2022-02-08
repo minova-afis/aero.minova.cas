@@ -10,6 +10,9 @@ Sie werden beim Setup nun richtig verarbeitet.
 
 Außerdem wird nun ein eigener Logger für das Setup verwendet.
 
+Fehlermeldungen können nun auf zwei verschiedene Arten verarbeitet und dargestellt werden.
+
+
 ## [12.34.2] - 2022-01-11
 
 core.application.system.service nutzt nun cas.client für die Kern-Klassen.

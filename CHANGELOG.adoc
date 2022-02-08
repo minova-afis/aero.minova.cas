@@ -3,14 +3,18 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [12.35.0] - 2022-??-??
+
+## [12.35.1] - 2022-??-??
+
+Es wird nun ein eigener Logger für das Setup verwendet.
+
+Fehlermeldungen können nun auf zwei verschiedene Arten verarbeitet und dargestellt werden.
+
+
+## [12.35.0] - 2022-02-08
 
 Es können nun auch Kundenprojekte als Abhängigkeit in anderen Kundenprojekten angegeben werden. 
 Sie werden beim Setup nun richtig verarbeitet.
-
-Außerdem wird nun ein eigener Logger für das Setup verwendet.
-
-Fehlermeldungen können nun auf zwei verschiedene Arten verarbeitet und dargestellt werden.
 
 
 ## [12.34.2] - 2022-01-11

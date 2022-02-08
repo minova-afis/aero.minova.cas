@@ -3,6 +3,13 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.35.0] - 2022-??-??
+
+Es können nun auch Kundenprojekte als Abhängigkeit in anderen Kundenprojekten angegeben werden. 
+Sie werden beim Setup nun richtig verarbeitet.
+
+Außerdem wird nun ein eigener Logger für das Setup verwendet.
+
 ## [12.34.2] - 2022-01-11
 
 core.application.system.service nutzt nun cas.client für die Kern-Klassen.

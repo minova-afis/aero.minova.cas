@@ -74,7 +74,7 @@
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
-	<appender name="Initialization" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="iniLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${APP_LOG_ROOT}/initialization.log</file>
 		<append>true</append>
 		<encoder>
@@ -105,6 +105,9 @@
 		<logger name="FilesLogger" level="trace" additivity="false">
 		<appender-ref ref="filesLog"/>
 		<appender-ref ref="console"/>
+	</logger>
+	<logger name="IniLogger" level="trace" additivity="false">
+		<appender-ref ref="iniLog"/>
 	</logger>
 	<root level="info">
 		<appender-ref ref="console"/>

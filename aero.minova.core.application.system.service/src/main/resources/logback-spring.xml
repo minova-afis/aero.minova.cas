@@ -74,14 +74,14 @@
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
-	<appender name="iniLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${APP_LOG_ROOT}/initialization.log</file>
+	<appender name="setupLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/setup.log</file>
 		<append>true</append>
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/archived/initialization_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<fileNamePattern>${APP_LOG_ROOT}/archived/setuo_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
@@ -106,8 +106,8 @@
 		<appender-ref ref="filesLog"/>
 		<appender-ref ref="console"/>
 	</logger>
-	<logger name="IniLogger" level="trace" additivity="false">
-		<appender-ref ref="iniLog"/>
+	<logger name="SetupLogger" level="trace" additivity="false">
+		<appender-ref ref="setupLog"/>
 	</logger>
 	<root level="info">
 		<appender-ref ref="console"/>

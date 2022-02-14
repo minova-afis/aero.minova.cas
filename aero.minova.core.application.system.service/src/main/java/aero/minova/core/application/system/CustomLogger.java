@@ -32,7 +32,7 @@ public class CustomLogger {
 	// Log für File Hashes und Zipps
 	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 	// Log für Setup
-	public Logger iniLogger = LoggerFactory.getLogger("IniLogger");
+	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
 
 	@Autowired
 	Gson gson;
@@ -92,7 +92,7 @@ public class CustomLogger {
 	}
 
 	public void logSetup(String logMessage) {
-		iniLogger.info("CAS " + logMessage);
+		setupLogger.info("CAS " + logMessage);
 	}
 
 	/**

@@ -34,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
 	private String ldapServerAddress;
 
+	// Hier ist kein Default gesetzt, damit man bewusst den Admin-Nutzer aktivieren muss.
 	@Value("${login_dataSource:}")
 	private String dataSource;
 

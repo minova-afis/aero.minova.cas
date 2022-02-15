@@ -1,6 +1,6 @@
 alter procedure dbo.xpcasUpdateUserGroup (
 	@KeyLong int,
-	@KeyText nvarchar(10) = null,
+	@KeyText nvarchar(50) = null,
 	@Description nvarchar(50) = null,
 	@UserCode nvarchar(50) = null,
 	@SecurityToken nvarchar(250) = null

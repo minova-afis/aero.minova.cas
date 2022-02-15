@@ -4,7 +4,7 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 
-## [12.35.1] - 2022-??-??
+## [12.36.0] - 2022-02-15
 
 Es wird nun ein eigener Logger für das Setup verwendet.
 

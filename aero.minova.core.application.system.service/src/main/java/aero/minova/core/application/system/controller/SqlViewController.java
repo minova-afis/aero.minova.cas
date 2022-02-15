@@ -73,18 +73,31 @@ public class SqlViewController {
 			} else {
 				limit = inputMetaData.getLimited();
 			}
-			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
+
+			// Wir setzten für Page 1 und für limited 0 ein, damit wir alle Ergebnisse bekommen. Die Menge wird später begrenzt.
+			val viewQuery = pagingWithSeek(inputTable, false, 0, false, 1, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logSql("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
-			int viewCount = 0;
+
+			int totalResults = 0;
 			if (result.getRows().size() > 0) {
-				viewCount = result.getRows().size();
+				totalResults = result.getRows().size();
 			}
-			result.fillMetaData(result, limit, viewCount, page);
+
+			// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
+			if (limit > 0) {
+				List<Row> resultRows = new ArrayList<>();
+				for (int i = 0; i < limit; i++) {
+					resultRows.add(result.getRows().get(i + (limit * (page - 1))));
+				}
+				result.setRows(resultRows);
+			}
+
+			result.fillMetaData(result, limit, totalResults, page);
 
 		} catch (Throwable e) {
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);

@@ -6,7 +6,7 @@
 			<number/>
 		</column>
 		<column name="KeyText" text="@xtcasUserGroup.KeyText">
-			<text length="10"/>
+			<text length="50"/>
 		</column>
 		<column name="Description" text="@xtcasUserGroup.Description">
 			<text length="50"/>

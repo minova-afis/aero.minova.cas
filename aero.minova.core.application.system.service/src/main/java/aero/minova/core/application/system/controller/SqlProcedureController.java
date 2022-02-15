@@ -165,6 +165,7 @@ public class SqlProcedureController {
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Throwable e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
+
 			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
 			throw new ProcedureException(e);
 		}

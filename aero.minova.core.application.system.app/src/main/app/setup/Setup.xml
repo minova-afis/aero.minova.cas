@@ -39,6 +39,7 @@
 		<script name="xpcasDeleteUserPrivilege" type="procedure"/>
 		<script name="xvcasUserPrivilegeIndex" type="view"/>
 		<script name="initPrivilegesForAdmin" type="script"/>
+		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
 	</sql-code>
 	<schema>
 		<tableschema name="xtcasError" type="table"/>

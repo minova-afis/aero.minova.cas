@@ -5,6 +5,10 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 
 
+## [12.36.2] - 2022-02-22
+
+Korrektes Anzeigen der letzten Seite einer View.
+
 ## [12.36.1] - 2022-02-15
 
 Fehlende Prozedur im Setup hinzugefügt.

@@ -92,7 +92,10 @@ public class SqlViewController {
 			if (limit > 0) {
 				List<Row> resultRows = new ArrayList<>();
 				for (int i = 0; i < limit; i++) {
-					resultRows.add(result.getRows().get(i + (limit * (page - 1))));
+					int rowPointer = i + (limit * (page - 1));
+					if (rowPointer < result.getRows().size()) {
+						resultRows.add(result.getRows().get(rowPointer));
+					}
 				}
 				result.setRows(resultRows);
 			}

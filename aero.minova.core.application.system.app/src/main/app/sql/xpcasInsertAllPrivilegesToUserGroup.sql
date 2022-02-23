@@ -1,4 +1,4 @@
-alter procedure dbo.xpcasInsertAllPrivilegesToUser (
+alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
 	@UserName nvarchar(50),
 	@SecurityToken nvarchar(10)
 ) with encryption as

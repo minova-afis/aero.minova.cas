@@ -124,7 +124,7 @@ public class SqlProcedureController {
 		// Nach dem erfolgreichen Setup noch die Admin-Rolle erstellen und alle Rechte geben.
 		try {
 			Table adminPrivilegeTable = new Table();
-			adminPrivilegeTable.setName("xpcasInsertAllPrivilegesToUser");
+			adminPrivilegeTable.setName("xpcasInsertAllPrivilegesToUserGroup");
 			adminPrivilegeTable.addColumn(new Column("UserName", DataType.STRING));
 			adminPrivilegeTable.addColumn(new Column("SecurityToken", DataType.STRING));
 

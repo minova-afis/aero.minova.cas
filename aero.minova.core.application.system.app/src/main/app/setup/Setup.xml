@@ -34,11 +34,10 @@
 		<script name="xpcasDeleteLuUserPrivilegeUserGroup" type="procedure"/>
 		<script name="xpcasReadUserPrivilege" type="procedure"/>
 		<script name="xpcasInsertUserPrivilege" type="procedure"/>
-		<script name="xpcasInsertAllPrivilegesToUser" type="procedure"/>
 		<script name="xpcasUpdateUserPrivilege" type="procedure"/>
 		<script name="xpcasDeleteUserPrivilege" type="procedure"/>
 		<script name="xvcasUserPrivilegeIndex" type="view"/>
-		<script name="initPrivilegesForAdmin" type="script"/>
+		<script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
 		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
 	</sql-code>
 	<schema>

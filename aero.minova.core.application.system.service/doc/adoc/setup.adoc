@@ -13,6 +13,11 @@ Diese Funktion ist als Extension für den SqlProcedureController integriert und 
 Dabei wird die Datei *"dependencyList.txt"* im setup Ordner ausgelesen.
 Ist diese nicht vorhanden, wird eine NoSuchFileException geworfen.
 
+Nachdem alle Tabellen,Views und Prozeduren installiert wurden, werden die Privilegien der Extensions in die xtcasUserPrivilege geschrieben.
+
+Zuletzt wird eine UserGroup 'admin' erzeugt, welcher alle Privilegien zugewiesen werden.
+Um diese Gruppe nutzen zu können, muss allerdings erst die login_dataSource in den application.properties gesetzt werden.
+
 === parseDependencyList
 Liest die dependencyList.txt als einen langen String ein und zerteilt dann die einzelnen Dependencies zu einer Liste an Strings.
 

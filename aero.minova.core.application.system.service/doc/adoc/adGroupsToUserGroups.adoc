@@ -1,4 +1,4 @@
-== Vergeben von erechtigungen für AD-Gruppen
+== Vergeben von Berechtigungen für AD-Gruppen
 
 Damit der User über seine AD-Gruppen Privilegien erhalten und nutzen kann,
 müssen folgende Schritte befolgt werden:

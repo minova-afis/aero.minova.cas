@@ -125,7 +125,7 @@ public class SqlProcedureController {
 		try {
 			Table adminPrivilegeTable = new Table();
 			adminPrivilegeTable.setName("xpcasInsertAllPrivilegesToUserGroup");
-			adminPrivilegeTable.addColumn(new Column("UserName", DataType.STRING));
+			adminPrivilegeTable.addColumn(new Column("UserGroup", DataType.STRING));
 			adminPrivilegeTable.addColumn(new Column("SecurityToken", DataType.STRING));
 
 			// Eine Gruppe mit dem Namen 'admin' und dem SecurityToken 'admin' anlegen.

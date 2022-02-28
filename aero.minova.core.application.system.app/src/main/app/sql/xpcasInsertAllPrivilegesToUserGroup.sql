@@ -1,5 +1,5 @@
 alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
-	@UserName nvarchar(50),
+	@UserGroup nvarchar(50),
 	@SecurityToken nvarchar(10)
 ) with encryption as
     if not exists (select * from xtcasUserPrivilege where KeyText = 'setup')
@@ -21,9 +21,9 @@ alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
     left join xtcasUserPrivilege p on p.KeyText = t.TABLE_NAME
     where p.KeyText is null
 
-    if not exists (select * from xtcasUserGroup where KeyText = @UserName)
+    if not exists (select * from xtcasUserGroup where KeyText = @UserGroup)
     begin
-        insert into xtcasUserGroup (KeyText,SecurityToken) VALUES (@UserName, '#' + @SecurityToken)
+        insert into xtcasUserGroup (KeyText,SecurityToken) VALUES (@UserGroup, '#' + @SecurityToken)
     end
 
 
@@ -38,7 +38,7 @@ alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
     declare @UserGroupKey int,
     @UserPrivilegeKey int
 
-    select @UserGroupKey = KeyLong from xtcasUserGroup where KeyText = @UserName
+    select @UserGroupKey = KeyLong from xtcasUserGroup where KeyText = @UserGroup
 
     DECLARE temp_cursor CURSOR FOR SELECT KeyText FROM #temp
 

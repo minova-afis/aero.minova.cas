@@ -6,6 +6,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [12.36.4] - 2022-03-02
 
 #254 Automatische Setup der Tabellen xtcasUsers und xtcasAuthorities.
+Diese Tabellen werden benötigt, damit Benutzer-Logins und deren Security-Token-Zuweisung für Nutzer über im SQL-Server gespeichert und geladen werden können.
 
 ## [12.36.3] - 2022-02-23
 

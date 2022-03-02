@@ -3,6 +3,10 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.36.4] - 2022-03-02
+
+#254 Automatische Setup der Tabellen xtcasUsers und xtcasAuthorities.
+
 ## [12.36.3] - 2022-02-23
 
 Automatische Admin-Rolle erstellen nach einem erfolgreichen Setup.

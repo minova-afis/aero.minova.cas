@@ -1,4 +1,4 @@
-package aero.minova.cas.domain;
+package aero.minova.cas.client.domain;
 
 public class ProcedureException extends Exception {
 

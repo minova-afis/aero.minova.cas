@@ -1,4 +1,4 @@
-package aero.minova.cas.domain;
+package aero.minova.cas.client.domain;
 
 public class PingResponse {
 	private final Integer returnCode = 0;

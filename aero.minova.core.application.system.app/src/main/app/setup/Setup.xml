@@ -43,8 +43,10 @@
 	<schema>
 		<tableschema name="xtcasError" type="table"/>
 		<tableschema name="xtcasUser" type="table"/>
+		<tableschema name="xtcasUsers" type="table"/>
 		<tableschema name="xtcasUserGroup" type="table"/>
 		<tableschema name="xtcasUserPrivilege" type="table"/>
+		<tableschema name="xtcasAuthorities" type="table"/>
 		<tableschema name="xtcasColumnSecurity" type="table"/>
 		<tableschema name="xtcasLuUserPrivilegeUserGroup" type="table"/>
 	</schema>

@@ -27,6 +27,7 @@ Datentyp: nvarchar(50) not null +
 
 ==== Authority
 
+Bezeichnung: Rolle/UserGruppe des Users. Kommt aus xtcasUserGroup. +
 Datentyp: nvarchar(50) not null +
 
 // tag::column.Authority[]

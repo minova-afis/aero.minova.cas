@@ -1,0 +1,64 @@
+
+
+== Tabelle xtcasUsers ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== Username
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.Username[]
+
+// end::column.Username[]
+
+
+==== Password
+
+Datentyp: nvarchar(100) not null +
+
+// tag::column.Password[]
+
+// end::column.Password[]
+
+
+==== LastUser
+
+Datentyp: nvarchar(50) +
+Default: `user_name()` +
+
+// tag::column.LastUser[]
+
+// end::column.LastUser[]
+
+
+==== LastDate
+
+Datentyp: datetime +
+Default: `getdate()` +
+
+// tag::column.LastDate[]
+
+// end::column.LastDate[]
+
+
+==== LastAction
+
+Datentyp: integer +
+Default: `1` +
+
+// tag::column.LastAction[]
+
+// end::column.LastAction[]

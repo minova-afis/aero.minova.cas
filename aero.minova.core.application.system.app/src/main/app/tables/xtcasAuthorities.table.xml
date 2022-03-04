@@ -22,10 +22,4 @@
 	<primarykey>
 		<column>KeyLong</column>
 	</primarykey>
-	<foreignkey refid="Username" table="xtcasUsers">
-		<column name="KeyText" />
-	</foreignkey>
-	<foreignkey refid="Authority" table="xtcasUserGroup">
-	<column name="KeyText" />
-	</foreignkey>
 </table>

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,6 +41,13 @@ public class SqlViewController {
 	CustomLogger customLogger;
 
 	@GetMapping(value = "data/index", produces = "application/json")
+	public Table getIndexViewGet(@RequestBody Table inputTable) throws Exception {
+		customLogger.logUserRequest(
+				": WARNING! The Get-Mapping of data/index will be removed in 6 months on 1st of September! Please use the Post-Mapping instead.");
+		return getIndexView(inputTable);
+	}
+
+	@PostMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
 		final val connection = systemDatabase.getConnection();

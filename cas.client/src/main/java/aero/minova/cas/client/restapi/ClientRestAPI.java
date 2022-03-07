@@ -1,4 +1,4 @@
-package aero.minova.cas.restapi;
+package aero.minova.cas.client.restapi;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -13,10 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import aero.minova.cas.domain.SqlProcedureResult;
-import aero.minova.cas.domain.Table;
-import aero.minova.cas.domain.XSqlProcedureResult;
-import aero.minova.cas.domain.XTable;
+import aero.minova.cas.client.domain.PingResponse;
+import aero.minova.cas.client.domain.SqlProcedureResult;
+import aero.minova.cas.client.domain.Table;
+import aero.minova.cas.client.domain.XSqlProcedureResult;
+import aero.minova.cas.client.domain.XTable;
 import lombok.NoArgsConstructor;
 
 @Component
@@ -49,6 +50,17 @@ public class ClientRestAPI {
 				setAccept(Arrays.asList(MediaType.ALL));
 			}
 		};
+	}
+
+	/**
+	 * Sendet einen Ping Request.
+	 * 
+	 * @return Die PingResponse als int.
+	 */
+	public int ping() {
+		HttpEntity<?> request = new HttpEntity<Object>(createHeaders(username, password));
+		ResponseEntity<PingResponse> response = restTemplate.exchange(url + "/ping", HttpMethod.GET, request, PingResponse.class);
+		return response.getBody().getReturnCode();
 	}
 
 	// View Controller

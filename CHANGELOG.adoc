@@ -3,6 +3,10 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.36.5] - 2022-03-17
+
+`upload/logs` Ursache für Entpackungs-Probleme der hochgeladenen Datei loggen und zurückgeben.
+
 ## [12.36.4] - 2022-03-04
 
 Korrektur der ForeignKey-Constraints von xtcasAuthorities.

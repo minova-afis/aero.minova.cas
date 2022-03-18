@@ -4,9 +4,7 @@
 
 Jede Installation besteht aus 4 Teilen:
 
-* Installation des CAS-Dienstes:
-** Ausführung in der Entwicklungsumgebung
-** Auslieferung als Docker-Image
+* Installation des CAS-Dienstes
 * Datenbank aufsetzen:
 ** <<sql-server-und-datenbank-einrichten>>
 ** <<Datenbank-initialisieren>>
@@ -16,6 +14,8 @@ Jede Installation besteht aus 4 Teilen:
 == Installation für Spezifische Umgebungen
 * <<CAS-als-Windows-Dienst-installieren>>
 * xref:./mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
+* Aufsetzen für die Entwicklungsumgebung.
+* Als Docker-Container ausliefern.
 
 [#sql-server-und-datenbank-einrichten]
 == SQL-Server und Datenbank einrichten.

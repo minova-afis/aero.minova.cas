@@ -1,5 +1,20 @@
 = Installation
 
+== Übersicht
+
+Jede Installation besteht aus 4 Teilen:
+
+* Dienst:
+** Ausführung in der Entwicklungsumgebung
+** Auslieferung als Docker-Image
+* Datenbank: xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
+* Dateisystem: Einbinden des lokalen Dateisystems
+* xref:./aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
+
+== Installation für Spezifische Umgebungen
+* xref:./installation.adoc#[Installation des Dienstes im alten Format]
+* xref:./mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
+
 == SQL-Server und Datenbank einrichten.
 * SQL-Server installieren.
 * Datenbank erstellen.

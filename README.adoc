@@ -27,21 +27,7 @@ Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeiner
 
 * xref:./CHANGELOG.adoc#[Changelog]
 * xref:./aero.minova.core.application.system.service/doc/adoc/index.adoc#[CAS-Dienst]
+* xref:./doc/adoc/installation.adoc#[Installation]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
-* xref:./doc/adoc/rechteverwaltung.adoc#[Rechteverwaltung]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
-
-== Installation
-
-Jede Installation besteht aus 4 Teilen:
-
-* Dienst:
-** Ausführung in der Entwicklungsumgebung
-** Auslieferung als Docker-Image
-* Datenbank: xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
-* Dateisystem: Einbinden des lokalen Dateisystems
-* xref:./aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
-
-=== Installation für Spezifische Umgebungen
-* xref:./doc/adoc/installation.adoc#[Installation des Dienstes im alten Format]
-* xref:./doc/adoc/mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
+* xref:./doc/adoc/rechteverwaltung.adoc#[Rechteverwaltung]

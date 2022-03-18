@@ -9,12 +9,12 @@ Jede Installation besteht aus 4 Teilen:
 ** Auslieferung als Docker-Image
 * Datenbank aufsetzen:
 ** <<sql-server-und-datenbank-einrichten>>
-** xref:./init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
+** <<Datenbank-initialisieren>>
 * Dateisystem einbinden.
 * xref:./../../aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
 
 == Installation für Spezifische Umgebungen
-* xref:./installation.adoc#[Installation des Dienstes im alten Format]
+* <<CAS-als-Windows-Dienst-installieren>>
 * xref:./mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
 
 [#sql-server-und-datenbank-einrichten]
@@ -26,7 +26,8 @@ Jede Installation besteht aus 4 Teilen:
 
 image::images/sql-server-tcp-config.jpg[]
 
-== CAS als minimalen Windows-Dienst installieren.
+[#CAS-als-Windows-Dienst-installieren]
+== CAS als Windows-Dienst installieren.
 
 * Dienst-Ordner erstellen (bspw. `Shared Data\Program Files\cas`).
 * `application.properties` im Dienst-Ordner erstellen:
@@ -91,3 +92,21 @@ kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) insta
 Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
 
 Windows-Dienst starten und die `data/procedure` Setup ausführen.
+
+[#Datenbank-initialisieren]
+== Datenbank initialisieren.
+
+Die Datenbank kann mit dem folgenden `data/procedure`-Befehl initialisiert werden:
+
+[source,json]
+.Body des Post-Requests
+--------
+{
+    "name": "setup",
+    "columns": [],
+    "rows": []
+}
+--------
+
+Jeder Nutzer darf diesen Befehl beim ersten mal ausführen.
+Bei den nachfolgenden Ausführungen muss der Nutzer das entsprechende Recht haben.

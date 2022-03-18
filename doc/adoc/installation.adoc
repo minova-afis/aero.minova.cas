@@ -7,23 +7,26 @@ Jede Installation besteht aus 4 Teilen:
 * Installation des CAS-Dienstes:
 ** Ausführung in der Entwicklungsumgebung
 ** Auslieferung als Docker-Image
-* Datenbank: xref:./init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
-* Dateisystem: Einbinden des lokalen Dateisystems
+* Datenbank aufsetzen:
+** <<sql-server-und-datenbank-einrichten>>
+** xref:./init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
+* Dateisystem einbinden.
 * xref:./../../aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
 
 == Installation für Spezifische Umgebungen
 * xref:./installation.adoc#[Installation des Dienstes im alten Format]
 * xref:./mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
 
+[#sql-server-und-datenbank-einrichten]
 == SQL-Server und Datenbank einrichten.
 * SQL-Server installieren.
-* Datenbank erstellen.
+* Datenbank erstellen: `create database <Datenbank-Name>`
 * SQL-Benutzer und SQL-Anmeldung für Datenbank einrichten.
 * TCP-Verbindungen für SQL-Server freischalten.
 
 image::images/sql-server-tcp-config.jpg[]
 
-== CAS-Dienst installieren.
+== CAS als minimalen Windows-Dienst installieren.
 
 * Dienst-Ordner erstellen (bspw. `Shared Data\Program Files\cas`).
 * `application.properties` im Dienst-Ordner erstellen:
@@ -73,11 +76,11 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 	<id>ID des Windows-Dienstes ohne Leerzeichen</id>
 	<name>Name des Windows-Dienstes</name>
 	<description>Beschreibung des Windows-Dienstes</description>
-	<executable>Pfad zum verwendeten java</executable>
+	<executable>Pfad zur java.exe.</executable>
 	<!-- Nur eines der beiden Argumente verwenden. -->
-	<!-- Die erste Variante ist für den Fall, dass die Release-Version verwendet wird. -->
+	<!-- Die erste Variante ist für den Fall, dass eine single fat Jar-Version verwendet wird. -->
 	<arguments>-Dloader.path="lib/" -jar aero.minova.core.application.system.service.jar</arguments>
-	<!-- Die zweite Variante ist für den Fall, dass die Entwickler-Version verwendet wird. -->
+	<!-- Die zweite Variante ist für den Fall, dass keine single fat Jar vorhanden ist. -->
 	<arguments>-cp "lib/*" aero.minova.core.application.system.CoreApplicationSystemApplication</arguments>
 	<logmode>rotate</logmode>
 </service>

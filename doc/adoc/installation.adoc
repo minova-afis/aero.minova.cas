@@ -2,7 +2,9 @@
 
 == Übersicht
 
-Jede Installation besteht aus 4 Teilen:
+Jede Installation besteht aus 4 Teilen,
+welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt werden
+(<<#sql-server-und-datenbank-einrichten>>):
 
 * Installation des CAS-Dienstes
 * Datenbank aufsetzen:

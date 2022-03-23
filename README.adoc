@@ -23,26 +23,15 @@ Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank s
 Der Fokus liegt hierbei darauf, das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.
 Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.
 
+Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereitgestellt
+
 == Weiterführende Dokumentation
 
 * xref:./CHANGELOG.adoc#[Changelog]
 * xref:./aero.minova.core.application.system.service/doc/adoc/index.adoc#[CAS-Dienst]
+* xref:./doc/adoc/installation.adoc#[Installation]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
-* xref:./doc/adoc/rechteverwaltung.adoc#[Rechteverwaltung]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
+* xref:./doc/adoc/rechteverwaltung.adoc#[Rechteverwaltung]
+* xref:./doc/adoc/structure.adoc#[Strukturübersicht]
 * xref:./aero.minova.core.application.system.app/doc/adoc/table-index.adoc#[Tabellen-Index]
-
-== Installation
-
-Jede Installation besteht aus 4 Teilen:
-
-* Dienst:
-** Ausführung in der Entwicklungsumgebung
-** Auslieferung als Docker-Image
-* Datenbank: xref:./doc/adoc/init.adoc#[Initialisieren und Manuelles Befüllen der Datenbank]
-* Dateisystem: Einbinden des lokalen Dateisystems
-* xref:./aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
-
-=== Installation für Spezifische Umgebungen
-* xref:./doc/adoc/installation.adoc#[Installation des Dienstes im alten Format]
-* xref:./doc/adoc/mindockerqnap-setup.adoc#[Installation auf mindockerqnap]

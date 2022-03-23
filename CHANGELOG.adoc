@@ -3,12 +3,18 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [12.36.4] - 2022-03-02
+## [12.36.5] - 2022-03-17
+
+`upload/logs` Ursache für Entpackungs-Probleme der hochgeladenen Datei loggen und zurückgeben.
+
+## [12.36.4] - 2022-03-04
+
+Korrektur der ForeignKey-Constraints von xtcasAuthorities.
+
+## [12.36.3] - 2022-03-02
 
 #254 Automatische Setup der Tabellen xtcasUsers und xtcasAuthorities.
 Diese Tabellen werden benötigt, damit Benutzer-Logins und deren Security-Token-Zuweisung für Nutzer über im SQL-Server gespeichert und geladen werden können.
-
-## [12.36.3] - 2022-02-23
 
 Automatische Admin-Rolle erstellen nach einem erfolgreichen Setup.
 

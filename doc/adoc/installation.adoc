@@ -1,14 +1,35 @@
 = Installation
 
+== Übersicht
+
+Jede Installation besteht aus 4 Teilen,
+welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt werden
+(<<#sql-server-und-datenbank-einrichten>>):
+
+* Installation des CAS-Dienstes
+* Datenbank aufsetzen:
+** <<sql-server-und-datenbank-einrichten>>
+** <<Datenbank-initialisieren>>
+* Dateisystem einbinden.
+* xref:./../../aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
+
+== Installation für Spezifische Umgebungen
+* <<CAS-als-Windows-Dienst-installieren>>
+* xref:./mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
+* Aufsetzen für die Entwicklungsumgebung.
+* Als Docker-Container ausliefern.
+
+[#sql-server-und-datenbank-einrichten]
 == SQL-Server und Datenbank einrichten.
 * SQL-Server installieren.
-* Datenbank erstellen.
+* Datenbank erstellen: `create database <Datenbank-Name>`
 * SQL-Benutzer und SQL-Anmeldung für Datenbank einrichten.
 * TCP-Verbindungen für SQL-Server freischalten.
 
 image::images/sql-server-tcp-config.jpg[]
 
-== CAS-Dienst installieren.
+[#CAS-als-Windows-Dienst-installieren]
+== CAS als Windows-Dienst installieren.
 
 * Dienst-Ordner erstellen (bspw. `Shared Data\Program Files\cas`).
 * `application.properties` im Dienst-Ordner erstellen:
@@ -58,11 +79,11 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 	<id>ID des Windows-Dienstes ohne Leerzeichen</id>
 	<name>Name des Windows-Dienstes</name>
 	<description>Beschreibung des Windows-Dienstes</description>
-	<executable>Pfad zum verwendeten java</executable>
+	<executable>Pfad zur java.exe.</executable>
 	<!-- Nur eines der beiden Argumente verwenden. -->
-	<!-- Die erste Variante ist für den Fall, dass die Release-Version verwendet wird. -->
+	<!-- Die erste Variante ist für den Fall, dass eine single fat Jar-Version verwendet wird. -->
 	<arguments>-Dloader.path="lib/" -jar aero.minova.core.application.system.service.jar</arguments>
-	<!-- Die zweite Variante ist für den Fall, dass die Entwickler-Version verwendet wird. -->
+	<!-- Die zweite Variante ist für den Fall, dass keine single fat Jar vorhanden ist. -->
 	<arguments>-cp "lib/*" aero.minova.core.application.system.CoreApplicationSystemApplication</arguments>
 	<logmode>rotate</logmode>
 </service>
@@ -73,3 +94,34 @@ kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) insta
 Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
 
 Windows-Dienst starten und die `data/procedure` Setup ausführen.
+
+[#Datenbank-initialisieren]
+== Datenbank initialisieren.
+
+Mit den `setup`-Befehl (`data/procedure`) wird die Datenbank aufgesetzt.
+Dieser kann über einen Webbrowser ausgeführt werden.
+Der `setup`-Befehl darf von jeden gültigen Nutzer ausgeführt werden,
+falls der `setup`-Befehl vorher nicht auf der Datenbank ausgeführt wurde.
+Alternativ, dazu kann auch ein REST-Client verwendet werden.
+
+=== Webbrowser
+** Browser mit URL des CAS-Dienstes aufrufen (bspw.: `http://localhost:8084/cas`).
+** An das CAS über Login-Seite anmelden.
+** Setup-Knopf drücken.
+
+=== REST-Client
+
+Die Datenbank kann mit dem folgenden `data/procedure`-Befehl initialisiert werden:
+
+[source,json]
+.Body des Post-Requests
+--------
+{
+    "name": "setup",
+    "columns": [],
+    "rows": []
+}
+--------
+
+Jeder Nutzer darf diesen Befehl beim ersten mal ausführen.
+Bei den nachfolgenden Ausführungen muss der Nutzer das entsprechende Recht haben.

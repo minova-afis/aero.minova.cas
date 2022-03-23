@@ -31,3 +31,4 @@ Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeiner
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 * xref:./doc/adoc/rechteverwaltung.adoc#[Rechteverwaltung]
+* xref:./doc/adoc/structure.adoc#[Struktur]

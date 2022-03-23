@@ -33,4 +33,4 @@ Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereit
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur für CAS-Module]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 * xref:./doc/adoc/rechteverwaltung.adoc#[Rechteverwaltung]
-* xref:./doc/adoc/structure.adoc#[Struktur]
+* xref:./doc/adoc/structure.adoc#[Strukturübersicht]

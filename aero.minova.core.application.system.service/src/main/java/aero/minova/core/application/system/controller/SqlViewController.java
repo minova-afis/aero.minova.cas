@@ -4,8 +4,11 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,9 +42,38 @@ public class SqlViewController {
 	@Autowired
 	CustomLogger customLogger;
 
+	final Object extensionSynchronizer = new Object();
+
+	/**
+	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
+	 */
+	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
+
+	/**
+	 * Hiermit lassen sich Erweiterungen für Views registrieren, die ausgeführt werden, wenn eine View mit der Namen der Registrierung ausgeführt werden soll.
+	 *
+	 * @param name
+	 *            Name der Erweiterung
+	 * @param ext
+	 *            Erweiterung
+	 */
+	public void registerExtension(String name, Function<Table, Table> ext) {
+		if (extensions.containsKey(name)) {
+			throw new IllegalArgumentException(name);
+		}
+		extensions.put(name, ext);
+	}
+
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
+
+		if (extensions.containsKey(inputTable.getName())) {
+			synchronized (extensionSynchronizer) {
+				return extensions.get(inputTable.getName()).apply(inputTable);
+			}
+		}
+
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();

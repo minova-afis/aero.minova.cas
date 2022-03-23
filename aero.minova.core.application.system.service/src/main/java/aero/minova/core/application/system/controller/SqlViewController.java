@@ -4,8 +4,11 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.domain.Column;
 import aero.minova.core.application.system.domain.DataType;
+import aero.minova.core.application.system.domain.OutputType;
 import aero.minova.core.application.system.domain.Row;
 import aero.minova.core.application.system.domain.Table;
 import aero.minova.core.application.system.domain.TableException;
@@ -39,17 +43,78 @@ public class SqlViewController {
 	@Autowired
 	CustomLogger customLogger;
 
+	@Autowired
+	SqlProcedureController spc;
+
+	final Object extensionSynchronizer = new Object();
+
+	/**
+	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
+	 */
+	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
+
+	/**
+	 * Hiermit lassen sich Erweiterungen für Views registrieren, die ausgeführt werden, wenn eine View mit der Namen der Registrierung ausgeführt werden soll.
+	 *
+	 * @param name
+	 *            Name der Erweiterung
+	 * @param ext
+	 *            Erweiterung
+	 */
+	public void registerExtension(String name, Function<Table, Table> ext) {
+		if (extensions.containsKey(name)) {
+			customLogger.logSetup("Cannot register two extensions with the same name: " + name);
+			throw new IllegalArgumentException(name);
+		}
+		extensions.put(name, ext);
+	}
+
+	/**
+	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
+	 * werden die Extensions in die tVersion10-Tabelle eingetragen.
+	 */
+	public void setupExtensions() {
+		Table extensionSetupTable = new Table();
+		extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
+		extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		extensionSetupTable.addColumn(new Column("KeyText", DataType.STRING));
+		extensionSetupTable.addColumn(new Column("Description", DataType.STRING));
+
+		for (String extensionName : extensions.keySet()) {
+			Row extensionSetupRows = new Row();
+			extensionSetupRows.addValue(null);
+			extensionSetupRows.addValue(new Value(extensionName, null));
+			extensionSetupRows.addValue(null);
+
+			extensionSetupTable.addRow(extensionSetupRows);
+		}
+		try {
+			spc.unsecurelyProcessProcedure(extensionSetupTable);
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to setup extension privileges!", e);
+			throw new RuntimeException(e);
+		}
+	}
+
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
+
+		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
+		List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
+		if (authoritiesForThisTable.isEmpty()) {
+			throw new TableException(new RuntimeException("msg.PrivilegeError %" + inputTable.getName()));
+		}
+		if (extensions.containsKey(inputTable.getName())) {
+			synchronized (extensionSynchronizer) {
+				return extensions.get(inputTable.getName()).apply(inputTable);
+			}
+		}
+
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
 		try {
-			List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
-			if (authoritiesForThisTable.isEmpty()) {
-				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
-			}
 			inputTable = securityService.columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {

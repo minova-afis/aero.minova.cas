@@ -14,7 +14,6 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import aero.minova.core.application.system.CustomLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.sql.SystemDatabase;
@@ -53,6 +54,9 @@ public class SetupService {
 	SqlProcedureController spc;
 
 	@Autowired
+	SqlViewController svc;
+
+	@Autowired
 	CustomLogger logger;
 
 	@PostConstruct
@@ -65,6 +69,7 @@ public class SetupService {
 				, service.getSystemFolder().resolve("setup")//
 				, true);
 				spc.setupExtensions();
+				svc.setupExtensions();
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);

@@ -6,9 +6,11 @@
 [WFC] --> [CAS]: Login und Anfragen
 User ..> [WFC]
 [CAS] .right.> AD: lesend
-[CAS] --> [Dateisystem]
-[CAS] --> [SQL-Datenbank]
+[CAS] --> [Resourcen]
+[Resourcen] --> [Dateisystem]
+[Resourcen] --> [SQL-Datenbank]
 [CAS] .left.> [Erweiterungen]
 [Erweiterungen] .left.> Dienste
+[Erweiterungen] ..> [Resourcen]
 @enduml
 ....

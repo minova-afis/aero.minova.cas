@@ -23,6 +23,8 @@ Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank s
 Der Fokus liegt hierbei darauf, das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.
 Das Ganze kann durch die Integration mit weiteren Systemen via Plugins verfeinert werden.
 
+Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereitgestellt
+
 == Weiterführende Dokumentation
 
 * xref:./CHANGELOG.adoc#[Changelog]

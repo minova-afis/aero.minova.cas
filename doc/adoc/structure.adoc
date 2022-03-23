@@ -1,0 +1,14 @@
+# Struktur (PlantUML)
+
+[plantuml, format="svg"]
+....
+@startuml
+[WFC] --> [CAS]: Login und Anfragen
+User ..> [WFC]
+[CAS] .right.> AD: lesend
+[CAS] --> [Dateisystem]
+[CAS] --> [SQL-Datenbank]
+[CAS] .left.> [Erweiterungen]
+[Erweiterungen] .left.> Dienste
+@enduml
+....

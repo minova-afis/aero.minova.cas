@@ -1,0 +1,18 @@
+# Struktur (PlantUML)
+
+Die gestrichelten Pfeile weisen darauf hin, dass die Aktion optional oder manuell ist.
+
+[plantuml, format="svg"]
+....
+@startuml
+[WFC] --> [CAS]: Login und Anfragen
+User ..> [WFC]
+[CAS] .right.> AD: lesend
+[CAS] --> [Resourcen]
+[Resourcen] --> [Dateisystem]
+[Resourcen] --> [SQL-Datenbank]
+[CAS] .left.> [Erweiterungen]
+[Erweiterungen] .left.> Dienste
+[Erweiterungen] ..> [Resourcen]
+@enduml
+....

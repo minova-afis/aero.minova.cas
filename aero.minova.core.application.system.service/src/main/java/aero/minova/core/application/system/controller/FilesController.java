@@ -443,7 +443,7 @@ public class FilesController {
 			fis.close();
 		} catch (IOException e) {
 			customLogger.logFiles("Error while unzipping file " + fileZip + " into directory " + destDirName);
-			throw new RuntimeException("msg.UnZipError %" + fileZip + " %" + destDirName);
+			throw new RuntimeException("msg.UnZipError %" + fileZip + " %" + destDirName, e);
 
 		}
 	}

@@ -1,5 +1,7 @@
 # Struktur (PlantUML)
 
+Die gestrichelten Pfeile weisen darauf hin, dass die Aktion optional oder manuell ist.
+
 [plantuml, format="svg"]
 ....
 @startuml

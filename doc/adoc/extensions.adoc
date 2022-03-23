@@ -7,5 +7,5 @@ Hierbei muss darauf geachtet werden, dass keine zwei Extensions mit demselben Na
 In diesem Fall wird eine entsprechenede Exception geworfen.
 
 Alle registierten Erweiterungen werden beim 'Setup' automatisch als Recht mit installiert und können so einfacher an die Rollen vergeben werden.
-Denn bevor eine Extension ausgeführt wird, werden die Rollen des Nutzer, der die Anfrage stellt, erst einmal darauf überprüft,
+Denn bevor eine Extension ausgeführt wird, werden die Rollen des Nutzers, der die Anfrage stellt, erst einmal darauf überprüft,
 ob das entsprechende Recht für die Extension vorhanden ist.

@@ -4,7 +4,7 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 
-## [12.36.6] - 2022-03-04
+## [12.37.0] - 2022-03-23
 
 Erweiterungen von Views können nun registriert werden.
 

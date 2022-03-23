@@ -75,6 +75,7 @@ public class SqlProcedureController {
 	 */
 	public void registerExtension(String name, Function<Table, ResponseEntity> ext) {
 		if (extensions.containsKey(name)) {
+			customLogger.logSetup("Cannot register two extensions with the same name: " + name);
 			throw new IllegalArgumentException(name);
 		}
 		extensions.put(name, ext);

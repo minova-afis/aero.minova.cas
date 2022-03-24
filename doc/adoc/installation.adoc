@@ -15,7 +15,6 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 
 == Installation für Spezifische Umgebungen
 * <<CAS-als-Windows-Dienst-installieren>>
-* xref:./mindockerqnap-setup.adoc#[Installation auf mindockerqnap]
 * Aufsetzen für die Entwicklungsumgebung.
 * Als Docker-Container ausliefern.
 

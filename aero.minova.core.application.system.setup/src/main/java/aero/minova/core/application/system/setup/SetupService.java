@@ -24,10 +24,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import aero.minova.cas.client.domain.SqlProcedureResult;
 import aero.minova.core.application.system.controller.SqlProcedureController;
 import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import domain.SqlProcedureResult;
 import lombok.val;
 
 /**

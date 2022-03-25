@@ -2,6 +2,7 @@ package aero.minova.cas.client.restapi;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpEntity;
@@ -84,7 +85,7 @@ public class ClientRestAPI {
 	 * @return Die OutpuParameter und das SqlProcedureResult der Prozedur als Table.
 	 */
 	public SqlProcedureResult sendProcedureRequest(Table inputTable) {
-		HttpEntity<Table> request = new HttpEntity<>(inputTable);
+		HttpEntity<Table> request = new HttpEntity<>(inputTable, createHeaders(username, password));
 		ResponseEntity<SqlProcedureResult> response = restTemplate.exchange(url + "/data/procedure", HttpMethod.POST, request, SqlProcedureResult.class);
 		return response.getBody();
 	}
@@ -97,8 +98,8 @@ public class ClientRestAPI {
 	 *            Eine Liste von Tables, bzw. eine XTable mit den Parametern der Prozeduren und IDs.
 	 * @return Die OutpuParameter und das SqlProcedureResult der Prozeduren als Liste von Tables mit IDs.
 	 */
-	public XSqlProcedureResult sendXProcedureRequest(XTable inputTable) {
-		HttpEntity<XTable> request = new HttpEntity<>(inputTable);
+	public XSqlProcedureResult sendXProcedureRequest(List<XTable> inputTable) {
+		HttpEntity<List<XTable>> request = new HttpEntity<>(inputTable, createHeaders(username, password));
 		ResponseEntity<XSqlProcedureResult> response = restTemplate.exchange(url + "/data/x-procedure", HttpMethod.POST, request, XSqlProcedureResult.class);
 		return response.getBody();
 	}
@@ -113,7 +114,7 @@ public class ClientRestAPI {
 	 * @return Die Datei als byte[].
 	 */
 	public byte[] sendGetFileRequest(String path) {
-		HttpEntity<String> request = new HttpEntity<>(path);
+		HttpEntity<String> request = new HttpEntity<>(path, createHeaders(username, password));
 		ResponseEntity<byte[]> response = restTemplate.exchange(url + "/files/read", HttpMethod.POST, request, byte[].class);
 		return response.getBody();
 	}
@@ -126,7 +127,7 @@ public class ClientRestAPI {
 	 * @return Den Hash der Datei als byte[].
 	 */
 	public byte[] sendGetHashRequest(String path) {
-		HttpEntity<String> request = new HttpEntity<>(path);
+		HttpEntity<String> request = new HttpEntity<>(path, createHeaders(username, password));
 		ResponseEntity<byte[]> response = restTemplate.exchange(url + "/files/hash", HttpMethod.POST, request, byte[].class);
 		return response.getBody();
 	}
@@ -139,7 +140,7 @@ public class ClientRestAPI {
 	 * @return Das Zip des Ordners als byte[].
 	 */
 	public byte[] sendGetZipRequest(String path) {
-		HttpEntity<String> request = new HttpEntity<>(path);
+		HttpEntity<String> request = new HttpEntity<>(path, createHeaders(username, password));
 		ResponseEntity<byte[]> response = restTemplate.exchange(url + "/files/zip", HttpMethod.POST, request, byte[].class);
 		return response.getBody();
 	}
@@ -152,7 +153,7 @@ public class ClientRestAPI {
 	 * @return HtpStatus.OK bei Erfolg.
 	 */
 	public HttpStatus sendUploadLogRequest(byte[] log) {
-		HttpEntity<byte[]> request = new HttpEntity<>(log);
+		HttpEntity<byte[]> request = new HttpEntity<>(log, createHeaders(username, password));
 		ResponseEntity<Void> response = restTemplate.exchange(url + "/upload/logs", HttpMethod.POST, request, Void.class);
 		return response.getStatusCode();
 	}

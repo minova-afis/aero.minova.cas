@@ -1,22 +1,34 @@
 package aero.minova.cas.client.restapi;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import aero.minova.cas.client.domain.PingResponse;
 import aero.minova.cas.client.domain.SqlProcedureResult;
 import aero.minova.cas.client.domain.Table;
+import aero.minova.cas.client.domain.Value;
+import aero.minova.cas.client.domain.ValueDeserializer;
+import aero.minova.cas.client.domain.ValueSerializer;
 import aero.minova.cas.client.domain.XSqlProcedureResult;
 import aero.minova.cas.client.domain.XTable;
 import lombok.NoArgsConstructor;
@@ -32,12 +44,27 @@ public class ClientRestAPI {
 
 	RestTemplate restTemplate;
 
+	@Autowired
+	Gson gson = gson();
+
+	@Bean
+	public Gson gson() {
+		return new GsonBuilder() //
+				.registerTypeAdapter(Value.class, new ValueSerializer()) //
+				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
+				.create();
+	}
+
 	public ClientRestAPI(String username, String password, String url) {
 		this.username = username;
 		this.password = password;
 		this.url = url;
 
 		restTemplate = new RestTemplate();
+		ArrayList<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
+		converters.add(new GsonHttpMessageConverter(gson));
+
+		restTemplate.setMessageConverters(converters);
 	}
 
 	private HttpHeaders createHeaders(String username, String password) {
@@ -54,12 +81,11 @@ public class ClientRestAPI {
 	/**
 	 * Sendet einen Ping Request.
 	 * 
-	 * @return Die PingResponse als int.
+	 * @return Die PingResponse als ResponseEntity.
 	 */
-	public int ping() {
+	public ResponseEntity<PingResponse> ping() {
 		HttpEntity<?> request = new HttpEntity<Object>(createHeaders(username, password));
-		ResponseEntity<PingResponse> response = restTemplate.exchange(url + "/ping", HttpMethod.GET, request, PingResponse.class);
-		return response.getBody().getReturnCode();
+		return restTemplate.exchange(url + "/ping", HttpMethod.GET, request, PingResponse.class);
 	}
 
 	// View Controller
@@ -70,10 +96,9 @@ public class ClientRestAPI {
 	 *            Die Table, für welche eine View zurückgegeben werden soll.
 	 * @return Eine Table mit dem gesamten Inhalt der View.
 	 */
-	public Table sendViewRequest(Table inputTable) {
+	public ResponseEntity<Table> sendViewRequest(Table inputTable) {
 		HttpEntity<Table> request = new HttpEntity<Table>(inputTable, createHeaders(username, password));
-		ResponseEntity<Table> response = restTemplate.exchange(url + "/data/index", HttpMethod.POST, request, Table.class);
-		return response.getBody();
+		return restTemplate.exchange(url + "/data/index", HttpMethod.POST, request, Table.class);
 	}
 
 	// SqlProcedureController
@@ -84,10 +109,9 @@ public class ClientRestAPI {
 	 *            Die Table mit den Parametern der Prozedur.
 	 * @return Die OutpuParameter und das SqlProcedureResult der Prozedur als Table.
 	 */
-	public SqlProcedureResult sendProcedureRequest(Table inputTable) {
+	public ResponseEntity<SqlProcedureResult> sendProcedureRequest(Table inputTable) {
 		HttpEntity<Table> request = new HttpEntity<>(inputTable, createHeaders(username, password));
-		ResponseEntity<SqlProcedureResult> response = restTemplate.exchange(url + "/data/procedure", HttpMethod.POST, request, SqlProcedureResult.class);
-		return response.getBody();
+		return restTemplate.exchange(url + "/data/procedure", HttpMethod.POST, request, SqlProcedureResult.class);
 	}
 
 	// XSqlProcedureController
@@ -98,10 +122,9 @@ public class ClientRestAPI {
 	 *            Eine Liste von Tables, bzw. eine XTable mit den Parametern der Prozeduren und IDs.
 	 * @return Die OutpuParameter und das SqlProcedureResult der Prozeduren als Liste von Tables mit IDs.
 	 */
-	public XSqlProcedureResult sendXProcedureRequest(List<XTable> inputTable) {
+	public ResponseEntity<List<XSqlProcedureResult>> sendXProcedureRequest(List<XTable> inputTable) {
 		HttpEntity<List<XTable>> request = new HttpEntity<>(inputTable, createHeaders(username, password));
-		ResponseEntity<XSqlProcedureResult> response = restTemplate.exchange(url + "/data/x-procedure", HttpMethod.POST, request, XSqlProcedureResult.class);
-		return response.getBody();
+		return restTemplate.exchange(url + "/data/x-procedure", HttpMethod.POST, request, new ParameterizedTypeReference<List<XSqlProcedureResult>>() {});
 	}
 
 	// FilesController
@@ -113,10 +136,9 @@ public class ClientRestAPI {
 	 *            Der Pfad oder nur der Name der Datei als String.
 	 * @return Die Datei als byte[].
 	 */
-	public byte[] sendGetFileRequest(String path) {
+	public ResponseEntity<byte[]> sendGetFileRequest(String path) {
 		HttpEntity<String> request = new HttpEntity<>(path, createHeaders(username, password));
-		ResponseEntity<byte[]> response = restTemplate.exchange(url + "/files/read", HttpMethod.POST, request, byte[].class);
-		return response.getBody();
+		return restTemplate.exchange(url + "/files/read", HttpMethod.POST, request, byte[].class);
 	}
 
 	/**
@@ -126,10 +148,9 @@ public class ClientRestAPI {
 	 *            Der Pfad oder nur er Name der zu hashenden Datei als String.
 	 * @return Den Hash der Datei als byte[].
 	 */
-	public byte[] sendGetHashRequest(String path) {
+	public ResponseEntity<byte[]> sendGetHashRequest(String path) {
 		HttpEntity<String> request = new HttpEntity<>(path, createHeaders(username, password));
-		ResponseEntity<byte[]> response = restTemplate.exchange(url + "/files/hash", HttpMethod.POST, request, byte[].class);
-		return response.getBody();
+		return restTemplate.exchange(url + "/files/hash", HttpMethod.POST, request, byte[].class);
 	}
 
 	/**
@@ -139,10 +160,9 @@ public class ClientRestAPI {
 	 *            Der Pfad zum Ordner oder der Name des Ordners als String.
 	 * @return Das Zip des Ordners als byte[].
 	 */
-	public byte[] sendGetZipRequest(String path) {
+	public ResponseEntity<byte[]> sendGetZipRequest(String path) {
 		HttpEntity<String> request = new HttpEntity<>(path, createHeaders(username, password));
-		ResponseEntity<byte[]> response = restTemplate.exchange(url + "/files/zip", HttpMethod.POST, request, byte[].class);
-		return response.getBody();
+		return restTemplate.exchange(url + "/files/zip", HttpMethod.POST, request, byte[].class);
 	}
 
 	/**

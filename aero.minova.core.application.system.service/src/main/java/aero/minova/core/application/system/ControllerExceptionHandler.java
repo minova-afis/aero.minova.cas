@@ -121,26 +121,20 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		if (errorMessage == null) {
 			errorMessage = "msg.NoErrorMessageAvailable";
 		}
-		// falls die Message in der Form 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird' ist
-		List<String> errorMessageParts = Stream.of(errorMessage.split("%"))//
-				.map(String::trim)//
-				.collect(Collectors.toList());
 
-		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
-		// Hinzufügen der Spalten für die InputParameter der Internationalierung
-		for (int i = 1; i < errorMessageParts.size(); i++) {
-			outputTable.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
+		// Alles vor 'msg.' wegschmeißen.
+		errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
+
+		/*
+		 * Es gibt zwei Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'
+		 */
+		if (errorMessage.contains("|")) {
+			// Verarbeiten der Fehlermeldungen in Form: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext'
+			outputTable = handleSqlErrorMessage(outputTable, errorMessage);
+		} else {
+			// Verarbeiten der Fehlermeldungen in Form: 2. 'msg.PrivilegeError %tBeispiel'
+			outputTable = handleGenericErrorMessage(outputTable, errorMessage);
 		}
-
-		Row internatMsg = new Row();
-
-		// Hinzufügen der International Message und der InputParameter der Internationalierung
-		for (int i = 0; i < errorMessageParts.size(); i++) {
-			Value param = new Value(errorMessageParts.get(i), null);
-			internatMsg.addValue(param);
-		}
-
-		outputTable.addRow(internatMsg);
 
 		Exception sqlE = new Exception(errorMessage, ex);
 		ErrorMessage error = new ErrorMessage();
@@ -155,6 +149,84 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		error.setTrace(trace);
 		outputTable.setReturnErrorMessage(error);
 		saveErrorInDatabase(ex);
+		return outputTable;
+	}
+
+	/**
+	 * Bringt das Format 'msg.PrivilegeError %tBeispiel' in Form einer Table noch ohne Stacktrace und returnErrorMessage.
+	 * 
+	 * @param outputTable
+	 *            Die bisher gebaute Table, welche dann auch uzrückgegeben wird.
+	 * @param errorMessage
+	 *            Die Fehlermeldung, welche auseinander gebaut werden muss.
+	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
+	 */
+	private Table handleGenericErrorMessage(Table outputTable, String errorMessage) {
+		Row parameterValues = new Row();
+
+		// Falls in der Message noch Parameter mit '%' vorkommen, z.B.: 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird', werden sie hier
+		// raus gefiltert und kommen in ihre eigene Zeile.
+		List<String> errorMessageParts = Stream.of(errorMessage.split("%"))//
+				.map(String::trim)//
+				.collect(Collectors.toList());
+
+		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
+		// Hinzufügen der Spalten für die InputParameter der Internationalierung
+		for (int i = 1; i < errorMessageParts.size(); i++) {
+			outputTable.addColumn(new Column("MessageInputParam" + i, DataType.STRING));
+		}
+
+		// Hinzufügen der International Message und der InputParameter der Internationalierung
+		for (int i = 0; i < errorMessageParts.size(); i++) {
+			Value param = new Value(errorMessageParts.get(i), null);
+			parameterValues.addValue(param);
+		}
+
+		outputTable.addRow(parameterValues);
+		return outputTable;
+	}
+
+	/**
+	 * Bringt das Format 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' in Form einer Table noch ohne Stacktrace und returnErrorMessage.
+	 * 
+	 * @param outputTable
+	 *            Die bisher gebaute Table, welche dann auch uzrückgegeben wird.
+	 * @param errorMessage
+	 *            Die Fehlermeldung, welche auseinander gebaut werden muss.
+	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
+	 */
+	private Table handleSqlErrorMessage(Table outputTable, String errorMessage) {
+
+		List<String> sqlErrorMessage = Stream.of(errorMessage.split("\\|"))//
+				.map(String::trim)//
+				.collect(Collectors.toList());
+
+		// Ab hier benutzen wir den ersten Teil der sqlErrorMessage.
+
+		// Splitte den String überall da, wo ein @ vorkommt.
+		String[] types = sqlErrorMessage.get(0).split("@");
+
+		Row internatMsg = new Row();
+
+		// Falls es sich um die erste Art der Fehlermeldung handelt, wird hier 'msg.sql.BeispielFehlermeldung' eingefügt.
+		internatMsg.addValue(new Value(types[0], null));
+
+		// Im ersten Array ist der Part mit msg.Fehlermeldung. Den wollen wir hier nicht.
+		// Im letzten Array von types ist nur noch die Standard-Errormessage. Die brauchen wir hier auch nicht.
+		for (int i = 1; i < types.length; i++) {
+			types[i] = types[i].trim();
+			int blank = types[i].indexOf(' ');
+			outputTable.addColumn(new Column(types[i].substring(0, blank), DataType.STRING));
+			internatMsg.addValue(new Value((types[i].subSequence(blank + 1, types[i].length())).toString(), null));
+		}
+
+		// Die Column MUSS 'DEFAULT' heißen.
+		outputTable.addColumn(new Column("DEFAULT", DataType.STRING));
+
+		// Die Standard-Fehlermeldung hinzufügen
+		internatMsg.addValue(new Value(sqlErrorMessage.get(1), null));
+
+		outputTable.addRow(internatMsg);
 		return outputTable;
 	}
 

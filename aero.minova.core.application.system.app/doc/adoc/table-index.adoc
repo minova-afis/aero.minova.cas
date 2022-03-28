@@ -4,7 +4,17 @@
 
     
         
+* link:xtcasAuthorities.adoc[]
+
+    
+    
+        
 * link:xtcasColumnSecurity.adoc[]
+
+    
+    
+        
+* link:xtcasError.adoc[]
 
     
     
@@ -19,16 +29,16 @@
     
     
         
-* link:xtcasUserPrivilege.adoc[]
-
-    
-    
-        
 * link:xtcasUserGroup.adoc[]
 
     
     
         
-* link:xtcasError.adoc[]
+* link:xtcasUserPrivilege.adoc[]
+
+    
+    
+        
+* link:xtcasUsers.adoc[]
 
     

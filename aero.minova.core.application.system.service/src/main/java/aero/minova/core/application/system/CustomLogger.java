@@ -31,6 +31,8 @@ public class CustomLogger {
 	public Logger userLogger = LoggerFactory.getLogger("UserLogger");
 	// Log für File Hashes und Zipps
 	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
+	// Log für Setup
+	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
 
 	@Autowired
 	Gson gson;
@@ -87,6 +89,10 @@ public class CustomLogger {
 
 	public void logFiles(String logMessage) {
 		filesLogger.info("CAS " + logMessage);
+	}
+
+	public void logSetup(String logMessage) {
+		setupLogger.info("CAS " + logMessage);
 	}
 
 	/**

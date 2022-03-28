@@ -7,6 +7,63 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 Bereitstellen des aero.minova.cas.client-Moduls, welches Kern-Klassen zum Austausch von HTTP-Anfragen an das CAS enthält.
 
+## [12.37.0] - 2022-03-23
+
+Erweiterungen von Views können nun registriert werden.
+
+## [12.36.5] - 2022-03-17
+
+`upload/logs` Ursache für Entpackungs-Probleme der hochgeladenen Datei loggen und zurückgeben.
+
+## [12.36.4] - 2022-03-04
+
+Korrektur der ForeignKey-Constraints von xtcasAuthorities.
+
+## [12.36.3] - 2022-03-02
+
+#254 Automatische Setup der Tabellen xtcasUsers und xtcasAuthorities.
+Diese Tabellen werden benötigt, damit Benutzer-Logins und deren Security-Token-Zuweisung für Nutzer über im SQL-Server gespeichert und geladen werden können.
+
+Automatische Admin-Rolle erstellen nach einem erfolgreichen Setup.
+
+## [12.36.2] - 2022-02-22
+
+Korrektes Anzeigen der letzten Seite einer View.
+
+## [12.36.1] - 2022-02-15
+
+Fehlende Prozedur im Setup hinzugefügt.
+
+## [12.36.0] - 2022-02-15
+
+Es wird nun ein eigener Logger für das Setup verwendet.
+
+Fehlermeldungen können nun auf zwei verschiedene Arten verarbeitet und dargestellt werden.
+
+
+## [12.35.0] - 2022-02-08
+
+Es können nun auch Kundenprojekte als Abhängigkeit in anderen Kundenprojekten angegeben werden. 
+Sie werden beim Setup nun richtig verarbeitet.
+
+
+## [12.34.2] - 2022-01-11
+
+core.application.system.service nutzt nun cas.client für die Kern-Klassen.
+cas.client Package-Namen angepasst. 
+
+## [12.34.1] - 2022-01-11
+
+Kern-Klassen in cas.client-Unterprojekt ausgelagert.
+
+## [12.34.0] - 2022-01-11
+
+Die Extensions werden nun beim Setup-Befehl mitinstalliert.
+
+## [12.33.1] - 2022-01-07
+
+Einführen einer Methode, um Prozeduren ungeprüft/ ohne Rechte ausführen zu können.
+
 ## [12.33.0] - 2021-12-17
 
 Der Setup-Befehl kann nun über die Web-Oberfläche ausgeführt werden.

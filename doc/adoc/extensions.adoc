@@ -1,0 +1,11 @@
+=== Extensions bzw. Erweiterungen
+
+Es können beim CAS Erweiterungen, sowohl für Prozeduren, als auch für Views registiert werden.
+
+Hierzu muss bei dem jeweiligen Controller nur die Methode *'registerExtension'* aufgerufen werden. 
+Hierbei muss darauf geachtet werden, dass keine zwei Extensions mit demselben Namen exisiteren. 
+In diesem Fall wird eine entsprechenede Exception geworfen.
+
+Alle registierten Erweiterungen werden beim 'Setup' automatisch als Recht mit installiert und können so einfacher an die Rollen vergeben werden.
+Denn bevor eine Extension ausgeführt wird, werden die Rollen des Nutzers, der die Anfrage stellt, erst einmal darauf überprüft,
+ob das entsprechende Recht für die Extension vorhanden ist.

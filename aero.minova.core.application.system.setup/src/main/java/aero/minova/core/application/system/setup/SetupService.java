@@ -14,8 +14,6 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +23,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import aero.minova.cas.api.domain.SqlProcedureResult;
+import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.controller.SqlProcedureController;
+import aero.minova.core.application.system.controller.SqlViewController;
 import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.sql.SystemDatabase;
 import lombok.val;
@@ -53,7 +53,11 @@ public class SetupService {
 	@Autowired
 	SqlProcedureController spc;
 
-	Logger logger = LoggerFactory.getLogger(SetupService.class);
+	@Autowired
+	SqlViewController svc;
+
+	@Autowired
+	CustomLogger logger;
 
 	@PostConstruct
 	private void setup() {
@@ -64,6 +68,8 @@ public class SetupService {
 				, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
 				, service.getSystemFolder().resolve("setup")//
 				, true);
+				spc.setupExtensions();
+				svc.setupExtensions();
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -82,11 +88,12 @@ public class SetupService {
 	 */
 	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = determineDependencyOrder(Files.readString(dependencyList));
-		logger.info("Dependency Installation Order: " + dependencies);
+		logger.logSetup("Dependency Installation Order: " + dependencies);
 		final List<String> procedures = new ArrayList<>();
 		for (String dependency : dependencies) {
+			logger.logSetup("Searching for setup.xml for dependency " + dependency);
 			final Path setupXml = findSetupXml(dependency, dependencySetupsDir);
-			logger.info("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);
+			logger.logSetup("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);
 			if (setupTableSchemas) {
 				installToolIntegration.installSetup(setupXml);
 			}
@@ -117,13 +124,14 @@ public class SetupService {
 		String niceSetupFile = dependency + ".setup.xml";
 		Path dependencySetupFile = dependencySetupsDir.resolve(niceSetupFile);
 		if (Files.exists(dependencySetupFile)) {
-			logger.info("Reading Setup-File: " + niceSetupFile);
+			logger.logSetup("Reading Setup-File: " + niceSetupFile);
 			return dependencySetupFile;
 		}
 		/*
-		 * Wenn dies kein Hack wäre, würde es hiermit enden. else { throw new NoSuchFileException("No setup file found with the name " + setupFile); }
+		 * Immer ab dem zweiten Punkt die Dependency abschneiden. Bsp: aero.minova.cas.app --> cas.app oder com.minova.cas.app --> cas.app Wenn dies kein Hack
+		 * wäre, würde es hiermit enden. else { throw new NoSuchFileException("No setup file found with the name " + setupFile); }
 		 */
-		final String adjustedDependency = dependency.substring("aero.minova.".length());
+		final String adjustedDependency = dependency.substring(dependency.indexOf(".", dependency.indexOf(".") + 1) + 1);
 		try {
 			final Optional<Path> result = Files.walk(dependencySetupsDir, 1).map(dir -> {
 				if (dir.getFileName().toString().startsWith(adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency)) {
@@ -198,12 +206,12 @@ public class SetupService {
 					// Den Sql-Code aus der Datei auslesen und ausführen.
 					String procedure = Files.readString(sqlFile);
 
-					logger.info("Executing Script " + procedureName);
+					logger.logSetup("Executing Script " + procedureName);
 					try {
 						connection.prepareCall(procedure).execute();
 						connection.commit();
 					} catch (Exception e) {
-						logger.info("Script " + procedureName + " is being executed.");
+						logger.logSetup("Script " + procedureName + " is being executed.");
 						// Falls das beim ersten Versuch die Prozedur/View noch nicht existiert, wird sie hier angelegt.
 						if (procedure.startsWith("alter ")) {
 							procedure = procedure.substring(5);

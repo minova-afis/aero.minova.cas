@@ -34,6 +34,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableMetaData;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.ExecuteStrategy;
@@ -73,6 +74,7 @@ public class SqlProcedureController {
 	 */
 	public void registerExtension(String name, Function<Table, ResponseEntity> ext) {
 		if (extensions.containsKey(name)) {
+			customLogger.logSetup("Cannot register two extensions with the same name: " + name);
 			throw new IllegalArgumentException(name);
 		}
 		extensions.put(name, ext);
@@ -91,6 +93,53 @@ public class SqlProcedureController {
 			throw new IllegalArgumentException(name);
 		}
 		extensionBootstrapChecks.put(name, extCheck);
+	}
+
+	/**
+	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
+	 * werden die Extensions in die tVersion10-Tabelle eingetragen und eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden.
+	 */
+	public void setupExtensions() {
+		Table extensionSetupTable = new Table();
+		extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
+		extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		extensionSetupTable.addColumn(new Column("KeyText", DataType.STRING));
+		extensionSetupTable.addColumn(new Column("Description", DataType.STRING));
+
+		for (String extensionName : extensions.keySet()) {
+			Row extensionSetupRows = new Row();
+			extensionSetupRows.addValue(null);
+			extensionSetupRows.addValue(new Value(extensionName, null));
+			extensionSetupRows.addValue(null);
+
+			extensionSetupTable.addRow(extensionSetupRows);
+		}
+		try {
+			unsecurelyProcessProcedure(extensionSetupTable);
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to setup extension privileges!", e);
+			throw new RuntimeException(e);
+		}
+
+		// Nach dem erfolgreichen Setup noch die Admin-Rolle erstellen und alle Rechte geben.
+		try {
+			Table adminPrivilegeTable = new Table();
+			adminPrivilegeTable.setName("xpcasInsertAllPrivilegesToUserGroup");
+			adminPrivilegeTable.addColumn(new Column("UserGroup", DataType.STRING));
+			adminPrivilegeTable.addColumn(new Column("SecurityToken", DataType.STRING));
+
+			// Eine Gruppe mit dem Namen 'admin' und dem SecurityToken 'admin' anlegen.
+			Row adminSetupRow = new Row();
+			adminSetupRow.addValue(new Value("admin", null));
+			adminSetupRow.addValue(new Value("admin", null));
+
+			adminPrivilegeTable.addRow(adminSetupRow);
+			unsecurelyProcessProcedure(adminPrivilegeTable);
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to setup privileges for admin!", e);
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	/**
@@ -136,9 +185,36 @@ public class SqlProcedureController {
 			return new ResponseEntity(result, HttpStatus.ACCEPTED);
 		} catch (Throwable e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
+
 			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
 			throw new ProcedureException(e);
 		}
+	}
+
+	/**
+	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben.
+	 * 
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 */
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		Row requestingAuthority = new Row();
+		/*
+		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
+		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+		 */
+		requestingAuthority.addValue(new Value(false, "1"));
+		requestingAuthority.addValue(new Value(false, "2"));
+		requestingAuthority.addValue(new Value(false, "3"));
+
+		List<Row> authority = new ArrayList<>();
+		authority.add(requestingAuthority);
+		return processSqlProcedureRequest(inputTable, authority);
 	}
 
 	/**
@@ -156,13 +232,14 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich.
+	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
+	 * zurückgegeben.
 	 *
 	 * @param inputTable
-	 *            Ausführungs-Parameter
+	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
 	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
-	 * @return Resultat der Ausführung
+	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */

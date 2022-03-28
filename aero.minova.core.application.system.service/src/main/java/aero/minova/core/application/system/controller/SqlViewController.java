@@ -4,8 +4,11 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.OutputType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
@@ -40,6 +44,59 @@ public class SqlViewController {
 	@Autowired
 	CustomLogger customLogger;
 
+	@Autowired
+	SqlProcedureController spc;
+
+	final Object extensionSynchronizer = new Object();
+
+	/**
+	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
+	 */
+	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
+
+	/**
+	 * Hiermit lassen sich Erweiterungen für Views registrieren, die ausgeführt werden, wenn eine View mit der Namen der Registrierung ausgeführt werden soll.
+	 *
+	 * @param name
+	 *            Name der Erweiterung
+	 * @param ext
+	 *            Erweiterung
+	 */
+	public void registerExtension(String name, Function<Table, Table> ext) {
+		if (extensions.containsKey(name)) {
+			customLogger.logSetup("Cannot register two extensions with the same name: " + name);
+			throw new IllegalArgumentException(name);
+		}
+		extensions.put(name, ext);
+	}
+
+	/**
+	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
+	 * werden die Extensions in die tVersion10-Tabelle eingetragen.
+	 */
+	public void setupExtensions() {
+		Table extensionSetupTable = new Table();
+		extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
+		extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		extensionSetupTable.addColumn(new Column("KeyText", DataType.STRING));
+		extensionSetupTable.addColumn(new Column("Description", DataType.STRING));
+
+		for (String extensionName : extensions.keySet()) {
+			Row extensionSetupRows = new Row();
+			extensionSetupRows.addValue(null);
+			extensionSetupRows.addValue(new Value(extensionName, null));
+			extensionSetupRows.addValue(null);
+
+			extensionSetupTable.addRow(extensionSetupRows);
+		}
+		try {
+			spc.unsecurelyProcessProcedure(extensionSetupTable);
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to setup extension privileges!", e);
+			throw new RuntimeException(e);
+		}
+	}
+
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexViewGet(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(
@@ -50,14 +107,22 @@ public class SqlViewController {
 	@PostMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
+
+		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
+		List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
+		if (authoritiesForThisTable.isEmpty()) {
+			throw new TableException(new RuntimeException("msg.PrivilegeError %" + inputTable.getName()));
+		}
+		if (extensions.containsKey(inputTable.getName())) {
+			synchronized (extensionSynchronizer) {
+				return extensions.get(inputTable.getName()).apply(inputTable);
+			}
+		}
+
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
 		try {
-			List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
-			if (authoritiesForThisTable.isEmpty()) {
-				throw new RuntimeException("msg.PrivilegeError %" + inputTable.getName());
-			}
 			inputTable = securityService.columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {
@@ -81,18 +146,34 @@ public class SqlViewController {
 			} else {
 				limit = inputMetaData.getLimited();
 			}
-			val viewQuery = pagingWithSeek(inputTable, false, limit, false, page, authoritiesForThisTable);
+
+			// Wir setzten für Page 1 und für limited 0 ein, damit wir alle Ergebnisse bekommen. Die Menge wird später begrenzt.
+			val viewQuery = pagingWithSeek(inputTable, false, 0, false, 1, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logSql("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
 			result = convertSqlResultToTable(inputTable, resultSet);
-			int viewCount = 0;
+
+			int totalResults = 0;
 			if (result.getRows().size() > 0) {
-				viewCount = result.getRows().size();
+				totalResults = result.getRows().size();
 			}
-			result.fillMetaData(result, limit, viewCount, page);
+
+			// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
+			if (limit > 0) {
+				List<Row> resultRows = new ArrayList<>();
+				for (int i = 0; i < limit; i++) {
+					int rowPointer = i + (limit * (page - 1));
+					if (rowPointer < result.getRows().size()) {
+						resultRows.add(result.getRows().get(rowPointer));
+					}
+				}
+				result.setRows(resultRows);
+			}
+
+			result.fillMetaData(result, limit, totalResults, page);
 
 		} catch (Throwable e) {
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);

@@ -69,10 +69,10 @@ public class XSqlProcedureController {
 		try {
 			connection = systemDatabase.getConnection();
 			// Hier wird die Anfrage bearbeitet.
-			resultSets = processXProcedures(inputTables, resultSets, sb, connection);
+			resultSets = processXProcedures(inputTables, resultSets);
 
 			// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
-			checkFollowUpProcedures(inputTables, resultSets, connection, sb);
+			checkFollowUpProcedures(inputTables, resultSets);
 
 			// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
 			connection.commit();
@@ -90,7 +90,7 @@ public class XSqlProcedureController {
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
 	}
 
-	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sb, Connection connection)
+	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets)
 			throws Exception, ProcedureException, SQLException {
 		for (XTable xt : inputTables) {
 			SqlProcedureResult result = new SqlProcedureResult();
@@ -106,7 +106,7 @@ public class XSqlProcedureController {
 					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
 				}
 			}
-			sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+			sqlProcedureController.executeProcedure(filledTable);
 			// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
 			resultSets.add(new XSqlProcedureResult(xt.getId(), result));
 		}
@@ -234,7 +234,7 @@ public class XSqlProcedureController {
 	 * @param sb
 	 *            Ein StringBuffer, welcher das Ausführen der Check-Prozeudren loggt.
 	 */
-	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults, Connection connection, StringBuffer sb) {
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults) {
 		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
 		Table privilegeRequest = new Table();
 		privilegeRequest.setName("xtcasUserPrivilege");
@@ -306,7 +306,7 @@ public class XSqlProcedureController {
 
 				}
 			}
-			processXProcedures(checksXtables, xsqlresults, sb, connection);
+			processXProcedures(checksXtables, xsqlresults);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to find follow up procedures.", e);
 		}

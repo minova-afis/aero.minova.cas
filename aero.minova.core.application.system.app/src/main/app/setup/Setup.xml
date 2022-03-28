@@ -2,6 +2,7 @@
 <setup name="aero.minova.core.application.system.app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
 	<sql-code>
+		<script name="xtcasAuthoritiesConstraints" type="script"/>
 		<script name="initDebug" type="script"/>
 		<script name="initVersionTable" type="script"/>
 		<script name="initVersionTable1" type="script"/>
@@ -34,16 +35,19 @@
 		<script name="xpcasDeleteLuUserPrivilegeUserGroup" type="procedure"/>
 		<script name="xpcasReadUserPrivilege" type="procedure"/>
 		<script name="xpcasInsertUserPrivilege" type="procedure"/>
-		<script name="xpcasInsertAllPrivilegesToUser" type="procedure"/>
 		<script name="xpcasUpdateUserPrivilege" type="procedure"/>
 		<script name="xpcasDeleteUserPrivilege" type="procedure"/>
 		<script name="xvcasUserPrivilegeIndex" type="view"/>
+		<script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
+		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
 	</sql-code>
 	<schema>
 		<tableschema name="xtcasError" type="table"/>
 		<tableschema name="xtcasUser" type="table"/>
+		<tableschema name="xtcasUsers" type="table"/>
 		<tableschema name="xtcasUserGroup" type="table"/>
 		<tableschema name="xtcasUserPrivilege" type="table"/>
+		<tableschema name="xtcasAuthorities" type="table"/>
 		<tableschema name="xtcasColumnSecurity" type="table"/>
 		<tableschema name="xtcasLuUserPrivilegeUserGroup" type="table"/>
 	</schema>

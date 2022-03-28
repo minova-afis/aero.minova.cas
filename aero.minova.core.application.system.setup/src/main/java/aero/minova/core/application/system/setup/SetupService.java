@@ -25,9 +25,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import aero.minova.core.application.system.controller.SqlProcedureController;
-import aero.minova.core.application.system.domain.SqlProcedureResult;
 import aero.minova.core.application.system.service.FilesService;
 import aero.minova.core.application.system.sql.SystemDatabase;
+import cas.domain.SqlProcedureResult;
 import lombok.val;
 
 /**

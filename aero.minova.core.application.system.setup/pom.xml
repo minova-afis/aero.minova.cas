@@ -21,7 +21,7 @@
 	<dependencies>
 	<dependency>
 			<groupId>aero.minova</groupId>
-			<artifactId>cas.client</artifactId>
+			<artifactId>cas.api</artifactId>
 			<version>12.35.0-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>

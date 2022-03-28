@@ -1,6 +1,6 @@
 == CAS API
 
-Ein Beispiel-Projekt zur Verwendung der CAS API, um mit dem CAS zu Kommunizieren findet man link:https://github.com/minova-afis/aero.minova.cas.client.quickstart[hier].
+Ein Beispiel-Projekt zur Verwendung der CAS API, um mit dem CAS zu Kommunizieren, findet man link:https://github.com/minova-afis/aero.minova.cas.client.quickstart[hier].
 
 DAS CAS API Modul enthält alle Komponenten, welche zur Kommunikation mit dem CAS benötigt werden.
 

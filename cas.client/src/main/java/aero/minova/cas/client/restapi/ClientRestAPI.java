@@ -59,11 +59,9 @@ public class ClientRestAPI {
 		this.username = username;
 		this.password = password;
 		this.url = url;
-
 		restTemplate = new RestTemplate();
 		ArrayList<HttpMessageConverter<?>> converters = new ArrayList<HttpMessageConverter<?>>();
 		converters.add(new GsonHttpMessageConverter(gson));
-
 		restTemplate.setMessageConverters(converters);
 	}
 

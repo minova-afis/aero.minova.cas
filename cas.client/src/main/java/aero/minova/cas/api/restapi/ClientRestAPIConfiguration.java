@@ -1,4 +1,4 @@
-package aero.minova.cas.client.restapi;
+package aero.minova.cas.api.restapi;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

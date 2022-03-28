@@ -1,4 +1,4 @@
-package aero.minova.cas.client.domain;
+package aero.minova.cas.api.domain;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;

@@ -1,4 +1,4 @@
-package aero.minova.cas.client.domain;
+package aero.minova.cas.api.domain;
 
 public enum DataType {
 	BOOLEAN, DOUBLE, INSTANT, INTEGER, LONG, STRING, ZONED, BIGDECIMAL;

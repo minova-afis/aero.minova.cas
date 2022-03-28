@@ -1,4 +1,4 @@
-package aero.minova.cas.client.restapi;
+package aero.minova.cas.api.restapi;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -23,14 +23,14 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import aero.minova.cas.client.domain.PingResponse;
-import aero.minova.cas.client.domain.SqlProcedureResult;
-import aero.minova.cas.client.domain.Table;
-import aero.minova.cas.client.domain.Value;
-import aero.minova.cas.client.domain.ValueDeserializer;
-import aero.minova.cas.client.domain.ValueSerializer;
-import aero.minova.cas.client.domain.XSqlProcedureResult;
-import aero.minova.cas.client.domain.XTable;
+import aero.minova.cas.api.domain.PingResponse;
+import aero.minova.cas.api.domain.SqlProcedureResult;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.api.domain.ValueDeserializer;
+import aero.minova.cas.api.domain.ValueSerializer;
+import aero.minova.cas.api.domain.XSqlProcedureResult;
+import aero.minova.cas.api.domain.XTable;
 import lombok.NoArgsConstructor;
 
 @Component
@@ -68,7 +68,7 @@ public class ClientRestAPI {
 	private HttpHeaders createHeaders(String username, String password) {
 		HttpHeaders headers = new HttpHeaders();
 		String auth = username + ":" + password;
-		byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+		byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("UTF8")));
 		String authHeader = "Basic " + new String(encodedAuth);
 		headers.set("Authorization", authHeader);
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -77,7 +77,8 @@ public class ClientRestAPI {
 	}
 
 	/**
-	 * Sendet einen Ping Request.
+	 * Sendet einen Ping Request. Dies funktioniert nur, wenn die Anmelde-Daten (Benutzername und Passwort) richtig sind. Es kann somit dazu genutzt werden, um
+	 * die Anmeldung zu prüfen.
 	 * 
 	 * @return Die PingResponse als ResponseEntity.
 	 */

@@ -15,9 +15,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import cas.domain.Value;
-import cas.domain.ValueDeserializer;
-import cas.domain.ValueSerializer;
+import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.api.domain.ValueDeserializer;
+import aero.minova.cas.api.domain.ValueSerializer;
 
 // Der ComponentScan wird verwendet, damit alle Minova Komponenten im classpath geladen werden.
 @SpringBootApplication

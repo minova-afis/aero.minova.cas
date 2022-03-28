@@ -22,19 +22,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.ErrorMessage;
+import aero.minova.cas.api.domain.ProcedureException;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.SqlProcedureResult;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.TableException;
+import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.api.domain.XProcedureException;
+import aero.minova.cas.api.domain.XSqlProcedureResult;
+import aero.minova.cas.api.domain.XTable;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import cas.domain.Column;
-import cas.domain.DataType;
-import cas.domain.ErrorMessage;
-import cas.domain.ProcedureException;
-import cas.domain.Row;
-import cas.domain.SqlProcedureResult;
-import cas.domain.Table;
-import cas.domain.TableException;
-import cas.domain.Value;
-import cas.domain.XProcedureException;
-import cas.domain.XSqlProcedureResult;
-import cas.domain.XTable;
 import lombok.val;
 
 @RestControllerAdvice

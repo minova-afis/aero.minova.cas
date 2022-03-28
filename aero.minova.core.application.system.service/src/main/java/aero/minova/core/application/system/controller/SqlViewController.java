@@ -15,17 +15,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.TableException;
+import aero.minova.cas.api.domain.TableMetaData;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
-import cas.domain.Column;
-import cas.domain.DataType;
-import cas.domain.Row;
-import cas.domain.Table;
-import cas.domain.TableException;
-import cas.domain.TableMetaData;
-import cas.domain.Value;
 import lombok.val;
 
 @RestController

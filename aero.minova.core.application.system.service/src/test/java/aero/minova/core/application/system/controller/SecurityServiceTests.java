@@ -26,14 +26,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.ProcedureException;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.core.application.system.CustomLogger;
 import aero.minova.core.application.system.service.SecurityService;
-import cas.domain.Column;
-import cas.domain.DataType;
-import cas.domain.ProcedureException;
-import cas.domain.Row;
-import cas.domain.Table;
-import cas.domain.Value;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen

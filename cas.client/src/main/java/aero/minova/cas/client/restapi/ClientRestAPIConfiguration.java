@@ -10,7 +10,7 @@ public class ClientRestAPIConfiguration {
 
 	@Bean
 	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		// Do any additional configuration here
+		// Alle Konfigurationen für das RestTemplate hier einfügen.
 		return builder.build();
 	}
 

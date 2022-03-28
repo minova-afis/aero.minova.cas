@@ -27,7 +27,7 @@
         <!-->module>aero.minova.cas.logic</module -->
         <module>aero.minova.core.application.system.app</module>
 		<module>aero.minova.core.application.system.setup</module>
-		<module>cas.client</module>
+		<module>cas.api</module>
     </modules>
     <repositories>
         <repository>

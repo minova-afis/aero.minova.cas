@@ -3,7 +3,7 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [12.38.0] - 2022-03-25
+## [12.38.0] - 2022-03-28
 
 Bereitstellen des aero.minova.cas.client-Moduls, welches Kern-Klassen zum Austausch von HTTP-Anfragen an das CAS enthält.
 

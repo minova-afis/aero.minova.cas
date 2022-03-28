@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cas.api</artifactId>
-	<version>12.38.0</version>
+	<version>12.38.1-SNAPSHOT</version>
 	<name>aero.minova.cas.api</name>
 	<parent>
 		<groupId>aero.minova</groupId>
@@ -33,7 +33,7 @@
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git
 		</developerConnection>
-		<tag>v12.38.0</tag>
+		<tag>v12.5.0</tag>
 	</scm>
 	<dependencies>
 		<dependency>

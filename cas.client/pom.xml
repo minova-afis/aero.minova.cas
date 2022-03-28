@@ -5,8 +5,8 @@
 	<name>aero.minova.cas.api</name>
 	<parent>
 		<groupId>aero.minova</groupId>
-		<artifactId>core.application.system</artifactId>
-		<version>12.35.0-SNAPSHOT</version>
+		<artifactId>spring.maven.root</artifactId>
+		<version>1.3.0</version>
 	</parent>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

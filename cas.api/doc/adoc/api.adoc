@@ -1,16 +1,40 @@
-== CAS API
+= CAS API
 
-Ein Beispiel-Projekt zur Verwendung der CAS API, um mit dem CAS zu Kommunizieren, findet man link:https://github.com/minova-afis/aero.minova.cas.client.quickstart[hier].
+Konkrete Beispiele sind in einer xref:../../aero.minova.service.core.application.system.postman_collection.json#[Postman Collection] gelistet.
+Die Authentifizierung findet über Basic Auth statt.
 
-DAS CAS API Modul enthält alle Komponenten, welche zur Kommunikation mit dem CAS benötigt werden.
+Die Art des Logins muss zu Beginn entweder auf 'ldap', 'admin' oder 'database' gesetzt werden.
+Es existiert nach dem Setup bereits eine Admin-Rolle, welche aber bewusst aktiviert, bzw. zugewiesen werden muss.
 
-Es vereinfacht die Aufrufe der einzelnden Controller durch entsprechende Methoden, sodass keine URLs angegeben werden müssen:
+NOTE: Vielleicht sollten wir das Dokument verkürzen, indem wir verlinken und nicht inkludieren?
 
-* *ping()*: Sendet eine Ping-Anfrage an den CommunicationController.
-* *sendViewRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ViewController des CAS.
-* *sendProcedureRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ProcedureController des CAS.
-* *sendXProcedureRequest(List<XTable>)*: Sendet eine Anfrage mit eienr Liste an XTable-Objekten an den XProcedureController des CAS.
-* *sendGetFileRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um eine Datei vom CAS zu erhalten.
-* *sendGetHashRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um den Hash einer Datei vom CAS zu erhalten.
-* *sendGetZipRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um eine ZIP-Datei vom CAS zu erhalten.
-* *sendUploadLogRequest(byte[] log)*: Sendet eine Anfrage mit einem Byte Array an den FileController des CAS, um ein Log hochzuladen.
+include::api-table.adoc[Tabellen-Format]
+
+include::api-procedure.adoc[data/procedure]
+
+include::api-xprocedure.adoc[data/x-procedure]
+
+== data/view
+
+Selektiert Objekte (View, Tabelle, etc.) des SQL-Servers.
+
+Als Ausgabe wird eine Table mit den selektierten Werten zurückgegeben.
+
+Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
+Die Eingabe-Tabelle schränkt die Auswahl der selektierten Werte ein.
+Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.model
+
+== /ping
+
+Hiermit kann man die Verbindung und die Anmeldedaten prüfen.
+Hat keine Eingabe und gibt als Antwort ein JSON-Object mit einem Return Code von 0 zurück,
+wenn alles gut gelaufen ist.
+
+[source,json]
+--------
+{
+	"returnCode":1
+}
+--------
+
+include::api-error.adoc[data/x-procedure]

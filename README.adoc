@@ -28,7 +28,7 @@ Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereit
 == Weiterführende Dokumentation
 
 * xref:./CHANGELOG.adoc#[Changelog]
-* xref:./aero.minova.cas.api/doc/adoc/api.adoc#[CAS API]
+* xref:./aero.minova.cas.api/doc/adoc/index.adoc#[CAS API]
 * xref:./aero.minova.core.application.system.service/doc/adoc/index.adoc#[CAS-Dienst]
 * xref:./doc/adoc/installation.adoc#[Installation]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]

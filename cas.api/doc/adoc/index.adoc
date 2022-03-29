@@ -1,0 +1,7 @@
+== CAS API
+
+* xref:api-lib.adoc#[API für den Client]
+* xref:api.adoc#[API für Ping und Viewanfragen direkt an das CAS]
+* xref:api-procedure.adoc#[API für Prozeduranfragen direkt an das CAS]
+* xref:api-xprocedure.adoc#[API für XProzeduranfragen direkt an das CAS]
+* xref:files-api.adoc#[Files Handling]

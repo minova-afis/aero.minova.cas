@@ -83,7 +83,7 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 	<!-- Die erste Variante ist für den Fall, dass eine single fat Jar-Version verwendet wird. -->
 	<arguments>-Dloader.path="lib/" -jar aero.minova.core.application.system.service.jar</arguments>
 	<!-- Die zweite Variante ist für den Fall, dass keine single fat Jar vorhanden ist. -->
-	<arguments>-cp "lib/*" aero.minova.core.application.system.CoreApplicationSystemApplication</arguments>
+	<arguments>-cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>
 	<logmode>rotate</logmode>
 </service>
 --------

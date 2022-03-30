@@ -30,8 +30,8 @@
 		</plugins>
 	</build>
 	<scm>
-		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
-		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git
+		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git
 		</developerConnection>
 		<tag>v12.5.0</tag>
 	</scm>

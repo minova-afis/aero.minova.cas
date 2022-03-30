@@ -51,11 +51,11 @@
 			<artifactId>ch.minova.setuppropertiesbean</artifactId>
 			<version>10.0.2</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/../aero.minova.core.application.system.setup/libs/ch.minova.setuppropertiesbean-10.0.2.jar</systemPath>
+			<systemPath>${project.basedir}/../setup/libs/ch.minova.setuppropertiesbean-10.0.2.jar</systemPath>
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>aero.minova.core.application.system.service</finalName>
+		<finalName>aero.minova.cas.service</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

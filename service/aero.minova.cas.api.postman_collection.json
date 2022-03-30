@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "16f45f62-a4b4-42bf-b9f8-20353d5f0341",
-		"name": "aero.minova.service.core.application.system",
+		"name": "aero.minova.service.cas",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [

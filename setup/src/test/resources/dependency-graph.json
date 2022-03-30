@@ -1,10 +1,10 @@
 {
   "graphName" : "oiltanking.swb",
   "artifacts" : [ {
-    "id" : "aero.minova:core.application.system.app:jar:app",
+    "id" : "aero.minova:cas.app:jar:app",
     "numericId" : 1,
     "groupId" : "aero.minova",
-    "artifactId" : "core.application.system.app",
+    "artifactId" : "cas.app",
     "version" : "12.24.7",
     "optional" : false,
     "classifiers" : [ "app" ],
@@ -70,14 +70,14 @@
     "types" : [ "jar" ]
   } ],
   "dependencies" : [ {
-    "from" : "aero.minova:core.application.system.app:jar:app",
+    "from" : "aero.minova:cas.app:jar:app",
     "to" : "aero.minova:app.build:jar",
     "numericFrom" : 0,
     "numericTo" : 1,
     "resolution" : "OMITTED_FOR_DUPLICATE"
   }, {
     "from" : "com.minova:oiltanking.swb:jar",
-    "to" : "aero.minova:core.application.system.app:jar:app",
+    "to" : "aero.minova:cas.app:jar:app",
     "numericFrom" : 2,
     "numericTo" : 0,
     "resolution" : "INCLUDED"
@@ -89,7 +89,7 @@
     "resolution" : "OMITTED_FOR_DUPLICATE"
   }, {
     "from" : "aero.minova:data.schema.app:jar:app",
-    "to" : "aero.minova:core.application.system.app:jar:app",
+    "to" : "aero.minova:cas.app:jar:app",
     "numericFrom" : 3,
     "numericTo" : 0,
     "version" : "12.21.28",
@@ -120,7 +120,7 @@
     "resolution" : "INCLUDED"
   }, {
     "from" : "aero.minova:invoice:jar:app",
-    "to" : "aero.minova:core.application.system.app:jar:app",
+    "to" : "aero.minova:cas.app:jar:app",
     "numericFrom" : 5,
     "numericTo" : 0,
     "version" : "12.24.0",

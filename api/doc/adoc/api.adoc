@@ -1,6 +1,6 @@
 = CAS API
 
-Konkrete Beispiele sind in einer xref:../../aero.minova.service.core.application.system.postman_collection.json#[Postman Collection] gelistet.
+Konkrete Beispiele sind in einer xref:../../aero.minova.cas.api.postman_collection.json#[Postman Collection] gelistet.
 Die Authentifizierung findet über Basic Auth statt.
 
 Die Art des Logins muss zu Beginn entweder auf 'ldap', 'admin' oder 'database' gesetzt werden.

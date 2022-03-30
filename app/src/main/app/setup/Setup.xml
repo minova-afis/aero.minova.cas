@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<setup name="aero.minova.core.application.system.app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<setup name="aero.minova.cas.app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
 	<sql-code>
 		<script name="xtcasAuthoritiesConstraints" type="script"/>

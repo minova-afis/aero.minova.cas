@@ -9,7 +9,7 @@
 		<relativePath />
 	</parent>
 	<scm>
-		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
+		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
 		<tag>v12.5.0</tag>
 	</scm>
 </project>

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 mvn clean verify
-cd ../aero.minova.core.application.system.setup
+cd ../setup
   mvn clean verify
-  cp ./target/*.jar ../aero.minova.core.application.system.service/target/libs/
-  cp ./target/libs/*.jar ../aero.minova.core.application.system.service/target/libs/
-  cp ./libs/*.jar ../aero.minova.core.application.system.service/target/libs/
-cd ../aero.minova.core.application.system.service
+  cp ./target/*.jar ../service/target/libs/
+  cp ./target/libs/*.jar ../service/target/libs/
+  cp ./libs/*.jar ../service/target/libs/
+cd ../service
   docker build --tag=$docker_user/aero.minova.cas:latest .
 exit
 

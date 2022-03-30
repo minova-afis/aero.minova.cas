@@ -13,8 +13,8 @@
 		<maven.compiler.release>11</maven.compiler.release>
 	</properties>
 	<scm>
-		<connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system</connection>
-		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova..core.application.system</developerConnection>
+		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas</connection>
+		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas</developerConnection>
 		<tag>v12.5.0</tag>
 	</scm>
 	<dependencies>

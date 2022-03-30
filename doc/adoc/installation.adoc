@@ -61,7 +61,7 @@ server.ssl.key-store-password=<Passwort des Keystores>
 ** Entwickler-Version verwenden:
 CAS-Dienst mit `mvn clean verify` bauen.
 `target/libs/*` in den lib Ordner kopieren.
-`target/aero.minova.core.application.system.service.jar.original` kopieren und `original` Suffix entfernen.
+`target/aero.minova.cas.service.jar.original` kopieren und `original` Suffix entfernen.
 
 
 * Windows-Dienst erstellen:
@@ -81,7 +81,7 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 	<executable>Pfad zur java.exe.</executable>
 	<!-- Nur eines der beiden Argumente verwenden. -->
 	<!-- Die erste Variante ist für den Fall, dass eine single fat Jar-Version verwendet wird. -->
-	<arguments>-Dloader.path="lib/" -jar aero.minova.core.application.system.service.jar</arguments>
+	<arguments>-Dloader.path="lib/" -jar aero.minova.cas.service.jar</arguments>
 	<!-- Die zweite Variante ist für den Fall, dass keine single fat Jar vorhanden ist. -->
 	<arguments>-cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>
 	<logmode>rotate</logmode>

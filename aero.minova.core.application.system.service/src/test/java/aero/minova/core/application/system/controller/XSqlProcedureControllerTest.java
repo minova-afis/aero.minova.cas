@@ -15,14 +15,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.SqlProcedureResult;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
-import aero.minova.core.application.system.domain.XSqlProcedureResult;
-import aero.minova.core.application.system.domain.XTable;
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.SqlProcedureResult;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.api.domain.XSqlProcedureResult;
+import aero.minova.cas.api.domain.XTable;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })

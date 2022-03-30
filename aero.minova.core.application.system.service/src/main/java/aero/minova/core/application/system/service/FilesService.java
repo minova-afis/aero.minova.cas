@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import aero.minova.cas.api.domain.Row;
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.domain.Row;
 
 @Service
 public class FilesService {

@@ -4,11 +4,9 @@
 
 * Zurück zur link:..[Übersicht]
 
-* xref:api.adoc#[API]
 * xref:properties.adoc#[Properties]
 * xref:versions.adoc#[Versionen]
 * xref:setup.adoc#[Setup Service]
-* xref:files-api.adoc#[Files Handling]
 
 == Sicherheitskonzept
 * xref:security.adoc#[Sicherheitsmechanismen]

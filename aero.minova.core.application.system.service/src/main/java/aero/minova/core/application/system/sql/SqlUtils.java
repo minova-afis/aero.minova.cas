@@ -11,12 +11,12 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.ProcedureException;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 
 public class SqlUtils {
 

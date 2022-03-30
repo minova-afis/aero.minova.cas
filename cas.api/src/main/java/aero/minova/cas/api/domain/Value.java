@@ -1,4 +1,4 @@
-package aero.minova.core.application.system.domain;
+package aero.minova.cas.api.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

@@ -3,6 +3,13 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.38.1] - 2022-03-28
+
+Verwenden der neuen CAS API als Abhängigkeit im CAS.
+
+## [12.38.0] - 2022-03-28
+
+Bereitstellen des aero.minova.cas.api-Moduls, welches Kern-Klassen zum Austausch von HTTP-Anfragen an das CAS enthält.
 
 ## [12.37.0] - 2022-03-23
 

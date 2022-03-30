@@ -14,18 +14,19 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.OutputType;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.TableException;
+import aero.minova.cas.api.domain.TableMetaData;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.OutputType;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.TableException;
-import aero.minova.core.application.system.domain.TableMetaData;
-import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.service.SecurityService;
 import aero.minova.core.application.system.sql.SqlUtils;
 import aero.minova.core.application.system.sql.SystemDatabase;
@@ -97,6 +98,13 @@ public class SqlViewController {
 	}
 
 	@GetMapping(value = "data/index", produces = "application/json")
+	public Table getIndexViewGet(@RequestBody Table inputTable) throws Exception {
+		customLogger.logUserRequest(
+				": WARNING! The Get-Mapping of data/index will be removed in 6 months on 1st of September! Please use the Post-Mapping instead.");
+		return getIndexView(inputTable);
+	}
+
+	@PostMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
 

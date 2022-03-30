@@ -26,13 +26,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.ProcedureException;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.domain.Column;
-import aero.minova.core.application.system.domain.DataType;
-import aero.minova.core.application.system.domain.ProcedureException;
-import aero.minova.core.application.system.domain.Row;
-import aero.minova.core.application.system.domain.Table;
-import aero.minova.core.application.system.domain.Value;
 import aero.minova.core.application.system.service.SecurityService;
 import lombok.val;
 

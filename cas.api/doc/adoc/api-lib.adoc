@@ -1,0 +1,18 @@
+== CAS API
+
+Ein Beispiel-Projekt zur Verwendung der CAS API, um mit dem CAS zu Kommunizieren, findet man link:https://github.com/minova-afis/aero.minova.cas.client.quickstart[hier].
+
+DAS CAS API Modul enthält alle Komponenten, welche zur Kommunikation mit dem CAS benötigt werden.
+
+Es vereinfacht die Aufrufe der einzelnden Controller durch entsprechende Methoden, sodass keine URLs angegeben werden müssen:
+
+* *ping()*: Sendet eine Ping-Anfrage an den CommunicationController.
+* *sendViewRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ViewController des CAS.
+* *sendProcedureRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ProcedureController des CAS.
+* *sendXProcedureRequest(List<XTable>)*: Sendet eine Anfrage mit eienr Liste an XTable-Objekten an den XProcedureController des CAS.
+* *sendGetFileRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um eine Datei vom CAS zu erhalten.
+* *sendGetHashRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um den Hash einer Datei vom CAS zu erhalten.
+* *sendGetZipRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um eine ZIP-Datei vom CAS zu erhalten.
+* *sendUploadLogRequest(byte[] log)*: Sendet eine Anfrage mit einem Byte Array an den FileController des CAS, um ein Log hochzuladen.
+
+Die Tables, welche für die Aufrufe der Methoden benötigt werden, finden sich xref:api-table.adoc[hier].

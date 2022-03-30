@@ -20,14 +20,14 @@
         <tag>v12.5.0</tag>
     </scm>
     <modules>
-        <module>aero.minova.core.application.system.service</module>
+        <module>service</module>
 		<!-- Wurde deaktivierte, da es auf interne Veröffentlichungen basiert.-->
 		<!--module>aero.minova.core.application.system.setup</module-->
         <!-- TODO Wird erst wieder aktiviert, wenn wir das Install-Tool auf Github haben. -->
         <!-->module>aero.minova.cas.logic</module -->
-        <module>aero.minova.core.application.system.app</module>
-		<module>aero.minova.core.application.system.setup</module>
-		<module>cas.api</module>
+        <module>app</module>
+		<module>setup</module>
+		<module>api</module>
     </modules>
     <repositories>
         <repository>

@@ -11,7 +11,7 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 ** <<sql-server-und-datenbank-einrichten>>
 ** <<Datenbank-initialisieren>>
 * Dateisystem einbinden.
-* xref:./../../aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
+* xref:./../../service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
 
 == Installation für Spezifische Umgebungen
 * <<CAS-als-Windows-Dienst-installieren>>

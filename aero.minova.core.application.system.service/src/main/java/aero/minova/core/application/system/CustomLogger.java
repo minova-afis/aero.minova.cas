@@ -7,7 +7,6 @@ import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.AbstractEnvironment;
@@ -18,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
+
+import aero.minova.cas.api.restapi.ClientRestAPI;
 
 @Component
 public class CustomLogger {
@@ -34,8 +35,9 @@ public class CustomLogger {
 	// Log für Setup
 	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
 
-	@Autowired
-	Gson gson;
+	private ClientRestAPI crapi = new ClientRestAPI();
+
+	Gson gson = crapi.gson();
 
 	// Eclipse zeigt keinen Fehler, wenn Methode nicht vorhanden ist, sie wird aber benötigt, da sonst beim Loggen von Exceptions eine NoSuchMethodException
 	// geworfen wird und der Code abbricht.

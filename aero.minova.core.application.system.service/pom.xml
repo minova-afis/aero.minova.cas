@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>aero.minova</groupId>
 			<artifactId>cas.api</artifactId>
-			<version>12.38.0</version>
+			<version>12.38.2</version>
 		</dependency>
 		<dependency>
 			<!-- Wird für Java 16 benötigt. -->

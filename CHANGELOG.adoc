@@ -9,7 +9,7 @@ BUGFIX: Beim Aufruf von XProcedures wurde das Result nicht zurückgegeben. Dies 
 
 ## [12.38.3] - 2022-03-30
 
-Alle CAS-Abhängigkeiten in der POM auf die neuste Version abgedated.
+Alle CAS-Abhängigkeiten in den POM auf die neuste Version abgedated.
 
 ## [12.38.2] - 2022-03-30
 

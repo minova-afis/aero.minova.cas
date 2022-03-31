@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>core.application.system</artifactId>
     <groupId>aero.minova</groupId>
-    <version>12.38.3-SNAPSHOT</version>
+    <version>12.38.4</version>
     <packaging>pom</packaging>
     <parent>
         <groupId>aero.minova</groupId>
@@ -17,7 +17,7 @@
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</connection>
         <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.core.application.system.git</developerConnection>
-        <tag>v12.38.3</tag>
+        <tag>v12.38.4</tag>
     </scm>
     <modules>
         <module>aero.minova.core.application.system.service</module>

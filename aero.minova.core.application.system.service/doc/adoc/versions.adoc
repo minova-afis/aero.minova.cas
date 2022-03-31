@@ -1,6 +1,0 @@
-= Core Application Server Versionen
-
-== Links
-
-* link:index.html[übergreifendes Modul]
-* link:..[Übersicht]

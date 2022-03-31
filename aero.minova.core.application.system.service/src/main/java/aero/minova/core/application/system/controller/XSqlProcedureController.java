@@ -106,7 +106,7 @@ public class XSqlProcedureController {
 					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
 				}
 			}
-			sqlProcedureController.executeProcedure(filledTable);
+			result = (SqlProcedureResult) sqlProcedureController.executeProcedure(filledTable).getBody();
 			// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
 			resultSets.add(new XSqlProcedureResult(xt.getId(), result));
 		}

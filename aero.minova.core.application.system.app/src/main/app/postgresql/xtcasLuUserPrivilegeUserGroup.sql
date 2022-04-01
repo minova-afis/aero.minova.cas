@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.xtcasluuserprivilegeusergroup
     userprivilegekey integer NOT NULL,
     usergroupkey integer NOT NULL,
     rowlevelsecurity integer NOT NULL DEFAULT 0,
-    lastuser character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    lastuser character varying(50) COLLATE pg_catalog."default" NOT NULL DEFAULT CURRENT_USER,
     lastdate timestamp without time zone NOT NULL DEFAULT now(),
     lastaction integer NOT NULL DEFAULT 1,
     CONSTRAINT xtcasluuserprivilegeusergroup_pkey PRIMARY KEY (keylong),

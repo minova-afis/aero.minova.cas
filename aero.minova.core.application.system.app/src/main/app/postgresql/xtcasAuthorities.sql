@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS public.xtcasauthorities
     keylong integer NOT NULL DEFAULT nextval('xtcasauthorities_keylong_seq'::regclass),
     username character varying(50) COLLATE pg_catalog."default" NOT NULL,
     authority character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    lastuser character varying(50) COLLATE pg_catalog."default",
+    lastuser character varying(50) COLLATE pg_catalog."default" DEFAULT CURRENT_USER,
     lastdate timestamp without time zone DEFAULT now(),
     lastaction integer DEFAULT 1,
     CONSTRAINT xtcasauthorities_pkey PRIMARY KEY (keylong),

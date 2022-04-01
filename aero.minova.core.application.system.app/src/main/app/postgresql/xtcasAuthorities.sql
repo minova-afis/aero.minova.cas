@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.xtcasauthorities
 (
-    keylong integer NOT NULL DEFAULT nextval('xtcasauthorities_keylong_seq'::regclass),
+    keylong serial NOT NULL,
     username character varying(50) COLLATE pg_catalog."default" NOT NULL,
     authority character varying(50) COLLATE pg_catalog."default" NOT NULL,
     lastuser character varying(50) COLLATE pg_catalog."default" DEFAULT CURRENT_USER,

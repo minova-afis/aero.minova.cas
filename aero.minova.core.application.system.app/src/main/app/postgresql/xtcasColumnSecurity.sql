@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.xtcascolumnsecurity
 (
-    keylong integer NOT NULL DEFAULT nextval('xtcascolumnsecurity_keylong_seq'::regclass),
+    keylong serial NOT NULL,
     tablename character varying(50) COLLATE pg_catalog."default" NOT NULL,
     columnname character varying(50) COLLATE pg_catalog."default" NOT NULL,
     securitytoken character varying(50) COLLATE pg_catalog."default" NOT NULL,

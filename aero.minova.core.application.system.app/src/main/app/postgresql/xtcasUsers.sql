@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.xtcasusers
 (
-    keylong integer NOT NULL DEFAULT nextval('xtcasusers_keylong_seq'::regclass),
+    keylong serial NOT NULL DEFAULT,
     username character varying(50) COLLATE pg_catalog."default" NOT NULL,
     password character varying(150) COLLATE pg_catalog."default" NOT NULL,
     lastaction integer NOT NULL DEFAULT 1,

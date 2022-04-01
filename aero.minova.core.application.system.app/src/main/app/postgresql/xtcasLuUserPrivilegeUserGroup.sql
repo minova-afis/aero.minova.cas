@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS public.xtcasluuserprivilegeusergroup
 (
-    keylong integer NOT NULL DEFAULT nextval('xtcasluuserprivilegeusergroup_keylong_seq'::regclass),
+    keylong serial NOT NULL,
     userprivilegekey integer NOT NULL,
     usergroupkey integer NOT NULL,
     rowlevelsecurity integer NOT NULL DEFAULT 0,

@@ -14,6 +14,9 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 * xref:./../../aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
 
 == Installation für Spezifische Umgebungen
+
+* Spezialfall: xref:installation.postgre.adoc[Postgre-Datenbank]
+
 * <<CAS-als-Windows-Dienst-installieren>>
 * Aufsetzen für die Entwicklungsumgebung.
 * Als Docker-Container ausliefern.

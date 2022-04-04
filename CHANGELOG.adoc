@@ -7,9 +7,13 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 Postgresql bei der Privilegienprüfung unterstützen.
 
-## [12.38.3] - 2022-03-31
+## [12.38.4] - 2022-03-31
 
 BUGFIX: Beim Aufruf von XProcedures wurde das Result nicht zurückgegeben. Dies ist nun korrigiert.
+
+## [12.38.3] - 2022-03-30
+
+Alle CAS-Abhängigkeiten in den POM auf die neuste Version abgedated.
 
 ## [12.38.2] - 2022-03-30
 

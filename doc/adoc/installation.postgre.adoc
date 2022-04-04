@@ -7,3 +7,8 @@ Die für Postgre angepassten Skripte zur Installation der sicherheitrelevanten T
 *aero.minova.core.application.system.app/app/postgresql*.
 
 Diese müssen dann von Hand auf der Datenbank ausgeführt werden.
+
+Die application.properties müssen desweiteren mit folgenden Properties geändert werden:
+
+* aero.minova.database=postgresql
+* aero_minova_database_url=jdbc:postgresql://URLZurDatenbank/DatenbankName

@@ -16,6 +16,7 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 == Installation für Spezifische Umgebungen
 
 * Spezialfall: xref:installation.postgre.adoc[Postgre-Datenbank]
+Postgre wird allerdings nicht so gut wie MsSql unterstützt. Es unterstützt bisher lediglich die Rechteprüfung und Extensions.
 
 * <<CAS-als-Windows-Dienst-installieren>>
 * Aufsetzen für die Entwicklungsumgebung.

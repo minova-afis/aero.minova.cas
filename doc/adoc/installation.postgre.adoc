@@ -12,3 +12,5 @@ Die application.properties müssen desweiteren mit folgenden Properties geänder
 
 * aero.minova.database.kind=postgresql
 * aero_minova_database_url=jdbc:postgresql://URLZurDatenbank/DatenbankName
+
+DA Postgresql RowCount als Funktion verwendet, wird eine andere Methode zum Zusammenbauen des preparedStatements verwendet und zwar die prepareViewString-Methode.

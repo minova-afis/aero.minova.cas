@@ -151,6 +151,8 @@ public class SqlViewController {
 			}
 
 			String viewQuery;
+			// POSTGRE SQL verwendet RowCount als Funktion, wesewegen es nicht so genutzt werden kann, wie wir es bei der pagingWithSeek-Methode verwenden.
+			// Deshalb verwenden wir stattdessen die prepareViewString-Methode, welche minimal langsamer ist.
 			if (databaseKind.equals("postgresql")) {
 				viewQuery = prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			} else {

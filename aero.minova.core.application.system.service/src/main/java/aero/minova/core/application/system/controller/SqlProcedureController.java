@@ -49,7 +49,7 @@ public class SqlProcedureController {
 	@Autowired
 	CustomLogger customLogger;
 
-	@org.springframework.beans.factory.annotation.Value("${aero.minova.database:mysql}")
+	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mysql}")
 	String databaseKind;
 
 	@Autowired

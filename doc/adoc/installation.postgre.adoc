@@ -10,5 +10,5 @@ Diese müssen dann von Hand auf der Datenbank ausgeführt werden.
 
 Die application.properties müssen desweiteren mit folgenden Properties geändert werden:
 
-* aero.minova.database=postgresql
+* aero.minova.database.kind=postgresql
 * aero_minova_database_url=jdbc:postgresql://URLZurDatenbank/DatenbankName

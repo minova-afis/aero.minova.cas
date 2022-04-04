@@ -41,7 +41,7 @@ public class SqlViewController {
 	@Autowired
 	SecurityService securityService;
 
-	@org.springframework.beans.factory.annotation.Value("${aero.minova.database:mysql}")
+	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mysql}")
 	String databaseKind;
 
 	@Autowired

@@ -41,6 +41,9 @@ public class SqlViewController {
 	@Autowired
 	SecurityService securityService;
 
+	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mysql}")
+	String databaseKind;
+
 	@Autowired
 	CustomLogger customLogger;
 
@@ -147,8 +150,15 @@ public class SqlViewController {
 				limit = inputMetaData.getLimited();
 			}
 
-			// Wir setzten für Page 1 und für limited 0 ein, damit wir alle Ergebnisse bekommen. Die Menge wird später begrenzt.
-			val viewQuery = pagingWithSeek(inputTable, false, 0, false, 1, authoritiesForThisTable);
+			String viewQuery;
+			// POSTGRE SQL verwendet RowCount als Funktion, wesewegen es nicht so genutzt werden kann, wie wir es bei der pagingWithSeek-Methode verwenden.
+			// Deshalb verwenden wir stattdessen die prepareViewString-Methode, welche minimal langsamer ist.
+			if (databaseKind.equals("postgresql")) {
+				viewQuery = prepareViewString(inputTable, false, 0, authoritiesForThisTable);
+			} else {
+				// Wir setzten für Page 1 und für limited 0 ein, damit wir alle Ergebnisse bekommen. Die Menge wird später begrenzt.
+				viewQuery = pagingWithSeek(inputTable, false, 0, false, 1, authoritiesForThisTable);
+			}
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logSql("Executing statements: " + sb.toString());

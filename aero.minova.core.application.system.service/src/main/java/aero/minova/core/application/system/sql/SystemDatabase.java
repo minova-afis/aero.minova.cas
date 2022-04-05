@@ -27,13 +27,20 @@ public class SystemDatabase {
 	@Value("${aero_minova_database_user_password:password}")
 	String userPassword;
 
+	@Value("${aero.minova.database.kind:mysql}")
+	String databaseKind;
+
 	private LinkedList<Connection> freeConnections = new LinkedList<>();
 
 	public synchronized Connection getConnection() {
 		try {
 			final Connection connection;
 			if (freeConnections.isEmpty()) {
-				Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+				if (databaseKind.equals("postgresql")) {
+					Class.forName("org.postgresql.Driver");
+				} else {
+					Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+				}
 				connection = DriverManager.getConnection(connectionString, userName, userPassword);
 				connection.setAutoCommit(false);
 			} else {

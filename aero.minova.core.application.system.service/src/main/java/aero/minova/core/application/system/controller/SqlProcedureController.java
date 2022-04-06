@@ -272,6 +272,8 @@ public class SqlProcedureController {
 				connection.close();
 			}
 			throw new ProcedureException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

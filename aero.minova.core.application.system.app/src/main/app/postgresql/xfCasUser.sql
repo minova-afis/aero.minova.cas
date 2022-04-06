@@ -1,8 +1,7 @@
 CREATE OR REPLACE FUNCTION public.xfcasuser(
-	)
-    RETURNS character varying
-    LANGUAGE 'sql'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
-
-RETURN current_setting('my.app_user'::text);
+       )
+   RETURNS character varying AS $test$
+BEGIN
+RETURN current_user;
+END;
+$test$ LANGUAGE plpgsql;

@@ -1,0 +1,20 @@
+2022-04-07T12:08:01.203 CAS msg.SystemFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests
+2022-04-07T12:08:01.203 CAS msg.SharedFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data
+2022-04-07T12:08:01.203 CAS msg.ProgramFilesFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data\Program Files
+2022-04-07T12:08:01.203 CAS msg.InternalFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal
+2022-04-07T12:08:01.203 CAS msg.LogsFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\UserLogs
+2022-04-07T12:08:01.206 CAS Creating directory C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\MD5
+2022-04-07T12:08:01.207 CAS Creating directory C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\Zips
+2022-04-07T12:08:03.267 CAS msg.SharedFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data
+2022-04-07T12:08:03.267 CAS msg.ProgramFilesFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data\Program Files
+2022-04-07T12:08:03.267 CAS msg.LogsFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\UserLogs
+2022-04-07T12:17:47.900 CAS msg.SystemFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests
+2022-04-07T12:17:47.900 CAS msg.SharedFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data
+2022-04-07T12:17:47.900 CAS msg.ProgramFilesFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data\Program Files
+2022-04-07T12:17:47.900 CAS msg.InternalFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal
+2022-04-07T12:17:47.900 CAS msg.LogsFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\UserLogs
+2022-04-07T12:17:47.916 CAS Creating directory C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\MD5
+2022-04-07T12:17:47.916 CAS Creating directory C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\Zips
+2022-04-07T12:17:50.052 CAS msg.SharedFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data
+2022-04-07T12:17:50.052 CAS msg.ProgramFilesFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Shared Data\Program Files
+2022-04-07T12:17:50.052 CAS msg.LogsFolder %C:\Users\avots\Documents\avm.local\git\github\aero.minova.cas\service\target\tests\Internal\UserLogs

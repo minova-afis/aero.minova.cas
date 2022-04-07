@@ -18,8 +18,8 @@ public class DependencyOrderTest {
 						.useDelimiter("\\A")//
 						.next());
 		assertThat(result).isEqualTo(
-				Arrays.asList("aero.minova.cas.app"//
-						, "aero.minova.app.i18n"//
+				Arrays.asList("aero.minova.app.i18n"//
+						, "aero.minova.cas.app"//
 						, "aero.minova.data.schema.app"//
 						, "aero.minova.contact"//
 						, "aero.minova.invoice"));

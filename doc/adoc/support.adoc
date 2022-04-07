@@ -1,0 +1,37 @@
+# Symptome, deren Ursachen und Lösungen für das CAS
+
+> Ich hatte schon befürchtet,
+> dass es keine Fortführung geben wird.
+> Als ich dann die Meldung bekommen habe,
+> musste ich vor Freude springen!
+-- Anonymer Supportler
+
+> Am Anfang war ich skeptisch,
+> aber als ich angefangen habe es zu lesen,
+> konnte ich es nicht mehr niederlegen bis ich durch war:
+> 10/10! Kann ich nur jeden empfehlen!
+-- Verzweifelter Hotliner
+
+> Früher war ich echt skeptisch bezüglich der Trilogie und der Meinung,
+> dass Code die Doku ist.
+> Mein Therapeut hat mich dann aber doch vom Konzept überzeugt und siehe da,
+> es funktioniert!
+> Jetzt kann ich meinen Tee endlich in Ruhe geniesen!
+-- Tee abhängiger Entwickler
+
+## Deadlock auf der SQL-Datenbank
+
+1. Herausfinden welche SQl-Sessions einen Deadlock verursachen.
+2. Die SQL-Statements der betroffenen Sessions herausfinden.
+3. In dem `request.log` nachschauen, welche Anfrage an das CAS zu den SQL-Statements passen.
+4. Zeiten der gefundenen Aufrufe vergleichen.
+   Sind die Zeiten gleich oder sehr nah beieinander,
+   hat man die Aufrufe gefunden,
+   die das Problem verursachen.
+   Man muss dafür sorgen, dass die SQL-Prozeduren der Aufrufe nicht gleichzeitig ausgeführt werden.
+   Wenn es nur ein Client ist,
+   kann man die betroffenen Anfragen an das CAS in ein `data/x-procedure` packen.
+   Andernfalls muss man dafür sorgen, dass die betroffenen Anfragen nicht gleichzeitig an das CAS geschickt werden.
+   (Alternativ könnte man es so implementieren, dass man eine Option für das CAS einführt,
+   womit sämtliche SQL-Anfragen nacheinander ausgeführt werden.
+   Dadurch sind SQL-Deadlocks durch das CAS nicht mehr möglich.)

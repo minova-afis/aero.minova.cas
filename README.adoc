@@ -33,4 +33,5 @@ Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereit
 * xref:./doc/adoc/rechteverwaltung.adoc#[Rechteverwaltung]
 * xref:./doc/adoc/extensions.adoc#[Erweiterungen]
 * xref:./doc/adoc/structure.adoc#[Strukturübersicht]
+* xref:./doc/adoc/support.adoc#[Symptome, deren Ursachen und Lösungen]
 * xref:./aero.minova.core.application.system.app/doc/adoc/table-index.adoc#[Tabellen-Index]

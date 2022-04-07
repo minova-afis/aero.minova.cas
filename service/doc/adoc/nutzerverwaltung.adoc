@@ -1,4 +1,4 @@
-== Nutzerverwaltung des CAS
+= Nutzerverwaltung des CAS
 
 Es gibt drei verschiedene Modi für das CAS, um Rechte zu verwalten.
 Diese können in den application.properties gesetzt werden unter der Property 'login_dataSource'.
@@ -8,20 +8,20 @@ Zulässige Werte sind folgende:
 * *login_dataSource=ldap*
 * *login_dataSource=database*
 
-==== Rechtevergabe
+== Rechtevergabe
 
-===== admin
+=== admin
 Ist die Property auf 'admin' gesetzt, hat der Admin-User direkt nach dem Setup *alle* Rechte.
 Es gibt allerdings *keine weiteren* User, nur den Admin.
 
 
-===== ldap
+===
 Ist die Property auf 'ldap' gesetzt, werden die Anmeldeinformationen des AD-Benutzers genommen, um sich einzuloggen.
 Damit die AD-Gruppen des Users genutzt werden können, müssen diese in der Datenbank in der *xtcasUserGroup* Tabelle abgebildet werden. 
 Hat man die Gruppen erstellt müssen diese dann mit den Privilegien aus der *xtcasUserPrivilege* Tabelle über die *xtcasLuUserPrivilegeUserGroup* Tabelle verknüpft werden.
 
 
-===== database
+===
 Ist die Porperty auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
 Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt. Das Passwort kann mit der Klasse *PasswordEncrypter* in *aero.minova.cas.service* verschlüsselt werden.
 

@@ -11,7 +11,7 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 ** <<sql-server-und-datenbank-einrichten>>
 ** <<Datenbank-initialisieren>>
 * Dateisystem einbinden.
-* xref:./../../aero.minova.core.application.system.service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
+* xref:./../../service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
 
 == Installation für Spezifische Umgebungen
 
@@ -19,7 +19,7 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 Postgre wird allerdings nicht so gut wie MsSql unterstützt. Es unterstützt bisher lediglich die Rechteprüfung und Extensions.
 
 * <<CAS-als-Windows-Dienst-installieren>>
-* Aufsetzen für die Entwicklungsumgebung.
+* xref:installation.dev.adoc[CAS für die Entwicklungsumgebung aufsetzen.]
 * Als Docker-Container ausliefern.
 
 [#sql-server-und-datenbank-einrichten]
@@ -65,7 +65,7 @@ server.ssl.key-store-password=<Passwort des Keystores>
 ** Entwickler-Version verwenden:
 CAS-Dienst mit `mvn clean verify` bauen.
 `target/libs/*` in den lib Ordner kopieren.
-`target/aero.minova.core.application.system.service.jar.original` kopieren und `original` Suffix entfernen.
+`target/aero.minova.cas.service.jar.original` kopieren und `original` Suffix entfernen.
 
 
 * Windows-Dienst erstellen:
@@ -85,9 +85,9 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 	<executable>Pfad zur java.exe.</executable>
 	<!-- Nur eines der beiden Argumente verwenden. -->
 	<!-- Die erste Variante ist für den Fall, dass eine single fat Jar-Version verwendet wird. -->
-	<arguments>-Dloader.path="lib/" -jar aero.minova.core.application.system.service.jar</arguments>
+	<arguments>-Dloader.path="lib/" -jar aero.minova.cas.service.jar</arguments>
 	<!-- Die zweite Variante ist für den Fall, dass keine single fat Jar vorhanden ist. -->
-	<arguments>-cp "lib/*" aero.minova.core.application.system.CoreApplicationSystemApplication</arguments>
+	<arguments>-cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>
 	<logmode>rotate</logmode>
 </service>
 --------

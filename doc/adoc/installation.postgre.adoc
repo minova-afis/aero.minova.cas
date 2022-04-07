@@ -4,7 +4,7 @@ Wird eine Postgre-Datenbank verwendet,
 kann die Setup Extension des CAS *nicht* verwendet werden.
 
 Die für Postgre angepassten Skripte zur Installation der sicherheitrelevanten Tabellen, Views und Prozeduren befinden sich in 
-*aero.minova.core.application.system.app/app/postgresql*.
+*app/app/postgresql*.
 
 Diese müssen dann von Hand auf der Datenbank ausgeführt werden.
 

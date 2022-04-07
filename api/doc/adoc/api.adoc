@@ -1,0 +1,40 @@
+= CAS API
+
+Konkrete Beispiele sind in einer xref:../../aero.minova.cas.api.postman_collection.json#[Postman Collection] gelistet.
+Die Authentifizierung findet über Basic Auth statt.
+
+Die Art des Logins muss zu Beginn entweder auf 'ldap', 'admin' oder 'database' gesetzt werden.
+Es existiert nach dem Setup bereits eine Admin-Rolle, welche aber bewusst aktiviert, bzw. zugewiesen werden muss.
+
+NOTE: Vielleicht sollten wir das Dokument verkürzen, indem wir verlinken und nicht inkludieren?
+
+include::api-table.adoc[Tabellen-Format]
+
+include::api-procedure.adoc[data/procedure]
+
+include::api-xprocedure.adoc[data/x-procedure]
+
+== data/view
+
+Selektiert Objekte (View, Tabelle, etc.) des SQL-Servers.
+
+Als Ausgabe wird eine Table mit den selektierten Werten zurückgegeben.
+
+Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
+Die Eingabe-Tabelle schränkt die Auswahl der selektierten Werte ein.
+Das Format der Eingabe entspricht der Beschreibung aus https://github.com/minova-afis/aero.minova.rcp/tree/master/bundles/aero.minova.rcp.model
+
+== /ping
+
+Hiermit kann man die Verbindung und die Anmeldedaten prüfen.
+Hat keine Eingabe und gibt als Antwort ein JSON-Object mit einem Return Code von 0 zurück,
+wenn alles gut gelaufen ist.
+
+[source,json]
+--------
+{
+	"returnCode":1
+}
+--------
+
+include::api-error.adoc[data/x-procedure]

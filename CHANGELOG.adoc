@@ -60,6 +60,10 @@ Es wird nun ein eigener Logger für das Setup verwendet.
 
 Fehlermeldungen können nun auf zwei verschiedene Arten verarbeitet und dargestellt werden.
 
+## [12.39.3] - 2022-04-07
+
+Die Packete `aero.minova.core.application.system.*` nach `aero.minova.cas.*` umbenennen
+und Ordnerstruktur übersichtlicher gestalten.
 
 ## [12.35.0] - 2022-02-08
 

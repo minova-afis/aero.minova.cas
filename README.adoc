@@ -12,7 +12,7 @@
     <img alt="Docker Images" src="https://img.shields.io/badge/Docker%20images-blue">
   </a>
   <img src="https://img.shields.io/badge/license-EPL%202.0-green">
-  <img src="https://github.com/minova-afis/aero.minova.core.application.system/actions/workflows/continuous-integration.yml/badge.svg">
+  <img src="https://github.com/minova-afis/aero.minova.cas/actions/workflows/continuous-integration.yml/badge.svg">
 </p>
 ++++
 

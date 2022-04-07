@@ -22,11 +22,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import aero.minova.cas.api.domain.SqlProcedureResult;
-import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.controller.SqlProcedureController;
-import aero.minova.core.application.system.controller.SqlViewController;
-import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.sql.SystemDatabase;
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.controller.SqlViewController;
+import aero.minova.cas.service.FilesService;
+import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
 /**

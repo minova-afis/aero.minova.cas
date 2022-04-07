@@ -20,13 +20,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>aero.minova</groupId>
-			<artifactId>core.application.system.service</artifactId>
-			<version>12.38.2</version>
+			<artifactId>cas.service</artifactId>
+			<version>12.39.2</version>
 		</dependency>
 		<dependency>
 			<groupId>aero.minova</groupId>
-			<artifactId>core.application.system.setup</artifactId>
-			<version>12.38.2</version>
+			<artifactId>cas.setup</artifactId>
+			<version>12.39.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

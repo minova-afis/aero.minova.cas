@@ -11,9 +11,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import aero.minova.core.application.system.CustomLogger;
-import aero.minova.core.application.system.service.FilesService;
-import aero.minova.core.application.system.sql.SystemDatabase;
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.service.FilesService;
+import aero.minova.cas.sql.SystemDatabase;
 import ch.minova.core.install.SetupDocument;
 import ch.minova.install.setup.BaseSetup;
 

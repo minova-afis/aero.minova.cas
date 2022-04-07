@@ -3,7 +3,23 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [12.38.1] - 2022-03-28
+## [12.39.0] - 2022-04-04
+
+Postgresql bei der Privilegienprüfung unterstützen.
+
+## [12.38.4] - 2022-03-31
+
+BUGFIX: Beim Aufruf von XProcedures wurde das Result nicht zurückgegeben. Dies ist nun korrigiert.
+
+## [12.38.3] - 2022-03-30
+
+Alle CAS-Abhängigkeiten in den POM auf die neuste Version abgedated.
+
+## [12.38.2] - 2022-03-30
+
+BUGFIX: Doppelte Gson-Bean Erstellung unterbinden. Dadurch konnte das CAS nicht mehr starten.
+
+## [12.38.1] - 2022-03-30
 
 Verwenden der neuen CAS API als Abhängigkeit im CAS.
 

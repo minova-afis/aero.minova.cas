@@ -49,6 +49,9 @@ public class SqlProcedureController {
 	@Autowired
 	CustomLogger customLogger;
 
+	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mysql}")
+	String databaseKind;
+
 	@Autowired
 	SecurityService securityService;
 
@@ -226,7 +229,13 @@ public class SqlProcedureController {
 	 *             Fehler beim setzen des Kontextes für die connection.
 	 */
 	private void setUserContextFor(Connection connection) throws SQLException {
-		final val userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
+
+		CallableStatement userContextSetter;
+		if (databaseKind.equals("postgresql")) {
+			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
+		} else {
+			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
+		}
 		userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
 		userContextSetter.execute();
 	}
@@ -263,6 +272,8 @@ public class SqlProcedureController {
 				connection.close();
 			}
 			throw new ProcedureException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

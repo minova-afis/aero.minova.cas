@@ -1,4 +1,4 @@
-=== Extensions bzw. Erweiterungen
+= Extensions bzw. Erweiterungen
 
 Es können beim CAS Erweiterungen, sowohl für Prozeduren, als auch für Views registiert werden.
 

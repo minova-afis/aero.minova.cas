@@ -1,4 +1,4 @@
-== Rechteverwaltung des CAS
+== Nutzerverwaltung des CAS
 
 Es gibt drei verschiedene Modi für das CAS, um Rechte zu verwalten.
 Diese können in den application.properties gesetzt werden unter der Property 'login_dataSource'.

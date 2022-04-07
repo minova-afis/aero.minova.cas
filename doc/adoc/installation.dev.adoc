@@ -1,0 +1,25 @@
+# CAS für die Entwicklungsumgebung aufsetzen.
+
+## Aufsetzen in Eclipse.
+
+NOTE: TODO
+
+## Snapshot lokal bauen und ausführen.
+
+* Projekt bauen: `mvn clean verify`
+* Docker-Image bauen: `docker build --tag=localtest .`
+* Docker-Image starten:
+[source,shell]
+----
+# test
+echo docker run \
+    --name=localtest \
+    --publish=8084:8084 \
+    --env login_dataSource='admin' \
+    --env aero_minova_database_url='jdbc:sqlserver://host.docker.internal;databaseName=test' \
+    --env aero_minova_database_user_name='Nutzer' \
+    --env aero_minova_database_user_password='Passwort' \
+    --env logging_level_root=DEBUG \
+    localtest
+----
+* Docker-Image wieder entfernen: `docker rmi -f localtest`

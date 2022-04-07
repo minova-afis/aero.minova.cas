@@ -34,4 +34,4 @@
    Andernfalls muss man dafür sorgen, dass die betroffenen Anfragen nicht gleichzeitig an das CAS geschickt werden.
    (Alternativ könnte man es so implementieren, dass man eine Option für das CAS einführt,
    womit sämtliche SQL-Anfragen nacheinander ausgeführt werden.
-   Dadurch sind SQL-Deadlocks durch das CAS nicht mehr möglich.)
+   Dadurch wären SQL-Deadlocks durch das CAS nicht mehr möglich.)

@@ -3,6 +3,11 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [Unreleased]
+
+#281: Logs aus Tests in den target-Ordner schreiben,
+damit diese nicht ausversehen commited werden.
+
 ## [12.40.1] - 2022-04-08
 
 Privilegienprüfung auf Prozeduren in PostgreSQL unterstützen.

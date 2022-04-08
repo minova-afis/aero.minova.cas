@@ -48,7 +48,7 @@ public class SecurityService {
 	 *             Fehler bei der Ermittelung
 	 */
 	public boolean arePrivilegeStoresSetup() throws Exception {
-		return isTablePresent("xvcasUserPrivileges");
+		return isTablePresent("xvcasuserprivileges");
 	}
 
 	private boolean isTablePresent(String tableName) throws Exception {

@@ -3,6 +3,10 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.40.1] - 2022-04-08
+
+Privilegienprüfung auf Prozeduren in PostgreSQL unterstützen.
+
 ## [12.40.0] - 2022-04-07
 
 Ordner, Paket und Projekt-Namen vereinheitlichen:

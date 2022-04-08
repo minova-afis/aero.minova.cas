@@ -1,0 +1,333 @@
+{
+	"info": {
+		"_postman_id": "16f45f62-a4b4-42bf-b9f8-20353d5f0341",
+		"name": "aero.minova.service.cas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "data/index",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "rqgzxTf71EAx8chvchMi",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "indexViewName",
+						"value": "Test",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"vWorkingTimeIndex2\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"KeyLong\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"EmployeeText\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"CustomerText\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"ChargedQuantity\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"&\",\r\n            \"type\": \"BOOLEAN\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\" : [\r\n                \"s->0\"\r\n                ,\"s-%VM\"\r\n                ,\"s-MIN\"\r\n                , \"s->0.5\"\r\n                , \"b-false\"\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://publictest.minova.com:17280/data/index",
+					"protocol": "https",
+					"host": [
+						"publictest",
+						"minova",
+						"com"
+					],
+					"port": "17280",
+					"path": [
+						"data",
+						"index"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "data/procedure-with-return-code",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "rqgzxTf71EAx8chvchMi",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "indexViewName",
+						"type": "text",
+						"value": "Test",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"spInsertWorkingTime\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"KeyLong\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"EmployeeKey\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"ServiceContractKey\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"OrderReceiverrKey\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"ServiceObjectKey\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"ServiceKey\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"BookingDate\",\r\n            \"type\": \"INSTANT\"\r\n        }\r\n        , {\r\n            \"name\": \"StartDate\",\r\n            \"type\": \"INSTANT\"\r\n        }\r\n        , {\r\n            \"name\": \"EndDate\",\r\n            \"type\": \"INSTANT\"\r\n        }\r\n        , {\r\n            \"name\": \"RenderedQuantity\",\r\n            \"type\": \"DOUBLE\"\r\n        }\r\n        , {\r\n            \"name\": \"ChargedQuantity\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"Description\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"Spelling\",\r\n            \"type\": \"BOOLEAN\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\" : [\r\n                null\r\n                , \"n-1\"\r\n                , \"n-1\"\r\n                , \"n-1\"\r\n                , \"n-1\"\r\n                , \"n-2\"\r\n                , \"i-2020-10-06T00:00:00.00Z\"\r\n                , \"i-2020-10-06T16:00:00.00Z\"\r\n                , \"i-2020-10-06T17:00:00.00Z\"\r\n                , \"d-1.0\"\r\n                , \"n-5\"\r\n                , \"s-Test via CAS\"\r\n                , \"b-0\"\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://publictest.minova.com:17280/data/procedure",
+					"protocol": "https",
+					"host": [
+						"publictest",
+						"minova",
+						"com"
+					],
+					"port": "17280",
+					"path": [
+						"data",
+						"procedure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "data/procedure-with-result-set",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "rqgzxTf71EAx8chvchMi",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "indexViewName",
+						"type": "text",
+						"value": "Test",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"spWorkingTimeServiceResolve\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"KeyLong\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"KeyText\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"FilterLastAction\",\r\n            \"type\": \"BOOLEAN\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\" : [\r\n                null\r\n                , \"s-ZPROGRAM\"\r\n                , \"b-0\"\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://publictest.minova.com:17280/data/procedure",
+					"protocol": "https",
+					"host": [
+						"publictest",
+						"minova",
+						"com"
+					],
+					"port": "17280",
+					"path": [
+						"data",
+						"procedure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "data/procedure-with-output-parameter",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "rqgzxTf71EAx8chvchMi",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "indexViewName",
+						"type": "text",
+						"value": "Test",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"spReadWorkingTime\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"KeyLong\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"EmployeeKey\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"ServiceContractKey\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"OrderReceiverrKey\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"ServiceObjectKey\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"ServiceKey\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"BookingDate\",\r\n            \"type\": \"INSTANT\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"StartDate\",\r\n            \"type\": \"INSTANT\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"EndDate\",\r\n            \"type\": \"INSTANT\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"RenderedQuantity\",\r\n            \"type\": \"DOUBLE\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"ChargedQuantity\",\r\n            \"type\": \"DOUBLE\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"Description\",\r\n            \"type\": \"STRING\",\r\n            \"outputType\": \"OUTPUT\"\r\n        },\r\n        {\r\n            \"name\": \"Spelling\",\r\n            \"type\": \"BOOLEAN\",\r\n            \"outputType\": \"OUTPUT\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\": [\r\n                \"n-1\",\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null,\r\n                null\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://publictest.minova.com:17280/data/procedure",
+					"protocol": "https",
+					"host": [
+						"publictest",
+						"minova",
+						"com"
+					],
+					"port": "17280",
+					"path": [
+						"data",
+						"procedure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "data/procedure-for-trac-ticket",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "rqgzxTf71EAx8chvchMi",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "indexViewName",
+						"type": "text",
+						"value": "Test",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Ticket\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"TicketNumber\",\r\n            \"type\": \"INTEGER\",\r\n            \"outputType\": \"OUTPUT\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\": [\r\n                \"s--123\"\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://publictest.minova.com:17280/data/procedure",
+					"protocol": "https",
+					"host": [
+						"publictest",
+						"minova",
+						"com"
+					],
+					"port": "17280",
+					"path": [
+						"data",
+						"procedure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ping",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "rqgzxTf71EAx8chvchMi",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "indexViewName",
+						"type": "text",
+						"value": "Test",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"vWorkingTimeIndex2\",\r\n    \"columns\": [\r\n        {\r\n            \"name\": \"KeyLong\",\r\n            \"type\": \"INTEGER\"\r\n        }\r\n        , {\r\n            \"name\": \"EmployeeText\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"CustomerText\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"ChargedQuantity\",\r\n            \"type\": \"STRING\"\r\n        }\r\n        , {\r\n            \"name\": \"&\",\r\n            \"type\": \"BOOLEAN\"\r\n        }\r\n    ],\r\n    \"rows\": [\r\n        {\r\n            \"values\" : [\r\n                \"s->0\"\r\n                ,\"s-%VM\"\r\n                ,\"s-MIN\"\r\n                , \"s->0.5\"\r\n                , \"b-false\"\r\n            ]\r\n        }\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://publictest.minova.com:17280/ping",
+					"protocol": "https",
+					"host": [
+						"publictest",
+						"minova",
+						"com"
+					],
+					"port": "17280",
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

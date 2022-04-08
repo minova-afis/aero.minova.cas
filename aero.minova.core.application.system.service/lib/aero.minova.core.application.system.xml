@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<service>
-	<id>de.minova.skyham.awb.cas</id>
-	<name>HAM MINOVA Core Application System</name>
-	<description>Siehe https://github.com/minova-afis/aero.minova.core.application.system</description>
-	<executable>D:\TEST_SYSTEME\programs\java\bin\java</executable>
-	<arguments>-jar aero.minova.core.application.system.service.jar --spring.profiles.active=production</arguments>
-	<logmode>rotate</logmode>
-</service>

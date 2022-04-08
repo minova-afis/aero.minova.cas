@@ -3,6 +3,14 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [12.40.0] - 2022-04-07
+
+Ordner, Paket und Projekt-Namen vereinheitlichen:
+
+* Die Pakete `aero.minova.core.application.system.*` wurden nach `aero.minova.cas.*` umbenannt.
+* Die Ordnernamen der Unterprojekte wurde verkürtzt indem der `aero.minova.core.application.system.` Prefix entfernt wurde.
+  Dadurch sind die Ordner einfacher voneinander zu unterscheiden.
+
 ## [12.39.0] - 2022-04-04
 
 Postgresql bei der Privilegienprüfung unterstützen.
@@ -60,6 +68,10 @@ Es wird nun ein eigener Logger für das Setup verwendet.
 
 Fehlermeldungen können nun auf zwei verschiedene Arten verarbeitet und dargestellt werden.
 
+## [12.39.3] - 2022-04-07
+
+Die Packete `aero.minova.core.application.system.*` nach `aero.minova.cas.*` umbenennen
+und Ordnerstruktur übersichtlicher gestalten.
 
 ## [12.35.0] - 2022-02-08
 

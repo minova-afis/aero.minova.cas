@@ -16,7 +16,7 @@
 > dass Code die Doku ist.
 > Mein Therapeut hat mich dann aber doch vom Konzept überzeugt und siehe da,
 > es funktioniert!
-> Jetzt kann ich meinen Tee endlich in Ruhe geniesen!
+> Jetzt kann ich meinen Tee endlich in Ruhe geniessen!
 -- Tee abhängiger Entwickler
 
 ## Deadlock auf der SQL-Datenbank

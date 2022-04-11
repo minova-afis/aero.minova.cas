@@ -12,15 +12,17 @@ User ..> [REST]: Login und Anfragen
 [HTTPS] --> [CAS]
 [REST] --> [CAS]
 [CAS] .right.> AD: lesend
-[CAS] --> [Resourcen]
-[Resourcen] --> [Dateisystem]
+[CAS] --> [Ressourcen]
+[Ressourcen] --> [Dateisystem]
 [Dateisystem] --> [App-Projekte]
 [Dateisystem] --> [Cache]
-[Resourcen] --> [SQL-Datenbank]
+[Ressourcen] --> [SQL-Datenbank]
 [CAS] <.left.> [Erweiterungen]
 [Erweiterungen] <.down.> [Setup-Erweiterung]
+[Erweiterungen] <.down.> [Override-Erweiterung]
 [Erweiterungen] .left.> Dienste
-[Erweiterungen] ..> [Resourcen]
+[Override-Erweiterung] <.left.> Dienste : 'registrieren' sich\n beim CAS
+[Erweiterungen] ..> [Ressourcen]
 @enduml
 ....
 
@@ -33,11 +35,14 @@ User ..> [REST]: Login und Anfragen
 [WFC] --> [CAS]: Login und Anfragen
 User ..> [WFC]
 [CAS] .right.> AD: lesend
-[CAS] --> [Resourcen]
-[Resourcen] --> [Dateisystem]
-[Resourcen] --> [SQL-Datenbank]
+[CAS] --> [Ressourcen]
+[Ressourcen] --> [Dateisystem]
+[Ressourcen] --> [SQL-Datenbank]
+[CAS] ..> [Overrides]
+[Overrides] .left.> Dienste
+[Overrides] -down-> [SQL-Datenbank]
 [CAS] .left.> [Erweiterungen]
 [Erweiterungen] .left.> Dienste
-[Erweiterungen] ..> [Resourcen]
+[Erweiterungen] ..> [Ressourcen]
 @enduml
 ....

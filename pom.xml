@@ -23,6 +23,7 @@
         <module>app</module>
 		<module>setup</module>
 		<module>api</module>
+		<module>override</module>
     </modules>
     <repositories>
         <repository>

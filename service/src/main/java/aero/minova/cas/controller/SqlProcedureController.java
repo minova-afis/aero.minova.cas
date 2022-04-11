@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.OutputType;
@@ -35,7 +38,6 @@ import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
@@ -56,6 +58,16 @@ public class SqlProcedureController {
 	SecurityService securityService;
 
 	final Object extensionSynchronizer = new Object();
+
+	/**
+	 * Enthält Tupel aus Prozeudrennamen und Dienstnamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
+	 */
+	private final Map<String, String> overrides = new HashMap<>();
+
+	/**
+	 * Enthält Tupel aus Dienstnamen und Tabellennamen. Wird eine der enthaltenen Tabellen verändert, muss der dazugehörige Dienst angetriggert werden.
+	 */
+	private final Map<String, String> newsfeeds = new HashMap<>();
 
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
@@ -96,6 +108,105 @@ public class SqlProcedureController {
 			throw new IllegalArgumentException(name);
 		}
 		extensionBootstrapChecks.put(name, extCheck);
+	}
+
+	/**
+	 * @return Eine Map der registrierten Dienste.
+	 */
+	public Map<String, String> getOverrides() {
+		return overrides;
+	}
+
+	/**
+	 * @return Eine Map der registrierten Prozeduren.
+	 */
+	public Map<String, String> getNewsfeeds() {
+		return newsfeeds;
+	}
+
+	/**
+	 * Mappt, welche Prozeduren welche Tabellen verändern.
+	 * 
+	 * @param procedureName
+	 *            Der Name der Prozedur.
+	 * @param tableName
+	 *            Der Name der Tabelle, welche durch die Prozedur verändert werden soll.
+	 */
+	public void registerOverrides(String procedureName, String tableName) {
+		if (!(overrides.containsKey(procedureName) && overrides.containsValue(tableName))) {
+			overrides.put(procedureName, tableName);
+		}
+	}
+
+	/**
+	 * Entfernt den Eintrag einer Tabelle zu einer Prozedur aus der Map.
+	 * 
+	 * @param procedureName
+	 *            Die Prozedur, zu welcher der Eintrag entfernt werden soll.
+	 * @param tableName
+	 *            Der Tabellenname, zu welchem die Prozedur entfernt werden soll.
+	 */
+	public void unregisterOverrides(String procedureName, String tableName) {
+		if ((overrides.containsKey(procedureName) && overrides.containsValue(tableName))) {
+			overrides.remove(procedureName, tableName);
+		}
+	}
+
+	/**
+	 * Mappt die Tabellen zu den Servicenamen und registriert somit, welche Services angetriggert werden müssen, wenn Änderungen auf bestimmten Tabellen
+	 * stattfinden.
+	 * 
+	 * @param serviceName
+	 *            Der Name des Dienstes
+	 * @param tableName
+	 *            Der Name der Tabelle, auf welche gehorcht werden soll
+	 */
+	public void registerNewsfeed(String serviceName, String tableName) {
+		if (!(newsfeeds.containsKey(serviceName) && newsfeeds.containsValue(tableName))) {
+			newsfeeds.put(serviceName, tableName);
+		}
+	}
+
+	/**
+	 * Entfernt den Eintrag einer Table zu einem Dienst aus der Map.
+	 * 
+	 * @param serviceName
+	 *            Der Dienst, zu welchem der Eintrag entfernt werden soll.
+	 * @param tableName
+	 *            Der
+	 */
+	public void unregisterNewsfeed(String serviceName, String tableName) {
+		if ((newsfeeds.containsKey(serviceName) && newsfeeds.containsValue(tableName))) {
+			newsfeeds.remove(serviceName, tableName);
+		}
+	}
+
+	/**
+	 * Wenn das CAS neu gestartet wird, müssen die Overrides wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
+	 */
+	@PostConstruct
+	private void initializeOverrides() {
+		try {
+			if (securityService.areOverrideStoresSetup()) {
+				Table overrideTable = new Table();
+				overrideTable.setName("xvcasCASServices");
+				overrideTable.addColumn(new Column("KeyText", DataType.STRING));
+				overrideTable.addColumn(new Column("TableName", DataType.STRING));
+				try {
+					Table viewResult = securityService.unsecurelyGetIndexView(overrideTable);
+
+					for (Row row : viewResult.getRows()) {
+						registerOverrides(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
+					}
+
+				} catch (Exception e) {
+					customLogger.logError("Error while trying to initialize overrides!", e);
+					throw new RuntimeException(e);
+				}
+			}
+		} catch (Exception e) {
+			customLogger.logError("Overrides could not be initialized!", e);
+		}
 	}
 
 	/**

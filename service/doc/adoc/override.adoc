@@ -1,0 +1,12 @@
+=== Overrides
+
+Die Override-Extension ist eine weitere Möglichkeit Dienste beim CAS zu registrieren.
+Sie bietet den Vorteil, dass auf Veränderungen bzw. Updates auf Tabellen gehorcht werden kann und dementsprechende Dienste benachrichtigt werden können.
+
+==== Override API
+Folgende Methodem werden 
+
+* setup(): Mit dieser Methode werden die ProzedurNamen in der extension-Map gespeichert, mit welchen man die Services registrieren kann. 
+* registerService(Table table): Speichert einen Dienst in der xtcasCASServices Tabelle.
+* registerNewsfeedListener(Table table): Speichert, auf welche Tabellen ein Dienst nach Updates horcht.
+* registerProcedureNewsfeed(Table tabe):  Speichert, welche Prozeduren Veränderungen auf Tabellen bewirken, bzw. welche ein Update auslösen. Werden diese Prozeduren ausgeführt, muss der CAS die entsprechenden Dienste antriggern.

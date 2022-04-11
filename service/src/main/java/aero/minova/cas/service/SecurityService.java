@@ -87,7 +87,7 @@ public class SecurityService {
 					.setValues(asList(new Value(privilegeName, null), new Value(ga.getAuthority(), null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
-		return getTableForSecurityCheck(userPrivileges).getRows();
+		return unsecurelyGetIndexView(userPrivileges).getRows();
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class SecurityService {
 	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
 	 * @return Das Ergebnis der Abfrage.
 	 */
-	public Table getTableForSecurityCheck(Table inputTable) {
+	public Table unsecurelyGetIndexView(Table inputTable) {
 		StringBuilder sb = new StringBuilder();
 		List<Row> userGroups = new ArrayList<>();
 		Row inputRow = new Row();
@@ -157,7 +157,7 @@ public class SecurityService {
 				List<Row> checkRow = new ArrayList<>();
 				checkRow.add(bar);
 				columnSec.setRows(checkRow);
-				List<Row> tokenSpecificAuthorities = getTableForSecurityCheck(columnSec).getRows();
+				List<Row> tokenSpecificAuthorities = unsecurelyGetIndexView(columnSec).getRows();
 				// wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
 				if (tokenSpecificAuthorities.isEmpty())
 					return inputTable;
@@ -341,7 +341,7 @@ public class SecurityService {
 		tUser.addRow(userEntry);
 
 		// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-		Table membershipsFromUser = getTableForSecurityCheck(tUser);
+		Table membershipsFromUser = unsecurelyGetIndexView(tUser);
 		List<String> userSecurityTokens = new ArrayList<>();
 
 		if (membershipsFromUser.getRows().size() > 0) {
@@ -381,7 +381,7 @@ public class SecurityService {
 			}
 		}
 		if (groups.getRows().size() > 0) {
-			List<Row> groupTokens = getTableForSecurityCheck(groups).getRows();
+			List<Row> groupTokens = unsecurelyGetIndexView(groups).getRows();
 			List<String> groupSecurityTokens = new ArrayList<>();
 			for (Row r : groupTokens) {
 				String memberships = r.getValues().get(1).getStringValue();

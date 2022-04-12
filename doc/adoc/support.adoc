@@ -35,3 +35,8 @@
    (Alternativ könnte man es so implementieren, dass man eine Option für das CAS einführt,
    womit sämtliche SQL-Anfragen nacheinander ausgeführt werden.
    Dadurch wären SQL-Deadlocks durch das CAS nicht mehr möglich.)
+
+## setup-Befehl hat einen Fehler.
+
+ Manchmal löst man das Problem indem man eine neue leere Datenbank dafür verwendet,
+ anstatt eine bereits vorhanden (`create database <name>`).

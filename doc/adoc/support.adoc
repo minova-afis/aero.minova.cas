@@ -38,5 +38,5 @@
 
 ## setup-Befehl hat einen Fehler.
 
- Manchmal löst man das Problem indem man eine neue leere Datenbank dafür verwendet,
- anstatt eine bereits vorhanden (`create database <name>`).
+Manchmal löst man das Problem indem man eine neue leere Datenbank dafür verwendet,
+anstatt eine bereits vorhanden (`create database <name>`).

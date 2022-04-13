@@ -11,8 +11,7 @@ NOTE: TODO
 * Docker-Image starten:
 [source,shell]
 ----
-# test
-echo docker run \
+docker run \
     --name=localtest \
     --publish=8084:8084 \
     --env login_dataSource='admin' \

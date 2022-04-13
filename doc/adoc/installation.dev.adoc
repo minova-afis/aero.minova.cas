@@ -1,9 +1,5 @@
 # CAS für die Entwicklungsumgebung aufsetzen.
 
-## Aufsetzen in Eclipse.
-
-NOTE: TODO
-
 ## Snapshot lokal bauen und ausführen.
 
 * Projekt bauen: `mvn clean verify`
@@ -22,3 +18,7 @@ docker run \
     localtest
 ----
 * Docker-Image wieder entfernen: `docker rmi -f localtest`
+
+## In Eclipse ausführen und debuggen.
+
+NOTE: TODO

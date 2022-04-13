@@ -6,18 +6,20 @@ Sie bietet den Vorteil, dass auf Veränderungen bzw. Updates auf Tabellen gehorc
 WARNING: Die ServiceNotifiers werden nach den Extensions ausgeführt, da Extensions ebenfalls Veränderungen auf Tabellen auslösen können.
 
 ==== ServiceNotifier API
-Folgende Methoden werden benötigt.
+Folgende Extensions können zum Registrieren verwendet werden:
+* registerService: Registriert einen Dienst mit den übergebenen Parametern.
+* unregisterService: Meldet den Dienst mit den übergebenen Parametern ab.
+* registerProcedureNewsfeed: Verknüpft die übergebenen Prozedurnamen mit den übergebenen Tabellennamen. Die Verbindung zeigt, welche Prozeduren Änderungen auf bestimmten Tabellen auslösen.
+* unregisterProcedureNewsfeed: Löscht die Verknüpfung von Prozedur und Tabelle.
+* registerNewsfeedListener: Speichert, welche Dienste auf welche Tabellen horchen. Der Dienstname und der Tabellenname müssen als Values übergeben werden.
+* unregisterNewsfeedListener: Löscht den Vermerk des Dienstes auf die Tabelle wieder.
 
-* setup(): Mit dieser Methode werden die ProzedurNamen in der extension-Map gespeichert, mit welchen man die Methoden der Extension aufrufen kann:
-** registerService: Registriert einen Dienst mit den übergebenen Parametern.
-** unregisterService: Meldet den Dienst mit den übergebenen Parametern ab.
-** registerProcedureNewsfeed: Verknüpft die übergebenen Prozedurnamen mit den übergebenen Tabellennamen. Die Verbindung zeigt, welche Prozeduren Änderungen auf bestimmten Tabellen auslösen.
-** unregisterProcedureNewsfeed: Löscht die Verknüpfung von Prozedur und Tabelle.
-** registerNewsfeedListener: Speichert, welche Dienste auf welche Tabellen horchen. Der Dienstname und der Tabellenname müssen als Values übergeben werden.
-** unregisterNewsfeedListener: Löscht den Vermerk des Dienstes auf die Tabelle wieder.
+Die Extenions rufen folgende Methoden auf:
 * registerService(Table table): Speichert einen Dienst in der xtcasCASServices Tabelle.
 * unregisterService(Table table): Löscht einen Dienst aus der xtcasCASServices Tabelle.
 * registerNewsfeedListener(Table table): Speichert, auf welche Tabellen ein Dienst nach Updates horcht.
 * unregisterNewsfeedListener(Table table): Löscht alle übergebenen Verknüpfungen zwischen Tabelle und Dienst.
 * registerProcedureNewsfeed(Table tabe):  Speichert, welche Prozeduren Veränderungen auf Tabellen bewirken, bzw. welche ein Update auslösen. Werden diese Prozeduren ausgeführt, muss der CAS die entsprechenden Dienste antriggern.
 * unregisterProcedureNewsfeed(Table table): Löscht die Verknüpfung zwischen Prozedur und Tabelle.
+* getServicenotifier(): Liefert die Map mit den Tupeln aus Prozedurname und Tabellenname.
+* getNewsfeeds(): Liefert die Map mit den Tupeln aus Dienstname und Tabellenname.

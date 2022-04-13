@@ -59,7 +59,7 @@ public class SecurityService {
 	 * @throws Exception
 	 *             Fehler bei der Emittlung
 	 */
-	public boolean areOverrideStoresSetup() throws Exception {
+	public boolean areServiceNotifiersStoresSetup() throws Exception {
 		return isTablePresent("xvcascasservices");
 	}
 

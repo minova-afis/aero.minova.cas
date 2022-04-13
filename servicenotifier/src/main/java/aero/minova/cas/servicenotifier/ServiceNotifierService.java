@@ -1,4 +1,4 @@
-package aero.minova.cas.override;
+package aero.minova.cas.servicenotifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.SecurityService;
 
-public class OverrideService {
+public class ServiceNotifierService {
 
 	@Autowired
 	SqlProcedureController spc;
@@ -31,9 +31,9 @@ public class OverrideService {
 	SecurityService securityService;
 
 	/**
-	 * Enthält Tupel aus Prozeudrennamen und Dienstnamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
+	 * Enthält Tupel aus Prozedurenamen und Dienstnamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
 	 */
-	private final Map<String, String> overrides = new HashMap<>();
+	private final Map<String, String> servicenotifier = new HashMap<>();
 
 	/**
 	 * Enthält Tupel aus Dienstnamen und Tabellennamen. Wird eine der enthaltenen Tabellen verändert, muss der dazugehörige Dienst angetriggert werden.
@@ -132,21 +132,21 @@ public class OverrideService {
 	}
 
 	/**
-	 * Wenn das CAS neu gestartet wird, müssen die Overrides wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
+	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
 	 */
 	@PostConstruct
-	private void initializeOverrides() {
+	private void initializeServicenotifier() {
 		try {
-			if (securityService.areOverrideStoresSetup()) {
-				Table overrideTable = new Table();
-				overrideTable.setName("xvcasCASServices");
-				overrideTable.addColumn(new Column("KeyText", DataType.STRING));
-				overrideTable.addColumn(new Column("TableName", DataType.STRING));
+			if (securityService.areServiceNotifiersStoresSetup()) {
+				Table servicenotifierTable = new Table();
+				servicenotifierTable.setName("xvcasCASServices");
+				servicenotifierTable.addColumn(new Column("KeyText", DataType.STRING));
+				servicenotifierTable.addColumn(new Column("TableName", DataType.STRING));
 				try {
-					Table viewResult = securityService.unsecurelyGetIndexView(overrideTable);
+					Table viewResult = securityService.unsecurelyGetIndexView(servicenotifierTable);
 
 					for (Row row : viewResult.getRows()) {
-						registerOverrides(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
+						registerServicenotifier(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
 					}
 
 				} catch (Exception e) {
@@ -162,8 +162,8 @@ public class OverrideService {
 	/**
 	 * @return Eine Map der registrierten Dienste.
 	 */
-	public Map<String, String> getOverrides() {
-		return overrides;
+	public Map<String, String> getServicenotifier() {
+		return servicenotifier;
 	}
 
 	/**
@@ -181,9 +181,9 @@ public class OverrideService {
 	 * @param tableName
 	 *            Der Name der Tabelle, welche durch die Prozedur verändert werden soll.
 	 */
-	public void registerOverrides(String procedureName, String tableName) {
-		if (!(overrides.containsKey(procedureName) && overrides.containsValue(tableName))) {
-			overrides.put(procedureName, tableName);
+	public void registerServicenotifier(String procedureName, String tableName) {
+		if (!(servicenotifier.containsKey(procedureName) && servicenotifier.containsValue(tableName))) {
+			servicenotifier.put(procedureName, tableName);
 		}
 	}
 
@@ -195,9 +195,9 @@ public class OverrideService {
 	 * @param tableName
 	 *            Der Tabellenname, zu welchem die Prozedur entfernt werden soll.
 	 */
-	public void unregisterOverrides(String procedureName, String tableName) {
-		if ((overrides.containsKey(procedureName) && overrides.containsValue(tableName))) {
-			overrides.remove(procedureName, tableName);
+	public void unregisterServicenotifier(String procedureName, String tableName) {
+		if ((servicenotifier.containsKey(procedureName) && servicenotifier.containsValue(tableName))) {
+			servicenotifier.remove(procedureName, tableName);
 		}
 	}
 

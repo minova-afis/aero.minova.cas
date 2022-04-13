@@ -1,11 +1,11 @@
-=== Overrides
+=== ServiceNotifiers
 
-Die Override-Extension ist eine weitere Möglichkeit, Dienste beim CAS zu registrieren.
+Die ServiceNotifier-Extension ist eine weitere Möglichkeit, Dienste beim CAS zu registrieren.
 Sie bietet den Vorteil, dass auf Veränderungen bzw. Updates auf Tabellen gehorcht werden kann und dementsprechende Dienste benachrichtigt werden können.
 
-WARNING: Die Overrides werden nach den Extensions ausgeführt, da Extensions ebenfalls Veränderungen auf Tabellen auslösen können.
+WARNING: Die ServiceNotifiers werden nach den Extensions ausgeführt, da Extensions ebenfalls Veränderungen auf Tabellen auslösen können.
 
-==== Override API
+==== ServiceNotifier API
 Folgende Methoden werden benötigt.
 
 * setup(): Mit dieser Methode werden die ProzedurNamen in der extension-Map gespeichert, mit welchen man die Methoden der Extension aufrufen kann:

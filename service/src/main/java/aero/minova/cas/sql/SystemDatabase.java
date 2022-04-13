@@ -27,7 +27,7 @@ public class SystemDatabase {
 	@Value("${aero_minova_database_user_password:password}")
 	String userPassword;
 
-	@Value("${aero.minova.database.kind:mysql}")
+	@Value("${aero.minova.database.kind:mssql}")
 	String databaseKind;
 
 	private LinkedList<Connection> freeConnections = new LinkedList<>();

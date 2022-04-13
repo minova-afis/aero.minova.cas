@@ -6,7 +6,9 @@ Sie bietet den Vorteil, dass auf Veränderungen bzw. Updates auf Tabellen gehorc
 WARNING: Die ServiceNotifiers werden nach den Extensions ausgeführt, da Extensions ebenfalls Veränderungen auf Tabellen auslösen können.
 
 ==== ServiceNotifier API
+
 Folgende Extensions können zum Registrieren verwendet werden:
+
 * registerService: Registriert einen Dienst mit den übergebenen Parametern.
 * unregisterService: Meldet den Dienst mit den übergebenen Parametern ab.
 * registerProcedureNewsfeed: Verknüpft die übergebenen Prozedurnamen mit den übergebenen Tabellennamen. Die Verbindung zeigt, welche Prozeduren Änderungen auf bestimmten Tabellen auslösen.
@@ -15,6 +17,7 @@ Folgende Extensions können zum Registrieren verwendet werden:
 * unregisterNewsfeedListener: Löscht den Vermerk des Dienstes auf die Tabelle wieder.
 
 Die Extenions rufen folgende Methoden auf:
+
 * registerService(Table table): Speichert einen Dienst in der xtcasCASServices Tabelle.
 * unregisterService(Table table): Löscht einen Dienst aus der xtcasCASServices Tabelle.
 * registerNewsfeedListener(Table table): Speichert, auf welche Tabellen ein Dienst nach Updates horcht.

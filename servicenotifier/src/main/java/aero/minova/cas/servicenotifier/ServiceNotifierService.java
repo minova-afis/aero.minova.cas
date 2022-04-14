@@ -134,9 +134,10 @@ public class ServiceNotifierService {
 	 *            eine Table, welche in der ersten Spalte den Dienstnamen, in der Zweiten die ServiceURL und in der dritten Column den Port benötigt.
 	 */
 	public void unregisterService(Table inputTable) {
+
 		Table unregisterSerivceTable = new Table();
 		unregisterSerivceTable.setName("xpcasDeleteCASService");
-		unregisterSerivceTable.addColumn(new Column("KeyText", DataType.STRING));
+		unregisterSerivceTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 		unregisterSerivceTable.addColumn(new Column("ServiceURL", DataType.STRING));
 		unregisterSerivceTable.addColumn(new Column("Port", DataType.INTEGER));
 
@@ -154,6 +155,12 @@ public class ServiceNotifierService {
 		}
 	}
 
+	/**
+	 * Registriert auf welcher Tabelle eine Prozedur ein Update ausführt.
+	 * 
+	 * @param inputTable
+	 *            Eine Table, welche den Prozedurnamen und den Tabellennamen enthält.
+	 */
 	public void registerProcedureNewsfeed(Table inputTable) {
 		Table registerProcedureNewsfeedTable = new Table();
 		registerProcedureNewsfeedTable.setName("xpcasInsertProcedureNewsfeed");
@@ -175,6 +182,12 @@ public class ServiceNotifierService {
 		}
 	}
 
+	/**
+	 * Löscht einen Eintrag aus der xtcasProcedureNewsfeed anhand der übergebenen Parameter. Dazu werden Prozedurname und Tabellenname benötigt.
+	 * 
+	 * @param inputTable
+	 *            Eine Table mit dem Prozedurnamen und dem Tabellennamen als String-Value in einer Row.
+	 */
 	public void unregisterProcedureNewsfeed(Table inputTable) {
 		Table unregisterProcedureNewsfeedTable = new Table();
 		unregisterProcedureNewsfeedTable.setName("xpcasDeleteProcedureNewsfeed");
@@ -194,6 +207,12 @@ public class ServiceNotifierService {
 		}
 	}
 
+	/**
+	 * Registriert für welche Tabelle ein Dienst angetriggert werden möchte, wenn ein Update auf dieser durchgeführt wird.
+	 * 
+	 * @param inputTable
+	 *            Eine Table mit den beiden Values CASServiceKey als int und dem Tabellennamen als String.
+	 */
 	public void registerNewsfeedListener(Table inputTable) {
 		Table registerNewsfeedTable = new Table();
 		registerNewsfeedTable.setName("xpcasInsertNewsfeedListener");
@@ -215,6 +234,12 @@ public class ServiceNotifierService {
 		}
 	}
 
+	/**
+	 * Löscht einen Eintrag aus der xtcasNewsfeedListener anhand der übergebenen Parameter. Dazu werden CASServicename und Tabellenname benötigt.
+	 * 
+	 * @param inputTable
+	 *            Eine Table mit dem CASServiceNamen und dem Tabellennamen als String-Value in einer Row.
+	 */
 	public void unregisterNewsfeedListener(Table inputTable) {
 		Table unregisterNewsfeedTable = new Table();
 		unregisterNewsfeedTable.setName("xpcasDeleteNewsfeedListener");
@@ -241,7 +266,7 @@ public class ServiceNotifierService {
 	private void initializeServicenotifiers() {
 		try {
 			if (securityService.areServiceNotifiersStoresSetup()) {
-				Table servicenotifierTable = findViewEntry(null, null, null);
+				Table servicenotifierTable = findViewEntry(null, null, null, null, null);
 				for (Row row : servicenotifierTable.getRows()) {
 					registerServicenotifier(row.getValues().get(4).getStringValue(), row.getValues().get(5).getStringValue());
 				}
@@ -259,7 +284,7 @@ public class ServiceNotifierService {
 	private void initializeNewsfeeds() {
 		try {
 			if (securityService.areServiceNotifiersStoresSetup()) {
-				Table newsfeedsTable = findViewEntry(null, null, null);
+				Table newsfeedsTable = findViewEntry(null, null, null, null, null);
 				for (Row row : newsfeedsTable.getRows()) {
 					registerNewsfeed(row.getValues().get(3).getStringValue(), row.getValues().get(5).getStringValue());
 				}
@@ -282,10 +307,14 @@ public class ServiceNotifierService {
 	 *            Der Name der Prozedur als String-Value.
 	 * @param tableName
 	 *            Der Name der Table als String-Value.
+	 * @param serviceURL
+	 *            Die URL eines Dienstes.
+	 * @param port
+	 *            Der Port eines Dienstes.
 	 * @return Eine Tabke mit den jeweiligen gefilterten Einträgen. Die Reihenfolge der Values ist folgende: CASServiceKey, NewsfeedListenerKey,
-	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, TableName
+	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, TableName, ServiceURL, Port
 	 */
-	public Table findViewEntry(Value casServiceName, Value procedureName, Value tableName) {
+	public Table findViewEntry(Value casServiceName, Value procedureName, Value tableName, Value serviceURL, Value port) {
 		Table viewResult = new Table();
 
 		Table viewTable = new Table();
@@ -296,6 +325,8 @@ public class ServiceNotifierService {
 		viewTable.addColumn(new Column("CASServiceName", DataType.STRING));
 		viewTable.addColumn(new Column("ProcedureName", DataType.STRING));
 		viewTable.addColumn(new Column("TableName", DataType.STRING));
+		viewTable.addColumn(new Column("ServiceURL", DataType.STRING));
+		viewTable.addColumn(new Column("PORT", DataType.INTEGER));
 
 		Row viewRow = new Row();
 		viewRow.addValue(null);
@@ -304,6 +335,8 @@ public class ServiceNotifierService {
 		viewRow.addValue(casServiceName);
 		viewRow.addValue(procedureName);
 		viewRow.addValue(tableName);
+		viewRow.addValue(serviceURL);
+		viewRow.addValue(port);
 		try {
 			viewResult = securityService.unsecurelyGetIndexView(viewTable);
 		} catch (Exception e) {

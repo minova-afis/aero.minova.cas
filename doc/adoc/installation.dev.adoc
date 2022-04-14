@@ -17,6 +17,7 @@ docker run \
     --env logging_level_root=DEBUG \
     localtest
 ----
+* Alle Rechte können den admin-Nutzer übergeben werden, wenn folgendes auf SQL-Datenbank ausgeführt wird: `exec xpcasInsertAllPrivilegesToUserGroup 'admin', 'admin'`
 * Docker-Image wieder entfernen: `docker rmi -f localtest`
 
 ## In Eclipse ausführen und debuggen.

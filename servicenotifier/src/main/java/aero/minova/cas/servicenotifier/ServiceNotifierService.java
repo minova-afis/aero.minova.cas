@@ -168,21 +168,25 @@ public class ServiceNotifierService {
 		registerProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
 		registerProcedureNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
 
-		Row registerRow = new Row();
-		registerRow.addValue(null);
-		registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
-		registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+		for (int i = 0; i < inputTable.getRows().size(); i++) {
 
-		registerProcedureNewsfeedTable.addRow(registerRow);
-		try {
-			spc.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
-		} catch (Exception e) {
-			logger.logError("The procedure " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
-			throw new RuntimeException(e);
+			Row registerRow = new Row();
+			registerRow.addValue(null);
+			registerRow.addValue(inputTable.getRows().get(i).getValues().get(0));
+			registerRow.addValue(inputTable.getRows().get(i).getValues().get(1));
+
+			registerProcedureNewsfeedTable.addRow(registerRow);
+			try {
+				spc.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
+			} catch (Exception e) {
+				logger.logError("The procedure " + inputTable.getRows().get(i).getValues().get(0).getStringValue() + " could not be registered for table "
+						+ inputTable.getRows().get(i).getValues().get(1).getStringValue(), e);
+				throw new RuntimeException(e);
+			}
+
+			registerServicenotifier(inputTable.getRows().get(i).getValues().get(0).getStringValue(),
+					inputTable.getRows().get(i).getValues().get(1).getStringValue());
 		}
-
-		registerServicenotifier(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
-				inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**
@@ -197,19 +201,23 @@ public class ServiceNotifierService {
 		unregisterProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
 		unregisterProcedureNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
 
-		Row unregisterRow = new Row();
-		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(0));
-		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+		for (int i = 0; i < inputTable.getRows().size(); i++) {
 
-		unregisterProcedureNewsfeedTable.addRow(unregisterRow);
-		try {
-			spc.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
-		} catch (Exception e) {
-			logger.logError("The procedure " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
-			throw new RuntimeException(e);
+			Row unregisterRow = new Row();
+			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(0));
+			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(1));
+
+			unregisterProcedureNewsfeedTable.addRow(unregisterRow);
+			try {
+				spc.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
+			} catch (Exception e) {
+				logger.logError("The procedure " + inputTable.getRows().get(i).getValues().get(0).getStringValue() + " could not be unregistered for table "
+						+ inputTable.getRows().get(0).getValues().get(1).getStringValue() + "!", e);
+				throw new RuntimeException(e);
+			}
+			unregisterServicenotifier(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
+					inputTable.getRows().get(0).getValues().get(1).getStringValue());
 		}
-		unregisterServicenotifier(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
-				inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**
@@ -225,19 +233,22 @@ public class ServiceNotifierService {
 		registerNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
 		registerNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
 
-		Row registerRow = new Row();
-		registerRow.addValue(null);
-		registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
-		registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+		for (int i = 0; i < inputTable.getRows().size(); i++) {
+			Row registerRow = new Row();
+			registerRow.addValue(null);
+			registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
+			registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
 
-		registerNewsfeedTable.addRow(registerRow);
-		try {
-			spc.unsecurelyProcessProcedure(registerNewsfeedTable);
-		} catch (Exception e) {
-			logger.logError("The newsfeed " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
-			throw new RuntimeException(e);
+			registerNewsfeedTable.addRow(registerRow);
+			try {
+				spc.unsecurelyProcessProcedure(registerNewsfeedTable);
+			} catch (Exception e) {
+				logger.logError("The newsfeed for service " + inputTable.getRows().get(0).getValues().get(0).getStringValue()
+						+ " could not be registered for table " + inputTable.getRows().get(i).getValues().get(1), e);
+				throw new RuntimeException(e);
+			}
+			registerNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(), inputTable.getRows().get(0).getValues().get(1).getStringValue());
 		}
-		registerNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(), inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**
@@ -252,18 +263,23 @@ public class ServiceNotifierService {
 		unregisterNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
 		unregisterNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
 
-		Row unregisterRow = new Row();
-		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(0));
-		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+		for (int i = 0; i < inputTable.getRows().size(); i++) {
 
-		unregisterNewsfeedTable.addRow(unregisterRow);
-		try {
-			spc.unsecurelyProcessProcedure(unregisterNewsfeedTable);
-		} catch (Exception e) {
-			logger.logError("The newsfeed " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
-			throw new RuntimeException(e);
+			Row unregisterRow = new Row();
+			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(0));
+			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(1));
+
+			unregisterNewsfeedTable.addRow(unregisterRow);
+			try {
+				spc.unsecurelyProcessProcedure(unregisterNewsfeedTable);
+			} catch (Exception e) {
+				logger.logError("The newsfeed for service " + inputTable.getRows().get(i).getValues().get(0).getStringValue()
+						+ " could not be unregistered for table " + inputTable.getRows().get(0).getValues().get(1).getStringValue() + "!", e);
+				throw new RuntimeException(e);
+			}
+			unregisterNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
+					inputTable.getRows().get(0).getValues().get(1).getStringValue());
 		}
-		unregisterNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(), inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**
@@ -318,7 +334,7 @@ public class ServiceNotifierService {
 	 *            Die URL eines Dienstes.
 	 * @param port
 	 *            Der Port eines Dienstes.
-	 * @return Eine Tabke mit den jeweiligen gefilterten Einträgen. Die Reihenfolge der Values ist folgende: CASServiceKey, NewsfeedListenerKey,
+	 * @return Eine Table mit den jeweiligen gefilterten Einträgen. Die Reihenfolge der Values ist folgende: CASServiceKey, NewsfeedListenerKey,
 	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, TableName, ServiceURL, Port
 	 */
 	public Table findViewEntry(Value casServiceName, Value procedureName, Value tableName, Value serviceURL, Value port) {

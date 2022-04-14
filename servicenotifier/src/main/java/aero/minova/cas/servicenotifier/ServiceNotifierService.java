@@ -16,6 +16,7 @@ import aero.minova.cas.api.domain.OutputType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.SecurityService;
 
@@ -31,7 +32,7 @@ public class ServiceNotifierService {
 	SecurityService securityService;
 
 	/**
-	 * Enthält Tupel aus Prozedurenamen und Dienstnamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
+	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
 	 */
 	private final Map<String, String> servicenotifier = new HashMap<>();
 
@@ -59,6 +60,30 @@ public class ServiceNotifierService {
 			}
 		});
 		spc.registerExtension("registerProcedureNewsfeed", inputTable -> {
+			try {
+				registerProcedureNewsfeed(inputTable);
+				return new ResponseEntity(HttpStatus.ACCEPTED);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		spc.registerExtension("unregisterProcedureNewsfeed", inputTable -> {
+			try {
+				unregisterProcedureNewsfeed(inputTable);
+				return new ResponseEntity(HttpStatus.ACCEPTED);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		spc.registerExtension("registerNewsfeedListener", inputTable -> {
+			try {
+				registerNewsfeedListener(inputTable);
+				return new ResponseEntity(HttpStatus.ACCEPTED);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
+		spc.registerExtension("unregisterNewsfeedListener", inputTable -> {
 			try {
 				return new ResponseEntity(HttpStatus.ACCEPTED);
 			} catch (Exception e) {
@@ -111,13 +136,11 @@ public class ServiceNotifierService {
 	public void unregisterService(Table inputTable) {
 		Table unregisterSerivceTable = new Table();
 		unregisterSerivceTable.setName("xpcasDeleteCASService");
-		unregisterSerivceTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
 		unregisterSerivceTable.addColumn(new Column("KeyText", DataType.STRING));
 		unregisterSerivceTable.addColumn(new Column("ServiceURL", DataType.STRING));
 		unregisterSerivceTable.addColumn(new Column("Port", DataType.INTEGER));
 
 		Row unregisterRow = new Row();
-		unregisterRow.addValue(null);
 		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(0));
 		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(1));
 		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(2));
@@ -131,43 +154,174 @@ public class ServiceNotifierService {
 		}
 	}
 
-	/**
-	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
-	 */
-	@PostConstruct
-	private void initializeServicenotifier() {
+	public void registerProcedureNewsfeed(Table inputTable) {
+		Table registerProcedureNewsfeedTable = new Table();
+		registerProcedureNewsfeedTable.setName("xpcasInsertProcedureNewsfeed");
+		registerProcedureNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		registerProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
+		registerProcedureNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+
+		Row registerRow = new Row();
+		registerRow.addValue(null);
+		registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
+		registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+
+		registerProcedureNewsfeedTable.addRow(registerRow);
 		try {
-			if (securityService.areServiceNotifiersStoresSetup()) {
-				Table servicenotifierTable = new Table();
-				servicenotifierTable.setName("xvcasCASServices");
-				servicenotifierTable.addColumn(new Column("KeyText", DataType.STRING));
-				servicenotifierTable.addColumn(new Column("TableName", DataType.STRING));
-				try {
-					Table viewResult = securityService.unsecurelyGetIndexView(servicenotifierTable);
-
-					for (Row row : viewResult.getRows()) {
-						registerServicenotifier(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
-					}
-
-				} catch (Exception e) {
-					logger.logError("Error while trying to initialize overrides!", e);
-					throw new RuntimeException(e);
-				}
-			}
+			spc.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
 		} catch (Exception e) {
-			logger.logError("Overrides could not be initialized!", e);
+			logger.logError("The procedure " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void unregisterProcedureNewsfeed(Table inputTable) {
+		Table unregisterProcedureNewsfeedTable = new Table();
+		unregisterProcedureNewsfeedTable.setName("xpcasDeleteProcedureNewsfeed");
+		unregisterProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
+		unregisterProcedureNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+
+		Row unregisterRow = new Row();
+		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(0));
+		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+
+		unregisterProcedureNewsfeedTable.addRow(unregisterRow);
+		try {
+			spc.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
+		} catch (Exception e) {
+			logger.logError("The procedure " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void registerNewsfeedListener(Table inputTable) {
+		Table registerNewsfeedTable = new Table();
+		registerNewsfeedTable.setName("xpcasInsertNewsfeedListener");
+		registerNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+		registerNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
+		registerNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+
+		Row registerRow = new Row();
+		registerRow.addValue(null);
+		registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
+		registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+
+		registerNewsfeedTable.addRow(registerRow);
+		try {
+			spc.unsecurelyProcessProcedure(registerNewsfeedTable);
+		} catch (Exception e) {
+			logger.logError("The newsfeed " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void unregisterNewsfeedListener(Table inputTable) {
+		Table unregisterNewsfeedTable = new Table();
+		unregisterNewsfeedTable.setName("xpcasDeleteNewsfeedListener");
+		unregisterNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
+		unregisterNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+
+		Row unregisterRow = new Row();
+		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(0));
+		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+
+		unregisterNewsfeedTable.addRow(unregisterRow);
+		try {
+			spc.unsecurelyProcessProcedure(unregisterNewsfeedTable);
+		} catch (Exception e) {
+			logger.logError("The newsfeed " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
+			throw new RuntimeException(e);
 		}
 	}
 
 	/**
-	 * @return Eine Map der registrierten Dienste.
+	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
+	 */
+	@PostConstruct
+	private void initializeServicenotifiers() {
+		try {
+			if (securityService.areServiceNotifiersStoresSetup()) {
+				Table servicenotifierTable = findViewEntry(null, null, null);
+				for (Row row : servicenotifierTable.getRows()) {
+					registerServicenotifier(row.getValues().get(4).getStringValue(), row.getValues().get(5).getStringValue());
+				}
+			}
+		} catch (Exception e) {
+			logger.logError("Error while trying to initialize servicenotifiers!", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Wenn das CAS neu gestartet wird, muss die Newsfeeds-Map wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
+	 */
+	@PostConstruct
+	private void initializeNewsfeeds() {
+		try {
+			if (securityService.areServiceNotifiersStoresSetup()) {
+				Table newsfeedsTable = findViewEntry(null, null, null);
+				for (Row row : newsfeedsTable.getRows()) {
+					registerNewsfeed(row.getValues().get(3).getStringValue(), row.getValues().get(5).getStringValue());
+				}
+			}
+
+		} catch (Exception e) {
+			logger.logError("Error while trying to initialize newsfeed!", e);
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Sucht in der xvCASServices die Einträge anhand der übergebenen Values heraus. Die Values müssen hierfür String-Values sein. Wichtig hierbei ist, dass
+	 * nicht jeder Value übergeben werden muss. Falls man die gesamte View haben möchte, kann man auch einfach 'null' in allen drei Übergabeparametern
+	 * übergeben.
+	 * 
+	 * @param casServiceName
+	 *            Der Name des Dienstes als String-Value.
+	 * @param procedureName
+	 *            Der Name der Prozedur als String-Value.
+	 * @param tableName
+	 *            Der Name der Table als String-Value.
+	 * @return Eine Tabke mit den jeweiligen gefilterten Einträgen. Die Reihenfolge der Values ist folgende: CASServiceKey, NewsfeedListenerKey,
+	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, TableName
+	 */
+	public Table findViewEntry(Value casServiceName, Value procedureName, Value tableName) {
+		Table viewResult = new Table();
+
+		Table viewTable = new Table();
+		viewTable.setName("xvcasCASServices");
+		viewTable.addColumn(new Column("CASServiceKey", DataType.STRING));
+		viewTable.addColumn(new Column("NewsfeedListenerKey", DataType.STRING));
+		viewTable.addColumn(new Column("ProcedureNewsfeedKey", DataType.STRING));
+		viewTable.addColumn(new Column("CASServiceName", DataType.STRING));
+		viewTable.addColumn(new Column("ProcedureName", DataType.STRING));
+		viewTable.addColumn(new Column("TableName", DataType.STRING));
+
+		Row viewRow = new Row();
+		viewRow.addValue(null);
+		viewRow.addValue(null);
+		viewRow.addValue(null);
+		viewRow.addValue(casServiceName);
+		viewRow.addValue(procedureName);
+		viewRow.addValue(tableName);
+		try {
+			viewResult = securityService.unsecurelyGetIndexView(viewTable);
+		} catch (Exception e) {
+			logger.logError("Error while trying to access view xvcasCASServices!", e);
+			throw new RuntimeException(e);
+		}
+		return viewResult;
+	}
+
+	/**
+	 * @return Eine Map der registrierten Dienste mit den Tabellen, auf welche sie horchen.
 	 */
 	public Map<String, String> getServicenotifier() {
 		return servicenotifier;
 	}
 
 	/**
-	 * @return Eine Map der registrierten Prozeduren.
+	 * @return Eine Map der registrierten Prozeduren mit den Tabellen, welche sie verändern/updaten.
 	 */
 	public Map<String, String> getNewsfeeds() {
 		return newsfeeds;

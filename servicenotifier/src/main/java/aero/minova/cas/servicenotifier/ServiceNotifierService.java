@@ -53,8 +53,8 @@ public class ServiceNotifierService {
 		});
 		spc.registerExtension("unregisterService", inputTable -> {
 			try {
-				int keyLong = registerService(inputTable);
-				return new ResponseEntity(keyLong, HttpStatus.ACCEPTED);
+				unregisterService(inputTable);
+				return new ResponseEntity(HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -180,6 +180,9 @@ public class ServiceNotifierService {
 			logger.logError("The procedure " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
 			throw new RuntimeException(e);
 		}
+
+		registerServicenotifier(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
+				inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**
@@ -205,6 +208,8 @@ public class ServiceNotifierService {
 			logger.logError("The procedure " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
 			throw new RuntimeException(e);
 		}
+		unregisterServicenotifier(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
+				inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**
@@ -232,6 +237,7 @@ public class ServiceNotifierService {
 			logger.logError("The newsfeed " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
 			throw new RuntimeException(e);
 		}
+		registerNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(), inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**
@@ -257,6 +263,7 @@ public class ServiceNotifierService {
 			logger.logError("The newsfeed " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
 			throw new RuntimeException(e);
 		}
+		unregisterNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(), inputTable.getRows().get(0).getValues().get(1).getStringValue());
 	}
 
 	/**

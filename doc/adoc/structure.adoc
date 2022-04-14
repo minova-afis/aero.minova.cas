@@ -13,31 +13,11 @@ User ..> [REST]: Login und Anfragen
 [REST] --> [CAS]
 [CAS] .right.> AD: lesend
 [CAS] --> [Resourcen]
-[Resourcen] --> [Dateisystem]
-[Dateisystem] --> [App-Projekte]
-[Dateisystem] --> [Cache]
-[Resourcen] --> [SQL-Datenbank]
-[CAS] <.left.> [Erweiterungen]
-[Erweiterungen] <.down.> [Setup-Erweiterung]
-[Erweiterungen] .left.> Dienste
-[Erweiterungen] ..> [Resourcen]
-@enduml
-....
-
-## Komponenten Übersicht
-
-[plantuml, format="svg"]
-.PlantUML-Übersicht.
-....
-@startuml
-[WFC] --> [CAS]: Login und Anfragen
-User ..> [WFC]
-[CAS] .right.> AD: lesend
-[CAS] --> [Resourcen]
+[CAS] --> [App-Projekt]
 [Resourcen] --> [Dateisystem]
 [Resourcen] --> [SQL-Datenbank]
 [CAS] .left.> [Erweiterungen]
+[Erweiterungen] .down.> [Setup-Erweiterung]
 [Erweiterungen] .left.> Dienste
-[Erweiterungen] ..> [Resourcen]
 @enduml
 ....

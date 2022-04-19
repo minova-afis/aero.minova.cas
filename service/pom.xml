@@ -27,6 +27,11 @@
 			<artifactId>cas.api</artifactId>
 			<version>12.38.2</version>
 		</dependency>		
+		<dependency>
+			<groupId>aero.minova</groupId>
+			<artifactId>cas.servicenotifier</artifactId>
+			<version>12.40.4</version>
+		</dependency>
 		<!-- Wird für Java 16 benötigt.-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

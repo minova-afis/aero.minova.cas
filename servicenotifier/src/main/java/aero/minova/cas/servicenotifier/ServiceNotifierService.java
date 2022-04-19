@@ -1,7 +1,10 @@
 package aero.minova.cas.servicenotifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -34,13 +37,14 @@ public class ServiceNotifierService {
 	/**
 	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
 	 */
-	private final Map<String, String> servicenotifier = new HashMap<>();
+	private final Map<String, List<String>> servicenotifier = new HashMap<>();
 
 	/**
 	 * Enthält Tupel aus Dienstnamen und Tabellennamen. Wird eine der enthaltenen Tabellen verändert, muss der dazugehörige Dienst angetriggert werden.
 	 */
-	private final Map<String, String> newsfeeds = new HashMap<>();
+	private final Map<String, List<String>> newsfeeds = new HashMap<>();
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
 	private void setup() {
 		spc.registerExtension("registerService", inputTable -> {
@@ -137,7 +141,7 @@ public class ServiceNotifierService {
 
 		Table unregisterSerivceTable = new Table();
 		unregisterSerivceTable.setName("xpcasDeleteCASService");
-		unregisterSerivceTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		unregisterSerivceTable.addColumn(new Column("KeyText", DataType.STRING));
 		unregisterSerivceTable.addColumn(new Column("ServiceURL", DataType.STRING));
 		unregisterSerivceTable.addColumn(new Column("Port", DataType.INTEGER));
 
@@ -153,6 +157,27 @@ public class ServiceNotifierService {
 			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
 			throw new RuntimeException(e);
 		}
+
+		// Wenn ein Service abgemeldet wird, müssen auch die Verweise aus den Maps und den Tabellen entfernt werden.
+		Table unregisterNewsfeedListenerTable = new Table();
+		unregisterNewsfeedListenerTable.addColumn(new Column("CASServiceName", DataType.STRING));
+		unregisterNewsfeedListenerTable.addColumn(new Column("TableName", DataType.STRING));
+
+		// Alle Tabellennamen aus der newsfeed-Map holen.
+		List<String> serviceEntries = newsfeeds.keySet()//
+				.stream()//
+				.filter(e -> e.equals(inputTable.getRows().get(0).getValues().get(0).getStringValue()))//
+				.collect(Collectors.toList());
+
+		Row unregisterNewsfeedRow = new Row();
+
+		for (String entry : serviceEntries) {
+			unregisterNewsfeedRow.addValue(new Value(inputTable.getRows().get(0).getValues().get(0).getStringValue(), null));
+			unregisterNewsfeedRow.addValue(new Value(entry, null));
+			newsfeeds.remove(inputTable.getRows().get(0).getValues().get(0).getStringValue());
+		}
+
+		unregisterNewsfeedListener(unregisterNewsfeedListenerTable);
 	}
 
 	/**
@@ -372,14 +397,14 @@ public class ServiceNotifierService {
 	/**
 	 * @return Eine Map der registrierten Dienste mit den Tabellen, auf welche sie horchen.
 	 */
-	public Map<String, String> getServicenotifier() {
+	public Map<String, List<String>> getServicenotifier() {
 		return servicenotifier;
 	}
 
 	/**
 	 * @return Eine Map der registrierten Prozeduren mit den Tabellen, welche sie verändern/updaten.
 	 */
-	public Map<String, String> getNewsfeeds() {
+	public Map<String, List<String>> getNewsfeeds() {
 		return newsfeeds;
 	}
 
@@ -392,8 +417,12 @@ public class ServiceNotifierService {
 	 *            Der Name der Tabelle, welche durch die Prozedur verändert werden soll.
 	 */
 	public void registerServicenotifier(String procedureName, String tableName) {
-		if (!(servicenotifier.containsKey(procedureName) && servicenotifier.containsValue(tableName))) {
-			servicenotifier.put(procedureName, tableName);
+		if (!servicenotifier.containsKey(procedureName)) {
+			List<String> tables = new ArrayList<>();
+			tables.add(tableName);
+			servicenotifier.put(procedureName, tables);
+		} else if (servicenotifier.containsKey(procedureName) && !servicenotifier.get(procedureName).contains(tableName)) {
+			servicenotifier.get(procedureName).add(tableName);
 		}
 	}
 
@@ -406,8 +435,8 @@ public class ServiceNotifierService {
 	 *            Der Tabellenname, zu welchem die Prozedur entfernt werden soll.
 	 */
 	public void unregisterServicenotifier(String procedureName, String tableName) {
-		if ((servicenotifier.containsKey(procedureName) && servicenotifier.containsValue(tableName))) {
-			servicenotifier.remove(procedureName, tableName);
+		if ((servicenotifier.containsKey(procedureName) && servicenotifier.get(procedureName).contains(tableName))) {
+			servicenotifier.get(procedureName).remove(tableName);
 		}
 	}
 
@@ -421,8 +450,12 @@ public class ServiceNotifierService {
 	 *            Der Name der Tabelle, auf welche gehorcht werden soll
 	 */
 	public void registerNewsfeed(String serviceName, String tableName) {
-		if (!(newsfeeds.containsKey(serviceName) && newsfeeds.containsValue(tableName))) {
-			newsfeeds.put(serviceName, tableName);
+		if (!newsfeeds.containsKey(serviceName)) {
+			List<String> tables = new ArrayList<>();
+			tables.add(tableName);
+			newsfeeds.put(serviceName, tables);
+		} else if (newsfeeds.containsKey(serviceName) && !newsfeeds.get(serviceName).contains(tableName)) {
+			newsfeeds.get(serviceName).add(tableName);
 		}
 	}
 
@@ -435,8 +468,8 @@ public class ServiceNotifierService {
 	 *            Der
 	 */
 	public void unregisterNewsfeed(String serviceName, String tableName) {
-		if ((newsfeeds.containsKey(serviceName) && newsfeeds.containsValue(tableName))) {
-			newsfeeds.remove(serviceName, tableName);
+		if ((newsfeeds.containsKey(serviceName) && newsfeeds.get(serviceName).contains(tableName))) {
+			newsfeeds.get(serviceName).remove(tableName);
 		}
 	}
 

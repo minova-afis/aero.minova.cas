@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -151,10 +150,12 @@ public class ServiceNotifierService {
 		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(2));
 
 		unregisterSerivceTable.addRow(unregisterRow);
+
+		String serviceName = inputTable.getRows().get(0).getValues().get(0).getStringValue();
 		try {
 			spc.unsecurelyProcessProcedure(unregisterSerivceTable);
 		} catch (Exception e) {
-			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be unregistered!", e);
+			logger.logError("The service " + serviceName + " could not be unregistered!", e);
 			throw new RuntimeException(e);
 		}
 
@@ -163,21 +164,16 @@ public class ServiceNotifierService {
 		unregisterNewsfeedListenerTable.addColumn(new Column("CASServiceName", DataType.STRING));
 		unregisterNewsfeedListenerTable.addColumn(new Column("TableName", DataType.STRING));
 
-		// Alle Tabellennamen aus der newsfeed-Map holen.
-		List<String> serviceEntries = newsfeeds.keySet()//
-				.stream()//
-				.filter(e -> e.equals(inputTable.getRows().get(0).getValues().get(0).getStringValue()))//
-				.collect(Collectors.toList());
-
+		// Alle Tabellennamen aus der newsfeed-Map holen und danach die Einträge dazu in den Tabellen löschen.
 		Row unregisterNewsfeedRow = new Row();
-
-		for (String entry : serviceEntries) {
-			unregisterNewsfeedRow.addValue(new Value(inputTable.getRows().get(0).getValues().get(0).getStringValue(), null));
+		for (String entry : newsfeeds.get(serviceName)) {
+			unregisterNewsfeedRow.addValue(new Value(serviceName, null));
 			unregisterNewsfeedRow.addValue(new Value(entry, null));
-			newsfeeds.remove(inputTable.getRows().get(0).getValues().get(0).getStringValue());
 		}
 
+		// Den Dienst erst aus den Tabellen und zum Schluss aus der lokalen Map löschen.
 		unregisterNewsfeedListener(unregisterNewsfeedListenerTable);
+		newsfeeds.remove(serviceName);
 	}
 
 	/**

@@ -138,21 +138,24 @@ public class ServiceNotifierService {
 	 */
 	public void unregisterService(Table inputTable) {
 
+		String serviceName = inputTable.getRows().get(0).getValues().get(0).getStringValue();
+
+		// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
+		Value keyLong = findViewEntry(null, inputTable.getRows().get(0).getValues().get(0), null, inputTable.getRows().get(0).getValues().get(1),
+				inputTable.getRows().get(0).getValues().get(2))//
+						.getRows().get(0).getValues().get(0);
+
 		Table unregisterSerivceTable = new Table();
 		unregisterSerivceTable.setName("xpcasDeleteCASService");
-		unregisterSerivceTable.addColumn(new Column("KeyText", DataType.STRING));
-		unregisterSerivceTable.addColumn(new Column("ServiceURL", DataType.STRING));
-		unregisterSerivceTable.addColumn(new Column("Port", DataType.INTEGER));
+		unregisterSerivceTable.addColumn(new Column("KeyLong", DataType.STRING));
 
 		Row unregisterRow = new Row();
-		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(0));
-		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(1));
-		unregisterRow.addValue(inputTable.getRows().get(0).getValues().get(2));
+		unregisterRow.addValue(keyLong);
 
 		unregisterSerivceTable.addRow(unregisterRow);
 
-		String serviceName = inputTable.getRows().get(0).getValues().get(0).getStringValue();
 		try {
+			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
 			spc.unsecurelyProcessProcedure(unregisterSerivceTable);
 		} catch (Exception e) {
 			logger.logError("The service " + serviceName + " could not be unregistered!", e);
@@ -173,7 +176,6 @@ public class ServiceNotifierService {
 
 		// Den Dienst erst aus den Tabellen und zum Schluss aus der lokalen Map löschen.
 		unregisterNewsfeedListener(unregisterNewsfeedListenerTable);
-		newsfeeds.remove(serviceName);
 	}
 
 	/**
@@ -189,24 +191,25 @@ public class ServiceNotifierService {
 		registerProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
 		registerProcedureNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
 
-		for (int i = 0; i < inputTable.getRows().size(); i++) {
+		for (Row inputRow : inputTable.getRows()) {
 
 			Row registerRow = new Row();
 			registerRow.addValue(null);
-			registerRow.addValue(inputTable.getRows().get(i).getValues().get(0));
-			registerRow.addValue(inputTable.getRows().get(i).getValues().get(1));
+			registerRow.addValue(inputRow.getValues().get(0));
+			registerRow.addValue(inputRow.getValues().get(1));
 
 			registerProcedureNewsfeedTable.addRow(registerRow);
-			try {
-				spc.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
-			} catch (Exception e) {
-				logger.logError("The procedure " + inputTable.getRows().get(i).getValues().get(0).getStringValue() + " could not be registered for table "
-						+ inputTable.getRows().get(i).getValues().get(1).getStringValue(), e);
-				throw new RuntimeException(e);
-			}
+		}
+		try {
+			spc.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
+		} catch (Exception e) {
+			logger.logError("Error while trying to register procedures: ", e);
+			throw new RuntimeException(e);
+		}
 
-			registerServicenotifier(inputTable.getRows().get(i).getValues().get(0).getStringValue(),
-					inputTable.getRows().get(i).getValues().get(1).getStringValue());
+		// Nach erfolgreichem Eintragen in der Datenbank werden die Einträge der Map hinzugefügt.
+		for (Row row : inputTable.getRows()) {
+			registerServicenotifier(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
 		}
 	}
 
@@ -217,27 +220,33 @@ public class ServiceNotifierService {
 	 *            Eine Table mit dem Prozedurnamen und dem Tabellennamen als String-Value in einer Row.
 	 */
 	public void unregisterProcedureNewsfeed(Table inputTable) {
+
 		Table unregisterProcedureNewsfeedTable = new Table();
 		unregisterProcedureNewsfeedTable.setName("xpcasDeleteProcedureNewsfeed");
-		unregisterProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
-		unregisterProcedureNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+		unregisterProcedureNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 
-		for (int i = 0; i < inputTable.getRows().size(); i++) {
+		for (Row inputRow : inputTable.getRows()) {
+
+			// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
+			Value keyLong = findViewEntry(null, inputRow.getValues().get(0), inputRow.getValues().get(1), null, null)//
+					.getRows().get(0).getValues().get(0);
 
 			Row unregisterRow = new Row();
-			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(0));
-			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(1));
+			unregisterRow.addValue(keyLong);
 
 			unregisterProcedureNewsfeedTable.addRow(unregisterRow);
-			try {
-				spc.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
-			} catch (Exception e) {
-				logger.logError("The procedure " + inputTable.getRows().get(i).getValues().get(0).getStringValue() + " could not be unregistered for table "
-						+ inputTable.getRows().get(0).getValues().get(1).getStringValue() + "!", e);
-				throw new RuntimeException(e);
-			}
-			unregisterServicenotifier(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
-					inputTable.getRows().get(0).getValues().get(1).getStringValue());
+		}
+		try {
+			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
+			spc.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
+		} catch (Exception e) {
+			logger.logError("Error while trying to unregister procedures: ", e);
+			throw new RuntimeException(e);
+		}
+
+		// Nach erfolgreichem Löschen der Einträge in der Datenbank werden diese auch in der Map gelöscht.
+		for (Row row : inputTable.getRows()) {
+			unregisterServicenotifier(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
 		}
 	}
 
@@ -254,21 +263,24 @@ public class ServiceNotifierService {
 		registerNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
 		registerNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
 
-		for (int i = 0; i < inputTable.getRows().size(); i++) {
+		for (Row inputRow : inputTable.getRows()) {
 			Row registerRow = new Row();
 			registerRow.addValue(null);
-			registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
-			registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
+			registerRow.addValue(inputRow.getValues().get(0));
+			registerRow.addValue(inputRow.getValues().get(1));
 
 			registerNewsfeedTable.addRow(registerRow);
-			try {
-				spc.unsecurelyProcessProcedure(registerNewsfeedTable);
-			} catch (Exception e) {
-				logger.logError("The newsfeed for service " + inputTable.getRows().get(0).getValues().get(0).getStringValue()
-						+ " could not be registered for table " + inputTable.getRows().get(i).getValues().get(1), e);
-				throw new RuntimeException(e);
-			}
-			registerNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(), inputTable.getRows().get(0).getValues().get(1).getStringValue());
+		}
+		try {
+			spc.unsecurelyProcessProcedure(registerNewsfeedTable);
+		} catch (Exception e) {
+			logger.logError("Error while trying to register a newsfeed: ", e);
+			throw new RuntimeException(e);
+		}
+
+		// Nach erfolgreichem Eintragen in der Datenbank werden die Einträge der Map hinzugefügt.
+		for (Row row : inputTable.getRows()) {
+			registerNewsfeed(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
 		}
 	}
 
@@ -279,27 +291,32 @@ public class ServiceNotifierService {
 	 *            Eine Table mit dem CASServiceNamen und dem Tabellennamen als String-Value in einer Row.
 	 */
 	public void unregisterNewsfeedListener(Table inputTable) {
+
 		Table unregisterNewsfeedTable = new Table();
 		unregisterNewsfeedTable.setName("xpcasDeleteNewsfeedListener");
-		unregisterNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
-		unregisterNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+		unregisterNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 
-		for (int i = 0; i < inputTable.getRows().size(); i++) {
+		for (Row inputRow : inputTable.getRows()) {
+
+			// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
+			Value keyLong = findViewEntry(inputRow.getValues().get(0), null, inputRow.getValues().get(1), null, null)//
+					.getRows().get(0).getValues().get(0);
 
 			Row unregisterRow = new Row();
-			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(0));
-			unregisterRow.addValue(inputTable.getRows().get(i).getValues().get(1));
+			unregisterRow.addValue(keyLong);
 
 			unregisterNewsfeedTable.addRow(unregisterRow);
-			try {
-				spc.unsecurelyProcessProcedure(unregisterNewsfeedTable);
-			} catch (Exception e) {
-				logger.logError("The newsfeed for service " + inputTable.getRows().get(i).getValues().get(0).getStringValue()
-						+ " could not be unregistered for table " + inputTable.getRows().get(0).getValues().get(1).getStringValue() + "!", e);
-				throw new RuntimeException(e);
-			}
-			unregisterNewsfeed(inputTable.getRows().get(0).getValues().get(0).getStringValue(),
-					inputTable.getRows().get(0).getValues().get(1).getStringValue());
+		}
+		try {
+			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
+			spc.unsecurelyProcessProcedure(unregisterNewsfeedTable);
+		} catch (Exception e) {
+			logger.logError("Error while trying to unregister newsfeed: ", e);
+			throw new RuntimeException(e);
+		}
+		// Nach erfolgreichem Löschen der Einträge in der Datenbank werden diese auch in der Map gelöscht.
+		for (Row row : inputTable.getRows()) {
+			unregisterNewsfeed(row.getValues().get(0).getStringValue(), row.getValues().get(1).getStringValue());
 		}
 	}
 

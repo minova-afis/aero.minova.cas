@@ -23,7 +23,7 @@
         <module>app</module>
 		<module>setup</module>
 		<module>api</module>
-		<module>override</module>
+		<module>servicenotifier</module>
     </modules>
     <repositories>
         <repository>

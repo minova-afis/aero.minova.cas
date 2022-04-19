@@ -309,12 +309,12 @@ public class ServiceNotifierService {
 	@PostConstruct
 	private void initializeServicenotifiers() {
 		try {
-			if (securityService.areServiceNotifiersStoresSetup()) {
-				Table servicenotifierTable = findViewEntry(null, null, null, null, null);
-				for (Row row : servicenotifierTable.getRows()) {
-					registerServicenotifier(row.getValues().get(4).getStringValue(), row.getValues().get(5).getStringValue());
-				}
+			// if (securityService.areServiceNotifiersStoresSetup()) {
+			Table servicenotifierTable = findViewEntry(null, null, null, null, null);
+			for (Row row : servicenotifierTable.getRows()) {
+				registerServicenotifier(row.getValues().get(4).getStringValue(), row.getValues().get(5).getStringValue());
 			}
+			// }
 		} catch (Exception e) {
 			logger.logError("Error while trying to initialize servicenotifiers!", e);
 			throw new RuntimeException(e);
@@ -327,12 +327,12 @@ public class ServiceNotifierService {
 	@PostConstruct
 	private void initializeNewsfeeds() {
 		try {
-			if (securityService.areServiceNotifiersStoresSetup()) {
-				Table newsfeedsTable = findViewEntry(null, null, null, null, null);
-				for (Row row : newsfeedsTable.getRows()) {
-					registerNewsfeed(row.getValues().get(3).getStringValue(), row.getValues().get(5).getStringValue());
-				}
+			// if (securityService.areServiceNotifiersStoresSetup()) {
+			Table newsfeedsTable = findViewEntry(null, null, null, null, null);
+			for (Row row : newsfeedsTable.getRows()) {
+				registerNewsfeed(row.getValues().get(3).getStringValue(), row.getValues().get(5).getStringValue());
 			}
+			// }
 
 		} catch (Exception e) {
 			logger.logError("Error while trying to initialize newsfeed!", e);
@@ -382,7 +382,7 @@ public class ServiceNotifierService {
 		viewRow.addValue(serviceURL);
 		viewRow.addValue(port);
 		try {
-			viewResult = securityService.unsecurelyGetIndexView(viewTable);
+			// viewResult = securityService.unsecurelyGetIndexView(viewTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to access view xvcasCASServices!", e);
 			throw new RuntimeException(e);

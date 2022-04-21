@@ -21,7 +21,7 @@ Sie muss eindeutig über alle Arrayelemente des Aufrufs sein.
 Über sie werden die Result-Tabellen und die Referenzwerte bestimmt.
 
 Das 2. Element ist das die `table`.
-Es entspricht der oben beschriebenen <<table>>, wie sie auch für <<data/procedure>> Aufrufe verwendet wird.
+Es entspricht der oben beschriebenen xref:api-table.adoc[Table], wie sie auch für <<data/procedure>> Aufrufe verwendet wird.
 
 Soll ein Wert aus einer anderen Row als der ersten Output-Row verwendet werden,
 wird dies durch folgendes Format signalisiert: 

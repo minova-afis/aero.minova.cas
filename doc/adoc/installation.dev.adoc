@@ -1,9 +1,5 @@
 # CAS für die Entwicklungsumgebung aufsetzen.
 
-## Aufsetzen in Eclipse.
-
-NOTE: TODO
-
 ## Snapshot lokal bauen und ausführen.
 
 * Projekt bauen: `mvn clean verify`
@@ -11,8 +7,7 @@ NOTE: TODO
 * Docker-Image starten:
 [source,shell]
 ----
-# test
-echo docker run \
+docker run \
     --name=localtest \
     --publish=8084:8084 \
     --env login_dataSource='admin' \
@@ -22,4 +17,9 @@ echo docker run \
     --env logging_level_root=DEBUG \
     localtest
 ----
+* Alle Rechte können den admin-Nutzer übergeben werden, wenn folgendes auf SQL-Datenbank ausgeführt wird: `exec xpcasInsertAllPrivilegesToUserGroup 'admin', 'admin'`
 * Docker-Image wieder entfernen: `docker rmi -f localtest`
+
+## In Eclipse ausführen und debuggen.
+
+NOTE: TODO

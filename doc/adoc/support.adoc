@@ -16,7 +16,7 @@
 > dass Code die Doku ist.
 > Mein Therapeut hat mich dann aber doch vom Konzept überzeugt und siehe da,
 > es funktioniert!
-> Jetzt kann ich meinen Tee endlich in Ruhe geniesen!
+> Jetzt kann ich meinen Tee endlich in Ruhe geniessen!
 -- Tee abhängiger Entwickler
 
 ## Deadlock auf der SQL-Datenbank
@@ -35,3 +35,18 @@
    (Alternativ könnte man es so implementieren, dass man eine Option für das CAS einführt,
    womit sämtliche SQL-Anfragen nacheinander ausgeführt werden.
    Dadurch wären SQL-Deadlocks durch das CAS nicht mehr möglich.)
+
+## setup-Befehl hat einen Fehler.
+
+Manchmal löst man das Problem indem man eine neue leere Datenbank dafür verwendet,
+anstatt eine bereits vorhanden (`create database <name>`).
+
+## Prozedur, View oder anderes SQL-Objekt fehlt nach Setup.
+
+Die setup-Prozedur bricht nach einem Fehler nicht immer mit einem Fehler ab,
+sondern führt das Setup fort und gibt am Ende ein OK zurück (link:https://github.com/minova-afis/aero.minova.cas/issues/285[#285]).
+In diesem Fall sollte man die Logs des CAS nach dem Wort `Exception` absuchen.
+
+Läuft das CAS lokal in einem Docker-Container,
+kann in der Docker-GUI über einen Klick auf den betroffenen Container das Log angeschaut werden.
+Dort ist es auch eine Wortsuche möglich.

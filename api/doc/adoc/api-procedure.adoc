@@ -12,7 +12,7 @@ und kann mit der entsprechenden Funktion abgerufen werden: `dbo.xfCasUser()`
 
 === Eingabe
 
-Als Eingabe wird eine Table im Body der Get-Anfrage erwartet.
+Als Eingabe wird eine xref:api-table.adoc[Table] im Body der Get-Anfrage erwartet.
 
 Diese Table enthält die Parameter für die SQL-Prozedur und optional Metadaten.
 Die columns beschreiben den Namen und den Typ der Argumente.

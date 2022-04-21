@@ -1,4 +1,4 @@
-create procedure dbo.xpcasInsertNewsfeedListener (
+alter procedure dbo.xpcasInsertNewsfeedListener (
     @KeyLong int output,
 	@CASServiceKey int,
 	@TableName nvarchar(50)

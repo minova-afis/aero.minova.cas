@@ -1,4 +1,4 @@
-create procedure dbo.xpcasInsertProcedureNewsfeed (
+alter procedure dbo.xpcasInsertProcedureNewsfeed (
     @KeyLong int output,
 	@KeyText nvarchar(50),
 	@TableName nvarchar(50)

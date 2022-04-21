@@ -1,4 +1,4 @@
-create procedure dbo.xpcasInsertCASService (
+alter procedure dbo.xpcasInsertCASService (
 	@KeyLong int output,
 	@KeyText nvarchar(50),
 	@ServiceURL nvarchar(50),
@@ -23,11 +23,15 @@ if exists(select * from xtcasCASServices
         and LastAction < 0 
 		)
 	begin
-    update xtcasCASServices
-    set LastAction = 1
+	select @KeyLong= KeyLong 
+	from xtcasCASServices 
     where KeyText = @KeyText
         and ServiceURL = @ServiceURL
-        and Port = @Port
+        and Port = @Port 
+
+    update xtcasCASServices
+    set LastAction = 1
+	where KeyLong=@KeyLong
     end 
     else
     begin 
@@ -40,6 +44,6 @@ if exists(select * from xtcasCASServices
 		@ServiceURL,
 		@Port
 	)
-    end 
 	select @KeyLong = @@identity
+    end 
 return @@error

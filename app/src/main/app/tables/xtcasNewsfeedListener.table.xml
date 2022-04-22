@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <table name="xtcasNewsfeedListener" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="table.xsd">
+<description><de>In dieser Tabelle wird hinterlegt, welche Services eine Nachricht gesendet werden muss, wenn bestimmte Topics getriggert wurde.</de></description>
 	<column name="KeyLong">
 		<integer nullable="false" identity="true"/>
 	</column>

@@ -6,7 +6,7 @@
 	<column name="KeyText">
 		<varchar length="50" nullable="false"/>
 	</column>
-	<column name="TableName">
+	<column name="Topic">
 		<varchar length="50" nullable="false"/>
 	</column>
 	<column name="LastUser" default="system_user">

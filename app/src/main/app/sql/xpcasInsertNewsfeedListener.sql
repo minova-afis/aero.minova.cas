@@ -1,13 +1,13 @@
 alter procedure dbo.xpcasInsertNewsfeedListener (
     @KeyLong int output,
 	@CASServiceKey int,
-	@TableName nvarchar(50)
+	@Topic nvarchar(50)
 )
-as
+with encryption as
 	if exists(select * from xtcasNewsfeedListener
 		where CASServiceKey = @CASServiceKey
-        and TableName = @TableName
-        and LastAction > 0 
+          and Topic = @Topic
+          and LastAction > 0 
 		)
 	begin
 		raiserror('ADO | 25 | msg.DuplicateNewsfeedListener | Es besteht bereits ein NewsfeedListener mit diesen Parametern!', 16, 1) with seterror
@@ -16,23 +16,23 @@ as
 
 	if exists(select * from xtcasNewsfeedListener
 		where CASServiceKey = @CASServiceKey
-        and TableName = @TableName
-        and LastAction < 0 
+          and Topic = @Topic
+          and LastAction < 0 
 		)
 	begin
     update xtcasNewsfeedListener
     set LastAction = 1
     where CASServiceKey = @CASServiceKey
-        and TableName = @TableName
+      and Topic = @Topic
     end 
     else
     begin 
 	insert into xtcasNewsfeedListener (
 		CASServiceKey,
-		TableName
+		Topic
 	) values (
 		@CASServiceKey,
-		@TableName
+		@Topic
 	)
     end 
 	select @KeyLong = @@identity

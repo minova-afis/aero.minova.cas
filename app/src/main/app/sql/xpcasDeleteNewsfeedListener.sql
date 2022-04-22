@@ -1,12 +1,12 @@
-create procedure dbo.xpcasDeleteNewsfeedListener (
+alter procedure dbo.xpcasDeleteNewsfeedListener (
     @KeyLong int
 )
-as
+with encryption as
 
 update xtcasNewsfeedListener
 set 
-LastAction = -1,
-LastUser = dbo.xfCasUser(),
-LastDate = getDate()
+    LastAction = -1,
+    LastUser = dbo.xfCasUser(),
+    LastDate = getDate()
 where 
-KeyLong = @KeyLong
+    KeyLong = @KeyLong

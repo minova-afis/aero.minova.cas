@@ -1,12 +1,12 @@
-create procedure dbo.xpcasDeleteCASService (
+alter procedure dbo.xpcasDeleteCASService (
     @KeyLong int
 )
-as
+with encryption as
 
 update xtcasCASServices
 set 
-LastAction = -1,
-LastUser = dbo.xfCasUser(),
-LastDate = getDate()
+    LastAction = -1,
+    LastUser = dbo.xfCasUser(),
+    LastDate = getDate()
 where 
-KeyLong = @KeyLong
+    KeyLong = @KeyLong

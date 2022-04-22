@@ -4,12 +4,12 @@ alter procedure dbo.xpcasInsertCASService (
 	@ServiceURL nvarchar(50),
     @Port int
 )
-as
+with encryption as
 	if exists(select * from xtcasCASServices
 		where KeyText = @KeyText
-        and ServiceURL = @ServiceURL
-        and Port = @Port
-        and LastAction > 0 
+          and ServiceURL = @ServiceURL
+          and Port = @Port
+          and LastAction > 0 
 		)
 	begin
 		raiserror('ADO | 25 | msg.DuplicateService | Es besteht bereits ein Dienst mit diesen Parametern!', 16, 1) with seterror
@@ -18,16 +18,16 @@ as
 
 if exists(select * from xtcasCASServices
 		where KeyText = @KeyText
-        and ServiceURL = @ServiceURL
-        and Port = @Port
-        and LastAction < 0 
+          and ServiceURL = @ServiceURL
+          and Port = @Port
+          and LastAction < 0 
 		)
 	begin
 	select @KeyLong= KeyLong 
 	from xtcasCASServices 
     where KeyText = @KeyText
-        and ServiceURL = @ServiceURL
-        and Port = @Port 
+      and ServiceURL = @ServiceURL
+      and Port = @Port 
 
     update xtcasCASServices
     set LastAction = 1

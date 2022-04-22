@@ -1,5 +1,5 @@
 alter view dbo.xvcasCASServices
-AS
+with encryption as
 select
     cs.KeyLong as CASServiceKey,
     cs.KeyText as CASServiceName,

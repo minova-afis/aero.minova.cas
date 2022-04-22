@@ -30,7 +30,6 @@ Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereit
 * xref:./service/doc/adoc/index.adoc#[CAS-Dienst]
 * xref:./doc/adoc/installation.adoc#[Installation]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
-* xref:./doc/adoc/extensions.adoc#[Erweiterungen]
 * xref:./doc/adoc/structure.adoc#[Strukturübersicht]
 * xref:./doc/adoc/support.adoc#[Symptome, deren Ursachen und Lösungen]
 * xref:./app/doc/adoc/table-index.adoc#[Tabellen-Index]

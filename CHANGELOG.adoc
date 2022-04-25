@@ -10,19 +10,21 @@ damit diese nicht ausversehen commited werden.
 
 ## [12.41.1] - 2022-04-25
 IsTablePresent-Methode public setzen.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
 
 ## [12.41.0] - 2022-04-25
 
 Zweite Version von aero.minova.cas.servicenotifier. DO NOT USE.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
 
 ## [12.40.4] - 2022-04-19
 
 Erste Version von aero.minova.cas.servicenotifier. DO NOT USE.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
 
 ## [12.40.3] - 2022-04-19
 
-Umbenennen der Methode getTableForSecurityCheck nach unsecurelyGetIndexView in aero.minova.cas.service.
-ACHTUNG: Nicht Abwärtskompatibel.
+Inkompatiblen Änderungen: Umbenennen der Methode getTableForSecurityCheck nach unsecurelyGetIndexView in aero.minova.cas.service.
 
 ## [12.40.1] - 2022-04-08
 

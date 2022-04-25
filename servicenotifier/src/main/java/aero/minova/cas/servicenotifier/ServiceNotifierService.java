@@ -10,7 +10,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
@@ -23,7 +22,9 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.SecurityService;
 
-@Service
+/*
+ * @Service Die Klasse kann später als Cache verwendet werden, wird aber momentan noch nicht benötigt.
+ */
 public class ServiceNotifierService {
 
 	@Autowired
@@ -582,5 +583,17 @@ public class ServiceNotifierService {
 			newsfeeds.get(serviceName).remove(tableName);
 		}
 	}
+
+//	/**
+//	 * Prüft, ob minimalen die Datenbank-Objekte notwendig für das Registrieren von Diensten und Newsfeeds vorhanden sind. Dazu prüft man, ob die
+//	 * `xvcasCASServices` vorhanden ist.
+//	 * 
+//	 * @return True, falls xvcascasservices vorhanden ist.
+//	 * @throws Exception
+//	 *             Fehler bei der Emittlung
+//	 */
+//	public boolean areServiceNotifiersStoresSetup() throws Exception {
+//		return securityService.isTablePresent("xvcascasservices");
+//	}
 
 }

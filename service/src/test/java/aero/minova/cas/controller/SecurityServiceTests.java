@@ -146,7 +146,7 @@ class SecurityServiceTests {
 		resultColumns.add(new Column("ServiceKey", DataType.STRING));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
 
-		doReturn(inputTable).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(inputTable).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
@@ -175,7 +175,7 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
@@ -211,7 +211,7 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
@@ -249,7 +249,7 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
@@ -284,7 +284,7 @@ class SecurityServiceTests {
 		CustomLogger logger = Mockito.mock(CustomLogger.class);
 		spyController.customLogger = logger;
 
-		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Throwable exception = assertThrows(RuntimeException.class, () -> spyController.columnSecurity(inputTable, userGroups));
 		thrown.expect(RuntimeException.class);
@@ -312,7 +312,7 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
@@ -356,7 +356,7 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
@@ -404,7 +404,7 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).getTableForSecurityCheck(Mockito.any());
+		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spyController.columnSecurity(inputTable, userGroups);
 		assertThat(result.getColumns().equals(resultColumns));
@@ -493,7 +493,7 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value(true, null));
 		mockResult.add(inputRow);
 
-		Mockito.doAnswer(returnsFirstArg()).when(spyController).getTableForSecurityCheck(Mockito.any());
+		Mockito.doAnswer(returnsFirstArg()).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		List<Row> result = spyController.getPrivilegePermissions("test");
 		assertThat(result).hasSize(3);
@@ -507,7 +507,7 @@ class SecurityServiceTests {
 	@Test
 	void test_getPrivilegePermissionNoPermissions() {
 
-		Mockito.doAnswer(returnsFirstArg()).when(spyController).getTableForSecurityCheck(Mockito.any());
+		Mockito.doAnswer(returnsFirstArg()).when(spyController).unsecurelyGetIndexView(Mockito.any());
 
 		List<Row> result = spyController.getPrivilegePermissions("test");
 		assertThat(result).hasSize(0);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<table name="xtcasNewsfeedListener" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="table.xsd">
+<description><de>In dieser Tabelle wird hinterlegt, an welche Services eine Nachricht gesendet werden muss, wenn bestimmte Topics getriggert wurden.</de></description>
+	<column name="KeyLong">
+		<integer nullable="false" identity="true"/>
+	</column>
+	<column name="CASServiceKey">
+		<integer nullable="false"/>
+	</column>
+	<column name="Topic">
+		<varchar length="50" nullable="false"/>
+	</column>
+	<column name="LastUser" default="system_user">
+		<varchar length="50" nullable="false"/>
+	</column>
+	<column name="LastDate" default="getdate()">
+		<datetime nullable="false"/>
+	</column>
+	<column name="LastAction" default="1">
+		<integer nullable="false"/>
+	</column>
+	<primarykey>
+		<column>KeyLong</column>
+	</primarykey>
+</table>

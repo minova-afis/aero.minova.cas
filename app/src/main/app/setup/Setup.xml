@@ -40,6 +40,14 @@
 		<script name="xvcasUserPrivilegeIndex" type="view"/>
 		<script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
 		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
+		<script name="xpcasDelete" type="procedure"/>
+		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
+		<script name="xpcasInsertCASService" type="procedure"/>
+		<script name="xpcasDeleteCASService" type="procedure"/>
+		<script name="xpcasInsertProcedureNewsfeed" type="procedure"/>
+		<script name="xpcasDeleteProcedureNewsfeed" type="procedure"/>
+		<script name="xpcasInsertNewsfeedListener" type="procedure"/>
+		<script name="xpcasDeleteNewsfeedListener" type="procedure"/>
 	</sql-code>
 	<schema>
 		<tableschema name="xtcasError" type="table"/>
@@ -50,5 +58,8 @@
 		<tableschema name="xtcasAuthorities" type="table"/>
 		<tableschema name="xtcasColumnSecurity" type="table"/>
 		<tableschema name="xtcasLuUserPrivilegeUserGroup" type="table"/>
+		<tableschema name="xtcasCASServices" type="table"/>
+		<tableschema name="xtcasProcedureNewsfeed" type="table"/>
+		<tableschema name="xtcasNewsfeedListener" type="table"/>
 	</schema>
 </setup>

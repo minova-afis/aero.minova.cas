@@ -1,0 +1,38 @@
+= ServiceNotifiers Service
+
+Die ServiceNotifier-Extension bietet eine Möglichkeit, Dienste beim CAS zu registrieren.
+Sie bietet den Vorteil, dass auf Veränderungen bzw. Updates auf Tabellen gehorcht werden kann und dementsprechende Dienste benachrichtigt werden können.
+
+[plantuml, format="svg", title="title"]
+.Caption
+....
+@startuml
+start
+:Anfrage;
+:SQL-Procedure-Controller;
+if (Ist Erweiterung vorhanden?) then (ja)
+:Erweiterung ausführen.;
+else (nein)
+:SQL-Prozedur ausführen.;
+endif
+if (Ist ServiceNotifier vorhanden?) then (ja)
+:Betroffene Dienste informieren.;
+endif
+:Result auf Anfrage ausgeben.;
+stop
+@enduml
+....
+
+WARNING: Die ServiceNotifiers werden nach den Extensions ausgeführt, da Extensions ebenfalls Veränderungen auf Tabellen auslösen können.
+
+==== ServiceNotifier API
+
+Folgende Extensions können mithilfe von *data/procedure* aufgerufen werden:
+
+* registerService: Registriert einen Dienst mit den übergebenen Parametern in der xtcasCASServices Tabelle. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name des Services, ServiceURL, Port
+* unregisterService: Meldet den Dienst mit den übergebenen Parametern ab und löscht ihn aus der xtcasCASServices Tabelle. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name des Services, ServiceURL, Port
+* registerProcedureNewsfeed: Verknüpft die übergebenen Prozedurnamen mit den übergebenen Topics. Die Verbindung zeigt, welche Prozeduren Änderungen auf bestimmten Tabellen auslösen. Die Informationen werden in der xtcasProcedureNewsfeed gespeichert. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name der Prozedur, Topic
+* unregisterProcedureNewsfeed: Löscht eine Verknüpfung von Prozedur und Tabelle aus der Tabelle xtcasProcedureNewsfeed. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name der Prozedur, Topic
+* unregisterProcedureNewsfeedCompletely: Löscht alle Verknüpfungen zwichen einer Prozedur und den dazugehörigen Tabellen. Die übergebene Tabelle muss nur den Name der Prozedur enthalten.
+* registerNewsfeedListener: Speichert, welche Dienste auf welche Topics horchen. Der Dienstname und der Tabellenname müssen als Values übergeben werden. Die Informationen werden in der xtcasNewsfeedListener gespeichert. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name des registrierten Services, Topic
+* unregisterNewsfeedListener: Löscht den Vermerk des Dienstes auf das Topic wieder aus der Tabelle xtcasNewsfeedListener. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name des registrierten Services, Topic

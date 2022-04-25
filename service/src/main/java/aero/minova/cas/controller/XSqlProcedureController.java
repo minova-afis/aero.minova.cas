@@ -251,7 +251,7 @@ public class XSqlProcedureController {
 			inputRows.add(requestParam);
 		}
 		try {
-			Table checksPerPrivilege = securityService.getTableForSecurityCheck(privilegeRequest);
+			Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
 			// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.
 			if (checksPerPrivilege.getRows().size() == 0) {

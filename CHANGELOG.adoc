@@ -8,6 +8,24 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 #281: Logs aus Tests in den target-Ordner schreiben,
 damit diese nicht ausversehen commited werden.
 
+## [12.41.1] - 2022-04-25
+IsTablePresent-Methode public setzen.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
+
+## [12.41.0] - 2022-04-25
+
+Experimentelle CAS-Erweiterung aero.minova.cas.servicenotifier an Änderungen anpassen.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
+
+## [12.40.4] - 2022-04-19
+
+Experimentelle CAS-Erweiterung aero.minova.cas.servicenotifier für die Registrierung von Diensten erstellen.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
+
+## [12.40.3] - 2022-04-19
+
+Inkompatiblen Änderungen: Umbenennen der Methode getTableForSecurityCheck nach unsecurelyGetIndexView in aero.minova.cas.service.
+
 ## [12.40.1] - 2022-04-08
 
 Privilegienprüfung auf Prozeduren in PostgreSQL unterstützen.

@@ -1,48 +1,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>cas.api</artifactId>
+	<artifactId>cas.servicenotifier</artifactId>
 	<version> 12.41.2-SNAPSHOT</version>
-	<name>aero.minova.cas.api</name>
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>spring.maven.root</artifactId>
 		<version>1.3.0</version>
+		<relativePath />
 	</parent>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<java.version>11</java.version>
 		<maven.compiler.release>11</maven.compiler.release>
+
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git
-		</developerConnection>
+		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</developerConnection>
 		<tag>v12.40.2</tag>
 	</scm>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<groupId>aero.minova</groupId>
+			<artifactId>cas.api</artifactId>
+			<version>12.38.2</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
+			<groupId>aero.minova</groupId>
+			<artifactId>cas.service</artifactId>
+			<version>12.41.1</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

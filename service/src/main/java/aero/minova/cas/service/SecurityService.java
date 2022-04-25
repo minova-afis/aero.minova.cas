@@ -51,18 +51,6 @@ public class SecurityService {
 		return isTablePresent("xvcasuserprivileges");
 	}
 
-	/**
-	 * Prüft, ob minimalen die Datenbank-Objekte notwendig für das Registrieren von Diensten und Newsfeeds vorhanden sind. Dazu prüft man, ob die
-	 * `xvcasCASServices` vorhanden ist.
-	 * 
-	 * @return True, falls xvcascasservices vorhanden ist.
-	 * @throws Exception
-	 *             Fehler bei der Emittlung
-	 */
-	public boolean areServiceNotifiersStoresSetup() throws Exception {
-		return isTablePresent("xvcascasservices");
-	}
-
 	private boolean isTablePresent(String tableName) throws Exception {
 		try (final Connection connection = systemDatabase.getConnection()) {
 			return connection.getMetaData()//

@@ -154,9 +154,14 @@ public class ServiceNotifierService {
 
 		try {
 			// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
-			Value keyLong = findViewEntry(null, inputTable.getRows().get(0).getValues().get(0), null, inputTable.getRows().get(0).getValues().get(1),
-					inputTable.getRows().get(0).getValues().get(2))//
-							.getRows().get(0).getValues().get(0);
+			Value keyLong = findViewEntry(//
+					null, //
+					inputTable.getRows().get(0).getValues().get(0), //
+					null, //
+					inputTable.getRows().get(0).getValues().get(1), //
+					inputTable.getRows().get(0).getValues().get(2)//
+			)//
+					.getRows().get(0).getValues().get(0);
 
 			Table unregisterSerivceTable = new Table();
 			unregisterSerivceTable.setName("xpcasDeleteCASService");

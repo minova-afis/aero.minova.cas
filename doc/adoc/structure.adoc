@@ -18,9 +18,7 @@ User ..> [REST]: Login und Anfragen
 [CAS] <.left.> [Erweiterungen]
 [CAS] --> [App-Projekt]
 [Erweiterungen] <.down.> [Setup-Erweiterung]
-[Erweiterungen] <.down.> [Override-Erweiterung]
 [Erweiterungen] .left.> Dienste
-[Override-Erweiterung] <.left.> Dienste : 'registrieren' sich\n beim CAS
 [Erweiterungen] ..> [Ressourcen]
 @enduml
 ....

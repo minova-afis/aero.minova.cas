@@ -1,6 +1,0 @@
-= Initialisierung
-
-Es gibt noch zwei Methoden, welche beim Start des CAS ausgeführt werden, falls die View *xvcascasservices* zu diesem Zeitpunkt in der Datenbank vorhanden ist:
-
-* initializeNewsfeeds: Lädt alle Tupel aus Prozedurenamen und Tabellennamen aus der Datenbank und initialisert die dazugehörige Map mit den Werten aus der Datenbank.
-* initializeServicenotifier: Lädt alle Tupel aus Dienstnamen und Tabellennamen aus der Datenbank und initialisert die dazugehörige Map mit den Werten aus der Datenbank.

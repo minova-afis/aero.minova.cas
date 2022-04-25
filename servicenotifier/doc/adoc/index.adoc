@@ -1,4 +1,3 @@
 = ServiceNotifier
 
 * servicenotifier.aodc#[ServiceNotifier API]
-* initialization.adoc#[Initialisierung]

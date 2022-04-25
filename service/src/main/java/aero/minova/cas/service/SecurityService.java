@@ -51,7 +51,7 @@ public class SecurityService {
 		return isTablePresent("xvcasuserprivileges");
 	}
 
-	private boolean isTablePresent(String tableName) throws Exception {
+	public boolean isTablePresent(String tableName) throws Exception {
 		try (final Connection connection = systemDatabase.getConnection()) {
 			return connection.getMetaData()//
 					.getTables(null, null, tableName, null)//

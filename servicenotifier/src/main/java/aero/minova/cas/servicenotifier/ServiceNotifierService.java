@@ -177,7 +177,7 @@ public class ServiceNotifierService {
 		// Wenn ein Service abgemeldet wird, müssen auch die Verweise aus den Maps und den Tabellen entfernt werden.
 		Table unregisterNewsfeedListenerTable = new Table();
 		unregisterNewsfeedListenerTable.addColumn(new Column("CASServiceName", DataType.STRING));
-		unregisterNewsfeedListenerTable.addColumn(new Column("TableName", DataType.STRING));
+		unregisterNewsfeedListenerTable.addColumn(new Column("Topic", DataType.STRING));
 
 		// Alle Tabellennamen aus der newsfeed-Map holen und danach die Einträge dazu in den Tabellen löschen.
 		Row unregisterNewsfeedRow = new Row();
@@ -204,7 +204,7 @@ public class ServiceNotifierService {
 		registerProcedureNewsfeedTable.setName("xpcasInsertProcedureNewsfeed");
 		registerProcedureNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
 		registerProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
-		registerProcedureNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+		registerProcedureNewsfeedTable.addColumn(new Column("Topic", DataType.STRING));
 
 		for (Row inputRow : inputTable.getRows()) {
 
@@ -247,8 +247,8 @@ public class ServiceNotifierService {
 				Table keyTable = findProcedureEntry(inputRow.getValues().get(0), inputRow.getValues().get(1));
 
 				if (keyTable.getRows().size() <= 0) {
-					throw new RuntimeException("The combination of procedurename and tablename could not be found! "
-							+ inputRow.getValues().get(0).getStringValue() + " " + inputRow.getValues().get(1).getStringValue());
+					throw new RuntimeException("The combination of procedurename and topic could not be found! " + inputRow.getValues().get(0).getStringValue()
+							+ " " + inputRow.getValues().get(1).getStringValue());
 				}
 				Value keyLong = keyTable.getRows().get(0).getValues().get(0);
 
@@ -317,7 +317,7 @@ public class ServiceNotifierService {
 		registerNewsfeedTable.setName("xpcasInsertNewsfeedListener");
 		registerNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
 		registerNewsfeedTable.addColumn(new Column("CASServiceKey", DataType.INTEGER));
-		registerNewsfeedTable.addColumn(new Column("TableName", DataType.STRING));
+		registerNewsfeedTable.addColumn(new Column("Topic", DataType.STRING));
 
 		for (Row inputRow : inputTable.getRows()) {
 			Row registerRow = new Row();
@@ -382,7 +382,7 @@ public class ServiceNotifierService {
 	@PostConstruct
 	private void initializeServicenotifiers() {
 		try {
-			if (securityService.areServiceNotifiersStoresSetup()) {
+			if (areServiceNotifiersStoresSetup()) {
 				servicenotifier = new HashMap<>();
 				Table servicenotifierTable = findViewEntry(null, null, null, null, null);
 				for (Row row : servicenotifierTable.getRows()) {
@@ -403,7 +403,7 @@ public class ServiceNotifierService {
 	@PostConstruct
 	private void initializeNewsfeeds() {
 		try {
-			if (securityService.areServiceNotifiersStoresSetup()) {
+			if (areServiceNotifiersStoresSetup()) {
 				newsfeeds = new HashMap<>();
 				Table newsfeedsTable = findViewEntry(null, null, null, null, null);
 				for (Row row : newsfeedsTable.getRows()) {
@@ -425,16 +425,16 @@ public class ServiceNotifierService {
 	 *            Der Name des Dienstes als String-Value.
 	 * @param procedureName
 	 *            Der Name der Prozedur als String-Value.
-	 * @param tableName
+	 * @param topic
 	 *            Der Name der Table als String-Value.
 	 * @param serviceURL
 	 *            Die URL eines Dienstes.
 	 * @param port
 	 *            Der Port eines Dienstes.
 	 * @return Eine Table mit den jeweiligen gefilterten Einträgen. Die Reihenfolge der Values ist folgende: CASServiceKey, NewsfeedListenerKey,
-	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, TableName, ServiceURL, Port
+	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, topic, ServiceURL, Port
 	 */
-	public Table findViewEntry(Value casServiceName, Value procedureName, Value tableName, Value serviceURL, Value port) {
+	public Table findViewEntry(Value casServiceName, Value procedureName, Value topic, Value serviceURL, Value port) {
 		Table viewResult = new Table();
 
 		Table viewTable = new Table();
@@ -444,9 +444,9 @@ public class ServiceNotifierService {
 		viewTable.addColumn(new Column("ProcedureNewsfeedKey", DataType.STRING));
 		viewTable.addColumn(new Column("CASServiceName", DataType.STRING));
 		viewTable.addColumn(new Column("ProcedureName", DataType.STRING));
-		viewTable.addColumn(new Column("TableName", DataType.STRING));
+		viewTable.addColumn(new Column("Topic", DataType.STRING));
 		viewTable.addColumn(new Column("ServiceURL", DataType.STRING));
-		viewTable.addColumn(new Column("PORT", DataType.INTEGER));
+		viewTable.addColumn(new Column("Port", DataType.INTEGER));
 
 		Row viewRow = new Row();
 		viewRow.addValue(null);
@@ -454,7 +454,7 @@ public class ServiceNotifierService {
 		viewRow.addValue(null);
 		viewRow.addValue(casServiceName);
 		viewRow.addValue(procedureName);
-		viewRow.addValue(tableName);
+		viewRow.addValue(topic);
 		viewRow.addValue(serviceURL);
 		viewRow.addValue(port);
 
@@ -475,24 +475,24 @@ public class ServiceNotifierService {
 	 * 
 	 * @param procedureName
 	 *            Der Name der Prozedur als String-Value.
-	 * @param tableName
+	 * @param topic
 	 *            Der Name der Table als String-Value.
 	 * @return Eine Table mit den gültigen KeyLongs zu der übergebenen Kombination.
 	 */
-	public Table findProcedureEntry(Value procedureName, Value tableName) {
+	public Table findProcedureEntry(Value procedureName, Value topic) {
 		Table viewResult = new Table();
 
 		Table viewTable = new Table();
 		viewTable.setName("xtcasProcedureNewsfeed");
 		viewTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 		viewTable.addColumn(new Column("KeyText", DataType.STRING));
-		viewTable.addColumn(new Column("TableName", DataType.STRING));
+		viewTable.addColumn(new Column("Topic", DataType.STRING));
 		viewTable.addColumn(new Column("LastAction", DataType.INTEGER));
 
 		Row viewRow = new Row();
 		viewRow.addValue(null);
 		viewRow.addValue(procedureName);
-		viewRow.addValue(tableName);
+		viewRow.addValue(topic);
 		viewRow.addValue(new Value("0", ">="));
 
 		viewTable.addRow(viewRow);
@@ -524,16 +524,16 @@ public class ServiceNotifierService {
 	 * 
 	 * @param procedureName
 	 *            Der Name der Prozedur.
-	 * @param tableName
+	 * @param topic
 	 *            Der Name der Tabelle, welche durch die Prozedur verändert werden soll.
 	 */
-	public void registerServicenotifier(String procedureName, String tableName) {
+	public void registerServicenotifier(String procedureName, String topic) {
 		if (!servicenotifier.containsKey(procedureName)) {
 			List<String> tables = new ArrayList<>();
-			tables.add(tableName);
+			tables.add(topic);
 			servicenotifier.put(procedureName, tables);
-		} else if (servicenotifier.containsKey(procedureName) && !servicenotifier.get(procedureName).contains(tableName)) {
-			servicenotifier.get(procedureName).add(tableName);
+		} else if (servicenotifier.containsKey(procedureName) && !servicenotifier.get(procedureName).contains(topic)) {
+			servicenotifier.get(procedureName).add(topic);
 		}
 	}
 
@@ -542,12 +542,12 @@ public class ServiceNotifierService {
 	 * 
 	 * @param procedureName
 	 *            Die Prozedur, zu welcher der Eintrag entfernt werden soll.
-	 * @param tableName
+	 * @param topic
 	 *            Der Tabellenname, zu welchem die Prozedur entfernt werden soll.
 	 */
-	public void unregisterServicenotifier(String procedureName, String tableName) {
-		if ((servicenotifier.containsKey(procedureName) && servicenotifier.get(procedureName).contains(tableName))) {
-			servicenotifier.get(procedureName).remove(tableName);
+	public void unregisterServicenotifier(String procedureName, String topic) {
+		if ((servicenotifier.containsKey(procedureName) && servicenotifier.get(procedureName).contains(topic))) {
+			servicenotifier.get(procedureName).remove(topic);
 		}
 	}
 
@@ -557,16 +557,16 @@ public class ServiceNotifierService {
 	 * 
 	 * @param serviceName
 	 *            Der Name des Dienstes
-	 * @param tableName
+	 * @param topic
 	 *            Der Name der Tabelle, auf welche gehorcht werden soll
 	 */
-	public void registerNewsfeed(String serviceName, String tableName) {
+	public void registerNewsfeed(String serviceName, String topic) {
 		if (!newsfeeds.containsKey(serviceName)) {
 			List<String> tables = new ArrayList<>();
-			tables.add(tableName);
+			tables.add(topic);
 			newsfeeds.put(serviceName, tables);
-		} else if (newsfeeds.containsKey(serviceName) && !newsfeeds.get(serviceName).contains(tableName)) {
-			newsfeeds.get(serviceName).add(tableName);
+		} else if (newsfeeds.containsKey(serviceName) && !newsfeeds.get(serviceName).contains(topic)) {
+			newsfeeds.get(serviceName).add(topic);
 		}
 	}
 
@@ -575,25 +575,25 @@ public class ServiceNotifierService {
 	 * 
 	 * @param serviceName
 	 *            Der Dienst, zu welchem der Eintrag entfernt werden soll.
-	 * @param tableName
-	 *            Der
+	 * @param topic
+	 *            Der Name des zu löschenden Topics als String.
 	 */
-	public void unregisterNewsfeed(String serviceName, String tableName) {
-		if ((newsfeeds.containsKey(serviceName) && newsfeeds.get(serviceName).contains(tableName))) {
-			newsfeeds.get(serviceName).remove(tableName);
+	public void unregisterNewsfeed(String serviceName, String topic) {
+		if ((newsfeeds.containsKey(serviceName) && newsfeeds.get(serviceName).contains(topic))) {
+			newsfeeds.get(serviceName).remove(topic);
 		}
 	}
 
-//	/**
-//	 * Prüft, ob minimalen die Datenbank-Objekte notwendig für das Registrieren von Diensten und Newsfeeds vorhanden sind. Dazu prüft man, ob die
-//	 * `xvcasCASServices` vorhanden ist.
-//	 * 
-//	 * @return True, falls xvcascasservices vorhanden ist.
-//	 * @throws Exception
-//	 *             Fehler bei der Emittlung
-//	 */
-//	public boolean areServiceNotifiersStoresSetup() throws Exception {
-//		return securityService.isTablePresent("xvcascasservices");
-//	}
+	/**
+	 * Prüft, ob minimalen die Datenbank-Objekte notwendig für das Registrieren von Diensten und Newsfeeds vorhanden sind. Dazu prüft man, ob die
+	 * `xvcasCASServices` vorhanden ist.
+	 * 
+	 * @return True, falls xvcascasservices vorhanden ist.
+	 * @throws Exception
+	 *             Fehler bei der Emittlung
+	 */
+	public boolean areServiceNotifiersStoresSetup() throws Exception {
+		return securityService.isTablePresent("xvcascasservices");
+	}
 
 }

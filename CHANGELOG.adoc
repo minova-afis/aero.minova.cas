@@ -8,13 +8,18 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 #281: Logs aus Tests in den target-Ordner schreiben,
 damit diese nicht ausversehen commited werden.
 
+## [12.41.0] - 2022-04-25
+
+Zweite Version von aero.minova.cas.servicenotifier. DO NOT USE.
+
 ## [12.40.4] - 2022-04-19
 
 Erste Version von aero.minova.cas.servicenotifier. DO NOT USE.
 
 ## [12.40.3] - 2022-04-19
 
-Umbenennen einer Methode in aero.minova.cas.service.
+Umbenennen der Methode getTableForSecurityCheck nach unsecurelyGetIndexView in aero.minova.cas.service.
+ACHTUNG: Nicht Abwärtskompatibel.
 
 ## [12.40.1] - 2022-04-08
 

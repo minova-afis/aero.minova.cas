@@ -1,5 +1,4 @@
 = ServiceNotifier
 
-* tableschema.adoc#[Tabellenschema]
 * servicenotifier.aodc#[ServiceNotifier API]
 * initialization.adoc#[Initialisierung]

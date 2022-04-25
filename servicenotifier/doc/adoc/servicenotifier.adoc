@@ -27,11 +27,6 @@ WARNING: Die ServiceNotifiers werden nach den Extensions ausgeführt, da Extensi
 
 ==== ServiceNotifier API
 
-Die zwei wichtigsten Objekte sind die beiden Maps, welche die Informationen zum Dienst und den Prozeduren enthalten:
-
-* *servicenotifier*: Enthält Tupel aus Prozedurenamen und Tabellennamen.
-* *newsfeeds*: Enthält Tupel aus Dienstnamen und Tabellennamen.
-
 Folgende Extensions können mithilfe von *data/procedure* aufgerufen werden:
 
 * registerService: Registriert einen Dienst mit den übergebenen Parametern in der xtcasCASServices Tabelle. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name des Services, ServiceURL, Port

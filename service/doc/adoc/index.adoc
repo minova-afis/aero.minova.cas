@@ -6,7 +6,7 @@
 
 * xref:properties.adoc#[Properties]
 * xref:./../../../setup/doc/adoc/setup.adoc#[Setup Service]
-* xref:./../../../servicenotifier/doc/adoc/servicenotifier.adoc#[ServiceNotifier Service]
+* xref:./../../../servicenotifier/doc/adoc/index.adoc#[ServiceNotifier Service]
 
 == Sicherheitskonzept
 * xref:security.adoc#[Sicherheitsmechanismen]

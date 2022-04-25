@@ -11,7 +11,7 @@
 		<varchar length="50" nullable="false"/>
 	</column>
 	<column name="Port">
-		<varchar length="50" nullable="false"/>
+		<integer nullable="false"/>
 	</column>
 	<column name="LastUser" default="system_user">
 		<varchar length="50" nullable="false"/>

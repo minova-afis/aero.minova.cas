@@ -1,7 +1,27 @@
-=== ServiceNotifiers
+= ServiceNotifiers Service
 
-Die ServiceNotifier-Extension ist eine weitere Möglichkeit, Dienste beim CAS zu registrieren.
+Die ServiceNotifier-Extension bietet eine Möglichkeit, Dienste beim CAS zu registrieren.
 Sie bietet den Vorteil, dass auf Veränderungen bzw. Updates auf Tabellen gehorcht werden kann und dementsprechende Dienste benachrichtigt werden können.
+
+[plantuml, format="svg", title="title"]
+.Caption
+....
+@startuml
+start
+:Anfrage;
+:SQL-Procedure-Controller;
+if (Ist Erweiterung vorhanden?) then (ja)
+:Erweiterung ausführen.;
+else (nein)
+:SQL-Prozedur ausführen.;
+endif
+if (Ist ServiceNotifier vorhanden?) then (ja)
+:Betroffene Dienste informieren.;
+endif
+:Result auf Anfrage ausgeben.;
+stop
+@enduml
+....
 
 WARNING: Die ServiceNotifiers werden nach den Extensions ausgeführt, da Extensions ebenfalls Veränderungen auf Tabellen auslösen können.
 
@@ -12,29 +32,12 @@ Die zwei wichtigsten Objekte sind die beiden Maps, welche die Informationen zum 
 * *servicenotifier*: Enthält Tupel aus Prozedurenamen und Tabellennamen.
 * *newsfeeds*: Enthält Tupel aus Dienstnamen und Tabellennamen.
 
-Folgende Extensions können zum Registrieren verwendet werden:
+Folgende Extensions können mithilfe von *data/procedure* aufgerufen werden:
 
-* registerService: Registriert einen Dienst mit den übergebenen Parametern.
-* unregisterService: Meldet den Dienst mit den übergebenen Parametern ab.
-* registerProcedureNewsfeed: Verknüpft die übergebenen Prozedurnamen mit den übergebenen Tabellennamen. Die Verbindung zeigt, welche Prozeduren Änderungen auf bestimmten Tabellen auslösen.
-* unregisterProcedureNewsfeed: Löscht eine Verknüpfung von Prozedur und Tabelle.
+* registerService: Registriert einen Dienst mit den übergebenen Parametern in der xtcasCASServices Tabelle.
+* unregisterService: Meldet den Dienst mit den übergebenen Parametern ab und löscht ihn aus der xtcasCASServices Tabelle.
+* registerProcedureNewsfeed: Verknüpft die übergebenen Prozedurnamen mit den übergebenen Topics. Die Verbindung zeigt, welche Prozeduren Änderungen auf bestimmten Tabellen auslösen. Die Informationen werden in der xtcasProcedureNewsfeed gespeichert.
+* unregisterProcedureNewsfeed: Löscht eine Verknüpfung von Prozedur und Tabelle aus der Tabelle xtcasProcedureNewsfeed.
 * unregisterProcedureNewsfeedCompletely: Löscht alle Verknüpfungen zwichen einer Prozedur und den dazugehörigen Tabellen.
-* registerNewsfeedListener: Speichert, welche Dienste auf welche Tabellen horchen. Der Dienstname und der Tabellenname müssen als Values übergeben werden.
-* unregisterNewsfeedListener: Löscht den Vermerk des Dienstes auf die Tabelle wieder.
-
-Die Extenions rufen folgende Methoden auf:
-
-* registerService(Table table): Speichert einen Dienst in der xtcasCASServices Tabelle.
-* unregisterService(Table table): Löscht einen Dienst aus der xtcasCASServices Tabelle.
-* registerNewsfeedListener(Table table): Speichert, auf welche Tabellen ein Dienst nach Updates horcht.
-* unregisterNewsfeedListener(Table table): Löscht alle übergebenen Verknüpfungen zwischen Tabelle und Dienst.
-* registerProcedureNewsfeed(Table tabe):  Speichert, welche Prozeduren Veränderungen auf Tabellen bewirken, bzw. welche ein Update auslösen. Werden diese Prozeduren ausgeführt, muss der CAS die entsprechenden Dienste antriggern.
-* unregisterProcedureNewsfeed(Table table): Löscht die Verknüpfung zwischen Prozedur und Tabelle.
-* unregisterProcedureNewsfeed(Table table)Completely: Löscht alle Verknüpfungen zwichen einer Prozedur und den dazugehörigen Tabellen.
-* getServicenotifier(): Liefert die Map mit den Tupeln aus Prozedurname und Tabellenname.
-* getNewsfeeds(): Liefert die Map mit den Tupeln aus Dienstname und Tabellenname.
-
-Außerdem gibt es nich zwei Methoden, welche beim Start des CAS ausgeführt werden, falls die View *xvcascasservices* beim Start in der Datenbank vorhanden ist:
-
-* initializeNewsfeeds: Lädt alle Tupel aus Prozedurenamen und Tabellennamen aus der Datenbank und initialisert die dazugehörige Map mit den Werten aus der Datenbank.
-* initializeServicenotifier: Lädt alle Tupel aus Dienstnamen und Tabellennamen aus der Datenbank und initialisert die dazugehörige Map mit den Werten aus der Datenbank.
+* registerNewsfeedListener: Speichert, welche Dienste auf welche Topics horchen. Der Dienstname und der Tabellenname müssen als Values übergeben werden. Die Informationen werden in der xtcasNewsfeedListener gespeichert.
+* unregisterNewsfeedListener: Löscht den Vermerk des Dienstes auf das Topic wieder aus der Tabelle xtcasNewsfeedListener.

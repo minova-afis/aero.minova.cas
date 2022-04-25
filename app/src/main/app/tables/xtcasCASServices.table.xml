@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <table name="xtcasCASServices" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="table.xsd">
-<description><de>Hier werden die Dienste abgespeichert.</de></description>
+<description><de>Hier werden die Dienste und dazugehörige Informationen abgespeichert.</de></description>
 	<column name="KeyLong">
 		<integer nullable="false" identity="true"/>
 	</column>

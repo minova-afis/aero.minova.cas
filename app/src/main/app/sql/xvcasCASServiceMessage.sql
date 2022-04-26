@@ -8,7 +8,8 @@ select
     sm.KeyLong as MessageKey,
     sm.Message,
     sm.isSent,
-    sm.NumberOfAttempts
+    sm.NumberOfAttempts,
+    sm.MessageDate
 from xtcasCASservices cs
 left join xtcasServiceMessage sm on sm.CASServiceKey = cs.KeyLong
 where cs.LastAction >=0

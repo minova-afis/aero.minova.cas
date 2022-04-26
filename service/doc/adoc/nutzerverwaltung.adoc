@@ -21,7 +21,9 @@ Damit die AD-Gruppen des Users genutzt werden können, müssen diese in der Date
 Hat man die Gruppen erstellt müssen diese dann mit den Privilegien aus der *xtcasUserPrivilege* Tabelle über die *xtcasLuUserPrivilegeUserGroup* Tabelle verknüpft werden.
 
 Folgende properties müssen gesetzt werden:
+
 * `security_ldap_domain`: Domain der Nutzer
+* `security_ldap_address`: URL des LDAP bzw. Active Directory (AD) Server
 
 === database
 Ist die Porperty auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.

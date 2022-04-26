@@ -14,6 +14,7 @@ eine Nachricht bis zu zehn mal zu verschicken. Die dazugehörige Property heit *
 
 Die API stellt folgende Methoden bereit:
 
+* writeMessage(): Speichert die zu sendende Nachricht in der xtcasServiceMessage.
 * getNextMessage(): Greift auf die View xvcasCASServiceMessage zu und holt sich daraus die Informationen zur nächsten Nachricht, welche verschickt werden muss.
 * send(Table message): Versucht eine Nachricht mit den Informationen der Table zu versenden. Gibt einen dementsprechenden Boolean Wert zurück.
 * saveAsSent(Table message): Wenn eine Nachricht verschickt wurde, wird sie als 'isSent' markiert.

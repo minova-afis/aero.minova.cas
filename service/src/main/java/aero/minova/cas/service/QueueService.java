@@ -42,6 +42,7 @@ public class QueueService implements BiConsumer {
 			List<Integer> blockedServices = new ArrayList<>();
 
 			for (Row pendingMessages : messagesToBeSend.getRows()) {
+
 				boolean sendSuccessfull = sendMessage(messagesToBeSend);
 				if (sendSuccessfull) {
 					safeAsSent(pendingMessages);
@@ -92,7 +93,9 @@ public class QueueService implements BiConsumer {
 	}
 
 	private boolean sendMessage(Table nextMessage) {
-		// TODO Auto-generated method stub
+		// TODO Falls NumberOfAttempts zu hoch -> Nachricht 'löschen'
+		// TODO Zu alte Nachrichten löschen (7 Tage?)
+		// TODO Nachrichten versenden
 		return false;
 	}
 

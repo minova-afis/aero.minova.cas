@@ -7,14 +7,16 @@ Selbst wenn das CAS neu gestartet wird, wenn Nachrichten noch in der Queue sind,
 Um dies zu ermöglichen, werden alle benötigten Daten in der Tabelle xtcasServiceMessage gespeichert. 
 Nachdem sie versendet wurden, werden die Nachrichten wieder gelöscht.
 
-Der QueueService versucht in einem zeitlichen Abstand von 1 Minute, welcher auch selbst in den application.properties gesetzt werden kann,
-eine Nachricht bis zu zehn mal zu verschicken. Die dazugehörige Property heit *aero.minova.check.message.intervall*.
+Der QueueService versucht in einem zeitlichen Abstand von 1 Minute, welcher auch selbst in den application.properties gesetzt werden kann, eine Nachricht zu verschicken. Die dazugehörige Property heißt *aero.minova.check.message.intervall*.
+
+Desweiteren werden Nachrichten gelöscht, welche entweder zu alt (standartmäßig älter als 7 Tage) sind oder zu oft versucht wurden zu verschicken (standartmäßig 10 Versuche).
+Die dafür interessanten Propterties sind *aero.minova.number.of.attempts* und *aero.minova.message.age*.
 
 === QueueService API
 
 Die API stellt folgende Methoden bereit:
 
-* writeMessage(): Speichert die zu sendende Nachricht in der xtcasServiceMessage.
-* getNextMessage(): Greift auf die View xvcasCASServiceMessage zu und holt sich daraus die Informationen zur nächsten Nachricht, welche verschickt werden muss.
-* send(Table message): Versucht eine Nachricht mit den Informationen der Table zu versenden. Gibt einen dementsprechenden Boolean Wert zurück.
-* saveAsSent(Table message): Wenn eine Nachricht verschickt wurde, wird sie als 'isSent' markiert.
+* apply(): Speichert die zu sendende Nachricht in der xtcasServiceMessage.
+* getNextMessage(): Greift auf die View xvcasCASServiceMessage zu und holt sich daraus die Informationen zur den nächsten Nachrichten, welche verschickt werden müssen.
+* sendMessage(Row message): Versucht eine Nachricht mit den Informationen der Row zu versenden. Gibt einen dementsprechenden Boolean Wert zurück.
+* saveAsSent(Row message): Markiert eine Nachricht als 'isSent'.

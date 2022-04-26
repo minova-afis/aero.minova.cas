@@ -18,7 +18,9 @@ User ..> [REST]: Login und Anfragen
 [CAS] <.left.> [Erweiterungen]
 [CAS] --> [App-Projekt]
 [Erweiterungen] <.down.> [Setup-Erweiterung]
+[CAS] .down.> [Subscription (QueueService)]
 [Erweiterungen] .left.> Dienste
+[Subscription (QueueService)] <.left.> Dienste
 [Erweiterungen] ..> [Ressourcen]
 @enduml
 ....

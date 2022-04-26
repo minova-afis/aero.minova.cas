@@ -25,13 +25,13 @@ Datentyp: integer not null +
 // end::column.CASServiceKey[]
 
 
-==== TableName
+==== Topic
 
 Datentyp: nvarchar(50) not null +
 
-// tag::column.TableName[]
+// tag::column.Topic[]
 
-// end::column.TableName[]
+// end::column.Topic[]
 
 
 ==== LastUser

@@ -53,6 +53,15 @@ Default: `0` +
 // end::column.NumberOfAttempts[]
 
 
+==== MessageCreationDate
+
+Datentyp: datetime not null +
+
+// tag::column.MessageCreationDate[]
+
+// end::column.MessageCreationDate[]
+
+
 ==== LastUser
 
 Datentyp: nvarchar(50) not null +

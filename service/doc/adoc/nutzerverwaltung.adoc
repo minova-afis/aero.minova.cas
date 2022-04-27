@@ -27,7 +27,8 @@ Folgende properties müssen gesetzt werden:
 
 === database
 Ist die Porperty auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
-Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt. Das Passwort kann mit der Klasse *PasswordEncrypter* in *aero.minova.cas.service* verschlüsselt werden.
+Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt.
+Das Passwort kann mit der Klasse *PasswordEncrypter* in *aero.minova.cas.service* verschlüsselt werden.
 
 Wie bei dem 'ldap'-Modus muss man hier auch die *xtcasUserGroup*, die *xtcasUserPrivilege* und die *xtcasLuUserPrivilegeUserGroup* Tabellen füllen und miteinander verknüpfen.
 

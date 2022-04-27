@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
@@ -37,12 +38,20 @@ public class QueueService implements BiConsumer {
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.number.of.attempts:10}")
 	int allowedNumberOfAttempts;
 
+	RestTemplate restTemplate;
+
+	/**
+	 * Speichert eine Nachricht in der Datenbank, welche beim nächsten Intervall verschickt wird.
+	 */
 	@Override
 	public void accept(Object t, Object u) {
 		// TODO Generiere Nachricht und speichere sie in der xtcasServiceMessage
 
 	}
 
+	/**
+	 * Versucht in einem bestimmten regelmäßigen Abstand unversendete Nachrichten an Dienste zu verschicken.
+	 */
 	@Scheduled(cron = "${aero.minova.check.message.intervall:0 * * * * *}")
 	private void sendQueueMessage() {
 
@@ -79,9 +88,27 @@ public class QueueService implements BiConsumer {
 		}
 	}
 
+	/**
+	 * Löscht eine Nachricht aus der Datenbank, damit nicht mehr versucht wird sie zu versenden.
+	 * 
+	 * @param pendingMessage
+	 *            Eine Row, bei welcher der KeyLong der Nachricht an 5.Stelle steht.
+	 */
 	private void deleteMessage(Row pendingMessage) {
-		// TODO Auto-generated method stub
+		Table messageToDelete = new Table();
+		messageToDelete.setName("xpcasDeleteServiceMessage");
+		messageToDelete.addColumn(new Column("KeyLong", DataType.INTEGER));
 
+		Row setSentRow = new Row();
+		setSentRow.addValue(pendingMessage.getValues().get(4));
+
+		messageToDelete.addRow(setSentRow);
+		try {
+			spc.unsecurelyProcessProcedure(messageToDelete);
+		} catch (Exception e) {
+			logger.logError("The message with key " + pendingMessage.getValues().get(4).getStringValue() + " could not be deleted!", e);
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -115,6 +142,11 @@ public class QueueService implements BiConsumer {
 		}
 	}
 
+	/**
+	 * Liest alle nicht versendeten Nachrichten aus der Datenbank.
+	 * 
+	 * @return Eine Table, bei welcher jede Row eine nicht versandte Nachricht ist.
+	 */
 	private Table getNextMessage() {
 		Table unsendMessages;
 
@@ -151,12 +183,26 @@ public class QueueService implements BiConsumer {
 		return unsendMessages;
 	}
 
+	/**
+	 * Versendet eine Nachricht.
+	 * 
+	 * @param nextMessage
+	 *            Eine Row, in der folgende Übergabeparamtern enthalten sind:CASServiceKey, CASServiceName, ServiceURL, Port, MessageKey, Message, isSent,
+	 *            NumberOfAttempts, MessageCreationDate
+	 * @return true, falls der Versandt erfolgreich war. Andernfalls false.
+	 */
 	private boolean sendMessage(Row nextMessage) {
 
 		// TODO Nachrichten versenden
 		return false;
 	}
 
+	/**
+	 * Speichert eine Nachricht als 'isSent' in der Datenbank.
+	 * 
+	 * @param nextMessage
+	 *            Eine Row, bei welcher der KeyLong der Nachricht an 5. Stelle und die NumberOfAttempts an 8.Stelle stehen.
+	 */
 	private void safeAsSent(Row nextMessage) {
 		Table setSent = new Table();
 		setSent.setName("xpcasUpdateServiceMessage");

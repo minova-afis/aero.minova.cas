@@ -1,6 +1,6 @@
-alter view dbo.xvcasCASServiceMessage
+create view dbo.xvcasCASServiceMessage
 with encryption as
-select
+select 
     cs.KeyLong as CASServiceKey,
     cs.KeyText as CASServiceName,
     cs.ServiceURL,
@@ -9,10 +9,9 @@ select
     sm.Message,
     sm.isSent,
     sm.NumberOfAttempts,
-    sm.MessageDate
-from xtcasCASservices cs
+    sm.MessageCreationDate
+from xtcasCASServices cs
 left join xtcasServiceMessage sm on sm.CASServiceKey = cs.KeyLong
 where cs.LastAction >=0
   and sm.LastAction >=0
   and sm.isSent = 0
-order by MessageKey desc

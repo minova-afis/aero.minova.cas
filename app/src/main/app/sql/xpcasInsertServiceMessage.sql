@@ -1,19 +1,20 @@
 alter procedure dbo.xpcasInsertServiceMessage (
 	@KeyLong int output,
 	@CASServiceKey int,
-	@Message nvarchar(250),
-	@MessageCreationDate datetime
+	@Message nvarchar(250)
 )
 with encryption as
 
 insert into xtcasServiceMessage (
 	CASServiceKey,
 	Message,
-	MessageCreationDate
+	MessageCreationDate,
+	IsSent
 ) values (
 	@CASServiceKey,
 	@Message,
-	@MessageCreationDate
+	getDate(),
+	0
 )
 select @KeyLong = @@identity
 return @@error

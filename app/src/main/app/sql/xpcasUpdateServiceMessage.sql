@@ -1,8 +1,7 @@
 alter procedure dbo.xpcasUpdateServiceMessage (
 	@KeyLong int,
 	@IsSent bit = null,
-	@NumberOfAttempts int = null,
-	
+	@NumberOfAttempts int = null
 )
 with encryption as
 

@@ -2,9 +2,7 @@ package aero.minova.cas.service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +58,7 @@ public class QueueService implements BiConsumer {
 	 */
 	@Scheduled(cron = "${aero.minova.check.message.intervall:0 * * * * *}")
 	private void sendQueueMessage() {
+		// Es wird hier ein neuer SecurityContext benötigt, da sonst die Methode 'getUserContext im SqlProcedureController abbrechen würde.
 		SecurityContextHolder.getContext().setAuthentication(new Authentication() {
 
 			@Override
@@ -94,7 +93,6 @@ public class QueueService implements BiConsumer {
 
 			@Override
 			public Collection<? extends GrantedAuthority> getAuthorities() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 		});
@@ -103,14 +101,13 @@ public class QueueService implements BiConsumer {
 		Table messagesToBeSend = getNextMessage();
 
 		if (messagesToBeSend != null && messagesToBeSend.getRows().size() > 0) {
-			List<Integer> blockedServices = new ArrayList<>();
 
 			for (Row pendingMessage : messagesToBeSend.getRows()) {
 
 				// Falls die Nachricht älter ist als das allowedMessageAge und falls die NumberOfAttempts höher ist als die allowedNumberOfAttempts, muss die
 				// Nachricht gelöscht werden.
 				if (pendingMessage.getValues().get(8).getInstantValue().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))
-						&& pendingMessage.getValues().get(7).getIntegerValue() > allowedNumberOfAttempts) {
+						|| pendingMessage.getValues().get(7).getIntegerValue() >= allowedNumberOfAttempts) {
 					deleteMessage(pendingMessage);
 					continue;
 				}
@@ -120,16 +117,9 @@ public class QueueService implements BiConsumer {
 				if (sendSuccessfull) {
 					safeAsSent(pendingMessage);
 				} else {
-					/*
-					 * Falls eine Nachricht nicht an einen Dienst geschickt werden konnte, wird dessen Key auf die blockedServices-Liste gesetzt, da alle
-					 * weiteren Nachrichten von der nicht versandten anhängen könnten. Deshalb werden in diesem Intervall keine Nachrichten mehr an diesen
-					 * Dienst geschickt.
-					 */
-					logger.logNewsfeed(pendingMessage.getValues().get(1).getStringValue()
-							+ " is not reachable! No more messages will be send to this service during this intervall.");
-					blockedServices.add(pendingMessage.getValues().get(0).getIntegerValue());
-					increaseAttempts(pendingMessage);
+					logger.logNewsfeed(pendingMessage.getValues().get(1).getStringValue() + " is not reachable!");
 				}
+				increaseAttempts(pendingMessage);
 			}
 		}
 	}

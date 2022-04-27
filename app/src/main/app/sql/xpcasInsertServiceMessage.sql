@@ -1,7 +1,7 @@
 alter procedure dbo.xpcasInsertServiceMessage (
 	@KeyLong int output,
 	@CASServiceKey int,
-	@Message nvarchar(250)
+	@Message nvarchar(1024)
 )
 with encryption as
 

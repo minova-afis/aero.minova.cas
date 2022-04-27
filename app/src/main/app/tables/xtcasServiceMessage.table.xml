@@ -11,7 +11,7 @@
 		<integer nullable="false"/>
 	</column>
 	<column name="Message">
-		<varchar length="250"/>
+		<varchar length="1024"/>
 	</column>
 	<column name="IsSent">
 		<boolean nullable="false"/>

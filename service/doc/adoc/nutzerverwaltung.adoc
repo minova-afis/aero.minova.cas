@@ -26,7 +26,7 @@ Folgende properties müssen gesetzt werden:
 * `security_ldap_address`: URL des LDAP bzw. Active Directory (AD) Server
 
 === database
-Ist die Porperty auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
+Ist die Property auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
 Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt.
 Das Passwort kann mit der Klasse *PasswordEncrypter* in *aero.minova.cas.service* verschlüsselt werden.
 

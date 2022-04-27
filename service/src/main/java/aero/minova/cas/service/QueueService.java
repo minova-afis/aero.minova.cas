@@ -3,6 +3,7 @@ package aero.minova.cas.service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -10,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -56,6 +60,44 @@ public class QueueService implements BiConsumer {
 	 */
 	@Scheduled(cron = "${aero.minova.check.message.intervall:0 * * * * *}")
 	private void sendQueueMessage() {
+		SecurityContextHolder.getContext().setAuthentication(new Authentication() {
+
+			@Override
+			public String getName() {
+				return "CAS QueueService";
+			}
+
+			@Override
+			public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+
+			}
+
+			@Override
+			public boolean isAuthenticated() {
+				return true;
+			}
+
+			@Override
+			public Object getPrincipal() {
+				return null;
+			}
+
+			@Override
+			public Object getDetails() {
+				return null;
+			}
+
+			@Override
+			public Object getCredentials() {
+				return null;
+			}
+
+			@Override
+			public Collection<? extends GrantedAuthority> getAuthorities() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
 
 		// Holt sich alle Nachrichten, die noch nicht versandt wurden.
 		Table messagesToBeSend = getNextMessage();
@@ -141,10 +183,11 @@ public class QueueService implements BiConsumer {
 		try {
 			spc.unsecurelyProcessProcedure(setSent);
 		} catch (Exception e) {
-			logger.logError("The message with key " + pendingMessages.getValues().get(4).getStringValue()
-					+ " could not be send! Number of attempts is increased to " + attempts, e);
+			logger.logError("Number of attempts could not be increased for message with key: " + pendingMessages.getValues().get(4).getIntegerValue(), e);
 			throw new RuntimeException(e);
 		}
+		logger.logNewsfeed("The message with key " + pendingMessages.getValues().get(4).getIntegerValue()
+				+ " could not be send! Number of attempts is increased to " + attempts);
 	}
 
 	/**
@@ -198,10 +241,10 @@ public class QueueService implements BiConsumer {
 	 */
 	private boolean sendMessage(Row nextMessage) {
 		RestTemplate restTemplate = new RestTemplate();
-		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getStringValue();
+		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getIntegerValue();
 
 		HttpEntity<?> request = new HttpEntity<Object>(nextMessage.getValues().get(5));
-		logger.logNewsfeed("Trying to send message with key " + nextMessage.getValues().get(4) + " to " + url);
+		logger.logNewsfeed("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
 		try {
 			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
 			logger.logNewsfeed("Sending message: " + nextMessage.getValues().get(5));

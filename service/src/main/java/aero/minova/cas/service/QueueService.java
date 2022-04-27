@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -81,6 +83,8 @@ public class QueueService implements BiConsumer {
 					 * weiteren Nachrichten von der nicht versandten anhängen könnten. Deshalb werden in diesem Intervall keine Nachrichten mehr an diesen
 					 * Dienst geschickt.
 					 */
+					logger.logNewsfeed(pendingMessage.getValues().get(1).getStringValue()
+							+ " is not reachable! No more messages will be send to this service during this intervall.");
 					blockedServices.add(pendingMessage.getValues().get(0).getIntegerValue());
 					increaseAttempts(pendingMessage);
 				}
@@ -104,9 +108,10 @@ public class QueueService implements BiConsumer {
 
 		messageToDelete.addRow(setSentRow);
 		try {
+			logger.logNewsfeed("Deleting message with key " + pendingMessage.getValues().get(4).getIntegerValue());
 			spc.unsecurelyProcessProcedure(messageToDelete);
 		} catch (Exception e) {
-			logger.logError("The message with key " + pendingMessage.getValues().get(4).getStringValue() + " could not be deleted!", e);
+			logger.logError("The message with key " + pendingMessage.getValues().get(4).getIntegerValue() + " could not be deleted!", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -192,9 +197,19 @@ public class QueueService implements BiConsumer {
 	 * @return true, falls der Versandt erfolgreich war. Andernfalls false.
 	 */
 	private boolean sendMessage(Row nextMessage) {
+		RestTemplate restTemplate = new RestTemplate();
+		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getStringValue();
 
-		// TODO Nachrichten versenden
-		return false;
+		HttpEntity<?> request = new HttpEntity<Object>(nextMessage.getValues().get(5));
+		logger.logNewsfeed("Trying to send message with key " + nextMessage.getValues().get(4) + " to " + url);
+		try {
+			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
+			logger.logNewsfeed("Sending message: " + nextMessage.getValues().get(5));
+		} catch (Exception e) {
+			logger.logError("Could not send message to " + url, e);
+			return false;
+		}
+		return true;
 	}
 
 	/**

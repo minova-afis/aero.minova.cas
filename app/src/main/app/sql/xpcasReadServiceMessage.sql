@@ -10,8 +10,7 @@ alter procedure dbo.xpcasReadServiceMessage (
 with encryption as
 	if (@KeyLong is not null)
 	begin
-		select	KeyLong,
-				@ServiceURL = ServiceURL,
+		select	@ServiceURL = ServiceURL,
                 @Port = Port,
 				@Message = Message,
                 @isSent = isSent,

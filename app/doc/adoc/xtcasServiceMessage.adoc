@@ -27,7 +27,7 @@ Datentyp: integer not null +
 
 ==== Message
 
-Datentyp: nvarchar(250) +
+Datentyp: nvarchar(1024) +
 
 // tag::column.Message[]
 

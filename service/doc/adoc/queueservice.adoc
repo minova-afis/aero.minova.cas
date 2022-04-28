@@ -11,14 +11,3 @@ Der QueueService versucht in einem zeitlichen Abstand von 1 Minute, welcher auch
 
 Desweiteren werden Nachrichten gelöscht, welche entweder zu alt (standartmäßig älter als 7 Tage) sind oder zu oft versucht wurden zu verschicken (standartmäßig 10 Versuche).
 Die dafür interessanten Propterties sind *aero.minova.number.of.attempts* und *aero.minova.message.age*.
-
-=== QueueService API
-
-Die API stellt folgende Methoden bereit:
-
-* apply(): Speichert die zu sendende Nachricht in der xtcasServiceMessage.
-* sendQueueMessage(): Führt in dem Intervall von aero.minova.check.message.intervall (standartmäßig 1 Minute) folgende Methoden aus:
-** getNextMessage(): Greift auf die View xvcasCASServiceMessage zu und holt sich daraus die Informationen zur den nächsten Nachrichten, welche verschickt werden müssen.
-** sendMessage(Row message): Versucht eine Nachricht mit den Informationen der Row zu versenden. Gibt einen dementsprechenden Boolean Wert zurück.
-** saveAsSent(Row message): Markiert eine Nachricht als 'isSent'.
-** deleteMessage: Löscht eine Methode und setzt sie auf LastAction = -1. Die Nachricht wird in nachfolgenden Intervallen nicht mehr berücksichtigt.

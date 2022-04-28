@@ -8,8 +8,8 @@ alter procedure dbo.xpcasReadServiceMessage (
 	@MessageCreationDate datetime output
 )
 with encryption as
-	if (@KeyLong is not null)
-	begin
+if (@KeyLong is not null)
+begin
 		select	@ServiceURL = ServiceURL,
                 @Port = Port,
 				@Message = Message,
@@ -19,5 +19,5 @@ with encryption as
 		from xvcasCASServiceMessage
 		where MessageKey = @KeyLong
 		  and LastAction > 0
-	end
+end
 return @@error

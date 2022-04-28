@@ -34,4 +34,5 @@
 	<primarykey>
 		<column>KeyLong</column>
 	</primarykey>
+	<foreignkey refid="CASServiceKey" table="xtcasCASServices"/>
 </table>

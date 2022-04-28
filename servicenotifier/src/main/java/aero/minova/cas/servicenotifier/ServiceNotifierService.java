@@ -23,6 +23,7 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.SecurityService;
 
+@Deprecated
 @Service
 public class ServiceNotifierService {
 

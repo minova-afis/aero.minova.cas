@@ -39,8 +39,7 @@ public class QueueService implements BiConsumer {
 	@Autowired
 	SecurityService securityService;
 
-	@Autowired
-	ServiceNotifierService serviceNotifierService;
+	ServiceNotifierService serviceNotifierService = new ServiceNotifierService();
 
 	@Autowired
 	SqlProcedureController spc;

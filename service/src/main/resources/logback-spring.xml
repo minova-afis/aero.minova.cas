@@ -87,14 +87,14 @@
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
-		<appender name="newsfeedLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${APP_LOG_ROOT}/newsfeed.log</file>
+		<appender name="queueServiceLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/queueServiceLog.log</file>
 		<append>true</append>
 		<encoder>
 			<pattern>${LOG_PATTERN}</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/archived/newsfeed_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<fileNamePattern>${APP_LOG_ROOT}/archived/queueServiceLog%d{dd-MM-yyyy}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
@@ -121,8 +121,8 @@
 	<logger name="SetupLogger" level="trace" additivity="false">
 		<appender-ref ref="setupLog"/>
 	</logger>
-	<logger name="NewsfeedLog" level="trace" additivity="false">
-		<appender-ref ref="newsfeedLog"/>
+	<logger name="QueueServiceLog" level="trace" additivity="false">
+		<appender-ref ref="queueServiceLog"/>
 		<appender-ref ref="console"/>
 	</logger>
 	

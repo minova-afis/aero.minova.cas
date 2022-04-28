@@ -34,8 +34,8 @@ public class CustomLogger {
 	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 	// Log für Setup
 	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
-	
-	public Logger newsfeedLogger = LoggerFactory.getLogger("NewsfeedLog");
+
+	public Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
 
 	private ClientRestAPI crapi = new ClientRestAPI();
 
@@ -99,10 +99,10 @@ public class CustomLogger {
 		setupLogger.info("CAS " + logMessage);
 	}
 
-	public void logNewsfeed(String logMessage) {
-		newsfeedLogger.info("CAS " + logMessage);
+	public void logQueueService(String logMessage) {
+		queueServiceLog.info("CAS " + logMessage);
 	}
-	
+
 	/**
 	 * TODO Das loggen funktioniert zur Zeit nicht.
 	 *

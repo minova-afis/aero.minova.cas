@@ -1,13 +1,18 @@
 package aero.minova.cas.service;
 
+import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,6 +27,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.servicenotifier.ServiceNotifierService;
 
 @SuppressWarnings("rawtypes")
 @Service
@@ -34,6 +40,9 @@ public class QueueService implements BiConsumer {
 	SecurityService securityService;
 
 	@Autowired
+	ServiceNotifierService serviceNotifierService;
+
+	@Autowired
 	SqlProcedureController spc;
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.message.age:7}")
@@ -44,13 +53,35 @@ public class QueueService implements BiConsumer {
 
 	RestTemplate restTemplate;
 
-	/**
-	 * Speichert eine Nachricht in der Datenbank, welche beim nächsten Intervall verschickt wird.
-	 */
-	@Override
-	public void accept(Object t, Object u) {
-		// TODO Generiere Nachricht und speichere sie in der xtcasServiceMessage
+	// Map<ProzedurName, Map< ServiceName, BiFunction>>
+	Map<String, Map<String, BiFunction>> serviceMessageCreators = new HashMap<>();
 
+	/**
+	 * Registriert eine BiFunction auf einen Prozedurnamen.
+	 * 
+	 * @param procedureName
+	 *            Der Name der Prozedur, nach welcher die BiFunction ausgeführt werden soll.
+	 * @param function
+	 *            Die BiFunction, die Ausgeführt werden soll. Muss vom Typ BiFunction<Table, HttpResponse<?>, String> sein.
+	 */
+	public void registerServiceMessageCreator(String procedureName, String serviceName, BiFunction<Table, HttpResponse<?>, String> function) {
+		if (!serviceMessageCreators.containsKey(procedureName)) {
+			Map<String, BiFunction> functions = new HashMap<>();
+			functions.put(serviceName, function);
+			serviceMessageCreators.put(procedureName, functions);
+		}
+	}
+
+	/**
+	 * Löscht alle BiFunctionen, die für einen Service registriert waren.
+	 * 
+	 * @param procedureName
+	 * @param serviceName
+	 */
+	public void unregisterServiceMessageCreator(String procedureName, String serviceName) {
+		if (serviceMessageCreators.containsKey(procedureName) && serviceMessageCreators.get(procedureName).containsKey(serviceName)) {
+			serviceMessageCreators.get(procedureName).remove(serviceName);
+		}
 	}
 
 	/**
@@ -122,6 +153,67 @@ public class QueueService implements BiConsumer {
 				increaseAttempts(pendingMessage);
 			}
 		}
+	}
+
+	/**
+	 * Speichert eine Nachricht in der Datenbank, welche beim nächsten Intervall verschickt wird.
+	 */
+	@Override
+	public void accept(Object t, Object u) {
+
+		if (t instanceof Table && u instanceof ResponseEntity) {
+			Table table = (Table) t;
+
+			Map<String, BiFunction> applyableFunctions = serviceMessageCreators.get(table.getName());
+
+			if (applyableFunctions != null) {
+
+				// Wenn eine Prozedur ausgeführt wurde, müssen Nachrichten für alle betroffenen Dienste generiert werden.
+				for (Map.Entry<String, BiFunction> entry : applyableFunctions.entrySet()) {
+					@SuppressWarnings("unchecked")
+					String message = (String) entry.getValue().apply(t, u);
+					saveMessage(message, table.getName(), entry.getKey());
+				}
+			}
+		}
+	}
+
+	/**
+	 * Speichert eine Nachricht für einen Service.
+	 * 
+	 * @param message
+	 *            Die Nachricht, die gespeichert werden soll.
+	 * @param procedureName
+	 *            Die Prozedur, wegen welcher die Nachricht erstellt wurde.
+	 * @param serviceName
+	 *            Der Name des Services, an welchen die Nachricht geschickt werden soll.
+	 */
+	private void saveMessage(String message, String procedureName, String serviceName) {
+		Table servicesToBeNotified = serviceNotifierService.findViewEntry(new Value(serviceName, null), new Value(procedureName, null), null, null, null);
+
+		for (Row services : servicesToBeNotified.getRows()) {
+			Table setSent = new Table();
+			setSent.setName("xpcasInsertServiceMessage");
+			setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
+			setSent.addColumn(new Column("CASServiceKey", DataType.INTEGER));
+			setSent.addColumn(new Column("Message", DataType.STRING));
+
+			Row setSentRow = new Row();
+			setSentRow.addValue(null);
+			setSentRow.addValue(services.getValues().get(0));
+			setSentRow.addValue(new Value(message, null));
+
+			setSent.addRow(setSentRow);
+			try {
+				logger.logNewsfeed("Saving message '" + message + "' for service: " + serviceName);
+				spc.unsecurelyProcessProcedure(setSent);
+				logger.logNewsfeed("Message saved!");
+			} catch (Exception e) {
+				logger.logError("Error while trying to save message for service: " + serviceName, e);
+				throw new RuntimeException(e);
+			}
+		}
+
 	}
 
 	/**
@@ -236,7 +328,7 @@ public class QueueService implements BiConsumer {
 		HttpEntity<?> request = new HttpEntity<Object>(nextMessage.getValues().get(5));
 		logger.logNewsfeed("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
 		try {
-			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
+			restTemplate.exchange(url + "/cas-event-listener", HttpMethod.POST, request, Void.class);
 			logger.logNewsfeed("Sending message: " + nextMessage.getValues().get(5));
 		} catch (Exception e) {
 			logger.logError("Could not send message to " + url, e);

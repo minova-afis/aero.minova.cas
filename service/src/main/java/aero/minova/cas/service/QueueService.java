@@ -29,9 +29,8 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
 
-@SuppressWarnings("rawtypes")
 @Service
-public class QueueService implements BiConsumer {
+public class QueueService implements BiConsumer<Table, HttpResponse<Object>> {
 
 	@Autowired
 	CustomLogger logger;
@@ -44,6 +43,7 @@ public class QueueService implements BiConsumer {
 	@Autowired
 	SqlProcedureController spc;
 
+	// Hierbei handelt es sich um Tage
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.message.age:7}")
 	int allowedMessageAge;
 
@@ -53,7 +53,7 @@ public class QueueService implements BiConsumer {
 	RestTemplate restTemplate;
 
 	// Map<ProzedurName, Map< ServiceName, BiFunction>>
-	Map<String, Map<String, BiFunction>> serviceMessageCreators = new HashMap<>();
+	Map<String, Map<String, BiFunction<Table, HttpResponse<Object>, String>>> serviceMessageCreators = new HashMap<>();
 
 	/**
 	 * Registriert eine BiFunction auf einen Prozedurnamen.
@@ -63,24 +63,15 @@ public class QueueService implements BiConsumer {
 	 * @param function
 	 *            Die BiFunction, die Ausgeführt werden soll. Muss vom Typ BiFunction<Table, HttpResponse<?>, String> sein.
 	 */
-	public void registerServiceMessageCreator(String procedureName, String serviceName, BiFunction<Table, HttpResponse<?>, String> function) {
-		if (!serviceMessageCreators.containsKey(procedureName)) {
-			Map<String, BiFunction> functions = new HashMap<>();
-			functions.put(serviceName, function);
-			serviceMessageCreators.put(procedureName, functions);
+	public void registerServiceMessageCreator(String procedureName, String topic, BiFunction<Table, HttpResponse<Object>, String> function) {
+		if (serviceMessageCreators.containsKey(procedureName)) {
+			throw new IllegalArgumentException();
+		} else if (serviceMessageCreators.get(procedureName).containsKey(topic)) {
+			throw new IllegalArgumentException();
 		}
-	}
-
-	/**
-	 * Löscht alle BiFunctionen, die für einen Service registriert waren.
-	 * 
-	 * @param procedureName
-	 * @param serviceName
-	 */
-	public void unregisterServiceMessageCreator(String procedureName, String serviceName) {
-		if (serviceMessageCreators.containsKey(procedureName) && serviceMessageCreators.get(procedureName).containsKey(serviceName)) {
-			serviceMessageCreators.get(procedureName).remove(serviceName);
-		}
+		Map<String, BiFunction<Table, HttpResponse<Object>, String>> functions = new HashMap<>();
+		functions.put(topic, function);
+		serviceMessageCreators.put(procedureName, functions);
 	}
 
 	/**
@@ -147,7 +138,7 @@ public class QueueService implements BiConsumer {
 				if (sendSuccessfull) {
 					safeAsSent(pendingMessage);
 				} else {
-					logger.logNewsfeed(pendingMessage.getValues().get(1).getStringValue() + " is not reachable!");
+					logger.logQueueService(pendingMessage.getValues().get(1).getStringValue() + " is not reachable!");
 				}
 				increaseAttempts(pendingMessage);
 			}
@@ -158,22 +149,22 @@ public class QueueService implements BiConsumer {
 	 * Speichert eine Nachricht in der Datenbank, welche beim nächsten Intervall verschickt wird.
 	 */
 	@Override
-	public void accept(Object t, Object u) {
+	public void accept(Table t, HttpResponse<Object> u) {
 
 		if (t instanceof Table && u instanceof ResponseEntity) {
-			Table table = (Table) t;
 
-			Map<String, BiFunction> applyableFunctions = serviceMessageCreators.get(table.getName());
+			Map<String, BiFunction<Table, HttpResponse<Object>, String>> applyableFunctions = serviceMessageCreators.get(t.getName());
 
 			if (applyableFunctions != null) {
 
 				// Wenn eine Prozedur ausgeführt wurde, müssen Nachrichten für alle betroffenen Dienste generiert werden.
-				for (Map.Entry<String, BiFunction> entry : applyableFunctions.entrySet()) {
-					@SuppressWarnings("unchecked")
-					String message = (String) entry.getValue().apply(t, u);
-					saveMessage(message, table.getName(), entry.getKey());
+				for (Map.Entry<String, BiFunction<Table, HttpResponse<Object>, String>> entry : applyableFunctions.entrySet()) {
+
+					String message = entry.getValue().apply(t, u).toString();
+					saveMessage(message, t.getName(), entry.getKey());
 				}
 			}
+
 		}
 	}
 
@@ -184,11 +175,11 @@ public class QueueService implements BiConsumer {
 	 *            Die Nachricht, die gespeichert werden soll.
 	 * @param procedureName
 	 *            Die Prozedur, wegen welcher die Nachricht erstellt wurde.
-	 * @param serviceName
-	 *            Der Name des Services, an welchen die Nachricht geschickt werden soll.
+	 * @param topic
+	 *            Das Topic, welches verändert wurde.
 	 */
-	private void saveMessage(String message, String procedureName, String serviceName) {
-		Table servicesToBeNotified = serviceNotifierService.findViewEntry(new Value(serviceName, null), new Value(procedureName, null), null, null, null);
+	private void saveMessage(String message, String procedureName, String topic) {
+		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, new Value(procedureName, null), new Value(topic, null), null, null);
 
 		for (Row services : servicesToBeNotified.getRows()) {
 			Table setSent = new Table();
@@ -204,11 +195,11 @@ public class QueueService implements BiConsumer {
 
 			setSent.addRow(setSentRow);
 			try {
-				logger.logNewsfeed("Saving message '" + message + "' for service: " + serviceName);
+				logger.logQueueService("Saving message '" + message + "'");
 				spc.unsecurelyProcessProcedure(setSent);
-				logger.logNewsfeed("Message saved!");
+				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
-				logger.logError("Error while trying to save message for service: " + serviceName, e);
+				logger.logError("Error while trying to save message " + message, e);
 				throw new RuntimeException(e);
 			}
 		}
@@ -231,7 +222,7 @@ public class QueueService implements BiConsumer {
 
 		messageToDelete.addRow(setSentRow);
 		try {
-			logger.logNewsfeed("Deleting message with key " + pendingMessage.getValues().get(4).getIntegerValue());
+			logger.logQueueService("Deleting message with key " + pendingMessage.getValues().get(4).getIntegerValue());
 			spc.unsecurelyProcessProcedure(messageToDelete);
 		} catch (Exception e) {
 			logger.logError("The message with key " + pendingMessage.getValues().get(4).getIntegerValue() + " could not be deleted!", e);
@@ -267,7 +258,7 @@ public class QueueService implements BiConsumer {
 			logger.logError("Number of attempts could not be increased for message with key: " + pendingMessages.getValues().get(4).getIntegerValue(), e);
 			throw new RuntimeException(e);
 		}
-		logger.logNewsfeed("The message with key " + pendingMessages.getValues().get(4).getIntegerValue()
+		logger.logQueueService("The message with key " + pendingMessages.getValues().get(4).getIntegerValue()
 				+ " could not be send! Number of attempts is increased to " + attempts);
 	}
 
@@ -325,10 +316,10 @@ public class QueueService implements BiConsumer {
 		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getIntegerValue();
 
 		HttpEntity<?> request = new HttpEntity<Object>(nextMessage.getValues().get(5));
-		logger.logNewsfeed("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
+		logger.logQueueService("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
 		try {
 			restTemplate.exchange(url + "/cas-event-listener", HttpMethod.POST, request, Void.class);
-			logger.logNewsfeed("Sending message: " + nextMessage.getValues().get(5));
+			logger.logQueueService("Sending message: " + nextMessage.getValues().get(5));
 		} catch (Exception e) {
 			logger.logError("Could not send message to " + url, e);
 			return false;
@@ -362,5 +353,4 @@ public class QueueService implements BiConsumer {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

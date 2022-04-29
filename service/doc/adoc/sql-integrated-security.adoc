@@ -1,0 +1,10 @@
+# Integrierte Sicherheit für SQL-Anmeldung
+
+## Integrierte Sicherheit über JDBC
+
+* link:https://www.microsoft.com/en-us/download/confirmation.aspx?id=11774[JDBC Driver],
+passende `sqljdbc_auth.dll` entpacken und in den Ausführungs-Ordner des Dienstes kopieren.
+* `;integratedSecurity=true` and die JDBC-URL anhängen.
+* Benutzernamen und Passwort für SQL-Datenbank entfernen.
+* Dienst unter den Nutzer starten,
+welcher entsprechende Rechte auf die Datenbank hat.

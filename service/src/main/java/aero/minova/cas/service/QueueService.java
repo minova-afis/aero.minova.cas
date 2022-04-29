@@ -1,6 +1,5 @@
 package aero.minova.cas.service;
 
-import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -30,7 +29,7 @@ import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
 
 @Service
-public class QueueService implements BiConsumer<Table, HttpResponse<Object>> {
+public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	@Autowired
 	CustomLogger logger;
@@ -53,7 +52,7 @@ public class QueueService implements BiConsumer<Table, HttpResponse<Object>> {
 	RestTemplate restTemplate;
 
 	// Map<ProzedurName, Map< ServiceName, BiFunction>>
-	Map<String, Map<String, BiFunction<Table, HttpResponse<Object>, String>>> serviceMessageCreators = new HashMap<>();
+	Map<String, Map<String, BiFunction<Table, ResponseEntity<Object>, String>>> serviceMessageCreators = new HashMap<>();
 
 	/**
 	 * Registriert eine BiFunction auf einen Prozedurnamen.
@@ -63,13 +62,13 @@ public class QueueService implements BiConsumer<Table, HttpResponse<Object>> {
 	 * @param function
 	 *            Die BiFunction, die Ausgeführt werden soll. Muss vom Typ BiFunction<Table, HttpResponse<?>, String> sein.
 	 */
-	public void registerServiceMessageCreator(String procedureName, String topic, BiFunction<Table, HttpResponse<Object>, String> function) {
+	public void registerServiceMessageCreator(String procedureName, String topic, BiFunction<Table, ResponseEntity<Object>, String> function) {
 		if (serviceMessageCreators.containsKey(procedureName)) {
 			throw new IllegalArgumentException();
 		} else if (serviceMessageCreators.get(procedureName).containsKey(topic)) {
 			throw new IllegalArgumentException();
 		}
-		Map<String, BiFunction<Table, HttpResponse<Object>, String>> functions = new HashMap<>();
+		Map<String, BiFunction<Table, ResponseEntity<Object>, String>> functions = new HashMap<>();
 		functions.put(topic, function);
 		serviceMessageCreators.put(procedureName, functions);
 	}
@@ -149,16 +148,16 @@ public class QueueService implements BiConsumer<Table, HttpResponse<Object>> {
 	 * Speichert eine Nachricht in der Datenbank, welche beim nächsten Intervall verschickt wird.
 	 */
 	@Override
-	public void accept(Table t, HttpResponse<Object> u) {
+	public void accept(Table t, ResponseEntity<Object> u) {
 
 		if (t instanceof Table && u instanceof ResponseEntity) {
 
-			Map<String, BiFunction<Table, HttpResponse<Object>, String>> applyableFunctions = serviceMessageCreators.get(t.getName());
+			Map<String, BiFunction<Table, ResponseEntity<Object>, String>> applyableFunctions = serviceMessageCreators.get(t.getName());
 
 			if (applyableFunctions != null) {
 
 				// Wenn eine Prozedur ausgeführt wurde, müssen Nachrichten für alle betroffenen Dienste generiert werden.
-				for (Map.Entry<String, BiFunction<Table, HttpResponse<Object>, String>> entry : applyableFunctions.entrySet()) {
+				for (Map.Entry<String, BiFunction<Table, ResponseEntity<Object>, String>> entry : applyableFunctions.entrySet()) {
 
 					String message = entry.getValue().apply(t, u).toString();
 					saveMessage(message, t.getName(), entry.getKey());

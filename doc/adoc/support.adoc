@@ -88,3 +88,16 @@ Wenn dieser Fehler auftritt, ist beim Bau/Release aus irgendwelchen Gründen die
 Ein häufiger Fehler ist es, dass bei einen Release nicht alles zusammen released wurde,
 sondern nur das App-Projekt veröffentlicht wurde,
 wodurch die Extension-Jar  im App-Projekt fehlt.
+
+## NoSuchBeanException
+
+### Für RestTemplate
+
+Im cas.api Projekt gibt es bereits eine Konfigurationsklasse für RestTemplates.
+Falls in einer Extension ein RestTemplate gebraucht wird, einfach mit `RestTemplate template = new RestTemplate();` initialisieren und *nicht* autowiren!
+
+### Für Gson
+
+Im cas.api Projekt wird ebenfalls die Gson-Klasse initialisiert und mit Serializer und Deserializer versehen.
+Wird ein Gson-Objekt in einer Klasse gebraucht, kann dieses durch `ClientRestAPI crapi = new ClientRestAPI(); CASRestAPI Gson gson = CASRestAPI.gson();` geholt werden. 
+Auch hier darf das Gson-Objekt *nicht* mit der Annotation `@Autowired` versehen werden

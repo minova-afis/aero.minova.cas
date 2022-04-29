@@ -28,6 +28,10 @@
 > Jetzt kann ich meinen Tee endlich in Ruhe geniessen!
 -- Tee abhängiger Entwickler
 
++
++
++
+
 ## Deadlock auf der SQL-Datenbank
 
 1. Herausfinden welche SQl-Sessions einen Deadlock verursachen.

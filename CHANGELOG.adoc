@@ -8,7 +8,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 #281: Logs aus Tests in den target-Ordner schreiben,
 damit diese nicht ausversehen commited werden.
 
-## [12.41.2] - 2022-04-29
+## [12.41.2 - 12.41.3] - 2022-04-29
 
 Kompatibilitäts-Projekt `aero.monova.core.application.system.app` erstellen,
 um einen Setup-Fehler zu beheben zu können.

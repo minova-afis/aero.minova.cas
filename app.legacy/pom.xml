@@ -16,7 +16,7 @@
         <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>cas.app</artifactId>
-            <version>12.41.1</version>
+            <version>12.41.2</version>
             <classifier>app</classifier>
         </dependency>
     </dependencies>

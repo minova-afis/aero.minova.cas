@@ -78,3 +78,13 @@ In diesem Fall sollte man die Logs des CAS nach dem Wort `Exception` absuchen.
 Läuft das CAS lokal in einem Docker-Container,
 kann in der Docker-GUI über einen Klick auf den betroffenen Container das Log angeschaut werden.
 Dort ist es auch eine Wortsuche möglich.
+
+## Jar von Abhängigkeit fehlt.
+
+In App-Projekten sind unter `src/main/app/extensions` und `traget/extension` (wird durch Maven und die POM reinkopiert) zusätzliche Jars für das CAS enthalten.
+Bei solchen Projekten gibt es in der Regel ein app und ein server Unterprojekt.
+
+Wenn dieser Fehler auftritt, ist beim Bau/Release aus irgendwelchen Gründen die server Jar nicht in die app Jar kopiert worden.
+Ein häufiger Fehler ist es, dass bei einen Release nicht alles zusammen released wurde,
+sondern nur das App-Projekt veröffentlicht wurde,
+wodurch die Extension-Jar  im App-Projekt fehlt.

@@ -1,5 +1,4 @@
-Asciidoc cheatsheet for GitHub
-==============================
+# Symptome, deren Ursachen und Lösungen für das CAS
 :toc:
 :toc-placement: preamble
 :toclevels: 1
@@ -8,8 +7,6 @@ Asciidoc cheatsheet for GitHub
 
 // Need some preamble to get TOC:
 {empty}
-
-# Symptome, deren Ursachen und Lösungen für das CAS
 
 > Ich hatte schon befürchtet,
 > dass es keine Fortführung geben wird.

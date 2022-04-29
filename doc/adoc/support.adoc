@@ -28,9 +28,9 @@
 > Jetzt kann ich meinen Tee endlich in Ruhe geniessen!
 -- Tee abhängiger Entwickler
 
- +
- +
- +
+ {nbsp} +
+ {nbsp} +
+ {nbsp} +
 
 ## Deadlock auf der SQL-Datenbank
 

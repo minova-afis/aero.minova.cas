@@ -23,6 +23,9 @@
 :toc-placement: preamble
 :toclevels: 1
 :showtitle:
+// Need some preamble to get TOC:
+{empty}
+
 
 ## Deadlock auf der SQL-Datenbank
 

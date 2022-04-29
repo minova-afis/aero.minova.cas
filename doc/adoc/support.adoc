@@ -79,7 +79,7 @@ Läuft das CAS lokal in einem Docker-Container,
 kann in der Docker-GUI über einen Klick auf den betroffenen Container das Log angeschaut werden.
 Dort ist es auch eine Wortsuche möglich.
 
-## Jar von Abhängigkeit fehlt.
+## ClassNotFoundException? - Jar von Abhängigkeit fehlt.
 
 In App-Projekten sind unter `src/main/app/extensions` und `traget/extension` (wird durch Maven und die POM reinkopiert) zusätzliche Jars für das CAS enthalten.
 Bei solchen Projekten gibt es in der Regel ein app und ein server Unterprojekt.

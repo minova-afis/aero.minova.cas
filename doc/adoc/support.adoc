@@ -20,6 +20,9 @@
 -- Tee abhängiger Entwickler
 
 :toc:
+:toc-placement: preamble
+:toclevels: 1
+:showtitle:
 
 ## Deadlock auf der SQL-Datenbank
 

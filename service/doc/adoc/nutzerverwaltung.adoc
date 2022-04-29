@@ -20,10 +20,15 @@ Ist die Property auf 'ldap' gesetzt, werden die Anmeldeinformationen des AD-Benu
 Damit die AD-Gruppen des Users genutzt werden können, müssen diese in der Datenbank in der *xtcasUserGroup* Tabelle abgebildet werden. 
 Hat man die Gruppen erstellt müssen diese dann mit den Privilegien aus der *xtcasUserPrivilege* Tabelle über die *xtcasLuUserPrivilegeUserGroup* Tabelle verknüpft werden.
 
+Folgende properties müssen gesetzt werden:
+
+* `security_ldap_domain`: Domain der Nutzer
+* `security_ldap_address`: URL des LDAP bzw. Active Directory (AD) Server
 
 === database
-Ist die Porperty auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
-Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt. Das Passwort kann mit der Klasse *PasswordEncrypter* in *aero.minova.cas.service* verschlüsselt werden.
+Ist die Property auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
+Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt.
+Das Passwort kann mit der Klasse *PasswordEncrypter* in *aero.minova.cas.service* verschlüsselt werden.
 
 Wie bei dem 'ldap'-Modus muss man hier auch die *xtcasUserGroup*, die *xtcasUserPrivilege* und die *xtcasLuUserPrivilegeUserGroup* Tabellen füllen und miteinander verknüpfen.
 

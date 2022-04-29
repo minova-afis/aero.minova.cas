@@ -9,6 +9,8 @@
 * xref:./../../../setup/doc/adoc/setup.adoc#[Setup Service]
 * xref:./../../../servicenotifier/doc/adoc/index.adoc#[ServiceNotifier Service]
 * xref:queueservice.adoc#[Queue Service]
+* xref:sql-integrated-security.adoc#[Integrierte Sicherheit für SQL-Anmeldung]
+
 
 == Sicherheitskonzept
 * xref:security.adoc#[Sicherheitsmechanismen]

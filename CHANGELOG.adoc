@@ -8,6 +8,13 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 #281: Logs aus Tests in den target-Ordner schreiben,
 damit diese nicht ausversehen commited werden.
 
+## [12.41.2] - 2022-04-29
+
+Kompatibilitäts-Projekt `aero.monova.core.application.system.app` erstellen,
+um einen Setup-Fehler zu beheben zu können.
+
+Siehe das link:doc/adoc/support.adoc[Support-Dokument] and link:app.legacy/README.adoc[Kompatibilitäts-Projekts-README] für Details.
+
 ## [12.41.1] - 2022-04-25
 IsTablePresent-Methode public setzen.
 Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.

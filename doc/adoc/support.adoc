@@ -38,8 +38,36 @@
 
 ## setup-Befehl hat einen Fehler.
 
+### 0815-Lösung
+
 Manchmal löst man das Problem indem man eine neue leere Datenbank dafür verwendet,
 anstatt eine bereits vorhanden (`create database <name>`).
+
+### `aero.minova.core.application.system.app.setup.xml` nicht gefunden.
+
+Die Fehlermeldung ist:
+```
+"message": "java.lang.RuntimeException: java.lang.RuntimeException: java.nio.file.NoSuchFileException: No setup file found with the name aero.minova.core.application.system.app.setup.xml",
+```
+
+Der Fehler ist, dass das veraltete `core.application.system.app` verwendet wird.
+Eigentlich müsste diese Abhängigkeit durch `cas.app` ersetzt werden,
+was allerdings zeitaufwendig ist (link:https://github.com/minova-afis/aero.minova.cas/issues/296[Ticket]).
+Als Hotfix kann die `core.application.system.app`-Version auf `12.42.0` gesetzt werden.
+Entweder ist `core.application.system.app` in der betroffenen Version direkt als Abhängigkeit gelistet und
+braucht nur aktualisiert zu werden,
+oder die Abhängigkeit wird indirekt eingeführt.
+In dem zweiten Fall muss folgende Abhängigkeit hinzugefügt werden.
+Siehe link:../../app.legacy/README.adoc[hier] für Details
+
+```
+<dependency>
+    <groupId>aero.minova</groupId>
+    <artifactId>core.application.system.app</artifactId>
+    <version>12.42.0</version>
+    <classifier>app</classifier>
+</dependency>
+```
 
 ## Prozedur, View oder anderes SQL-Objekt fehlt nach Setup.
 

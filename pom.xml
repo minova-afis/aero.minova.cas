@@ -19,11 +19,12 @@
         <tag>v12.40.2</tag>
     </scm>
     <modules>
-        <module>service</module>
+        <module>api</module>
         <module>app</module>
-		<module>setup</module>
-		<module>api</module>
+        <module>app.legacy</module>
+        <module>service</module>
 		<module>servicenotifier</module>
+        <module>setup</module>
     </modules>
     <repositories>
         <repository>

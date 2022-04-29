@@ -1,3 +1,12 @@
+:toc:
+:toc-placement: preamble
+:toclevels: 1
+:showtitle:
+:Some attr: Some value
+
+// Need some preamble to get TOC:
+{empty}
+
 # Symptome, deren Ursachen und Lösungen für das CAS
 
 > Ich hatte schon befürchtet,
@@ -18,17 +27,6 @@
 > es funktioniert!
 > Jetzt kann ich meinen Tee endlich in Ruhe geniessen!
 -- Tee abhängiger Entwickler
-
-:toc:
-:toc-placement: preamble
-:toclevels: 1
-:showtitle:
-:Some attr: Some value
-
-// Need some preamble to get TOC:
-{empty}
-
-
 
 ## Deadlock auf der SQL-Datenbank
 

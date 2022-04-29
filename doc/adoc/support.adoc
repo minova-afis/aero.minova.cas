@@ -38,8 +38,36 @@
 
 ## setup-Befehl hat einen Fehler.
 
+### 0815-Lösung
+
 Manchmal löst man das Problem indem man eine neue leere Datenbank dafür verwendet,
 anstatt eine bereits vorhanden (`create database <name>`).
+
+### `aero.minova.core.application.system.app.setup.xml` nicht gefunden.
+
+Die Fehlermeldung ist:
+```
+"message": "java.lang.RuntimeException: java.lang.RuntimeException: java.nio.file.NoSuchFileException: No setup file found with the name aero.minova.core.application.system.app.setup.xml",
+```
+
+Der Fehler ist, dass das veraltete `core.application.system.app` verwendet wird.
+Eigentlich müsste diese Abhängigkeit durch `cas.app` ersetzt werden,
+was allerdings zeitaufwendig ist (link:https://github.com/minova-afis/aero.minova.cas/issues/296[Ticket]).
+Als Hotfix kann die `core.application.system.app`-Version auf `12.42.0` gesetzt werden.
+Entweder ist `core.application.system.app` in der betroffenen Version direkt als Abhängigkeit gelistet und
+braucht nur aktualisiert zu werden,
+oder die Abhängigkeit wird indirekt eingeführt.
+In dem zweiten Fall muss folgende Abhängigkeit hinzugefügt werden.
+Siehe link:../../app.legacy/README.adoc[hier] für Details
+
+```
+<dependency>
+    <groupId>aero.minova</groupId>
+    <artifactId>core.application.system.app</artifactId>
+    <version>12.42.0</version>
+    <classifier>app</classifier>
+</dependency>
+```
 
 ## Prozedur, View oder anderes SQL-Objekt fehlt nach Setup.
 
@@ -50,3 +78,13 @@ In diesem Fall sollte man die Logs des CAS nach dem Wort `Exception` absuchen.
 Läuft das CAS lokal in einem Docker-Container,
 kann in der Docker-GUI über einen Klick auf den betroffenen Container das Log angeschaut werden.
 Dort ist es auch eine Wortsuche möglich.
+
+## Jar von Abhängigkeit fehlt.
+
+In App-Projekten sind unter `src/main/app/extensions` und `traget/extension` (wird durch Maven und die POM reinkopiert) zusätzliche Jars für das CAS enthalten.
+Bei solchen Projekten gibt es in der Regel ein app und ein server Unterprojekt.
+
+Wenn dieser Fehler auftritt, ist beim Bau/Release aus irgendwelchen Gründen die server Jar nicht in die app Jar kopiert worden.
+Ein häufiger Fehler ist es, dass bei einen Release nicht alles zusammen released wurde,
+sondern nur das App-Projekt veröffentlicht wurde,
+wodurch die Extension-Jar  im App-Projekt fehlt.

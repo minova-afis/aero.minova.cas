@@ -1,0 +1,32 @@
+# Legacy CAS-App
+
+Dieses Kundenprojekt stellt die Kompatibilität zwischen dem alten und den neuen Projektnamen her.
+Früher waren die IDs vom CAS `aero.minova.core.application.system.*`
+und wurde dann nach `aero.minova.cas.*` umbenannt,
+um die Projektnamensgebung zu vereinheitlichen.
+Allerdings haben noch einige App-Projekte `aero.minova.core.application.system.app` als Abhängigkeit eingetragen,
+was bei der Installation zu Fehlern führt:
+
+```
+"message": "java.lang.RuntimeException: java.lang.RuntimeException: java.nio.file.NoSuchFileException: No setup file found with the name aero.minova.core.application.system.app.setup.xml",
+```
+
+Um ein App-Projekt von dem alten CAS zum neuen CAS zu migrieren,
+müsste die `aero.minova.core.application.system.app` in jeder direkten und indirekten Abhängigkeit umbenannt werden.
+
+Um die Weiterentwicklung in der Zwischenzeit Aufrecht zu erhalten,
+wurde eine neue Version vom `aero.minova.core.application.system.app` erstellt,
+welches keinen Inhalt hat und nur eine Abhängigkeit nach `aero.minova.cas.app` enthält.
+Das legacy CAS-App ist dieses Projekt.
+Dadurch reicht es in Projekten mit der alten `aero.minova.core.application.system.app`-Abhängigkeiten,
+die Version von `aero.minova.core.application.system.app` explizit auf die letzte Version zu setzen,
+um das Projekt wieder installierbar zu machen:
+
+```
+<dependency>
+    <groupId>aero.minova</groupId>
+    <artifactId>core.application.system.app</artifactId>
+    <version>12.42.0</version>
+    <classifier>app</classifier>
+</dependency>
+```

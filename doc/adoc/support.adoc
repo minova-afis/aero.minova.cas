@@ -100,4 +100,4 @@ Falls in einer Extension ein RestTemplate gebraucht wird, einfach mit `RestTempl
 
 Im cas.api Projekt wird ebenfalls die Gson-Klasse initialisiert und mit Serializer und Deserializer versehen.
 Wird ein Gson-Objekt in einer Klasse gebraucht, kann dieses durch `ClientRestAPI crapi = new ClientRestAPI(); CASRestAPI Gson gson = CASRestAPI.gson();` geholt werden. 
-Auch hier darf das Gson-Objekt *nicht* mit der Annotation `@Autowired` versehen werden
+Auch hier darf das Gson-Objekt *nicht* mit der Annotation `@Autowired` versehen werden.

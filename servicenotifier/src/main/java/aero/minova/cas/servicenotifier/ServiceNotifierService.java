@@ -49,7 +49,7 @@ public class ServiceNotifierService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
 	private void setup() {
-		spc.registerExtension("registerService", inputTable -> {
+		spc.registerExtension("xpcasRegisterService", inputTable -> {
 			try {
 				int keyLong = registerService(inputTable);
 				return new ResponseEntity(keyLong, HttpStatus.ACCEPTED);
@@ -57,7 +57,7 @@ public class ServiceNotifierService {
 				throw new RuntimeException(e);
 			}
 		});
-		spc.registerExtension("unregisterService", inputTable -> {
+		spc.registerExtension("xpcasUnregisterService", inputTable -> {
 			try {
 				unregisterService(inputTable);
 				return new ResponseEntity(HttpStatus.ACCEPTED);
@@ -65,7 +65,7 @@ public class ServiceNotifierService {
 				throw new RuntimeException(e);
 			}
 		});
-		spc.registerExtension("registerProcedureNewsfeed", inputTable -> {
+		spc.registerExtension("xpcasRegisterProcedureNewsfeed", inputTable -> {
 			try {
 				registerProcedureNewsfeed(inputTable);
 				return new ResponseEntity(HttpStatus.ACCEPTED);
@@ -73,7 +73,7 @@ public class ServiceNotifierService {
 				throw new RuntimeException(e);
 			}
 		});
-		spc.registerExtension("unregisterProcedureNewsfeed", inputTable -> {
+		spc.registerExtension("xpcasUnregisterProcedureNewsfeed", inputTable -> {
 			try {
 				unregisterProcedureNewsfeed(inputTable);
 				return new ResponseEntity(HttpStatus.ACCEPTED);
@@ -81,7 +81,7 @@ public class ServiceNotifierService {
 				throw new RuntimeException(e);
 			}
 		});
-		spc.registerExtension("unregisterProcedureNewsfeedCompletely", inputTable -> {
+		spc.registerExtension("xpcasUnregisterProcedureNewsfeedCompletely", inputTable -> {
 			try {
 				unregisterProcedureNewsfeedCompletely(inputTable);
 				return new ResponseEntity(HttpStatus.ACCEPTED);
@@ -89,7 +89,7 @@ public class ServiceNotifierService {
 				throw new RuntimeException(e);
 			}
 		});
-		spc.registerExtension("registerNewsfeedListener", inputTable -> {
+		spc.registerExtension("xpcasRegisterNewsfeedListener", inputTable -> {
 			try {
 				registerNewsfeedListener(inputTable);
 				return new ResponseEntity(HttpStatus.ACCEPTED);
@@ -97,7 +97,7 @@ public class ServiceNotifierService {
 				throw new RuntimeException(e);
 			}
 		});
-		spc.registerExtension("unregisterNewsfeedListener", inputTable -> {
+		spc.registerExtension("xpcasUnregisterNewsfeedListener", inputTable -> {
 			try {
 				unregisterNewsfeedListener(inputTable);
 				return new ResponseEntity(HttpStatus.ACCEPTED);

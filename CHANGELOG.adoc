@@ -7,7 +7,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 #281: Logs aus Tests in den target-Ordner schreiben,
 damit diese nicht ausversehen commited werden.
-Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste.
+Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste implementieren.
 
 ## [12.41.1] - 2022-04-25
 IsTablePresent-Methode public setzen.

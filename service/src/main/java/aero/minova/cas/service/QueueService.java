@@ -135,11 +135,11 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				// Versuche die Nachricht an den Dienst zu verschicken.
 				boolean sendSuccessfull = sendMessage(pendingMessage);
 				if (sendSuccessfull) {
-					safeAsSent(pendingMessage);
+					safeAsSent(true, pendingMessage);
 				} else {
+					safeAsSent(false, pendingMessage);
 					logger.logQueueService(pendingMessage.getValues().get(1).getStringValue() + " is not reachable!");
 				}
-				increaseAttempts(pendingMessage);
 			}
 		}
 	}
@@ -152,12 +152,12 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		if (t instanceof Table && u instanceof ResponseEntity) {
 
-			Map<String, BiFunction<Table, ResponseEntity<Object>, String>> applyableFunctions = serviceMessageCreators.get(t.getName());
+			Map<String, BiFunction<Table, ResponseEntity<Object>, String>> topicSpecificMessages = serviceMessageCreators.get(t.getName());
 
-			if (applyableFunctions != null) {
+			if (topicSpecificMessages != null) {
 
 				// Wenn eine Prozedur ausgeführt wurde, müssen Nachrichten für alle betroffenen Dienste generiert werden.
-				for (Map.Entry<String, BiFunction<Table, ResponseEntity<Object>, String>> entry : applyableFunctions.entrySet()) {
+				for (Map.Entry<String, BiFunction<Table, ResponseEntity<Object>, String>> entry : topicSpecificMessages.entrySet()) {
 
 					String message = entry.getValue().apply(t, u).toString();
 					saveMessage(message, t.getName(), entry.getKey());
@@ -168,7 +168,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	}
 
 	/**
-	 * Speichert eine Nachricht für einen Service.
+	 * Speichert eine Nachricht für einen Topic.
 	 * 
 	 * @param message
 	 *            Die Nachricht, die gespeichert werden soll.
@@ -194,7 +194,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			setSent.addRow(setSentRow);
 			try {
-				logger.logQueueService("Saving message '" + message + "'");
+				logger.logQueueService("Saving message for " + topic + " because of " + procedureName + ": " + message + "'");
 				spc.unsecurelyProcessProcedure(setSent);
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
@@ -227,38 +227,6 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			logger.logError("The message with key " + pendingMessage.getValues().get(4).getIntegerValue() + " could not be deleted!", e);
 			throw new RuntimeException(e);
 		}
-	}
-
-	/**
-	 * Erhöht die NumberOfAttempts der übergebenen Nachricht.
-	 * 
-	 * @param pendingMessages
-	 *            Eine Row mit den Übergabeparamtern:CASServiceKey, CASServiceName, ServiceURL, Port, MessageKey, Message, isSent, NumberOfAttempts,
-	 *            MessageCreationDate
-	 */
-	private void increaseAttempts(Row pendingMessages) {
-		int attempts = pendingMessages.getValues().get(7).getIntegerValue() + 1;
-
-		Table setSent = new Table();
-		setSent.setName("xpcasUpdateServiceMessage");
-		setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
-		setSent.addColumn(new Column("isSent", DataType.BOOLEAN));
-		setSent.addColumn(new Column("NumberOfAttempts", DataType.INTEGER));
-
-		Row setSentRow = new Row();
-		setSentRow.addValue(pendingMessages.getValues().get(4));
-		setSentRow.addValue(pendingMessages.getValues().get(6));
-		setSentRow.addValue(new Value(attempts, null));
-
-		setSent.addRow(setSentRow);
-		try {
-			spc.unsecurelyProcessProcedure(setSent);
-		} catch (Exception e) {
-			logger.logError("Number of attempts could not be increased for message with key: " + pendingMessages.getValues().get(4).getIntegerValue(), e);
-			throw new RuntimeException(e);
-		}
-		logger.logQueueService("The message with key " + pendingMessages.getValues().get(4).getIntegerValue()
-				+ " could not be send! Number of attempts is increased to " + attempts);
 	}
 
 	/**
@@ -327,12 +295,16 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	}
 
 	/**
-	 * Speichert eine Nachricht als 'isSent' in der Datenbank.
+	 * Speichert den Status einer Nachricht als 'isSent' in der Datenbank. Erhöht gleichzeitig auch die NumberOfAttempts.
 	 * 
+	 * @param isSent
+	 *            True, falls die Nachricht erfolgreich versandt wurde. False, wenn nicht.
 	 * @param nextMessage
 	 *            Eine Row, bei welcher der KeyLong der Nachricht an 5. Stelle und die NumberOfAttempts an 8.Stelle stehen.
 	 */
-	private void safeAsSent(Row nextMessage) {
+	private void safeAsSent(boolean isSent, Row nextMessage) {
+		int attempts = nextMessage.getValues().get(7).getIntegerValue() + 1;
+
 		Table setSent = new Table();
 		setSent.setName("xpcasUpdateServiceMessage");
 		setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
@@ -341,8 +313,8 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		Row setSentRow = new Row();
 		setSentRow.addValue(nextMessage.getValues().get(4));
-		setSentRow.addValue(new Value(true, null));
-		setSentRow.addValue(nextMessage.getValues().get(7));
+		setSentRow.addValue(new Value(isSent, null));
+		setSentRow.addValue(new Value(attempts, null));
 
 		setSent.addRow(setSentRow);
 		try {

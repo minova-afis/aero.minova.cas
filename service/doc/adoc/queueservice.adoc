@@ -1,0 +1,13 @@
+= QueueService
+
+Der QueueService speichert die Nachrichten, welche an andere Dienste versendet werden sollen und schickt diese dann.
+
+Selbst wenn das CAS neu gestartet wird, wenn Nachrichten noch in der Queue sind, gehen diese *nicht* verloren und werden nach dem Start beim nächsten Intervall versandt.
+
+Um dies zu ermöglichen, werden alle benötigten Daten in der Tabelle xtcasServiceMessage gespeichert. 
+Nachdem sie versendet wurden, werden die Nachrichten wieder gelöscht.
+
+Der QueueService versucht in einem zeitlichen Abstand von 1 Minute, welcher auch selbst in den application.properties gesetzt werden kann, eine Nachricht zu verschicken. Die dazugehörige Property heißt *aero.minova.check.message.intervall*.
+
+Desweiteren werden Nachrichten gelöscht, welche entweder zu alt (standartmäßig älter als 7 Tage) sind oder zu oft versucht wurden zu verschicken (standartmäßig 10 Versuche).
+Die dafür interessanten Propterties sind *aero.minova.number.of.attempts* und *aero.minova.message.age*.

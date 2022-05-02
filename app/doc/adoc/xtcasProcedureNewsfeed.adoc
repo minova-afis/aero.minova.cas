@@ -25,13 +25,13 @@ Datentyp: nvarchar(50) not null +
 // end::column.KeyText[]
 
 
-==== TableName
+==== Topic
 
 Datentyp: nvarchar(50) not null +
 
-// tag::column.TableName[]
+// tag::column.Topic[]
 
-// end::column.TableName[]
+// end::column.Topic[]
 
 
 ==== LastUser

@@ -35,6 +35,8 @@ public class CustomLogger {
 	// Log für Setup
 	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
 
+	public Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
+
 	private ClientRestAPI crapi = new ClientRestAPI();
 
 	Gson gson = crapi.gson();
@@ -95,6 +97,10 @@ public class CustomLogger {
 
 	public void logSetup(String logMessage) {
 		setupLogger.info("CAS " + logMessage);
+	}
+
+	public void logQueueService(String logMessage) {
+		queueServiceLog.info("CAS " + logMessage);
 	}
 
 	/**

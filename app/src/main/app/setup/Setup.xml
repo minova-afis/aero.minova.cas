@@ -47,6 +47,10 @@
 		<script name="xpcasDeleteProcedureNewsfeed" type="procedure"/>
 		<script name="xpcasInsertNewsfeedListener" type="procedure"/>
 		<script name="xpcasDeleteNewsfeedListener" type="procedure"/>
+		<script name="xpcasDeleteServiceMessage" type="procedure"/>
+		<script name="xpcasInsertServiceMessage" type="procedure"/>
+		<script name="xpcasReadServiceMessage" type="procedure"/>
+		<script name="xpcasUpdateServiceMessage" type="procedure"/>
 	</sql-code>
 	<schema>
 		<tableschema name="xtcasError" type="table"/>
@@ -60,5 +64,6 @@
 		<tableschema name="xtcasCASServices" type="table"/>
 		<tableschema name="xtcasProcedureNewsfeed" type="table"/>
 		<tableschema name="xtcasNewsfeedListener" type="table"/>
+		<tableschema name="xtcasServiceMessage" type="table"/>
 	</schema>
 </setup>

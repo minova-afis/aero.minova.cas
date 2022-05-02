@@ -54,6 +54,11 @@
     
     
         
+* link:xtcasServiceMessage.adoc[]
+
+    
+    
+        
 * link:xtcasError.adoc[]
 
     

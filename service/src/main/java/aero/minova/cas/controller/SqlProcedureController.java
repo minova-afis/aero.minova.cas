@@ -36,6 +36,7 @@ import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
@@ -54,6 +55,9 @@ public class SqlProcedureController {
 
 	@Autowired
 	SecurityService securityService;
+
+	@Autowired
+	QueueService queueService;
 
 	final Object extensionSynchronizer = new Object();
 
@@ -178,14 +182,17 @@ public class SqlProcedureController {
 			}
 			if (extensions.containsKey(inputTable.getName())) {
 				synchronized (extensionSynchronizer) {
-					return extensions.get(inputTable.getName()).apply(inputTable);
+					val extResult = extensions.get(inputTable.getName()).apply(inputTable);
+					queueService.accept(inputTable, extResult);
+					return extResult;
 				}
 			}
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}
-			val result = processSqlProcedureRequest(inputTable, privilegeRequest);
-			return new ResponseEntity(result, HttpStatus.ACCEPTED);
+			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
+			queueService.accept(inputTable, result);
+			return result;
 		} catch (Throwable e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
 

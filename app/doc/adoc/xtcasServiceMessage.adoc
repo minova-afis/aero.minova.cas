@@ -1,6 +1,6 @@
 
 
-== Tabelle xtcasCASServices ()
+== Tabelle xtcasServiceMessage ()
 
 
 === Spalten
@@ -16,31 +16,50 @@ Datentyp: integer (identity) not null +
 // end::column.KeyLong[]
 
 
-==== KeyText
-
-Datentyp: nvarchar(50) not null +
-
-// tag::column.KeyText[]
-
-// end::column.KeyText[]
-
-
-==== ServiceURL
-
-Datentyp: nvarchar(50) not null +
-
-// tag::column.ServiceURL[]
-
-// end::column.ServiceURL[]
-
-
-==== Port
+==== CASServiceKey
 
 Datentyp: integer not null +
 
-// tag::column.Port[]
+// tag::column.CASServiceKey[]
 
-// end::column.Port[]
+// end::column.CASServiceKey[]
+
+
+==== Message
+
+Datentyp: nvarchar(1024) +
+
+// tag::column.Message[]
+
+// end::column.Message[]
+
+
+==== IsSent
+
+Datentyp: bit not null +
+
+// tag::column.IsSent[]
+
+// end::column.IsSent[]
+
+
+==== NumberOfAttempts
+
+Datentyp: integer not null +
+Default: `0` +
+
+// tag::column.NumberOfAttempts[]
+
+// end::column.NumberOfAttempts[]
+
+
+==== MessageCreationDate
+
+Datentyp: datetime not null +
+
+// tag::column.MessageCreationDate[]
+
+// end::column.MessageCreationDate[]
 
 
 ==== LastUser

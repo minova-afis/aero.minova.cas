@@ -4,7 +4,7 @@
     "name" : "spInsertItem",
     "columns" : [ {
       "name" : "KeyLong",
-      "type" : "INTEGER"
+      "type" : "INTEGER",
       "outputType" : "OUTPUT"
     }, {
       "name" : "KeyText",
@@ -23,7 +23,7 @@
     "name" : "opInsertItemDensity",
     "columns" : [ {
       "name" : "ItemKey",
-      "type" : "INTEGER",
+      "type" : "INTEGER"
     }, {
       "name" : "DefaultDensity",
       "type" : "DOUBLE"

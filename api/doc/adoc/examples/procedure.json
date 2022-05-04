@@ -10,7 +10,7 @@
     "name" : "ServiceContractKey",
     "type" : "INTEGER"
   }, {
-    "name" : "OrderReceiverrKey",
+    "name" : "OrderReceiverKey",
     "type" : "INTEGER"
   }, {
     "name" : "ServiceObjectKey",

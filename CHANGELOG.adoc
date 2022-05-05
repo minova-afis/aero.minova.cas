@@ -4,13 +4,18 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [Unreleased]
+
+## [12.43.0 ] - 2022-05-05
 registerServiceMessage-Methode im QueueService korrigieren.
+
 #299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
+
+#302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
 
 ## [12.42.0 ] - 2022-05-02
 #281: Logs aus Tests in den target-Ordner schreiben, damit diese nicht ausversehen commited werden.
+
 Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste implementieren.
-#302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
 
 ## [12.41.2 - 12.41.3] - 2022-04-29
 

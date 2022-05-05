@@ -10,8 +10,7 @@ import java.time.ZonedDateTime;
  *
  * @author avots
  */
-public class Value
-        implements Serializable {
+public class Value implements Serializable {
 	private static final long serialVersionUID = 202106161639L;
 	private DataType type;
 	private Object value;
@@ -32,7 +31,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( Integer integerValue, String rule) {
+	public Value(Integer integerValue, String rule) {
 		type = DataType.INTEGER;
 		this.rule = rule;
 		setValue(integerValue);
@@ -46,7 +45,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( Long longValue, String rule) {
+	public Value(Long longValue, String rule) {
 		type = DataType.LONG;
 		this.rule = rule;
 		setValue(longValue);
@@ -57,7 +56,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( Boolean booleanValue, String rule) {
+	public Value(Boolean booleanValue, String rule) {
 		type = DataType.BOOLEAN;
 		this.rule = rule;
 		setValue(booleanValue);
@@ -71,7 +70,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( Double doubleValue, String rule) {
+	public Value(Double doubleValue, String rule) {
 		type = DataType.DOUBLE;
 		this.rule = rule;
 		setValue(doubleValue);
@@ -85,7 +84,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( String stringValue, String rule) {
+	public Value(String stringValue, String rule) {
 		type = DataType.STRING;
 		this.rule = rule;
 		setValue(stringValue);
@@ -99,7 +98,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( Instant instantValue, String rule) {
+	public Value(Instant instantValue, String rule) {
 		type = DataType.INSTANT;
 		this.rule = rule;
 		setValue(instantValue);
@@ -113,7 +112,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( ZonedDateTime zonedDateTimeValue, String rule) {
+	public Value(ZonedDateTime zonedDateTimeValue, String rule) {
 		type = DataType.ZONED;
 		this.rule = rule;
 		setValue(zonedDateTimeValue);
@@ -127,7 +126,7 @@ public class Value
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */
-	public Value( BigDecimal decimalValue, String rule) {
+	public Value(BigDecimal decimalValue, String rule) {
 		type = DataType.BIGDECIMAL;
 		this.rule = rule;
 		setValue(decimalValue);

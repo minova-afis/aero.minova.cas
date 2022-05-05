@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 // Der ComponentScan wird verwendet, damit alle Minova Komponenten im classpath geladen werden.
 @SpringBootApplication
-@ComponentScan("aero.minova")
+@ComponentScan({ "aero.minova", "com.minova" })
 @EntityScan("aero.minova")
 @EnableJpaRepositories("aero.minova")
 @Configuration

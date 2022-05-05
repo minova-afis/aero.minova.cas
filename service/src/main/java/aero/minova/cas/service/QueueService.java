@@ -65,7 +65,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	public void registerServiceMessageCreator(String procedureName, String topic, BiFunction<Table, ResponseEntity<Object>, String> function) {
 		if (serviceMessageCreators.containsKey(procedureName) && serviceMessageCreators.get(procedureName).containsKey(topic)) {
 			throw new IllegalArgumentException("There is already a message creator registered for procedure and topic: " + procedureName + ", " + topic);
-		} else if (serviceMessageCreators.containsKey(procedureName)) {
+		} else if (!serviceMessageCreators.containsKey(procedureName)) {
 			Map<String, BiFunction<Table, ResponseEntity<Object>, String>> functions = new HashMap<>();
 			functions.put(topic, function);
 			serviceMessageCreators.put(procedureName, functions);

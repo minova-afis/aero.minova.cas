@@ -4,7 +4,7 @@
     "name" : "spInsertItem",
     "columns" : [ {
       "name" : "KeyLong",
-      "type" : "INTEGER"
+      "type" : "INTEGER",
       "outputType" : "OUTPUT"
     }, {
       "name" : "KeyText",
@@ -30,7 +30,7 @@
     "name" : "opInsertItemDensity",
     "columns" : [ {
       "name" : "ItemKey",
-      "type" : "INTEGER",
+      "type" : "INTEGER"
     }, {
       "name" : "DefaultDensity",
       "type" : "DOUBLE"
@@ -45,4 +45,4 @@
       "values" : [ "r-parent_call-2-KeyLong", "d-802.0", "d-800.0", "d-845.0" ]
     } ]
   }
-}
+}]

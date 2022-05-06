@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 
 /**
  * Der Wert kann auch null sein. Wenn dass nicht so wäre, könnten wir optionale Werte in einer {@link Table} nicht darstellen.
- * 
+ *
  * @author avots
  */
 public class Value implements Serializable {
@@ -17,7 +17,7 @@ public class Value implements Serializable {
 	private String rule;
 
 	/**
-	 * Der leere Konstruktor. Wird noramlerweise nicht verwendet. Wird aber benötigt, damit die Hauptklasse von Serializable erben kann.
+	 * Der leere Konstruktor. Wird normalerweise nicht verwendet. Wird aber benötigt, damit die Hauptklasse von Serializable erben kann.
 	 */
 	public Value() {
 
@@ -25,7 +25,7 @@ public class Value implements Serializable {
 
 	/**
 	 * Der Standard-Konstruktor für Integer-Values.
-	 * 
+	 *
 	 * @param integerValue
 	 *            Der Wert als Integer.
 	 * @param rule
@@ -39,7 +39,7 @@ public class Value implements Serializable {
 
 	/**
 	 * Der Standard-Konstruktor für Long-Values.
-	 * 
+	 *
 	 * @param longValue
 	 *            Der Wert als Long.
 	 * @param rule
@@ -64,7 +64,7 @@ public class Value implements Serializable {
 
 	/**
 	 * Der Standard-Konstruktor für Double-Values.
-	 * 
+	 *
 	 * @param doubleValue
 	 *            Der Wert als Double.
 	 * @param rule
@@ -78,7 +78,7 @@ public class Value implements Serializable {
 
 	/**
 	 * Der Standard-Konstruktor für String-Values.
-	 * 
+	 *
 	 * @param stringValue
 	 *            Der Wert als String.
 	 * @param rule
@@ -92,7 +92,7 @@ public class Value implements Serializable {
 
 	/**
 	 * Der Standard-Konstruktor für Instant-Values.
-	 * 
+	 *
 	 * @param instantValue
 	 *            Der Wert als Instant.
 	 * @param rule
@@ -106,7 +106,7 @@ public class Value implements Serializable {
 
 	/**
 	 * Der Standard-Konstruktor für ZonedDateTime-Values.
-	 * 
+	 *
 	 * @param zonedDateTimeValue
 	 *            Der Wert als ZonedDateTime.
 	 * @param rule
@@ -120,9 +120,9 @@ public class Value implements Serializable {
 
 	/**
 	 * Der Standard-Konstruktor für BigDecimal-Values. Wird für Money verwendet.
-	 * 
+	 *
 	 * @param decimalValue
-	 *            Der Wert als BigDecial.
+	 *            Der Wert als BigDecimal.
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
 	 */

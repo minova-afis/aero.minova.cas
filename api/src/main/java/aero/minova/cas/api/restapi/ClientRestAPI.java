@@ -53,7 +53,7 @@ public class ClientRestAPI {
 				.create();
 	}
 
-	public ClientRestAPI( String username, String password, String url) {
+	public ClientRestAPI(String username, String password, String url) {
 		this.username = username;
 		this.password = password;
 		this.url = url;

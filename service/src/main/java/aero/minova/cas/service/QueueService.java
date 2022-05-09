@@ -79,6 +79,14 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 */
 	@Scheduled(cron = "${aero.minova.check.message.intervall:0 * * * * *}")
 	private void sendQueueMessage() {
+		try {
+			if (securityService.isTablePresent("xvcasCASServiceMessage")) {
+
+			}
+		} catch (Exception e) {
+			logger.logError("Could not access database!", e);
+		}
+
 		// Es wird hier ein neuer SecurityContext benötigt, da sonst die Methode 'getUserContext im SqlProcedureController abbrechen würde.
 		SecurityContextHolder.getContext().setAuthentication(new Authentication() {
 

@@ -3,7 +3,6 @@
 	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
 	<sql-code>
 		<script name="xtcasAuthoritiesConstraints" type="script"/>
-		<script name="xfCasUser" type="function"/>
 		<script name="initDebug" type="script"/>
 		<script name="initVersionTable" type="script"/>
 		<script name="initVersionTable1" type="script"/>
@@ -13,6 +12,7 @@
 		<script name="spMinovaCheckFunction" type="procedure"/>
 		<script name="spMinovaCheckTable" type="procedure"/>
 		<script name="spMinovaCheckData" type="procedure"/>
+		<script name="xfCasUser" type="function"/>
 		<script name="xvcasUserPrivileges" type="view"/>
 		<script name="xpcasReadUser" type="procedure"/>
 		<script name="xpcasInsertUser" type="procedure"/>

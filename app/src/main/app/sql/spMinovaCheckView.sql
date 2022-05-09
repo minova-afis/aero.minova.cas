@@ -6,7 +6,7 @@ alter procedure spMinovaCheckView
 	@MinorVersion int,
 	@PatchLevel int,
 	@BuildNumber int,
-	@Dataname nvarchar(255) = dbo.xfCasUser()
+	@Dataname nvarchar(255) = null
 ) with encryption as
 SET NOCOUNT ON
 	if not exists (select * from tVersion10 where KeyText = @ViewName and ModuleName = @ModuleName)

@@ -41,7 +41,7 @@
 		<script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
 		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
 		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
-		<script name="xvcasCASServiceMessage" type="procedure"/>
+		<script name="xvcasCASServiceMessage" type="view"/>
 		<script name="xpcasInsertCASService" type="procedure"/>
 		<script name="xpcasDeleteCASService" type="procedure"/>
 		<script name="xpcasInsertProcedureNewsfeed" type="procedure"/>

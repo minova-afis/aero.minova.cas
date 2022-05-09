@@ -3,6 +3,7 @@
 	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
 	<sql-code>
 		<script name="xtcasAuthoritiesConstraints" type="script"/>
+		<script name="xfCasUser" type="function"/>
 		<script name="initDebug" type="script"/>
 		<script name="initVersionTable" type="script"/>
 		<script name="initVersionTable1" type="script"/>
@@ -13,7 +14,6 @@
 		<script name="spMinovaCheckTable" type="procedure"/>
 		<script name="spMinovaCheckData" type="procedure"/>
 		<script name="xvcasUserPrivileges" type="view"/>
-		<script name="xfCasUser" type="function"/>
 		<script name="xpcasReadUser" type="procedure"/>
 		<script name="xpcasInsertUser" type="procedure"/>
 		<script name="xpcasUpdateUser" type="procedure"/>
@@ -41,6 +41,7 @@
 		<script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
 		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
 		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
+		<script name="xvcasCASServiceMessage" type="procedure"/>
 		<script name="xpcasInsertCASService" type="procedure"/>
 		<script name="xpcasDeleteCASService" type="procedure"/>
 		<script name="xpcasInsertProcedureNewsfeed" type="procedure"/>

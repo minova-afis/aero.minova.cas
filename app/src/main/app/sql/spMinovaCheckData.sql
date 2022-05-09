@@ -7,6 +7,7 @@ alter procedure dbo.spMinovaCheckData (
 	@BuildNumber int,
 	@Dataname nvarchar(255) = null
 ) with encryption as
+SET NOCOUNT ON
 select @ProcedureName = 'DATA'
 	if not exists (select * from tVersion10 where Dataname = @Dataname and ModuleName = @ModuleName and KeyText = 'DATA')
 	begin

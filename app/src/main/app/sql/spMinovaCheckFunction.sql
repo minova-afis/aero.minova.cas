@@ -7,6 +7,7 @@ alter procedure spMinovaCheckFunction
 	@PatchLevel int,
 	@BuildNumber int
 ) with encryption as
+SET NOCOUNT ON
 	if not exists (select * from tVersion10 where KeyText = @FunctionName and ModuleName = @ModuleName)
 	begin
 		exec('create function dbo.' + @FunctionName + N'(@a int) returns int as begin return 0 end')

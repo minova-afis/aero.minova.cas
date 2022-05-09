@@ -8,6 +8,7 @@ alter procedure spMinovaCheckTable
 	@BuildNumber int,
 	@Dataname nvarchar(255) = null
 ) with encryption as
+SET NOCOUNT ON
 	if not exists (select * from tVersion10 where KeyText = @TableName and ModuleName = @ModuleName)
 	begin
 --		insert into tVersion10(KeyText, ModuleName, MajorVersion, MinorVersion, PatchLevel, BuildNumber) 

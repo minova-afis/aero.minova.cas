@@ -19,6 +19,7 @@
         <tag>v12.40.2</tag>
     </scm>
     <modules>
+        <module>dev</module>
         <module>api</module>
         <module>app</module>
         <module>app.legacy</module>

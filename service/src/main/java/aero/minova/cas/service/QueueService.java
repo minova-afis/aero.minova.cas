@@ -84,7 +84,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			}
 		} catch (Exception e) {
-			logger.logError("Could not access database!", e);
+			logger.logError("Could not find view xvcasCASServiceMessage. No messages will be send to registered services!", e);
 		}
 
 		// Es wird hier ein neuer SecurityContext benötigt, da sonst die Methode 'getUserContext im SqlProcedureController abbrechen würde.
@@ -203,7 +203,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			setSent.addRow(setSentRow);
 			try {
-				logger.logQueueService("Saving message for " + topic + " because of " + procedureName + ": " + message + "'");
+				logger.logQueueService("Saving message for " + topic + " because of " + procedureName + ": '" + message + "'");
 				spc.unsecurelyProcessProcedure(setSent);
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
@@ -273,7 +273,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		try {
 			unsendMessages = securityService.unsecurelyGetIndexView(messagesRequest);
 		} catch (Exception e) {
-			logger.logError("The QueueService could not access the view xvcasCASServiceMessage", e);
+			logger.logError("Could not read next message. The QueueService could not access the view " + messagesRequest.getName(), e);
 			throw new RuntimeException(e);
 		}
 		return unsendMessages;
@@ -290,12 +290,13 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	private boolean sendMessage(Row nextMessage) {
 		RestTemplate restTemplate = new RestTemplate();
 		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getIntegerValue();
+		String message = nextMessage.getValues().get(5).getStringValue();
 
-		HttpEntity<?> request = new HttpEntity<Object>(nextMessage.getValues().get(5));
+		HttpEntity<?> request = new HttpEntity<Object>(message);
 		logger.logQueueService("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
 		try {
+			logger.logQueueService("Sending message: " + message);
 			restTemplate.exchange(url + "/cas-event-listener", HttpMethod.POST, request, Void.class);
-			logger.logQueueService("Sending message: " + nextMessage.getValues().get(5));
 		} catch (Exception e) {
 			logger.logError("Could not send message to " + url, e);
 			return false;
@@ -329,7 +330,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		try {
 			spc.unsecurelyProcessProcedure(setSent);
 		} catch (Exception e) {
-			logger.logError("The message with key " + nextMessage.getValues().get(4).getStringValue() + " could not access view xvcasCASServiceMessage", e);
+			logger.logError("Could not update message with key " + nextMessage.getValues().get(4).getStringValue() + ".", e);
 			throw new RuntimeException(e);
 		}
 	}

@@ -5,6 +5,13 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased]
 
+#305 Keytext-Spalte der xtcasUserPrivilege-Tabelle vergrößern.
+
+Setup wieder durchfürbar machen.
+
+Falls ein Fehler während des Setups auftritt, wird nun die korrekte HTTPServletResponse zurückgegeben.
+
+
 ## [12.43.0 ] - 2022-05-05
 registerServiceMessage-Methode im QueueService korrigieren.
 

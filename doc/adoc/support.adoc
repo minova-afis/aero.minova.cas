@@ -32,6 +32,11 @@
 {empty} +
 {empty} +
 
+## Anmeldung funktioniert nicht mit WFC.
+
+1. Die Anmeldung über den Browser versuchen.
+2. CAS neustarten.
+
 ## Deadlock auf der SQL-Datenbank
 
 1. Herausfinden welche SQl-Sessions einen Deadlock verursachen.

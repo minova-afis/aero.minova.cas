@@ -14,7 +14,10 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 
 == Installation für Spezifische Umgebungen
 
-* Java spezifische Einstellungen sind im Projekt link:https://github.com/minova-afis/aero.minova.maven.root/blob/master/README.adoc[maven.root]
+* Generelle Java spezifische Einstellungen sind im Projekt link:https://github.com/minova-afis/aero.minova.maven.root/blob/master/README.adoc[maven.root]
+dokumentiert.
+* Generelle Spring Boot spezifische Einstellungen sind in den Projekten link:https://github.com/minova-afis/aero.minova.spring.maven.root/[spirng.maven.root]
+und link:https://github.com/minova-afis/aero.minova.spring.service/blob/master/doc/adoc/index.adoc[spring.services]
 dokumentiert.
 * Spezialfall: xref:installation.postgre.adoc[Postgre-Datenbank]
 Postgre wird allerdings nicht so gut wie MsSql unterstützt. Es unterstützt bisher lediglich die Rechteprüfung und Extensions.

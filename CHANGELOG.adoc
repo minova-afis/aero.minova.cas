@@ -4,8 +4,8 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [Unreleased]
-
 #299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
+#303 SpringBoot: /actuator ist auf dem Management-Port 8081 zu finden. Per Konfiguration `management.endpoints.enabled-by-default=false` sind alle weiteren Endpunkte deaktiviert.
 
 ## [12.42.0 ] - 2022-05-02
 #281: Logs aus Tests in den target-Ordner schreiben,

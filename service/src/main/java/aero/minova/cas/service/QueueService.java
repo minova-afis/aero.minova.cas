@@ -80,8 +80,8 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	@Scheduled(cron = "${aero.minova.check.message.intervall:0 * * * * *}")
 	private void sendQueueMessage() {
 		try {
-			if (securityService.isTablePresent("xvcasCASServiceMessage")) {
-
+			if (!securityService.isTablePresent("xvcasCASServiceMessage")) {
+				return;
 			}
 		} catch (Exception e) {
 			logger.logError("Could not find view xvcasCASServiceMessage. No messages will be send to registered services!", e);

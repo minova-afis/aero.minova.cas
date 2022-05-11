@@ -7,7 +7,8 @@ alter procedure dbo.spMinovaCheckData (
 	@BuildNumber int,
 	@Dataname nvarchar(255) = null
 ) with encryption as
-SET NOCOUNT ON
+
+SET NOCOUNT ON -- Verhindert, dass mehrere Ergebnisse zurückgegen werden. Ist vor allem ein Problem bei Pointern. 
 select @ProcedureName = 'DATA'
 	if not exists (select * from tVersion10 where Dataname = @Dataname and ModuleName = @ModuleName and KeyText = 'DATA')
 	begin

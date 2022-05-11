@@ -11,7 +11,7 @@ welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt we
 ** <<sql-server-und-datenbank-einrichten>>
 ** <<Datenbank-initialisieren>>
 * Dateisystem einbinden.
-* xref:./../../service/doc/adoc/security.adoc[Absicherung des Netzwerkes und der Daten]
+* xref:security.adoc[Absicherung des Netzwerkes und der Daten]
 
 == Installation für Spezifische Umgebungen
 

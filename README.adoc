@@ -28,7 +28,7 @@ Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereit
 * xref:./CHANGELOG.adoc#[Changelog]
 * xref:./api/doc/adoc/index.adoc#[CAS API]
 * xref:./service/doc/adoc/index.adoc#[CAS-Dienst]
-* xref:./doc/adoc/installation.adoc#[Installation]
+* xref:./service/doc/adoc/installation.adoc#[Installation]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 * xref:./doc/adoc/structure.adoc#[Strukturübersicht]
 * xref:./doc/adoc/support.adoc#[Symptome, deren Ursachen und Lösungen]

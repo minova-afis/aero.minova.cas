@@ -4,6 +4,19 @@ Es wird Java 11 und Maven benötigt.
 
 ## In Eclipse ausführen und debuggen.
 
+In Eclipse:
+
+* Repository runterladen: `git clone git@github.com:minova-afis/aero.minova.cas.git`
+* Repo als Maven-Projekt in Eclipse importieren.
+* Gesamtes Projekt bauen: `mvn clean verify`
+* Die `Java Application`-`Run Configuration` für die Klasse `aero.minova.cas.CoreApplicationSystemApplication` anlegen:
+** Als Ausführungspfad den lib-Ordner des Testsystems angeben (siehe später).
+** Unter Classpath auf `User Entries` klicken.
+Danach kann man über `Add Projects...` Extensions als Projekte hinzufügen.
+Diese werden dann bei der Ausführung mitgeladen.
+In der Regel braucht man dabei die `setup`-Extension,
+da man sonst keinen Setup-Befehl hat.
+
 Testsystem-Ordner einrichten:
 
 * Testsystem-Ordner erstellen.
@@ -19,20 +32,8 @@ logging_level_root=DEBUG
 aero_minova_core_application_root_path=<Testsystem-Ordner>/system-files
 ```
 * `<Testsystem-Ordner>/system-files` erstellen und mit Masken etc. füllen.
-
-
-In Eclipse:
-
-* Repository runterladen: `git clone git@github.com:minova-afis/aero.minova.cas.git`
-* Repo als Maven-Projekt in Eclipse importieren.
-* Gesamtes Projekt bauen: `mvn clean verify`
-* Die `Java Application`-`Run Configuration` für die Klasse `aero.minova.cas.CoreApplicationSystemApplication` anlegen:
-** Als Ausführungspfad den lib-Ordner des Testsystems angeben.
-** Unter Classpath auf `User Entries` klicken.
-Danach kann man über `Add Projects...` Extensions als Projekte hinzufügen.
-Diese werden dann bei der Ausführung mitgeladen.
-In der Regel braucht man dabei die `setup`-Extension,
-da man sonst keinen Setup-Befehl hat.
+Falls man nicht weiss, wass man reintun soll:
+`app/target/docker-layer` im Repo ist ein guter Anfang.
 
 ## Snapshot-Docker-Image lokal bauen und ausführen.
 

@@ -428,7 +428,7 @@ public class ServiceNotifierService {
 		Table viewTable = new Table();
 		viewTable.setName("xtcasCASServices");
 		viewTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		viewTable.addColumn(new Column("CASServiceName", DataType.STRING));
+		viewTable.addColumn(new Column("KeyText", DataType.STRING));
 
 		Row viewRow = new Row();
 		viewRow.addValue(null);
@@ -438,7 +438,7 @@ public class ServiceNotifierService {
 		try {
 			viewResult = securityService.unsecurelyGetIndexView(viewTable);
 		} catch (Exception e) {
-			logger.logError("Error while trying to access view xvcasCASServices!", e);
+			logger.logError("Error while trying to access view xtcasCASServices!", e);
 			throw new RuntimeException(e);
 		}
 		// Da die ServiceNamen eindeutig sein müssen, kann man beruhigt den ersten KeyLong zurückgeben, den man findet.

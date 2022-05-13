@@ -12,8 +12,8 @@
 		<script name="spMinovaCheckFunction" type="procedure"/>
 		<script name="spMinovaCheckTable" type="procedure"/>
 		<script name="spMinovaCheckData" type="procedure"/>
-		<script name="xvcasUserPrivileges" type="view"/>
 		<script name="xfCasUser" type="function"/>
+		<script name="xvcasUserPrivileges" type="view"/>
 		<script name="xpcasReadUser" type="procedure"/>
 		<script name="xpcasInsertUser" type="procedure"/>
 		<script name="xpcasUpdateUser" type="procedure"/>
@@ -40,7 +40,8 @@
 		<script name="xvcasUserPrivilegeIndex" type="view"/>
 		<script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
 		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
-		<script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
+		<script name="xvcasCASServiceMessage" type="view"/>
+		<script name="xvcasCASServices" type="view"/>
 		<script name="xpcasInsertCASService" type="procedure"/>
 		<script name="xpcasDeleteCASService" type="procedure"/>
 		<script name="xpcasInsertProcedureNewsfeed" type="procedure"/>

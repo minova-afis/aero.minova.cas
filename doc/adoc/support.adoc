@@ -32,6 +32,11 @@
 {empty} +
 {empty} +
 
+## Anmeldung funktioniert nicht mit WFC.
+
+1. Die Anmeldung über den Browser versuchen.
+2. CAS neustarten.
+
 ## Deadlock auf der SQL-Datenbank
 
 1. Herausfinden welche SQl-Sessions einen Deadlock verursachen.
@@ -94,13 +99,60 @@ Dort ist es auch eine Wortsuche möglich.
 
 ## ClassNotFoundException - Jar von Abhängigkeit fehlt.
 
-In App-Projekten sind unter `src/main/app/extensions` und `traget/extension` (wird durch Maven und die POM reinkopiert) zusätzliche Jars für das CAS enthalten.
-Bei solchen Projekten gibt es in der Regel ein app und ein server Unterprojekt.
+### Es wurde ein App-Projekt mit flaschen Release eingebunden.
+
+In App-Projekten sind unter `src/main/app/extensions` und `traget/extension`
+(wird durch Maven und die POM reinkopiert) zusätzliche Jars für das CAS enthalten.
+Bei solchen Projekten gibt es in der Regel ein app und ein server Unterprojekt (manchmal mehr).
 
 Wenn dieser Fehler auftritt, ist beim Bau/Release aus irgendwelchen Gründen die server Jar nicht in die app Jar kopiert worden.
 Ein häufiger Fehler ist es, dass bei einen Release nicht alles zusammen released wurde,
 sondern nur das App-Projekt veröffentlicht wurde,
 wodurch die Extension-Jar  im App-Projekt fehlt.
+
+Bei den Projekt `aero.minova.birt.report` bspw. gibt es eine Server und eine Model-Jar,
+welche in einem Release des App-Projektes gefehlt hat:
+
+```
+2022-05-11T12:25:43.319 Servlet.service() for servlet [dispatcherServlet] in context with path [/cas] threw exception [Request processing failed; nested exception is aero.minova.cas.api.domain.ProcedureException: java.lang.NoClassDefFoundError: aero/minova/BirtRequestParameter] with root cause
+java.lang.NoClassDefFoundError: aero/minova/BirtRequestParameter
+at aero.minova.birt.report.BirtReport.createOrReadBirtReport(BirtReport.java:215)
+at aero.minova.birt.report.BirtReport.lambda$setup$0(BirtReport.java:79)
+at aero.minova.cas.controller.SqlProcedureController.executeProcedure(SqlProcedureController.java:181)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+```
+
+Die betroffene Abhängigkeit muss aktualisiert werden.
+
+### Altes und neues CAS sind im lib-Verzeichnis gemischt.
+
+Das Project `aero.minova.cas` hies mal `aero.minova.core.application.system`.
+Es wurde umbenannt, da das Projekt primär unter CAS bekannt war und
+der Name somit irritierend war.
+Zudem war die Länge des Namens an einigen Stellen hinderlich.
+
+Falls im lib Ordner jar vom alten und vom neuen CAS vorhanden sind,
+zeigt sich dies häufig dadurch, dass die eine Klasse von `aero.minova.cas.*` nicht gefunden wird:
+
+```
+Caused by: java.lang.ClassNotFoundException: aero.minova.cas.api.domain.ProcedureException
+at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:581)
+at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:178)
+at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:522)
+... 19 common frames omitted
+```
+
+Es gibt mehrere Lösungen:
+
+* Das Kundenprojekt ist bereits in Ordnung:
+in diesem Fall kann man das Kundenprojekt komplett neu bauen und ausliefern.
+* Das Kundenprojekt hat selber gemischte Jars:
+in diesem Fall sollte man alle Abhängigkeiten auf den neuesten Stand bringen.
+* In der XML des Dienste Wrappers steht noch der alte Pfad:
+`<arguments>-cp "lib/*" aero.minova.core.application.system.CoreApplicationSystemApplication</arguments>`:
+In diesem Fall muss der Pfad aktualisiert werden:
+`<arguments>-cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>`
 
 ## NoSuchBeanException
 
@@ -114,3 +166,12 @@ Falls in einer Extension ein RestTemplate gebraucht wird, einfach mit `RestTempl
 Im cas.api Projekt wird ebenfalls die Gson-Klasse initialisiert und mit Serializer und Deserializer versehen.
 Wird ein Gson-Objekt in einer Klasse gebraucht, kann dieses durch `ClientRestAPI crapi = new ClientRestAPI(); CASRestAPI Gson gson = CASRestAPI.gson();` geholt werden. 
 Auch hier darf das Gson-Objekt *nicht* mit der Annotation `@Autowired` versehen werden.
+
+## Einstellung ist nicht gültig.
+
+Manche Einstellungen werden über die `application.properties` getätigt.
+Dabei muss beachtet werden,
+dass Backslash (`\`) ein Escape-Symbol ist.
+Wenn man also wirklich `\` angibt,
+muss `\\` stattdessen angegeben werden.
+Das kann besonders bei Passwörtern ärgerlich werden.

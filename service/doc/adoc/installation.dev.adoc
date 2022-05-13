@@ -1,0 +1,58 @@
+# CAS für die Entwicklungsumgebung aufsetzen.
+
+Es wird Java 11 und Maven benötigt.
+
+## In Eclipse ausführen und debuggen.
+
+In Eclipse:
+
+* Repository runterladen: `git clone git@github.com:minova-afis/aero.minova.cas.git`
+* Repo als Maven-Projekt in Eclipse importieren.
+* Gesamtes Projekt bauen: `mvn clean verify`
+* Die `Java Application`-`Run Configuration` für die Klasse `aero.minova.cas.CoreApplicationSystemApplication` anlegen:
+** Als Ausführungspfad den lib-Ordner des Testsystems angeben (siehe später).
+** Unter Classpath auf `User Entries` klicken.
+Danach kann man über `Add Projects...` Extensions als Projekte hinzufügen.
+Diese werden dann bei der Ausführung mitgeladen.
+In der Regel braucht man dabei die `setup`-Extension,
+da man sonst keinen Setup-Befehl hat.
+
+Testsystem-Ordner einrichten:
+
+* Testsystem-Ordner erstellen.
+* `<Testsystem-Ordner>/lib` Unterordner erstellen und dort `application.properties` anlegen und mit passenden Werten füllen.
+Folgendes ist eine häufig nützliche minimal Konfiguration:
+[source,properties]
+```
+login_dataSource=admin
+aero_minova_database_url=<jdbc:sqlserver://host.docker.internal;databaseName=test>
+aero_minova_database_user_name=<Datenbank-Nutzer>
+aero_minova_database_user_password=<Passwort>
+logging_level_root=DEBUG
+aero_minova_core_application_root_path=<Testsystem-Ordner>/system-files
+```
+* `<Testsystem-Ordner>/system-files` erstellen und mit Masken etc. füllen.
+Falls man nicht weiss, wass man reintun soll:
+Kann man aus dem CAS-Repo den Inhalt von den Ordner `app/target/docker-layer` in den `<Testsystem-Ordner>/system-files` kopieren.
+
+## Snapshot-Docker-Image lokal bauen und ausführen.
+
+* Repository runterladen: `git clone git@github.com:minova-afis/aero.minova.cas.git`
+* Shell in lokalen Repo öffnen: `cd <Pfad zum Repo-Ordner>/aero.minova.cas`
+* Projekt bauen: `mvn clean verify`
+* Docker-Image bauen: `docker build --tag=localtest .`
+* Docker-Image starten:
+[source,shell]
+----
+docker run \
+    --name=localtest \
+    --publish=8084:8084 \
+    --env login_dataSource='admin' \
+    --env aero_minova_database_url='jdbc:sqlserver://host.docker.internal;databaseName=test' \
+    --env aero_minova_database_user_name='Nutzer' \
+    --env aero_minova_database_user_password='Passwort' \
+    --env logging_level_root=DEBUG \
+    localtest
+----
+* Alle Rechte können den admin-Nutzer übergeben werden, wenn folgendes auf SQL-Datenbank ausgeführt wird: `exec xpcasInsertAllPrivilegesToUserGroup 'admin', 'admin'`
+* Docker-Image wieder entfernen: `docker rmi -f localtest`

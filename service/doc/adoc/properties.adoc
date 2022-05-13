@@ -2,6 +2,8 @@
 
 Hier werden die Properties gelistet, die durch diesen Dienst definiert werden.
 
+IMPORTANT: Falls eine Property in den application.properties verändert wird, *muss* das CAS neugestartet werden!
+
 == Links
 
 * Zurück zur xref:index.adoc[Übersicht]

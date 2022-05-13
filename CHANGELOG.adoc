@@ -3,7 +3,12 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [12.44.0]
+## [Unreleased]
+
+* Korrektur des ServiceNotifierServices, damit NewsfeedListener angelegt werden können.
+* Automatisches Anlegen eines Admins mit *allen* Rechten am Ende des Setups.
+
+## [12.44.0] - 2022-05-13
 
 * #305 Keytext-Spalte der xtcasUserPrivilege-Tabelle vergrößern.
 * Setup wieder durchfürbar machen.

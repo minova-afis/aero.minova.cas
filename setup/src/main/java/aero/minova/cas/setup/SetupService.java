@@ -69,7 +69,9 @@ public class SetupService {
 				, true);
 				svc.setupExtensions();
 				spc.setupExtensions();
-				// TODO nach dem nächsten Release spc.setupPrivileges() einfügen.
+
+				// Diese Methode darf erst ganz zum Schluss ausgeführt werden, damit sichergestellt werden kann, dass der Admin tatsächlich ALLE Rechte bekommt.
+				spc.setupPrivileges();
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);

@@ -8,7 +8,6 @@ alter procedure spMinovaCheckView
 	@BuildNumber int,
 	@Dataname nvarchar(255) = null
 ) with encryption as
-SET NOCOUNT ON
 	if not exists (select * from tVersion10 where KeyText = @ViewName and ModuleName = @ModuleName)
 	begin
 		exec('create view dbo.' + @ViewName + N' as select 0 as col1')

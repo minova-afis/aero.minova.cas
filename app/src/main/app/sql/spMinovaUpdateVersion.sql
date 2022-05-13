@@ -7,7 +7,6 @@ alter procedure dbo.spMinovaUpdateVersion (
 	@BuildNumber int,
 	@Dataname nvarchar(255) = null
 ) with encryption as
-SET NOCOUNT ON
 	if not exists (
 		select * 
 		from tVersion10 

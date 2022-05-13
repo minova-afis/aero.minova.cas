@@ -7,7 +7,6 @@ alter procedure dbo.spMinovaCheckProcedure (
 	@BuildNumber int,
 	@Dataname nvarchar(255) =  null
 ) with encryption as
-SET NOCOUNT ON
 	if not exists (select * from tVersion10 where KeyText = @ProcedureName and ModuleName = @ModuleName)
 	begin
 		exec('create Procedure dbo.' + @ProcedureName + N' as select 0')

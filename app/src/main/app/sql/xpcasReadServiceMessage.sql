@@ -18,6 +18,5 @@ begin
 				@MessageCreationDate = MessageCreationDate
 		from xvcasCASServiceMessage
 		where MessageKey = @KeyLong
-		  and LastAction > 0
 end
 return @@error

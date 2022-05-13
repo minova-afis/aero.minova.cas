@@ -64,13 +64,18 @@ public class CommunicationController {
 	public void setup(HttpServletResponse httpServletResponse) throws Exception {
 		Table setupTable = new Table();
 		setupTable.setName("setup");
+		boolean success = true;
 		try {
 			spc.executeProcedure(setupTable);
 		} catch (Exception e) {
+			success = false;
+		}
+		if (success) {
+			httpServletResponse.setHeader("Location", homePath + "/setupSuccess");
+			httpServletResponse.setStatus(302);
+		} else {
 			httpServletResponse.setHeader("Location", homePath + "/setupError");
 			httpServletResponse.setStatus(302);
 		}
-		httpServletResponse.setHeader("Location", homePath + "/setupSuccess");
-		httpServletResponse.setStatus(302);
 	}
 }

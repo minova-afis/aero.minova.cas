@@ -104,7 +104,7 @@ public class SqlProcedureController {
 
 	/**
 	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
-	 * werden die Extensions in die tVersion10-Tabelle eingetragen und eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden.
+	 * werden die Extensions in die tVersion10-Tabelle eingetragen.
 	 */
 	public void setupExtensions() {
 		Table extensionSetupTable = new Table();
@@ -127,8 +127,12 @@ public class SqlProcedureController {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);
 		}
+	}
 
-		// Nach dem erfolgreichen Setup noch die Admin-Rolle erstellen und alle Rechte geben.
+	/**
+	 * Erstellt eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden. Wird nach dem erfolgreichen Setup ausgeführt.
+	 */
+	public void setupPrivileges() {
 		try {
 			Table adminPrivilegeTable = new Table();
 			adminPrivilegeTable.setName("xpcasInsertAllPrivilegesToUserGroup");

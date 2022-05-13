@@ -35,15 +35,19 @@ cas-project
 |	|
 |	+-- pom.xml
 |	
++-- lombok.config
 +-- pom.xml
 +-- README.adoc
 
 ----
 
+=== /
+* Damit Code Coverage Werkzeuge nicht eine fehlende Testabdeckung bei mittels Lombok generierten Getters/Setter
+bemängeln, sorgt *lombok.config* für eine passende Annotation bei autogenerierten Methoden. Gffs. ist diese Datei
+auch in allen Unterprojekten erforderlich. Siehe auch https://projectlombok.org/features/configuration
+* Die *README.adoc* des Root-Verzeichnisses enthält wichtige Informationen zum CAS und dient als Anleitung zur Installation beim Kunden.
 
-Die *README.adoc* des Root-Verzeichnisses enthält wichtige Informationen zum CAS und dient als Anleitung zur Installation beim Kunden.
-
-=== pom.xml
+==== pom.xml
 
 Sowohl das Projekt selbst, sowie die Ordner client, server und setup besitzen jeweils eine pom.xml,
 sodass *insgesamt vier POMs* im gesamten Projekt exisiteren:

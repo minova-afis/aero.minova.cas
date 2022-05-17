@@ -17,7 +17,7 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"columns": [
 		{
 			"name": "ParameterName",
-			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED",
+			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED|BIGDECIMAL",
 			"outputType": "INPUT|OUTPUT"
 		},...
 	],

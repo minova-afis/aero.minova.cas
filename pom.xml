@@ -26,7 +26,6 @@
         <module>app</module>
         <module>app.legacy</module>
         <module>service</module>
-        <!-- <module>servicenotifier</module>-->
         <module>setup</module>
     </modules>
 

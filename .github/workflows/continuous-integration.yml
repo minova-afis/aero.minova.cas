@@ -40,6 +40,17 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
+      - name: Prepare build
+        run: |
+          cd $GITHUB_WORKSPACE
+          mvn --batch-mode clean install \
+          -DskipTests
+          -Dusername=$GITHUB_ACCESS_TOKEN \
+          --file pom.xml \
+          --settings .github/settings.xml
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+
       - name: Build
         run: |
           cd $GITHUB_WORKSPACE

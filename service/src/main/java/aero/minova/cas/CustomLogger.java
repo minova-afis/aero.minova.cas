@@ -7,6 +7,7 @@ import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.AbstractEnvironment;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Component;
 import com.google.gson.Gson;
 
 import aero.minova.cas.api.restapi.ClientRestAPI;
+
+import javax.annotation.PostConstruct;
 
 @Component
 public class CustomLogger {
@@ -37,9 +40,15 @@ public class CustomLogger {
 
 	public Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
 
-	private ClientRestAPI crapi = new ClientRestAPI();
+	@Autowired
+	private ClientRestAPI crapi;
 
-	Gson gson = crapi.gson();
+	private Gson gson;
+
+	@PostConstruct
+	private void init(){
+		gson = crapi.getGson();
+	}
 
 	// Eclipse zeigt keinen Fehler, wenn Methode nicht vorhanden ist, sie wird aber benötigt, da sonst beim Loggen von Exceptions eine NoSuchMethodException
 	// geworfen wird und der Code abbricht.
@@ -106,8 +115,7 @@ public class CustomLogger {
 	/**
 	 * TODO Das loggen funktioniert zur Zeit nicht.
 	 *
-	 * @param event
-	 *            Das Event, bei dem die Methode ausgeführt werden soll.
+	 * @param event Das Event, bei dem die Methode ausgeführt werden soll.
 	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {

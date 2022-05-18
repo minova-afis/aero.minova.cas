@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -28,19 +30,21 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
 
+import javax.annotation.PostConstruct;
+
 @Service
 public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	@Autowired
-	CustomLogger logger;
+	private CustomLogger logger;
 
 	@Autowired
-	SecurityService securityService;
+	private SecurityService securityService;
 
-	ServiceNotifierService serviceNotifierService = new ServiceNotifierService();
+	private ServiceNotifierService serviceNotifierService = new ServiceNotifierService();
 
-	@Autowired
-	SqlProcedureController spc;
+	@Setter
+	private SqlProcedureController spc;
 
 	// Hierbei handelt es sich um Tage
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.message.age:7}")
@@ -56,11 +60,9 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	/**
 	 * Registriert eine BiFunction auf einen Prozedurnamen.
-	 * 
-	 * @param procedureName
-	 *            Der Name der Prozedur, nach welcher die BiFunction ausgeführt werden soll.
-	 * @param function
-	 *            Die BiFunction, die Ausgeführt werden soll. Muss vom Typ BiFunction<Table, HttpResponse<?>, String> sein.
+	 *
+	 * @param procedureName Der Name der Prozedur, nach welcher die BiFunction ausgeführt werden soll.
+	 * @param function      Die BiFunction, die Ausgeführt werden soll. Muss vom Typ BiFunction<Table, HttpResponse<?>, String> sein.
 	 */
 	public void registerServiceMessageCreator(String procedureName, String topic, BiFunction<Table, ResponseEntity<Object>, String> function) {
 		if (serviceMessageCreators.containsKey(procedureName) && serviceMessageCreators.get(procedureName).containsKey(topic)) {
@@ -178,13 +180,10 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	/**
 	 * Speichert eine Nachricht für einen Topic.
-	 * 
-	 * @param message
-	 *            Die Nachricht, die gespeichert werden soll.
-	 * @param procedureName
-	 *            Die Prozedur, wegen welcher die Nachricht erstellt wurde.
-	 * @param topic
-	 *            Das Topic, welches verändert wurde.
+	 *
+	 * @param message       Die Nachricht, die gespeichert werden soll.
+	 * @param procedureName Die Prozedur, wegen welcher die Nachricht erstellt wurde.
+	 * @param topic         Das Topic, welches verändert wurde.
 	 */
 	private void saveMessage(String message, String procedureName, String topic) {
 		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, new Value(procedureName, null), new Value(topic, null), null, null);
@@ -216,9 +215,8 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	/**
 	 * Löscht eine Nachricht aus der Datenbank, damit nicht mehr versucht wird sie zu versenden.
-	 * 
-	 * @param pendingMessage
-	 *            Eine Row, bei welcher der KeyLong der Nachricht an 5.Stelle steht.
+	 *
+	 * @param pendingMessage Eine Row, bei welcher der KeyLong der Nachricht an 5.Stelle steht.
 	 */
 	private void deleteMessage(Row pendingMessage) {
 		Table messageToDelete = new Table();
@@ -240,7 +238,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	/**
 	 * Liest alle nicht versendeten Nachrichten aus der Datenbank.
-	 * 
+	 *
 	 * @return Eine Table, bei welcher jede Row eine nicht versandte Nachricht ist.
 	 */
 	private Table getNextMessage() {
@@ -281,10 +279,9 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	/**
 	 * Versendet eine Nachricht.
-	 * 
-	 * @param nextMessage
-	 *            Eine Row, in der folgende Übergabeparamtern enthalten sind:CASServiceKey, CASServiceName, ServiceURL, Port, MessageKey, Message, isSent,
-	 *            NumberOfAttempts, MessageCreationDate
+	 *
+	 * @param nextMessage Eine Row, in der folgende Übergabeparamtern enthalten sind:CASServiceKey, CASServiceName, ServiceURL, Port, MessageKey, Message, isSent,
+	 *                    NumberOfAttempts, MessageCreationDate
 	 * @return true, falls der Versandt erfolgreich war. Andernfalls false.
 	 */
 	private boolean sendMessage(Row nextMessage) {
@@ -306,11 +303,9 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	/**
 	 * Speichert den Status einer Nachricht als 'isSent' in der Datenbank. Erhöht gleichzeitig auch die NumberOfAttempts.
-	 * 
-	 * @param isSent
-	 *            True, falls die Nachricht erfolgreich versandt wurde. False, wenn nicht.
-	 * @param nextMessage
-	 *            Eine Row, bei welcher der KeyLong der Nachricht an 5. Stelle und die NumberOfAttempts an 8.Stelle stehen.
+	 *
+	 * @param isSent      True, falls die Nachricht erfolgreich versandt wurde. False, wenn nicht.
+	 * @param nextMessage Eine Row, bei welcher der KeyLong der Nachricht an 5. Stelle und die NumberOfAttempts an 8.Stelle stehen.
 	 */
 	private void safeAsSent(boolean isSent, Row nextMessage) {
 		int attempts = nextMessage.getValues().get(7).getIntegerValue() + 1;

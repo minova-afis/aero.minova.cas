@@ -42,6 +42,8 @@ import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
+import javax.annotation.PostConstruct;
+
 @RestController
 public class SqlProcedureController {
 	@Autowired
@@ -70,6 +72,11 @@ public class SqlProcedureController {
 	 * ist.
 	 */
 	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
+
+	@PostConstruct
+	public void init(){
+		queueService.setSpc(this);
+	}
 
 	/**
 	 * Hiermit lassen sich Erweiterungen registrieren, die ausgeführt werden, wenn eine Prozedur mit der Namen der Registrierung ausgeführt werden soll.

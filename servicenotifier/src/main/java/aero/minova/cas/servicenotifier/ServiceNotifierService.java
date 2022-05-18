@@ -36,6 +36,9 @@ public class ServiceNotifierService {
 	@Autowired
 	SecurityService securityService;
 
+	@org.springframework.beans.factory.annotation.Value("${aero.minova.cas.postConstruct:true}")
+	boolean runOnStartUp;
+
 	/**
 	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
 	 */
@@ -378,6 +381,9 @@ public class ServiceNotifierService {
 	 */
 	@PostConstruct
 	private void initializeServicenotifiers() {
+		if (!runOnStartUp) {
+			return;
+		}
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				servicenotifier = new HashMap<>();
@@ -399,6 +405,9 @@ public class ServiceNotifierService {
 	 */
 	@PostConstruct
 	private void initializeNewsfeeds() {
+		if (!runOnStartUp) {
+			return;
+		}
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				newsfeeds = new HashMap<>();

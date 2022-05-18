@@ -46,7 +46,7 @@ jobs:
           mvn --batch-mode clean install \
           -Dusername=$GITHUB_ACCESS_TOKEN \
           --file pom.xml \
-          --settings .github/settings.xml
+          --settings ../.github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}

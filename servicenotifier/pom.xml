@@ -7,6 +7,7 @@
         <version>12.44.1-SNAPSHOT</version>
     </parent>
     <artifactId>cas.servicenotifier</artifactId>
+    <packaging>jar</packaging>
 
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>

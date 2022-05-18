@@ -3,6 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cas.dev</artifactId>
     <description>Hiermit kann man einfach CAS mit Plugins in der IDE ausführen.</description>
+    <packaging>pom</packaging>
 
     <parent>
         <groupId>aero.minova</groupId>

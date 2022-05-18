@@ -7,6 +7,9 @@ on:
     branches: [ master main ]
   workflow_dispatch:
 
+env:
+  ACCOUNT: minova-afis
+
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>app.parent</artifactId>
-		<version>12.5.3</version>
+		<version>12.6.5</version>
 		<relativePath />
 	</parent>
 	<scm>

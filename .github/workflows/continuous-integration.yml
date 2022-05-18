@@ -40,11 +40,10 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Prepare build
+      - name: Build servicenotifier
         run: |
-          cd $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE/servicenotifier
           mvn --batch-mode clean install \
-          -DskipTests \
           -Dusername=$GITHUB_ACCESS_TOKEN \
           --file pom.xml \
           --settings .github/settings.xml

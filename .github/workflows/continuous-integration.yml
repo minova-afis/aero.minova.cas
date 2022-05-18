@@ -44,7 +44,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           mvn --batch-mode clean install \
-          -DskipTests
+          -DskipTests \
           -Dusername=$GITHUB_ACCESS_TOKEN \
           --file pom.xml \
           --settings .github/settings.xml

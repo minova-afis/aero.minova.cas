@@ -1,20 +1,44 @@
 package aero.minova.cas.api.domain;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class ValueDeserializer implements JsonDeserializer<Value> {
+@Slf4j
+public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeserializer<Value> implements JsonDeserializer<Value> {
+	@Autowired
+	private Gson gson;
+
+	private ObjectMapper jacksonMapper = new ObjectMapper();
+
 	public static final String SQL_IS_NULL = "null";
 	public static final String SQL_IS_NOT_NULL = "!null";
 	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", SQL_IS_NULL, SQL_IS_NOT_NULL };
+
+	@Override
+	public Value deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+		ObjectCodec codec = jsonParser.getCodec();
+		JsonNode node = codec.readTree(jsonParser);
+
+		return gson.fromJson(jacksonMapper.writeValueAsString(node), Value.class);
+	}
 
 	@Override
 	public Value deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
@@ -75,9 +99,8 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 
 	/**
 	 * Prüft, ob der String einen SQL Operator am Anfang hat
-	 * 
-	 * @param value
-	 *            String mit eventuellen SQL-Operatoren am Anfang
+	 *
+	 * @param value String mit eventuellen SQL-Operatoren am Anfang
 	 * @return Gibt an, ob ein solcher Operator vorhanden ist.
 	 */
 	@Deprecated
@@ -87,9 +110,8 @@ public class ValueDeserializer implements JsonDeserializer<Value> {
 
 	/**
 	 * Wenn es einen Operator gibt, dann liefert die Funktion den Index bis zu dem sich der Operator erstreckt
-	 * 
-	 * @param value
-	 *            String mit SQL-Operator am Anfrang
+	 *
+	 * @param value String mit SQL-Operator am Anfrang
 	 * @return 0, wenn es keinen Operator gibt
 	 */
 	protected static int getOperatorEndIndex(String value) {

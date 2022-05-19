@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -31,7 +30,7 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
 	@Override
-	public Value deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+	public Value deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
 		ObjectCodec codec = jsonParser.getCodec();
 		JsonNode node = codec.readTree(jsonParser);
 
@@ -96,6 +95,7 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 	}
 
 	/**
+	 * @deprecated
 	 * Prüft, ob der String einen SQL Operator am Anfang hat
 	 *
 	 * @param value String mit eventuellen SQL-Operatoren am Anfang

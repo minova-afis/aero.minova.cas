@@ -2,12 +2,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cas.api</artifactId>
 	<name>aero.minova.cas.api</name>
-	<packaging>jar</packaging>
-
 	<parent>
 		<groupId>aero.minova</groupId>
-		<artifactId>cas-parent</artifactId>
-		<version>12.44.1-SNAPSHOT</version>
+		<artifactId>cas.parent</artifactId>
+		<version>12.45.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>

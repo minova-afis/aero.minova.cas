@@ -7,8 +7,8 @@
 
     <parent>
         <groupId>aero.minova</groupId>
-        <artifactId>cas-parent</artifactId>
-        <version>12.44.1-SNAPSHOT</version>
+        <artifactId>cas.parent</artifactId>
+        <version>12.45.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -79,11 +79,11 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Minova Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</repositories>
 </project>

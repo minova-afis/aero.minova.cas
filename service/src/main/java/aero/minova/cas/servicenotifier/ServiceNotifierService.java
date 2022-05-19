@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Deprecated
 @Service
 public class ServiceNotifierService {
 
@@ -37,12 +36,12 @@ public class ServiceNotifierService {
 	/**
 	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
 	 */
-	private Map<String, List<String>> servicenotifier = new HashMap<>();
+	protected Map<String, List<String>> servicenotifier = new HashMap<>();
 
 	/**
 	 * Enthält Tupel aus Dienstnamen und Tabellennamen. Wird eine der enthaltenen Tabellen verändert, muss der dazugehörige Dienst angetriggert werden.
 	 */
-	private Map<String, List<String>> newsfeeds = new HashMap<>();
+	protected Map<String, List<String>> newsfeeds = new HashMap<>();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
@@ -372,47 +371,6 @@ public class ServiceNotifierService {
 	}
 
 	/**
-	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
-	 */
-	@PostConstruct
-	private void initializeServicenotifiers() {
-		try {
-			if (areServiceNotifiersStoresSetup()) {
-				servicenotifier = new HashMap<>();
-				Table servicenotifierTable = findViewEntry(null, null, null, null, null);
-				for (Row row : servicenotifierTable.getRows()) {
-					if (row.getValues().get(4) != null && row.getValues().get(5) != null) {
-						registerServicenotifier(row.getValues().get(4).getStringValue(), row.getValues().get(5).getStringValue());
-					}
-				}
-			}
-		} catch (Exception e) {
-			logger.logError("Error while trying to initialize servicenotifiers!", e);
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Wenn das CAS neu gestartet wird, muss die Newsfeeds-Map wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
-	 */
-	@PostConstruct
-	private void initializeNewsfeeds() {
-		try {
-			if (areServiceNotifiersStoresSetup()) {
-				newsfeeds = new HashMap<>();
-				Table newsfeedsTable = findViewEntry(null, null, null, null, null);
-				for (Row row : newsfeedsTable.getRows()) {
-					registerNewsfeed(row.getValues().get(3).getStringValue(), row.getValues().get(5).getStringValue());
-				}
-			}
-
-		} catch (Exception e) {
-			logger.logError("Error while trying to initialize newsfeed!", e);
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
 	 * Findet den KeyLong zu einem bestimmten CASServiceName heraus. Sucht dafür in der xtcasCASServices-Tabelle. Muss man statt findViewEntry verwenden, wenn
 	 * der ServiceKey zum Registrieren benötigt wird.
 	 * 
@@ -612,18 +570,6 @@ public class ServiceNotifierService {
 		if ((newsfeeds.containsKey(serviceName) && newsfeeds.get(serviceName).contains(topic))) {
 			newsfeeds.get(serviceName).remove(topic);
 		}
-	}
-
-	/**
-	 * Prüft, ob minimalen die Datenbank-Objekte notwendig für das Registrieren von Diensten und Newsfeeds vorhanden sind. Dazu prüft man, ob die
-	 * `xvcasCASServices` vorhanden ist.
-	 * 
-	 * @return True, falls xvcascasservices vorhanden ist.
-	 * @throws Exception
-	 *             Fehler bei der Emittlung
-	 */
-	public boolean areServiceNotifiersStoresSetup() throws Exception {
-		return securityService.isTablePresent("xvcascasservices");
 	}
 
 }

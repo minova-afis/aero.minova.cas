@@ -40,7 +40,7 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build, but skipTests since they rely on an SQL-Server sidecar we don't have
+      - name: Maven build and SonarQube scan
         run: |
           cd $GITHUB_WORKSPACE
           mvn --batch-mode verify \

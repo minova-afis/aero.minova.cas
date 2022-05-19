@@ -11,7 +11,8 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
 
-// @Component
+// @Component - Der Cache wird bisher nicht verwendet, der er momentan auch noch nicht benötigt wird.
+// Außerdem würde er, wenn er angeschalten ist, zu Testfehlern führen (aufgrund der PostConstruct-Annotation), welche schwierig zu lösen sind und wofür wir momentan keine Zeit haben.
 @Deprecated
 public class ServiceNotifierCache {
 

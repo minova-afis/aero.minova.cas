@@ -12,7 +12,6 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import aero.minova.cas.setup.dependency.DependencyOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +20,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.FilesService;
+import aero.minova.cas.setup.dependency.DependencyOrder;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
@@ -67,8 +67,11 @@ public class SetupService {
 				, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
 				, service.getSystemFolder().resolve("setup")//
 				, true);
-				spc.setupExtensions();
 				svc.setupExtensions();
+				spc.setupExtensions();
+
+				// Diese Methode darf erst ganz zum Schluss ausgeführt werden, damit sichergestellt werden kann, dass der Admin tatsächlich ALLE Rechte bekommt.
+				spc.setupPrivileges();
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);

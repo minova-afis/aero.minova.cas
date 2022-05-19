@@ -33,7 +33,7 @@ aero_minova_core_application_root_path=<Testsystem-Ordner>/system-files
 ```
 * `<Testsystem-Ordner>/system-files` erstellen und mit Masken etc. füllen.
 Falls man nicht weiss, wass man reintun soll:
-`app/target/docker-layer` im Repo ist ein guter Anfang.
+Kann man aus dem CAS-Repo den Inhalt von den Ordner `app/target/docker-layer` in den `<Testsystem-Ordner>/system-files` kopieren.
 
 ## Snapshot-Docker-Image lokal bauen und ausführen.
 
@@ -116,3 +116,4 @@ docker run --name=dev_cas3 `
         -v ${pwd}\target\docker-layer\:/opt/aero.minova.cas/system-files-override/ `
         dev_cas2
 ----
+=======

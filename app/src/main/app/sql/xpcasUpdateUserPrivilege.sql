@@ -1,6 +1,6 @@
 alter procedure dbo.xpcasUpdateUserPrivilege (
 	@KeyLong int,
-	@KeyText nvarchar(50) = null,
+	@KeyText nvarchar(200) = null,
 	@Description nvarchar(50) = null
 )
 with encryption as

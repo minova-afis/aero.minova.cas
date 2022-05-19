@@ -49,6 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		// SpringBoot: management port
+		http.authorizeRequests().antMatchers("/actuator/**").permitAll();
+
 		http.authorizeRequests().antMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll();
 		http.authorizeRequests().anyRequest().fullyAuthenticated();
 		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");

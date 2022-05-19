@@ -1,4 +1,4 @@
-create view dbo.xvcasCASServiceMessage
+alter view dbo.xvcasCASServiceMessage
 with encryption as
 select 
     cs.KeyLong as CASServiceKey,

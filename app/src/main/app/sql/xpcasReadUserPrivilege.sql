@@ -1,6 +1,6 @@
 alter procedure dbo.xpcasReadUserPrivilege (
 	@KeyLong int output,
-	@KeyText nvarchar(50) = null output,
+	@KeyText nvarchar(200) = null output,
 	@Description nvarchar(50) = null output
 )
 with encryption as

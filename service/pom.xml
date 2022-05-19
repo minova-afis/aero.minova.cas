@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cas.service</artifactId>
-	<version> 12.44.0-SNAPSHOT</version>
+	<version> 12.45.0-SNAPSHOT</version>
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>spring.maven.root</artifactId>
@@ -26,22 +26,17 @@
 			<groupId>aero.minova</groupId>
 			<artifactId>cas.api</artifactId>
 			<version>12.38.2</version>
-		</dependency>	
-		<dependency>
-			<groupId>aero.minova</groupId>
-			<artifactId>cas.servicenotifier</artifactId>
-			<version>12.41.0</version>
-		</dependency>		
-		<dependency>
-			<groupId>aero.minova</groupId>
-			<artifactId>cas.servicenotifier</artifactId>
-			<version>12.40.4</version>
 		</dependency>
-		<!-- Wird für Java 16 benötigt.-->
+		<dependency>
+			<groupId>aero.minova</groupId>
+			<artifactId>cas.servicenotifier</artifactId>
+			<version>12.44.1</version>
+		</dependency>
+		<!-- Wird für Java 17 benötigt.-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.20</version>
+			<version>1.18.24</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -137,6 +132,14 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.cache</groupId>

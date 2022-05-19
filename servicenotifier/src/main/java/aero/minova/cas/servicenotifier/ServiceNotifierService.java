@@ -23,7 +23,6 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.SecurityService;
 
-@Deprecated
 @Service
 public class ServiceNotifierService {
 
@@ -39,12 +38,12 @@ public class ServiceNotifierService {
 	/**
 	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
 	 */
-	private Map<String, List<String>> servicenotifier = new HashMap<>();
+	protected Map<String, List<String>> servicenotifier = new HashMap<>();
 
 	/**
 	 * Enthält Tupel aus Dienstnamen und Tabellennamen. Wird eine der enthaltenen Tabellen verändert, muss der dazugehörige Dienst angetriggert werden.
 	 */
-	private Map<String, List<String>> newsfeeds = new HashMap<>();
+	protected Map<String, List<String>> newsfeeds = new HashMap<>();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
@@ -154,14 +153,7 @@ public class ServiceNotifierService {
 
 		try {
 			// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
-			Value keyLong = findViewEntry(//
-					null, //
-					inputTable.getRows().get(0).getValues().get(0), //
-					null, //
-					inputTable.getRows().get(0).getValues().get(1), //
-					inputTable.getRows().get(0).getValues().get(2)//
-			)//
-					.getRows().get(0).getValues().get(0);
+			Value keyLong = findServiceEntry(serviceName);
 
 			Table unregisterSerivceTable = new Table();
 			unregisterSerivceTable.setName("xpcasDeleteCASService");
@@ -315,8 +307,7 @@ public class ServiceNotifierService {
 	public void registerNewsfeedListener(Table inputTable) {
 
 		// Key zum CASServiceName herausfinden.
-		Value serviceKey = findViewEntry(inputTable.getRows().get(0).getValues().get(0), null, null, null, null)//
-				.getRows().get(0).getValues().get(0);
+		Value serviceKey = findServiceEntry(inputTable.getRows().get(0).getValues().get(0).getStringValue());
 
 		Table registerNewsfeedTable = new Table();
 		registerNewsfeedTable.setName("xpcasInsertNewsfeedListener");
@@ -382,43 +373,37 @@ public class ServiceNotifierService {
 	}
 
 	/**
-	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
+	 * Findet den KeyLong zu einem bestimmten CASServiceName heraus. Sucht dafür in der xtcasCASServices-Tabelle. Muss man statt findViewEntry verwenden, wenn
+	 * der ServiceKey zum Registrieren benötigt wird.
+	 * 
+	 * @param casServiceName
+	 *            Der ServiceName, zu welchem man den KeyLong finden möchte.
+	 * @return Den passenden KeyLong zum casServiceName.
 	 */
-	@PostConstruct
-	private void initializeServicenotifiers() {
+	private Value findServiceEntry(String casServiceName) {
+		Table viewResult = new Table();
+
+		Table viewTable = new Table();
+		viewTable.setName("xtcasCASServices");
+		viewTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		viewTable.addColumn(new Column("KeyText", DataType.STRING));
+
+		Row viewRow = new Row();
+		viewRow.addValue(null);
+		viewRow.addValue(new Value(casServiceName, null));
+
+		viewTable.addRow(viewRow);
 		try {
-			if (areServiceNotifiersStoresSetup()) {
-				servicenotifier = new HashMap<>();
-				Table servicenotifierTable = findViewEntry(null, null, null, null, null);
-				for (Row row : servicenotifierTable.getRows()) {
-					if (row.getValues().get(4) != null && row.getValues().get(5) != null) {
-						registerServicenotifier(row.getValues().get(4).getStringValue(), row.getValues().get(5).getStringValue());
-					}
-				}
-			}
+			viewResult = securityService.unsecurelyGetIndexView(viewTable);
 		} catch (Exception e) {
-			logger.logError("Error while trying to initialize servicenotifiers!", e);
+			logger.logError("Error while trying to access view xtcasCASServices!", e);
 			throw new RuntimeException(e);
 		}
-	}
-
-	/**
-	 * Wenn das CAS neu gestartet wird, muss die Newsfeeds-Map wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
-	 */
-	@PostConstruct
-	private void initializeNewsfeeds() {
-		try {
-			if (areServiceNotifiersStoresSetup()) {
-				newsfeeds = new HashMap<>();
-				Table newsfeedsTable = findViewEntry(null, null, null, null, null);
-				for (Row row : newsfeedsTable.getRows()) {
-					registerNewsfeed(row.getValues().get(3).getStringValue(), row.getValues().get(5).getStringValue());
-				}
-			}
-
-		} catch (Exception e) {
-			logger.logError("Error while trying to initialize newsfeed!", e);
-			throw new RuntimeException(e);
+		// Da die ServiceNamen eindeutig sein müssen, kann man beruhigt den ersten KeyLong zurückgeben, den man findet.
+		if (viewResult.getRows().size() <= 0) {
+			throw new RuntimeException("No service with the name " + casServiceName + " registered.");
+		} else {
+			return viewResult.getRows().get(0).getValues().get(0);
 		}
 	}
 
@@ -587,18 +572,6 @@ public class ServiceNotifierService {
 		if ((newsfeeds.containsKey(serviceName) && newsfeeds.get(serviceName).contains(topic))) {
 			newsfeeds.get(serviceName).remove(topic);
 		}
-	}
-
-	/**
-	 * Prüft, ob minimalen die Datenbank-Objekte notwendig für das Registrieren von Diensten und Newsfeeds vorhanden sind. Dazu prüft man, ob die
-	 * `xvcasCASServices` vorhanden ist.
-	 * 
-	 * @return True, falls xvcascasservices vorhanden ist.
-	 * @throws Exception
-	 *             Fehler bei der Emittlung
-	 */
-	public boolean areServiceNotifiersStoresSetup() throws Exception {
-		return securityService.isTablePresent("xvcascasservices");
 	}
 
 }

@@ -8,6 +8,19 @@ IMPORTANT: Falls eine Property in den application.properties verändert wird, *m
 
 * Zurück zur xref:index.adoc[Übersicht]
 
+== Standard Properties
+* server.port
+
+** *Default*: `8084`
+
+* management.server.port
+** *Default*: `8081`
+** *Beschreibung*: Setzt den Port unter dem die Endpunkte des SpringBoot Actuators zu finden sind.
+
+* management.endpoints.web.exposure.include
+** *Default*: `*`
+** *Beschreibung*: Siehe https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
+
 == Minova Properties
 
 * app.log.root
@@ -29,10 +42,6 @@ IMPORTANT: Falls eine Property in den application.properties verändert wird, *m
 * security_ldap_address
 
 ** *Default* `ldap:Minova Ldap Adresse`
-
-* server.port
-
-** *Default*: `8084`
 
 * login_dataSource
 

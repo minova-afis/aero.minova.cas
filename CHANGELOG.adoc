@@ -5,13 +5,35 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased]
 
+<<<<<<< HEAD
 * Erstelle Standard-Prozedur-Erweiterung `xpcasEncodePassword` damit der Nutzer keine Entwicklungsumgebung braucht,
 um Passwörter zu hashen.
+=======
+* Einbinden des ServiceNotifierServices in den QueueService, damit Dienstextensions Listener registrieren können, ohne dass NullPointerExceptions geworfen werden.
+
+## [12.44.1] - 2022-05-19
+
+* Korrektur des ServiceNotifierServices, damit NewsfeedListener angelegt werden können.
+* Automatisches Anlegen eines Admins mit *allen* Rechten am Ende des Setups.
+* Auslagern der Cache Methoden aus dem ServiceNotifierService.
+
+## [12.44.0] - 2022-05-13
+
+* #305 Keytext-Spalte der xtcasUserPrivilege-Tabelle vergrößern.
+* Setup wieder durchfürbar machen.
+* Falls ein Fehler während des Setups auftritt, wird nun die korrekte HTTPServletResponse zurückgegeben.
+
+>>>>>>> master
 
 ## [12.43.0 ] - 2022-05-05
 * registerServiceMessage-Methode im QueueService korrigieren.
 
+<<<<<<< HEAD
 * #299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
+=======
+#299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
+#303 SpringBoot: /actuator ist auf dem Management-Port 8081 zu finden. Per Konfiguration `management.endpoints.enabled-by-default=false` sind alle weiteren Endpunkte deaktiviert.
+>>>>>>> master
 
 * #302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
 

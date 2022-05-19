@@ -5,23 +5,25 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased]
 
+* Erstelle Standard-Prozedur-Erweiterung `xpcasEncodePassword` damit der Nutzer keine Entwicklungsumgebung braucht,
+um Passwörter zu hashen.
+
 ## [12.43.0 ] - 2022-05-05
-registerServiceMessage-Methode im QueueService korrigieren.
+* registerServiceMessage-Methode im QueueService korrigieren.
 
-#299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
+* #299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
 
-#302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
+* #302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
 
 ## [12.42.0 ] - 2022-05-02
-#281: Logs aus Tests in den target-Ordner schreiben, damit diese nicht ausversehen commited werden.
+* #281: Logs aus Tests in den target-Ordner schreiben, damit diese nicht ausversehen commited werden.
 
-Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste implementieren.
+* Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste implementieren.
 
 ## [12.41.2 - 12.41.3] - 2022-04-29
 
 Kompatibilitäts-Projekt `aero.monova.core.application.system.app` erstellen,
 um einen Setup-Fehler zu beheben zu können.
-
 Siehe das link:doc/adoc/support.adoc[Support-Dokument] and link:app.legacy/README.adoc[Kompatibilitäts-Projekts-README] für Details.
 
 ## [12.41.1] - 2022-04-25

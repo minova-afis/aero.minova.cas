@@ -20,7 +20,7 @@ public class ClientRestAPIConfiguration {
 	}
 
 	@Bean
-	public Gson myGson() {
+	public Gson gson() {
 		return new GsonBuilder() //
 				.registerTypeAdapter(Value.class, new ValueSerializer()) //
 				.registerTypeAdapter(Value.class, new ValueDeserializer()) //

@@ -44,7 +44,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	@Autowired
 	private ServiceNotifierService serviceNotifierService;
 
-	@Setter
+	@Autowired
 	private SqlProcedureController spc;
 
 	// Hierbei handelt es sich um Tage
@@ -58,6 +58,11 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	// Map<ProzedurName, Map< ServiceName, BiFunction>>
 	Map<String, Map<String, BiFunction<Table, ResponseEntity<Object>, String>>> serviceMessageCreators = new HashMap<>();
+
+	@PostConstruct
+	public void init() {
+		spc.setQueueService(this);
+	}
 
 	/**
 	 * Registriert eine BiFunction auf einen Prozedurnamen.

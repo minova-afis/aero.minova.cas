@@ -47,7 +47,6 @@ jobs:
           dependency-check:aggregate \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -P repo-github \
-          -DskipTests \
           -Dusername=$GITHUB_ACCESS_TOKEN \
           -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} \
           -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \

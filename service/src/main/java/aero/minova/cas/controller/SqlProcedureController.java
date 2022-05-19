@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,7 @@ public class SqlProcedureController {
 	@Autowired
 	SecurityService securityService;
 
-	@Autowired
+	@Setter
 	QueueService queueService;
 
 	final Object extensionSynchronizer = new Object();
@@ -72,11 +73,6 @@ public class SqlProcedureController {
 	 * ist.
 	 */
 	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
-
-	@PostConstruct
-	public void init(){
-		queueService.setSpc(this);
-	}
 
 	/**
 	 * Hiermit lassen sich Erweiterungen registrieren, die ausgeführt werden, wenn eine Prozedur mit der Namen der Registrierung ausgeführt werden soll.

@@ -37,7 +37,8 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	@Autowired
 	SecurityService securityService;
 
-	ServiceNotifierService serviceNotifierService = new ServiceNotifierService();
+	@Autowired
+	ServiceNotifierService serviceNotifierService;
 
 	@Autowired
 	SqlProcedureController spc;

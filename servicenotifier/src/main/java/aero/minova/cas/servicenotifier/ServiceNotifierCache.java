@@ -24,17 +24,11 @@ public class ServiceNotifierCache {
 	@Autowired
 	SecurityService securityService;
 
-	@org.springframework.beans.factory.annotation.Value("${aero.minova.cas.postConstruct:true}")
-	boolean runOnStartUp;
-
 	/**
 	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
 	 */
 	@PostConstruct
 	private void initializeServicenotifiers() {
-		if (!runOnStartUp) {
-			return;
-		}
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.servicenotifier = new HashMap<>();
@@ -56,9 +50,6 @@ public class ServiceNotifierCache {
 	 */
 	@PostConstruct
 	private void initializeNewsfeeds() {
-		if (!runOnStartUp) {
-			return;
-		}
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.newsfeeds = new HashMap<>();

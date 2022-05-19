@@ -18,10 +18,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Slf4j
 public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeserializer<Value> implements JsonDeserializer<Value> {
 	@Autowired
 	private Gson gson;

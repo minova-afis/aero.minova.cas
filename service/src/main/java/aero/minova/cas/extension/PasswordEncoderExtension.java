@@ -1,7 +1,6 @@
 package aero.minova.cas.extension;
 
 import aero.minova.cas.api.domain.DataType;
-import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import lombok.val;
@@ -24,29 +23,33 @@ public class PasswordEncoderExtension {
     private void setup() {
         spc.registerExtension("xpcasEncodePassword", input -> {
             final var passwordColumn = input.getColumns().stream()//
-                    .filter(c -> c.getName().equals("password"))//
+                    .filter(c -> c.getName().equals("Password"))//
                     .findFirst();
             final var encodedPasswordColumn = input.getColumns().stream()//
-                    .filter(c -> c.getName().equals("encodedPassword"))//
+                    .filter(c -> c.getName().equals("EncodedPassword"))//
                     .findFirst();
             if (passwordColumn.isEmpty()) {
-                throw new IllegalArgumentException("Column `password` is missing.");
+                throw new IllegalArgumentException("Column `Password` is missing.");
             }
             if (encodedPasswordColumn.isEmpty()) {
-                throw new IllegalArgumentException("Column `encodedPassword` is missing.");
+                throw new IllegalArgumentException("Column `EncodedPassword` is missing.");
             }
             if (!DataType.STRING.equals(passwordColumn.get().getType())) {
-                throw new IllegalArgumentException("Column `password` has to be of type String but is `" + passwordColumn.get().getType() + "`.");
+                throw new IllegalArgumentException("Column `Password` has to be of type String but is `" + passwordColumn.get().getType() + "`.");
             }
             if (!DataType.STRING.equals(encodedPasswordColumn.get().getType())) {
-                throw new IllegalArgumentException("Column `encodedPassword` has to be of type String but is `" + encodedPasswordColumn.get().getType() + "`.");
+                throw new IllegalArgumentException("Column `EncodedPassword` has to be of type String but is `" + encodedPasswordColumn.get().getType() + "`.");
             }
             val passwordIndex = input.getColumns().indexOf(passwordColumn.get());
             val encodedPasswordIndex = input.getColumns().indexOf(encodedPasswordColumn.get());
             input.getRows().forEach(row -> {
-                row.getValues().set(encodedPasswordIndex, new Value(passwordEncoder.encode(row.getValues().get(passwordIndex).getStringValue()), null));
+                val passwordValue = row.getValues().get(passwordIndex);
+                if (passwordValue == null) {
+                    throw new IllegalArgumentException("Column `Password` has no value.");
+                }
+                row.getValues().set(encodedPasswordIndex, new Value(passwordEncoder.encode(passwordValue.getStringValue()), null));
             });
-            return new ResponseEntity<Table>(input, HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(input, HttpStatus.ACCEPTED);
         });
     }
 }

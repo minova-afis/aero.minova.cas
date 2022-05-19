@@ -1,6 +1,7 @@
 package aero.minova.cas.api.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.time.ZonedDateTime;
  * @author avots
  */
 @JsonDeserialize(using = ValueDeserializer.class)
+@JsonSerialize(using = ValueSerializer.class)
 public class Value implements Serializable {
 	private static final long serialVersionUID = 202106161639L;
 	private DataType type;

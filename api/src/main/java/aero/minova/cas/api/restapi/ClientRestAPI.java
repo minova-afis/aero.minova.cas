@@ -70,7 +70,7 @@ public class ClientRestAPI {
 	 * @return Die PingResponse als ResponseEntity.
 	 */
 	public ResponseEntity<PingResponse> ping() {
-		HttpEntity<?> request = new HttpEntity<Object>(createHeaders(username, password));
+		HttpEntity<?> request = new HttpEntity<>(createHeaders(username, password));
 		return restTemplate.exchange(url + "/ping", HttpMethod.GET, request, PingResponse.class);
 	}
 

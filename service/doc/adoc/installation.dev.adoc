@@ -56,3 +56,63 @@ docker run \
 ----
 * Alle Rechte können den admin-Nutzer übergeben werden, wenn folgendes auf SQL-Datenbank ausgeführt wird: `exec xpcasInsertAllPrivilegesToUserGroup 'admin', 'admin'`
 * Docker-Image wieder entfernen: `docker rmi -f localtest`
+
+## Snapshot-Docker-Image lokal bauen, ausführen und Masken live editieren.
+
+Wenn man gerade an einer Maske arbeitet,
+kann es Sinn machen, dass man eine Änderung testen kann, ohne dabei alles neu zu bauen und zu starten.
+
+Dazu geht man in das Maskenprojekt und baut dieses einmal via `mvn clean verify`.
+Danach starten man das Maskenprojekt als Docker-Container (Dockerfile wird benötigt) und
+bindet dabei den `target/docker-layer` des App-Projekts ein.
+
+Wenn man dann die Maske editiert hat,
+muss man diese im passenden `<Benutzer-Ordner>/.minwfc/*/*.xml`-Ordner löschen.
+In der WFC-Anwendung muss man die Maske nur noch schließen und wieder öffnen,
+um diese zu aktualisieren.
+
+Der Docker-Befehl ist unter Windows leichter anders als unter Unix-ähnlichen Systemen.
+
+### Unix-ähnlichen
+
+[source,shell]
+----
+docker rmi -f dev_cas3
+docker build --tag=dev_cas2 .
+docker rmi -f dev_cas3
+docker build --tag=dev_cas2 .
+docker run \
+    --name=dev_cas3 \
+    --publish=8084:8084 \
+    --env login_dataSource='admin' \
+    --env aero_minova_database_url='jdbc:sqlserver://host.docker.internal;databaseName=test' \
+    --env aero_minova_database_user_name='Nutzer' \
+    --env aero_minova_database_user_password='Passwort' \
+    --env logging_level_root=DEBUG \
+    --env aero_minova_core_application_root_path='/opt/aero.minova.cas/system-files-override/' \
+    -v "$(pwd)/target/docker-layer/:/opt/aero.minova.cas/system-files-override/" \
+    dev_cas2
+----
+
+### Windows
+
+Eine Ausführung in der Git Bash funktioniert nicht wie erhofft.
+
+[source,powershell]
+----
+docker rmi -f dev_cas3
+docker build --tag=dev_cas2 .
+docker rmi -f dev_cas3
+docker build --tag=dev_cas2 .
+docker run --name=dev_cas3 `
+        --publish=8084:8084 `
+        --env login_dataSource='admin' `
+        --env aero_minova_database_url='jdbc:sqlserver://host.docker.internal;databaseName=AFIS_GDN' `
+        --env aero_minova_database_user_name='sa' `
+        --env aero_minova_database_user_password='Minova+0' `
+        --env logging_level_root=DEBUG `
+        --env app_log_root='./target/logs' `
+        --env aero_minova_core_application_root_path='/opt/aero.minova.cas/system-files-override/' `
+        -v ${pwd}\target\docker-layer\:/opt/aero.minova.cas/system-files-override/ `
+        dev_cas2
+----

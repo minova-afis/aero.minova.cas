@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>aero.minova</groupId>
 			<artifactId>cas.servicenotifier</artifactId>
-			<version>12.40.4</version>
+			<version>12.44.1</version>
 		</dependency>
 		<!-- Wird für Java 17 benötigt.-->
 		<dependency>

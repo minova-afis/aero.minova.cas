@@ -14,3 +14,4 @@ target/
 /Internal/**
 /logs/**
 /service/src/main/resources/application-local.properties
+/service/logs/**

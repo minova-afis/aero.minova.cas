@@ -6,6 +6,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [Unreleased]
 
 * Einbinden des ServiceNotifierServices in den QueueService, damit Dienstextensions Listener registrieren können, ohne dass NullPointerExceptions geworfen werden.
+* Update auf SpringBoot 2.7.0
 
 ## [12.44.1] - 2022-05-19
 

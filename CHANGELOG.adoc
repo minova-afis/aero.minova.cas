@@ -7,6 +7,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Erstelle Standard-Prozedur-Erweiterung `xpcasEncodePassword` damit der Nutzer keine Entwicklungsumgebung braucht,
 um Passwörter zu hashen.
 * Einbinden des ServiceNotifierServices in den QueueService, damit Dienstextensions Listener registrieren können, ohne dass NullPointerExceptions geworfen werden.
+* Integration von SonarQube, OWASP Dependency-Check und JaCoCo in die CI-Pipeline
 * Update auf SpringBoot 2.7.0
 
 ## [12.44.1] - 2022-05-19

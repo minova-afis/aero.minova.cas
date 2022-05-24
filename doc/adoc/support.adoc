@@ -32,6 +32,8 @@
 {empty} +
 {empty} +
 
+Manchmal ist es nicht eindeutig, ob der Fehler im CAS oder in der WFC Anwendung liegt. link:https://github.com/minova-afis/aero.minova.rcp/wiki/Hilfestellung-bei-Support[Hier geht es zur Support Seite der WFC Anwendung]
+
 ## Anmeldung funktioniert nicht mit WFC.
 
 1. Die Anmeldung über den Browser versuchen.
@@ -175,3 +177,16 @@ dass Backslash (`\`) ein Escape-Symbol ist.
 Wenn man also wirklich `\` angibt,
 muss `\\` stattdessen angegeben werden.
 Das kann besonders bei Passwörtern ärgerlich werden.
+
+## PrivilegeError
+
+Die häufigste Exception. Tritt auf, wenn:
+
+* die aufrgerufene Prozedur/View/Tabelle nicht existiert. In diesem Fall wurde entweder Setup noch nicht ausgeführt oder die Prozedur/View/Tabelle, die man anfragt, war im Ordner rootPath/sql nicht enthalten.
+* der User, der die Anfrage schickt keine Berechtigung hat, diese auszuführen. In diesem Fall muss man prüfen, ob die UserGruppe in der Datenbank korrekt angelegt und wie xref:https://github.com/minova-afis/aero.minova.cas/blob/master/service/doc/adoc/security.adoc[hier] richtig verknüpft ist.
+
+## IllegalArgumentException
+
+### URI is not absolute
+
+Tritt (bisher) nur auf, wenn die BIRT Extension mit dem CAS gestartet wird und in den application.properties keine URI zum dazugehörigen BIRT Service gesetzt wurde. 

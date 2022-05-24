@@ -4,9 +4,15 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [Unreleased]
+* Erstelle Standard-Prozedur-Erweiterung `xpcasEncodePassword` damit der Nutzer keine Entwicklungsumgebung braucht,
+um Passwörter zu hashen.
+* Einbinden des ServiceNotifierServices in den QueueService, damit Dienstextensions Listener registrieren können, ohne dass NullPointerExceptions geworfen werden.
+
+## [12.44.1] - 2022-05-19
 
 * Korrektur des ServiceNotifierServices, damit NewsfeedListener angelegt werden können.
 * Automatisches Anlegen eines Admins mit *allen* Rechten am Ende des Setups.
+* Auslagern der Cache Methoden aus dem ServiceNotifierService.
 
 ## [12.44.0] - 2022-05-13
 
@@ -14,25 +20,21 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Setup wieder durchfürbar machen.
 * Falls ein Fehler während des Setups auftritt, wird nun die korrekte HTTPServletResponse zurückgegeben.
 
-
 ## [12.43.0 ] - 2022-05-05
-registerServiceMessage-Methode im QueueService korrigieren.
-
-#299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
-#303 SpringBoot: /actuator ist auf dem Management-Port 8081 zu finden. Per Konfiguration `management.endpoints.enabled-by-default=false` sind alle weiteren Endpunkte deaktiviert.
-
-#302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
+* registerServiceMessage-Methode im QueueService korrigieren.
+* #299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
+* #303 SpringBoot: /actuator ist auf dem Management-Port 8081 zu finden. Per Konfiguration `management.endpoints.enabled-by-default=false` sind alle weiteren Endpunkte deaktiviert.
+* #302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
 
 ## [12.42.0 ] - 2022-05-02
-#281: Logs aus Tests in den target-Ordner schreiben, damit diese nicht ausversehen commited werden.
+* #281: Logs aus Tests in den target-Ordner schreiben, damit diese nicht ausversehen commited werden.
 
-Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste implementieren.
+* Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste implementieren.
 
 ## [12.41.2 - 12.41.3] - 2022-04-29
 
 Kompatibilitäts-Projekt `aero.monova.core.application.system.app` erstellen,
 um einen Setup-Fehler zu beheben zu können.
-
 Siehe das link:doc/adoc/support.adoc[Support-Dokument] and link:app.legacy/README.adoc[Kompatibilitäts-Projekts-README] für Details.
 
 ## [12.41.1] - 2022-04-25

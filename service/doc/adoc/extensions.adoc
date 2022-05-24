@@ -9,3 +9,9 @@ In diesem Fall wird eine entsprechenede Exception geworfen.
 Alle registierten Erweiterungen werden beim 'Setup' automatisch als Recht mit installiert und können so einfacher an die Rollen vergeben werden.
 Denn bevor eine Extension ausgeführt wird, werden die Rollen des Nutzers, der die Anfrage stellt, erst einmal darauf überprüft,
 ob das entsprechende Recht für die Extension vorhanden ist.
+
+== Standard-Prozedur-Erweiterungen
+
+* xpcasEncodePassword: nimmt eine Tabelle mit den Spalten `password` und `encodedPassword` entgegen.
+Die Passwörter in der Spalte `password` werden kodiert und das Ergebnis in `encodedPassword` abgelegt.
+Die so gehashten Passwörter können in `xtcasUsers.Password` verwendet werden.

@@ -1,3 +1,0 @@
-= ServiceNotifier
-
-* xref:servicenotifier.adoc#[ServiceNotifier API]

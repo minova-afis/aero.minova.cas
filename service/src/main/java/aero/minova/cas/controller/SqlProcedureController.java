@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,8 @@ import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
+import javax.annotation.PostConstruct;
+
 @RestController
 public class SqlProcedureController {
 	@Autowired
@@ -56,7 +59,7 @@ public class SqlProcedureController {
 	@Autowired
 	SecurityService securityService;
 
-	@Autowired
+	@Setter
 	QueueService queueService;
 
 	final Object extensionSynchronizer = new Object();

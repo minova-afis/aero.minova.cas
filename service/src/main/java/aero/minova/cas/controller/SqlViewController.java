@@ -12,7 +12,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,8 @@ import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
+import javax.annotation.PostConstruct;
+
 @RestController
 public class SqlViewController {
 
@@ -39,7 +43,7 @@ public class SqlViewController {
 	SystemDatabase systemDatabase;
 
 	@Autowired
-	SecurityService securityService;
+	private SecurityService securityService;
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mysql}")
 	String databaseKind;
@@ -56,6 +60,12 @@ public class SqlViewController {
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
 	 */
 	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
+
+
+	@PostConstruct
+	public void init(){
+		securityService.setSvc(this);
+	}
 
 	/**
 	 * Hiermit lassen sich Erweiterungen für Views registrieren, die ausgeführt werden, wenn eine View mit der Namen der Registrierung ausgeführt werden soll.

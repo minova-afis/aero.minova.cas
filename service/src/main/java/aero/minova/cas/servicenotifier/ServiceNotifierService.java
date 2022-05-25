@@ -1,17 +1,5 @@
 package aero.minova.cas.servicenotifier;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
@@ -22,6 +10,16 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.SecurityService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ServiceNotifierService {
@@ -243,7 +241,7 @@ public class ServiceNotifierService {
 				// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
 				Table keyTable = findProcedureEntry(inputRow.getValues().get(0), inputRow.getValues().get(1));
 
-				if (keyTable.getRows().size() <= 0) {
+				if (keyTable.getRows().isEmpty()) {
 					throw new RuntimeException("The combination of procedurename and topic could not be found! " + inputRow.getValues().get(0).getStringValue()
 							+ " " + inputRow.getValues().get(1).getStringValue());
 				}
@@ -400,7 +398,7 @@ public class ServiceNotifierService {
 			throw new RuntimeException(e);
 		}
 		// Da die ServiceNamen eindeutig sein müssen, kann man beruhigt den ersten KeyLong zurückgeben, den man findet.
-		if (viewResult.getRows().size() <= 0) {
+		if (viewResult.getRows().isEmpty()) {
 			throw new RuntimeException("No service with the name " + casServiceName + " registered.");
 		} else {
 			return viewResult.getRows().get(0).getValues().get(0);

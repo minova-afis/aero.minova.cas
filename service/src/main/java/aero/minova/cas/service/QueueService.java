@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -28,20 +30,22 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
 
+import javax.annotation.PostConstruct;
+
 @Service
 public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	@Autowired
-	CustomLogger logger;
+	private CustomLogger logger;
 
 	@Autowired
-	SecurityService securityService;
+	private SecurityService securityService;
 
 	@Autowired
-	ServiceNotifierService serviceNotifierService;
+	private ServiceNotifierService serviceNotifierService;
 
 	@Autowired
-	SqlProcedureController spc;
+	private SqlProcedureController spc;
 
 	// Hierbei handelt es sich um Tage
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.message.age:7}")
@@ -54,6 +58,11 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	// Map<ProzedurName, Map< ServiceName, BiFunction>>
 	Map<String, Map<String, BiFunction<Table, ResponseEntity<Object>, String>>> serviceMessageCreators = new HashMap<>();
+
+	@PostConstruct
+	public void init() {
+		spc.setQueueService(this);
+	}
 
 	/**
 	 * Registriert eine BiFunction auf einen Prozedurnamen.

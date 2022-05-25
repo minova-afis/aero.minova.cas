@@ -2,13 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cas.dev</artifactId>
-    <version>12.45.0-SNAPSHOT</version>
     <description>Hiermit kann man einfach CAS mit Plugins in der IDE ausführen.</description>
+    <packaging>pom</packaging>
+
     <parent>
         <groupId>aero.minova</groupId>
-        <artifactId>spring.maven.root</artifactId>
-        <version>1.3.1</version>
-        <relativePath/>
+        <artifactId>cas.parent</artifactId>
+        <version>12.45.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -79,11 +79,11 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Minova Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</repositories>
 </project>

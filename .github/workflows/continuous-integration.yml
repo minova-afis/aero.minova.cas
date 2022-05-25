@@ -40,10 +40,10 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build
+      - name: Maven build and SonarQube scan
         run: |
           cd $GITHUB_WORKSPACE
-          mvn --batch-mode clean verify \
+          mvn --batch-mode verify \
           dependency-check:aggregate \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -P repo-github \

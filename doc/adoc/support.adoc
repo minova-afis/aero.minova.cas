@@ -190,3 +190,30 @@ Die häufigste Exception. Tritt auf, wenn:
 ### URI is not absolute
 
 Tritt (bisher) nur auf, wenn die BIRT Extension mit dem CAS gestartet wird und in den application.properties keine URI zum dazugehörigen BIRT Service gesetzt wurde. 
+
+
+## SQLServerException: PKIX path building failed
+Ab SpringBoot 2.7.0 wird für die Verbindung zum MS-SQL eine verschlüsselte Verbindung aufgebaut. Das heißt der Wert für `encrypt` ist nun per Default `true` zuvor war er auf `false`. Siehe https://github.com/spring-projects/spring-boot/issues/31157
+
+=== Fehlermeldung
+```
+2022-05-25T12:24:36.384 Servlet.service() for servlet [dispatcherServlet] in context with path [/cas] threw exception [Request processing failed; nested exception is aero.minova.cas.api.domain.ProcedureException: java.lang.RuntimeException: com.microsoft.sqlserver.jdbc.SQLServerException: Der Treiber konnte keine sichere Verbindung mit SQL Server über die SSL (Secure Sockets Layer)-Verschlüsselung herstellen. Fehler: 'PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target'. ClientConnectionId:19cbae03-1613-493f-acd0-decc7f65f14f] with root cause
+sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.build(SunCertPathBuilder.java:141)
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:126)
+	at java.base/java.security.cert.CertPathBuilder.build(CertPathBuilder.java:297)
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:434)
+	at java.base/sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:306)
+	at java.base/sun.security.validator.Validator.validate(Validator.java:264)
+	at java.base/sun.security.ssl.X509TrustManagerImpl.validate(X509TrustManagerImpl.java:313)
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:233)
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:110)
+
+[...]
+```
+
+=== Lösung
+Bei der Konfiguration von `aero_minova_database_url` den Parameter `encrypt` auf `false` setzen, z.B.:
+```
+aero_minova_database_url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
+```

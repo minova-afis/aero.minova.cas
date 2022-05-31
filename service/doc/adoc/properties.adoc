@@ -49,7 +49,7 @@ IMPORTANT: Falls eine Property in den application.properties verändert wird, *m
 
 * aero_minova_database_url
 
-** *Default*: `jdbc:sqlserver://localhost;databaseName=AFIS_HAM`
+** *Default*: `jdbc:sqlserver://localhost;encrypt=false;databaseName=AFIS_HAM`
 
 * aero_minova_database_user_name
 

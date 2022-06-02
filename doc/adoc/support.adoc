@@ -217,3 +217,26 @@ Bei der Konfiguration von `aero_minova_database_url` den Parameter `encrypt` auf
 ```
 aero_minova_database_url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
 ```
+
+## Port already in use
+
+Genaue Fehlermeldung: 
+```
+***************************
+APPLICATION FAILED TO START
+***************************
+Description:
+Web server failed to start. Port 8081 was already in use.
+```
+### Der Server-Port vom CAS ist auf 8081 gestellt
+
+Wenn die server.port Property in den application.properties auf 8081 gestellt ist und dieser Fehler kommt, läuft ein anderer Dienst gerade auf diesem Port.
+
+War das CAS schon die ganze Zeit auf diesen Port eingestellt und diese Meldung kommt bei einem Neustart, muss man in den Taskmanager oder besser noch in den Sysinternals Process Explorer gehen und nach einer einsamen java.exe suchen und diese beenden.
+
+Ist das CAS nicht bereits auf diesem Port gelaufen, muss man sich einen freien Port suchen und diesen in die application.properties schreiben.
+
+### Der CAS läuft nicht auf 8081.
+Seit Release 12.43.0 gibt es unter dem Management-Port 8081 den SpringBoot /actuator.
+Man kann den Port umbelegen, indem man in den application.properties die Property management.server.port auf einen anderen Port setzt, oder per 
+management.endpoints.enabled-by-default=false die Funktionalität abschalten.

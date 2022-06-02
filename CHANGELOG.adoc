@@ -4,6 +4,8 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [Unreleased]
+* API für Extensions, welche Nachrichten an einen Dienst schicken möchten.
+
 * Update auf SpringBoot 2.7.0: MS-SQL Dependency wurde von 9.x auf 10.x aktualisiert. Das heißt der Wert für `encrypt` ist nun per Default `true`. Siehe `support.adoc` und https://github.com/spring-projects/spring-boot/issues/31157
 
 ## [12.45.0] - 2022-05-25

@@ -2,7 +2,7 @@
 
 Es wird Java 11 und Maven benötigt.
 
-## In Eclipse ausführen und debuggen.
+## In Eclipse ausführen und debuggen. (Diese Beschreibung ist unvollständig)
 
 In Eclipse:
 

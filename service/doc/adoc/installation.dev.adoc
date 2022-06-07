@@ -97,6 +97,7 @@ docker run \
 ### Windows
 
 Eine Ausführung in der Git Bash funktioniert nicht wie erhofft.
+Stattdessen kann man die PowerShell verwenden:
 
 [source,powershell]
 ----

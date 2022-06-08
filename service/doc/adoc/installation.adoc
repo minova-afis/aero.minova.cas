@@ -2,14 +2,13 @@
 
 == Übersicht
 
-Jede Installation besteht aus 4 Teilen,
+Jede Installation besteht aus 5 Teilen,
 welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt werden:
 
 * Installation des CAS-Dienstes
-* Datenbank aufsetzen:
-** <<sql-server-und-datenbank-einrichten>>
-** <<Datenbank-initialisieren>>
+* Datenbank aufsetzen: <<sql-server-und-datenbank-einrichten>>
 * Dateisystem einbinden.
+* <<Datenbank-initialisieren>>
 * xref:security.adoc[Absicherung des Netzwerkes und der Daten]
 
 == Installation für Spezifische Umgebungen

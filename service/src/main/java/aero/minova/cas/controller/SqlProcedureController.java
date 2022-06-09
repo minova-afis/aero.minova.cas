@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +40,8 @@ import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
+import lombok.Setter;
 import lombok.val;
-
-import javax.annotation.PostConstruct;
 
 @RestController
 public class SqlProcedureController {
@@ -55,6 +53,9 @@ public class SqlProcedureController {
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mysql}")
 	String databaseKind;
+
+	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.maxresultsetcount:512}")
+	Integer maxResultSetCount;
 
 	@Autowired
 	SecurityService securityService;
@@ -211,7 +212,7 @@ public class SqlProcedureController {
 	/**
 	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
 	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben.
-	 * 
+	 *
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @return SqlProcedureResult der Ausführung
@@ -295,7 +296,7 @@ public class SqlProcedureController {
 	/**
 	 * Führt eine SQL-Prozedur aus. Hier gibt es keinen Rollback oder Commit. Diese müssen selbst durchgeführt werden. Diese Methode ist public, weil diese von
 	 * Erweiterungen genutzt werden, um bei Fehlern in komplexeren Prozessen alle Änderungen in der Datenbank rückgängig zu machen.
-	 * 
+	 *
 	 * @param inputTable
 	 *            Die Table mit allen Werten zum Verarbeiten der Prozedur.
 	 * @param privilegeRequest
@@ -365,8 +366,9 @@ public class SqlProcedureController {
 						// Es gibt kein nächstes Result gibt.
 						break;
 					}
-					if (++i >= 256) {
-						customLogger.logSql("Warning: too many result sets.");
+					if (++i >= maxResultSetCount) {
+						customLogger.logSql(
+								"Warning: too many result sets. Mabye there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");
 						break;
 					}
 				}
@@ -390,9 +392,7 @@ public class SqlProcedureController {
 									return new Column(name, DataType.INSTANT);
 								} else if (type == Types.INTEGER) {
 									return new Column(name, DataType.INTEGER);
-								} else if (type == Types.VARCHAR) {
-									return new Column(name, DataType.STRING);
-								} else if (type == Types.NVARCHAR) {
+								} else if ((type == Types.VARCHAR) || (type == Types.NVARCHAR)) {
 									return new Column(name, DataType.STRING);
 								} else if (type == Types.DECIMAL) {
 									return new Column(name, DataType.BIGDECIMAL);
@@ -470,7 +470,7 @@ public class SqlProcedureController {
 				if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 					resultRow = outputValues;
 				} else {
-					for (int i = 0; i < outputValues.getValues().size(); i++) {
+					for (Value element : outputValues.getValues()) {
 						resultRow.addValue(null);
 					}
 				}
@@ -549,7 +549,7 @@ public class SqlProcedureController {
 							} else if (type == DataType.INTEGER) {
 								preparedStatement.setInt(i + parameterOffset, iVal.getIntegerValue());
 							} else if (type == DataType.LONG) {
-								preparedStatement.setDouble(i + parameterOffset, Double.valueOf(iVal.getLongValue()));
+								preparedStatement.setDouble(i + parameterOffset, iVal.getLongValue());
 							} else if (type == DataType.STRING) {
 								preparedStatement.setString(i + parameterOffset, iVal.getStringValue());
 							} else if (type == DataType.ZONED) {

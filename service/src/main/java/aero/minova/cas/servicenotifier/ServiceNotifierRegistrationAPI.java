@@ -1,6 +1,7 @@
 package aero.minova.cas.servicenotifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
@@ -10,6 +11,7 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 
+@Service
 public class ServiceNotifierRegistrationAPI {
 
 	@Autowired
@@ -72,6 +74,7 @@ public class ServiceNotifierRegistrationAPI {
 		}
 	}
 
+	// TODO: In Table
 	/**
 	 * Sucht anhand des Spaltennamens an welcher Position sich diese befindet und gibt die Stelle zurück. Falls der Name nicht vorkommt, wird eine
 	 * IllegalArgumentException geworfen.

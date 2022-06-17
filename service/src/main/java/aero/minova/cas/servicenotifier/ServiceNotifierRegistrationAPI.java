@@ -73,26 +73,4 @@ public class ServiceNotifierRegistrationAPI {
 			logger.logError("The Newsfeedlistener could not be registered for topic " + topic + " and procedure " + procedureName, e);
 		}
 	}
-
-	// TODO: In Table
-	/**
-	 * Sucht anhand des Spaltennamens an welcher Position sich diese befindet und gibt die Stelle zurück. Falls der Name nicht vorkommt, wird eine
-	 * IllegalArgumentException geworfen.
-	 * 
-	 * @param t
-	 *            Tabelle, in welcher gesucht werden soll.
-	 * @param columnName
-	 *            Spaltenname, nach welchem gesucht werden soll.
-	 * @return Die Position als int.
-	 */
-	public int findColumnPosition(Table t, String columnName) {
-		for (int i = 0; i < t.getColumns().size(); i++) {
-			if (t.getColumns().get(i).getName().toLowerCase().equals(columnName.toLowerCase())) {
-				return i;
-			}
-		}
-		throw new IllegalArgumentException(
-				"Column name " + columnName + " could not be found for procedure " + t.getName() + "! No message can be created with this input table!");
-	}
-
 }

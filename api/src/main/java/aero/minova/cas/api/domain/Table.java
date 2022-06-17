@@ -40,6 +40,25 @@ public class Table implements Serializable {
 		this.metaData = metaData;
 	}
 
+	/**
+	 * Sucht anhand des Spaltennamens an welcher Position sich diese befindet und gibt die Stelle zurück. Falls der Name nicht vorkommt, wird eine
+	 * IllegalArgumentException geworfen.
+	 * 
+	 * @param t
+	 *            Tabelle, in welcher gesucht werden soll.
+	 * @param columnName
+	 *            Spaltenname, nach welchem gesucht werden soll.
+	 * @return Die Position als int.
+	 */
+	public int findColumnPosition(String columnName) {
+		for (int i = 0; i < columns.size(); i++) {
+			if (columns.get(i).getName().toLowerCase().equals(columnName.toLowerCase())) {
+				return i;
+			}
+		}
+		throw new IllegalArgumentException("Column name " + columnName + " could not be found for table " + name + "!");
+	}
+
 	public void addColumn(Column c) {
 		if (getRows().size() != 0) {
 			throw new IllegalArgumentException();

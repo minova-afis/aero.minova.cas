@@ -7,7 +7,7 @@
 * xref:extensions.adoc#[Erweiterungen]
 * xref:properties.adoc#[Properties]
 * xref:./../../../setup/doc/adoc/setup.adoc#[Setup Service]
-* xref:./../../../servicenotifier/doc/adoc/index.adoc#[ServiceNotifier Service]
+* xref:./servicenotifier.adoc#[ServiceNotifier Service]
 * xref:queueservice.adoc#[Queue Service]
 * xref:sql-integrated-security.adoc#[Integrierte Sicherheit für SQL-Anmeldung]
 
@@ -17,7 +17,3 @@
 * xref:nutzerverwaltung.adoc#[Nutzerverwaltung]
 * xref:rowlevelexample.adoc#[Beispiel zum Aktivieren der RowLevelSecurity]
 * xref:adGroupsToUserGroups.adoc#[Vergeben von Berechtigungen für AD-Gruppen]
-
-= ServiceNotifier
-
-* xref:servicenotifier.adoc#[ServiceNotifier API]

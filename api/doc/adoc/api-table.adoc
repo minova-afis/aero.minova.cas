@@ -71,6 +71,9 @@ also die 1.Seite, ausgegeben.
 
 Die Parameter-Typen des Aufrufes.
 
+Mithilfe der findColumnPosition-Methode kann die Position einer bestimmten Column mithilfe deren Name gefunden werden.
+Ist der Name nicht vorhanden wird eine IllegalArgumentException geworfen.
+
 ==== columns/values/*
 
 Die Werte dürfen prinzipiell von einem beliebigen Typ sein,

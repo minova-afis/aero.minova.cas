@@ -36,3 +36,10 @@ Folgende Extensions können mithilfe von *data/procedure* aufgerufen werden:
 * unregisterProcedureNewsfeedCompletely: Löscht alle Verknüpfungen zwichen einer Prozedur und den dazugehörigen Tabellen. Die übergebene Tabelle muss nur den Name der Prozedur enthalten.
 * xpcasRegisterNewsfeedListener: Speichert, welche Dienste auf welche Topics horchen. Der Dienstname und der Tabellenname müssen als Values übergeben werden. Die Informationen werden in der xtcasNewsfeedListener gespeichert. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name des registrierten Services, Topic
 * xpcasUnregisterNewsfeedListener: Löscht den Vermerk des Dienstes auf das Topic wieder aus der Tabelle xtcasNewsfeedListener. Die übergebene Tabelle muss folgende Informationen beinhalten in dieser Reihenfolge: Name des registrierten Services, Topic
+
+
+Zum leichteren Registrieren der ServiceNotifier und ProcedureNewsfeeds, gibt es die *ServiceNotifierRegistrationAPI*-Klasse.
+
+Diese beinhaltet zwei Methoden:
+* *registerNewsfeedListener*(String topic, String serviceName): Registriert einen Service auf ein Topic.
+* *registerProcedureNewsfeed*(String procedureName, String topic): Registriert eine Prozedur auf ein Topic.

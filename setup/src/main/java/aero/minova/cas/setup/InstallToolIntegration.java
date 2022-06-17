@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Hashtable;
 import java.util.Optional;
+import java.util.Vector;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,9 +51,10 @@ public class InstallToolIntegration {
 					BaseSetup.parameter.put("fs", "value");
 				}
 				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
-				BaseSetup.hashModules.clear();
-				BaseSetup.hashtables.clear();
-				BaseSetup.tablevector.clear();
+
+				BaseSetup.hashModules = new Hashtable<>();
+				BaseSetup.hashtables = new Hashtable<>();
+				BaseSetup.tablevector = new Vector<>();
 				final BaseSetup setup = new BaseSetup();
 				setup.setSetupDocument(setupDocument);
 				setup.readSchema();

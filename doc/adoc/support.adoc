@@ -89,6 +89,21 @@ Siehe link:../../app.legacy/README.adoc[hier] für Details
 </dependency>
 ```
 
+### `The value is not set for the parameter number 7`
+
+Dabei kommt auch der Fehler `com.microsoft.sqlserver.jdbc.SQLServerException: The statement must be executed before any results can be obtained.`.
+Meistens fällt dabei auf, dass keinerlei SQL-Prozeduren beim Setup-Befehl aufgespielt wurden und auch keine in der Datenbank vorhanden sind.
+
+```
+<dependency>
+    <groupId>aero.minova</groupId>
+    <artifactId>core.application.system.app</artifactId>
+    <version>12.42.0</version>
+    <classifier>app</classifier>
+</dependency>
+```
+
+
 ## Prozedur, View oder anderes SQL-Objekt fehlt nach Setup.
 
 Die setup-Prozedur bricht nach einem Fehler nicht immer mit einem Fehler ab,

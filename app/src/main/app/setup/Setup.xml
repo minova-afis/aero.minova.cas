@@ -6,6 +6,8 @@
 		<script name="initDebug" type="script"/>
 		<script name="initVersionTable" type="script"/>
 		<script name="initVersionTable1" type="script"/>
+		<!-- Die Prozeduren spMinovaUpdateVersion und spMinovaCheckProcedure müssen als type="script" aufgespielt werden,
+		weil type="procedure" diese beiden Prozeduren benötigt. Siehe initVersionTable1, sorgt dafür, dass alter procedure funktioniert. -->
 		<script name="spMinovaUpdateVersion" type="script"/>
 		<script name="spMinovaCheckProcedure" type="script"/>
 		<script name="spMinovaCheckView" type="procedure"/>

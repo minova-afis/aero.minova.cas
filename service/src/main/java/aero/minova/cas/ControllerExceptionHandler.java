@@ -317,8 +317,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
-				logger.info(
-						"CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError + "/n" + sw.toString());
+				logger.info("CAS : Saving stacktrace : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError + "/n"
+						+ sw.toString());
 			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();

@@ -123,7 +123,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 
 		// Alles vor 'msg.' wegschmeißen.
-		errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
+		if (errorMessage.contains("msg.")) {
+			errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
+		}
 
 		/*
 		 * Es gibt zwei Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'

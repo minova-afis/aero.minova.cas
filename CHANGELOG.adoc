@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased]
 * API für Extensions, welche Nachrichten an einen Dienst schicken möchten.
+* #274 Fehlermeldungen, welche nicht mit 'msg.' beginnen, verarbeitbar machen.
+* #291 Doku für Logs hinzugefügt
 
 
 ## [12.46.0] - 2022-06-09

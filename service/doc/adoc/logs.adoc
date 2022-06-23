@@ -4,7 +4,7 @@ Die Logs des CAS werden im logs-Ordner im root-Verzeichnis abgelegt.
 
 Es gibt sieben verschiedene Logs:
 
-* *errorLog*: Loggt alle auftretenden Fehlermeldungen.
+* *errorLog*: Loggt alle auftretenden Fehlermeldungen und den dazugehörigen Stacktrace.
 * *privilegeLog*: Loggt alle Privilegienanfragen, welche das CAS durchführt.
 * *springLog*: Loggt alle SQL-Anfragen vom CAS an die Datenbank.
 * *userLog*: Loggt alle Anfragen der User an das CAS.

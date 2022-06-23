@@ -6,6 +6,7 @@
 
 * xref:extensions.adoc#[Erweiterungen]
 * xref:properties.adoc#[Properties]
+* xref:logs.adoc#[Logging und Logs]
 * xref:./../../../setup/doc/adoc/setup.adoc#[Setup Service]
 * xref:./servicenotifier.adoc#[ServiceNotifier Service]
 * xref:queueservice.adoc#[Queue Service]

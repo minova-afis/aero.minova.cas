@@ -1,0 +1,21 @@
+== Logging und Logs
+
+Die Logs des CAS werden im logs-Ordner im root-Verzeichnis abgelegt.
+
+Es gibt sieben verschiedene Logs:
+
+* *errorLog*: Loggt alle auftretenden Fehlermeldungen.
+* *privilegeLog*: Loggt alle Privilegienanfragen, welche das CAS durchführt.
+* *springLog*: Loggt alle SQL-Anfragen vom CAS an die Datenbank.
+* *userLog*: Loggt alle Anfragen der User an das CAS.
+* *filesLog*: Loggt alle File-Anfragen von Usern und alle Hash- und Zip-Operationen des CAS.
+* *setupLog*: Loggt alle Operationen, welche das CAS beim Setup durchführt.
+* *queueServiceLog*: Loggt jede Aktivität des QueueService.
+
+Nachdem ein neuer Tag anbricht, verschiebt das CAS die 'alten' Logs automatisch in einen 'archived'-Ordner innerhalb des logs-Ordners.
+Somit gibt es für immer genau *ein Log jeder Art pro Tag*.
+
+Das Log-Pattern und das Namens-Pattern der Logs wird durch die logback-spring.xml im src/main/resources bestimmt.
+Dort werden die Logfiles auch mit der CustomLogger-Klasse verbunden.
+
+Das Pattern der Logs im Allgemeinen ist immer: *yyyy-MM-dd'T'HH:mm:ss.SSS Benutzer:*

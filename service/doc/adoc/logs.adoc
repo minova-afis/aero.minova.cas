@@ -1,6 +1,6 @@
 == Logging und Logs
 
-Die Logs des CAS werden im logs-Ordner im root-Verzeichnis abgelegt.
+Die Logs des CAS werden im APP_LOG_ROOT-Verzeichnis abgelegt, welches als Default einen logs-Ordner im Root-Verzeichnis des CAS Dienstes anlegt.
 
 Es gibt sieben verschiedene Logs:
 

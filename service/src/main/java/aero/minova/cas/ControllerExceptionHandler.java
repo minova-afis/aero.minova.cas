@@ -123,7 +123,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 
 		// Alles vor 'msg.' wegschmeißen.
-		errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
+		if (errorMessage.contains("msg.")) {
+			errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
+		}
 
 		/*
 		 * Es gibt zwei Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'
@@ -315,8 +317,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				e.printStackTrace(pw);
-				logger.info(
-						"CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError + "/n" + sw.toString());
+				customLogger.logSql("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
+				// Der Stacktrace wird nicht in der Datenbank gespeichert, da das Feld einfach viel zu lang ist. Deswegen geben wir ihn im ErrorLog aus.
+				customLogger.errorLogger.info("CAS: Showing Stacktrace : " + sw.toString());
 			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();
@@ -324,7 +327,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e1.printStackTrace(pw);
-			customLogger.errorLogger.error("CAS : Error could not be saved in database." + "/n" + sw.toString());
+			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw.toString(), e1);
 		} finally {
 			systemDatabase.freeUpConnection(connection);
 		}

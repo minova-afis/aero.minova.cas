@@ -34,6 +34,17 @@
 
 Manchmal ist es nicht eindeutig, ob der Fehler im CAS oder in der WFC Anwendung liegt. link:https://github.com/minova-afis/aero.minova.rcp/wiki/Hilfestellung-bei-Support[Hier geht es zur Support Seite der WFC Anwendung]
 
+## Log-Files durchsuchen.
+
+Folgendes Schema kann man beim Log-Durchsuchen häufig verwenden:
+* Erste `request.log` durchsuchen, um die dazugehörige Request zu finden.
+  Falls man einen Fehler hat kann man hier vorher noch über `error.log` die Zeit der Anfrage finden.
+  Hiermit weiss man, was im Detail gemacht werden sollte.
+* Fehlermeldung über `error.log` suchen.
+* Ausführungsdetails über `springLog.log` suchen.
+  Hier kann man Details herausfinden, welche vielleicht in der Fehlermeldung fehlen
+  oder vom Dienst garnicht als Fehler erkannt wurden.
+
 ## Anmeldung funktioniert nicht mit WFC.
 
 1. Die Anmeldung über den Browser versuchen.

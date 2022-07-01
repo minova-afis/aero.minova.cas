@@ -38,8 +38,8 @@ Manchmal ist es nicht eindeutig, ob der Fehler im CAS oder in der WFC Anwendung 
 
 Folgendes Schema kann man beim Log-Durchsuchen häufig verwenden:
 
-* Erste `request.log` durchsuchen, um die dazugehörige Request zu finden.
-  Falls man einen Fehler hat kann man hier vorher noch über `error.log` die Zeit der Anfrage finden.
+* Erst die `request.log` durchsuchen, um die dazugehörige Request zu finden:
+  Falls man einen Fehler hat, kann man hier vorher noch über `error.log` die Zeit der Anfrage finden.
   Hiermit weiss man, was im Detail gemacht werden sollte.
 * Fehlermeldung über `error.log` suchen.
 * Ausführungsdetails über `springLog.log` suchen.

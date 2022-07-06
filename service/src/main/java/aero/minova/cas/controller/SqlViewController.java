@@ -12,14 +12,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.Setter;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.OutputType;
@@ -28,13 +29,10 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
-
-import javax.annotation.PostConstruct;
 
 @RestController
 public class SqlViewController {
@@ -61,9 +59,8 @@ public class SqlViewController {
 	 */
 	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
 
-
 	@PostConstruct
-	public void init(){
+	public void init() {
 		securityService.setSvc(this);
 	}
 
@@ -160,15 +157,11 @@ public class SqlViewController {
 				limit = inputMetaData.getLimited();
 			}
 
-			String viewQuery;
 			// POSTGRE SQL verwendet RowCount als Funktion, wesewegen es nicht so genutzt werden kann, wie wir es bei der pagingWithSeek-Methode verwenden.
 			// Deshalb verwenden wir stattdessen die prepareViewString-Methode, welche minimal langsamer ist.
-			if (databaseKind.equals("postgresql")) {
-				viewQuery = prepareViewString(inputTable, false, 0, authoritiesForThisTable);
-			} else {
-				// Wir setzten für Page 1 und für limited 0 ein, damit wir alle Ergebnisse bekommen. Die Menge wird später begrenzt.
-				viewQuery = pagingWithSeek(inputTable, false, 0, false, 1, authoritiesForThisTable);
-			}
+			// Die pagingWithSeek-Methode benötigt immer einen KeyLong in der Anfrage. Es gibt allerdings auch einige Anfragen, die keinen KeyLong benötigen,
+			// weswegen dann Fehlermeldungen geworfen werden. Deshalb wird ab jetzt einfach die prepareViewString-Methode verwendet.
+			String viewQuery = prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logSql("Executing statements: " + sb.toString());
@@ -365,7 +358,8 @@ public class SqlViewController {
 	}
 
 	/*
-	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen
+	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen. Wird NICHT für den "normalen" Index-Aufruf verwendet, da immer
+	 * davon ausgegangen wird, dass ein KeyLong in der View/Table vorhanden ist.
 	 */
 	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
 		final StringBuffer sb = new StringBuffer();

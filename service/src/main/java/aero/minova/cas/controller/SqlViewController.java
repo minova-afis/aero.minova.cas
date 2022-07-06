@@ -157,12 +157,11 @@ public class SqlViewController {
 				limit = inputMetaData.getLimited();
 			}
 
-			String viewQuery;
 			// POSTGRE SQL verwendet RowCount als Funktion, wesewegen es nicht so genutzt werden kann, wie wir es bei der pagingWithSeek-Methode verwenden.
 			// Deshalb verwenden wir stattdessen die prepareViewString-Methode, welche minimal langsamer ist.
 			// Die pagingWithSeek-Methode benötigt immer einen KeyLong in der Anfrage. Es gibt allerdings auch einige Anfragen, die keinen KeyLong benötigen,
 			// weswegen dann Fehlermeldungen geworfen werden. Deshalb wird ab jetzt einfach die prepareViewString-Methode verwendet.
-			viewQuery = prepareViewString(inputTable, false, 0, authoritiesForThisTable);
+			String viewQuery = prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logSql("Executing statements: " + sb.toString());

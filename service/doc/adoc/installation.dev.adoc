@@ -9,7 +9,7 @@ In Eclipse:
 * Repository runterladen: `git clone git@github.com:minova-afis/aero.minova.cas.git`
 * Repo als Maven-Projekt in Eclipse importieren.
 * Gesamtes Projekt bauen: `mvn clean install`
-** Im `Package Explorer` das Projekt `cas.root` aufklappen.
+** Im `Package Explorer` das Projekt `cas.parent` aufklappen.
 ** `pom.xml` Rechts klicken und `Run As` -> `Maven build...` auswählen.
 ** `clean install` in den Goals eintragen und `Run` klicken.
 * Die `Java Application`-`Run Configuration` erstellen:

@@ -358,7 +358,8 @@ public class SqlViewController {
 	}
 
 	/*
-	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen
+	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen. Wird NICHT für den "normalen" Index-Aufruf verwendet, da immer
+	 * davon ausgegangen wird, dass ein KeyLong in der View/Table vorhanden ist.
 	 */
 	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
 		final StringBuffer sb = new StringBuffer();

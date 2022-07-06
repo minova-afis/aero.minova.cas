@@ -2,25 +2,26 @@
 
 Es wird Java 11 und Maven benötigt.
 
-## In Eclipse ausführen und debuggen. (Diese Beschreibung ist unvollständig)
+## In Eclipse ausführen und debuggen.
 
 In Eclipse:
 
 * Repository runterladen: `git clone git@github.com:minova-afis/aero.minova.cas.git`
 * Repo als Maven-Projekt in Eclipse importieren.
-* Gesamtes Projekt bauen: `mvn clean verify`
-* Die `Java Application`-`Run Configuration` für die Klasse `aero.minova.cas.CoreApplicationSystemApplication` anlegen:
-** Als Ausführungspfad den lib-Ordner des Testsystems angeben (siehe später).
-** Unter Classpath auf `User Entries` klicken.
-Danach kann man über `Add Projects...` Extensions als Projekte hinzufügen.
-Diese werden dann bei der Ausführung mitgeladen.
-In der Regel braucht man dabei die `setup`-Extension,
-da man sonst keinen Setup-Befehl hat.
+* Gesamtes Projekt bauen: `mvn clean install`
+** Im `Package Explorer` das Projekt `cas.parent` aufklappen.
+** `pom.xml` Rechts klicken und `Run As` -> `Maven build...` auswählen.
+** `clean install` in den Goals eintragen und `Run` klicken.
+* Die `Java Application`-`Run Configuration` erstellen:
+** Unter Main als `Project` `cas.dev` auswählen.
+** Unter Main als `Main Class` `aero.minova.cas.CoreApplicationSystemApplication` eintragen.
+** Unter Arguments in `Working Directory` `Others:` selektieren und mit `File System...` einen Ausführungs-Ordner für das CAS auswählen.
+   Dieser muss unter Umständen erstellt werden und enthält Dateien (wie bspw. Konfigurationen) für das lokale CAS.
 
-Testsystem-Ordner einrichten:
+CAS-Ordner einrichten:
 
-* Testsystem-Ordner erstellen.
-* `<Testsystem-Ordner>/lib` Unterordner erstellen und dort `application.properties` anlegen und mit passenden Werten füllen.
+* CAS-Ordner erstellen (der selbe wie in der `Run Configuration)`.
+* In `<Testsystem-Ordner>` die Datei `application.properties` anlegen und mit passenden Werten füllen.
 Folgendes ist eine häufig nützliche minimal Konfiguration:
 [source,properties]
 ```
@@ -33,7 +34,9 @@ aero_minova_core_application_root_path=<Testsystem-Ordner>/system-files
 ```
 * `<Testsystem-Ordner>/system-files` erstellen und mit Masken etc. füllen.
 Falls man nicht weiss, wass man reintun soll:
-Kann man aus dem CAS-Repo den Inhalt von den Ordner `app/target/docker-layer` in den `<Testsystem-Ordner>/system-files` kopieren.
+man kann aus dem CAS-Repo den Inhalt des Ordners `app/target/docker-layer` in den `<Testsystem-Ordner>/system-files` kopieren.
+
+Jetzt kann man das CAS mit der erstellen `Run Configuration` in Eclipse starten.
 
 ## Snapshot-Docker-Image lokal bauen und ausführen.
 

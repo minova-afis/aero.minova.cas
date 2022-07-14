@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased]
 * #217 Es wird nicht mehr bei jedem SQL-Aufruf erwartet, dass die View/Tabelle einen KeyLong besitzt.
+* Ein weiteres Format von Fehlermeldungen unterstützen: 'ADO|Zahl|Fehlermeldung'
 
 ## [12.47.1] - 2022-06-24
 * #274 Fehlermeldungen, welche nicht mit 'msg.' beginnen, verarbeitbar machen.

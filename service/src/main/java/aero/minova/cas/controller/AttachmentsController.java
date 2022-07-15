@@ -17,8 +17,11 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,9 +43,9 @@ public class AttachmentsController implements AttachmentsApi {
 	}
 
 	@Override
-	public ResponseEntity<AttachmentMetaEntry> createAttachment(Resource body) {
-		try {
-			StorageLowLevelMetaData metaData = service.store(UUID.randomUUID().toString(), body.getInputStream());
+	public ResponseEntity<AttachmentMetaEntry> createAttachment(String body) {
+		try(InputStream is = new ByteArrayInputStream(Base64.getDecoder().decode(body))) {
+			StorageLowLevelMetaData metaData = service.store(UUID.randomUUID().toString(), is);
 
 			return ResponseEntity
 					.created(generateResourceUri(UUID.fromString(metaData.getFileName())))
@@ -53,10 +56,10 @@ public class AttachmentsController implements AttachmentsApi {
 	}
 
 	@Override
-	public ResponseEntity<AttachmentMetaEntry> overwriteAttachmentById(UUID attachmentId, @Valid Resource body) {
-		try {
+	public ResponseEntity<AttachmentMetaEntry> overwriteAttachmentById(UUID attachmentId, String body) {
+		try(InputStream is = new ByteArrayInputStream(Base64.getDecoder().decode(body)))  {
 			return ResponseEntity
-					.ok(convert(service.store(attachmentId.toString(), body.getInputStream())));
+					.ok(convert(service.store(attachmentId.toString(), is)));
 		} catch (IOException e) {
 			throw new StorageException(e);
 		}
@@ -70,12 +73,16 @@ public class AttachmentsController implements AttachmentsApi {
 	}
 
 	@Override
-	public ResponseEntity<Resource> retrieveAttachmentById(UUID attachmentId) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+	public ResponseEntity<String> retrieveAttachmentById(UUID attachmentId) {
+		try(ByteArrayOutputStream out = new ByteArrayOutputStream())
+		{
+			if(service.retrieve(attachmentId.toString(), out))
+				return ResponseEntity.ok(Base64.getEncoder().encodeToString(out.toByteArray()));
 
-		service.retrieve(attachmentId.toString(), out);
-
-		return ResponseEntity.ok(new ByteArrayResource(out.toByteArray()));
+			return ResponseEntity.notFound().build();
+		} catch (IOException e) {
+			throw new StorageException(e);
+		}
 	}
 
 	private URI generateResourceUri(UUID id) {

@@ -65,3 +65,31 @@ IMPORTANT: Falls eine Property in den application.properties verändert wird, *m
 
 ** *Wertebereich*: `true/false` Schalter für die files/read- und files/hash-Anfragen, welcher bestimmt, 
 ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
+
+* application.storage.aws.access.key
+
+** *Default*: `null`
+
+** *Wertebereich*: AWS S3 Access Key als Text, z.B. `"AKIAIOSFODNN7EXAMPLE"`
+
+* application.storage.aws.secret.access.key
+
+** *Default*: `null`
+
+** *Wertebereich*: AWS S3 Secret Access Key als Text, z.B. `"wJalrXUtnFEMI//K7MDENG//bPxRfiCYEXAMPLEKEY"`
+
+* application.storage.aws.secret.access.key
+
+** *Default*: `null`
+
+** *Wertebereich*: _Amazon_ AWS S3 kompatible Region
+
+** *Beschreibung*: Bei anderen AWS S3 Providern (also nicht _Amazon_) wird implizit die Region `AWS_GLOBAL` gesetzt. Das Setzen der Property `application.storage.aws.endpoint.override` ist unbedingt erforderlich.
+
+* application.storage.aws.endpoint.override
+
+** *Default*: `null`
+
+** *Wertebereich*: URI, z.B. `https://s3-eu-central-1.ionoscloud.com/`
+
+** *Beschreibung*: Überschreibt den AWS S3 Endpunkt beim Anbieter _Amazon_ durch eine andere URI. Das wird verwendet, um den AWS S3 Service bei einem anderen Anbieter oder einen AWS S3 Proxy Dienst zu nutzen.

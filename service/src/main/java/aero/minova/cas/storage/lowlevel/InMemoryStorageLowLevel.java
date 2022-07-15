@@ -55,14 +55,13 @@ public class InMemoryStorageLowLevel extends AbstractStorageLowLevel {
 	}
 
 	@Override
-	public void retrieve(String key, OutputStream outputStream) {
-		var data = dataMap.get(key);
-
-		if (data == null)
-			throw new StorageException("Unable to retrieve stream for key '" + key + "': Data not found");
+	public boolean retrieve(String key, OutputStream outputStream) {
+		if (!dataMap.containsKey(key))
+			return false;
 
 		try {
-			outputStream.write(data);
+			outputStream.write(dataMap.get(key));
+			return true;
 		} catch (IOException e) {
 			throw new StorageException("Unable to retrieve stream for key '" + key + "': " + e.getMessage(), e);
 		}

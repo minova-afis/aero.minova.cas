@@ -46,10 +46,12 @@ jobs:
           mvn --batch-mode verify \
           dependency-check:aggregate \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -P repo-github \
+          -P repo-github -P all-tests \
           -Dusername=$GITHUB_ACCESS_TOKEN \
           -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} \
           -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
+          -DAWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
+          -DAWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
           --file pom.xml \
           --settings .github/settings.xml
         env:

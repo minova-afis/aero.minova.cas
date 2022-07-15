@@ -3,7 +3,6 @@ package aero.minova.cas.service;
 import aero.minova.cas.storage.lowlevel.AbstractStorageLowLevel;
 import aero.minova.cas.storage.lowlevel.StorageLowLevelMetaData;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -33,8 +32,7 @@ public class AttachmentsService {
 		storage.delete(key);
 	}
 
-	public void retrieve(String key, OutputStream outputStream) {
-		storage.retrieve(key, outputStream);
-		IOUtils.closeQuietly(outputStream);
+	public boolean retrieve(String key, OutputStream outputStream) {
+		return storage.retrieve(key, outputStream);
 	}
 }

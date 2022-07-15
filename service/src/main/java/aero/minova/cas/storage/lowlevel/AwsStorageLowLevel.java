@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
@@ -34,7 +33,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class AwsStorageLowLevel extends AbstractStorageLowLevel {
-	private static final DateTimeFormatter AWS_TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	protected final AwsStorageLowLevelConfig config;
 
 	private S3Client s3client = null;
@@ -83,7 +81,7 @@ public class AwsStorageLowLevel extends AbstractStorageLowLevel {
 	}
 
 	@Override
-	public void retrieve(String key, OutputStream outputStream) {
+	public boolean retrieve(String key, OutputStream outputStream) {
 		checkPrecondition();
 
 		GetObjectRequest request =
@@ -94,9 +92,11 @@ public class AwsStorageLowLevel extends AbstractStorageLowLevel {
 						 s3client.getObject(request, ResponseTransformer.toBytes()).asInputStream()) {
 				IOUtils.copy(in, outputStream);
 			}
-			outputStream.close();
+			return true;
+		} catch (NoSuchKeyException e) {
+			return false;
 		} catch (Exception e) {
-			throw prepareStorageMinovaException(key, e);
+			throw prepareStorageException(key, e);
 		}
 	}
 
@@ -145,16 +145,13 @@ public class AwsStorageLowLevel extends AbstractStorageLowLevel {
 	}
 
 	@Override
-	public Collection<StorageLowLevelMetaData> list(Optional<String> prefix) {
+	public Collection<StorageLowLevelMetaData> list(String prefix) {
 		try {
 			ListObjectsRequest.Builder builder = ListObjectsRequest.builder()
 					.bucket(config.getStorageBucketName());
 
-			if (prefix.isPresent()) {
-				if (StringUtils.isNotBlank(prefix.get())) {
-					builder.prefix(prefix.get());
-				}
-			}
+			if (StringUtils.isNotBlank(prefix))
+				builder.prefix(prefix);
 
 			ListObjectsResponse response = s3client.listObjects(builder.build());
 
@@ -216,7 +213,7 @@ public class AwsStorageLowLevel extends AbstractStorageLowLevel {
 		return s3client.headObject(request);
 	}
 
-	private StorageException prepareStorageMinovaException(String key, Exception e) {
+	private StorageException prepareStorageException(String key, Exception e) {
 		return new StorageException("Unable to retrieve key '" + key + "': " + e.getMessage(), e);
 	}
 

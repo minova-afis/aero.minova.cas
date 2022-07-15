@@ -24,12 +24,13 @@ jobs:
           git config --global user.email "service@minova.com"
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE/
-          mvn --batch-mode release:prepare release:perform -P repo-github \
+          mvn --batch-mode release:prepare release:perform -P repo-github -P all-tests \
                       -Dusername=$GITHUB_ACCESS_TOKEN \
                       -Dpassword=$GITHUB_ACCESS_TOKEN \
                       -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
                       -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
                       -Darguments="-Dmaven.javadoc.skip=true" \
+                      -Darguments="-DAWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} -DAWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
                       --settings .github/settings.xml
                     git pull
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}

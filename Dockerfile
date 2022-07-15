@@ -1,4 +1,8 @@
 FROM adoptopenjdk/openjdk11:jre11u-alpine-nightly
+
+LABEL org.opencontainers.image.source=https://github.com/minova-afis/aero.minova.cas
+LABEL maintainer=weber@minova.com
+
 COPY service/target/libs /opt/aero.minova.cas/lib/
 COPY service/target/*.jar /opt/aero.minova.cas/lib/
 COPY setup/target/libs /opt/aero.minova.cas/lib/

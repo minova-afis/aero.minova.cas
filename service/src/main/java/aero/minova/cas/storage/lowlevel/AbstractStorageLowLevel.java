@@ -7,23 +7,23 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractStorageLowLevel {
 	protected static final String NOT_IMPLEMENTED = "not implemented";
 
-	public void open() {}
+	public void open() {
+	}
 
-	public void close() {}
+	public void close() {
+	}
 
 	/**
-	 *
-	 * @param key ID des Attachments
+	 * @param key          ID des Attachments
 	 * @param outputStream Inhalt des Attachments wird in diesen Stream geschrieben.
 	 */
-	public abstract void retrieve(String key, OutputStream outputStream);
+	public abstract boolean retrieve(String key, OutputStream outputStream);
 
 	public abstract StorageLowLevelMetaData store(String key, InputStream sourceStream);
 
@@ -36,10 +36,10 @@ public abstract class AbstractStorageLowLevel {
 	}
 
 	public Collection<StorageLowLevelMetaData> listAll() {
-		return list(Optional.empty());
+		return list(null);
 	}
 
-	public Collection<StorageLowLevelMetaData> list(Optional<String> prefix) {
+	public Collection<StorageLowLevelMetaData> list(String prefix) {
 		throw new StorageException(NOT_IMPLEMENTED);
 	}
 }

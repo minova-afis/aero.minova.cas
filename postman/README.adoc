@@ -1,0 +1,9 @@
+# Postman collections für das CAS
+
+## Beschreibung
+
+Dieses Verzeichnis enthält `Collections` für die Applikation Postman (https://www.postman.com/downloads/), um den Einstieg in die CAS-API zu vereinfachen.
+
+## Installation
+
+`*.json` Datei mit Postman via Drag'n'Drop importieren.

@@ -1,9 +1,11 @@
 package aero.minova.cas;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@Slf4j
 public class PasswordEncrypter {
 	public static void main(String... args) {
-		System.out.println(new BCryptPasswordEncoder().encode("rqgzxTf71EAx8chvchMi"));
+		log.info(new BCryptPasswordEncoder().encode("Q1HK.m2Cp_gcF9.3O4na"));
 	}
 }

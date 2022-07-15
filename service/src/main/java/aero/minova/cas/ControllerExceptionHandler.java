@@ -132,8 +132,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 
 		/*
-		 * Es gibt zwei Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel' Ein
-		 * neues drittes ist hinzugekommen: 'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.'
+		 * Es gibt drei Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'
+		 * 3.'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.'
 		 */
 		if (errorMessage.contains("|")) {
 			// Verarbeiten der Fehlermeldungen in Form: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext'

@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import lombok.Getter;
-import lombok.Setter;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -29,8 +29,6 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
-
-import javax.annotation.PostConstruct;
 
 @Service
 public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
@@ -197,7 +195,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 *            Das Topic, welches verändert wurde.
 	 */
 	private void saveMessage(String message, String procedureName, String topic) {
-		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, new Value(procedureName, null), new Value(topic, null), null, null);
+		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, null, new Value(topic, null), null, null);
 
 		for (Row services : servicesToBeNotified.getRows()) {
 			Table setSent = new Table();
@@ -213,7 +211,8 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			setSent.addRow(setSentRow);
 			try {
-				logger.logQueueService("Saving message for " + topic + " because of " + procedureName + ": '" + message + "'");
+				logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
+						+ procedureName + ": '" + message + "'");
 				spc.unsecurelyProcessProcedure(setSent);
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {

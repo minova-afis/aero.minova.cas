@@ -11,7 +11,7 @@ target/
 .DS_Store
 
 ### Minova - CAS
-/Internal/**
-/logs/**
-/service/src/main/resources/application-local.properties
-/service/logs/**
+Internal/**
+logs/**
+service/src/main/resources/application-local.properties
+service/logs/**

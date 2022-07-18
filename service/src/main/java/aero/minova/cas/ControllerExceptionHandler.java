@@ -107,7 +107,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	 *            Die Exception.
 	 * @return Eine Table, welche die Exception in Tabellenform beinhaltet.
 	 */
-	protected Table prepareExceptionReturnTable(Exception ex) {
+	public Table prepareExceptionReturnTable(Exception ex) {
 		Table outputTable = new Table();
 		outputTable.setName("Error");
 		outputTable.addColumn(new Column("International Message", DataType.STRING));
@@ -206,7 +206,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	 *            Signalisiert, ob der Part vor msg. abgeschnitten wurde, oder nicht.
 	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
 	 */
-	private Table handleSqlErrorMessage(Table outputTable, String errorMessage, boolean hasMsg) {
+	public Table handleSqlErrorMessage(Table outputTable, String errorMessage, boolean hasMsg) {
 
 		List<String> sqlErrorMessage = Stream.of(errorMessage.split("\\|"))//
 				.map(String::trim)//

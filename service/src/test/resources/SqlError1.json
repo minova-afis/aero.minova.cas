@@ -1,0 +1,34 @@
+{
+	"name": "Error",
+    "columns": 
+    	[
+    		{
+      			"name": "International Message",
+            	"type": "STRING"
+        	},
+        	{
+            	"name": "p",
+            	"type": "STRING"
+        	},
+        	{
+            	"name": "p",
+            	"type": "STRING"
+        	},
+        	{
+            	"name": "DEFAULT",
+            	"type": "STRING"
+        	}
+    	],
+    "rows": 
+    	[
+        	{
+                "values": 
+                [
+                    "s-msg.sql.51103",
+                    "s-tUnit.Description.16",
+                    "s-kg",
+                    "s-Beipieltext"
+                ]
+            }
+        ]
+}

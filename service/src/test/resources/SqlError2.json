@@ -1,0 +1,27 @@
+		{
+			"name":"Error",
+			"metaData":null,
+			"columns":
+			[
+				{
+					"name":"International Message",
+					"type":"STRING",
+					"outputType":null
+					},
+				{
+					"name":"DEFAULT",
+					"type":"STRING",
+					"outputType":null
+				}
+			],
+			"rows":
+			[
+				{
+					"values":
+					[
+						"s-delaycode.description.comma",
+						"s-Commas are not allowed in the description."
+					]
+				}
+			]
+		}

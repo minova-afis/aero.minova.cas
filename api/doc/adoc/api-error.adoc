@@ -12,15 +12,16 @@ insert into xtcasError (Username, ErrorMessage, Date) values (username,errorMess
 
 Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, kann folgende Formate besitzen:
 
- 1. Sql-Fehler-Format
+ 1. Sql-Fehler-Format1
  2. Programm-Fehler-Format
+ 3. Sql-Fehler-Format2
 
-=== Sql-Fehler-Format
+=== Sql-Fehler-Format1
 
 .Ursprünglich Fehlermeldung
 [source]
 ----
-(ADO | ADO | 25 | msg.Error @p tTable.Description.7 @p tTable.Description.14 | Default Message)
+ADO | 25 | msg.Error @p tTable.Description.7 @p tTable.Description.14 | Default Message
 ----
 
 Das Sql-Fehler Format wird dann auftreten, wenn es einen Fehler in einer oder mehreren Prozeduren gibt.
@@ -28,10 +29,9 @@ Das Sql-Fehler Format wird dann auftreten, wenn es einen Fehler in einer oder me
 Das CAS wird diesen in folgender Form ausgeben:
 
 
-.Sql-Fehler-Format
+.Sql-Fehler-Format1
 [source,json]
 ----
-{
 {
     "resultSet": {
         "name": "Error",
@@ -165,6 +165,65 @@ Die returnErrorMessage beinhaltet immer eine detailsMessage, einen cause und ein
 
 Sie wird nur befüllt, falls ein Fehler auftritt.
 Ansonsten ist dieses Objekt *null*.
+
+
+=== Sql-Fehler-Format2
+
+.Ursprünglich Fehlermeldung
+[source]
+----
+ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.
+----
+
+Das Sql-Fehler Format wird dann auftreten, wenn es einen Fehler in einer oder mehreren Prozeduren gibt.
+
+Das CAS wird diesen in folgender Form ausgeben:
+
+
+.Sql-Fehler-Format2
+[source,json]
+----
+{
+    "resultSet": {
+        "name": "Error",
+        "columns": [
+            {
+                "name": "International Message",
+                "type": "STRING"
+            },
+            {
+                "name": "DEFAULT",
+                "type": "STRING"
+            }
+        ],
+        "rows": [
+            {
+                "values": [
+                    "s-delaycode.description.comma",
+                    "s-Commas are not allowed in the description."
+                ]
+            }
+        ],
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [
+			"StackTraceMessages",
+			...
+		]
+	},
+    "returnCodes": [
+        -1
+    ],
+    "returnCode": -1
+}
+----
+
+Die beiden Sql-Fehler-Formate sind sich sehr ähnlich. 
+Der wesentliche Unterschied zwischen den beiden ist, dass die *International Message* kein 'msg.' am Anfang hat.
+Die Verarbeitung der '@[Datentyp]'-Parameter bleibt aber gleich.
+
+Dementsprechend ist der Ablauf und die Rückgabe der Werte derselbe wie bei Sql-Fehler-Format1.
 
 ==== returnErrorMessage/detailsMessage
 

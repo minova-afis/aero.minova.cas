@@ -172,33 +172,10 @@ public class SqlProcedureController {
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: ", inputTable);
-		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
-			if (securityService.arePrivilegeStoresSetup()) {
-				privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
-				if (privilegeRequest.isEmpty()) {
-					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-				}
-			} else {
-				if (extensionBootstrapChecks.containsKey(inputTable.getName())) {
-					if (!extensionBootstrapChecks.get(inputTable.getName()).apply(inputTable)) {
-						throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-					}
-				} else {
-					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-				}
-			}
-			if (extensions.containsKey(inputTable.getName())) {
-				synchronized (extensionSynchronizer) {
-					val extResult = extensions.get(inputTable.getName()).apply(inputTable);
-					queueService.accept(inputTable, extResult);
-					return extResult;
-				}
-			}
-			if (privilegeRequest.isEmpty()) {
-				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-			}
-			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
+			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
+
+			val result = processSqlProcedureRequest(inputTable, privilegeRequest);
 			queueService.accept(inputTable, result);
 			return result;
 		} catch (Throwable e) {
@@ -207,6 +184,56 @@ public class SqlProcedureController {
 			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
 			throw new ProcedureException(e);
 		}
+	}
+
+	/**
+	 * Überprüft, ob es für den Namen der übergebenen Table einen passenden Eintrag in den Extensions gibt und gibt das Ergebnis der ausgeführten Extension als
+	 * ResponseEntity zurück.
+	 * 
+	 * @param inputTable
+	 *            Eine Table. Muss einen Namen haben.
+	 * @return Das Ergebnis der Extension mit der übergebenen Table als Input.
+	 */
+	private ResponseEntity checkForExtension(Table inputTable) {
+		if (extensions.containsKey(inputTable.getName())) {
+			synchronized (extensionSynchronizer) {
+				val extResult = extensions.get(inputTable.getName()).apply(inputTable);
+				queueService.accept(inputTable, extResult);
+				return extResult;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Überprüft, ob es für den derzeitigen Nutzer und die übergebene Table Privilegien gibt und falls nicht, ob eine Extension vorhanden ist, welche keine
+	 * Privilegien benötigt.
+	 * 
+	 * @param inputTable
+	 *            Die Table, welche auf Privilegien geprüft werden muss.
+	 * @return Eine Liste von Rows mit Privilegname, UserGroup-Name und RowLevelSecurity-Bit.
+	 * @throws Exception
+	 *             Falls keine Datenbankverbindung aufgebaut werden kann.
+	 * @throws ProcedureException
+	 *             Falls der Nutzer kein Recht hat, die Aktion durchzuführen.
+	 */
+	private List<Row> checkForPrivilegeAndBootstrapExtension(Table inputTable) throws Exception, ProcedureException {
+		final List<Row> privilegeRequest = new ArrayList<>();
+		if (securityService.arePrivilegeStoresSetup()) {
+			privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
+			if (privilegeRequest.isEmpty()) {
+				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+			}
+		} else {
+			if (extensionBootstrapChecks.containsKey(inputTable.getName())) {
+				if (!extensionBootstrapChecks.get(inputTable.getName()).apply(inputTable)) {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
+			} else {
+				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+			}
+		}
+		return privilegeRequest;
 	}
 
 	/**
@@ -219,7 +246,12 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
 	 */
-	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+	public ResponseEntity unsecurelyProcessProcedure(Table inputTable) throws Exception {
+		ResponseEntity extensionResult = checkForExtension(inputTable);
+
+		if (extensionResult != null) {
+			return extensionResult;
+		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
 		/*
@@ -267,14 +299,14 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */
-	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		val result = new SqlProcedureResult();
+	public ResponseEntity processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
+		ResponseEntity result = new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
 		try {
 			connection = systemDatabase.getConnection();
-			calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
+			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
@@ -313,9 +345,20 @@ public class SqlProcedureController {
 	 * @throws ProcedureException
 	 *             Falls generell ein Fehler geworfen wird, zum Beispiel beim Konvertieren der Typen.
 	 */
-	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
-			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
+	public ResponseEntity calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection, StringBuffer sb)
+			throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
+
+		ResponseEntity extensionResult = checkForExtension(inputTable);
+		if (extensionResult != null) {
+			return extensionResult;
+		}
+
+		if (privilegeRequest.isEmpty()) {
+			throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+		}
+
+		SqlProcedureResult result = new SqlProcedureResult();
 		result.setReturnCodes(new ArrayList<Integer>());
 		result.setReturnCode(0);
 		val parameterOffset = 2;
@@ -508,7 +551,7 @@ public class SqlProcedureController {
 				result.getReturnCodes().add(resultForThisRow.getReturnCode());
 			}
 		}
-		return result;
+		return new ResponseEntity(result, HttpStatus.ACCEPTED);
 	}
 
 	private void fillCallableSqlProcedureStatement(CallableStatement preparedStatement, Table inputTable, int parameterOffset, StringBuffer sb, int row) {

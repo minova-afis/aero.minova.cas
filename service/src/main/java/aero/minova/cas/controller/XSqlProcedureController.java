@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
@@ -23,7 +24,6 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XProcedureException;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
-import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 
@@ -69,10 +69,10 @@ public class XSqlProcedureController {
 		try {
 			connection = systemDatabase.getConnection();
 			// Hier wird die Anfrage bearbeitet.
-			resultSets = processXProcedures(inputTables, resultSets);
+			resultSets = processXProcedures(inputTables, resultSets, sb, connection);
 
 			// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
-			checkFollowUpProcedures(inputTables, resultSets);
+			checkFollowUpProcedures(inputTables, resultSets, sb, connection);
 
 			// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
 			connection.commit();
@@ -90,7 +90,7 @@ public class XSqlProcedureController {
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
 	}
 
-	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets)
+	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sb, Connection connection)
 			throws Exception, ProcedureException, SQLException {
 		for (XTable xt : inputTables) {
 			SqlProcedureResult result = new SqlProcedureResult();
@@ -106,7 +106,7 @@ public class XSqlProcedureController {
 					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
 				}
 			}
-			result = (SqlProcedureResult) sqlProcedureController.executeProcedure(filledTable).getBody();
+			result = (SqlProcedureResult) sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, sb).getBody();
 			// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
 			resultSets.add(new XSqlProcedureResult(xt.getId(), result));
 		}
@@ -234,7 +234,7 @@ public class XSqlProcedureController {
 	 * @param sb
 	 *            Ein StringBuffer, welcher das Ausführen der Check-Prozeudren loggt.
 	 */
-	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults) {
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults, StringBuffer sb, Connection connection) {
 		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
 		Table privilegeRequest = new Table();
 		privilegeRequest.setName("xtcasUserPrivilege");
@@ -306,7 +306,7 @@ public class XSqlProcedureController {
 
 				}
 			}
-			processXProcedures(checksXtables, xsqlresults);
+			processXProcedures(checksXtables, xsqlresults, sb, connection);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to find follow up procedures.", e);
 		}

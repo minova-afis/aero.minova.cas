@@ -8,7 +8,8 @@ Es vereinfacht die Aufrufe der einzelnden Controller durch entsprechende Methode
 
 * *ping()*: Sendet eine Ping-Anfrage an den CommunicationController.
 * *sendViewRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ViewController des CAS.
-* *sendProcedureRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ProcedureController des CAS.
+* *sendProcedureRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ProcedureController des CAS und gibt ein SqlProcedureResult zurück.
+* *sendGenericProcedureRequest(Table table)*: Sendet eine Anfrage mit einem Table-Objekt an den ProcedureController des CAS und gibt ein Objekt vom beliebigen Typ zurück.
 * *sendXProcedureRequest(List<XTable>)*: Sendet eine Anfrage mit eienr Liste an XTable-Objekten an den XProcedureController des CAS.
 * *sendGetFileRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um eine Datei vom CAS zu erhalten.
 * *sendGetHashRequest(String path)*: Sendet eine Anfrage mit einem Pfad einer Datei als String an den FileController des CAS, um den Hash einer Datei vom CAS zu erhalten.

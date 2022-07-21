@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -175,7 +176,7 @@ public class SqlProcedureController {
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
 
-			val result = processSqlProcedureRequest(inputTable, privilegeRequest);
+			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
 			return result;
 		} catch (Throwable e) {
@@ -187,22 +188,34 @@ public class SqlProcedureController {
 	}
 
 	/**
+	 * Überprüft synchronized, ob der übergeben Key in den Extension vorhanden ist.
+	 * 
+	 * @param extensionKey
+	 *            Der Key, auf welchen geprüft wird.
+	 * @return true, wenn der Key in den ExtensionKeys vorhanden ist, andernfall false.
+	 */
+	synchronized boolean extensionContainsKey(String extensionKey) {
+		return extensions.containsKey(extensionKey);
+	}
+
+	/**
 	 * Überprüft, ob es für den Namen der übergebenen Table einen passenden Eintrag in den Extensions gibt und gibt das Ergebnis der ausgeführten Extension als
-	 * ResponseEntity zurück.
+	 * Optional<ResponseEntity> zurück.
 	 * 
 	 * @param inputTable
 	 *            Eine Table. Muss einen Namen haben.
-	 * @return Das Ergebnis der Extension mit der übergebenen Table als Input.
+	 * @return Das Ergebnis der Extension als Optional mit der übergebenen Table als Input.
 	 */
-	private ResponseEntity checkForExtension(Table inputTable) {
-		if (extensions.containsKey(inputTable.getName())) {
+	Optional<ResponseEntity> checkForExtension(Table inputTable) {
+		ResponseEntity extResult = null;
+
+		if (extensionContainsKey(inputTable.getName())) {
 			synchronized (extensionSynchronizer) {
-				val extResult = extensions.get(inputTable.getName()).apply(inputTable);
+				extResult = extensions.get(inputTable.getName()).apply(inputTable);
 				queueService.accept(inputTable, extResult);
-				return extResult;
 			}
 		}
-		return null;
+		return Optional.ofNullable(extResult);
 	}
 
 	/**
@@ -246,8 +259,37 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
 	 */
-	public ResponseEntity unsecurelyProcessProcedure(Table inputTable) throws Exception {
-		ResponseEntity extensionResult = checkForExtension(inputTable);
+	@Deprecated
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		Row requestingAuthority = new Row();
+		/*
+		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
+		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+		 */
+		requestingAuthority.addValue(new Value(false, "1"));
+		requestingAuthority.addValue(new Value(false, "2"));
+		requestingAuthority.addValue(new Value(false, "3"));
+
+		List<Row> authority = new ArrayList<>();
+		authority.add(requestingAuthority);
+		return processSqlProcedureRequest(inputTable, authority);
+	}
+
+	/**
+	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben. Prüft auch, ob eine Extension statt einer Prozedur
+	 * aufgerufen werden muss.
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 */
+	public ResponseEntity unsecurelyProcessProcedureWithExtensionCheck(Table inputTable) throws Exception {
+		ResponseEntity extensionResult = checkForExtension(inputTable).get();
 
 		if (extensionResult != null) {
 			return extensionResult;
@@ -264,7 +306,7 @@ public class SqlProcedureController {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return processSqlProcedureRequest(inputTable, authority);
+		return new ResponseEntity(processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
 	}
 
 	/**
@@ -299,8 +341,8 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */
-	public ResponseEntity processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		ResponseEntity result = new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
+		SqlProcedureResult result = null;
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
@@ -345,14 +387,9 @@ public class SqlProcedureController {
 	 * @throws ProcedureException
 	 *             Falls generell ein Fehler geworfen wird, zum Beispiel beim Konvertieren der Typen.
 	 */
-	public ResponseEntity calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection, StringBuffer sb)
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection, StringBuffer sb)
 			throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
-
-		ResponseEntity extensionResult = checkForExtension(inputTable);
-		if (extensionResult != null) {
-			return extensionResult;
-		}
 
 		if (privilegeRequest.isEmpty()) {
 			throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
@@ -551,7 +588,7 @@ public class SqlProcedureController {
 				result.getReturnCodes().add(resultForThisRow.getReturnCode());
 			}
 		}
-		return new ResponseEntity(result, HttpStatus.ACCEPTED);
+		return result;
 	}
 
 	private void fillCallableSqlProcedureStatement(CallableStatement preparedStatement, Table inputTable, int parameterOffset, StringBuffer sb, int row) {

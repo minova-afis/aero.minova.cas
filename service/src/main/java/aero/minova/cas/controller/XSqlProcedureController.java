@@ -106,7 +106,13 @@ public class XSqlProcedureController {
 					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
 				}
 			}
-			result = (SqlProcedureResult) sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, sb).getBody();
+
+			ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).get();
+			if (extensionResult != null) {
+				resultSets.add(new XSqlProcedureResult(xt.getId(), (SqlProcedureResult) extensionResult.getBody()));
+			}
+
+			result = (SqlProcedureResult) sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, sb);
 			// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
 			resultSets.add(new XSqlProcedureResult(xt.getId(), result));
 		}

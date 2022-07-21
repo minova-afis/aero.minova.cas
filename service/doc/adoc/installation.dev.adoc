@@ -57,7 +57,7 @@ docker run \
     --env logging_level_root=DEBUG \
     localtest
 ----
-* Alle Rechte können den admin-Nutzer übergeben werden, wenn folgendes auf SQL-Datenbank ausgeführt wird: `exec xpcasInsertAllPrivilegesToUserGroup 'admin', 'admin'`
+* Alle Rechte können den admin-Nutzer übergeben werden, wenn folgendes auf SQL-Datenbank ausgeführt wird: `exec xpcasInsertAllPrivilegesToUserGroup 'admin', 'admin'`. Damit werden auch Privilegien für alle SQL-Objekte wie Prozeduren auch gleich mit erstellt, falls noch nicht vorhanden.
 * Docker-Image wieder entfernen: `docker rmi -f localtest`
 
 ## Snapshot-Docker-Image lokal bauen, ausführen und Masken live editieren.

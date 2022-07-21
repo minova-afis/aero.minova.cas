@@ -107,7 +107,7 @@ public class XSqlProcedureController {
 				}
 			}
 
-			ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).get();
+			ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).orElse(null);
 			if (extensionResult != null) {
 				resultSets.add(new XSqlProcedureResult(xt.getId(), (SqlProcedureResult) extensionResult.getBody()));
 			}

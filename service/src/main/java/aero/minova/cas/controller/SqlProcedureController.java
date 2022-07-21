@@ -289,7 +289,7 @@ public class SqlProcedureController {
 	 *             Fehler beim Ausführen der Prozedur.
 	 */
 	public ResponseEntity unsecurelyProcessProcedureWithExtensionCheck(Table inputTable) throws Exception {
-		ResponseEntity extensionResult = checkForExtension(inputTable).get();
+		ResponseEntity extensionResult = checkForExtension(inputTable).orElse(null);
 
 		if (extensionResult != null) {
 			return extensionResult;

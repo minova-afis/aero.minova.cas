@@ -132,7 +132,7 @@ public class ServiceNotifierService {
 
 		registerSerivceTable.addRow(registerRow);
 		try {
-			registerResult = (SqlProcedureResult) spc.unsecurelyProcessProcedure(registerSerivceTable).getBody();
+			registerResult = (SqlProcedureResult) spc.unsecurelyProcessProcedure(registerSerivceTable);
 		} catch (Exception e) {
 			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
 			throw new RuntimeException(e);

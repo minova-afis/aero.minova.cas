@@ -277,11 +277,11 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
 	 */
-	public Optional<ResponseEntity<?>> unsecurelyProcessProcedureWithExtensionCheck(Table inputTable) throws Exception {
-		ResponseEntity extensionResult = checkForExtension(inputTable).orElse(null);
+	public ResponseEntity<?> unsecurelyProcessProcedureWithExtensionCheck(Table inputTable) throws Exception {
+		Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
 
 		if (extensionResult != null) {
-			return Optional.of(extensionResult);
+			return extensionResult.orElse(null);
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
@@ -295,7 +295,7 @@ public class SqlProcedureController {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return Optional.of(new ResponseEntity(processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED));
+		return new ResponseEntity(processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
 	}
 
 	/**

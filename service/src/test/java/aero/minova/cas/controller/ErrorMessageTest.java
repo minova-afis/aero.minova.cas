@@ -1,0 +1,121 @@
+package aero.minova.cas.controller;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+
+import java.util.Scanner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
+
+import com.google.gson.Gson;
+
+import aero.minova.cas.ControllerExceptionHandler;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.restapi.ClientRestAPI;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@ContextConfiguration
+@WebAppConfiguration
+public class ErrorMessageTest {
+
+	Gson gson;
+
+	@Autowired
+	ClientRestAPI clientRestAPI;
+
+	@Autowired
+	ControllerExceptionHandler testSubject;
+
+	@Spy
+	ControllerExceptionHandler spySubject;
+
+	@Mock
+	ControllerExceptionHandler mockSubject;
+
+	@SuppressWarnings("deprecation")
+	@BeforeEach
+	public void setUp() {
+		gson = clientRestAPI.getGson();
+
+		MockitoAnnotations.initMocks(this);
+		spySubject = spy(testSubject);
+		mockSubject = mock(ControllerExceptionHandler.class);
+
+		doCallRealMethod().when(mockSubject).prepareExceptionReturnTable(any(Exception.class));
+		doCallRealMethod().when(mockSubject).handleSqlErrorMessage(any(Table.class), any(String.class), any(Boolean.class));
+	}
+
+	@SuppressWarnings("resource")
+	public Table readTableFromExampleJson(String fileName) {
+
+		return gson.fromJson(new Scanner(getClass()//
+				.getClassLoader()//
+				.getResourceAsStream(fileName + ".json"), "UTF-8")//
+						.useDelimiter("\\A")//
+						.next(),
+				Table.class);
+	}
+
+	@Test
+	public void testSqlErrorMessage1() {
+		Exception e = new Exception("ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext");
+
+		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
+
+		Table sqlError1 = readTableFromExampleJson("SqlError1");
+
+		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
+		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
+		assertThat(sqlError1.getRows().get(0).getValues().get(0).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(0).getStringValue().trim());
+		assertThat(sqlError1.getRows().get(0).getValues().get(1).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(1).getStringValue().trim());
+		assertThat(sqlError1.getRows().get(0).getValues().get(2).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(2).getStringValue());
+		assertThat(sqlError1.getRows().get(0).getValues().get(3).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(3).getStringValue().trim());
+	}
+
+	@Test
+	public void testSqlErrorMessage2() {
+		Exception e = new Exception("ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.");
+
+		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
+
+		Table sqlError1 = readTableFromExampleJson("SqlError2");
+
+		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
+		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
+		assertThat(sqlError1.getRows().get(0).getValues().get(0).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(0).getStringValue().trim());
+		assertThat(sqlError1.getRows().get(0).getValues().get(1).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(1).getStringValue().trim());
+	}
+
+	@Test
+	public void testProgramMessage() {
+		Exception e = new Exception("msg.PrivilegeError");
+
+		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
+
+		Table sqlError1 = readTableFromExampleJson("ProgramError");
+
+		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
+		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
+		assertThat(sqlError1.getRows().get(0).getValues().get(0).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(0).getStringValue().trim());
+	}
+}

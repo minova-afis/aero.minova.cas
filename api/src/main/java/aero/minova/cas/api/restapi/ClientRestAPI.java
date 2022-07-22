@@ -102,6 +102,17 @@ public class ClientRestAPI {
 		return restTemplate.exchange(url + "/data/procedure", HttpMethod.POST, request, SqlProcedureResult.class);
 	}
 
+	/**
+	 * Sendet einen Request, um eine Prozedur auszuführen.
+	 *
+	 * @param inputTable Die Table mit den Parametern der Prozedur.
+	 * @return Die OutputParameter und das SqlProcedureResult der Prozedur als Table.
+	 */
+	public <T> ResponseEntity<T> sendGenericProcedureRequest(Table inputTable, Class<T> type) {
+		HttpEntity<Table> request = new HttpEntity<>(inputTable, createHeaders(username, password));
+		return restTemplate.exchange(url + "/data/procedure", HttpMethod.POST, request, type);
+	}
+
 	// XSqlProcedureController
 
 	/**

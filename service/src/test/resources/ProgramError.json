@@ -1,0 +1,19 @@
+{
+	"name": "Error",
+    "columns": 
+    	[
+    		{
+      			"name": "International Message",
+            	"type": "STRING"
+        	}
+    	],
+    "rows": 
+    	[
+        	{
+                "values": 
+                [
+                    "s-msg.PrivilegeError"
+                ]
+            }
+        ]
+}

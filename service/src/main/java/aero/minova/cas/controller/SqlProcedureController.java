@@ -284,15 +284,15 @@ public class SqlProcedureController {
 	 *
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
-	 * @return SqlProcedureResult der Ausführung
+	 * @return Optional einer SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
 	 */
-	public ResponseEntity unsecurelyProcessProcedureWithExtensionCheck(Table inputTable) throws Exception {
+	public Optional<ResponseEntity<?>> unsecurelyProcessProcedureWithExtensionCheck(Table inputTable) throws Exception {
 		ResponseEntity extensionResult = checkForExtension(inputTable).orElse(null);
 
 		if (extensionResult != null) {
-			return extensionResult;
+			return Optional.of(extensionResult);
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
@@ -306,7 +306,7 @@ public class SqlProcedureController {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return new ResponseEntity(processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
+		return Optional.of(new ResponseEntity(processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED));
 	}
 
 	/**
@@ -348,7 +348,7 @@ public class SqlProcedureController {
 
 		try {
 			connection = systemDatabase.getConnection();
-			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, sb);
+			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
@@ -387,15 +387,10 @@ public class SqlProcedureController {
 	 * @throws ProcedureException
 	 *             Falls generell ein Fehler geworfen wird, zum Beispiel beim Konvertieren der Typen.
 	 */
-	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection, StringBuffer sb)
-			throws SQLException, ProcedureException {
+	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
+			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
 
-		if (privilegeRequest.isEmpty()) {
-			throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-		}
-
-		SqlProcedureResult result = new SqlProcedureResult();
 		result.setReturnCodes(new ArrayList<Integer>());
 		result.setReturnCode(0);
 		val parameterOffset = 2;

@@ -188,17 +188,6 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Überprüft synchronized, ob der übergeben Key in den Extension vorhanden ist.
-	 * 
-	 * @param extensionKey
-	 *            Der Key, auf welchen geprüft wird.
-	 * @return true, wenn der Key in den ExtensionKeys vorhanden ist, andernfall false.
-	 */
-	synchronized boolean extensionContainsKey(String extensionKey) {
-		return extensions.containsKey(extensionKey);
-	}
-
-	/**
 	 * Überprüft, ob es für den Namen der übergebenen Table einen passenden Eintrag in den Extensions gibt und gibt das Ergebnis der ausgeführten Extension als
 	 * Optional<ResponseEntity> zurück.
 	 * 
@@ -209,8 +198,8 @@ public class SqlProcedureController {
 	Optional<ResponseEntity> checkForExtension(Table inputTable) {
 		ResponseEntity extResult = null;
 
-		if (extensionContainsKey(inputTable.getName())) {
-			synchronized (extensionSynchronizer) {
+		synchronized (extensionSynchronizer) {
+			if (extensions.containsKey(inputTable.getName())) {
 				extResult = extensions.get(inputTable.getName()).apply(inputTable);
 				queueService.accept(inputTable, extResult);
 			}

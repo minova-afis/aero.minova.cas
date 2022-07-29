@@ -1,4 +1,9 @@
-FROM adoptopenjdk/openjdk11:jre11u-alpine-nightly
+FROM eclipse-temurin:11-jre-alpine
+    # Dies ist ein Java-11 Docker-Image von Adoptium.
+    # Da wir generelle JDK/JREs von Adoptium bevorzugen, verwenden wir auch deren Docker-Image.
+    # Hier wird die Docker-Organisation von Adoptiums-Seite aus verlinkt: https://blog.adoptium.net/2021/08/using-jlink-in-dockerfiles/
+    # Hier ist die verlinkte Docker-Organisation: https://hub.docker.com/_/eclipse-temurin
+    # Wir verwenden die alpine-Variante, um die Größe des Docker-Images zu minimieren.
 COPY service/target/libs /opt/aero.minova.cas/lib/
 COPY service/target/*.jar /opt/aero.minova.cas/lib/
 COPY setup/target/libs /opt/aero.minova.cas/lib/

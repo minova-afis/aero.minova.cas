@@ -176,6 +176,12 @@ public class SqlProcedureController {
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
 
+			Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
+
+			if (extensionResult.isPresent()) {
+				return extensionResult.get();
+			}
+
 			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
 			return result;

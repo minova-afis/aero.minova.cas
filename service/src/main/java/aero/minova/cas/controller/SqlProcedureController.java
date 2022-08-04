@@ -331,7 +331,7 @@ public class SqlProcedureController {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		SqlProcedureResult result = null;
+		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 

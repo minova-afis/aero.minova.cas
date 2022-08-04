@@ -277,7 +277,7 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
 	 */
-	public ResponseEntity<?> unsecurelyProcessProcedureWithExtensionCheck(Table inputTable) throws Exception {
+	public ResponseEntity<?> unsecurelyExecuteProcedure(Table inputTable) throws Exception {
 		Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
 
 		if (extensionResult != null) {

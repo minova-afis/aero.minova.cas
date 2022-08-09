@@ -30,5 +30,16 @@
 				</node>
 			</node>
 		</node>
+		<node name="Users.xml">
+			<map/>
+			<node name="OptionPages">
+				<map/>
+				<node name="Authorities.op.xml">
+					<map>
+						<entry key="Username" value="Username"/>
+					</map>
+				</node>
+			</node>
+		</node>
 	</root>
 </preferences>

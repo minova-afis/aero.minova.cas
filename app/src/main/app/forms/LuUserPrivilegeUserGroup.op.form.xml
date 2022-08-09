@@ -4,7 +4,7 @@
         <number/>        	
     </field>    	
     <field name="UserPrivilegeKey" sql-index="1" text="@xtcasLuUserPrivilegeUserGroup.UserPrivilegeKey" required="true" key-type="primary">	
-        <lookup table="xtCasUserPrivilege"/>
+        <lookup table="xtcasUserPrivilege"/>
     </field>
     <field name="UserGroupKey" sql-index="2" text="@xtcasLuUserPrivilegeUserGroup.UserGroupKey" required="true" key-type="primary">
         <lookup table="xtcasUserGroup"/>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<main icon="CAS.ico" titel="CAS">
+    <action action="ColumnSecurity.xml" generic="true" icon="ColumnSecurity.ico" id="ColumnSecurity" text="ColumnSecurity"/>
+    <action action="User.xml" generic="true" icon="User.ico" id="User" text="User"/>
+    <action action="UserGroup.xml" generic="true" icon="UserGroup.ico" id="UserGroup" text="UserGroup"/>
+    <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege.ico" id="UserPrivileges" text="UserPrivilege"/>
+    <menu id="main">
+        <menu id="masterdata" text="@Masterdata" position="10.0" override="false">
+            <entry id="ColumnSecurity" position="10.0" override="false" type="action"/>
+            <entry id="" position="0.0" override="" type="separator"/>
+            <entry id="User" position="15.0" override="false" type="action"/>
+            <entry id="" position="0.0" override="" type="separator"/>
+            <entry id="UserGroup" position="25.0" override="false" type="action"/>
+            <entry id="UserPrivileges" position="55.0" override="false" type="action"/>
+        </menu>
+    </menu>
+</main>

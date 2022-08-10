@@ -17,15 +17,15 @@ Die jeweiligen values müssen genauso viele Werte haben wie columns.
 	"columns": [
 		{
 			"name": "ParameterName",
-			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED|BIGDECIMAL",
+			"type": "BOOLEAN|DOUBLE|INSTANT|INTEGER|STRING|ZONED|BIGDECIMAL|LONG",
 			"outputType": "INPUT|OUTPUT"
 		},...
 	],
 	"rows": [
 		{
 			"values": [
-				"(f-Operator-(b|d|i|n|s|z|m)-Value)|"
-				"(b|d|i|n|s|z|m-Value)|"
+				"(f-Operator-(b|d|i|n|s|z|m|l)-Value)|"
+				"(b|d|i|n|s|z|m|l-Value)|"
 				"null",...
 			]
 		}
@@ -89,6 +89,7 @@ Der Typ wird anhand des Prefixes des Values angegeben:
 * *"s"*: String
 * *"z"*: ZonedDateTime: Entspricht dem Format von "java.time.ZonedDateTime.parse(String)".
 * *"m"*: Money: Entspricht dem Format von "java.math.BigDecimal.valueOf(Double.parseDouble(String))".
+* *"l"*: Money: Entspricht dem Format von "java.lang.Long.parseLong(String)".
 * *"f"*: Filter: Zeigt an, dass ein Operator mit angegeben wurde
 
 Durch den Prefix "f-" können die Operatoren *<> , &lt;=, >=, <, >, =, between(), in(), !~, ~, null* und *!null* bei der Eingabe verwendet werden.

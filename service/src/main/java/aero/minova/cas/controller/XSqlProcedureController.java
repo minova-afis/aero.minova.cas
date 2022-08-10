@@ -166,12 +166,13 @@ public class XSqlProcedureController {
 			}
 
 			ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).orElse(null);
+
+			// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunen wurde, normal ausführen.
 			if (extensionResult != null) {
 				resultSets.add(new XSqlProcedureResult(xt.getId(), (SqlProcedureResult) extensionResult.getBody()));
+			} else {
+				result = (SqlProcedureResult) sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
 			}
-
-			result = (SqlProcedureResult) sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
-
 			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompabilität da, damit hier keine NullPointerException geworfen wird.
 			if (inputTablesWithResults != null) {
 				// InputTable und Ergebnis hinzufügen, damit später Nachrichten versand werden können.

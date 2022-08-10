@@ -8,6 +8,15 @@ IMPORTANT: Falls eine Property in den application.properties verändert wird, *m
 
 * Zurück zur xref:index.adoc[Übersicht]
 
+
+== Richtlinien
+
+1. Wird eine neue Property, die das CAS betrifft, erstellt, sollte diese mit *cas.* beginnen.
+2. Handelt es sich dabei um eine Property für eine Extension, sollte danach der Name der Extension folgen. 
+Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die Property *'cas.example. ...'* genannt werden.
+3. Die Trennzeichen zwischen den Worten sind *Punkte*. Siehe 'files.permission.check'.
+
+
 == Standard Properties
 * server.port
 

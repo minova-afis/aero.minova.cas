@@ -5,7 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased]
 * Basis-Docker-Image von Adoptium verwenden und dessen Einsatz begründen.
-* #300 Long als Value unterstützen
+* #300 Long als Value unterstützen.
+* #184 Http2 Property hinzufügen.
 
 ## [12.48.0] -- 2022-07-20
 * #217 Es wird nicht mehr bei jedem SQL-Aufruf erwartet, dass die View/Tabelle einen KeyLong besitzt.

@@ -21,10 +21,12 @@ public class Table implements Serializable {
 	}
 
 	public void fillMetaData(Table inputTable, int limit, int totalResults, int page) {
-		TableMetaData metaData = inputTable.getMetaData();
 		if (inputTable.getMetaData() == null) {
 			metaData = new TableMetaData();
+		} else {
+			this.metaData = inputTable.getMetaData();
 		}
+
 		if (limit <= 0) {
 			limit = totalResults;
 		}
@@ -36,8 +38,6 @@ public class Table implements Serializable {
 		metaData.setLimited(limit);
 		metaData.setPage(page);
 		metaData.setTotalResults(totalResults);
-
-		this.metaData = metaData;
 	}
 
 	/**

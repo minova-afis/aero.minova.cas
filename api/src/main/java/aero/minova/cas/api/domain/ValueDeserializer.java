@@ -47,6 +47,10 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 		String value = json.getAsString().substring(2);
 		String rule;
 
+		if (value == null) {
+			throw new NullPointerException("No values found!");
+		}
+
 		if (typeString.equals("f")) {
 			int operatorPos = getOperatorEndIndex(value);
 			rule = value.substring(0, operatorPos).toLowerCase();

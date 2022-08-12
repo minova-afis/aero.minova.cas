@@ -320,8 +320,14 @@ public class SqlProcedureController {
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
 		}
-		userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
-		userContextSetter.execute();
+		try {
+			userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
+			userContextSetter.execute();
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to set user for procedures: ", e);
+		} finally {
+			userContextSetter.close();
+		}
 	}
 
 	/**
@@ -348,12 +354,14 @@ public class SqlProcedureController {
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
 			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
-			try {
-				connection.rollback();
-				systemDatabase.freeUpConnection(connection);
-			} catch (Exception e1) {
-				customLogger.logError("Couldn't roll back procedure execution", e);
-				connection.close();
+			if (connection != null) {
+				try {
+					connection.rollback();
+					systemDatabase.freeUpConnection(connection);
+				} catch (Exception e1) {
+					customLogger.logError("Couldn't roll back procedure execution", e);
+					connection.close();
+				}
 			}
 			throw new ProcedureException(e);
 		} finally {

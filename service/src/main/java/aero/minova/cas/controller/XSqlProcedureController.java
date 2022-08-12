@@ -94,12 +94,14 @@ public class XSqlProcedureController {
 
 		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
-			try {
-				connection.rollback();
-				systemDatabase.freeUpConnection(connection);
-			} catch (Exception e1) {
-				customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
-				connection.close();
+			if (connection != null) {
+				try {
+					connection.rollback();
+					systemDatabase.freeUpConnection(connection);
+				} catch (Exception e1) {
+					customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
+					connection.close();
+				}
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
 		}
@@ -258,7 +260,7 @@ public class XSqlProcedureController {
 				return Optional.ofNullable(dependency.getOutputParameters().getRows().get(row).getValues().get(i));
 			}
 		}
-		return null;
+		return Optional.ofNullable(null);
 	}
 
 	/**

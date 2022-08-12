@@ -348,7 +348,9 @@ public class FilesController {
 
 		File zipFile = new File(zipDataName + ".zip");
 		// erzeugt Datei, falls sie noch nicht existiert, macht ansonsten nichts
-		zipFile.createNewFile();
+		if (zipFile.createNewFile()) {
+			customLogger.logFiles("Empty file created: " + zipFile.getName());
+		}
 
 		customLogger.logFiles("Zipping: " + zipFile);
 		zip(files.getSystemFolder().toString(), zipFile, fileList);
@@ -394,12 +396,18 @@ public class FilesController {
 					}
 					zos.closeEntry();
 					fis.close();
+					entryStream.close();
 				}
 			}
 			zos.close();
 			fos.close();
 		} catch (Exception e) {
-			customLogger.logFiles("Error while zipping file " + ze.getName());
+			if (ze != null) {
+				customLogger.logFiles("Error while zipping file " + ze.getName());
+			} else {
+				// Landet nur hier, wenn es nicht mal bis in das erste if geschafft hat.
+				customLogger.logFiles("Error while accessing file path for file to zip.");
+			}
 			throw new RuntimeException("msg.ZipError %" + ze.getName());
 		}
 	}

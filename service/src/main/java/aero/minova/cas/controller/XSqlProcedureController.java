@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
@@ -23,7 +24,6 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XProcedureException;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
-import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 
@@ -78,12 +78,14 @@ public class XSqlProcedureController {
 			connection.commit();
 		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
-			try {
-				connection.rollback();
-				systemDatabase.freeUpConnection(connection);
-			} catch (Exception e1) {
-				customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
-				connection.close();
+			if (connection != null) {
+				try {
+					connection.rollback();
+					systemDatabase.freeUpConnection(connection);
+				} catch (Exception e1) {
+					customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
+					connection.close();
+				}
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
 		}
@@ -180,7 +182,7 @@ public class XSqlProcedureController {
 				return Optional.ofNullable(dependency.getOutputParameters().getRows().get(row).getValues().get(i));
 			}
 		}
-		return null;
+		return Optional.ofNullable(null);
 	}
 
 	/**

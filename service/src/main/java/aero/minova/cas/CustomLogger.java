@@ -5,6 +5,8 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.stream.StreamSupport;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +23,22 @@ import com.google.gson.Gson;
 
 import aero.minova.cas.api.restapi.ClientRestAPI;
 
-import javax.annotation.PostConstruct;
-
 @Component
 public class CustomLogger {
 	// Log für alle ausgeführten SQL Queries, außer die Privilegien
-	public Logger logger = LoggerFactory.getLogger("SqlLogger");
+	private static Logger logger = LoggerFactory.getLogger("SqlLogger");
 	// Log für alle Privilegien Anfragen
-	public Logger privilegeLogger = LoggerFactory.getLogger("PrivilegeLogger");
+	private static Logger privilegeLogger = LoggerFactory.getLogger("PrivilegeLogger");
 	// Log für Fehlermeldungen
-	Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
+	private static Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
 	// Log für die Anfragen der User ohne SQL
-	public Logger userLogger = LoggerFactory.getLogger("UserLogger");
+	private static Logger userLogger = LoggerFactory.getLogger("UserLogger");
 	// Log für File Hashes und Zipps
-	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
+	private static Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 	// Log für Setup
-	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
+	private static Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
 
-	public Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
+	private static Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
 
 	@Autowired
 	private ClientRestAPI crapi;
@@ -46,7 +46,7 @@ public class CustomLogger {
 	private Gson gson;
 
 	@PostConstruct
-	private void init(){
+	private void init() {
 		gson = crapi.getGson();
 	}
 
@@ -115,7 +115,8 @@ public class CustomLogger {
 	/**
 	 * TODO Das loggen funktioniert zur Zeit nicht.
 	 *
-	 * @param event Das Event, bei dem die Methode ausgeführt werden soll.
+	 * @param event
+	 *            Das Event, bei dem die Methode ausgeführt werden soll.
 	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {

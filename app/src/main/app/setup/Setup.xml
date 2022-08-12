@@ -62,7 +62,13 @@
 		<script name="xpcasReadUsers" type="procedure"/>
 		<script name="xpcasUpdateAuthorites" type="procedure"/>
 		<script name="xpcasUpdateUsers" type="procedure"/>
-		<script name="xvcasUsers" type="view"/>
+		<script name="xvcasUsersIndex" type="view"/>
+		<script name="xvcasUsersIndex2" type="view"/>
+		<script name="xvcasUserIndex2" type="view"/>
+		<script name="xpcasDeleteUserGroupUserUsers" type="procedure"/>
+		<script name="xpcasInsertUserGroupUserUsers" type="procedure"/>
+		<script name="xpcasReadUserGroupUserUsers" type="procedure"/>
+		<script name="xpcasUpdateUserGroupUserUsers" type="procedure"/>
 	</sql-code>
 	<schema>
 		<tableschema name="xtcasError" type="table"/>

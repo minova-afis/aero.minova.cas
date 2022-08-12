@@ -12,11 +12,11 @@ with encryption as
 		return -1
 	end
 
+	-- Der übergebene Authority Key ist eigentlich der UserGroupKey
 	if exists (select * from xtcasUserGroup where KeyLong = @Authority)
 	begin
 
 	declare @UserGroup nvarchar(50)
-
 	select @UserGroup=KeyText from xtcasUserGroup where KeyLong = @Authority
 
 	insert into xtcasAuthorities (

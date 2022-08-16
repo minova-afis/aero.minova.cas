@@ -9,8 +9,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
@@ -19,6 +18,8 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 
 public class SqlUtils {
+
+	static CustomLogger logger = new CustomLogger();
 
 	private SqlUtils() {
 		throw new UnsupportedOperationException();
@@ -36,7 +37,7 @@ public class SqlUtils {
 		}
 	}
 
-	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser) throws ProcedureException {
+	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Object conversionUser) throws ProcedureException {
 		try {
 			Row row = new Row();
 			for (Column column : outputTable.getColumns()) {
@@ -66,7 +67,7 @@ public class SqlUtils {
 						value = new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault()), null);
 					}
 				} else {
-					logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
+					logger.logUserRequest(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
 							+ column.getType());
 					value = new Value(sqlSet.getString(column.getName()), null);
 				}

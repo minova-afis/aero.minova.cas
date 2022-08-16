@@ -2,7 +2,6 @@ package aero.minova.cas.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -172,7 +171,7 @@ class SqlViewControllerTest extends BaseTest {
 		@val
 		aero.minova.cas.api.domain.Row testResult = null;
 		try {
-			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, this);
 		} catch (ProcedureException e) {}
 		assertThat(testResult.getValues()).hasSize(1);
 		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
@@ -226,7 +225,7 @@ class SqlViewControllerTest extends BaseTest {
 		@val
 		aero.minova.cas.api.domain.Row testResult = null;
 		try {
-			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, this);
 		} catch (ProcedureException e) {}
 		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
 		assertThat(testResult.getValues().get(1).getBooleanValue()).isEqualTo(true);

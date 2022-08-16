@@ -285,7 +285,7 @@ public class SqlViewController {
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
 							.collect(Collectors.toList()));
 			while (sqlSet.next()) {
-				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, customLogger.logger, this));
+				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, this));
 			}
 			return outputTable;
 		} catch (Throwable e) {

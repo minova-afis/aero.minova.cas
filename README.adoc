@@ -28,7 +28,7 @@ Für die alten Hasen unter uns: ein sehr großer Teil vom CAS stellt eine REST-S
 == Status
 
 Wir sind jetzt an einem Punkt angekommen,
-wo Breaking-Changes bzgl. der REST-Schnittstelle und den Klassen `aero.minova.cas.[controller.*, service.*, servicenotifier*, sql.*, CustomLogger]`
+wo Breaking-Changes bzgl. der REST-Schnittstelle und den Klassen `aero.minova.cas.[controller. *, service. *, servicenotifier. *, sql. *, CustomLogger]`
 nicht erwünscht und so weit, wie sinnvoll möglich, vermieden werden.
 
 == Weiterführende Dokumentation

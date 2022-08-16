@@ -31,6 +31,9 @@ Wir sind jetzt an einem Punkt angekommen,
 wo Breaking-Changes bzgl. der REST-Schnittstelle und den Klassen `aero.minova.cas.[controller. *, service. *, servicenotifier. *, sql. *, CustomLogger]`
 nicht erwünscht und so weit, wie sinnvoll möglich, vermieden werden.
 
+Clients und Extensions sollen sich also darauf verlassen können,
+dass die API möglichst stabil gehalten wird.
+
 == Weiterführende Dokumentation
 
 * xref:./CHANGELOG.adoc#[Changelog]

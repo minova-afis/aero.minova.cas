@@ -6,8 +6,8 @@ alter procedure dbo.xpcasInsertLuUserPrivilegeUserGroup (
 )
 with encryption as
 	declare @returnCode int
-	execute @returnCode = xpcasUpdateLuUserPrivilegeUserGroup
-		@KeyLong output,
+	execute @returnCode = xpcasUpdateLuUserPrivilegeUserGroup 
+		@KeyLong,
 		@UserPrivilegeKey,
 		@UserGroupKey,
 		@RowLevelSecurity

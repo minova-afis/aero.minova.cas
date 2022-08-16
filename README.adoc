@@ -23,6 +23,14 @@ Der Fokus liegt hierbei darauf, das Backend und die Infrastruktur für Eclipse/l
 
 Eine Illustration der Struktur wird xref:./doc/adoc/structure.adoc#[hier] bereitgestellt.
 
+Für die alten Hasen unter uns: ein sehr großer Teil vom CAS stellt eine REST-Schnittstelle zu den SQL-Funktionalitäten vom Ncore und dem Install-Tool bereit.
+
+== Status
+
+Wir sind jetzt an einem Punkt angekommen,
+wo Breaking-Changes bzgl. der REST-Schnittstelle und den Klassen `aero.minova.cas.[controller.*, service.*, servicenotifier*, sql.*, CustomLogger]`
+nicht erwünscht und so weit, wie sinnvoll möglich, vermieden werden.
+
 == Weiterführende Dokumentation
 
 * xref:./CHANGELOG.adoc#[Changelog]

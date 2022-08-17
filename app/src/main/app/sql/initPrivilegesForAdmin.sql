@@ -1,1 +1,1 @@
-exec xpcasInsertAllPrivilegesToUser 'admin', 'admin'
+exec xpcasInsertAllPrivilegesToUserGroup 'admin', 'admin'

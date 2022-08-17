@@ -25,7 +25,13 @@ stop
 
 WARNING: Die ServiceNotifiers werden nach den Extensions ausgeführt, da Extensions ebenfalls Veränderungen auf Tabellen auslösen können.
 
-==== ServiceNotifier API
+== Grund für Eigenimplementierung
+
+Die Funktionalität könnte prinzipiell auch durch einen Message-Broker wie RabbitMQ bereitgestellt werden.
+Wir haben uns dagegen entschieden, da wir nicht viele Features brauchen und den Zusatzaufwand für die Administrationen
+eines neuen uns unbekannten Dienstes nicht im Verhältnis zur benötigten Funktionalität stand.
+
+== ServiceNotifier API
 
 Folgende Extensions können mithilfe von *data/procedure* aufgerufen werden:
 

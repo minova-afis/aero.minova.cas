@@ -8,6 +8,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [12.48.0] -- 2022-07-20
 * #217 Es wird nicht mehr bei jedem SQL-Aufruf erwartet, dass die View/Tabelle einen KeyLong besitzt.
+* #341 BUGFIX: Kein Commit mehr zwischen XProcedures.
 * Ein weiteres Format von Fehlermeldungen unterstützen: 'ADO|Zahl|Fehlermeldung'
 * CAS-Client-API um die Methode `sendGenericProcedureRequest` erweitern, um beliebige Objekte von `data/procedure` abzufragen.
 Dies ist besonders nützlich, wenn beispielsweise ein PDF-Report vom CAS abgefragt wird.

@@ -357,7 +357,7 @@ public class XSqlProcedureController {
 			Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
 			// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.
-			if (checksPerPrivilege.getRows().size() == 0) {
+			if (checksPerPrivilege.getRows().isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError");
 			}
 
@@ -373,7 +373,7 @@ public class XSqlProcedureController {
 
 					// Falls keine passenden OutputParameter gefunden werden können, muss das ResultSet des Haupt-Aufrufs (der erste in der Transaktion)
 					// verwendet werden.
-					if (resultsToCheck.size() == 0) {
+					if (resultsToCheck.isEmpty()) {
 						resultsToCheck.add(xsqlresults.get(0));
 					}
 

@@ -153,7 +153,7 @@ public class FilesController {
 
 		String extension = FilenameUtils.getExtension(path);
 		// Zur Abwertskompatibilität Dateieindung überprüfen und, falls diese Zip ist, getZip aufrufen.
-		if (extension.equals("zip")) {
+		if (extension.equalsIgnoreCase("zip")) {
 			return getZip(path);
 		}
 		val inputPath = files.checkLegalPath(Paths.get(path));
@@ -182,7 +182,7 @@ public class FilesController {
 		String extension = FilenameUtils.getExtension(path);
 
 		// Falls man den Hash eines Zip-Files möchte, liegen diese jetzt im Internal-Ordner
-		if (extension.equals("zip")) {
+		if (extension.equalsIgnoreCase("zip")) {
 			md5FilePath = files.getMd5Folder().resolve("Internal").resolve("Zips").resolve(toBeResolved);
 		} else {
 			md5FilePath = files.getMd5Folder().resolve(toBeResolved);
@@ -199,7 +199,7 @@ public class FilesController {
 		String toBeResolved = path;
 		String extension = FilenameUtils.getExtension(path);
 
-		if (!extension.equals("zip")) {
+		if (!extension.equalsIgnoreCase("zip")) {
 			// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im Zips Ordner nachgestellt.
 			toBeResolved = toBeResolved + ".zip";
 		}
@@ -311,7 +311,7 @@ public class FilesController {
 			}
 			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
 			// es kann sein, dass von einem vorherigen Start bereits gezippte Dateien vorhanden sind, welche schon gehashed wurden
-			if (fileSuffix.toLowerCase().equals("md5")) {
+			if (fileSuffix.equalsIgnoreCase("md5")) {
 				String filePrefix = path.toString().substring(0, path.toString().lastIndexOf("."));
 				fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1, path.toString().length());
 			}

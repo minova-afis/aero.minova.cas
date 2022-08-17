@@ -170,7 +170,7 @@ public class SqlViewController {
 			result = convertSqlResultToTable(inputTable, resultSet);
 
 			int totalResults = 0;
-			if (result.getRows().size() > 0) {
+			if (!result.getRows().isEmpty()) {
 				totalResults = result.getRows().size();
 			}
 
@@ -222,7 +222,7 @@ public class SqlViewController {
 		for (int i = 0; i < inputValues.size(); i++) {
 			try {
 				val iVal = inputValues.get(i);
-				if (!(iVal == null)) {
+				if (iVal != null) {
 					val rule = iVal.getRule();
 					String stringValue = iVal.getValue() + "";
 					if (rule == null) {
@@ -235,7 +235,7 @@ public class SqlViewController {
 							parameterOffset--;
 						}
 					} else if (rule.contains("in")) {
-						List<String> inBetweenValues = new ArrayList<>();
+						List<String> inBetweenValues;
 						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
 								.collect(Collectors.toList());
 						for (String string : inBetweenValues) {
@@ -246,7 +246,7 @@ public class SqlViewController {
 						// i zählt als nächstes hoch, deswegem muss parameterOffset wieder um 1 verringert werden
 						parameterOffset--;
 					} else if (rule.contains("between")) {
-						List<String> inBetweenValues = new ArrayList<>();
+						List<String> inBetweenValues;
 						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
 								.collect(Collectors.toList());
 						// bei between vertrauen wir nicht darauf, dass der Nutzer wirklich nur zwei Werte einträgt,
@@ -342,7 +342,7 @@ public class SqlViewController {
 		}
 		sb.append(params.getName());
 		boolean whereClauseExists = false;
-		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
+		if (!params.getColumns().isEmpty() && !params.getRows().isEmpty()) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 			if (!where.trim().equals("")) {
@@ -382,7 +382,7 @@ public class SqlViewController {
 
 		sb.append("( select Row_Number() over (order by KeyLong) as RowNum, * from ").append(params.getName());
 		boolean whereClauseExists = false;
-		if (params.getColumns().size() > 0 && params.getRows().size() > 0) {
+		if (!params.getColumns().isEmpty() && !params.getRows().isEmpty()) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 			if (!where.trim().equals("")) {

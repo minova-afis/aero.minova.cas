@@ -466,6 +466,8 @@ public class SqlProcedureController {
 									return new Column(name, DataType.STRING);
 								} else if (type == Types.DECIMAL) {
 									return new Column(name, DataType.BIGDECIMAL);
+								} else if (type == Types.BIGINT) {
+									return new Column(name, DataType.LONG);
 								} else {
 									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}
@@ -605,6 +607,8 @@ public class SqlProcedureController {
 								preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.DECIMAL);
+							} else if (type == DataType.LONG) {
+								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
 							} else {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
@@ -618,14 +622,14 @@ public class SqlProcedureController {
 								preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getInstantValue()));
 							} else if (type == DataType.INTEGER) {
 								preparedStatement.setInt(i + parameterOffset, iVal.getIntegerValue());
-							} else if (type == DataType.LONG) {
-								preparedStatement.setDouble(i + parameterOffset, iVal.getLongValue());
 							} else if (type == DataType.STRING) {
 								preparedStatement.setString(i + parameterOffset, iVal.getStringValue());
 							} else if (type == DataType.ZONED) {
 								preparedStatement.setTimestamp(i + parameterOffset, Timestamp.from(iVal.getZonedDateTimeValue().toInstant()));
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.setBigDecimal(i + parameterOffset, iVal.getBigDecimalValue());
+							} else if (type == DataType.LONG) {
+								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
 							} else {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
@@ -640,7 +644,7 @@ public class SqlProcedureController {
 							} else if (type == DataType.INTEGER) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.INTEGER);
 							} else if (type == DataType.LONG) {
-								preparedStatement.registerOutParameter(i + parameterOffset, Types.DOUBLE);
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.BIGINT);
 							} else if (type == DataType.STRING) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.NVARCHAR);
 							} else if (type == DataType.ZONED) {

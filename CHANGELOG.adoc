@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased]
 * Basis-Docker-Image von Adoptium verwenden und dessen Einsatz begründen.
+* #300 Long als Value unterstützen.
+* #184 Tests zum Beweisen, dass Http2 Property funktionieren würde, hinzufügen.
 * BUGFIX: Initialisieren des CAS API Objektes mit eigener JSON Instanz.
 * Code aufräumen: Nicht verwendete Ordner `Program Files` und `Shared Date` aus `FileService` entfernen.
 

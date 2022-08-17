@@ -3,6 +3,8 @@ package aero.minova.cas.api.domain;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.gson.Gson;
@@ -10,9 +12,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 
-public class ValueSerializer extends com.fasterxml.jackson.databind.JsonSerializer<Value>  implements JsonSerializer<Value> {
+public class ValueSerializer extends com.fasterxml.jackson.databind.JsonSerializer<Value> implements JsonSerializer<Value> {
 	@Autowired
 	private Gson gson;
 
@@ -41,6 +42,8 @@ public class ValueSerializer extends com.fasterxml.jackson.databind.JsonSerializ
 			return new JsonPrimitive("b-" + value.getBooleanValue().toString());
 		case BIGDECIMAL:
 			return new JsonPrimitive("m-" + value.getBigDecimalValue().toString());
+		case LONG:
+			return new JsonPrimitive("l-" + value.getLongValue().toString());
 		default:
 			return null;
 		}

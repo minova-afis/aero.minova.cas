@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -172,32 +173,15 @@ public class SqlProcedureController {
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: ", inputTable);
-		final List<Row> privilegeRequest = new ArrayList<>();
 		try {
-			if (securityService.arePrivilegeStoresSetup()) {
-				privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
-				if (privilegeRequest.isEmpty()) {
-					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-				}
-			} else {
-				if (extensionBootstrapChecks.containsKey(inputTable.getName())) {
-					if (!extensionBootstrapChecks.get(inputTable.getName()).apply(inputTable)) {
-						throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-					}
-				} else {
-					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-				}
+			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
+
+			Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
+
+			if (extensionResult.isPresent()) {
+				return extensionResult.get();
 			}
-			if (extensions.containsKey(inputTable.getName())) {
-				synchronized (extensionSynchronizer) {
-					val extResult = extensions.get(inputTable.getName()).apply(inputTable);
-					queueService.accept(inputTable, extResult);
-					return extResult;
-				}
-			}
-			if (privilegeRequest.isEmpty()) {
-				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
-			}
+
 			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
 			return result;
@@ -210,6 +194,57 @@ public class SqlProcedureController {
 	}
 
 	/**
+	 * Überprüft, ob es für den Namen der übergebenen Table einen passenden Eintrag in den Extensions gibt und gibt das Ergebnis der ausgeführten Extension als
+	 * Optional<ResponseEntity> zurück.
+	 * 
+	 * @param inputTable
+	 *            Eine Table. Muss einen Namen haben.
+	 * @return Das Ergebnis der Extension als Optional mit der übergebenen Table als Input.
+	 */
+	Optional<ResponseEntity> checkForExtension(Table inputTable) {
+		ResponseEntity extResult = null;
+
+		synchronized (extensionSynchronizer) {
+			if (extensions.containsKey(inputTable.getName())) {
+				extResult = extensions.get(inputTable.getName()).apply(inputTable);
+				queueService.accept(inputTable, extResult);
+			}
+		}
+		return Optional.ofNullable(extResult);
+	}
+
+	/**
+	 * Überprüft, ob es für den derzeitigen Nutzer und die übergebene Table Privilegien gibt und falls nicht, ob eine Extension vorhanden ist, welche keine
+	 * Privilegien benötigt.
+	 * 
+	 * @param inputTable
+	 *            Die Table, welche auf Privilegien geprüft werden muss.
+	 * @return Eine Liste von Rows mit Privilegname, UserGroup-Name und RowLevelSecurity-Bit.
+	 * @throws Exception
+	 *             Falls keine Datenbankverbindung aufgebaut werden kann.
+	 * @throws ProcedureException
+	 *             Falls der Nutzer kein Recht hat, die Aktion durchzuführen.
+	 */
+	private List<Row> checkForPrivilegeAndBootstrapExtension(Table inputTable) throws Exception, ProcedureException {
+		final List<Row> privilegeRequest = new ArrayList<>();
+		if (securityService.arePrivilegeStoresSetup()) {
+			privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
+			if (privilegeRequest.isEmpty()) {
+				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+			}
+		} else {
+			if (extensionBootstrapChecks.containsKey(inputTable.getName())) {
+				if (!extensionBootstrapChecks.get(inputTable.getName()).apply(inputTable)) {
+					throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+				}
+			} else {
+				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
+			}
+		}
+		return privilegeRequest;
+	}
+
+	/**
 	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
 	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben.
 	 *
@@ -219,7 +254,9 @@ public class SqlProcedureController {
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
 	 */
+	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
 		/*
@@ -233,6 +270,38 @@ public class SqlProcedureController {
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
 		return processSqlProcedureRequest(inputTable, authority);
+	}
+
+	/**
+	 * Diese Methode ist nicht geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben. Prüft auch, ob eine Extension statt einer Prozedur
+	 * aufgerufen werden muss.
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @return Optional einer SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 */
+	public ResponseEntity<?> unsecurelyExecuteProcedure(Table inputTable) throws Exception {
+		Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
+
+		if (extensionResult != null) {
+			return extensionResult.orElse(null);
+		}
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		Row requestingAuthority = new Row();
+		/*
+		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
+		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+		 */
+		requestingAuthority.addValue(new Value(false, "1"));
+		requestingAuthority.addValue(new Value(false, "2"));
+		requestingAuthority.addValue(new Value(false, "3"));
+
+		List<Row> authority = new ArrayList<>();
+		authority.add(requestingAuthority);
+		return new ResponseEntity(processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
 	}
 
 	/**
@@ -268,13 +337,13 @@ public class SqlProcedureController {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		val result = new SqlProcedureResult();
+		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
 		try {
 			connection = systemDatabase.getConnection();
-			calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
+			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
@@ -316,6 +385,7 @@ public class SqlProcedureController {
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
 			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
+
 		result.setReturnCodes(new ArrayList<Integer>());
 		result.setReturnCode(0);
 		val parameterOffset = 2;

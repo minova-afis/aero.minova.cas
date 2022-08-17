@@ -1,9 +1,10 @@
 package aero.minova.cas.controller;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
@@ -23,7 +25,7 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XProcedureException;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
-import aero.minova.cas.CustomLogger;
+import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 
@@ -44,6 +46,9 @@ public class XSqlProcedureController {
 
 	@Autowired
 	SqlViewController sqlViewController;
+
+	@Autowired
+	QueueService queueService;
 
 	/**
 	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden. Erst wenn alle
@@ -68,14 +73,25 @@ public class XSqlProcedureController {
 
 		try {
 			connection = systemDatabase.getConnection();
+
+			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap();
+
 			// Hier wird die Anfrage bearbeitet.
-			resultSets = processXProcedures(inputTables, resultSets);
+			resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
 
 			// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
-			checkFollowUpProcedures(inputTables, resultSets);
+			checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
 
 			// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
 			connection.commit();
+
+			// Nachdem alle Prozeduren und Folgeprozeduren erfolgreich durchgelaufen sind, kann man die Nachrichten über den QueueService verschicken.
+			for (Map.Entry<Table, List<SqlProcedureResult>> mapEntry : inputTablesWithResults.entrySet()) {
+				for (SqlProcedureResult result : mapEntry.getValue()) {
+					queueService.accept(mapEntry.getKey(), new ResponseEntity(result, HttpStatus.ACCEPTED));
+				}
+			}
+
 		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			try {
@@ -90,8 +106,50 @@ public class XSqlProcedureController {
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
 	}
 
-	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets)
-			throws Exception, ProcedureException, SQLException {
+	/**
+	 * Überprüft, ob nötige Privilegien für jede XTable vorhanden sind und führt dann die entsprechende Prozedur aus. Hier wird noch KEIN Commit auf die
+	 * Datenbank durchgeführt. Es wird ebenfalls überprüft, ob eine mögliche Extension vorhanden ist. Dient nur der Abwärtskompabilität und ist deswegen
+	 * deprecated.
+	 * 
+	 * @param inputTables
+	 *            Eine Liste an XTables, welche Prozeduren enthalten ausgeführt werden sollen.
+	 * @param resultSets
+	 *            Die bisher noch leere Liste an XSqlResultSets, welche in dieser Methode gefüllt weden.
+	 * @param sb
+	 *            Ein StringBuffer.
+	 * @param connection
+	 *            Eine Connection zur Datenbank. QueueService später benötigt.
+	 * @return Gibt die zuvor leere Liste an XSqlProcedureResults zurück, welche nun gefüllt ist.
+	 * @throws Exception
+	 *             Wirft einen Fehler, falls das Privileg nicht vorhanden ist oder es einen Fehler bei der Ausführung der Prozedur gab.
+	 */
+	@Deprecated
+	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sb, Connection connection)
+			throws Exception {
+		return processXProcedures(inputTables, resultSets, sb, connection, null);
+	}
+
+	/**
+	 * Überprüft, ob nötige Privilegien für jede XTable vorhanden sind und führt dann die entsprechende Prozedur aus. Hier wird noch KEIN Commit auf die
+	 * Datenbank durchgeführt. Es wird ebenfalls überprüft, ob eine mögliche Extension vorhanden ist.
+	 * 
+	 * @param inputTables
+	 *            Eine Liste an XTables, welche Prozeduren enthalten ausgeführt werden sollen.
+	 * @param resultSets
+	 *            Die bisher noch leere Liste an XSqlResultSets, welche in dieser Methode gefüllt weden.
+	 * @param sb
+	 *            Ein StringBuffer.
+	 * @param connection
+	 *            Eine Connection zur Datenbank.
+	 * @param inputTablesWithResults
+	 *            Eine Map, in welcher die InputTables und deren SqlProcedureResults gespeichert werden. Wird zum Versenden von Nachrichten über den
+	 *            QueueService später benötigt.
+	 * @return Gibt die zuvor leere Liste an XSqlProcedureResults zurück, welche nun gefüllt ist.
+	 * @throws Exception
+	 *             Wirft einen Fehler, falls das Privileg nicht vorhanden ist oder es einen Fehler bei der Ausführung der Prozedur gab.
+	 */
+	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sb, Connection connection,
+			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) throws Exception {
 		for (XTable xt : inputTables) {
 			SqlProcedureResult result = new SqlProcedureResult();
 			Table filledTable = new Table();
@@ -106,7 +164,27 @@ public class XSqlProcedureController {
 					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
 				}
 			}
-			result = (SqlProcedureResult) sqlProcedureController.executeProcedure(filledTable).getBody();
+
+			ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).orElse(null);
+
+			// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunen wurde, normal ausführen.
+			if (extensionResult != null) {
+				resultSets.add(new XSqlProcedureResult(xt.getId(), (SqlProcedureResult) extensionResult.getBody()));
+			} else {
+				result = (SqlProcedureResult) sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+			}
+			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompabilität da, damit hier keine NullPointerException geworfen wird.
+			if (inputTablesWithResults != null) {
+				// InputTable und Ergebnis hinzufügen, damit später Nachrichten versand werden können.
+				if (inputTablesWithResults.containsKey(filledTable)) {
+					inputTablesWithResults.get(filledTable).add(result);
+				} else {
+					List<SqlProcedureResult> resultList = new ArrayList<SqlProcedureResult>();
+					resultList.add(result);
+					inputTablesWithResults.put(filledTable, resultList);
+				}
+			}
+
 			// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
 			resultSets.add(new XSqlProcedureResult(xt.getId(), result));
 		}
@@ -223,7 +301,8 @@ public class XSqlProcedureController {
 
 	/**
 	 * Findet anhand der übergebenen Liste an XTables und über einen Aufruf der xtcasUserPrivilege-Tabelle heraus, welche Check-Prozeduren für die gerade
-	 * ausgeführten XProzeduren durchgeführt werden müssen. In dieser Methode wird noch kein Commit an die Datenbank gesendet.
+	 * ausgeführten XProzeduren durchgeführt werden müssen. In dieser Methode wird noch kein Commit an die Datenbank gesendet. Methode dient nur zur
+	 * Abwärtskompabilität und ist deswegen deprecated.
 	 * 
 	 * @param inputTables
 	 *            Die Original-Anfrage, welche an das CAS gesendet wurde.
@@ -234,7 +313,29 @@ public class XSqlProcedureController {
 	 * @param sb
 	 *            Ein StringBuffer, welcher das Ausführen der Check-Prozeudren loggt.
 	 */
-	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults) {
+	@Deprecated
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults, StringBuffer sb, Connection connection) {
+		checkFollowUpProcedures(inputTables, xsqlresults, sb, connection, null);
+	}
+
+	/**
+	 * Findet anhand der übergebenen Liste an XTables und über einen Aufruf der xtcasUserPrivilege-Tabelle heraus, welche Check-Prozeduren für die gerade
+	 * ausgeführten XProzeduren durchgeführt werden müssen. In dieser Methode wird noch kein Commit an die Datenbank gesendet.
+	 * 
+	 * @param inputTables
+	 *            Die Original-Anfrage, welche an das CAS gesendet wurde.
+	 * @param xsqlresults
+	 *            Die XSqlProcedureResults, welche die ausgeführten Prozeduren geliefert haben.
+	 * @param connection
+	 *            Die Verbindung zur Datenbank.
+	 * @param sb
+	 *            Ein StringBuffer, welcher das Ausführen der Check-Prozeudren loggt.
+	 * @param inputTablesWithResults
+	 *            Eine Map, in welcher die InputTables und deren SqlProcedureResults gespeichert werden. Wird zum Versenden von Nachrichten über den
+	 *            QueueService später benötigt.
+	 */
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlresults, StringBuffer sb, Connection connection,
+			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) {
 		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
 		Table privilegeRequest = new Table();
 		privilegeRequest.setName("xtcasUserPrivilege");
@@ -306,7 +407,7 @@ public class XSqlProcedureController {
 
 				}
 			}
-			processXProcedures(checksXtables, xsqlresults);
+			processXProcedures(checksXtables, xsqlresults, sb, connection, inputTablesWithResults);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to find follow up procedures.", e);
 		}

@@ -404,11 +404,12 @@ public class FilesController {
 		} catch (Exception e) {
 			if (ze != null) {
 				customLogger.logFiles("Error while zipping file " + ze.getName());
+				throw new RuntimeException("msg.ZipError %" + ze.getName());
 			} else {
 				// Landet nur hier, wenn es nicht mal bis in das erste if geschafft hat.
 				customLogger.logFiles("Error while accessing file path for file to zip.");
+				throw new RuntimeException("Error while accessing file path " + source + " for file to zip.", e);
 			}
-			throw new RuntimeException("msg.ZipError %" + ze.getName());
 		}
 	}
 

@@ -1,4 +1,4 @@
-package aero.minova.cas.setup.xml;
+package aero.minova.cas.setup.xml.setup;
 
 import org.junit.Test;
 

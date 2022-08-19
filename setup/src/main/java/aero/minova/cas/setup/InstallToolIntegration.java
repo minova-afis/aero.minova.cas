@@ -1,8 +1,5 @@
 package aero.minova.cas.setup;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -10,14 +7,13 @@ import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
 
-import aero.minova.cas.setup.xml.Setup;
+import aero.minova.cas.setup.xml.setup.Setup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
 import aero.minova.cas.sql.SystemDatabase;
-import ch.minova.core.install.SetupDocument;
 import ch.minova.install.setup.BaseSetup;
 
 /**

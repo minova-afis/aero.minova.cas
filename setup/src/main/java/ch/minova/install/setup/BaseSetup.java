@@ -22,7 +22,9 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import aero.minova.cas.setup.xml.Setup;
+import aero.minova.cas.setup.xml.setup.Setup;
+import aero.minova.cas.setup.xml.setup.Script;
+import aero.minova.cas.setup.xml.setup.Tableschema;
 import org.apache.xmlbeans.XmlException;
 
 import ch.minova.install.setup.schema.SqlDatabase;
@@ -31,7 +33,7 @@ import ch.minova.install.setup.schema.XmlDatabaseColumn;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
 import ch.minova.install.sql.TVersion;
 
-import static aero.minova.cas.setup.xml.Script.*;
+import static aero.minova.cas.setup.xml.setup.Script.*;
 import static java.nio.file.Files.readAllBytes;
 
 /**
@@ -897,9 +899,9 @@ public class BaseSetup {
 		tVersionHash = getTVersion(connection, table);
 		// Einlesen der Daten aus tVersion
 		if (doc.getSqlCode() != null) {
-			final List<aero.minova.cas.setup.xml.Script> scripts = doc.getSqlCode();
+			final List<Script> scripts = doc.getSqlCode();
 			for (int i = 0; i < scripts.size(); i++) {
-				final aero.minova.cas.setup.xml.Script scp = scripts.get(i);
+				final Script scp = scripts.get(i);
 				final String name = scp.getName();
 				final String type = scp.getType();
 				log(MessageFormat.format("Script: {0}, Type= {1}", name, type.toString()));
@@ -1259,7 +1261,7 @@ public class BaseSetup {
 	public boolean readSchema() throws XmlException, IOException, BaseSetupException, ModuleNotFoundException, SQLException {
 		final Setup doc = getSetupDocument();
 		if (doc.getSchema() != null) {
-			final List<aero.minova.cas.setup.xml.Tableschema> tables = doc.getSchema();
+			final List<Tableschema> tables = doc.getSchema();
 			for (int i = 0; i < tables.size(); i++) {
 				if (!hashtables.containsKey(tables.get(i))) {
 					tablevector.add(new TableVector(tables.get(i).getName(), tables.get(i).getType()));

@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
 
+import aero.minova.cas.setup.xml.Setup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,6 @@ public class InstallToolIntegration {
 	 */
 	public void installSetup(Path setupXml) {
 		try {
-			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
 			final Connection connection = systemDatabase.getConnection();
 			try {
 				connection.setAutoCommit(true);
@@ -50,7 +50,7 @@ public class InstallToolIntegration {
 				if (!BaseSetup.parameter.containsKey("fs")) {
 					BaseSetup.parameter.put("fs", "value");
 				}
-				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
+				final Setup setupDocument = Setup.parse(setupXml);
 
 				BaseSetup.hashModules = new Hashtable<>();
 				BaseSetup.hashtables = new Hashtable<>();
@@ -66,10 +66,10 @@ public class InstallToolIntegration {
 				setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
 				if (rs.getInt("Anzahl") == 0) {
 					setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
-					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getSetup().getName());
+					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getName());
 				} else {
 					setup.readoutSchema(connection, tableLibrary, sqlLibrary);
-					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getSetup().getName());
+					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getName());
 				}
 				setup.handleSqlScripts(connection, sqlLibrary);
 				connection.commit();

@@ -1,87 +1,37 @@
 package ch.minova.install.setup;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.management.RuntimeErrorException;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.apache.commons.io.FileUtils;
+import aero.minova.cas.setup.xml.Setup;
 import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlOptions;
 
-import ch.minova.core.install.DircopyDocument.Dircopy;
-import ch.minova.core.install.ExecuteJavaDocument.ExecuteJava;
-import ch.minova.core.install.FilecopyDocument.Filecopy;
-import ch.minova.core.install.Log4JConfDocument.Log4JConf;
-import ch.minova.core.install.MainDocument;
-import ch.minova.core.install.MainDocument.Main;
-import ch.minova.core.install.Map;
-import ch.minova.core.install.ModuleDocument.Module;
-import ch.minova.core.install.NodeDocument.Node;
-import ch.minova.core.install.OneOfDocument.OneOf;
-import ch.minova.core.install.PreferencesDocument;
-import ch.minova.core.install.PreferencesDocument.Preferences;
-import ch.minova.core.install.PreferencesDocument.Preferences.Root;
-import ch.minova.core.install.ScriptDocument.Script;
-import ch.minova.core.install.ScriptDocument.Script.Type;
-import ch.minova.core.install.ScriptDocument.Script.Type.Enum;
-import ch.minova.core.install.ServiceDocument.Service;
-import ch.minova.core.install.SetupDocument;
-import ch.minova.core.install.TableschemaDocument.Tableschema;
-import ch.minova.core.install.VersionDocument.Version;
-import ch.minova.core.install.WrapperConfDocument.WrapperConf;
-import ch.minova.install.IInstaller;
-import ch.minova.install.ncore.ApplicationType;
-import ch.minova.install.ncore.IApplicationType;
-import ch.minova.install.setup.copyfile.DirCopy;
-import ch.minova.install.setup.copyfile.FileCopy;
-import ch.minova.install.setup.mdi.Entry;
-import ch.minova.install.setup.mdi.Menu;
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
 import ch.minova.install.setup.schema.XmlDatabaseColumn;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
-import ch.minova.install.setup.xbs.NodeException;
 import ch.minova.install.sql.TVersion;
-import net.sourceforge.jtds.util.SSPIJNIClient;
 
+import static aero.minova.cas.setup.xml.Script.*;
 import static java.nio.file.Files.readAllBytes;
 
 /**
@@ -101,7 +51,7 @@ public class BaseSetup {
 	private static String sqldialect = "sql";
 	private Connection connection = null;
 	private HashMap<String, String> mymap;
-	private SetupDocument setupDocument;
+	private Setup setupDocument;
 	protected VersionInfo versionInfo;
 
 	public static Properties parameter = null;
@@ -715,8 +665,8 @@ public class BaseSetup {
 		XmlDatabaseTable xmlTable = null;
 		SqlDatabaseTable sqlTable = null;
 		String sqlCode = null;
-		SetupDocument doc = getSetupDocument();
-		if (doc.getSetup().getSchema() == null) {
+		Setup doc = getSetupDocument();
+		if (doc.getSchema() == null) {
 			return false;
 		}
 		try {
@@ -732,9 +682,9 @@ public class BaseSetup {
 				// Table aus der ausgelesenen Datenbank
 				if (tablevector.get(i).getType().equalsIgnoreCase("script")) {
 					// ist das der gleiche Name
-					if (doc.getSetup().getSchema().getTableschemaArray(i).getName().equalsIgnoreCase(tablevector.get(i).getName())) {
+					if (doc.getSchema().get(i).getName().equalsIgnoreCase(tablevector.get(i).getName())) {
 						// soll das script vorher ausgeführt werden
-						if (doc.getSetup().getSchema().getTableschemaArray(i).getExecute().toString().equalsIgnoreCase("before")) {
+						if (doc.getSchema().get(i).getExecute().toString().equalsIgnoreCase("before")) {
 							execSqlScripts(tablevector.get(i).getName(), sqlLibrary);
 						}
 					}
@@ -880,9 +830,9 @@ public class BaseSetup {
 			if (tablevector.get(i).getType().equalsIgnoreCase("script")) {
 				doc = getSetupDocument();
 				// ist das der gleiche Name
-				if (doc.getSetup().getSchema().getTableschemaArray(i).getName().equalsIgnoreCase(tablevector.get(i).getName())) {
+				if (doc.getSchema().get(i).getName().equalsIgnoreCase(tablevector.get(i).getName())) {
 					// soll das script vorher ausgeführt werden
-					if (doc.getSetup().getSchema().getTableschemaArray(i).getExecute().toString().equalsIgnoreCase("after")) {
+					if (doc.getSchema().get(i).getExecute().toString().equalsIgnoreCase("after")) {
 						try {
 							execSqlScripts(tablevector.get(i).getName(), sqlLibrary);
 						} catch (final SQLException e) {
@@ -905,18 +855,11 @@ public class BaseSetup {
 	 * @throws IOException
 	 * @throws BaseSetupException
 	 */
-	private SetupDocument getSetupDocument() throws XmlException, IOException, BaseSetupException {
+	private Setup getSetupDocument() throws XmlException, IOException, BaseSetupException {
 		if (setupDocument != null) {
 			return setupDocument;
 		}
-		final String setupxml = "Setup.xml";
-		final InputStream isSetupXmlpfad = this.getClass().getResourceAsStream(setupxml);
-		if (isSetupXmlpfad == null) {
-			throw new BaseSetupException(MessageFormat.format(MISSINGFILE, setupxml));
-		}
-		final SetupDocument doc = SetupDocument.Factory.parse(isSetupXmlpfad, null);
-		// setjavacall(doc);
-		return doc;
+		throw new IllegalStateException("Getting `Setup.xml` via class resource was removed with version 12.");
 	}
 
 	private void execSqlScripts(final String tablename, Optional<Path> sqlLibrary) throws IOException, SQLException {
@@ -941,7 +884,7 @@ public class BaseSetup {
 
 	public void handleSqlScripts(final Connection con, final Optional<Path> sqlLibrary)
 			throws XmlException, IOException, BaseSetupException, SQLException, SQLExeption {
-		SetupDocument doc;
+		Setup doc;
 		final String table = "tVersion10";
 		final boolean forceSql = parameter.containsKey("fs");
 		doc = getSetupDocument();
@@ -953,22 +896,22 @@ public class BaseSetup {
 		checktVersion10(con, Optional.empty());
 		tVersionHash = getTVersion(connection, table);
 		// Einlesen der Daten aus tVersion
-		if (doc.getSetup().getSqlCode() != null) {
-			final Script scripts[] = doc.getSetup().getSqlCode().getScriptArray();
-			for (int i = 0; i < scripts.length; i++) {
-				final Script scp = scripts[i];
+		if (doc.getSqlCode() != null) {
+			final List<aero.minova.cas.setup.xml.Script> scripts = doc.getSqlCode();
+			for (int i = 0; i < scripts.size(); i++) {
+				final aero.minova.cas.setup.xml.Script scp = scripts.get(i);
 				final String name = scp.getName();
-				final Enum type = scp.getType();
+				final String type = scp.getType();
 				log(MessageFormat.format("Script: {0}, Type= {1}", name, type.toString()));
 				// connection = checkConnection(null);
 				// falls es Versions gibt wird überprüft!
 				final String sqlScript = readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, name + ".sql", sqlLibrary);
 				log(sqlScript, false);
-				if (type == Type.SCRIPT) {
+				if (type.equals(TYPE_SCRIPT)) {
 					executeSqlScript(sqlScript);
-				} else if (type == Type.TABLE) {
+				} else if (type.equals(TYPE_TABLE)) {
 					readSQLOfOrderedModules();
-				} else if (type == Type.PROCEDURE || type == Type.VIEW || type == Type.FUNCTION) {
+				} else if (type.equals(TYPE_PROCEDURE) || type.equals(TYPE_VIEW) || type.equals(TYPE_FUNCTION)) {
 					if (!tVersionHash.containsKey(name)) {
 						// Prozedur /View nicht in tVersion10 vorhanden
 						runScript(sqlScript, name, this.versionInfo, type, con);
@@ -991,7 +934,7 @@ public class BaseSetup {
 	}
 
 	public void readSQLOfOrderedModules() throws XmlException, IOException, BaseSetupException, SQLException {
-		SetupDocument setup = null;
+		Setup setup = null;
 
 		final BaseSetup[] a = orderedDependingModules.toArray(new BaseSetup[0]);
 
@@ -1000,13 +943,9 @@ public class BaseSetup {
 				setup = bs.getSetupDocument();
 				log(MessageFormat.format("Aus der Setup.xml Datei wird der sql-Code ausgelesen Modul:{0}_{1}", bs.getVersionInfo().getModulName(),
 						bs.getVersionInfo().toString()));
-				bs.checkSql(bs, setup);
 			} catch (final BaseSetupException e) {
 				e.printStackTrace();
 				throw new BaseSetupException(e.getMessage() + setup.getClass().getName());
-			} catch (final SQLException e) {
-				e.printStackTrace();
-				throw new SQLException(e.getMessage() + setup.getClass().getName());
 			}
 		}
 	}
@@ -1019,13 +958,13 @@ public class BaseSetup {
 	 * @param con
 	 * @throws SQLException
 	 */
-	private void runScript(final String sqlScript, final String name, final VersionInfo versionInfo2, final Enum type, final Connection con)
+	private void runScript(final String sqlScript, final String name, final VersionInfo versionInfo2, final String type, final Connection con)
 			throws SQLException {
-		if (type == Type.FUNCTION) {
+		if (type.equals(TYPE_FUNCTION)) {
 			executeSqlFunction(sqlScript, name, true, con);
-		} else if (type == Type.PROCEDURE) {
+		} else if (type.equals(TYPE_PROCEDURE)) {
 			executeSqlProcedure(sqlScript, name, true, con);
-		} else if (type == Type.VIEW) {
+		} else if (type.equals(TYPE_VIEW)) {
 			executeSqlView(sqlScript, name, true, con);
 		}
 	}
@@ -1201,182 +1140,10 @@ public class BaseSetup {
 	}
 
 	/**
-	 * überprüfung der SQL-Einträge in der Setup.xml Datei
-	 *
-	 * @param bs  BaseSetup
-	 * @param doc SetupDocument
-	 * @throws IOException
-	 * @throws SQLException
-	 * @throws BaseSetupException
-	 */
-	public void checkSql(final BaseSetup bs, final SetupDocument doc) throws IOException, SQLException, BaseSetupException {
-		final Script[] sc = doc.getSetup().getSqlCode().getScriptArray();
-		String path = bs.getClass().getName().replace(".Setup", "").replace(".setup", "") + "/sql";
-		log(MessageFormat.format("Pfad unter dem die sql Dateien zu finden sind: {0}", path));
-		@SuppressWarnings("unused")
-		boolean checkscripts = false;
-		if (parameter.containsKey("basedir")) {
-			path = parameter.getProperty("basedir") + path;
-		} else {
-			path = "../" + path;
-		}
-		for (int i = 0; i < sc.length; i++) {
-			checkscripts = false;
-			// Nur table Scripte
-			log(MessageFormat.format("Name: {0}, Type:{1}", sc[i].getName(), sc[i].getType()));
-			final String type = sc[i].getType().toString();
-			if (type.equals("table")) {
-				checkscripts = checkScriptVersion(sc[i], bs);
-			}
-		}
-	}
-
-	/**
 	 * Diese Methode liest die eingelesene xbs Datei aus Dabei werden die Einträge connection2 und den Driver aus.
 	 */
 	public void connect() {
 		throw new RuntimeException("BaseSEtup#connect not implemented yet.");
-	}
-
-	/**
-	 * Verarbeitung der Scripte vom type "table", dabie werden die Versionen auf ihre existens überprüft!
-	 *
-	 * @param script
-	 * @param bs
-	 * @param path
-	 * @param name
-	 * @return
-	 * @throws IOException
-	 * @throws SQLException
-	 * @throws BaseSetupException
-	 */
-	private boolean checkScriptVersion(final Script script, final BaseSetup bs) throws IOException, SQLException, BaseSetupException {
-		final Version[] varrayscript = script.getVersionArray();
-		String path = getModuleName(bs.getClass());
-		final String jarpath = path + ".jar";
-		log(MessageFormat.format("Pfad zur Jar_Datei: {0}", jarpath));
-		path = path.replace(".", "/") + "/";
-		log(MessageFormat.format("Pfad zur den Xml-Datein: {0}", path));
-
-		JarFile jFile = null;
-		JarEntry jEntry = null;
-		// java.util.Map.Entry<?, ?> entry = null;
-		jFile = new JarFile(jarpath);
-		String dataName = "";
-		VersionInfo version = null;
-		int countsql = 0;
-		final Vector<String> sqltables = new Vector<String>();
-		final Vector<String> sqlconstrains = new Vector<String>();
-		final Vector<String> sqlvalues = new Vector<String>();
-		// ein Array mit genau so vielen Einträgen wie verschiedene
-		// Minorversions
-		// die höchste Minorversion bestimmt die anzhal der Felder des Arrays
-		for (int i = 0; i < varrayscript.length; i++) {
-			int versionfound = 0;
-			log(MessageFormat.format("Version der von {0} : {1}", script.getName(), varrayscript[i].toString()));
-			final Enumeration<JarEntry> jEntries = jFile.entries();
-			while (jEntries.hasMoreElements()) {
-				jEntry = jEntries.nextElement();
-				dataName = jEntry.getName().replace(path, "");
-				if (dataName.startsWith("sql/" + script.getName())) {
-					if (i == 0) {
-						countsql++;
-					}
-					log(MessageFormat.format("Datei gelesen= {0}", dataName));
-					version = getVersionFromString(dataName);
-					// Version wurde gefunden!
-					if (version.getMajorVersion() == varrayscript[i].getMajor().intValue()) {
-						if (version.getMinorVersion() == varrayscript[i].getMinor().intValue()) {
-							if (version.getPatchLevel() == varrayscript[i].getPatch().intValue()) {
-								log(MessageFormat.format("Die ausgelesene Datei: {0} stimmt mit der Version ueberein",
-										version.getModulName() + "-" + version.toString()));
-								versionfound++;
-								if (dataName.endsWith(".constraints.sql")) {
-									sqlconstrains.add(dataName.replace(".sql", "").replace("sql/", ""));
-								} else if (dataName.endsWith(".values.sql")) {
-									sqlvalues.add(dataName.replace(".sql", "").replace("sql/", ""));
-								} else if (dataName.endsWith(".sql")) {
-									sqltables.add(dataName.replace(".sql", "").replace("sql/", ""));
-								}
-							}
-						}
-					}
-				}
-			}
-			final String name = script.getName() + "-" + varrayscript[i].getMajor() + "." + varrayscript[i].getMinor() + "." + varrayscript[i].getPatch();
-			if (versionfound > 0) {
-				countsql = countsql - versionfound;
-				log(MessageFormat.format("Es wurden {0}, gleichnamige Dateien gefunden: {1}", versionfound, name));
-			} else {
-				log(MessageFormat.format("Es wurden {0}, gleichnamige Dateien gefunden: {1} Error", versionfound, name), true);
-				// keine Version gefunden die zu dieser Datei gehört, -->
-				// Anlegen
-				// und hinzufügen!
-				// TODO
-			}
-		}
-
-		final String table = "tVersion10";
-		final Connection connection = checkConnection(null);
-		final Hashtable<String, TVersion> tVersionHash = new Hashtable<String, TVersion>();
-		ResultSet results = null;
-		results = connection.createStatement().executeQuery("select * from " + table);
-		TVersion tversion = null;
-		// Einlesen der Daten aus tVersion
-		while (results.next()) {
-			tVersionHash.put(results.getString("Keytext"),
-					new TVersion(results.getInt("KeyLong"), results.getString("Keytext"), results.getString("ModuleName"), results.getInt("MajorVersion"),
-							results.getInt("MinorVersion"), results.getInt("PatchLevel"), results.getInt("BuildNumber"), results.getString("LastUser"),
-							results.getString("LastDate"), results.getInt("LastAction")));
-		}
-
-		if (tVersionHash.containsKey(script.getName())) {
-			tversion = tVersionHash.get(script.getName());
-			log(MessageFormat.format("Tabelleneintrag: Keylong:{0} ,Modul:{6}, Name:{1}, {2}.{3}.{4}-{5}", tversion.getKeylong(), tversion.getKeytext(),
-					tversion.getMajorversion(), tversion.getMinorversion(), tversion.getPatchlevel(), tversion.getBuildnumber(), tversion.getModulname()));
-		}
-
-		try {
-			Collections.sort(sqltables);
-			Collections.sort(sqlconstrains);
-			Collections.sort(sqlvalues);
-		} catch (final Exception e) {
-			throw new BaseSetupException(MessageFormat.format("Sorting Vectors Error: {0}", e.getMessage()));
-		}
-
-		for (final String s : sqltables) {
-			log(MessageFormat.format("SQL-Tables: {0}", s));
-			if (tversion == null) {
-				log(MessageFormat.format("SQL-Tables: {0} wurde ausgefuehrt", s), true);
-				// executeSqlTable(readSqlScript(s), s);
-				executeSqlTable(readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, s + ".sql"), s);
-			} else {
-				if (compareToTVersion(tversion, new VersionInfo(s.substring(s.indexOf(".") + 1, s.length()) + "-0", "", s.substring(0, s.indexOf("."))))) {
-					log(MessageFormat.format("SQL-Tables: {0} wurde ausgefuehrt", s), true);
-					executeSqlTable(readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, s + ".sql"), s);
-				}
-			}
-		}
-		for (final String s : sqlconstrains) {
-			log(MessageFormat.format("SQL-Constrains: {0}", s));
-			if (compareToTVersion(tversion, new VersionInfo(s.substring(s.indexOf(".") + 1, s.lastIndexOf(".")) + "-0", "", s.substring(0, s.indexOf("."))))) {
-				log(MessageFormat.format("SQL-Constrains: {0} wurde ausgefuehrt", s), true);
-				executeSqlScript(readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, s + ".sql"));
-			}
-		}
-		for (final String s : sqlvalues) {
-			log(MessageFormat.format("SQL-Values: {0}", s));
-			if (compareToTVersion(tversion, new VersionInfo(s.substring(s.indexOf(".") + 1, s.lastIndexOf(".")) + "-0", "", s.substring(0, s.indexOf("."))))) {
-				log(MessageFormat.format("SQL-Values: {0} wurde ausgefuehrt", s), true);
-				executeSqlScript(readSqlFromJarFileToString(getVersionInfo().getModulName(), sqldialect, s + ".sql"));
-			}
-		}
-		if (countsql == 0) {
-			log(MessageFormat.format("Es wurden {0} Dateien zu viel in {1} gedunden", countsql, jarpath + "/sql"));
-		} else {
-			log(MessageFormat.format("Es wurden {0} Dateien zu viel in {1} gedunden Error", countsql, jarpath + "/sql"), true);
-		}
-		return false;
 	}
 
 	/**
@@ -1490,14 +1257,14 @@ public class BaseSetup {
 	 * @throws SQLException
 	 */
 	public boolean readSchema() throws XmlException, IOException, BaseSetupException, ModuleNotFoundException, SQLException {
-		final SetupDocument doc = getSetupDocument();
-		if (doc.getSetup().getSchema() != null) {
-			final Tableschema[] tables = doc.getSetup().getSchema().getTableschemaArray();
-			for (int i = 0; i < tables.length; i++) {
-				if (!hashtables.containsKey(tables[i])) {
-					tablevector.add(new TableVector(tables[i].getName(), tables[i].getType()));
-					hashtables.put(tables[i].getName().toLowerCase(), tables[i].getName());
-					log(MessageFormat.format("Table: {0}", tables[i].getName()));
+		final Setup doc = getSetupDocument();
+		if (doc.getSchema() != null) {
+			final List<aero.minova.cas.setup.xml.Tableschema> tables = doc.getSchema();
+			for (int i = 0; i < tables.size(); i++) {
+				if (!hashtables.containsKey(tables.get(i))) {
+					tablevector.add(new TableVector(tables.get(i).getName(), tables.get(i).getType()));
+					hashtables.put(tables.get(i).getName().toLowerCase(), tables.get(i).getName());
+					log(MessageFormat.format("Table: {0}", tables.get(i).getName()));
 				}
 			}
 			return true;
@@ -1505,7 +1272,7 @@ public class BaseSetup {
 		return false;
 	}
 
-	public void setSetupDocument(SetupDocument setupDocument) {
+	public void setSetupDocument(Setup setupDocument) {
 		this.setupDocument = setupDocument;
 	}
 }

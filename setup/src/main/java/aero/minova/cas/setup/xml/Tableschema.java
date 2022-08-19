@@ -10,4 +10,5 @@ import lombok.Setter;
 public class Tableschema {
     private String name;
     private String type;
+    private String execute;
 }

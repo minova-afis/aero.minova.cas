@@ -1,7 +1,10 @@
 package ch.minova.install.setup.schema;
 
-import ch.minova.core.xml.tables.TableDocument.Table;
-import ch.minova.core.xml.tables.TableDocument.Table.Uniquekey;
+import aero.minova.cas.setup.xml.table.Column;
+import aero.minova.cas.setup.xml.table.Table;
+import aero.minova.cas.setup.xml.table.UniqueKey;
+
+import java.util.List;
 
 public class XmlUniqueKeyConstraint {
 	private String columnName;
@@ -24,12 +27,12 @@ public class XmlUniqueKeyConstraint {
 		this.tableName = tableName;
 	}
 
-	public XmlUniqueKeyConstraint(final Table t, final Uniquekey uniqueKey, final String[] columns) {
+	public XmlUniqueKeyConstraint(final Table t, final UniqueKey uniqueKey, final List<Column> columns) {
 		this.tableName = t.getName();
 		this.columnName = uniqueKey.getName();
-		final XmlUniqueKeyColumn uniKeyColumns[] = new XmlUniqueKeyColumn[columns.length];
-		for (int i = 0; i < columns.length; i++) {
-			final XmlUniqueKeyColumn xmlc = new XmlUniqueKeyColumn(columns[i].toString());
+		final XmlUniqueKeyColumn uniKeyColumns[] = new XmlUniqueKeyColumn[columns.size()];
+		for (int i = 0; i < columns.size(); i++) {
+			final XmlUniqueKeyColumn xmlc = new XmlUniqueKeyColumn(columns.get(i).getName());
 			uniKeyColumns[i] = xmlc;
 		}
 		this.uniqueKeyColumns = uniKeyColumns;

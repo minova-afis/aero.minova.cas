@@ -1,6 +1,6 @@
 package aero.minova.cas.setup.xml.setup;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 import java.util.Scanner;

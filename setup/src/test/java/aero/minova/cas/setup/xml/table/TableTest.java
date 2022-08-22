@@ -1,7 +1,7 @@
 package aero.minova.cas.setup.xml.table;
 
 import aero.minova.cas.setup.xml.setup.Setup;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 import java.util.Scanner;
@@ -17,5 +17,6 @@ public class TableTest {
                 .useDelimiter("\\A")//
                 .next();
         final var testSubject = Setup.parse(tFuellingType);
+        assertThat(testSubject.getName()).isEqualTo("tFuellingType");
     }
 }

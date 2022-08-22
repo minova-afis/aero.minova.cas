@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table revision="$Revision: 1.3 $"
+    source="$Source: /srv/cvs/ch.minova.data/src/ch/minova/data/types/tFuellingType.table.xml,v $"
+    name="tFuellingType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../table.xsd">
+    <description>
+        <de>Stammdaten Flugzeug</de>
+        <en>System table Fuelling type</en>
+    </description>
+    <docbook>
+        <de>
+            <para xmlns="http://docbook.org/ns/docbook">In dieser Tabelle werden die Betankungstypen
+                verwaltet. Die Betankungstypen werden vor allem für die spätere Abrechnung der
+                Betankungsvorgänge genutzt. Jeder Betankungstyp kann unterschiedlich verrechnet
+                werden. Dabei unterscheidet man zwischen Betankungen (Refuelings), Enttankungen
+                (Defuelings) und internen Bewegungen wie TU (techn. Umpumpen), RB (Refueling Bowser)
+                und CO (Korrektur). Dabei ist zu beachten, dass die Fuelling-Typen "RB","TU" und
+                "CO" nur für interne Buchungen benutzt werden. D.h. beim Erfassen oder Bearbeiten
+                eines Lieferscheins, werden keine Flugdaten gespeichert. Achtung: bei Änderung der
+                Betankungsart von einem echten Type wie "R1" auf z.B "CO" wird die Verknüpfung zum
+                Flug gelöscht. Es fehlen die Informationen.</para>
+        </de>
+        <en>
+            <para xmlns="http://docbook.org/ns/docbook">This system table contains the different
+                fuelling types used in AFIS.</para>
+        </en>
+    </docbook>
+    <column name="KeyLong">
+        <integer nullable="false"/>
+        <description>
+            <de>Eindeutiger Schlüssel</de>
+            <en>Unique Key</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook">Diese Schlüssel ist nur für den internen
+                    Gebrauch.</para>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook">This Key is only for internal use and
+                    not shown to the user.</para>
+            </en>
+        </docbook>
+    </column>
+    <column name="KeyText">
+        <varchar length="10" nullable="false"/>
+        <description>
+            <de>Eindeutiger Schlüssel</de>
+            <en>Unique ID of the fuelling type.This can be:
+                1=R1,2=R2,3=RW,4=D1,5=DW,6=RB,7=TU,8=RN,9=RK,10=2R,11=DN,12=CO</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook">Dieser Schlüssel wird für die Eingabe
+                    der Betankungsart in den unterschiedlichen Masken benutzt.</para>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook">The unique ID of the fuelling type in
+                    the system.R1=Refuelling, R2=second refuelling, RW=Fuelling in the
+                    hangar,D1=Defuelling, DW=Defuelling in the hangar,RB=Refuelling of another
+                    truck,TU=technical pumping,RK=Fuelling of small machines, 2R=Refuelling with a
+                    second truck, DN=Night defuelling, CO=Corrections. </para>
+            </en>
+        </docbook>
+    </column>
+    <column name="Description">
+        <varchar length="50" nullable="true"/>
+        <description>
+            <de>Bemerkungen, Erklärungen oder Notizen.</de>
+            <en>The description of the fuelling type.</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook">Der Text erscheint später in einigen
+                    Berichten.</para>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </column>
+    <column name="LastUser" default="user_name()">
+        <varchar length="50" nullable="true"/>
+        <description>
+            <de>SQL Benutzername vom Benutzer, der die letzte Änderung durchgeführt hat.</de>
+            <en>SQL-Username of the user who made the last modifcation.</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook">Der Benutzername des Benutzers, das als
+                    letzter eine Änderung an diesen Daten durchgeführt hat.</para>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook">The username for the last user who
+                    modified the record.</para>
+            </en>
+        </docbook>
+    </column>
+    <column name="LastDate" default="getdate()">
+        <datetime nullable="true"/>
+        <description>
+            <de>Zeitpunkt der letzten Änderung</de>
+            <en>Timestamp of last modification</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook">Mit jeder Änderung durch den Benutzer
+                    sollte in dieses Feld die aktuelle Zeit eingetragen werden. In den Felder
+                    LastUser und LastAction werden der Benutzer und die Art der Veränderung
+                    festgelegt.</para>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook">With each modification by a user, the
+                    timestamp, type of modification and username is stored with the record.</para>
+            </en>
+        </docbook>
+    </column>
+    <column name="LastAction" default="1">
+        <integer nullable="true"/>
+        <description>
+            <de>Zeitpunkt der letzten Änderung</de>
+            <en>Type of the last modification. Keylong of the table tLastAction.</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook">Mit jeder Änderung durch den Benutzer
+                    sollte in dieses Feld die aktuelle Zeit eingetragen werden. In den Felder
+                    LastUser und LastAction werden der Benutzer und die Art der Veränderung
+                    festgelegt.</para>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook">With each modification by a user, the
+                    timestamp, type of modification and username is stored with the record.</para>
+            </en>
+        </docbook>
+    </column>
+    <column name="Refuelling" default="0">
+        <boolean/>
+        <description>
+            <de/>
+            <en>Defines if the fuelling type is a refuelling.</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </column>
+    <column name="Defuelling" default="0">
+        <boolean/>
+        <description>
+            <de/>
+            <en>Defines if the fuelling type is a defuelling.</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </column>
+    <column name="NightFuelling" default="0">
+        <boolean/>
+        <description>
+            <de/>
+            <en>Defines if the fuelling type is a night fuelling.</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </column>
+    <column name="SplittingContract">
+        <boolean nullable="true"/>
+        <description>
+            <de>Menge in Statistik Splitting Contracts berücksichtigen</de>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook" userlevel="dev"> Wenn dieses Kennzeichen
+                    auf 1 gesetzt ist, werden Lieferungen mit diesem FuellungType in der Statistik
+                    Splitting Contracts (Modul <filename>ch.minova.splittingcontracts</filename>)
+                    berücksichtigt. </para>
+            </de>
+        </docbook>
+    </column>
+    <column name="UsedForBlankTicket" default="1">
+    	<boolean nullable="false"/>
+    	<description>
+            <de>Gibt an, ob dieser Fuelling Typ für Blank Tickets verwendet wird.</de>
+        </description>
+        <docbook>
+            <de>
+            	<para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+        </docbook>
+    </column>
+    <primarykey>
+        <column>KeyLong</column>
+        <description>
+            <de/>
+            <en/>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </primarykey>
+    <values>
+        <column refid="KeyLong"/>
+        <column refid="KeyText"/>
+        <column refid="Description"/>
+        <column refid="Refuelling"/>
+        <column refid="Defuelling"/>
+        <column refid="NightFuelling"/>
+        <column refid="SplittingContract"/>
+        <row>
+            <value>1</value>
+            <value>R1</value>
+            <value>Refuelling</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <value>1</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>2</value>
+            <value>R2</value>
+            <value>Refuelling 2 Fahrzeuge</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <value>1</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>3</value>
+            <value>RW</value>
+            <value>Werftbetankung</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>4</value>
+            <value>D1</value>
+            <value>Normalenttankung</value>
+            <value>0</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>5</value>
+            <value>DW</value>
+            <value>Werftenttankung</value>
+            <value>0</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>6</value>
+            <value>RB</value>
+            <value>Refuelling Bowser</value>
+            <value>0</value>
+            <value>0</value>
+            <value>0</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>7</value>
+            <value>TU</value>
+            <value>technisches Umpumpen</value>
+            <value>0</value>
+            <value>0</value>
+            <value>0</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>8</value>
+            <value>RN</value>
+            <value>Nachtbetankung</value>
+            <value>1</value>
+            <value>0</value>
+            <value>1</value>
+            <value>1</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>9</value>
+            <value>RK</value>
+            <value>Kleingerätebetankung</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>10</value>
+            <value>2R</value>
+            <value>zweites Refuelling</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <value>1</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>11</value>
+            <value>DN</value>
+            <value>Nachtenttankung</value>
+            <value>0</value>
+            <value>1</value>
+            <value>1</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+        <row>
+            <value>12</value>
+            <value>CO</value>
+            <value>Ausgleichsbuchung</value>
+            <value>1</value>
+            <value>0</value>
+            <value>0</value>
+            <value>0</value>
+            <description>
+                <de/>
+                <en/>
+            </description>
+            <docbook>
+                <de>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </de>
+                <en>
+                    <para xmlns="http://docbook.org/ns/docbook"/>
+                </en>
+            </docbook>
+        </row>
+    </values>
+</table>

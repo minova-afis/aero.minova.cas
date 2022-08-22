@@ -57,6 +57,8 @@ public class BaseSetup {
 	protected VersionInfo versionInfo;
 
 	public static Properties parameter = null;
+
+	public static final String FAILTOWRITENODETODOCUMENT = "Error: Der Knoten {0} konnte nicht in die Datei eingetragen werden!";
 	public boolean readoutSchemaCreate(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
 		return readoutSchemaCreate(con, Optional.empty(), Optional.empty());
 	}

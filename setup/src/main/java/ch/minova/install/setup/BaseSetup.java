@@ -25,7 +25,6 @@ import java.util.jar.JarFile;
 import aero.minova.cas.setup.xml.setup.Setup;
 import aero.minova.cas.setup.xml.setup.Script;
 import aero.minova.cas.setup.xml.setup.Tableschema;
-import org.apache.xmlbeans.XmlException;
 
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
@@ -59,7 +58,7 @@ public class BaseSetup {
 	public static Properties parameter = null;
 
 	public static final String FAILTOWRITENODETODOCUMENT = "Error: Der Knoten {0} konnte nicht in die Datei eingetragen werden!";
-	public boolean readoutSchemaCreate(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
+	public boolean readoutSchemaCreate(final Connection con) throws IOException, BaseSetupException {
 		return readoutSchemaCreate(con, Optional.empty(), Optional.empty());
 	}
 
@@ -95,7 +94,7 @@ public class BaseSetup {
 	}
 
 	public boolean readoutSchemaCreate(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary)
-			throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException {
+			throws IOException, BaseSetupException {
 		checktVersion10(con, sqlLibrary);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
@@ -133,9 +132,6 @@ public class BaseSetup {
 			}
 		} catch (final IOException e) {
 			log(MessageFormat.format("IOException create tables \n {0}", e.getMessage()), true);
-			throw new RuntimeException(e.getMessage());
-		} catch (final org.apache.xmlbeans.XmlException e) {
-			log(MessageFormat.format("Fehler beim einlesen der Tabelle: {0}", xmlTable.getName()), true);
 			throw new RuntimeException(e.getMessage());
 		} catch (final Exception e) {
 			log(MessageFormat.format("Exception create tables \n {0}", e.getMessage()), true);
@@ -645,7 +641,7 @@ public class BaseSetup {
 		return true;
 	}
 
-	public boolean readoutSchema(final Connection con) throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
+	public boolean readoutSchema(final Connection con) throws IOException, BaseSetupException, SQLException {
 		return readoutSchema(con, Optional.empty(), Optional.empty());
 	}
 
@@ -663,7 +659,7 @@ public class BaseSetup {
 	 * @throws ClassNotFoundException
 	 */
 	public boolean readoutSchema(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary)
-			throws org.apache.xmlbeans.XmlException, IOException, BaseSetupException, SQLException {
+			throws IOException, BaseSetupException, SQLException {
 		checktVersion10(con, sqlLibrary);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
@@ -715,9 +711,6 @@ public class BaseSetup {
 		} catch (final RuntimeException re) {
 			throw re;
 		} catch (final IOException e) {
-			throw new RuntimeException(e.getMessage());
-		} catch (final org.apache.xmlbeans.XmlException e) {
-			System.out.println("Fehler beim einlesen der Tabelle:" + xmlTable.getName());
 			throw new RuntimeException(e.getMessage());
 		} catch (final Exception e) {
 			throw new RuntimeException(e.getMessage());
@@ -855,11 +848,10 @@ public class BaseSetup {
 	 * auslesen der Setup.xml Datei des Modul. Dabei wird eine SetupDocumet erstellt, welche auch zurückgegebn wird
 	 *
 	 * @return
-	 * @throws XmlException
 	 * @throws IOException
 	 * @throws BaseSetupException
 	 */
-	private Setup getSetupDocument() throws XmlException, IOException, BaseSetupException {
+	private Setup getSetupDocument() throws IOException, BaseSetupException {
 		if (setupDocument != null) {
 			return setupDocument;
 		}
@@ -876,18 +868,17 @@ public class BaseSetup {
 	 * Ausführen und Einlesen der Sql-Scripts, dabei werden zwischen 4 unterschiedlichen Typen unterschieden. View, Script, Procedure und Function
 	 *
 	 * @param con
-	 * @throws XmlException
 	 * @throws IOException
 	 * @throws BaseSetupException
 	 * @throws SQLException
 	 * @throws SQLExeption
 	 */
-	public void handleSqlScripts(final Connection con) throws XmlException, IOException, BaseSetupException, SQLException, SQLExeption {
+	public void handleSqlScripts(final Connection con) throws IOException, BaseSetupException, SQLException, SQLExeption {
 		handleSqlScripts(con, Optional.empty());
 	}
 
 	public void handleSqlScripts(final Connection con, final Optional<Path> sqlLibrary)
-			throws XmlException, IOException, BaseSetupException, SQLException, SQLExeption {
+			throws IOException, BaseSetupException, SQLException, SQLExeption {
 		Setup doc;
 		final String table = "tVersion10";
 		final boolean forceSql = parameter.containsKey("fs");
@@ -937,7 +928,7 @@ public class BaseSetup {
 		}
 	}
 
-	public void readSQLOfOrderedModules() throws XmlException, IOException, BaseSetupException, SQLException {
+	public void readSQLOfOrderedModules() throws IOException, BaseSetupException, SQLException {
 		Setup setup = null;
 
 		final BaseSetup[] a = orderedDependingModules.toArray(new BaseSetup[0]);
@@ -1254,13 +1245,12 @@ public class BaseSetup {
 	 * in einer HashTable aufgelistst.
 	 *
 	 * @return
-	 * @throws XmlException
 	 * @throws IOException
 	 * @throws BaseSetupException
 	 * @throws ModuleNotFoundException
 	 * @throws SQLException
 	 */
-	public boolean readSchema() throws XmlException, IOException, BaseSetupException, ModuleNotFoundException, SQLException {
+	public boolean readSchema() throws IOException, BaseSetupException, ModuleNotFoundException, SQLException {
 		final Setup doc = getSetupDocument();
 		if (doc.getSchema() != null) {
 			final List<Tableschema> tables = doc.getSchema();

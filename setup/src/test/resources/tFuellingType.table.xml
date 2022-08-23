@@ -63,8 +63,8 @@
             </en>
         </docbook>
     </column>
-    <column name="Description">
-        <varchar length="50" nullable="true"/>
+    <column name="Description" default="getdate()">
+        <varchar length="50" nullable="true" identity="true"/>
         <description>
             <de>Bemerkungen, Erklärungen oder Notizen.</de>
             <en>The description of the fuelling type.</en>
@@ -80,7 +80,7 @@
         </docbook>
     </column>
     <column name="LastUser" default="user_name()">
-        <varchar length="50" nullable="true"/>
+        <varchar length="50" nullable="true" identity="true"/>
         <description>
             <de>SQL Benutzername vom Benutzer, der die letzte Änderung durchgeführt hat.</de>
             <en>SQL-Username of the user who made the last modifcation.</en>
@@ -97,7 +97,7 @@
         </docbook>
     </column>
     <column name="LastDate" default="getdate()">
-        <datetime nullable="true"/>
+        <datetime nullable="true" identity="true"/>
         <description>
             <de>Zeitpunkt der letzten Änderung</de>
             <en>Timestamp of last modification</en>
@@ -116,7 +116,7 @@
         </docbook>
     </column>
     <column name="LastAction" default="1">
-        <integer nullable="true"/>
+        <integer nullable="true" identity="true"/>
         <description>
             <de>Zeitpunkt der letzten Änderung</de>
             <en>Type of the last modification. Keylong of the table tLastAction.</en>
@@ -135,10 +135,58 @@
         </docbook>
     </column>
     <column name="Refuelling" default="0">
-        <boolean/>
+        <boolean nullable="true" identity="true"/>
         <description>
             <de/>
             <en>Defines if the fuelling type is a refuelling.</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </column>
+    <column name="StartWeight">
+        <float decimals="2" nullable="true" identity="true"/>
+        <description>
+            <de/>
+            <en/>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </column>
+    <column name="DischargeVolume1">
+        <money nullable="true" identity="true"/>
+        <description>
+            <de>Rabatt 1</de>
+            <en>Discharge 1</en>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook" userlevel="dev">Kann seit März 2022 vom DispoOrderCollector importiert werden, wird aber bisher NICHT verarbeitet.</para>
+                <para xmlns="http://docbook.org/ns/docbook" userlevel="dev">In diesem Feld befindet sich der Rabatt auf den Preis, der verwendet werden muss, wenn die
+                    Liefermenge größer ist als die Menge, die in Feld HighVolume1 steht und kleiner gleich der Menge in Feld HightVolume2.
+                </para>
+                <warning xmlns="http://docbook.org/ns/docbook" userlevel="dev">
+                    <para>Es kann immer nur einen Rabatt geben.</para>
+                </warning>
+            </de>
+        </docbook>
+    </column>
+    <column name="AmbientVolume">
+        <bigint nullable="true"/>
+        <description>
+            <de/>
+            <en/>
         </description>
         <docbook>
             <de>
@@ -219,6 +267,35 @@
             </en>
         </docbook>
     </primarykey>
+    <foreignkey refid="ShipKey" table="tShip">
+        <column name="ShipKey" refid="VehicleKey"/>
+        <description>
+            <de/>
+            <en/>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </foreignkey>
+    <foreignkey refid="ShiftClosingKey" table="tShiftClosing">
+        <description>
+            <de/>
+            <en/>
+        </description>
+        <docbook>
+            <de>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </de>
+            <en>
+                <para xmlns="http://docbook.org/ns/docbook"/>
+            </en>
+        </docbook>
+    </foreignkey>
     <values>
         <column refid="KeyLong"/>
         <column refid="KeyText"/>

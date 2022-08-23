@@ -1,6 +1,5 @@
 package ch.minova.install.setup.schema;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Vector;
 
 import aero.minova.cas.setup.xml.table.*;
-import org.apache.xmlbeans.XmlException;
 
 public class XmlDatabaseTable {
     private String name;
@@ -117,12 +115,12 @@ public class XmlDatabaseTable {
         // der angegeben Name aus der xml-Datei wird hier in "name"
         // geschrieben
         this.name = t.getName();
-        for (int i = 0; i < t.getColumns().size(); i++) {
-            final XmlDatabaseColumn dbc = new XmlDatabaseColumn(t, t.getColumns().get(i), this.DBCollation);
+        for (int i = 0; i < t.getColumn().size(); i++) {
+            final XmlDatabaseColumn dbc = new XmlDatabaseColumn(t, t.getColumn().get(i), this.DBCollation);
             this.columnTable.put(dbc.getName(), dbc);
-            if (t.getColumns().get(i).getName().equalsIgnoreCase("Keylong")) {
+            if (t.getColumn().get(i).getName().equalsIgnoreCase("Keylong")) {
                 // nicht immer auf identitiy setzen
-                if (t.getColumns().get(i).getInteger().getIdentity() == true) {
+                if (t.getColumn().get(i).getInteger().getIdentity() == true) {
                     setIdentity(true);
                 }
             }
@@ -131,14 +129,14 @@ public class XmlDatabaseTable {
         if (t.getPrimarykey() != null) {
             this.primaryKeyConstraint = new XmlPrimaryKeyConstraint(t);
             final PrimaryKey primaryKey = t.getPrimarykey();
-            final List<String> colNames = primaryKey.getColumns();
+            final List<String> colNames = primaryKey.getColumn();
             for (int i = 0; i < colNames.size(); i++) {
                 this.primaryKeyConstraint.addColumnName(colNames.get(i));
             }
         }
-        final List<ForeignKey> fkeys = t.getForeignkeys();
+        final List<ForeignKey> fkeys = t.getForeignkey();
         for (int i = 0; i < fkeys.size(); i++) {
-            final XmlForeignKeyContraint fkc = new XmlForeignKeyContraint(t, fkeys.get(i), fkeys.get(i).getColumns());
+            final XmlForeignKeyContraint fkc = new XmlForeignKeyContraint(t, fkeys.get(i), fkeys.get(i).getColumn());
             this.foreignKeyContraint.add(fkc);
         }
         final List<UniqueKey> ukeys = t.getUniquekeys();
@@ -150,10 +148,10 @@ public class XmlDatabaseTable {
         // 2 Dimensionales Array!
         final Values v = t.getValues();
         if (v != null) {
-            final XmlValues xmlv = new XmlValues(v.getColumnReferences(), this.name);
+            final XmlValues xmlv = new XmlValues(v.getColumn(), this.name);
             setXmlvalues(xmlv);
-            for (int i = 0; i < v.getRows().size(); i++) {
-                this.xmlvalues.addValueRow(v.getRows().get(i).getValues());
+            for (int i = 0; i < v.getRow().size(); i++) {
+                this.xmlvalues.addValueRow(v.getRow().get(i).getValue());
             }
         }
     }

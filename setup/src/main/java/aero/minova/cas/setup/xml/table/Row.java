@@ -12,5 +12,5 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Row {
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Value> values;
+    private List<Value> value;
 }

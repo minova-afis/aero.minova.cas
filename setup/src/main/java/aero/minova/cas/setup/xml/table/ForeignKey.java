@@ -14,5 +14,5 @@ public class ForeignKey {
     private String refid;
     private String table;
     @JacksonXmlElementWrapper(useWrapping = false)
-    List<Column> columns;
+    List<Column> column;
 }

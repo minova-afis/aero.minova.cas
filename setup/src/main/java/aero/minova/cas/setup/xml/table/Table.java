@@ -20,12 +20,13 @@ public class Table {
     private final static XmlMapper XML_MAPPER = new XmlMapper();
     private boolean identity = false;
     private String name;
-    private List<Column> columns;
+    @JacksonXmlElementWrapper(useWrapping = false)
+    private List<Column> column;
     private PrimaryKey primarykey;
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<UniqueKey> uniquekeys;
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<ForeignKey> foreignkeys;
+    private List<ForeignKey> foreignkey;
     private Values values;
 
     public static Table parse(Path file) {
@@ -59,7 +60,7 @@ public class Table {
     }
     public Column addNewColumn(){
         final Column column = new Column();
-        columns.add(column);
+        this.column.add(column);
         return column;
     }
 }

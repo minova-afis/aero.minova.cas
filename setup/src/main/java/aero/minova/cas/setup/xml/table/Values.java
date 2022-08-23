@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Values {
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<ColumnReference> columnReferences;
+    private List<ColumnReference> column;
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Row> rows;
+    private List<Row> row;
 }

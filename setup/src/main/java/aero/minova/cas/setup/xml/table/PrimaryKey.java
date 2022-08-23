@@ -12,5 +12,5 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PrimaryKey {
     @JacksonXmlElementWrapper(useWrapping = false)
-    List<String> columns;
+    List<String> column;
 }

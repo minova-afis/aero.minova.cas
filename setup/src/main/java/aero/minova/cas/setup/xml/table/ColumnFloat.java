@@ -9,7 +9,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ColumnFloat {
     private boolean identity;
-    private boolean nullable;
+    private boolean nullable = true;
     private int decimals;
     public boolean getIdentity() {
         return identity;

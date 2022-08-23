@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ColumnBigint {
-    private boolean nullable;
+    private boolean nullable = true;
 
     public boolean getNullable() {
         return nullable;

@@ -9,7 +9,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ColumnDatetime {
     private boolean identity;
-    private boolean nullable;
+    private boolean nullable = true;
     public boolean getIdentity() {
         return identity;
     }

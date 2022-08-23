@@ -12,6 +12,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * `org.apache.xmlbeans:xmlbeans`-Abhängigkeit aus Setup-Extension entfernen und dadurch Abhängigkeit-Updates in der Zukunft vereinfachen.
   Vorher hatten wir die Version 3 verwendet und konnten nicht einfach auf die Version 5 aktualisieren.
   Zudem wurde aus dem Install-Tool-Code nicht verwendeter Code entfernt.
+  Auch konnten wir die Binaries aus `setup/libs/*` hiermit entfernen.
 
 ## [12.48.0] -- 2022-07-20
 * #217 Es wird nicht mehr bei jedem SQL-Aufruf erwartet, dass die View/Tabelle einen KeyLong besitzt.

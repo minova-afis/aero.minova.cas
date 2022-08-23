@@ -139,7 +139,7 @@ public class BaseSetup {
 			throw new RuntimeException(e.getMessage());
 		} catch (final Exception e) {
 			log(MessageFormat.format("Exception create tables \n {0}", e.getMessage()), true);
-			throw new RuntimeException(e.getMessage());
+			throw new RuntimeException(e);
 		}
 		sqldatabase = new SqlDatabase();
 		// checkConnection(null);
@@ -234,7 +234,7 @@ public class BaseSetup {
 				} catch (final Exception e) {
 					log(MessageFormat.format("Exception write constrains FK \n {0}", e.getMessage()), true);
 					log(MessageFormat.format("SQL_CODE: ", sqlCode));
-					throw new RuntimeException(e.getMessage());
+					throw new RuntimeException(e);
 				}
 			}
 		}
@@ -428,7 +428,7 @@ public class BaseSetup {
 			log(MessageFormat.format("ERROR", ""), true);
 			log(sqlScript, true);
 			e.printStackTrace();
-			throw new SQLException(e.getMessage());
+			throw new SQLException(e);
 		}
 	}
 	private InputStream readTableXml(String tableName, Optional<Path> tableLibrary) {

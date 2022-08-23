@@ -51,6 +51,10 @@ public class TableTest {
         assertThat(testSubject.getForeignkey().get(0).getColumn().size()).isEqualTo(1);
         assertThat(testSubject.getForeignkey().get(1).getRefid()).isEqualTo("ShiftClosingKey");
         assertThat(testSubject.getForeignkey().get(1).getTable()).isEqualTo("tShiftClosing");
+        assertThat(testSubject.getUniquekey().size()).isEqualTo(2);
+        assertThat(testSubject.getUniquekey().get(1).getName()).isEqualTo("UQ_xtcasUserGroupTest");
+        assertThat(testSubject.getUniquekey().get(1).getColumn().size()).isEqualTo(1);
+        assertThat(testSubject.getUniquekey().get(1).getColumn().get(0)).isEqualTo("KeyLong");
 
         assertThat(testSubject.getValues().getColumn().size()).isEqualTo(7);
         assertThat(testSubject.getValues().getColumn().get(5).getRefid()).isEqualTo("NightFuelling");

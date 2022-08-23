@@ -139,9 +139,9 @@ public class XmlDatabaseTable {
             final XmlForeignKeyContraint fkc = new XmlForeignKeyContraint(t, fkeys.get(i), fkeys.get(i).getColumn());
             this.foreignKeyContraint.add(fkc);
         }
-        final List<UniqueKey> ukeys = t.getUniquekeys();
+        final List<UniqueKey> ukeys = t.getUniquekey();
         for (int i = 0; i < ukeys.size(); i++) {
-            final XmlUniqueKeyConstraint ukc = new XmlUniqueKeyConstraint(t, ukeys.get(i), ukeys.get(i).getColumns());
+            final XmlUniqueKeyConstraint ukc = new XmlUniqueKeyConstraint(t, ukeys.get(i), ukeys.get(i).getColumn());
             this.uniqueKeyConstraint.add(ukc);
         }
         // auslesen wie viele Rows,

@@ -3,6 +3,8 @@ package aero.minova.cas.setup.xml.table;
 import ch.minova.install.setup.schema.SqlDatabaseColumn;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import lombok.Getter;
 import lombok.Setter;
 

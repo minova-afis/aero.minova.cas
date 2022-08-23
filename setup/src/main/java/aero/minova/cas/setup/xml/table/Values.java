@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -12,7 +13,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Values {
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<ColumnReference> column;
+    private List<ColumnReference> column = new ArrayList<>();
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Row> row;
+    private List<Row> row = new ArrayList<>();
 }

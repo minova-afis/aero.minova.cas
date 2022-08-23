@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -16,5 +17,5 @@ public class UniqueKey {
     @JacksonXmlElementWrapper(useWrapping = false)
     private String refid;
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Column> columns;
+    List<String> column = new ArrayList<>();
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -21,12 +22,12 @@ public class Table {
     private boolean identity = false;
     private String name;
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Column> column;
+    private List<Column> column = new ArrayList<>();
     private PrimaryKey primarykey;
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<UniqueKey> uniquekeys;
+    private List<UniqueKey> uniquekey = new ArrayList<>();
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<ForeignKey> foreignkey;
+    private List<ForeignKey> foreignkey = new ArrayList<>();
     private Values values;
 
     public static Table parse(Path file) {

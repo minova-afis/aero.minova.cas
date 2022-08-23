@@ -557,4 +557,10 @@
             </docbook>
         </row>
     </values>
+    <uniquekey name="UQ_xtcasUserGroup">
+        <column>KeyText</column>
+    </uniquekey>
+    <uniquekey name="UQ_xtcasUserGroupTest">
+        <column>KeyLong</column>
+    </uniquekey>
 </table>

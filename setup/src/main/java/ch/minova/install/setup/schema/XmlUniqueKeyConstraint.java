@@ -27,12 +27,12 @@ public class XmlUniqueKeyConstraint {
 		this.tableName = tableName;
 	}
 
-	public XmlUniqueKeyConstraint(final Table t, final UniqueKey uniqueKey, final List<Column> columns) {
+	public XmlUniqueKeyConstraint(final Table t, final UniqueKey uniqueKey, final List<String> columns) {
 		this.tableName = t.getName();
 		this.columnName = uniqueKey.getName();
 		final XmlUniqueKeyColumn uniKeyColumns[] = new XmlUniqueKeyColumn[columns.size()];
 		for (int i = 0; i < columns.size(); i++) {
-			final XmlUniqueKeyColumn xmlc = new XmlUniqueKeyColumn(columns.get(i).getName());
+			final XmlUniqueKeyColumn xmlc = new XmlUniqueKeyColumn(columns.get(i));
 			uniKeyColumns[i] = xmlc;
 		}
 		this.uniqueKeyColumns = uniKeyColumns;

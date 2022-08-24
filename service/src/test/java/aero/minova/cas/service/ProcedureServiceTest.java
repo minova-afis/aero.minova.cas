@@ -1,4 +1,4 @@
-package aero.minova.cas.controller;
+package aero.minova.cas.service;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,6 +11,7 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.OutputType;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.controller.BaseTest;
 import aero.minova.cas.service.ProcedureService;
 import lombok.val;
 

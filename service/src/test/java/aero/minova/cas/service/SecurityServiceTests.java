@@ -1,4 +1,4 @@
-package aero.minova.cas.controller;
+package aero.minova.cas.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;

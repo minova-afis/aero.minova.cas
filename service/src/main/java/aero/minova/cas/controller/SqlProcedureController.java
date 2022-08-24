@@ -286,7 +286,7 @@ public class SqlProcedureController {
 	public ResponseEntity<?> unsecurelyExecuteProcedure(Table inputTable) throws Exception {
 		Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
 
-		if (extensionResult != null) {
+		if (extensionResult.isPresent()) {
 			return extensionResult.orElse(null);
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.

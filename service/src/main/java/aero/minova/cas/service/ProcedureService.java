@@ -110,6 +110,34 @@ public class ProcedureService {
 	}
 
 	/**
+	 * Diese Methode ist NICHT geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben. CHECKT KEINE EXTENSIONS!!!
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 */
+	@Deprecated
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+
+		// Hiermit wird der unsichere Zugriff ermöglicht.
+		Row requestingAuthority = new Row();
+		/*
+		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
+		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+		 */
+		requestingAuthority.addValue(new Value(false, "1"));
+		requestingAuthority.addValue(new Value(false, "2"));
+		requestingAuthority.addValue(new Value(false, "3"));
+
+		List<Row> authority = new ArrayList<>();
+		authority.add(requestingAuthority);
+		return processSqlProcedureRequest(inputTable, authority);
+	}
+
+	/**
 	 * Führt eine SQL-Prozedur aus. Hier gibt es keinen Rollback oder Commit. Diese müssen selbst durchgeführt werden. Diese Methode ist public, weil diese von
 	 * Erweiterungen genutzt werden, um bei Fehlern in komplexeren Prozessen alle Änderungen in der Datenbank rückgängig zu machen.
 	 *

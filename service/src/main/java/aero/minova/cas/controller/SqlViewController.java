@@ -24,6 +24,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.service.ViewService;
 
@@ -40,7 +41,7 @@ public class SqlViewController {
 	CustomLogger customLogger;
 
 	@Autowired
-	SqlProcedureController spc;
+	ProcedureService procedureService;
 
 	final Object extensionSynchronizer = new Object();
 
@@ -90,7 +91,7 @@ public class SqlViewController {
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
 		try {
-			spc.unsecurelyProcessProcedure(extensionSetupTable);
+			procedureService.unsecurelyProcessProcedure(extensionSetupTable);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);

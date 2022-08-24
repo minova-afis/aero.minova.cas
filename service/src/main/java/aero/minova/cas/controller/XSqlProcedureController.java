@@ -25,6 +25,7 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XProcedureException;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
+import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
@@ -43,6 +44,9 @@ public class XSqlProcedureController {
 
 	@Autowired
 	SqlProcedureController sqlProcedureController;
+
+	@Autowired
+	ProcedureService procedureService;
 
 	@Autowired
 	SqlViewController sqlViewController;
@@ -171,7 +175,7 @@ public class XSqlProcedureController {
 			if (extensionResult != null) {
 				resultSets.add(new XSqlProcedureResult(xt.getId(), (SqlProcedureResult) extensionResult.getBody()));
 			} else {
-				result = (SqlProcedureResult) sqlProcedureController.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+				result = (SqlProcedureResult) procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
 			}
 			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompabilität da, damit hier keine NullPointerException geworfen wird.
 			if (inputTablesWithResults != null) {

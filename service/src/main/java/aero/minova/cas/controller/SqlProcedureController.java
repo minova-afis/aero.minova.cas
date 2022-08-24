@@ -112,7 +112,7 @@ public class SqlProcedureController {
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
 		try {
-			unsecurelyProcessProcedure(extensionSetupTable);
+			procedureService.unsecurelyProcessProcedure(extensionSetupTable);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);
@@ -135,7 +135,7 @@ public class SqlProcedureController {
 			adminSetupRow.addValue(new Value("admin", null));
 
 			adminPrivilegeTable.addRow(adminSetupRow);
-			unsecurelyProcessProcedure(adminPrivilegeTable);
+			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup privileges for admin!", e);
 			throw new RuntimeException(e);
@@ -241,20 +241,7 @@ public class SqlProcedureController {
 	 */
 	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
-
-		// Hiermit wird der unsichere Zugriff ermöglicht.
-		Row requestingAuthority = new Row();
-		/*
-		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
-		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
-		 */
-		requestingAuthority.addValue(new Value(false, "1"));
-		requestingAuthority.addValue(new Value(false, "2"));
-		requestingAuthority.addValue(new Value(false, "3"));
-
-		List<Row> authority = new ArrayList<>();
-		authority.add(requestingAuthority);
-		return processSqlProcedureRequest(inputTable, authority);
+		return procedureService.unsecurelyProcessProcedure(inputTable);
 	}
 
 	/**

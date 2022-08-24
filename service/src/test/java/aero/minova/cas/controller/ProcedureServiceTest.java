@@ -11,13 +11,14 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.OutputType;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.service.ProcedureService;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
-public class SqlProcedureControllerTest extends BaseTest {
+public class ProcedureServiceTest extends BaseTest {
 	@Autowired
-	SqlProcedureController testSubject;
+	ProcedureService testSubject;
 
 	@Test
 	public void test_prepareProcedureString() {

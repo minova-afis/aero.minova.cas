@@ -203,7 +203,7 @@ public class ViewService {
 		}
 	}
 
-	String prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities) throws IllegalArgumentException {
+	public String prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities) throws IllegalArgumentException {
 		return prepareViewString(params, autoLike, maxRows, false, authorities);
 	}
 

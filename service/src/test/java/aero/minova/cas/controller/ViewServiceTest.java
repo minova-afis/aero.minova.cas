@@ -25,15 +25,16 @@ import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.service.ViewService;
 import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
-class SqlViewControllerTest extends BaseTest {
+class ViewServiceTest extends BaseTest {
 
 	@Autowired
-	SqlViewController testSubject;
+	ViewService testSubject;
 
 	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")
 	@Test

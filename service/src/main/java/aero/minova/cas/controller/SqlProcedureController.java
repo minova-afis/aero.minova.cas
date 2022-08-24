@@ -605,8 +605,6 @@ public class SqlProcedureController {
 								preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
 							} else if (type == DataType.INTEGER) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.INTEGER);
-							} else if (type == DataType.LONG) {
-								preparedStatement.setObject(i + parameterOffset, null, Types.DOUBLE);
 							} else if (type == DataType.STRING) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.NVARCHAR);
 							} else if (type == DataType.ZONED) {

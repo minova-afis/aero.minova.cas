@@ -94,12 +94,14 @@ public class XSqlProcedureController {
 
 		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
-			try {
-				connection.rollback();
-				systemDatabase.freeUpConnection(connection);
-			} catch (Exception e1) {
-				customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
-				connection.close();
+			if (connection != null) {
+				try {
+					connection.rollback();
+					systemDatabase.freeUpConnection(connection);
+				} catch (Exception e1) {
+					customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
+					connection.close();
+				}
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
 		}
@@ -258,7 +260,7 @@ public class XSqlProcedureController {
 				return Optional.ofNullable(dependency.getOutputParameters().getRows().get(row).getValues().get(i));
 			}
 		}
-		return null;
+		return Optional.ofNullable(null);
 	}
 
 	/**
@@ -355,7 +357,7 @@ public class XSqlProcedureController {
 			Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
 			// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.
-			if (checksPerPrivilege.getRows().size() == 0) {
+			if (checksPerPrivilege.getRows().isEmpty()) {
 				throw new RuntimeException("msg.PrivilegeError");
 			}
 
@@ -371,7 +373,7 @@ public class XSqlProcedureController {
 
 					// Falls keine passenden OutputParameter gefunden werden können, muss das ResultSet des Haupt-Aufrufs (der erste in der Transaktion)
 					// verwendet werden.
-					if (resultsToCheck.size() == 0) {
+					if (resultsToCheck.isEmpty()) {
 						resultsToCheck.add(xsqlresults.get(0));
 					}
 

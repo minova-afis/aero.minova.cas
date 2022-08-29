@@ -286,7 +286,7 @@ public class SqlProcedureController {
 	public ResponseEntity<?> unsecurelyExecuteProcedure(Table inputTable) throws Exception {
 		Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
 
-		if (extensionResult != null) {
+		if (extensionResult.isPresent()) {
 			return extensionResult.orElse(null);
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
@@ -320,8 +320,14 @@ public class SqlProcedureController {
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
 		}
-		userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
-		userContextSetter.execute();
+		try {
+			userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
+			userContextSetter.execute();
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to set user for procedures: ", e);
+		} finally {
+			userContextSetter.close();
+		}
 	}
 
 	/**
@@ -348,12 +354,14 @@ public class SqlProcedureController {
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 		} catch (Exception e) {
 			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
-			try {
-				connection.rollback();
-				systemDatabase.freeUpConnection(connection);
-			} catch (Exception e1) {
-				customLogger.logError("Couldn't roll back procedure execution", e);
-				connection.close();
+			if (connection != null) {
+				try {
+					connection.rollback();
+					systemDatabase.freeUpConnection(connection);
+				} catch (Exception e1) {
+					customLogger.logError("Couldn't roll back procedure execution", e);
+					connection.close();
+				}
 			}
 			throw new ProcedureException(e);
 		} finally {
@@ -489,13 +497,13 @@ public class SqlProcedureController {
 						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
 							rowToBeAdded = convertSqlResultToRow(resultSet//
 									, sqlResultSet//
-									, customLogger.logger////
+									, customLogger.getUserLogger()//
 									, this);
 						}
 					} else {
 						rowToBeAdded = convertSqlResultToRow(resultSet//
 								, sqlResultSet//
-								, customLogger.logger////
+								, customLogger.getUserLogger()//
 								, this);
 					}
 
@@ -599,8 +607,6 @@ public class SqlProcedureController {
 								preparedStatement.setObject(i + parameterOffset, null, Types.TIMESTAMP);
 							} else if (type == DataType.INTEGER) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.INTEGER);
-							} else if (type == DataType.LONG) {
-								preparedStatement.setObject(i + parameterOffset, null, Types.DOUBLE);
 							} else if (type == DataType.STRING) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.NVARCHAR);
 							} else if (type == DataType.ZONED) {

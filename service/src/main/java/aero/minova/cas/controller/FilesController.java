@@ -5,6 +5,7 @@ import static java.nio.file.Files.readAllBytes;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -367,13 +368,14 @@ public class FilesController {
 	 *            List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden sollen.
 	 * @throws RuntimeException
 	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
+	 * @throws FileNotFoundException
 	 */
-	public void zip(String source, File zipFile, List<Path> fileList) throws RuntimeException {
+	public void zip(String source, File zipFile, List<Path> fileList) throws Exception {
 		ZipEntry ze = null;
-		try {
-			// Jede Datei wird einzeln zu dem ZIP hinzugefügt.
-			FileOutputStream fos = new FileOutputStream(zipFile);
-			ZipOutputStream zos = new ZipOutputStream(fos);
+		// Jede Datei wird einzeln zu dem ZIP hinzugefügt.
+		FileOutputStream fos = new FileOutputStream(zipFile);
+		try (ZipOutputStream zos = new ZipOutputStream(fos);) {
+
 			for (Path filePath : fileList) {
 
 				// noch mehr zipps in einer zip sind sinnlos
@@ -388,19 +390,20 @@ public class FilesController {
 
 					// Jeder Eintrag wird nacheinander in die ZIP Datei geschrieben mithilfe eines Buffers.
 					FileInputStream fis = new FileInputStream(filePath.toFile());
+
 					int len;
 					byte[] buffer = new byte[1024];
-					BufferedInputStream entryStream = new BufferedInputStream(fis, 2048);
-					while ((len = entryStream.read(buffer, 0, 1024)) != -1) {
-						zos.write(buffer, 0, len);
+
+					try (BufferedInputStream entryStream = new BufferedInputStream(fis, 2048)) {
+						while ((len = entryStream.read(buffer, 0, 1024)) != -1) {
+							zos.write(buffer, 0, len);
+						}
+					} finally {
+						zos.closeEntry();
+						fis.close();
 					}
-					zos.closeEntry();
-					fis.close();
-					entryStream.close();
 				}
 			}
-			zos.close();
-			fos.close();
 		} catch (Exception e) {
 			if (ze != null) {
 				customLogger.logFiles("Error while zipping file " + ze.getName());
@@ -410,6 +413,8 @@ public class FilesController {
 				customLogger.logFiles("Error while accessing file path for file to zip.");
 				throw new RuntimeException("Error while accessing file path " + source + " for file to zip.", e);
 			}
+		} finally {
+			fos.close();
 		}
 	}
 

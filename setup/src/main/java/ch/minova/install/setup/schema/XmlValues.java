@@ -84,7 +84,7 @@ public class XmlValues {
 				} else {
 					begin += " and ";
 				}
-				begin += "([" + this.valuecolumns.get(i).getRefid() + "] = '" + row.get(i) + "')";
+				begin += "([" + this.valuecolumns.get(i).getRefid() + "] = '" + row.get(i).getContent() + "')";
 			}
 		}
 		begin += ") BEGIN ";
@@ -99,11 +99,16 @@ public class XmlValues {
 		}
 		insert += ") Values(";
 		for (int i = 0; i < row.size(); i++) {
-			// aufpassen bei Hochkommata
-			if (row.get(i).getContent().contains("'")) {
-				row.get(i).setContent(row.get(i).getContent().replace("'", "''"));
+			if (row.get(i).getContent() == null) {
+				// Hiermit wird der Default-Value für die Spalte verwendet, so wie es auch im alten Install-Tool gemacht wurde.
+				insert += " ''";
+			} else {
+				// aufpassen bei Hochkommata
+				if (row.get(i).getContent().contains("'")) {
+					row.get(i).setContent(row.get(i).getContent().replace("'", "''"));
+				}
+				insert += " '" + row.get(i).getContent() + "'";
 			}
-			insert += " '" + row.get(i).getContent() + "'";
 			if ((i + 1) < row.size()) {
 				insert += ",";
 			}

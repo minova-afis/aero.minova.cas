@@ -202,7 +202,7 @@ public class BaseSetup {
 					}
 				} catch (final Exception e) {
 					log(MessageFormat.format("Exception write values \n {0} , - {1}", e.getMessage(), tablevector.get(i).getName()), true);
-					throw new RuntimeException(e.getMessage());
+					throw new RuntimeException(e);
 				}
 			}
 		}

@@ -497,11 +497,13 @@ public class SqlProcedureController {
 						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
 							rowToBeAdded = convertSqlResultToRow(resultSet//
 									, sqlResultSet//
+									, customLogger.getUserLogger()//
 									, this);
 						}
 					} else {
 						rowToBeAdded = convertSqlResultToRow(resultSet//
 								, sqlResultSet//
+								, customLogger.getUserLogger()//
 								, this);
 					}
 

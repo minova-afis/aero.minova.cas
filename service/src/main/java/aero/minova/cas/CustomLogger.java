@@ -22,23 +22,25 @@ import org.springframework.stereotype.Component;
 import com.google.gson.Gson;
 
 import aero.minova.cas.api.restapi.ClientRestAPI;
+import lombok.Getter;
 
 @Component
+@Getter
 public class CustomLogger {
 	// Log für alle ausgeführten SQL Queries, außer die Privilegien
-	private static Logger logger = LoggerFactory.getLogger("SqlLogger");
+	public Logger logger = LoggerFactory.getLogger("SqlLogger");
 	// Log für alle Privilegien Anfragen
-	private static Logger privilegeLogger = LoggerFactory.getLogger("PrivilegeLogger");
+	public Logger privilegeLogger = LoggerFactory.getLogger("PrivilegeLogger");
 	// Log für Fehlermeldungen
-	private static Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
+	public Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
 	// Log für die Anfragen der User ohne SQL
-	private static Logger userLogger = LoggerFactory.getLogger("UserLogger");
+	public Logger userLogger = LoggerFactory.getLogger("UserLogger");
 	// Log für File Hashes und Zipps
-	private static Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
+	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 	// Log für Setup
-	private static Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
+	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
 
-	private static Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
+	public Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
 
 	@Autowired
 	private ClientRestAPI crapi;

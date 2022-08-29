@@ -30,9 +30,6 @@ public class ViewService {
 	@Autowired
 	SystemDatabase systemDatabase;
 
-	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mysql}")
-	String databaseKind;
-
 	@Autowired
 	CustomLogger customLogger;
 	@Autowired

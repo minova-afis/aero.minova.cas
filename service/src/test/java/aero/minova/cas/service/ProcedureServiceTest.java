@@ -1,4 +1,4 @@
-package aero.minova.cas.controller;
+package aero.minova.cas.service;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,16 +11,17 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.OutputType;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.controller.BaseTest;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
-public class SqlProcedureControllerTest extends BaseTest {
+class ProcedureServiceTest extends BaseTest {
 	@Autowired
-	SqlProcedureController testSubject;
+	ProcedureService testSubject;
 
 	@Test
-	public void test_prepareProcedureString() {
+	void test_prepareProcedureString() {
 		val testParameter = new Table();
 		testParameter.setName("testProcedure");
 		testParameter.setColumns(//

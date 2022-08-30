@@ -21,6 +21,7 @@ import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
 
 @Service
@@ -34,6 +35,9 @@ public class ServiceNotifierService {
 
 	@Autowired
 	SecurityService securityService;
+
+	@Autowired
+	ProcedureService procedureService;
 
 	/**
 	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
@@ -132,7 +136,7 @@ public class ServiceNotifierService {
 
 		registerSerivceTable.addRow(registerRow);
 		try {
-			registerResult = spc.unsecurelyProcessProcedure(registerSerivceTable);
+			registerResult = procedureService.unsecurelyProcessProcedure(registerSerivceTable);
 		} catch (Exception e) {
 			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
 			throw new RuntimeException(e);
@@ -165,7 +169,7 @@ public class ServiceNotifierService {
 			unregisterSerivceTable.addRow(unregisterRow);
 
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			spc.unsecurelyProcessProcedure(unregisterSerivceTable);
+			procedureService.unsecurelyProcessProcedure(unregisterSerivceTable);
 		} catch (Exception e) {
 			logger.logError("The service " + serviceName + " could not be unregistered!", e);
 			throw new RuntimeException(e);
@@ -213,7 +217,7 @@ public class ServiceNotifierService {
 			registerProcedureNewsfeedTable.addRow(registerRow);
 		}
 		try {
-			spc.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to register procedures: ", e);
 			throw new RuntimeException(e);
@@ -255,7 +259,7 @@ public class ServiceNotifierService {
 				unregisterProcedureNewsfeedTable.addRow(unregisterRow);
 			}
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			spc.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister procedures: ", e);
 			throw new RuntimeException(e);
@@ -286,7 +290,7 @@ public class ServiceNotifierService {
 				}
 			}
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			spc.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister procedures: ", e);
 			throw new RuntimeException(e);
@@ -324,7 +328,7 @@ public class ServiceNotifierService {
 			registerNewsfeedTable.addRow(registerRow);
 		}
 		try {
-			spc.unsecurelyProcessProcedure(registerNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(registerNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to register a newsfeed: ", e);
 			throw new RuntimeException(e);
@@ -361,7 +365,7 @@ public class ServiceNotifierService {
 				unregisterNewsfeedTable.addRow(unregisterRow);
 			}
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			spc.unsecurelyProcessProcedure(unregisterNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(unregisterNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister newsfeed: ", e);
 			throw new RuntimeException(e);

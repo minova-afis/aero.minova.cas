@@ -4,6 +4,9 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [Unreleased]
+* #320 Code aufräumen: Datenbankzurgriffe aus den Controllern in einene Service-Klassen verschieben.
+
+## [12.49.0] -- 2022-08-30
 * Basis-Docker-Image von Adoptium verwenden und dessen Einsatz begründen.
 * #300 Long als Value unterstützen.
 * #184 Tests zum Beweisen, dass Http2 Property funktionieren würde, hinzufügen.

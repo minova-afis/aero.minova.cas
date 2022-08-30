@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,14 +16,15 @@ import java.util.List;
 @Setter
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Setup {
+@JacksonXmlRootElement(localName = "setup")
+public class SetupType {
     private final static XmlMapper XML_MAPPER = new XmlMapper();
     private String name;
-    List<Tableschema> schema;
+    List<TableschemaType> schema;
     @JsonProperty("sql-code")
-    List<Script> sqlCode;
+    List<ScriptType> sqlCode;
 
-    public static Setup parse(Path file) {
+    public static SetupType parse(Path file) {
         try {
             return parse(Files.readString(file));
         } catch (IOException e) {
@@ -30,9 +32,9 @@ public class Setup {
         }
     }
 
-    public static Setup parse(String document) {
+    public static SetupType parse(String document) {
         try {
-            return XML_MAPPER.readValue(document, Setup.class);
+            return XML_MAPPER.readValue(document, SetupType.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

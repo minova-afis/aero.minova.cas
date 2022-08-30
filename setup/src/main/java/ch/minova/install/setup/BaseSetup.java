@@ -22,9 +22,9 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import aero.minova.cas.setup.xml.setup.Setup;
-import aero.minova.cas.setup.xml.setup.Script;
-import aero.minova.cas.setup.xml.setup.Tableschema;
+import aero.minova.cas.setup.xml.setup.SetupType;
+import aero.minova.cas.setup.xml.setup.ScriptType;
+import aero.minova.cas.setup.xml.setup.TableschemaType;
 
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
@@ -32,7 +32,7 @@ import ch.minova.install.setup.schema.XmlDatabaseColumn;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
 import ch.minova.install.sql.TVersion;
 
-import static aero.minova.cas.setup.xml.setup.Script.*;
+import static aero.minova.cas.setup.xml.setup.ScriptType.*;
 import static java.nio.file.Files.readAllBytes;
 
 /**
@@ -52,7 +52,7 @@ public class BaseSetup {
 	private static String sqldialect = "sql";
 	private Connection connection = null;
 	private HashMap<String, String> mymap;
-	private Setup setupDocument;
+	private SetupType setupDocument;
 	protected VersionInfo versionInfo;
 
 	public static Properties parameter = null;
@@ -665,7 +665,7 @@ public class BaseSetup {
 		XmlDatabaseTable xmlTable = null;
 		SqlDatabaseTable sqlTable = null;
 		String sqlCode = null;
-		Setup doc = getSetupDocument();
+		SetupType doc = getSetupDocument();
 		if (doc.getSchema() == null) {
 			return false;
 		}
@@ -851,7 +851,7 @@ public class BaseSetup {
 	 * @throws IOException
 	 * @throws BaseSetupException
 	 */
-	private Setup getSetupDocument() throws IOException, BaseSetupException {
+	private SetupType getSetupDocument() throws IOException, BaseSetupException {
 		if (setupDocument != null) {
 			return setupDocument;
 		}
@@ -879,7 +879,7 @@ public class BaseSetup {
 
 	public void handleSqlScripts(final Connection con, final Optional<Path> sqlLibrary)
 			throws IOException, BaseSetupException, SQLException, SQLExeption {
-		Setup doc;
+		SetupType doc;
 		final String table = "tVersion10";
 		final boolean forceSql = parameter.containsKey("fs");
 		doc = getSetupDocument();
@@ -892,9 +892,9 @@ public class BaseSetup {
 		tVersionHash = getTVersion(connection, table);
 		// Einlesen der Daten aus tVersion
 		if (doc.getSqlCode() != null) {
-			final List<Script> scripts = doc.getSqlCode();
+			final List<ScriptType> scripts = doc.getSqlCode();
 			for (int i = 0; i < scripts.size(); i++) {
-				final Script scp = scripts.get(i);
+				final ScriptType scp = scripts.get(i);
 				final String name = scp.getName();
 				final String type = scp.getType();
 				log(MessageFormat.format("Script: {0}, Type= {1}", name, type.toString()));
@@ -929,7 +929,7 @@ public class BaseSetup {
 	}
 
 	public void readSQLOfOrderedModules() throws IOException, BaseSetupException, SQLException {
-		Setup setup = null;
+		SetupType setup = null;
 
 		final BaseSetup[] a = orderedDependingModules.toArray(new BaseSetup[0]);
 
@@ -1251,9 +1251,9 @@ public class BaseSetup {
 	 * @throws SQLException
 	 */
 	public boolean readSchema() throws IOException, BaseSetupException, ModuleNotFoundException, SQLException {
-		final Setup doc = getSetupDocument();
+		final SetupType doc = getSetupDocument();
 		if (doc.getSchema() != null) {
-			final List<Tableschema> tables = doc.getSchema();
+			final List<TableschemaType> tables = doc.getSchema();
 			for (int i = 0; i < tables.size(); i++) {
 				if (!hashtables.containsKey(tables.get(i))) {
 					tablevector.add(new TableVector(tables.get(i).getName(), tables.get(i).getType()));
@@ -1266,7 +1266,7 @@ public class BaseSetup {
 		return false;
 	}
 
-	public void setSetupDocument(Setup setupDocument) {
+	public void setSetupDocument(SetupType setupDocument) {
 		this.setupDocument = setupDocument;
 	}
 }

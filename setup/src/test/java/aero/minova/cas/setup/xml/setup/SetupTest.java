@@ -15,7 +15,7 @@ public class SetupTest {
                 .getResourceAsStream("Setup.xml")), "UTF-8")//
                 .useDelimiter("\\A")//
                 .next();
-        final var testSubject = Setup.parse(setupXml);
+        final var testSubject = SetupType.parse(setupXml);
         assertThat(testSubject.getName()).isEqualTo("aero.minova.cas.app");
         assertThat(testSubject.getSchema().size()).isEqualTo(2);
         assertThat(testSubject.getSchema().get(0).getName()).isEqualTo("xtcasError");

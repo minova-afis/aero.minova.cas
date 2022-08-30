@@ -7,7 +7,7 @@ import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
 
-import aero.minova.cas.setup.xml.setup.Setup;
+import aero.minova.cas.setup.xml.setup.SetupType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +46,7 @@ public class InstallToolIntegration {
 				if (!BaseSetup.parameter.containsKey("fs")) {
 					BaseSetup.parameter.put("fs", "value");
 				}
-				final Setup setupDocument = Setup.parse(setupXml);
+				final SetupType setupDocument = SetupType.parse(setupXml);
 
 				BaseSetup.hashModules = new Hashtable<>();
 				BaseSetup.hashtables = new Hashtable<>();

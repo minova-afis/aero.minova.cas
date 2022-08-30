@@ -3,6 +3,12 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## Unreleased
+* ...
+
+## [12.51.0] -- 2022-08-30
+* Update auf SpringBoot 2.7.3
+
 ## [12.50.0] -- 2022-08-30
 * #320 Code aufräumen: Datenbankzurgriffe aus den Controllern in einene Service-Klassen verschieben.
 

@@ -140,7 +140,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		// Holt sich alle Nachrichten, die noch nicht versandt wurden.
 		Table messagesToBeSend = getNextMessage();
 
-		if (messagesToBeSend != null && messagesToBeSend.getRows().size() > 0) {
+		if (messagesToBeSend != null && !messagesToBeSend.getRows().isEmpty()) {
 
 			for (Row pendingMessage : messagesToBeSend.getRows()) {
 

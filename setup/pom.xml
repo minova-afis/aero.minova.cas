@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cas.setup</artifactId>
-	<version> 12.48.1-SNAPSHOT</version>
+	<version> 12.49.1-SNAPSHOT</version>
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>cas.parent</artifactId>
-		<version> 12.48.1-SNAPSHOT</version>
+		<version> 12.49.1-SNAPSHOT</version>
 	</parent>
 
 	<scm>
@@ -31,11 +31,6 @@
 			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.xmlbeans</groupId>
-			<artifactId>xmlbeans</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
@@ -49,20 +44,10 @@
 			<version>2.11.0</version>
 		</dependency>
 		<dependency>
-			<groupId>ch.minova</groupId>
-			<artifactId>ch.minova.setuppropertiesbean</artifactId>
-			<version>10.0.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/ch.minova.setuppropertiesbean-10.0.2.jar</systemPath>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.13.3</version>
 		</dependency>
-		<dependency>
-			<groupId>ch.minova</groupId>
-			<artifactId>ch.minova.tablebean</artifactId>
-			<version>10.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/ch.minova.tablebean.jar</systemPath>
-		</dependency>
-
 		<dependency>
 			<!--  must be on the classpath test coverage  -->
 			<groupId>org.jacoco</groupId>

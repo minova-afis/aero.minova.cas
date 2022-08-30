@@ -6,7 +6,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.parent</artifactId>
-        <version>12.48.1-SNAPSHOT</version>
+        <version>12.49.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -25,11 +25,6 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>net.sourceforge.jtds</groupId>
             <artifactId>jtds</artifactId>
         </dependency>
@@ -38,20 +33,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
-        <dependency>
-            <groupId>ch.minova</groupId>
-            <artifactId>ch.minova.setuppropertiesbean</artifactId>
-            <version>10.0.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../setup/libs/ch.minova.setuppropertiesbean-10.0.2.jar</systemPath>
-        </dependency>
-        <dependency>
-			<groupId>ch.minova</groupId>
-			<artifactId>ch.minova.tablebean</artifactId>
-			<version>10.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/../setup/libs/ch.minova.tablebean.jar</systemPath>
-		</dependency>
     </dependencies>
     <build>
         <finalName>aero.minova.cas.service</finalName>

@@ -258,7 +258,7 @@ public class SqlProcedureController {
 	public ResponseEntity<?> unsecurelyExecuteProcedure(Table inputTable) throws Exception {
 		Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
 
-		if (extensionResult != null) {
+		if (extensionResult.isPresent()) {
 			return extensionResult.orElse(null);
 		}
 		// Hiermit wird der unsichere Zugriff ermöglicht.
@@ -284,7 +284,6 @@ public class SqlProcedureController {
 	 * @throws SQLException
 	 *             Fehler beim setzen des Kontextes für die connection.
 	 */
-
 	@Deprecated
 	private void setUserContextFor(Connection connection) throws SQLException {
 		procedureService.setUserContextFor(connection);

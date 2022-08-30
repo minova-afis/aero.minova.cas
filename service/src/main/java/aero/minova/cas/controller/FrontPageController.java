@@ -5,24 +5,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class FrontPageController {
+
+	private static final String FRONTPAGE = "index.html";
+
 	@GetMapping("")
 	public String root() {
-		return "index.html";
+		return FRONTPAGE;
 	}
 
 	@GetMapping("index")
 	public String index() {
-		return "index.html";
+		return FRONTPAGE;
 	}
 
 	@GetMapping("index.html")
 	public String indexFull() {
-		return "index.html";
+		return FRONTPAGE;
 	}
 
 	@GetMapping("login")
 	public String login() {
-		return "index.html";
+		return FRONTPAGE;
 	}
 
 	@GetMapping("setupError")

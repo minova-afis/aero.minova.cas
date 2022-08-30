@@ -1,7 +1,10 @@
 package ch.minova.install.setup.schema;
 
-import ch.minova.core.xml.tables.TableDocument.Table;
-import ch.minova.core.xml.tables.TableDocument.Table.Foreignkey;
+import aero.minova.cas.setup.xml.table.Column;
+import aero.minova.cas.setup.xml.table.ForeignKey;
+import aero.minova.cas.setup.xml.table.Table;
+
+import java.util.List;
 
 public class XmlForeignKeyContraint {
 	private String tableName;
@@ -9,7 +12,7 @@ public class XmlForeignKeyContraint {
 	private String foreignTableName;
 	private XmlForeignKeyColumn[] foreignKeyColumns;
 
-	public XmlForeignKeyContraint(final Table table, final Foreignkey foreignkey) {
+	public XmlForeignKeyContraint(final Table table, final ForeignKey foreignkey) {
 		this(table, foreignkey, null);
 	}
 
@@ -59,15 +62,15 @@ public class XmlForeignKeyContraint {
 		this.foreignKeyColumns = foreignKeyColumns;
 	}
 
-	public XmlForeignKeyContraint(final Table table, final Foreignkey foreignkey,
-			final ch.minova.core.xml.tables.TableDocument.Table.Foreignkey.Column[] columnArray) {
+	public XmlForeignKeyContraint(final Table table, final ForeignKey foreignkey,
+			final List<Column> columnArray) {
 		this.tableName = table.getName();
-		this.columnName = foreignkey.getRefid().getStringValue();
-		this.foreignTableName = foreignkey.getTable().getStringValue();
+		this.columnName = foreignkey.getRefid();
+		this.foreignTableName = foreignkey.getTable();
 		if (columnArray != null) {
-			this.foreignKeyColumns = new XmlForeignKeyColumn[columnArray.length];
-			for (int i = 0; i < columnArray.length; i++) {
-				this.foreignKeyColumns[i] = new XmlForeignKeyColumn(columnArray[i].getName(), columnArray[i].getRefid());
+			this.foreignKeyColumns = new XmlForeignKeyColumn[columnArray.size()];
+			for (int i = 0; i < columnArray.size(); i++) {
+				this.foreignKeyColumns[i] = new XmlForeignKeyColumn(columnArray.get(i).getName(), columnArray.get(i).getRefid());
 			}
 		}
 	}

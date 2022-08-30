@@ -7,18 +7,14 @@
 
 package ch.minova.install.setup.schema;
 
+import aero.minova.cas.setup.xml.table.*;
+
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-
-import ch.minova.core.xml.tables.TableDocument.Table;
-import ch.minova.core.xml.tables.TableDocument.Table.Column;
-import ch.minova.core.xml.tables.TableDocument.Table.Column.Float;
-import ch.minova.core.xml.tables.TableDocument.Table.Column.Integer;
-import ch.minova.core.xml.tables.TableDocument.Table.Column.Varchar;
 
 public class XmlDatabaseColumn {
 	public static final int BIGINT = 1;
@@ -356,12 +352,12 @@ public class XmlDatabaseColumn {
 			col.addNewDatetime().setNullable(this.nullable);
 			break;
 		case FLOAT:
-			final Float f = col.addNewFloat();
+			final ColumnFloat f = col.addNewFloat();
 			f.setNullable(this.nullable);
 			f.setDecimals(this.decimals);
 			break;
 		case INT:
-			final Integer i = col.addNewInteger();
+			final ColumnInteger i = col.addNewInteger();
 			i.setIdentity(this.identity);
 			i.setNullable(this.nullable);
 			break;
@@ -369,8 +365,8 @@ public class XmlDatabaseColumn {
 			col.addNewMoney().setNullable(this.nullable);
 			break;
 		case VARCHAR:
-			final Varchar v = col.addNewVarchar();
-			v.setLength(BigInteger.valueOf(this.length));
+			final ColumnVarchar v = col.addNewVarchar();
+			v.setLength(this.length);
 			v.setNullable(this.nullable);
 			break;
 		default:

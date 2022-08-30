@@ -47,6 +47,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	SystemDatabase systemDatabase;
 
+	private static final String ADMIN = "admin";
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		// SpringBoot: management port
@@ -80,9 +82,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.dataSource(systemDatabase.getDataSource())//
 					.usersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?")//
 					.authoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
-		} else if (dataSource.equals("admin")) {
+		} else if (dataSource.equals(ADMIN)) {
 			auth.inMemoryAuthentication()//
-					.withUser("admin").password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities("admin");
+					.withUser(ADMIN).password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).authorities(ADMIN);
 		}
 	}
 

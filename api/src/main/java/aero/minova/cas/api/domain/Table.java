@@ -21,10 +21,12 @@ public class Table implements Serializable {
 	}
 
 	public void fillMetaData(Table inputTable, int limit, int totalResults, int page) {
-		TableMetaData metaData = inputTable.getMetaData();
 		if (inputTable.getMetaData() == null) {
 			metaData = new TableMetaData();
+		} else {
+			this.metaData = inputTable.getMetaData();
 		}
+
 		if (limit <= 0) {
 			limit = totalResults;
 		}
@@ -36,8 +38,6 @@ public class Table implements Serializable {
 		metaData.setLimited(limit);
 		metaData.setPage(page);
 		metaData.setTotalResults(totalResults);
-
-		this.metaData = metaData;
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class Table implements Serializable {
 	 */
 	public int findColumnPosition(String columnName) {
 		for (int i = 0; i < columns.size(); i++) {
-			if (columns.get(i).getName().toLowerCase().equals(columnName.toLowerCase())) {
+			if (columns.get(i).getName().equalsIgnoreCase(columnName)) {
 				return i;
 			}
 		}
@@ -60,7 +60,7 @@ public class Table implements Serializable {
 	}
 
 	public void addColumn(Column c) {
-		if (getRows().size() != 0) {
+		if (!getRows().isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 		getColumns().add(c);
@@ -97,8 +97,8 @@ public class Table implements Serializable {
 		return metaData;
 	}
 
-	public void setMetaData(TableMetaData meta_data) {
-		this.metaData = meta_data;
+	public void setMetaData(TableMetaData metaData) {
+		this.metaData = metaData;
 	}
 
 	public ErrorMessage getReturnErrorMessage() {

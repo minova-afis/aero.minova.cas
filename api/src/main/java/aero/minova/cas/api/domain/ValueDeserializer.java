@@ -28,7 +28,7 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 
 	public static final String SQL_IS_NULL = "null";
 	public static final String SQL_IS_NOT_NULL = "!null";
-	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", SQL_IS_NULL, SQL_IS_NOT_NULL };
+	protected static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
 	@Override
 	public Value deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
@@ -46,6 +46,10 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 		String typeString = json.getAsString().substring(0, 1);
 		String value = json.getAsString().substring(2);
 		String rule;
+
+		if (value == null) {
+			throw new NullPointerException("No values found!");
+		}
 
 		if (typeString.equals("f")) {
 			int operatorPos = getOperatorEndIndex(value);

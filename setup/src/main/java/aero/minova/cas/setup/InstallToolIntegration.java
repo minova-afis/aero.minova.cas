@@ -1,8 +1,5 @@
 package aero.minova.cas.setup;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -10,13 +7,13 @@ import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
 
+import aero.minova.cas.setup.xml.setup.SetupType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
 import aero.minova.cas.sql.SystemDatabase;
-import ch.minova.core.install.SetupDocument;
 import ch.minova.install.setup.BaseSetup;
 
 /**
@@ -42,7 +39,6 @@ public class InstallToolIntegration {
 	 */
 	public void installSetup(Path setupXml) {
 		try {
-			final InputStream is = new BufferedInputStream(new FileInputStream(setupXml.toFile()));
 			final Connection connection = systemDatabase.getConnection();
 			try {
 				connection.setAutoCommit(true);
@@ -50,7 +46,7 @@ public class InstallToolIntegration {
 				if (!BaseSetup.parameter.containsKey("fs")) {
 					BaseSetup.parameter.put("fs", "value");
 				}
-				final SetupDocument setupDocument = (SetupDocument) SetupDocument.Factory.parse(is, null);
+				final SetupType setupDocument = SetupType.parse(setupXml);
 
 				BaseSetup.hashModules = new Hashtable<>();
 				BaseSetup.hashtables = new Hashtable<>();
@@ -66,10 +62,10 @@ public class InstallToolIntegration {
 				setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
 				if (rs.getInt("Anzahl") == 0) {
 					setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
-					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getSetup().getName());
+					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getName());
 				} else {
 					setup.readoutSchema(connection, tableLibrary, sqlLibrary);
-					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getSetup().getName());
+					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getName());
 				}
 				setup.handleSqlScripts(connection, sqlLibrary);
 				connection.commit();

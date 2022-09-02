@@ -93,7 +93,7 @@ public class SecurityConfig {
 
 	@Order(1)
 	@Configuration
-	@Profile("dev")
+	@Profile("development")
 	public static class DevSecurityConfig extends WebSecurityConfigurerAdapter {
 		@Autowired
 		SecurityConfig securityConfig;
@@ -111,7 +111,6 @@ public class SecurityConfig {
 			http.cors();
 		}
 
-		// CORS
 		@Bean
 		CorsConfigurationSource corsConfigurationSource() {
 			UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

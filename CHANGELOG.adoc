@@ -6,7 +6,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## Unreleased
 * ...
 
-## [12.51.1] -- 2022-09-02
+## [12.52.0] -- 2022-09-02
 * Profil für Dev-System, um CORS für Entwicklungszwecke zu erlauben
 
 ## [12.51.0] -- 2022-08-30

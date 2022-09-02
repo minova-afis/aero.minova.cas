@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -40,8 +42,6 @@ public class SecurityConfig {
 	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
 	private String ldapServerAddress;
 
-	// Hier ist kein Default gesetzt, damit man bewusst den Admin-Nutzer aktivieren
-	// muss.
 	@Value("${login_dataSource:}")
 	private String dataSource;
 
@@ -53,6 +53,9 @@ public class SecurityConfig {
 
 	@Autowired
 	SystemDatabase systemDatabase;
+
+	@Autowired
+	CustomLogger customLogger;
 
 	private static final String ADMIN = "admin";
 
@@ -93,7 +96,7 @@ public class SecurityConfig {
 
 	@Order(1)
 	@Configuration
-	@Profile("development")
+	@Profile("dev")
 	public static class DevSecurityConfig extends WebSecurityConfigurerAdapter {
 		@Autowired
 		SecurityConfig securityConfig;
@@ -165,5 +168,10 @@ public class SecurityConfig {
 				return super.mapUserFromContext(ctx, username, grantedAuthorities);
 			}
 		};
+	}
+
+	@PostConstruct
+	public void devWarning() {
+		customLogger.logError("Never use dev-profile in production!", new Exception());
 	}
 }

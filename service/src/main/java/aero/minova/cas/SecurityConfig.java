@@ -1,5 +1,6 @@
 package aero.minova.cas;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +21,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 
 import aero.minova.cas.service.SecurityService;
@@ -64,6 +69,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.httpBasic();
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
+		
+		// Enables CorsConfigurationSource to be used
+		http.cors();
+	}
+	
+	// CORS
+    @Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		// Allow origin "http://localhost:8100"
+		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100"));
+		// Allow only "GET" methods from "http://localhost:8100" (for /ping)
+		corsConfiguration.setAllowedMethods(Arrays.asList(HttpMethod.GET.name()));
+		// Allow all headers from "http://localhost:8100"
+		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+		// Register mapping(s) to be added to cors whitelist e.g /cas/ping or /**
+		source.registerCorsConfiguration("/cas/ping", corsConfiguration);
+		return source;
 	}
 
 	@Bean

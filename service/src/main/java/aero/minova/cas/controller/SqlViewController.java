@@ -24,6 +24,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.service.JOOQService;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.service.ViewService;
@@ -35,6 +36,9 @@ public class SqlViewController {
 	private ViewService viewService;
 
 	@Autowired
+	private JOOQService jooqService;
+
+	@Autowired
 	private SecurityService securityService;
 
 	@Autowired
@@ -44,6 +48,9 @@ public class SqlViewController {
 	ProcedureService procedureService;
 
 	final Object extensionSynchronizer = new Object();
+
+	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MySQL}")
+	String context;
 
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
@@ -108,9 +115,13 @@ public class SqlViewController {
 	@PostMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
-
+		List<Row> authoritiesForThisTable;
 		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
-		List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
+		if (!context.equalsIgnoreCase("MSSQL")) {
+			authoritiesForThisTable = jooqService.getPrivilegePermissions(inputTable.getName());
+		} else {
+			authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
+		}
 		if (authoritiesForThisTable.isEmpty()) {
 			throw new TableException(new RuntimeException("msg.PrivilegeError %" + inputTable.getName()));
 		}
@@ -119,7 +130,9 @@ public class SqlViewController {
 				return extensions.get(inputTable.getName()).apply(inputTable);
 			}
 		}
-
+		if (!context.equalsIgnoreCase("MSSQL")) {
+			return jooqService.executeView(inputTable, authoritiesForThisTable);
+		}
 		return viewService.executeView(inputTable, authoritiesForThisTable);
 	}
 

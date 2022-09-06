@@ -10,7 +10,7 @@ Diese müssen dann von Hand auf der Datenbank ausgeführt werden.
 
 Die application.properties müssen desweiteren mit folgenden Properties geändert werden:
 
-* aero.minova.database.kind=postgresql
+* spring.jooq.sql-dialect=POSTGRESQL
 * aero_minova_database_url=jdbc:postgresql://URLZurDatenbank/DatenbankName
 
 DA Postgresql RowCount als Funktion verwendet, wird eine andere Methode zum Zusammenbauen des preparedStatements verwendet und zwar die prepareViewString-Methode.

@@ -27,7 +27,7 @@ public class SystemDatabase {
 	@Value("${aero_minova_database_user_password:password}")
 	String userPassword;
 
-	@Value("${aero.minova.database.kind:mssql}")
+	@Value("${spring.jooq.sql-dialect:mssql}")
 	String databaseKind;
 
 	private LinkedList<Connection> freeConnections = new LinkedList<>();
@@ -36,7 +36,7 @@ public class SystemDatabase {
 		try {
 			final Connection connection;
 			if (freeConnections.isEmpty()) {
-				if (databaseKind.equals("postgresql")) {
+				if (databaseKind.equalsIgnoreCase("postgresql")) {
 					Class.forName("org.postgresql.Driver");
 				} else {
 					Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

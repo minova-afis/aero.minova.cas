@@ -42,7 +42,7 @@ public class ProcedureService {
 	@Autowired
 	SystemDatabase systemDatabase;
 
-	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mssql}")
+	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:mssql}")
 	String databaseKind;
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.maxresultsetcount:512}")

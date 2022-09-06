@@ -146,6 +146,23 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq</artifactId>
+			<version>3.16.0</version>
+		</dependency>
+
+		<!-- These may not be required, unless you use the GenerationTool manually for code generation -->
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-meta</artifactId>
+			<version>3.16.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-codegen</artifactId>
+			<version>3.16.0</version>
+		</dependency>
+		<dependency>
 			<!--  must be on the classpath test coverage  -->
 			<groupId>org.jacoco</groupId>
 			<artifactId>org.jacoco.agent</artifactId>

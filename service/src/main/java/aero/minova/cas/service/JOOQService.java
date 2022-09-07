@@ -2,12 +2,9 @@ package aero.minova.cas.service;
 
 import static java.util.Arrays.asList;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,11 +74,11 @@ public class JOOQService {
 
 			String sql = query.getSQL();
 			val preparedStatement = connection.prepareCall(sql);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, sql, sb);
+			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, sql, sb, customLogger.getErrorLogger());
 			customLogger.logSql("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
-			result = convertSqlResultToTable(inputTable, resultSet);
+			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
 
 			int totalResults = 0;
 			if (!result.getRows().isEmpty()) {
@@ -111,102 +108,6 @@ public class JOOQService {
 		return result;
 	}
 
-	/**
-	 * das Prepared Statement wird mit den dafür vorgesehenen Parametern befüllt
-	 *
-	 * @param inputTable
-	 *            die Table, welche vom getIndexView aufgerufen wurde
-	 * @param preparedStatement
-	 *            das Prepared Statement, welches nur noch befüllt werden muss
-	 * @return das befüllte, ausführbare Prepared Statement
-	 */
-	public PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
-		int parameterOffset = 1;
-		sb.append(query);
-
-		List<Value> inputValues = new ArrayList<>();
-		for (Row row : inputTable.getRows()) {
-			for (int i = 0; i < row.getValues().size(); i++) {
-				// nur die Values von den Spalten, welche nicht die AND_FIELD Spalte ist, interessiert uns
-				if (!inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
-					inputValues.add(row.getValues().get(i));
-				}
-			}
-		}
-		for (int i = 0; i < inputValues.size(); i++) {
-			try {
-				val iVal = inputValues.get(i);
-				if (iVal != null) {
-					val rule = iVal.getRule();
-					String stringValue = iVal.getValue() + "";
-					if (rule == null) {
-						if (!stringValue.trim().isEmpty()) {
-							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
-							preparedStatement.setString(i + parameterOffset, stringValue);
-						} else {
-							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' hat
-							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
-							parameterOffset--;
-						}
-					} else if (rule.contains("in")) {
-						List<String> inBetweenValues;
-						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
-								.collect(Collectors.toList());
-						for (String string : inBetweenValues) {
-							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + string);
-							preparedStatement.setString(i + parameterOffset, string);
-							parameterOffset++;
-						}
-						// i zählt als nächstes hoch, deswegem muss parameterOffset wieder um 1 verringert werden
-						parameterOffset--;
-					} else if (rule.contains("between")) {
-						List<String> inBetweenValues;
-						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
-								.collect(Collectors.toList());
-						// bei between vertrauen wir nicht darauf, dass der Nutzer wirklich nur zwei Werte einträgt,
-						// sondern nehmen den ersten und den letzten Wert
-						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(0));
-						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(0));
-						parameterOffset++;
-						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(inBetweenValues.size() - 1));
-						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(inBetweenValues.size() - 1));
-					} else {
-						if (!stringValue.trim().isEmpty()) {
-							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
-							preparedStatement.setString(i + parameterOffset, stringValue);
-						} else {
-							parameterOffset--;
-						}
-					}
-				} else {
-					parameterOffset--;
-				}
-			} catch (Exception e) {
-				customLogger.logError("Statement could not be filled: " + sb.toString(), e);
-				throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
-			}
-		}
-		sb.append("\n");
-		return preparedStatement;
-	}
-
-	public Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
-		try {
-			Table outputTable = new Table();
-			outputTable.setName(inputTable.getName());
-			outputTable.setColumns(//
-					inputTable.getColumns().stream()//
-							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
-							.collect(Collectors.toList()));
-			while (sqlSet.next()) {
-				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, customLogger.getUserLogger(), this));
-			}
-			return outputTable;
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public Query prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities) throws IllegalArgumentException {
 		return prepareViewString(params, autoLike, maxRows, false, authorities);
 	}
@@ -223,9 +124,10 @@ public class JOOQService {
 	 *            maximale Anzahl Ergebnisse (Zeilen), die die Abfrage liefern soll, 0 für unbegrenzt
 	 * @param count
 	 *            Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
+	 * @param authorities
+	 *            Eine Liste an autorisierten UserGruppen. Wird für die RowLevelSecurity benötigt.
 	 * @return Präparierter View-String, der ausgeführt werden kann
 	 * @throws IllegalArgumentException
-	 * @author wild
 	 */
 	public Query prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 
@@ -246,6 +148,7 @@ public class JOOQService {
 
 		Query query;
 
+		// Hier wird nur unterschieden, ob die Einträge gezählt werden sollen oder nicht.
 		if (count) {
 			if (condition != null) {
 				query = DSL.selectCount().from(params.getName()).where(condition);
@@ -351,10 +254,10 @@ public class JOOQService {
 		try {
 			final String viewQuery = prepareViewString(inputTable, false, -1, false, userGroups).getSQL();
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb, customLogger.getErrorLogger());
 			customLogger.logPrivilege("Executing statement: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
-			result = convertSqlResultToTable(inputTable, resultSet);
+			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);

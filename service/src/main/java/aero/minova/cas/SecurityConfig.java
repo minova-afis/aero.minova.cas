@@ -54,9 +54,6 @@ public class SecurityConfig {
 	@Autowired
 	SystemDatabase systemDatabase;
 
-	@Autowired
-	CustomLogger customLogger;
-
 	private static final String ADMIN = "admin";
 
 	public void configureAuthStandard(AuthenticationManagerBuilder auth) throws Exception {
@@ -98,8 +95,17 @@ public class SecurityConfig {
 	@Configuration
 	@Profile("dev")
 	public static class DevSecurityConfig extends WebSecurityConfigurerAdapter {
+
 		@Autowired
 		SecurityConfig securityConfig;
+
+		@Autowired
+		CustomLogger customLogger;
+
+		@PostConstruct
+		public void devWarning() {
+			customLogger.logError("Never use dev-profile in production!", new Exception());
+		}
 
 		@Override
 		public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -170,8 +176,4 @@ public class SecurityConfig {
 		};
 	}
 
-	@PostConstruct
-	public void devWarning() {
-		customLogger.logError("Never use dev-profile in production!", new Exception());
-	}
 }

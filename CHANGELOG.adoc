@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 * ...
+* devWarning in "dev"-Profile verschoben
 
 ## [12.52.0] -- 2022-09-02
 * Profil für Dev-System, um CORS für Entwicklungszwecke zu erlauben

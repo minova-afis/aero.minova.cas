@@ -61,7 +61,7 @@ public class ProcedureService {
 	 */
 	public void setUserContextFor(Connection connection) throws SQLException {
 		CallableStatement userContextSetter;
-		if (databaseKind.equals("postgresql")) {
+		if (databaseKind.equalsIgnoreCase("postgresql")) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");

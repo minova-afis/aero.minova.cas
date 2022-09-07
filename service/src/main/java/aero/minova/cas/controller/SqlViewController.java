@@ -49,7 +49,7 @@ public class SqlViewController {
 
 	final Object extensionSynchronizer = new Object();
 
-	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MySQL}")
+	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MSSQL}")
 	String context;
 
 	/**

@@ -149,7 +149,7 @@ public class ViewService {
 	 * @author wild
 	 */
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
 			throw new IllegalArgumentException("msg.ViewNullName");
 		}
@@ -278,10 +278,7 @@ public class ViewService {
 			COLS: for (int colI = 0; colI < r.getValues().size(); ++colI) {
 				val def = r.getValues().get(colI);
 				val col = params.getColumns().get(colI);
-				if (Column.AND_FIELD_NAME.equalsIgnoreCase(col.getName())) {
-					continue COLS;
-				}
-				if (r.getValues().get(colI) == null) {
+				if (Column.AND_FIELD_NAME.equalsIgnoreCase(col.getName()) || r.getValues().get(colI) == null) {
 					continue COLS;
 				}
 

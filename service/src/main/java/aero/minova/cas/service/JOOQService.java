@@ -155,6 +155,12 @@ public class JOOQService {
 			} else {
 				query = DSL.selectCount().from(params.getName());
 			}
+		} else if (maxRows > 0) {
+			if (condition != null) {
+				query = DSL.select(fields).from(params.getName()).where(condition).limit(maxRows);
+			} else {
+				query = DSL.select(fields).from(params.getName()).limit(maxRows);
+			}
 		} else {
 			if (condition != null) {
 				query = DSL.select(fields).from(params.getName()).where(condition);
@@ -181,14 +187,27 @@ public class JOOQService {
 		for (Row r : params.getRows()) {
 			for (int i = 0; i < r.getValues().size(); i++) {
 				Value value = r.getValues().get(i);
-				if (value != null && !value.getValue().toString().isBlank() && !params.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
-					String rule = value.getRule();
-					if (autoLike && params.getColumns().get(i).getType().equals(DataType.STRING) && (!value.getStringValue().contains("%"))) {
+
+				if (value != null && !params.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
+					String rule = (r.getValues().get(i).getRule() != null ? r.getValues().get(i).getRule() : null);
+
+					// Is Null und is not Null muss zuerst geprüft werden, da es egal ist, ob etwas im Value steht.
+					if (rule != null && rule.contains("!null")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNotNull());
+						continue;
+					} else if (rule != null && rule.contains("null")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNull());
+						continue;
+					}
+
+					if (autoLike && params.getColumns().get(i).getType().equals(DataType.STRING) && !value.getValue().toString().isBlank()
+							&& (!value.getStringValue().contains("%"))) {
 						value = new Value(value.getStringValue() + "%", rule);
 					}
-					if (rule == null) {
+
+					if (rule == null && !value.getValue().toString().contains("%")) {
 						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).eq(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("~")) {
+					} else if (value.getValue().toString().contains("%") || rule.equals("~")) {
 						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).like(value.getValue().toString()));
 					} else if (rule.equals("!~")) {
 						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).notLike(value.getValue().toString()));
@@ -204,19 +223,15 @@ public class JOOQService {
 						condition.and(DSL.field(params.getColumns().get(i).getName()).ne(r.getValues().get(i).getValue().toString()));
 					} else if (rule.equals("between()")) {
 						int separator = value.getValue().toString().indexOf(",");
-						String valueA = value.getValue().toString().substring(0, separator - 1);
+						String valueA = value.getValue().toString().substring(0, separator);
 						String valueB = value.getValue().toString().substring(separator + 1);
 						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).between(valueA, valueB));
 					} else if (rule.equals("in()")) {
 						List<String> inValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
 
 						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).in(inValues));
-					} else if (rule.equals("null")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNull());
-					} else if (rule.equals("!null")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNotNull());
 					} else {
-						throw new IllegalArgumentException("Invalid rule " + rule + "for value" + value.getValue().toString() + " !");
+						throw new IllegalArgumentException("Invalid rule " + rule + " for value" + value.getValue().toString() + " !");
 					}
 				}
 			}

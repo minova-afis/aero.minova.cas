@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.impl.DSL;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -31,10 +32,10 @@ import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
-class ViewServiceTest extends BaseTest {
+public class JOOQServiceTest extends BaseTest {
 
 	@Autowired
-	ViewService testSubject;
+	JOOQService testSubject;
 
 	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")
 	@Test
@@ -47,8 +48,8 @@ class ViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 * from vWorkingTimeIndex2");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+				.isEqualTo("select * from vWorkingTimeIndex2 limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge mit einem bestimmten Wert eines Feldes.")
@@ -70,9 +71,8 @@ class ViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))");
-		assertThat(inputTable.getRows().get(0).getValues().get(0).getStringValue()).isEqualTo("AVM%");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
@@ -96,8 +96,8 @@ class ViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ? and CustomerText like ?))");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where (EmployeeText like ? and CustomerText like ?) limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -125,10 +125,9 @@ class ViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 BookingDate from vWorkingTimeIndex2\r\n" //
-						+ "where ((BookingDate <= ?)\r\n"//
-						+ "  and (BookingDate > ?))");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+				.isEqualTo(
+						"select BookingDate\r\nfrom vWorkingTimeIndex2\r\nwhere (\r\nBookingDate like '2020-07-31%'\r\nand BookingDate like '2020-07-29%'\r\n)\r\nlimit 1000");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -156,10 +155,8 @@ class ViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
-						+ "where ((EmployeeText like ?)\r\n"//
-						+ "   or (EmployeeText like ?))");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where (EmployeeText like ? and EmployeeText like ?) limit ?");
 	}
 
 	@Test
@@ -200,8 +197,8 @@ class ViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
 	}
 
 	@Test
@@ -245,19 +242,18 @@ class ViewServiceTest extends BaseTest {
 		intputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
 		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		intputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
-		// Wenn es keine Row bei der InputTable gibt, gibt es auch keine Where-Bedingung.
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList())).isEqualTo(DSL.noCondition());
 	}
 
 	@Test
 	void test_SearchViaString() {
 		val intputTable = new Table();
 		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		intputTable.addColumn(new Column("KeyLong", DataType.STRING));
 		val row = new Row();
-		row.addValue(new Value("1", null));
+		row.addValue(new Value("1", ""));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong like ?)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString()).isEqualTo("KeyLong like '1%'");
 	}
 
 	@Test
@@ -268,7 +264,7 @@ class ViewServiceTest extends BaseTest {
 		val row = new Row();
 		row.addValue(new Value("1,2,3", "in()"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong in(?, ?, ?))");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString()).isEqualTo("KeyLong in (\r\n'1', '2', '3'\r\n)");
 	}
 
 	@Test
@@ -279,7 +275,7 @@ class ViewServiceTest extends BaseTest {
 		val row = new Row();
 		row.addValue(new Value("1,2,3", "between()"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong between ? and ?)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString()).isEqualTo("(KeyLong between 1 and 2)");
 	}
 
 	@Test
@@ -292,103 +288,8 @@ class ViewServiceTest extends BaseTest {
 		row.addValue(new Value("", "is !null"));
 		row.addValue(new Value("", "is null"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong is not null and KeyText is null)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString())
+				.isEqualTo("(\r\nKeyLong is not null\r\nand KeyText is null\r\n)");
 	}
 
-	@DisplayName("Zeige erste Seite.")
-	@Test
-	void testPaging() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 0"
-						+ "\r\nand RowNum <= 3 order by RowNum");
-	}
-
-	@DisplayName("Zeige alles auf erster Seite.")
-	@Test
-	void testPagingWithNoAttributes() {
-		Table inputTable = new Table();
-
-		inputTable.setName("vWorkingTimeIndex2");
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
-				.isEqualTo("select * from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2" + " ) as RowConstraintResult"
-						+ "\r\nwhere RowNum > 0" + "\r\nand RowNum <= 3 order by RowNum");
-	}
-
-	@DisplayName("Zeige Einträge auf höherer Page.")
-	@Test
-	void testPagingOnHighPage() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 12"
-						+ "\r\nand RowNum <= 15 order by RowNum");
-	}
-
-	@DisplayName("Zeige alle Einträge (auch wenn Page eingestellt ist).")
-	@Test
-	void testPagingAllEntries() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 0");
-	}
 }

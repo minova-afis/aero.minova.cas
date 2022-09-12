@@ -7,8 +7,8 @@ alter procedure dbo.xpcasUpdateServiceProperties (
 with encryption as
 	update xtcasServiceProperties
 	set Service = @Service,
-		Property = @Property,
-		Val = @Val
+        Property = @Property,
+        Val = @Val
 	where KeyLong = @KeyLong
 
     return @@error

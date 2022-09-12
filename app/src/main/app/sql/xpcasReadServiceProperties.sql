@@ -5,9 +5,9 @@ alter procedure dbo.xpcasReadServiceProperties (
     @Val nvarchar(1024) = null output
 )
 with encryption as
-	select	@Service = Service,
-			@Property = Property,
-			@Val = Val
+	select @Service = Service,
+	       @Property = Property,
+           @Val = Val
 	from xtcasServiceProperties
 	where KeyLong = @KeyLong
 

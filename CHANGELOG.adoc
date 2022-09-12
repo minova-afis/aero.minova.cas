@@ -6,6 +6,9 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## Unreleased
 * ...
 * devWarning in "dev"-Profile verschoben
+* link:https://github.com/minova-afis/aero.minova.cas/issues/368[#368] ServiceProperties Tabelle und Maske erstellen:
+  Hiermit werden zukünftig Dienste über link:https://github.com/minova-afis/aero.minova.service[aero.minova.service] konfiguriert.
+  Damit kann man Dienste über eine Maske und somit ohne Dateizugriff einfach und dennoch sicher konfigurieren.
 
 ## [12.52.0] -- 2022-09-02
 * Profil für Dev-System, um CORS für Entwicklungszwecke zu erlauben

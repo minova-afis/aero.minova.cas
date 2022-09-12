@@ -5,10 +5,10 @@ alter procedure dbo.xpcasUpdateServiceProperties (
 	@Val nvarchar(1024) = null
 )
 with encryption as
-	update xtcasServiceProperties
-	set Service = @Service,
+    update xtcasServiceProperties
+    set Service = @Service,
         Property = @Property,
         Val = @Val
-	where KeyLong = @KeyLong
+    where KeyLong = @KeyLong
 
     return @@error

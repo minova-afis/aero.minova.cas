@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<main icon="CAS.ico" titel="CAS">
+    <!-- Das ist eine Vorlage. -->
+    <action action="ServiceProperties.xml" generic="true" icon="xtcasServiceProperties.ico" id="ServiceProperties" text="@xtcasServiceProperties"/>
+    <menu id="main">
+        <menu id="config" text="@cas.config" position="10.0" override="false">
+            <entry id="ServiceProperties" position="10.0" override="false" type="action"/>
+        </menu>
+    </menu>
+</main>

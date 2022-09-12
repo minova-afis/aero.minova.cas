@@ -2,8 +2,10 @@ package aero.minova.cas.service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -75,7 +77,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 */
 	public void registerServiceMessageCreator(String procedureName, String topic, BiFunction<Table, ResponseEntity<Object>, String> function) {
 		if (serviceMessageCreators.containsKey(procedureName) && serviceMessageCreators.get(procedureName).containsKey(topic)) {
-			throw new IllegalArgumentException("There is already a message creator registered for procedure and topic: " + procedureName + ", " + topic);
+			logger.logQueueService("There is already a message creator registered for procedure and topic: " + procedureName + ", " + topic);
 		} else if (!serviceMessageCreators.containsKey(procedureName)) {
 			Map<String, BiFunction<Table, ResponseEntity<Object>, String>> functions = new HashMap<>();
 			functions.put(topic, function);
@@ -200,27 +202,37 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	private void saveMessage(String message, String procedureName, String topic) {
 		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, null, new Value(topic, null), null, null);
 
+		List<Integer> notifiedServices = new ArrayList<>();
+
 		for (Row services : servicesToBeNotified.getRows()) {
+
+			Value serviceKey = services.getValues().get(0);
 			Table setSent = new Table();
-			setSent.setName("xpcasInsertServiceMessage");
-			setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
-			setSent.addColumn(new Column("CASServiceKey", DataType.INTEGER));
-			setSent.addColumn(new Column("Message", DataType.STRING));
 
-			Row setSentRow = new Row();
-			setSentRow.addValue(null);
-			setSentRow.addValue(services.getValues().get(0));
-			setSentRow.addValue(new Value(message, null));
+			// Es reicht, wenn die Dienste einmal getriggert werden. Die if-Bedingung verhindert, dass x Mal dieselbe Nachricht verschickt wird.
+			if (!notifiedServices.contains(serviceKey.getIntegerValue())) {
+				setSent.setName("xpcasInsertServiceMessage");
+				setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
+				setSent.addColumn(new Column("CASServiceKey", DataType.INTEGER));
+				setSent.addColumn(new Column("Message", DataType.STRING));
 
-			setSent.addRow(setSentRow);
-			try {
-				logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
-						+ procedureName + ": '" + message + "'");
-				procedureService.unsecurelyProcessProcedure(setSent);
-				logger.logQueueService("Message saved!");
-			} catch (Exception e) {
-				logger.logError("Error while trying to save message " + message, e);
-				throw new RuntimeException(e);
+				Row setSentRow = new Row();
+				setSentRow.addValue(null);
+				setSentRow.addValue(serviceKey);
+				setSentRow.addValue(new Value(message, null));
+
+				setSent.addRow(setSentRow);
+
+				notifiedServices.add(serviceKey.getIntegerValue());
+				try {
+					logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
+							+ procedureName + ": '" + message + "'");
+					procedureService.unsecurelyProcessProcedure(setSent);
+					logger.logQueueService("Message saved!");
+				} catch (Exception e) {
+					logger.logError("Error while trying to save message " + message, e);
+					throw new RuntimeException(e);
+				}
 			}
 		}
 

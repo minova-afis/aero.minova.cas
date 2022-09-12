@@ -4,7 +4,7 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
-* ...
+* BUGFIX: Der QueueService verschickt jetzt nicht mehr mehrfach dieselbe Nachricht an denselben Server, nur noch 1 Mal pro accept-Aufruf.
 * devWarning in "dev"-Profile verschoben
 
 ## [12.52.0] -- 2022-09-02

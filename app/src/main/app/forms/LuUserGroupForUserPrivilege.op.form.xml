@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	id="LuUserGroupForUserPrivilege" icon="LuUserGroupForUserPrivilege"
+	id="LuUserGroupForUserPrivilege" icon="UserGroupForUserPrivilege"
 	title="@LuUserGroupForUserPrivilege" procedure-prefix="xpcas"
 	procedure-suffix="LuUserPrivilegeUserGroup"
 	read-requires-all-params="true" delete-requires-all-params="true"

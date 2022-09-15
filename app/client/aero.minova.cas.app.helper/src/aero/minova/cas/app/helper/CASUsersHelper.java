@@ -92,10 +92,10 @@ public class CASUsersHelper implements IHelper {
 
 		try {
 			SqlProcedureResult results = callTransactionAsync.get().get(0).getSQLProcedureResult(); // Warten bis Aufruf fertig ist
-			if (results != null && results.getOutputParameters() != null) {
-				Row outputParameters = results.getOutputParameters().getRows().get(0);
-				if (outputParameters.getValue(1) != null) {
-					password.setValue(new Value(outputParameters.getValue(1)), false);
+			if (results != null && results.getResultSet() != null) {
+				Row resultSet = results.getResultSet().getRows().get(0);
+				if (resultSet.getValue(1) != null) {
+					password.setValue(new Value(resultSet.getValue(1).getStringValue()), false);
 					return;
 				}
 			}

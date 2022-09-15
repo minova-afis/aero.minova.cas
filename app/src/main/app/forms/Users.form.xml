@@ -9,7 +9,7 @@ helper-class="aero.minova.cas.app.helper.CASUsersHelper"
 		<column name="Username" text="@xtcasUsers.Username">
 			<text length="50"/>
 		</column>
-		<column name="Password" text="@xtcasUsers.Password">
+		<column name="Password" text="@xtcasUsers.Password" visible="false">
 			<text length="100"/>
 		</column>
 	</index-view>

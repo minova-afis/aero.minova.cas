@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <main icon="CAS.ico" titel="CAS">
-    <action action="ColumnSecurity.xml" generic="true" icon="ColumnSecurity.ico" id="ColumnSecurity" text="ColumnSecurity"/>
-    <action action="User.xml" generic="true" icon="User.ico" id="User" text="User"/>
-    <action action="UserGroup.xml" generic="true" icon="UserGroup.ico" id="UserGroup" text="UserGroup"/>
-    <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege.ico" id="UserPrivileges" text="UserPrivilege"/>
-    <action action="Users.xml" generic="true" icon="Users.ico" id="Users" text="Users"/>
+    <action action="ColumnSecurity.xml" generic="true" icon="ColumnSecurity" id="ColumnSecurity" text="ColumnSecurity"/>
+    <action action="User.xml" generic="true" icon="User" id="User" text="User"/>
+    <action action="UserGroup.xml" generic="true" icon="UserGroup" id="UserGroup" text="UserGroup"/>
+    <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege" id="UserPrivileges" text="UserPrivilege"/>
+    <action action="Users.xml" generic="true" icon="User" id="Users" text="Users"/>
     <menu id="main">
         <menu id="CAS" text="CAS" position="10.0" override="false">
             <entry id="ColumnSecurity" position="10.0" override="false" type="action"/>

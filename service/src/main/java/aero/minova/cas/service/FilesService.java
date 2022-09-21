@@ -33,9 +33,6 @@ public class FilesService {
 
 	@Autowired
 	public CustomLogger customLogger;
-
-	private Path programFilesFolder;
-	private Path sharedDataFolder;
 	private Path systemFolder;
 	private Path internalFolder;
 	private Path logsFolder;
@@ -57,35 +54,25 @@ public class FilesService {
 			rootPath = Paths.get(".").toAbsolutePath().normalize().toString();
 		}
 		systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
-		sharedDataFolder = systemFolder.resolve("Shared Data").toAbsolutePath().normalize();
 		internalFolder = systemFolder.resolve("Internal").toAbsolutePath().normalize();
 		logsFolder = internalFolder.resolve("UserLogs").toAbsolutePath().normalize();
 		md5Folder = internalFolder.resolve("MD5").toAbsolutePath().normalize();
 		zipsFolder = internalFolder.resolve("Zips").toAbsolutePath().normalize();
-		programFilesFolder = sharedDataFolder.resolve("Program Files").toAbsolutePath().normalize();
 		if (!isDirectory(systemFolder)) {
 			customLogger.logFiles("msg.SystemFolder %" + systemFolder);
-		}
-		if (!isDirectory(sharedDataFolder)) {
-			customLogger.logFiles("msg.SharedFolder %" + sharedDataFolder);
-		}
-		if (!isDirectory(programFilesFolder)) {
-			customLogger.logFiles("msg.ProgramFilesFolder %" + programFilesFolder);
 		}
 		if (!isDirectory(internalFolder)) {
 			customLogger.logFiles("msg.InternalFolder %" + internalFolder);
 		}
-		if (!isDirectory(programFilesFolder)) {
+		if (!isDirectory(logsFolder)) {
 			customLogger.logFiles("msg.LogsFolder %" + logsFolder);
 		}
-
 		if (md5Folder.toFile().mkdirs()) {
 			customLogger.logFiles("Creating directory " + md5Folder);
 		}
 		if (zipsFolder.toFile().mkdirs()) {
 			customLogger.logFiles("Creating directory " + zipsFolder);
 		}
-
 	}
 
 	/**

@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -17,7 +19,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeserializer<Value> implements JsonDeserializer<Value> {
 	@Autowired
@@ -27,7 +28,7 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 
 	public static final String SQL_IS_NULL = "null";
 	public static final String SQL_IS_NOT_NULL = "!null";
-	public static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", SQL_IS_NULL, SQL_IS_NOT_NULL };
+	protected static final String[] SQL_OPERATORS = { "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", SQL_IS_NULL, SQL_IS_NOT_NULL };
 
 	@Override
 	public Value deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
@@ -45,6 +46,10 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 		String typeString = json.getAsString().substring(0, 1);
 		String value = json.getAsString().substring(2);
 		String rule;
+
+		if (value == null) {
+			throw new NullPointerException("No values found!");
+		}
 
 		if (typeString.equals("f")) {
 			int operatorPos = getOperatorEndIndex(value);
@@ -88,6 +93,8 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 			return new Value(Boolean.valueOf(value), rule);
 		case "m":
 			return new Value(BigDecimal.valueOf(Double.parseDouble(value)), rule);
+		case "l":
+			return new Value(Long.parseLong(value), rule);
 		default:
 			break;
 		}
@@ -95,10 +102,9 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 	}
 
 	/**
-	 * @deprecated
-	 * Prüft, ob der String einen SQL Operator am Anfang hat
-	 *
-	 * @param value String mit eventuellen SQL-Operatoren am Anfang
+	 * @deprecated Prüft, ob der String einen SQL Operator am Anfang hat
+	 * @param value
+	 *            String mit eventuellen SQL-Operatoren am Anfang
 	 * @return Gibt an, ob ein solcher Operator vorhanden ist.
 	 */
 	@Deprecated
@@ -109,7 +115,8 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 	/**
 	 * Wenn es einen Operator gibt, dann liefert die Funktion den Index bis zu dem sich der Operator erstreckt
 	 *
-	 * @param value String mit SQL-Operator am Anfrang
+	 * @param value
+	 *            String mit SQL-Operator am Anfrang
 	 * @return 0, wenn es keinen Operator gibt
 	 */
 	protected static int getOperatorEndIndex(String value) {

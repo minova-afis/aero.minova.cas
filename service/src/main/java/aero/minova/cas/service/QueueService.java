@@ -45,6 +45,9 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	@Autowired
 	private SqlProcedureController spc;
 
+	@Autowired
+	private ProcedureService procedureService;
+
 	// Hierbei handelt es sich um Tage
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.message.age:7}")
 	int allowedMessageAge;
@@ -137,7 +140,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		// Holt sich alle Nachrichten, die noch nicht versandt wurden.
 		Table messagesToBeSend = getNextMessage();
 
-		if (messagesToBeSend != null && messagesToBeSend.getRows().size() > 0) {
+		if (messagesToBeSend != null && !messagesToBeSend.getRows().isEmpty()) {
 
 			for (Row pendingMessage : messagesToBeSend.getRows()) {
 
@@ -213,7 +216,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			try {
 				logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
 						+ procedureName + ": '" + message + "'");
-				spc.unsecurelyProcessProcedure(setSent);
+				procedureService.unsecurelyProcessProcedure(setSent);
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
 				logger.logError("Error while trying to save message " + message, e);
@@ -240,7 +243,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		messageToDelete.addRow(setSentRow);
 		try {
 			logger.logQueueService("Deleting message with key " + pendingMessage.getValues().get(4).getIntegerValue());
-			spc.unsecurelyProcessProcedure(messageToDelete);
+			procedureService.unsecurelyProcessProcedure(messageToDelete);
 		} catch (Exception e) {
 			logger.logError("The message with key " + pendingMessage.getValues().get(4).getIntegerValue() + " could not be deleted!", e);
 			throw new RuntimeException(e);
@@ -337,7 +340,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		setSent.addRow(setSentRow);
 		try {
-			spc.unsecurelyProcessProcedure(setSent);
+			procedureService.unsecurelyProcessProcedure(setSent);
 		} catch (Exception e) {
 			logger.logError("Could not update message with key " + nextMessage.getValues().get(4).getStringValue() + ".", e);
 			throw new RuntimeException(e);

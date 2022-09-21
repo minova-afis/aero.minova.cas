@@ -5,6 +5,7 @@ import static java.nio.file.Files.readAllBytes;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -153,7 +154,7 @@ public class FilesController {
 
 		String extension = FilenameUtils.getExtension(path);
 		// Zur Abwertskompatibilität Dateieindung überprüfen und, falls diese Zip ist, getZip aufrufen.
-		if (extension.equals("zip")) {
+		if (extension.equalsIgnoreCase("zip")) {
 			return getZip(path);
 		}
 		val inputPath = files.checkLegalPath(Paths.get(path));
@@ -182,7 +183,7 @@ public class FilesController {
 		String extension = FilenameUtils.getExtension(path);
 
 		// Falls man den Hash eines Zip-Files möchte, liegen diese jetzt im Internal-Ordner
-		if (extension.equals("zip")) {
+		if (extension.equalsIgnoreCase("zip")) {
 			md5FilePath = files.getMd5Folder().resolve("Internal").resolve("Zips").resolve(toBeResolved);
 		} else {
 			md5FilePath = files.getMd5Folder().resolve(toBeResolved);
@@ -199,7 +200,7 @@ public class FilesController {
 		String toBeResolved = path;
 		String extension = FilenameUtils.getExtension(path);
 
-		if (!extension.equals("zip")) {
+		if (!extension.equalsIgnoreCase("zip")) {
 			// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im Zips Ordner nachgestellt.
 			toBeResolved = toBeResolved + ".zip";
 		}
@@ -311,7 +312,7 @@ public class FilesController {
 			}
 			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
 			// es kann sein, dass von einem vorherigen Start bereits gezippte Dateien vorhanden sind, welche schon gehashed wurden
-			if (fileSuffix.toLowerCase().equals("md5")) {
+			if (fileSuffix.equalsIgnoreCase("md5")) {
 				String filePrefix = path.toString().substring(0, path.toString().lastIndexOf("."));
 				fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1, path.toString().length());
 			}
@@ -348,7 +349,9 @@ public class FilesController {
 
 		File zipFile = new File(zipDataName + ".zip");
 		// erzeugt Datei, falls sie noch nicht existiert, macht ansonsten nichts
-		zipFile.createNewFile();
+		if (zipFile.createNewFile()) {
+			customLogger.logFiles("Empty file created: " + zipFile.getName());
+		}
 
 		customLogger.logFiles("Zipping: " + zipFile);
 		zip(files.getSystemFolder().toString(), zipFile, fileList);
@@ -365,13 +368,14 @@ public class FilesController {
 	 *            List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden sollen.
 	 * @throws RuntimeException
 	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
+	 * @throws FileNotFoundException
 	 */
-	public void zip(String source, File zipFile, List<Path> fileList) throws RuntimeException {
+	public void zip(String source, File zipFile, List<Path> fileList) throws Exception {
 		ZipEntry ze = null;
-		try {
-			// Jede Datei wird einzeln zu dem ZIP hinzugefügt.
-			FileOutputStream fos = new FileOutputStream(zipFile);
-			ZipOutputStream zos = new ZipOutputStream(fos);
+		// Jede Datei wird einzeln zu dem ZIP hinzugefügt.
+		FileOutputStream fos = new FileOutputStream(zipFile);
+		try (ZipOutputStream zos = new ZipOutputStream(fos);) {
+
 			for (Path filePath : fileList) {
 
 				// noch mehr zipps in einer zip sind sinnlos
@@ -386,21 +390,31 @@ public class FilesController {
 
 					// Jeder Eintrag wird nacheinander in die ZIP Datei geschrieben mithilfe eines Buffers.
 					FileInputStream fis = new FileInputStream(filePath.toFile());
+
 					int len;
 					byte[] buffer = new byte[1024];
-					BufferedInputStream entryStream = new BufferedInputStream(fis, 2048);
-					while ((len = entryStream.read(buffer, 0, 1024)) != -1) {
-						zos.write(buffer, 0, len);
+
+					try (BufferedInputStream entryStream = new BufferedInputStream(fis, 2048)) {
+						while ((len = entryStream.read(buffer, 0, 1024)) != -1) {
+							zos.write(buffer, 0, len);
+						}
+					} finally {
+						zos.closeEntry();
+						fis.close();
 					}
-					zos.closeEntry();
-					fis.close();
 				}
 			}
-			zos.close();
-			fos.close();
 		} catch (Exception e) {
-			customLogger.logFiles("Error while zipping file " + ze.getName());
-			throw new RuntimeException("msg.ZipError %" + ze.getName());
+			if (ze != null) {
+				customLogger.logFiles("Error while zipping file " + ze.getName());
+				throw new RuntimeException("msg.ZipError %" + ze.getName());
+			} else {
+				// Landet nur hier, wenn es nicht mal bis in das erste if geschafft hat.
+				customLogger.logFiles("Error while accessing file path for file to zip.");
+				throw new RuntimeException("Error while accessing file path " + source + " for file to zip.", e);
+			}
+		} finally {
+			fos.close();
 		}
 	}
 

@@ -9,6 +9,7 @@ target/
 *.iml
 .idea/
 .DS_Store
+.run/
 
 ### Minova - CAS
 Internal/**

@@ -65,10 +65,14 @@
 		<script name="xvcasUsersIndex" type="view"/>
 		<script name="xvcasUsersIndex2" type="view"/>
 		<script name="xvcasUserIndex2" type="view"/>
-		<script name="xpcasDeleteUserGroupUserUsers" type="procedure"/>
-		<script name="xpcasInsertUserGroupUserUsers" type="procedure"/>
-		<script name="xpcasReadUserGroupUserUsers" type="procedure"/>
-		<script name="xpcasUpdateUserGroupUserUsers" type="procedure"/>
+		<script name="xpcasDeleteUserGroupUser" type="procedure"/>
+		<script name="xpcasDeleteUserGroupUsers" type="procedure"/>
+		<script name="xpcasInsertUserGroupUser" type="procedure"/>
+		<script name="xpcasInsertUserGroupUsers" type="procedure"/>
+		<script name="xpcasReadUserGroupUser" type="procedure"/>
+		<script name="xpcasReadUserGroupUsers" type="procedure"/>
+		<script name="xpcasUpdateUserGroupUser" type="procedure"/>
+		<script name="xpcasUpdateUserGroupUsers" type="procedure"/>
 		<script name="xvcasServicePropertiesIndex" type="view"/>
 		<script name="xpcasDeleteServiceProperties" type="procedure"/>
 		<script name="xpcasInsertServiceProperties" type="procedure"/>

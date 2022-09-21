@@ -1,39 +1,55 @@
-<?xml version="1.0" encoding="UTF-8"?><form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="UserGroup" title="@UserGroup" 
-xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/minova-afis/aero.minova.xsd/main/form.xsd">
-    <index-view id="IndexView" source="xvcasUserGroupIndex" index-report="auto">        		
-        <column name="KeyLong" key="true" visible="false">            			
-            <number/>            		
-        </column>        		
-        <column name="KeyText" text="@xtcasUserGroup.KeyText">            			
-            <text length="50"/>            		
-        </column>        		
-        <column name="Description" text="@xtcasUserGroup.Description">            			
-            <text length="50"/>            		
-        </column>
-        <column name="UserCode" text="@xtcasUserGroup.UserCode">            			
-            <text length="50"/>            		
-        </column>        		
-        <column name="SecurityToken" text="@xtcasUserGroup.SecurityToken">            			
-            <text length="250"/>            		
-        </column>
-    </index-view>    	
-    <detail id="Detail" procedure-prefix="xpcas" procedure-suffix="UserGroup">        		
-        <head>
-         <field name="KeyLong" key-type="primary" sql-index="0" visible="false">                				
-                <number/>                			
-            </field>            			
-            <field name="KeyText" sql-index="1" text="@xtcasUserGroup.KeyText" required="true" key-type="user">                				
-                <text length="10"/>                			
-            </field>            			
-            <field name="Description" sql-index="2" text="@xtcasUserGroup.Description" number-columns-spanned="4" fill="toright">                				
-                <text length="50"/>                			
-            </field>
-            <field name="UserCode" sql-index="3" text="@xtcasUserGroup.UserCode" number-columns-spanned="4" fill="toright">                				
-                <text length="50"/>                			
-            </field>            			
-            <field name="SecurityToken" sql-index="4" text="@xtcasUserGroup.SecurityToken" number-columns-spanned="4" required="true" fill="toright">
-                <text length="250"/> 
-            </field>         		
-        </head>        	
-    </detail>    
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="UserGroup" title="@UserGroup" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/minova-afis/aero.minova.xsd/main/form.xsd">
+	<index-view id="IndexView" source="xvcasUserGroupIndex" index-report="auto">
+		<column name="KeyLong" key="true" visible="false">
+			<number />
+		</column>
+		<column name="KeyText" text="@xtcasUserGroup.KeyText">
+			<text length="50" />
+		</column>
+		<column name="Description" text="@xtcasUserGroup.Description">
+			<text length="50" />
+		</column>
+		<column name="UserCode" text="@xtcasUserGroup.UserCode">
+			<text length="50" />
+		</column>
+		<column name="SecurityToken" text="@xtcasUserGroup.SecurityToken">
+			<text length="250" />
+		</column>
+	</index-view>
+	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="UserGroup">
+		<head>
+			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
+				<number />
+			</field>
+			<field name="KeyText" sql-index="1" text="@xtcasUserGroup.KeyText" required="true" key-type="user">
+				<text length="10" />
+			</field>
+			<field name="Description" sql-index="2" text="@xtcasUserGroup.Description" number-columns-spanned="4" fill="toright">
+				<text length="50" />
+			</field>
+			<field name="UserCode" sql-index="3" text="@xtcasUserGroup.UserCode" number-columns-spanned="4" fill="toright">
+				<text length="50" />
+			</field>
+			<field name="SecurityToken" sql-index="4" text="@xtcasUserGroup.SecurityToken" number-columns-spanned="4" required="true" fill="toright">
+				<text length="250" />
+			</field>
+		</head>
+		<grid id="UserGroupUser" icon="UserGroupUsers" title="@UserGroupUser" procedure-prefix="xpcas" procedure-suffix="UserGroupUser">
+			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
+				<number />
+			</field>
+			<field name="UserKey" sql-index="1" text="@UserKey" required="false" key-type="primary">
+				<lookup table="xvcasUserIndex2" />
+			</field>
+		</grid>
+		<grid id="UserGroupUsers" icon="UserGroupUsers" title="@UserGroupUsers" procedure-prefix="xpcas" procedure-suffix="UserGroupUsers">
+			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
+				<number />
+			</field>
+			<field name="UsersKey" sql-index="1" text="@UsersKey" required="false" key-type="primary">
+				<lookup table="xvcasUsersIndex2" />
+			</field>
+		</grid>
+	</detail>
 </form>

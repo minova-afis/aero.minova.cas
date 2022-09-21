@@ -4,12 +4,7 @@
 
     
         
-* link:xtcasAuthorities.adoc[]
-
-    
-    
-        
-* link:xtcasCASServices.adoc[]
+* link:xtcasNewsfeedListener.adoc[]
 
     
     
@@ -19,7 +14,12 @@
     
     
         
-* link:xtcasError.adoc[]
+* link:xtcasCASServices.adoc[]
+
+    
+    
+        
+* link:xtcasUsers.adoc[]
 
     
     
@@ -29,12 +29,27 @@
     
     
         
-* link:xtcasNewsfeedListener.adoc[]
+* link:xtcasProcedureNewsfeed.adoc[]
 
     
     
         
-* link:xtcasProcedureNewsfeed.adoc[]
+* link:xtcasAuthorities.adoc[]
+
+    
+    
+        
+* link:xtcasUser.adoc[]
+
+    
+    
+        
+* link:xtcasUserPrivilege.adoc[]
+
+    
+    
+        
+* link:xtcasUserGroup.adoc[]
 
     
     
@@ -49,21 +64,6 @@
     
     
         
-* link:xtcasUser.adoc[]
-
-    
-    
-        
-* link:xtcasUserGroup.adoc[]
-
-    
-    
-        
-* link:xtcasUserPrivilege.adoc[]
-
-    
-    
-        
-* link:xtcasUsers.adoc[]
+* link:xtcasError.adoc[]
 
     

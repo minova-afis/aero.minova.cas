@@ -11,10 +11,10 @@
 	</field>
 	<field name="UserPrivilegeKey" sql-index="1"
 		text="@xtcasLuUserGroupForUserPrivilege.UserPrivilegeKey"
-		visible="false" key-type="primary">
+		visible="false">
 		<number />
 	</field>
-	<field name="UserGroupKey" sql-index="2"
+	<field name="UserGroupKey" sql-index="2"  key-type="primary"
 		text="@xtcasLuUserGroupForUserPrivilege.UserGroupKey" required="true">
 		<lookup table="xtcasUserGroup" />
 	</field>

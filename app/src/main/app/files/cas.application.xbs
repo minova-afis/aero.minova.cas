@@ -23,7 +23,7 @@
 			<map/>
 			<node name="OptionPages">
 				<map/>
-				<node name="LuUserPrivilegeForUserGroup.op.xml">
+				<node name="LuUserGroupForUserPrivilege.op.xml">
 					<map>
 						<entry key="UserGroupKey" value="KeyLong"/>
 					</map>

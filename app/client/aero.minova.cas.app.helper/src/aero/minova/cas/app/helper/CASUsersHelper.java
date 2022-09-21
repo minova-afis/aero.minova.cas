@@ -68,6 +68,7 @@ public class CASUsersHelper implements IHelper {
 		case BEFOREREAD:
 		case AFTERREAD:
 			password.setRequired(false);
+			break;
 		default:
 			password.setRequired(true);
 			break;

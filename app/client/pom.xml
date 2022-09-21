@@ -87,9 +87,5 @@
 	<modules>
 		<module>aero.minova.cas.app.helper</module>
 	</modules>
-	<scm>
-		<connection>scm:git:https://github.com/minova-afis/aero.minova.workingtime.git</connection>
-		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.workingtime.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+
 </project>

@@ -4,7 +4,7 @@ public class TableVector {
 	private String name;
 	private String type;
 
-	public TableVector(final String name2, final ch.minova.core.install.TableschemaDocument.Tableschema.Type.Enum type2) {
+	public TableVector(final String name2, final String type2) {
 		setName(name2);
 		if (type2 == null) {
 			setType("table");

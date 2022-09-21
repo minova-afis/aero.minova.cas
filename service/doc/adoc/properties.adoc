@@ -8,6 +8,15 @@ IMPORTANT: Falls eine Property in den application.properties verändert wird, *m
 
 * Zurück zur xref:index.adoc[Übersicht]
 
+
+== Richtlinien
+
+1. Wird eine neue Property, die das CAS betrifft, erstellt, sollte diese mit *cas.* beginnen.
+2. Handelt es sich dabei um eine Property für eine Extension, sollte danach der Name der Extension folgen. 
+Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die Property *'cas.example. ...'* genannt werden.
+3. Die Trennzeichen zwischen den Worten sind *Punkte*. Siehe 'files.permission.check'.
+
+
 == Standard Properties
 * server.port
 
@@ -65,3 +74,14 @@ IMPORTANT: Falls eine Property in den application.properties verändert wird, *m
 
 ** *Wertebereich*: `true/false` Schalter für die files/read- und files/hash-Anfragen, welcher bestimmt, 
 ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
+
+== Profiles
+
+* spring.profiles.active
+
+** *Default*: `""`
+
+** *Beschreibung*: Setzt das Profil. Es gibt aktuell nur das Profil `dev`. Erlaubt alle CORS-Policies 
+aus Entwicklungszwecken. Niemals im Produktivbetrieb benutzen!
+
+

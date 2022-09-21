@@ -42,7 +42,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Autowired
 	SystemDatabase systemDatabase;
-	CustomLogger customLogger = new CustomLogger();
+	@Autowired
+	CustomLogger customLogger;
 
 	@ExceptionHandler(XProcedureException.class)
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -338,7 +339,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				e.printStackTrace(pw);
 				customLogger.logSql("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
 				// Der Stacktrace wird nicht in der Datenbank gespeichert, da das Feld einfach viel zu lang ist. Deswegen geben wir ihn im ErrorLog aus.
-				customLogger.errorLogger.info("CAS: Showing Stacktrace : " + sw.toString());
+				customLogger.logError("CAS: Showing Stacktrace : " + sw.toString(), e);
 			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();

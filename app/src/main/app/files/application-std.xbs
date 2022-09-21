@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<preferences>
+    <!-- Das ist eine Vorlage. -->
+    <root>
+        <map/>
+        <node name="Settings">
+            <map>
+                <entry key="CustomerID" value="Minova"/>
+                <entry key="ApplicationID" value="CAS"/>
+            </map>
+        </node>
+    </root>
+</preferences>

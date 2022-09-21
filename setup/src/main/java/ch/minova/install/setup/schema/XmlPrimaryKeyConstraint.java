@@ -1,8 +1,8 @@
 package ch.minova.install.setup.schema;
 
-import java.util.Vector;
+import aero.minova.cas.setup.xml.table.Table;
 
-import ch.minova.core.xml.tables.TableDocument.Table;
+import java.util.Vector;
 
 public class XmlPrimaryKeyConstraint {
 	public String getTableName() {

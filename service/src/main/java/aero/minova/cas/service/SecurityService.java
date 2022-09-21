@@ -232,7 +232,7 @@ public class SecurityService {
 		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen
 		rowSec.append(" ( SecurityToken IS NULL )");
 
-		if (requestingRoles.size() > 0) {
+		if (!requestingRoles.isEmpty()) {
 			rowSec.append("\r\nor ( SecurityToken IN (");
 			for (String r : requestingRoles) {
 				rowSec.append("'").append(r.trim()).append("',");
@@ -345,7 +345,7 @@ public class SecurityService {
 		Table membershipsFromUser = unsecurelyGetIndexView(tUser);
 		List<String> userSecurityTokens = new ArrayList<>();
 
-		if (membershipsFromUser.getRows().size() > 0) {
+		if (!membershipsFromUser.getRows().isEmpty()) {
 			String result = membershipsFromUser.getRows().get(0).getValues().get(2).getStringValue();
 
 			// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
@@ -381,7 +381,7 @@ public class SecurityService {
 				groups.addRow(tokens);
 			}
 		}
-		if (groups.getRows().size() > 0) {
+		if (!groups.getRows().isEmpty()) {
 			List<Row> groupTokens = unsecurelyGetIndexView(groups).getRows();
 			List<String> groupSecurityTokens = new ArrayList<>();
 			for (Row r : groupTokens) {

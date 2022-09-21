@@ -1,12 +1,12 @@
 alter procedure dbo.xpcasReadUserGroupUser (
 	@KeyLong int,
-	@UserKey int output
+	@UserKey int
 )
 with encryption as
 	
 	select 
 	ug.KeyLong,
-	u.KeyLong
+	u.KeyLong as UserKey
 	from xtcasUserGroup ug 
 	inner join xtcasUser u on (SELECT value FROM STRING_SPLIT( u.Memberships, ',') where value = ug.KeyText)=ug.KeyText
 	where 

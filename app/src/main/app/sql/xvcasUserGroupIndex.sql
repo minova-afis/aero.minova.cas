@@ -6,8 +6,7 @@ with encryption as
 			ug.Description,
 			ug.UserCode,
 			ug.SecurityToken,
-			ug.KeyLong as UserPrivilegeKey,
-			lu.RowLevelSecurity
+			ug.KeyLong as UserPrivilegeKey
 	from xtcasUserGroup ug
 	left join xtcasLuUserPrivilegeUserGroup lu on lu.UserGroupKey = ug.KeyLong
 	left join xtcasUserPrivilege up on  up.KeyLong=lu.UserPrivilegeKey

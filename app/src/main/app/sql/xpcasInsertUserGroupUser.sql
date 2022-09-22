@@ -6,10 +6,10 @@ alter procedure dbo.xpcasInsertUserGroupUser (
     declare @UserGroupToken nvarchar(50)
     declare @Memberships nvarchar(250)
 
-    -- Den Namen der UserGroup herausbekommen.
-    select @UserGroupToken=KeyText from xtcasUserGroup where KeyLong=@KeyLong
+    -- Den UserCode der UserGroup herausbekommen.
+    select @UserGroupToken=UserCode from xtcasUserGroup where KeyLong=@KeyLong
 
-    -- Überprüfen, ob es innerhalb der Memberships eine Membership der U
+    -- Überprüfen, ob es innerhalb der Memberships eine Membership der UserGroup gibt.
     select @Memberships=Memberships from xtcasUser where KeyLong=@UserKey
 
     declare @UserGroupIsInMembership int
@@ -18,13 +18,12 @@ alter procedure dbo.xpcasInsertUserGroupUser (
 
     if (@UserGroupIsInMembership = 0)
     begin
-        select @Memberships = CONCAT(@Memberships, ',', @UserGroupToken );
+        select @Memberships = CONCAT(@Memberships, @UserGroupToken );
 
         update xtcasUser
         set Memberships = @Memberships
         where KeyLong = @UserKey 
     end
-
 
 select @KeyLong = @@identity
 return @@error

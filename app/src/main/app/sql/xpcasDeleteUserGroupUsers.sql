@@ -1,6 +1,6 @@
 alter procedure dbo.xpcasDeleteUserGroupUsers (
 	@KeyLong int,
-	@UsersKey int = null output
+	@UsersKey int output
 )
 with encryption as
 
@@ -8,14 +8,14 @@ with encryption as
 	select @UserGroupText=KeyText from xtcasUserGroup where KeyLong=@KeyLong
 
 
-		declare @Username nvarchar(50)
-		select @Username=Username from xtcasUsers where KeyLong = @UsersKey
+	declare @Username nvarchar(50)
+	select @Username=Username from xtcasUsers where KeyLong = @UsersKey
 
-		update xtcasAuthorities
-		set	LastAction = -1,
-			LastUser = dbo.xfCasUser(),
-			LastDate = getdate()
-		where Username = @Username
-		and Authority = @UserGroupText
+	update xtcasAuthorities
+	set	LastAction = -1,
+		LastUser = dbo.xfCasUser(),
+		LastDate = getdate()
+	where Username = @Username
+	and Authority = @UserGroupText
 
 return @@error

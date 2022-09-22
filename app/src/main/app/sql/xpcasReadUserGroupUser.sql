@@ -3,16 +3,47 @@ alter procedure dbo.xpcasReadUserGroupUser (
 	@UserKey int
 )
 with encryption as
+
+    declare @UserGroupToken nvarchar(50)
+	declare @Memberships nvarchar(250)
+
+	-- Den UserCode der UserGroup herausbekommen.
+	select @UserGroupToken=UserCode from xtcasUserGroup where KeyLong=@KeyLong
+
+	create table #temp(  
+    KeyLong  int,  
+	UserKey int
+	);
+
+	declare user_cursor cursor for 
+    select KeyLong, Memberships 
+    from dbo.xtcasUser 
+
+	open user_cursor 
+	fetch next from user_cursor into @UserKey, @Memberships 
+ 
+	while @@FETCH_STATUS = 0 
+	begin
+
+		declare @UserGroupIsInMembership int
+
+    	-- Überprüfen, ob es innerhalb der Memberships eine Membership der UserGroup gibt.
+    	select @Memberships=Memberships from xtcasUser where KeyLong=@UserKey and LastAction > 0
+    	select @UserGroupIsInMembership = CHARINDEX(@UserGroupToken, @Memberships) 
+
+    	if (@UserGroupIsInMembership <> 0)
+		begin
+			insert into #temp (KeyLong, UserKey) values (@KeyLong, @UserKey)
+		end
 	
-	select 
-	ug.KeyLong,
-	u.KeyLong as UserKey
-	from xtcasUserGroup ug 
-	inner join xtcasUser u on (SELECT value FROM STRING_SPLIT( u.Memberships, ',') where value = ug.KeyText)=ug.KeyText
-	where 
-	ug.KeyLong = @KeyLong
-	and u.KeyLong=@KeyLong
-	and ug.LastAction>0
-	and u.LastAction>0
+		fetch next from user_cursor into @UserKey, @Memberships 
+	end
+
+	close user_cursor 
+	deallocate user_cursor 
+
+	select * from #temp
+
+	drop table #temp
 
 return @@error

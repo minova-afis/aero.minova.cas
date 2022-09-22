@@ -8,5 +8,5 @@ alter procedure dbo.xpcasInsertUserGroupUsers (
 
     exec xpcasInsertAuthorities null, @UserName, @KeyLong
 
-select @KeyLong = @@identity
-return @@error
+	select @KeyLong = @@identity
+	return @@error

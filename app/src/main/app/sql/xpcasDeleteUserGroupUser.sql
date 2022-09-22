@@ -20,4 +20,4 @@ with encryption as
 	set Memberships = @Memberships
 	where KeyLong = @UserKey
 
-return @@error
+	return @@error

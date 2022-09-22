@@ -29,4 +29,4 @@ with encryption as
 
 	select @KeyLong = @@identity
 	end
-return @@error
+	return @@error

@@ -20,4 +20,4 @@ with encryption as
 		LastDate = getdate()
 	where KeyLong = @KeyLong
 
-return @@error
+	return @@error

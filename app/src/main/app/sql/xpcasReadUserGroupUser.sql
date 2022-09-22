@@ -46,4 +46,4 @@ with encryption as
 
 	drop table #temp
 
-return @@error
+	return @@error

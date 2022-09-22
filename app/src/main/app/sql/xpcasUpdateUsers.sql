@@ -27,4 +27,4 @@ with encryption as
 		where KeyLong = @KeyLong
 
 	end
-return @@error
+	return @@error

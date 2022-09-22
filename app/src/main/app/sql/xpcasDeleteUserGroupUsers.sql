@@ -18,4 +18,4 @@ with encryption as
 	where Username = @Username
 	and Authority = @UserGroupText
 
-return @@error
+	return @@error

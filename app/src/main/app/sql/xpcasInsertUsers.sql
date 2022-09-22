@@ -21,4 +21,4 @@ with encryption as
 	)
 
 	select @KeyLong = @@identity
-return @@error
+	return @@error

@@ -17,4 +17,4 @@ with encryption as
 	update xtcasAuthorities
 	set	Authority = @Authority
 	where KeyLong = @KeyLong
-return @@error
+	return @@error

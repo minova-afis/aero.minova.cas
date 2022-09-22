@@ -8,4 +8,4 @@ with encryption as
 	select	@Username = Username
 	from xtcasUsers
 	where KeyLong = @KeyLong
-return @@error
+	return @@error

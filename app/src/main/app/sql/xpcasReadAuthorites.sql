@@ -12,4 +12,4 @@ with encryption as
 	and a.LastAction > 0
 	and ug.LastAction > 0
 
-return @@error
+	return @@error

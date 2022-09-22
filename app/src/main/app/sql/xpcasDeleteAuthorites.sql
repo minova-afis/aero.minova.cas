@@ -9,4 +9,4 @@ with encryption as
 		LastUser = dbo.xfCasUser(),
 		LastDate = getdate()
 	where KeyLong = @KeyLong
-return @@error
+	return @@error

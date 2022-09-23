@@ -3,6 +3,9 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## [UNRELEASED] -- ****-**-**
+* #293 Standardmasken zum Verwalten von Benutzern einbinden.
+
 ## [12.53.0] -- 2022-09-13
 * devWarning in "dev"-Profile verschoben
 * link:https://github.com/minova-afis/aero.minova.cas/issues/368[#368] ServiceProperties Tabelle und Maske erstellen:

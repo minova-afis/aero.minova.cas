@@ -1,0 +1,51 @@
+name: Release App And Helper
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version'
+        required: true
+        default: ''
+      nextDevelopmentVersion:
+        description: 'Next Development Version ("-SNAPSHOT" muss nicht angegeben werden.)'
+        required: true
+        default: ''
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+          java-package: 'jdk'
+          
+      - name: Build Helper and Copy to plugins
+        run: |
+          cd app/client && mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="${{ github.event.inputs.releaseVersion }}.qualifier"
+          cd ..
+          mvn --batch-mode --update-snapshots verify --file client/pom.xml
+          rm src/main/app/plugins/*
+          cp app/client/aero.minova.cas.app.helper/target/*.jar src/main/app/plugins/
+          git config user.email "service@minova.com"
+          git config user.name "minova-worker"
+          git add . 
+          git commit -m "add .jar to plugin-folder"
+          git push
+      
+      - name: Build
+        run: |
+          git config --global user.email "service@minova.com"
+          git config --global user.name "minova-worker"
+          cd $GITHUB_WORKSPACE/
+          mvn --batch-mode release:prepare release:perform -P repo-github \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
+                      -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
+                      -Darguments="-Dmaven.javadoc.skip=true" \
+                      --settings .github/settings.xml
+        env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}

@@ -25,5 +25,5 @@ alter procedure dbo.xpcasInsertUserGroupUser (
         where KeyLong = @UserKey 
     end
 
-select @KeyLong = @@identity
-return @@error
+    select @KeyLong = @@identity
+    return @@error

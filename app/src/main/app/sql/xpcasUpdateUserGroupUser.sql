@@ -4,4 +4,4 @@ alter procedure dbo.xpcasUpdateUserGroupUser (
 )
 with encryption as
     --DO NOTHING
-return @KeyLong
+	return @KeyLong

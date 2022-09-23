@@ -10,16 +10,16 @@ with encryption as
 	-- Den UserCode der UserGroup herausbekommen.
 	select @UserGroupToken=UserCode from xtcasUserGroup where KeyLong=@KeyLong
 
-	create table #temp(  
-    KeyLong  int,  
-	UserKey int
+	create table #temp(
+		KeyLong  int,
+		UserKey int
 	);
 
 	declare user_cursor cursor for 
     select KeyLong, Memberships 
     from dbo.xtcasUser 
 
-	open user_cursor 
+	open user_cursor
 	fetch next from user_cursor into @UserKey, @Memberships 
  
 	while @@FETCH_STATUS = 0 

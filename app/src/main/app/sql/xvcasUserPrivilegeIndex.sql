@@ -10,4 +10,4 @@ with encryption as
 	left join xtcasLuUserPrivilegeUserGroup lu on lu.UserPrivilegeKey = up.KeyLong
 	left join xtcasUserGroup ug on  ug.KeyLong=lu.UserGroupKey
 	where up.LastAction > 0
-    and ug.LastAction > 0
+	and ug.LastAction > 0

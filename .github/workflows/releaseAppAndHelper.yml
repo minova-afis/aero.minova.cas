@@ -23,8 +23,8 @@ jobs:
       - name: Build Helper and Copy to plugins
         run: |
           cd app/client && mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="${{ github.event.inputs.releaseVersion }}.qualifier"
+          mvn --batch-mode --update-snapshots verify --file pom.xml
           cd ..
-          mvn --batch-mode --update-snapshots verify --file client/pom.xml
           rm src/main/app/plugins/*
           cp app/client/aero.minova.cas.app.helper/target/*.jar src/main/app/plugins/
           git config user.email "service@minova.com"

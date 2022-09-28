@@ -1,8 +1,7 @@
 alter procedure dbo.xpcasReadLuUserPrivilegeUserGroup (
 	@KeyLong int,
-	@UserPrivilegeKey int = null,
-	@UserGroupKey int = null,
-	@RowLevelSecurity bit = 0
+	@UserPrivilegeKey int,
+	@UserGroupKey int
 )
 with encryption as
 	if (@UserPrivilegeKey is not null)

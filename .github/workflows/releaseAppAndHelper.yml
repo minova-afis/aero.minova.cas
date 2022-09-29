@@ -26,7 +26,7 @@ jobs:
           mvn --batch-mode --update-snapshots verify --file pom.xml
           cd ..
           rm app/src/main/app/plugins/*
-          cp client/aero.minova.cas.app.helper/target/*.jar src/main/app/plugins/
+          cp client/aero.minova.cas.app.helper/target/*.jar app/src/main/app/plugins/
           git config user.email "service@minova.com"
           git config user.name "minova-worker"
           git add . 

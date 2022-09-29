@@ -54,13 +54,13 @@
 		<script name="xpcasInsertServiceMessage" type="procedure"/>
 		<script name="xpcasReadServiceMessage" type="procedure"/>
 		<script name="xpcasUpdateServiceMessage" type="procedure"/>
-		<script name="xpcasDeleteAuthorites" type="procedure"/>
+		<script name="xpcasDeleteAuthorities" type="procedure"/>
 		<script name="xpcasDeleteUsers" type="procedure"/>
 		<script name="xpcasInsertAuthorities" type="procedure"/>
 		<script name="xpcasInsertUsers" type="procedure"/>
-		<script name="xpcasReadAuthorites" type="procedure"/>
+		<script name="xpcasReadAuthorities" type="procedure"/>
 		<script name="xpcasReadUsers" type="procedure"/>
-		<script name="xpcasUpdateAuthorites" type="procedure"/>
+		<script name="xpcasUpdateAuthorities" type="procedure"/>
 		<script name="xpcasUpdateUsers" type="procedure"/>
 		<script name="xvcasUsersIndex" type="view"/>
 		<script name="xvcasUsersIndex2" type="view"/>

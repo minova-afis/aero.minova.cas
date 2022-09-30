@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CASUsersHelper
 Bundle-SymbolicName: aero.minova.cas.app.helper
-Bundle-Version: 12.54.1.qualifier
+Bundle-Version: 12.54.2.qualifier
 Automatic-Module-Name: aero.minova.cas.app.helper
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy

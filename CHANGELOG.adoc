@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 * #362 Zugriff auf weitere Datenbanken unterstzützen (zumindest über Views).
+* Property aero.minova.database.kind durch spring.jooq.sql-dialect ersetzt.
 * devWarning in "dev"-Profile verschoben
 
 ## [12.52.0] -- 2022-09-02

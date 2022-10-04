@@ -24,7 +24,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.service.JOOQService;
+import aero.minova.cas.service.JOOQViewService;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.service.ViewService;
@@ -36,7 +36,7 @@ public class SqlViewController {
 	private ViewService viewService;
 
 	@Autowired
-	private JOOQService jooqService;
+	private JOOQViewService jooqService;
 
 	@Autowired
 	private SecurityService securityService;

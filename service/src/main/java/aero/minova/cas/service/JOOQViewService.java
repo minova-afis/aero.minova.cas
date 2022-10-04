@@ -30,7 +30,7 @@ import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
 @Service
-public class JOOQService {
+public class JOOQViewService {
 
 	@Autowired
 	SystemDatabase systemDatabase;

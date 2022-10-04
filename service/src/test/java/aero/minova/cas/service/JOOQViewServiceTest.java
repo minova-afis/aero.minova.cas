@@ -32,10 +32,10 @@ import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(properties = { "application.runner.enabled=false" })
-public class JOOQServiceTest extends BaseTest {
+public class JOOQViewServiceTest extends BaseTest {
 
 	@Autowired
-	JOOQService testSubject;
+	JOOQViewService testSubject;
 
 	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")
 	@Test

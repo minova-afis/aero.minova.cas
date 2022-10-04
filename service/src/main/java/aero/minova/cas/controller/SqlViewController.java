@@ -52,6 +52,8 @@ public class SqlViewController {
 	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MSSQL}")
 	String context;
 
+	private static String MSSQL = "MSSQL";
+
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
 	 */
@@ -117,7 +119,7 @@ public class SqlViewController {
 		customLogger.logUserRequest(": data/view: ", inputTable);
 		List<Row> authoritiesForThisTable;
 		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
-		if (!context.equalsIgnoreCase("MSSQL")) {
+		if (!context.equalsIgnoreCase(MSSQL)) {
 			authoritiesForThisTable = jooqService.getPrivilegePermissions(inputTable.getName());
 		} else {
 			authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
@@ -130,7 +132,7 @@ public class SqlViewController {
 				return extensions.get(inputTable.getName()).apply(inputTable);
 			}
 		}
-		if (!context.equalsIgnoreCase("MSSQL")) {
+		if (!context.equalsIgnoreCase(MSSQL)) {
 			return jooqService.executeView(inputTable, authoritiesForThisTable);
 		}
 		return viewService.executeView(inputTable, authoritiesForThisTable);

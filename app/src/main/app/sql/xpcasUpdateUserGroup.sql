@@ -16,9 +16,9 @@ with encryption as
 		return -1
 	end
 
-	declare @UserCodeOld nvarchar(50)
+	declare @KeytextOld nvarchar(50)
 
-	select @UserCodeOld = UserCode from xtcasUserGroup where KeyLong=@KeyLong
+	select @KeytextOld = Keytext from xtcasUserGroup where KeyLong=@KeyLong
 
 
 	update xtcasUserGroup
@@ -29,7 +29,7 @@ with encryption as
 	where KeyLong = @KeyLong
 	
 
-	if (@UserCodeOld<>@UserCode)
+	if (@KeytextOld<>@KeyText)
 	begin
 
 		declare @Memberships nvarchar(max),
@@ -50,10 +50,11 @@ with encryption as
 
 			-- Überprüfen, ob es innerhalb der Memberships eine Membership der UserGroup gibt.
 			select @Memberships=Memberships from xtcasUser where KeyLong=@UserKey and LastAction > 0
-			select @UserGroupIsInMembership = CHARINDEX(@UserCodeOld, @Memberships) 
+			select @UserGroupIsInMembership = CHARINDEX(@KeytextOld, @Memberships) 
 
 			if (@UserGroupIsInMembership <> 0)
 			begin 
+				-- Wir löschen einfach den Eintrag in der Membership und legen ihn danach wieder an mit dem neuen KeyText.
 				exec xpcasDeleteUserGroupUser @KeyLong,@UserKey
 				exec xpcasInsertUserGroupUser @KeyLong,@UserKey
 			end

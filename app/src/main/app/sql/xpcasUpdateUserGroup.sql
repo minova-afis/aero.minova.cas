@@ -31,39 +31,8 @@ with encryption as
 
 	if (@KeytextOld<>@KeyText)
 	begin
-
-		declare @Memberships nvarchar(max),
-		@UserKey int
-		
-
-		declare user_cursor cursor for 
-		select KeyLong, Memberships 
-		from xtcasUser
-
-		open user_cursor
-		fetch next from user_cursor into @UserKey, @Memberships 
-	
-		while @@FETCH_STATUS = 0 
-		begin
-
-			declare @UserGroupIsInMembership int
-
-			-- Überprüfen, ob es innerhalb der Memberships eine Membership der UserGroup gibt.
-			select @Memberships=Memberships from xtcasUser where KeyLong=@UserKey and LastAction > 0
-			select @UserGroupIsInMembership = CHARINDEX(@KeytextOld, @Memberships) 
-
-			if (@UserGroupIsInMembership <> 0)
-			begin 
-				-- Wir löschen einfach den Eintrag in der Membership und legen ihn danach wieder an mit dem neuen KeyText.
-				exec xpcasDeleteUserGroupUser @KeyLong,@UserKey
-				exec xpcasInsertUserGroupUser @KeyLong,@UserKey
-			end
-		
-			fetch next from user_cursor into @UserKey, @Memberships 
-		end
-
-		close user_cursor 
-		deallocate user_cursor 
+		raiserror('ADO | 25 | msg.sql.KeytextNoChangeAllowed | Der KeyText darf nicht verändert werden.', 16, 1) with seterror
+		return -1
 	end
 
 

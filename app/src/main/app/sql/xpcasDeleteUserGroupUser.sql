@@ -13,7 +13,7 @@ with encryption as
 	select @Memberships=Memberships from xtcasUser where KeyLong = @UserKey
 
 	-- Wir können den String nur dann löschen, wenn er auch eine Raute davor hat, sonst löschen wir möglicherweise Substrings.
-	select @Memberships = REPLACE(@Memberships, @UserGroupText+'#', '')
+	select @Memberships = REPLACE(@Memberships, '#'+@UserGroupText, '')
 		
 	update xtcasUser
 	set Memberships = @Memberships

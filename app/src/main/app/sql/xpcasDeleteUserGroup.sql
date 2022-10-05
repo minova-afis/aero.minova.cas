@@ -35,7 +35,6 @@ with encryption as
 		if (@UserGroupIsInMembership <> 0)
 		begin 
 			exec xpcasDeleteUserGroupUser @KeyLong,@UserKey
-			exec xpcasInsertUserGroupUser @KeyLong,@UserKey
 		end
 	
 		fetch next from user_cursor into @UserKey, @Memberships 

@@ -13,7 +13,6 @@ import org.jooq.Query;
 import org.jooq.SelectField;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +21,13 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.TableException;
-import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
 @Service
-public class JOOQViewService {
+public class JOOQViewService implements ViewServiceInterface {
 
 	@Autowired
 	SystemDatabase systemDatabase;
@@ -39,76 +36,15 @@ public class JOOQViewService {
 	CustomLogger customLogger;
 
 	@Autowired
-	SecurityService securityService;
+	private SecurityService securityService;
 
-	public Table executeView(Table inputTable, List<Row> authoritiesForThisTable) throws TableException {
-		final val connection = systemDatabase.getConnection();
-		Table result = new Table();
-		StringBuilder sb = new StringBuilder();
-		try {
-			inputTable = columnSecurity(inputTable, authoritiesForThisTable);
-			TableMetaData inputMetaData = inputTable.getMetaData();
-			if (inputTable.getMetaData() == null) {
-				inputMetaData = new TableMetaData();
-			}
-			final int page;
-			final int limit;
-			// falls nichts als page angegeben wurde, wird angenommen, dass die erste Seite ausgegeben werden soll
-			if (inputMetaData.getPage() == null) {
-				page = 1;
-			} else if (inputMetaData.getPage() <= 0) {
-				throw new IllegalArgumentException("msg.PageError");
-			} else {
-				page = inputMetaData.getPage();
-			}
-			// falls nichts als Size/maxRows angegeben wurde, wird angenommen, dass alles ausgegeben werden soll; alles = 0
-			if (inputMetaData.getLimited() == null) {
-				limit = 0;
-			} else if (inputMetaData.getLimited() < 0) {
-				throw new IllegalArgumentException("msg.LimitError");
-			} else {
-				limit = inputMetaData.getLimited();
-			}
-
-			Query query = prepareViewString(inputTable, false, limit, false, authoritiesForThisTable);
-
-			String sql = query.getSQL();
-			val preparedStatement = connection.prepareCall(sql);
-			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, sql, sb, customLogger.getErrorLogger());
-			customLogger.logSql("Executing statements: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-
-			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
-
-			int totalResults = 0;
-			if (!result.getRows().isEmpty()) {
-				totalResults = result.getRows().size();
-			}
-
-			// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
-			if (limit > 0) {
-				List<Row> resultRows = new ArrayList<>();
-				for (int i = 0; i < limit; i++) {
-					int rowPointer = i + (limit * (page - 1));
-					if (rowPointer < result.getRows().size()) {
-						resultRows.add(result.getRows().get(rowPointer));
-					}
-				}
-				result.setRows(resultRows);
-			}
-
-			result.fillMetaData(result, limit, totalResults, page);
-
-		} catch (Throwable e) {
-			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
-			throw new TableException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
-		}
-		return result;
+	public JOOQViewService(SystemDatabase systemDatabase, CustomLogger customLogger, SecurityService securityService) {
+		this.systemDatabase = systemDatabase;
+		this.customLogger = customLogger;
+		this.securityService = securityService;
 	}
 
-	public Query prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities) throws IllegalArgumentException {
+	public String prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities) throws IllegalArgumentException {
 		return prepareViewString(params, autoLike, maxRows, false, authorities);
 	}
 
@@ -129,7 +65,7 @@ public class JOOQViewService {
 	 * @return Präparierter View-String, der ausgeführt werden kann
 	 * @throws IllegalArgumentException
 	 */
-	public Query prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
+	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 
 		if (params.getName() == null || params.getName().trim().length() == 0) {
 			throw new IllegalArgumentException("msg.ViewNullName");
@@ -169,7 +105,7 @@ public class JOOQViewService {
 			}
 		}
 
-		return query;
+		return query.getSQL();
 	}
 
 	/**
@@ -222,10 +158,8 @@ public class JOOQViewService {
 					} else if (rule.equals("<>")) {
 						condition.and(DSL.field(params.getColumns().get(i).getName()).ne(r.getValues().get(i).getValue().toString()));
 					} else if (rule.equals("between()")) {
-						int separator = value.getValue().toString().indexOf(",");
-						String valueA = value.getValue().toString().substring(0, separator);
-						String valueB = value.getValue().toString().substring(separator + 1);
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).between(valueA, valueB));
+						List<String> betweenValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).between(betweenValues.get(0), betweenValues.get(1)));
 					} else if (rule.equals("in()")) {
 						List<String> inValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
 
@@ -267,7 +201,7 @@ public class JOOQViewService {
 		Table result = new Table();
 		final val connection = systemDatabase.getConnection();
 		try {
-			final String viewQuery = prepareViewString(inputTable, false, -1, false, userGroups).getSQL();
+			final String viewQuery = prepareViewString(inputTable, false, -1, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb, customLogger.getErrorLogger());
 			customLogger.logPrivilege("Executing statement: " + sb.toString());
@@ -397,34 +331,8 @@ public class JOOQViewService {
 		}
 	}
 
-	/**
-	 * Überprüft, ob es in der xvcasUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt. Die Abfrage sieht
-	 * folgendermaßen aus: select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserPrivileges where (PrivilegeKeyText = privilegeName and KeyText =
-	 * UserSecurityToken1) or (PrivilegeKeyText = privilegeName and KeyText = UserSecurityToken2) or ... Die erzeugten Rows haben folgendes Format: Row r =
-	 * [Tabellenname,UserSecurityToken,RowLevelSecurity], Beispiel: Row r = ["tTestTabelle","User1",1], Row r2 = ["tTestTabelle","User2",0]
-	 *
-	 * @param privilegeName
-	 *            Das Privilege, für das ein Recht eingefordert wird.
-	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
-	 **/
-	public List<Row> getPrivilegePermissions(String privilegeName) {
-		@SuppressWarnings("unchecked")
-		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		Table userPrivileges = new Table();
-		userPrivileges.setName("xvcasUserPrivileges");
-		List<Column> columns = new ArrayList<>();
-		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
-		columns.add(new Column("KeyText", DataType.STRING));
-		columns.add(new Column("RowLevelSecurity", DataType.BOOLEAN));
-		columns.add(Column.AND_FIELD);
-		userPrivileges.setColumns(columns);
-
-		for (GrantedAuthority ga : allUserAuthorities) {
-			Row tableNameAndUserToken = new Row();
-			tableNameAndUserToken
-					.setValues(asList(new Value(privilegeName, null), new Value(ga.getAuthority(), null), new Value("", null), new Value(false, null)));
-			userPrivileges.addRow(tableNameAndUserToken);
-		}
-		return unsecurelyGetIndexView(userPrivileges).getRows();
+	@Override
+	public String prepareWhereClause(Table params, boolean autoLike) {
+		return null;
 	}
 }

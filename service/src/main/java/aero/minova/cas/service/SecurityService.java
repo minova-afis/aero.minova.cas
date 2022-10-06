@@ -3,7 +3,6 @@ package aero.minova.cas.service;
 import static java.util.Arrays.asList;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,19 +22,18 @@ import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.Setter;
 import lombok.val;
 
 @Service
+@Setter
 public class SecurityService {
+
+	ViewServiceInterface viewService;
 
 	@Autowired
 	SystemDatabase systemDatabase;
-
-	@Setter
-	private SqlViewController svc;
 
 	@Autowired
 	public CustomLogger customLogger;
@@ -100,29 +98,7 @@ public class SecurityService {
 	 * @return Das Ergebnis der Abfrage.
 	 */
 	public Table unsecurelyGetIndexView(Table inputTable) {
-		StringBuilder sb = new StringBuilder();
-		List<Row> userGroups = new ArrayList<>();
-		Row inputRow = new Row();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		Table result = new Table();
-		final val connection = systemDatabase.getConnection();
-		try {
-			final val viewQuery = svc.prepareViewString(inputTable, false, -1, false, userGroups);
-			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = svc.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			customLogger.logPrivilege("Executing statement: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-			result = svc.convertSqlResultToTable(inputTable, resultSet);
-		} catch (Exception e) {
-			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
-			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
-		}
-		return result;
+		return viewService.unsecurelyGetIndexView(inputTable);
 	}
 
 	/**

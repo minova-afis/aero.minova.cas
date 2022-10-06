@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +22,6 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.service.JOOQViewService;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.service.ViewService;
@@ -34,9 +31,6 @@ public class SqlViewController {
 
 	@Autowired
 	private ViewService viewService;
-
-	@Autowired
-	private JOOQViewService jooqService;
 
 	@Autowired
 	private SecurityService securityService;
@@ -49,20 +43,10 @@ public class SqlViewController {
 
 	final Object extensionSynchronizer = new Object();
 
-	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MSSQL}")
-	String context;
-
-	private static String MSSQL = "MSSQL";
-
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
 	 */
 	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
-
-	@PostConstruct
-	public void init() {
-		securityService.setSvc(this);
-	}
 
 	/**
 	 * Hiermit lassen sich Erweiterungen für Views registrieren, die ausgeführt werden, wenn eine View mit der Namen der Registrierung ausgeführt werden soll.
@@ -107,6 +91,7 @@ public class SqlViewController {
 		}
 	}
 
+	@Deprecated
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexViewGet(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(
@@ -119,11 +104,8 @@ public class SqlViewController {
 		customLogger.logUserRequest(": data/view: ", inputTable);
 		List<Row> authoritiesForThisTable;
 		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
-		if (!context.equalsIgnoreCase(MSSQL)) {
-			authoritiesForThisTable = jooqService.getPrivilegePermissions(inputTable.getName());
-		} else {
-			authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
-		}
+
+		authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
 		if (authoritiesForThisTable.isEmpty()) {
 			throw new TableException(new RuntimeException("msg.PrivilegeError %" + inputTable.getName()));
 		}
@@ -131,9 +113,6 @@ public class SqlViewController {
 			synchronized (extensionSynchronizer) {
 				return extensions.get(inputTable.getName()).apply(inputTable);
 			}
-		}
-		if (!context.equalsIgnoreCase(MSSQL)) {
-			return jooqService.executeView(inputTable, authoritiesForThisTable);
 		}
 		return viewService.executeView(inputTable, authoritiesForThisTable);
 	}

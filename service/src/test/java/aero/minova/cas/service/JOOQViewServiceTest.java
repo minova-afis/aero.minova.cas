@@ -31,7 +31,7 @@ import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
+@SpringBootTest(properties = { "application.runner.enabled=false", "spring.jooq.sql-dialect:POSTGRE" })
 public class JOOQViewServiceTest extends BaseTest {
 
 	@Autowired
@@ -48,7 +48,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select * from vWorkingTimeIndex2 limit ?");
 	}
 
@@ -71,7 +71,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
 	}
 
@@ -96,7 +96,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where (EmployeeText like ? and CustomerText like ?) limit ?");
 	}
 
@@ -125,9 +125,8 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
-				.isEqualTo(
-						"select BookingDate\r\nfrom vWorkingTimeIndex2\r\nwhere (\r\nBookingDate like '2020-07-31%'\r\nand BookingDate like '2020-07-29%'\r\n)\r\nlimit 1000");
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
+				.isEqualTo("select BookingDate from vWorkingTimeIndex2 where (BookingDate like ? and BookingDate like ?) limit ?");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -155,7 +154,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where (EmployeeText like ? and EmployeeText like ?) limit ?");
 	}
 
@@ -197,7 +196,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups).getSQL())//
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
 	}
 
@@ -264,7 +263,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		val row = new Row();
 		row.addValue(new Value("1,2,3", "in()"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString()).isEqualTo("KeyLong in (\r\n'1', '2', '3'\r\n)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString()).isEqualTo("KeyLong in (\n  '1', '2', '3'\n)");
 	}
 
 	@Test
@@ -275,7 +274,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		val row = new Row();
 		row.addValue(new Value("1,2,3", "between()"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString()).isEqualTo("(KeyLong between 1 and 2)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString()).isEqualTo("KeyLong between '1' and '2'");
 	}
 
 	@Test
@@ -288,8 +287,8 @@ public class JOOQViewServiceTest extends BaseTest {
 		row.addValue(new Value("", "is !null"));
 		row.addValue(new Value("", "is null"));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString())
-				.isEqualTo("(\r\nKeyLong is not null\r\nand KeyText is null\r\n)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true, new ArrayList()).toString().strip())
+				.isEqualTo("(\n  KeyLong is not null\n  and KeyText is null\n)");
 	}
 
 }

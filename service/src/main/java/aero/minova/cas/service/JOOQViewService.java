@@ -1,7 +1,5 @@
 package aero.minova.cas.service;
 
-import static java.util.Arrays.asList;
-
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +11,6 @@ import org.jooq.Query;
 import org.jooq.SelectField;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
@@ -49,9 +46,6 @@ public class JOOQViewService implements ViewServiceInterface {
 	}
 
 	/**
-	 * Diese Methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String vor und berücksichtigt eine evtl.
-	 * angegebene Maximalanzahl Ergebnisse
-	 *
 	 * @param params
 	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
 	 * @param autoLike
@@ -214,90 +208,6 @@ public class JOOQViewService implements ViewServiceInterface {
 			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
-	}
-
-	/**
-	 * Entfernt alle Spalten der Eingabe-Tabelle, auf die der Nutzer keinen Zugriff hat. Die Sql-Abfrage hat folgendes Format: select TableName, ColumnName,
-	 * SecurityToken from xtcasColumnSecurity where (TableName = inputTableName and SecurityToken = UserSecurityToken1) or (TableName = inputTableName and
-	 * SecurityToken = UserSecurityToken2) or ... Die Rows der zurückgelieferten Table haben folgendes Format: Row r = [Tabellenname,ColumnName,SecurityToken],
-	 * Beispiel: Row r = ["tTestTabelle","Spalte1","User1"] Row r = ["tTestTabelle","Spalte2","User1"]
-	 *
-	 * @param inputTable
-	 *            Enthält den Tabellen-Namen und die Spalten, welche von einem Nutzer angefragt werden.
-	 * @param userGroups
-	 *            Die Nutzer-Gruppen/Rollen, welche Zugriff auf die Tabelle haben wollen.
-	 * @return Diese Tabelle enhtält die Spalten, welche für die Index-View von diesem User verwendet werden dürfen.
-	 * @author weber
-	 */
-	public Table columnSecurity(Table params, List<Row> userGroups) {
-
-		Table inputTable = new Table();
-
-		inputTable.setName(params.getName());
-		inputTable.setColumns(params.getColumns());
-		inputTable.setRows(params.getRows());
-
-		Table columnSec = new Table();
-		columnSec.setName("xtcasColumnSecurity");
-		List<Column> columns = new ArrayList<>();
-		columns.add(new Column("TableName", DataType.STRING));
-		columns.add(new Column("ColumnName", DataType.STRING));
-		columns.add(new Column("SecurityToken", DataType.STRING));
-		columnSec.setColumns(columns);
-
-		List<Row> columnRestrictionsForThisUserAndThisTable = new ArrayList<>();
-
-		for (Row row : userGroups) {
-			if (row.getValues().get(0).getStringValue().equalsIgnoreCase(inputTable.getName())) {
-
-				Row bar = new Row();
-				bar.setValues(asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
-				List<Row> checkRow = new ArrayList<>();
-				checkRow.add(bar);
-				columnSec.setRows(checkRow);
-
-				List<Row> tokenSpecificAuthorities = unsecurelyGetIndexView(columnSec).getRows();
-				// wenn es in der tColumnSecurity keinen Eintrag für diese Tabelle gibt, dann darf der User jede Spalte ansehen
-				if (tokenSpecificAuthorities.isEmpty())
-					return inputTable;
-				columnRestrictionsForThisUserAndThisTable.addAll(tokenSpecificAuthorities);
-			}
-		}
-		List<String> grantedColumns = new ArrayList<String>();
-		// die Spaltennamen, welche wir durch den Select erhalten haben in eine List packen, dabei darauf achten,
-		// dass verschiedene SecurityTokens dieselbe Erlaubnis haben können, deshalb Doppelte rausfiltern
-		for (Row row : columnRestrictionsForThisUserAndThisTable) {
-			String grantedColumnFromtColumnSecurity = row.getValues().get(1).getStringValue();
-			if (!grantedColumns.contains(grantedColumnFromtColumnSecurity)) {
-				grantedColumns.add(grantedColumnFromtColumnSecurity);
-			}
-		}
-
-		// wenn SELECT *, dann ist wantedColumns leer
-		List<Column> wantedColumns = new ArrayList<Column>(inputTable.getColumns());
-		if (wantedColumns.isEmpty())
-			for (String s : grantedColumns) {
-				inputTable.addColumn(new Column(s, DataType.STRING));
-			}
-
-		// Hier wird herausgefiltert, welche der angeforderten Spalten(wantedColumns) genehmigt werden können(grantedColumns)
-		for (Column column : wantedColumns) {
-			if (!grantedColumns.contains(column.getName())) {
-				for (Row r : inputTable.getRows()) {
-					r.getValues().remove(inputTable.getColumns().indexOf(column));
-				}
-				inputTable.getColumns().remove(column);
-			}
-		}
-
-		// falls die Spalten der inputTable danach leer sind, darf wohl keine Spalte gesehen werden
-		if (inputTable.getColumns().isEmpty()) {
-			RuntimeException exception = new RuntimeException(
-					"msg.ColumnSecurityError %" + SecurityContextHolder.getContext().getAuthentication().getName() + " %" + inputTable.getName());
-			customLogger.logError("No columns available for this user", exception);
-			throw exception;
-		}
-		return inputTable;
 	}
 
 	/**

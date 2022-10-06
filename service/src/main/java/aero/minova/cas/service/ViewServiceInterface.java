@@ -30,9 +30,6 @@ public interface ViewServiceInterface {
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities);
 
 	/**
-	 * Diese Methode stammt ursprünglich aus "ch.minova.ncore.data.sql.SQLTools#prepareViewString". Bereitet einen View-String vor und berücksichtigt eine evtl.
-	 * angegebene Maximalanzahl Ergebnisse
-	 *
 	 * @param params
 	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
 	 * @param autoLike

@@ -9,6 +9,7 @@ COPY service/target/*.jar /opt/aero.minova.cas/lib/
 COPY setup/target/libs /opt/aero.minova.cas/lib/
 COPY setup/target/*.jar /opt/aero.minova.cas/lib/
 COPY app/target/classes /opt/aero.minova.cas/system-files/
+COPY app/target/classes/files /opt/aero.minova.cas/system-files/
 COPY app/target/classes/forms /opt/aero.minova.cas/system-files/
 ENV aero_minova_core_application_root_path='/opt/aero.minova.cas/system-files/'
 ENTRYPOINT ["/opt/java/openjdk/bin/java"]

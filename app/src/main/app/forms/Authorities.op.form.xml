@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Authorities" icon="Authorities" title="@xtcasAuthorities.Administration" procedure-prefix="xpcas" 
+procedure-suffix="Authorities" read-requires-all-params="true" delete-requires-all-params="true" 
+xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">    	
+    <field name="KeyLong" key-type="primary" sql-index="0" visible="false">        		
+        <number/>        	
+    </field>    	
+    <field name="Username" sql-index="1" text="@xtcasAuthorities.Username" visible="false" key-type="primary" read-only="true">	
+        <text length="50"/>
+    </field>
+    <field name="Authority" sql-index="2" text="@xtcasAuthorities.Authority" required="true">
+        <lookup table="xtcasUserGroup"/>
+    </field> 
+</grid>

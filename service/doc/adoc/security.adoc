@@ -63,7 +63,7 @@ or    ...
 
 * *PrivilegeKeyText*: der Name der Tabelle, auf welche der User zugreifen möchte
 * *KeyText*: eine der Rollen des Users
-* *RowLevelSecurity*: ein Bit, welches darauf hinweist, ob diese Rolle auf der angefragten Tabelle nur bestimmte Spalten sehen darf; siehe <<Row-Level-Security>>
+* *RowLevelSecurity*: ein Bit, welches darauf hinweist, ob diese Rolle auf der angefragten Tabelle nur bestimmte Zeilen sehen darf; siehe <<Row-Level-Security>>
 
 Diese Liste an Tripeln wird dann an die dafür vorgesehenen Methoden weiter gereicht. 
 

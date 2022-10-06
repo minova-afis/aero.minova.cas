@@ -54,6 +54,30 @@
 		<script name="xpcasInsertServiceMessage" type="procedure"/>
 		<script name="xpcasReadServiceMessage" type="procedure"/>
 		<script name="xpcasUpdateServiceMessage" type="procedure"/>
+		<script name="xpcasDeleteAuthorities" type="procedure"/>
+		<script name="xpcasDeleteUsers" type="procedure"/>
+		<script name="xpcasInsertAuthorities" type="procedure"/>
+		<script name="xpcasInsertUsers" type="procedure"/>
+		<script name="xpcasReadAuthorities" type="procedure"/>
+		<script name="xpcasReadUsers" type="procedure"/>
+		<script name="xpcasUpdateAuthorities" type="procedure"/>
+		<script name="xpcasUpdateUsers" type="procedure"/>
+		<script name="xvcasUsersIndex" type="view"/>
+		<script name="xvcasUsersIndex2" type="view"/>
+		<script name="xvcasUserIndex2" type="view"/>
+		<script name="xpcasDeleteUserGroupUser" type="procedure"/>
+		<script name="xpcasDeleteUserGroupUsers" type="procedure"/>
+		<script name="xpcasInsertUserGroupUser" type="procedure"/>
+		<script name="xpcasInsertUserGroupUsers" type="procedure"/>
+		<script name="xpcasReadUserGroupUser" type="procedure"/>
+		<script name="xpcasReadUserGroupUsers" type="procedure"/>
+		<script name="xpcasUpdateUserGroupUser" type="procedure"/>
+		<script name="xpcasUpdateUserGroupUsers" type="procedure"/>
+		<script name="xvcasServicePropertiesIndex" type="view"/>
+		<script name="xpcasDeleteServiceProperties" type="procedure"/>
+		<script name="xpcasInsertServiceProperties" type="procedure"/>
+		<script name="xpcasReadServiceProperties" type="procedure"/>
+		<script name="xpcasUpdateServiceProperties" type="procedure"/>
 	</sql-code>
 	<schema>
 		<tableschema name="xtcasError" type="table"/>
@@ -68,5 +92,6 @@
 		<tableschema name="xtcasProcedureNewsfeed" type="table"/>
 		<tableschema name="xtcasNewsfeedListener" type="table"/>
 		<tableschema name="xtcasServiceMessage" type="table"/>
+		<tableschema name="xtcasServiceProperties" type="table"/>
 	</schema>
 </setup>

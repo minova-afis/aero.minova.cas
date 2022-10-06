@@ -128,7 +128,9 @@ public class SecurityService {
 
 		List<Row> columnRestrictionsForThisUserAndThisTable = new ArrayList<>();
 		for (Row row : userGroups) {
-			if (row.getValues().get(0).getStringValue().equals(inputTable.getName())) {
+			// Hier wird darauf abgefragt, welche UserGruppen für die angeforderte Tabelle authorisiert sind. Hierbei sollte die Schreibweise der Tabelle/View
+			// egal sein.
+			if (row.getValues().get(0).getStringValue().equalsIgnoreCase(inputTable.getName())) {
 				Row bar = new Row();
 				bar.setValues(asList(new Value(inputTable.getName(), null), new Value("", null), new Value(row.getValues().get(1).getStringValue(), null)));
 				List<Row> checkRow = new ArrayList<>();

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<preferences>
+    <!-- Das ist eine Vorlage. -->
+    <root>
+        <map/>
+        <node name="Settings">
+            <map>
+                <entry key="CustomerID" value="Minova"/>
+                <entry key="ApplicationID" value="CAS"/>
+            </map>
+		</node>
+		<node name="UserPrivilege.xml">
+			<map/>
+			<node name="OptionPages">
+				<map/>
+				<node name="LuUserGroupForUserPrivilege.op.xml">
+					<map>
+						<entry key="UserPrivilegeKey" value="KeyLong"/>
+					</map>
+				</node>
+			</node>
+		</node>
+		<node name="UserGroup.xml">
+			<map/>
+			<node name="OptionPages">
+				<map/>
+				<node name="LuUserPrivilegeForUserGroup.op.xml">
+					<map>
+						<entry key="UserGroupKey" value="KeyLong"/>
+					</map>
+				</node>
+			</node>
+		</node>
+		<node name="Users.xml">
+			<map/>
+			<node name="OptionPages">
+				<map/>
+				<node name="Authorities.op.xml">
+					<map>
+						<entry key="Username" value="Username"/>
+					</map>
+				</node>
+			</node>
+		</node>
+	</root>
+</preferences>

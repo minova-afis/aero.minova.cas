@@ -1,0 +1,73 @@
+
+
+== Tabelle xtcasServiceProperties ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== Service
+
+Datentyp: nvarchar(128) not null +
+
+// tag::column.Service[]
+
+// end::column.Service[]
+
+
+==== Property
+
+Datentyp: nvarchar(256) not null +
+
+// tag::column.Property[]
+
+// end::column.Property[]
+
+
+==== Val
+
+Datentyp: nvarchar(1024) not null +
+
+// tag::column.Val[]
+
+// end::column.Val[]
+
+
+==== LastUser
+
+Datentyp: nvarchar(50) +
+Default: `user_name()` +
+
+// tag::column.LastUser[]
+
+// end::column.LastUser[]
+
+
+==== LastDate
+
+Datentyp: datetime +
+Default: `getdate()` +
+
+// tag::column.LastDate[]
+
+// end::column.LastDate[]
+
+
+==== LastAction
+
+Datentyp: integer +
+Default: `1` +
+
+// tag::column.LastAction[]
+
+// end::column.LastAction[]

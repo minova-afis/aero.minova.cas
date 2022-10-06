@@ -6,7 +6,29 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## Unreleased
 * #362 Zugriff auf weitere Datenbanken unterstzützen (zumindest über Views).
 * Property aero.minova.database.kind durch spring.jooq.sql-dialect ersetzt.
+
+## [12.54.4] -- 2022-10-05
+* Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.
+
+## [12.54.3] -- 2022-09-30
+
+Keine Änderungen 
+
+## [12.54.2] -- 2022-09-29
+* Tabellenbezeichnung von xtcasUserPrivileges korrigieren.
+
+## [12.54.1] -- 2022-09-29
+* Releaseprozess für Helper korrigieren.
+
+## [12.54.0] -- 2022-09-29
+* #293 Standardmasken zum Verwalten von Benutzern einbinden.
+* Helper zum Verschlüsseln von Passwörtern innerhalb der Maske.
+
+## [12.53.0] -- 2022-09-13
 * devWarning in "dev"-Profile verschoben
+* link:https://github.com/minova-afis/aero.minova.cas/issues/368[#368] ServiceProperties Tabelle und Maske erstellen:
+  Hiermit werden zukünftig Dienste über link:https://github.com/minova-afis/aero.minova.service[aero.minova.service] konfiguriert.
+  Damit kann man Dienste über eine Maske und somit ohne Dateizugriff einfach und dennoch sicher konfigurieren.
 
 ## [12.52.0] -- 2022-09-02
 * Profil für Dev-System, um CORS für Entwicklungszwecke zu erlauben

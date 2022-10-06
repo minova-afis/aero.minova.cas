@@ -1,5 +1,5 @@
 alter procedure dbo.xpcasUpdateLuUserPrivilegeUserGroup (
-	@KeyLong int,
+	@KeyLong int output,
 	@UserPrivilegeKey int = null,
 	@UserGroupKey int = null,
 	@RowLevelSecurity bit = 0

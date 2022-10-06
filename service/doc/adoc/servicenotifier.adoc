@@ -31,6 +31,14 @@ Die Funktionalität könnte prinzipiell auch durch einen Message-Broker wie Rabb
 Wir haben uns dagegen entschieden, da wir nicht viele Features brauchen und den Zusatzaufwand für die Administrationen
 eines neuen uns unbekannten Dienstes nicht im Verhältnis zur benötigten Funktionalität stand.
 
+== Was ist ein Topic?
+Ein Topic ist ein Trigger.
+Ein Dienst, welcher auf ein bestimmtes Topic registriert ist, reagiert auf "Veränderungen" am Topic.
+Diese Veränderungen, werden durch die Prozeduren durchgeführt, welche ebenfalls erst darauf registriert werden müssen.
+
+Topics werden im folgenden Format registriert: *Tabelle-PackageDesDienstes*.
+Ein Beispiel hierfür wäre der FTLConnect. Das Topic, auf welcher dieser Dienst registiert ist, heißt *'tShipment-com.minova.cas.ftlconnect'*.
+
 == ServiceNotifier API
 
 Folgende Extensions können mithilfe von *data/procedure* aufgerufen werden:
@@ -47,5 +55,6 @@ Folgende Extensions können mithilfe von *data/procedure* aufgerufen werden:
 Zum leichteren Registrieren der ServiceNotifier und ProcedureNewsfeeds, gibt es die *ServiceNotifierRegistrationAPI*-Klasse.
 
 Diese beinhaltet zwei Methoden:
+
 * *registerNewsfeedListener*(String topic, String serviceName): Registriert einen Service auf ein Topic.
 * *registerProcedureNewsfeed*(String procedureName, String topic): Registriert eine Prozedur auf ein Topic.

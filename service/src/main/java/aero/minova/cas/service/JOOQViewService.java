@@ -66,7 +66,17 @@ public class JOOQViewService implements ViewServiceInterface {
 		}
 
 		// Hier wird auch schon die RowLevelSecurity mit rein gepackt.
-		Condition condition = prepareWhereClause(params, autoLike, authorities);
+		String whereClause = prepareWhereClause(params, autoLike);
+
+		Condition condition = DSL.condition(whereClause);
+
+		// Hier passiert die RowLevelSecurity.
+		if (!authorities.isEmpty()) {
+			Condition userCondition = rowLevelSecurity(authorities);
+			if (userCondition != null) {
+				condition = condition.and(userCondition);
+			}
+		}
 
 		List<SelectField> fields = new ArrayList();
 
@@ -79,20 +89,22 @@ public class JOOQViewService implements ViewServiceInterface {
 		Query query;
 
 		// Hier wird nur unterschieden, ob die Einträge gezählt werden sollen oder nicht.
+		// Wenn eine condition leer ist und die toString()-Methode auf diese angewandt wird, kommt ein "(true)" dabei raus. Das wollen wir nicht in unserer
+		// Abfrage haben.
 		if (count) {
-			if (condition != null) {
+			if (condition != null && condition != DSL.noCondition() && !condition.toString().equals("(true)")) {
 				query = DSL.selectCount().from(params.getName()).where(condition);
 			} else {
 				query = DSL.selectCount().from(params.getName());
 			}
 		} else if (maxRows > 0) {
-			if (condition != null) {
+			if (condition != null && condition != DSL.noCondition() && !condition.toString().equals("(true)")) {
 				query = DSL.select(fields).from(params.getName()).where(condition).limit(maxRows);
 			} else {
 				query = DSL.select(fields).from(params.getName()).limit(maxRows);
 			}
 		} else {
-			if (condition != null) {
+			if (condition != null && condition != DSL.noCondition() && !condition.toString().equals("(true)")) {
 				query = DSL.select(fields).from(params.getName()).where(condition);
 			} else {
 				query = DSL.select(fields).from(params.getName());
@@ -100,80 +112,6 @@ public class JOOQViewService implements ViewServiceInterface {
 		}
 
 		return query.getSQL();
-	}
-
-	/**
-	 * @param params
-	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
-	 * @param autoLike
-	 *            wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
-	 * @return die Where-Klausel für die angegebenen Parameter
-	 * @author wild
-	 */
-	public Condition prepareWhereClause(Table params, boolean autoLike, List<Row> authorities) {
-
-		Condition condition = DSL.noCondition();
-
-		for (Row r : params.getRows()) {
-			for (int i = 0; i < r.getValues().size(); i++) {
-				Value value = r.getValues().get(i);
-
-				if (value != null && !params.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
-					String rule = (r.getValues().get(i).getRule() != null ? r.getValues().get(i).getRule() : null);
-
-					// Is Null und is not Null muss zuerst geprüft werden, da es egal ist, ob etwas im Value steht.
-					if (rule != null && rule.contains("!null")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNotNull());
-						continue;
-					} else if (rule != null && rule.contains("null")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNull());
-						continue;
-					}
-
-					if (autoLike && params.getColumns().get(i).getType().equals(DataType.STRING) && !value.getValue().toString().isBlank()
-							&& (!value.getStringValue().contains("%"))) {
-						value = new Value(value.getStringValue() + "%", rule);
-					}
-
-					if (rule == null && !value.getValue().toString().contains("%")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).eq(r.getValues().get(i).getValue().toString()));
-					} else if (value.getValue().toString().contains("%") || rule.equals("~")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).like(value.getValue().toString()));
-					} else if (rule.equals("!~")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).notLike(value.getValue().toString()));
-					} else if (rule.equals(">")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).gt(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals(">=")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).ge(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("<")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).lt(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("<=")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).le(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("<>")) {
-						condition.and(DSL.field(params.getColumns().get(i).getName()).ne(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("between()")) {
-						List<String> betweenValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).between(betweenValues.get(0), betweenValues.get(1)));
-					} else if (rule.equals("in()")) {
-						List<String> inValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
-
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).in(inValues));
-					} else {
-						throw new IllegalArgumentException("Invalid rule " + rule + " for value" + value.getValue().toString() + " !");
-					}
-				}
-			}
-		}
-
-		// Hier passiert die RowLevelSecurity.
-		if (!authorities.isEmpty()) {
-			Condition userCondition = rowLevelSecurity(authorities);
-			if (userCondition != null) {
-				condition = condition.and(userCondition);
-			}
-		}
-
-		return condition;
 	}
 
 	/**
@@ -243,6 +181,58 @@ public class JOOQViewService implements ViewServiceInterface {
 
 	@Override
 	public String prepareWhereClause(Table params, boolean autoLike) {
-		return null;
+		Condition condition = DSL.noCondition();
+
+		for (Row r : params.getRows()) {
+			for (int i = 0; i < r.getValues().size(); i++) {
+				Value value = r.getValues().get(i);
+
+				if (value != null && !params.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
+					String rule = (r.getValues().get(i).getRule() != null ? r.getValues().get(i).getRule() : null);
+
+					// Is Null und is not Null muss zuerst geprüft werden, da es egal ist, ob etwas im Value steht.
+					if (rule != null && rule.contains("!null")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNotNull());
+						continue;
+					} else if (rule != null && rule.contains("null")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNull());
+						continue;
+					}
+
+					if (autoLike && params.getColumns().get(i).getType().equals(DataType.STRING) && !value.getValue().toString().isBlank()
+							&& (!value.getStringValue().contains("%"))) {
+						value = new Value(value.getStringValue() + "%", rule);
+					}
+
+					if (rule == null && !value.getValue().toString().contains("%")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).eq(r.getValues().get(i).getValue().toString()));
+					} else if (value.getValue().toString().contains("%") || rule.equals("~")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).like(value.getValue().toString()));
+					} else if (rule.equals("!~")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).notLike(value.getValue().toString()));
+					} else if (rule.equals(">")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).gt(r.getValues().get(i).getValue().toString()));
+					} else if (rule.equals(">=")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).ge(r.getValues().get(i).getValue().toString()));
+					} else if (rule.equals("<")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).lt(r.getValues().get(i).getValue().toString()));
+					} else if (rule.equals("<=")) {
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).le(r.getValues().get(i).getValue().toString()));
+					} else if (rule.equals("<>")) {
+						condition.and(DSL.field(params.getColumns().get(i).getName()).ne(r.getValues().get(i).getValue().toString()));
+					} else if (rule.equals("between()")) {
+						List<String> betweenValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).between(betweenValues.get(0), betweenValues.get(1)));
+					} else if (rule.equals("in()")) {
+						List<String> inValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
+
+						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).in(inValues));
+					} else {
+						throw new IllegalArgumentException("Invalid rule " + rule + " for value" + value.getValue().toString() + " !");
+					}
+				}
+			}
+		}
+		return condition.toString();
 	}
 }

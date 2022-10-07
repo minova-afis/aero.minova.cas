@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- ****-**-**
 * Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.
+* Korrektur xpcasInsertAuthorities. Es konnte über die Authorities ein Benutzer nur einer UserGruppe zugeordnet werden.
+* Weitere Übersetzungen für die UserGroup Masken und OptionPages.
 
 ## [12.54.3] -- 2022-09-30
 

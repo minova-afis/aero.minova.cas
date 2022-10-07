@@ -8,30 +8,30 @@ with encryption as
 	if exists (select * from xtcasUserGroup where KeyLong = @Authority)
 	begin
 	
-	declare @UserGroup nvarchar(50)
-	select @UserGroup=KeyText from xtcasUserGroup where KeyLong = @Authority
+		declare @UserGroup nvarchar(50)
+		select @UserGroup=KeyText from xtcasUserGroup where KeyLong = @Authority
 
 
-	if exists(select * from xtcasAuthorities
-		where Username = @Username
-		  and Authority = @UserGroup
-		  and LastAction > 0)
-	begin
-		raiserror('ADO | 25 | msg.sql.DuplicateMatchcodeNotAllowed', 16, 1) with seterror
-		return -1
-	end
+		if exists(select * from xtcasAuthorities
+			where Username = @Username
+			and Authority = @UserGroup
+			and LastAction > 0)
+		begin
+			raiserror('ADO | 25 | msg.sql.DuplicateMatchcodeNotAllowed', 16, 1) with seterror
+			return -1
+		end
 
 
 
-	
-	insert into xtcasAuthorities (
-		Username,
-		Authority
-	) values (
-		@Username,
-		@UserGroup
-	)
+		
+		insert into xtcasAuthorities (
+			Username,
+			Authority
+		) values (
+			@Username,
+			@UserGroup
+		)
 
-	select @KeyLong = @@identity
+		select @KeyLong = @@identity
 	end
 	return @@error

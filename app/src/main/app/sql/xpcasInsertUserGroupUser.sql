@@ -6,8 +6,8 @@ alter procedure dbo.xpcasInsertUserGroupUser (
     declare @UserGroupToken nvarchar(50)
     declare @Memberships nvarchar(250)
 
-    -- Den UserCode der UserGroup herausbekommen.
-    select @UserGroupToken=UserCode from xtcasUserGroup where KeyLong=@KeyLong
+    -- Den KeyText der UserGroup herausbekommen.
+    select @UserGroupToken='#'+KeyText from xtcasUserGroup where KeyLong=@KeyLong
 
     -- Überprüfen, ob es innerhalb der Memberships eine Membership der UserGroup gibt.
     select @Memberships=Memberships from xtcasUser where KeyLong=@UserKey

@@ -4,7 +4,21 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- ****-**-**
+* Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.
+
+## [12.54.3] -- 2022-09-30
+
+Keine Änderungen 
+
+## [12.54.2] -- 2022-09-29
+* Tabellenbezeichnung von xtcasUserPrivileges korrigieren.
+
+## [12.54.1] -- 2022-09-29
+* Releaseprozess für Helper korrigieren.
+
+## [12.54.0] -- 2022-09-29
 * #293 Standardmasken zum Verwalten von Benutzern einbinden.
+* Helper zum Verschlüsseln von Passwörtern innerhalb der Maske.
 
 ## [12.53.0] -- 2022-09-13
 * devWarning in "dev"-Profile verschoben

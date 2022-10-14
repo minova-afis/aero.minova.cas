@@ -35,7 +35,7 @@
 				<text length="250" />
 			</field>
 		</head>
-		<grid id="UserGroupUser" icon="UserGroupUsers" title="@UserGroupUser" procedure-prefix="xpcas" procedure-suffix="UserGroupUser">
+		<grid id="UserGroupUser" icon="UserGroupUser" title="@UserGroupUser" procedure-prefix="xpcas" procedure-suffix="UserGroupUser">
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>

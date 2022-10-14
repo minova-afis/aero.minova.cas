@@ -8,3 +8,29 @@ passende `sqljdbc_auth.dll` entpacken und in den Ausführungs-Ordner des Dienste
 * Benutzernamen und Passwort für SQL-Datenbank entfernen.
 * Dienst unter den Nutzer starten,
 welcher entsprechende Rechte auf die Datenbank hat.
+
+## Fehlermeldung bei fehlender `sqljdbc_auth.dll` Datei
+
+Wird `integratedSecurity=true` genutzt, aber die `sqljdbc_auth.dll` Datei fehlt, erscheint folgende Fehlermeldung.
+
+```
+com.microsoft.sqlserver.jdbc.SQLServerException: Dieser Treiber ist nicht für integrierte Authentifizierung konfiguriert. ClientConnectionId:3eda3c18-b1d3-4b94-86d3-13b95411f529
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.terminate(SQLServerConnection.java:2924)
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<init>(AuthenticationJNI.java:73)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:3686)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.access$000(SQLServerConnection.java:94)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:3675)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7194)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:2979) 
+        ...
+Caused by: java.lang.UnsatisfiedLinkError: no sqljdbc_auth in java.library.path: [/Users/janiak/Library/Java/Extensions, /Library/Java/Extensions, /Network/Library/Java/Extensions, /System/Library/Java/Extensions, /usr/lib/java, .]
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2673)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:830)
+	at java.base/java.lang.System.loadLibrary(System.java:1873)
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<clinit>(AuthenticationJNI.java:52)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:3685)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.access$000(SQLServerConnection.java:94)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:3675)
+	...
+```
+

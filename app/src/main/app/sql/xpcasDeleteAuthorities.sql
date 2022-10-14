@@ -4,9 +4,8 @@ alter procedure dbo.xpcasDeleteAuthorities (
 	@Authority nvarchar(50) = null
 )
 with encryption as
-	update xtcasAuthorities
-	set	LastAction = -1,
-		LastUser = dbo.xfCasUser(),
-		LastDate = getdate()
+
+	delete from xtcasAuthorities
 	where KeyLong = @KeyLong
+
 	return @@error

@@ -36,11 +36,11 @@ dass die API möglichst stabil gehalten wird.
 
 == Weiterführende Dokumentation
 
+* xref:./doc/adoc/support.adoc#[Symptome, deren Ursachen und Lösungen]
 * xref:./CHANGELOG.adoc#[Changelog]
 * xref:./api/doc/adoc/index.adoc#[CAS API]
 * xref:./service/doc/adoc/index.adoc#[CAS-Dienst]
 * xref:./service/doc/adoc/installation.adoc#[Installation]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 * xref:./doc/adoc/structure.adoc#[Strukturübersicht]
-* xref:./doc/adoc/support.adoc#[Symptome, deren Ursachen und Lösungen]
 * xref:./app/doc/adoc/table-index.adoc#[Tabellen-Index]

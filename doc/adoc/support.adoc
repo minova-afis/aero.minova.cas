@@ -293,3 +293,25 @@ Ist das CAS nicht bereits auf diesem Port gelaufen, muss man sich einen freien P
 Seit Release 12.43.0 gibt es unter dem Management-Port 8081 den SpringBoot /actuator.
 Man kann den Port umbelegen, indem man in den application.properties die Property management.server.port auf einen anderen Port setzt, oder per 
 management.endpoints.enabled-by-default=false die Funktionalität abschalten.
+
+
+## Probleme beim Einloggen mit AD / LDAP
+
+Log im CAS:
+```
+Active Directory authentication failed: Supplied password was invalid.
+```
+
+Hier sollten man an verschiedenen Stellen Einstellungen überprüfen:
+
+In den application.properties:
+* security_ldap_domain
+* security_ldap_address 
+
+Man solle auf jeden Fall überprüfen, ob die beiden Properties richtig sind. Dabei ist zu beachten, dass die security_ldap_address immer mit 'ldap://' beginnt.
+
+Die security_ldap_domain kann über den Command Line Befehl 'net user USERNAME /domain' herausgefunden werden. Hierbei wird USERNAME durch einen bekannten AD-Benutzernamen ersetzt.
+
+Im WFC:
+Beim Login im *WFC* sollte auch besonders darauf geachtet werden, dass der Benutzer richtig eingegeben wird, z.B. muss man auch auf Groß- und Kleinschreibung achten. 
+Oft hat der Benutzer folgende Struktur: AD-NAME/Benutzername. Hier könnte man auch versuchen, den AD-NAMEN und den Slash weg zu lassen. 

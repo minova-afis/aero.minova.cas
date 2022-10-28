@@ -305,6 +305,7 @@ Active Directory authentication failed: Supplied password was invalid.
 Hier sollten man an verschiedenen Stellen Einstellungen überprüfen:
 
 In den application.properties:
+
 * security_ldap_domain
 * security_ldap_address 
 
@@ -313,5 +314,6 @@ Man solle auf jeden Fall überprüfen, ob die beiden Properties richtig sind. Da
 Die security_ldap_domain kann über den Command Line Befehl 'net user USERNAME /domain' herausgefunden werden. Hierbei wird USERNAME durch einen bekannten AD-Benutzernamen ersetzt.
 
 Im WFC:
+
 Beim Login im *WFC* sollte auch besonders darauf geachtet werden, dass der Benutzer richtig eingegeben wird, z.B. muss man auch auf Groß- und Kleinschreibung achten. 
 Oft hat der Benutzer folgende Struktur: AD-NAME/Benutzername. Hier könnte man auch versuchen, den AD-NAMEN und den Slash weg zu lassen. 

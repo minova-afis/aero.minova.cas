@@ -32,16 +32,18 @@
 {empty} +
 {empty} +
 
-## WFC-Support
+## Allgemeines
+
+### WFC-Support
 
 Manchmal ist es nicht eindeutig, ob der Fehler im CAS oder in der WFC Anwendung liegt. link:https://github.com/minova-afis/aero.minova.rcp/wiki/Hilfestellung-bei-Support[Hier geht es zur Support Seite der WFC Anwendung]
 
-## Java-Spezifika
+### Java-Spezifika
 
 Einige Sachen beziehen sich auf allgemeine Java-Dinge und
 sind link:https://github.com/minova-afis/aero.minova.maven.root[hier] dokumentiert.
 
-## Spring-Boot-Spezifika
+### Spring-Boot-Spezifika
 
 Einige Sachen beziehen sich auf allgemeine Spring-Boot-Dinge und
 sind link:https://github.com/minova-afis/aero.minova.spring.service.example[hier] und

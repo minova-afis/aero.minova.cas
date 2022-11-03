@@ -9,6 +9,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Weitere Übersetzungen für die UserGroup Masken und OptionPages.
 * Korrektur xpcasDeleteAuthorities. Obwohl die Authority auf -1 gestellt wurde, hatte man trotzdem volle Rechte. Nun wird sie ganz gelöscht.
 * Neue Icons.
+* Update auf SpringBoot 2.7.5
+
 
 ## [12.54.3] -- 2022-09-30
 

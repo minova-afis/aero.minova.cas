@@ -60,6 +60,7 @@ public class SecurityConfig {
 		if (dataSource.equals("ldap")) {
 			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain,
 					ldapServerAddress);
+			acldap.setConvertSubErrorCodesToExceptions(true);
 			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
 			auth.authenticationProvider(acldap);
 		} else if (dataSource.equals("database")) {

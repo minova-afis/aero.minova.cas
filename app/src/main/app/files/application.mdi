@@ -3,10 +3,10 @@
     <!-- Das ist eine Vorlage. -->
     <action action="ServiceProperties.xml" generic="true" icon="xtcasServiceProperties.ico" id="ServiceProperties" text="@xtcasServiceProperties"/>
     <action action="ColumnSecurity.xml" generic="true" icon="ColumnSecurity" id="ColumnSecurity" text="ColumnSecurity"/>
-    <action action="User.xml" generic="true" icon="User" id="User" text="User"/>
+    <action action="User.xml" generic="true" icon="LDAPUser" id="User" text="User"/>
     <action action="UserGroup.xml" generic="true" icon="UserGroup" id="UserGroup" text="UserGroup"/>
     <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege" id="UserPrivileges" text="UserPrivilege"/>
-    <action action="Users.xml" generic="true" icon="User" id="Users" text="Users"/>
+    <action action="Users.xml" generic="true" icon="DBUser" id="Users" text="Users"/>
     <menu id="main">
         <menu id="config" text="@cas.config" position="10.0" override="false">
             <entry id="ServiceProperties" position="10.0" override="false" type="action"/>

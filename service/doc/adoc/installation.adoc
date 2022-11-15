@@ -62,7 +62,7 @@ server.ssl.key-alias=<Alias im Keystore>
 server.ssl.key-store-password=<Passwort des Keystores>
 ----
 
-=== lib-Ordner erstellen.
+=== lib-Ordner erstellen
 
 ** Release verwenden: Die Release Jars aus einem Docker-Image kopieren.
 ** Entwickler-Version verwenden:
@@ -71,7 +71,8 @@ CAS-Dienst mit `mvn clean verify` bauen.
 `target/aero.minova.cas.service.jar.original` kopieren und `original` Suffix entfernen.
 
 
-* Windows-Dienst erstellen:
+=== Windows-Dienst erstellen
+
 ** Letzten stabilen Release der Wrapper-Exe kopieren: https://github.com/winsw/winsw/releases
 ** Die Exe in den Dienst Ordner kopieren und passend umbennen.
 ** XML-Konfigurations-Datei für den Wrapper erstellen.

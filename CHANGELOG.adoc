@@ -3,12 +3,18 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## Unreleased
+## [UNRELEASED] -- ****-**-**
+* LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException
 * #362 Zugriff auf weitere Datenbanken unterstzützen (zumindest über Views).
 * Property aero.minova.database.kind durch spring.jooq.sql-dialect ersetzt.
 
-## [12.54.4] -- 2022-10-05
+## [12.55.0] -- 2022-11-11
 * Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.
+* Korrektur xpcasInsertAuthorities. Es konnte über die Authorities ein Benutzer nur einer UserGruppe zugeordnet werden.
+* Weitere Übersetzungen für die UserGroup Masken und OptionPages.
+* Korrektur xpcasDeleteAuthorities. Obwohl die Authority auf -1 gestellt wurde, hatte man trotzdem volle Rechte. Nun wird sie ganz gelöscht.
+* Neue Icons.
+* Update auf SpringBoot 2.7.5
 
 ## [12.54.3] -- 2022-09-30
 

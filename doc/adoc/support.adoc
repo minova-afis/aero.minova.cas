@@ -32,7 +32,22 @@
 {empty} +
 {empty} +
 
+## Allgemeines
+
+### WFC-Support
+
 Manchmal ist es nicht eindeutig, ob der Fehler im CAS oder in der WFC Anwendung liegt. link:https://github.com/minova-afis/aero.minova.rcp/wiki/Hilfestellung-bei-Support[Hier geht es zur Support Seite der WFC Anwendung]
+
+### Java-Spezifika
+
+Einige Sachen beziehen sich auf allgemeine Java-Dinge und
+sind link:https://github.com/minova-afis/aero.minova.maven.root[hier] dokumentiert.
+
+### Spring-Boot-Spezifika
+
+Einige Sachen beziehen sich auf allgemeine Spring-Boot-Dinge und
+sind link:https://github.com/minova-afis/aero.minova.spring.service.example[hier] und
+link:https://github.com/minova-afis/aero.minova.spring.maven.root[hier] dokumentiert.
 
 ## Log-Files durchsuchen.
 
@@ -50,23 +65,6 @@ Folgendes Schema kann man beim Log-Durchsuchen häufig verwenden:
 
 1. Die Anmeldung über den Browser versuchen.
 2. CAS neustarten.
-
-## Deadlock auf der SQL-Datenbank
-
-1. Herausfinden welche SQl-Sessions einen Deadlock verursachen.
-2. Die SQL-Statements der betroffenen Sessions herausfinden.
-3. In dem `request.log` nachschauen, welche Anfrage an das CAS zu den SQL-Statements passen.
-4. Zeiten der gefundenen Aufrufe vergleichen.
-   Sind die Zeiten gleich oder sehr nah beieinander,
-   hat man die Aufrufe gefunden,
-   die das Problem verursachen.
-   Man muss dafür sorgen, dass die SQL-Prozeduren der Aufrufe nicht gleichzeitig ausgeführt werden.
-   Wenn es nur ein Client ist,
-   kann man die betroffenen Anfragen an das CAS in ein `data/x-procedure` packen.
-   Andernfalls muss man dafür sorgen, dass die betroffenen Anfragen nicht gleichzeitig an das CAS geschickt werden.
-   (Alternativ könnte man es so implementieren, dass man eine Option für das CAS einführt,
-   womit sämtliche SQL-Anfragen nacheinander ausgeführt werden.
-   Dadurch wären SQL-Deadlocks durch das CAS nicht mehr möglich.)
 
 ## setup-Befehl hat einen Fehler.
 
@@ -218,11 +216,54 @@ Die häufigste Exception. Tritt auf, wenn:
 
 Tritt (bisher) nur auf, wenn die BIRT Extension mit dem CAS gestartet wird und in den application.properties keine URI zum dazugehörigen BIRT Service gesetzt wurde. 
 
+## SQL-Server
 
-## SQLServerException: PKIX path building failed
+### Deadlock auf der SQL-Datenbank
+
+1. Herausfinden welche SQl-Sessions einen Deadlock verursachen.
+2. Die SQL-Statements der betroffenen Sessions herausfinden.
+3. In dem `request.log` nachschauen, welche Anfrage an das CAS zu den SQL-Statements passen.
+4. Zeiten der gefundenen Aufrufe vergleichen.
+   Sind die Zeiten gleich oder sehr nah beieinander,
+   hat man die Aufrufe gefunden,
+   die das Problem verursachen.
+   Man muss dafür sorgen, dass die SQL-Prozeduren der Aufrufe nicht gleichzeitig ausgeführt werden.
+   Wenn es nur ein Client ist,
+   kann man die betroffenen Anfragen an das CAS in ein `data/x-procedure` packen.
+   Andernfalls muss man dafür sorgen, dass die betroffenen Anfragen nicht gleichzeitig an das CAS geschickt werden.
+   (Alternativ könnte man es so implementieren, dass man eine Option für das CAS einführt,
+   womit sämtliche SQL-Anfragen nacheinander ausgeführt werden.
+   Dadurch wären SQL-Deadlocks durch das CAS nicht mehr möglich.)
+
+### Fehlermeldung bei fehlender `sqljdbc_auth.dll` Datei
+
+Wird `integratedSecurity=true` genutzt, aber die `sqljdbc_auth.dll` Datei fehlt, erscheint folgende Fehlermeldung.
+
+```
+com.microsoft.sqlserver.jdbc.SQLServerException: Dieser Treiber ist nicht für integrierte Authentifizierung konfiguriert. ClientConnectionId:3eda3c18-b1d3-4b94-86d3-13b95411f529
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.terminate(SQLServerConnection.java:2924)
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<init>(AuthenticationJNI.java:73)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:3686)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.access$000(SQLServerConnection.java:94)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:3675)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7194)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:2979) 
+        ...
+Caused by: java.lang.UnsatisfiedLinkError: no sqljdbc_auth in java.library.path: [/Users/janiak/Library/Java/Extensions, /Library/Java/Extensions, /Network/Library/Java/Extensions, /System/Library/Java/Extensions, /usr/lib/java, .]
+	at java.base/java.lang.ClassLoader.loadLibrary(ClassLoader.java:2673)
+	at java.base/java.lang.Runtime.loadLibrary0(Runtime.java:830)
+	at java.base/java.lang.System.loadLibrary(System.java:1873)
+	at com.microsoft.sqlserver.jdbc.AuthenticationJNI.<clinit>(AuthenticationJNI.java:52)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.logon(SQLServerConnection.java:3685)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.access$000(SQLServerConnection.java:94)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection$LogonCommand.doExecute(SQLServerConnection.java:3675)
+	...
+```
+
+### SQLServerException: PKIX path building failed
 Ab SpringBoot 2.7.0 wird für die Verbindung zum MS-SQL eine verschlüsselte Verbindung aufgebaut. Das heißt der Wert für `encrypt` ist nun per Default `true` zuvor war er auf `false`. Siehe https://github.com/spring-projects/spring-boot/issues/31157
 
-=== Fehlermeldung
+==== Fehlermeldung
 ```
 2022-05-25T12:24:36.384 Servlet.service() for servlet [dispatcherServlet] in context with path [/cas] threw exception [Request processing failed; nested exception is aero.minova.cas.api.domain.ProcedureException: java.lang.RuntimeException: com.microsoft.sqlserver.jdbc.SQLServerException: Der Treiber konnte keine sichere Verbindung mit SQL Server über die SSL (Secure Sockets Layer)-Verschlüsselung herstellen. Fehler: 'PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target'. ClientConnectionId:19cbae03-1613-493f-acd0-decc7f65f14f] with root cause
 sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
@@ -239,7 +280,7 @@ sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid
 [...]
 ```
 
-=== Lösung
+==== Lösung
 Bei der Konfiguration von `aero_minova_database_url` den Parameter `encrypt` auf `false` setzen, z.B.:
 ```
 aero_minova_database_url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
@@ -267,3 +308,27 @@ Ist das CAS nicht bereits auf diesem Port gelaufen, muss man sich einen freien P
 Seit Release 12.43.0 gibt es unter dem Management-Port 8081 den SpringBoot /actuator.
 Man kann den Port umbelegen, indem man in den application.properties die Property management.server.port auf einen anderen Port setzt, oder per 
 management.endpoints.enabled-by-default=false die Funktionalität abschalten.
+
+
+## Probleme beim Einloggen mit AD / LDAP
+
+Log im CAS:
+```
+Active Directory authentication failed: Supplied password was invalid.
+```
+
+Hier sollten man an verschiedenen Stellen Einstellungen überprüfen:
+
+In den application.properties:
+
+* security_ldap_domain
+* security_ldap_address 
+
+Man solle auf jeden Fall überprüfen, ob die beiden Properties richtig sind. Dabei ist zu beachten, dass die security_ldap_address immer mit 'ldap://' beginnt.
+
+Die security_ldap_domain kann über den Command Line Befehl 'net user USERNAME /domain' herausgefunden werden. Hierbei wird USERNAME durch einen bekannten AD-Benutzernamen ersetzt.
+
+Im WFC:
+
+Beim Login im *WFC* sollte auch besonders darauf geachtet werden, dass der Benutzer richtig eingegeben wird, z.B. muss man auch auf Groß- und Kleinschreibung achten. 
+Oft hat der Benutzer folgende Struktur: AD-NAME/Benutzername. Hier könnte man auch versuchen, den AD-NAMEN und den Slash weg zu lassen. 

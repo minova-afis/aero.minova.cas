@@ -12,9 +12,8 @@ Diese hat folgenden Aufbau
 - Typ: Beschreibt den Typ für den entsprechenden Eintrag
     - Application - Eintrag darf nur einmal in der Tabell existieren, (SIS, DISPO..)
     - From - Action Einträge für die einzelnen XML-Masken
-    - Menu - Menustruktureinträge
-    - Toolbar
-- Menu: Menu, in welchem die Maske eingetragen wird
+    - Menu - Menustruktureinträge, kann auch geschachtelt werden
+- Menu: Menupunkt, in welchem die Maske eingetragen wird
 - Position: Position der Form/Maske innerhalb des Menus, kann auch mit Fließkommawert angegeben werden
 - SecurityToken: 
 - LastAction:

@@ -42,12 +42,11 @@ Aus dem oberen Beispiel sollte die folgende MDI Datei erstellt werden.
 	<action action="Driver.xml" generic="true" icon="Driver" id="driver" text="@Driver.Administration"/>
 	<menu id="main">
 	    <menu id="masterdata" text="@menu.masterdata" position="1" override="false">
-			<entry id="driver" position="1.2" override="false" type="action"/>
-            <entry id="item" position="3" override="false" type="action"/>
-        	<entry id="vehicle" position="5" override="false" type="action"/>
+		<entry id="driver" position="1.2" override="false" type="action"/>
+		<entry id="item" position="3" override="false" type="action"/>
+		<entry id="vehicle" position="5" override="false" type="action"/>
         </menu>
     </menu>
 </main>
 
-
-
+```

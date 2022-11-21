@@ -16,10 +16,10 @@ Diese hat folgenden Aufbau
     - Menu - Menustruktureinträge, kann auch geschachtelt werden
 - Menu: Menupunkt, in welchem die Maske eingetragen wird
 - Position: Position der Form/Maske innerhalb des Menus, kann auch mit Fließkommawert angegeben werden
-- SecurityToken: 
-- LastAction:
-- LastDate:
-- LastUser: 
+- SecurityToken: eindeutiger Benutzer-Token
+- LastAction: Status des Datensatzes, -1 (gelöscht), 1 (neu erstellt) , 2 (upgedated)
+- LastDate: Datum der letzten Änderung
+- LastUser: Benutzer, der zuletzt dieses Datensatz angepasst hat.
 
 ## Beispiele
 

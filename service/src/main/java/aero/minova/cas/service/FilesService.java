@@ -2,22 +2,38 @@ package aero.minova.cas.service;
 
 import static java.nio.file.Files.isDirectory;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.controller.SqlViewController;
+import aero.minova.cas.service.mdi.Main;
+import aero.minova.cas.service.mdi.Main.Menu;
 
 @Service
 public class FilesService {
@@ -30,6 +46,9 @@ public class FilesService {
 
 	@Autowired
 	SecurityService securityUtils;
+
+	@Autowired
+	SqlViewController viewController;
 
 	@Autowired
 	public CustomLogger customLogger;
@@ -161,5 +180,170 @@ public class FilesService {
 			throw new NoSuchFileException("msg.FileError %" + path);
 		}
 		return inputPath;
+	}
+
+	/**
+	 * Methode zum Zippen einer Datei.
+	 * 
+	 * @param source
+	 *            String, Teil des ursprünglichen Pfades, welcher abgeschnitten werden muss.
+	 * @param zipFile
+	 *            File, gewünschtes finales Zip-File.
+	 * @param fileList
+	 *            List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden sollen.
+	 * @throws RuntimeException
+	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
+	 * @throws FileNotFoundException
+	 */
+	public void zip(String source, File zipFile, List<Path> fileList) throws Exception {
+		ZipEntry ze = null;
+		// Jede Datei wird einzeln zu dem ZIP hinzugefügt.
+		FileOutputStream fos = new FileOutputStream(zipFile);
+		try (ZipOutputStream zos = new ZipOutputStream(fos);) {
+
+			for (Path filePath : fileList) {
+
+				// noch mehr zipps in einer zip sind sinnlos
+				if (filePath.toFile().isFile() && (!filePath.toString().contains("zip"))) {
+					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()).replace('\\', '/'));
+
+					// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,
+					// wenn die Zip erstellt wird.
+					ze.setCreationTime(FileTime.from(Instant.EPOCH));
+					ze.setTime(0);
+					zos.putNextEntry(ze);
+
+					// Jeder Eintrag wird nacheinander in die ZIP Datei geschrieben mithilfe eines Buffers.
+					FileInputStream fis = new FileInputStream(filePath.toFile());
+
+					int len;
+					byte[] buffer = new byte[1024];
+
+					try (BufferedInputStream entryStream = new BufferedInputStream(fis, 2048)) {
+						while ((len = entryStream.read(buffer, 0, 1024)) != -1) {
+							zos.write(buffer, 0, len);
+						}
+					} finally {
+						zos.closeEntry();
+						fis.close();
+					}
+				}
+			}
+		} catch (Exception e) {
+			if (ze != null) {
+				customLogger.logFiles("Error while zipping file " + ze.getName());
+				throw new RuntimeException("msg.ZipError %" + ze.getName());
+			} else {
+				// Landet nur hier, wenn es nicht mal bis in das erste if geschafft hat.
+				customLogger.logFiles("Error while accessing file path for file to zip.");
+				throw new RuntimeException("Error while accessing file path " + source + " for file to zip.", e);
+			}
+		} finally {
+			fos.close();
+		}
+	}
+
+	/**
+	 * Methode zum Entpacken einer Datei.
+	 * 
+	 * @param fileZip
+	 *            File, die gepackte Datei.
+	 * @param destDirName
+	 *            Path, Pfad im Dateisystem, an welchem der Inhalt des Zips gespeichert werden soll.
+	 * @throws IOException
+	 *             Falls das Directory nicht existiert oder kein Directory ist oder falls die Datei nicht entpackt werden kann.
+	 */
+	public void unzipFile(File fileZip, Path destDirName) throws IOException {
+		byte[] buffer = new byte[1024];
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream(fileZip);
+			ZipInputStream zis = new ZipInputStream(fis);
+			ZipEntry ze = zis.getNextEntry();
+			while (ze != null) {
+				String zippedFileEntry = ze.getName();
+				if (zippedFileEntry.startsWith(File.separator)) {
+					zippedFileEntry = zippedFileEntry.substring(1);
+				}
+				File newFile = destDirName.resolve(zippedFileEntry).toFile();
+				// create directories for sub directories in zip
+				new File(newFile.getParent()).mkdirs();
+				FileOutputStream fos = new FileOutputStream(newFile);
+				int len;
+				while ((len = zis.read(buffer)) > 0) {
+					fos.write(buffer, 0, len);
+				}
+				fos.close();
+				zis.closeEntry();
+				ze = zis.getNextEntry();
+			}
+			zis.closeEntry();
+			zis.close();
+			fis.close();
+		} catch (IOException e) {
+			customLogger.logFiles("Error while unzipping file " + fileZip + " into directory " + destDirName);
+			throw new RuntimeException("msg.UnZipError %" + fileZip + " %" + destDirName, e);
+
+		}
+	}
+
+	public byte[] readMDI() {
+
+		String user = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		Table mdi = new Table();
+		mdi.setName("xvcasMdi");
+
+		mdi.addColumn(new Column("ID", DataType.STRING));
+		mdi.addColumn(new Column("Icon", DataType.STRING));
+		mdi.addColumn(new Column("Text", DataType.STRING));
+		mdi.addColumn(new Column("Menu", DataType.STRING));
+		mdi.addColumn(new Column("Position", DataType.DOUBLE));
+		mdi.addColumn(new Column("SecurityToken", DataType.STRING));
+		mdi.addColumn(new Column("MdiTypeKey", DataType.INTEGER));
+
+		Table result;
+		try {
+			result = viewController.getIndexView(mdi);
+		} catch (Exception e) {
+			throw new RuntimeException("Error while trying to access xvcasMDI.", e);
+		}
+		customLogger.logUserRequest("Generating MDI for User " + user);
+
+		if (result.getRows().isEmpty()) {
+			throw new RuntimeException("No MDI definition for " + user);
+		}
+
+		// Ab hier wird die MDI erstellt.
+
+		Main main = new Main();
+		Menu mainMenu = new Menu();
+		mainMenu.setId("main");
+		main.setMenu(mainMenu);
+
+		List<Row> formRows = new ArrayList<>();
+
+		// TODO: Rekursiven Aufruf später.
+
+		for (Row r : mdi.getRows()) {
+			int mdiKey = mdi.getValue("MdiTypeKey", r).getIntegerValue();
+			if (mdiKey == 1) {
+				formRows.add(r);
+			} else if (mdiKey == 2) {
+				Menu menu = new Menu();
+				menu.setId(mdi.getValue("ID", r).getStringValue());
+				menu.setText(mdi.getValue("Text", r).getStringValue());
+
+				// Menupunkt an Hauptmenü anhängen.
+				mainMenu.getMenuOrEntry().add(menu);
+			} else if (mdiKey == 3) {
+				main.setIcon(mdi.getValue("Icon", r).getStringValue());
+				main.setTitle(mdi.getValue("Text", r).getStringValue());
+			} else {
+				throw new IllegalArgumentException("No definition for mdiKey " + mdiKey + "found!");
+			}
+		}
+
+		return null;
 	}
 }

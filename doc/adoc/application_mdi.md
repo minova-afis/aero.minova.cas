@@ -1,4 +1,4 @@
-# Generated MDI
+# Generated MDI (Menu Definition Interface)
 Im Folgenden wir die Generierung der MDI beschrieben. Die MDI soll vom CAS generiert werden. Dafür wird eine SQL-Tabelle ausgelesen.
 Diese hat folgenden Aufbau
 
@@ -20,3 +20,10 @@ Diese hat folgenden Aufbau
 - LastAction:
 - LastDate:
 - LastUser: 
+
+## Beispiele
+
+| KeyLong | ID | Text | Typ | Icon | Menu | Position | SecurityToken | LastAction | LastDate | LastUser |
+|---------|----|----|-----|------|------|----------|---------------|------------|----------|----------|
+| 1 | driver |@Driver.Administration | Form | Driver |MasterData | 1.2| zdga6737er87gd6zed | 2 | 21.11.2022 12:23:45 |erlanger |
+| 2 | masterdata |@menu.masterdata | Menu| | | 1| h8h7d349hd7e8 | 2 | 21.11.2022 12:34:12 |erlanger |

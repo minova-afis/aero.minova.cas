@@ -2,13 +2,14 @@
 Im Folgenden wir die Generierung der MDI beschrieben. Die MDI soll vom CAS generiert werden. Dafür wird eine SQL-Tabelle ausgelesen.
 Diese hat folgenden Aufbau
 
-| KeyLong | ID | Typ | Icon | Menu | Position | SecurityToken | LastAction | LastDate | LastUser |
-|---------|----|-----|------|------|----------|---------------|------------|----------|----------|
-|         |    |     |      |      |          |               |            |          |          |
+| KeyLong | ID | Typ |Text | Icon | Menu | Position | SecurityToken | LastAction | LastDate | LastUser |
+|---------|----|-----|-----|------|------|----------|---------------|------------|----------|----------|
+|         |    |     |	|      |      |          |               |            |          |          |
 
 - KeyLong: Identity-Spalte
 - ID: eindeutiger Text innerhalb der MDI Datei
 - Icon: Icon, welches auch in dem Menu oder in der Toolbar angezeigt wird.
+- Text: Text, der über die Übersetzungen eingetragen wird
 - Typ: Beschreibt den Typ für den entsprechenden Eintrag
     - Application - Eintrag darf nur einmal in der Tabell existieren, (SIS, DISPO..)
     - From - Action Einträge für die einzelnen XML-Masken

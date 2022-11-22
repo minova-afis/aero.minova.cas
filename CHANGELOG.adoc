@@ -5,6 +5,10 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- ****-**-**
 * LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException
+* Username Spaltenlänge in Error Table korrigiert
+* Mdi Masken, Tabelle und Prozeduren erstellt(samt Icon und Übersetzung)
+* Initialisierungs Prozedur und Skript erstellt
+* Icon Schrott beseitigt
 
 ## [12.55.0] -- 2022-11-11
 * Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.

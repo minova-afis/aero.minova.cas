@@ -1,15 +1,16 @@
 package aero.minova.cas.api.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
- * Der Wert kann auch null sein. Wenn dass nicht so wäre, könnten wir optionale Werte in einer {@link Table} nicht darstellen.
+ * Der Wert kann auch null sein. Wenn dass nicht so wäre, könnten wir optionale
+ * Werte in einer {@link Table} nicht darstellen.
  *
  * @author avots
  */
@@ -22,7 +23,8 @@ public class Value implements Serializable {
 	private String rule;
 
 	/**
-	 * Der leere Konstruktor. Wird normalerweise nicht verwendet. Wird aber benötigt, damit die Hauptklasse von Serializable erben kann.
+	 * Der leere Konstruktor. Wird normalerweise nicht verwendet. Wird aber
+	 * benötigt, damit die Hauptklasse von Serializable erben kann.
 	 */
 	public Value() {
 
@@ -31,10 +33,10 @@ public class Value implements Serializable {
 	/**
 	 * Der Standard-Konstruktor für Integer-Values.
 	 *
-	 * @param integerValue
-	 *            Der Wert als Integer.
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param integerValue Der Wert als Integer.
+	 * @param rule         Gültige Rules sind entweder null oder folgende Strings:
+	 *                     "<>", "<=", ">=", "<", ">", "=", "between()", "in()",
+	 *                     "!~", "~", "null", "!null"
 	 */
 	public Value(Integer integerValue, String rule) {
 		type = DataType.INTEGER;
@@ -45,10 +47,10 @@ public class Value implements Serializable {
 	/**
 	 * Der Standard-Konstruktor für Long-Values.
 	 *
-	 * @param longValue
-	 *            Der Wert als Long.
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param longValue Der Wert als Long.
+	 * @param rule      Gültige Rules sind entweder null oder folgende Strings:
+	 *                  "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~",
+	 *                  "~", "null", "!null"
 	 */
 	public Value(Long longValue, String rule) {
 		type = DataType.LONG;
@@ -58,8 +60,9 @@ public class Value implements Serializable {
 
 	/**
 	 * @param booleanValue
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param rule         Gültige Rules sind entweder null oder folgende Strings:
+	 *                     "<>", "<=", ">=", "<", ">", "=", "between()", "in()",
+	 *                     "!~", "~", "null", "!null"
 	 */
 	public Value(Boolean booleanValue, String rule) {
 		type = DataType.BOOLEAN;
@@ -70,10 +73,10 @@ public class Value implements Serializable {
 	/**
 	 * Der Standard-Konstruktor für Double-Values.
 	 *
-	 * @param doubleValue
-	 *            Der Wert als Double.
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param doubleValue Der Wert als Double.
+	 * @param rule        Gültige Rules sind entweder null oder folgende Strings:
+	 *                    "<>", "<=", ">=", "<", ">", "=", "between()", "in()",
+	 *                    "!~", "~", "null", "!null"
 	 */
 	public Value(Double doubleValue, String rule) {
 		type = DataType.DOUBLE;
@@ -84,10 +87,10 @@ public class Value implements Serializable {
 	/**
 	 * Der Standard-Konstruktor für String-Values.
 	 *
-	 * @param stringValue
-	 *            Der Wert als String.
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param stringValue Der Wert als String.
+	 * @param rule        Gültige Rules sind entweder null oder folgende Strings:
+	 *                    "<>", "<=", ">=", "<", ">", "=", "between()", "in()",
+	 *                    "!~", "~", "null", "!null"
 	 */
 	public Value(String stringValue, String rule) {
 		type = DataType.STRING;
@@ -98,10 +101,10 @@ public class Value implements Serializable {
 	/**
 	 * Der Standard-Konstruktor für Instant-Values.
 	 *
-	 * @param instantValue
-	 *            Der Wert als Instant.
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param instantValue Der Wert als Instant.
+	 * @param rule         Gültige Rules sind entweder null oder folgende Strings:
+	 *                     "<>", "<=", ">=", "<", ">", "=", "between()", "in()",
+	 *                     "!~", "~", "null", "!null"
 	 */
 	public Value(Instant instantValue, String rule) {
 		type = DataType.INSTANT;
@@ -112,10 +115,10 @@ public class Value implements Serializable {
 	/**
 	 * Der Standard-Konstruktor für ZonedDateTime-Values.
 	 *
-	 * @param zonedDateTimeValue
-	 *            Der Wert als ZonedDateTime.
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param zonedDateTimeValue Der Wert als ZonedDateTime.
+	 * @param rule               Gültige Rules sind entweder null oder folgende
+	 *                           Strings: "<>", "<=", ">=", "<", ">", "=",
+	 *                           "between()", "in()", "!~", "~", "null", "!null"
 	 */
 	public Value(ZonedDateTime zonedDateTimeValue, String rule) {
 		type = DataType.ZONED;
@@ -126,10 +129,10 @@ public class Value implements Serializable {
 	/**
 	 * Der Standard-Konstruktor für BigDecimal-Values. Wird für Money verwendet.
 	 *
-	 * @param decimalValue
-	 *            Der Wert als BigDecimal.
-	 * @param rule
-	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 * @param decimalValue Der Wert als BigDecimal.
+	 * @param rule         Gültige Rules sind entweder null oder folgende Strings:
+	 *                     "<>", "<=", ">=", "<", ">", "=", "between()", "in()",
+	 *                     "!~", "~", "null", "!null"
 	 */
 	public Value(BigDecimal decimalValue, String rule) {
 		type = DataType.BIGDECIMAL;
@@ -193,4 +196,10 @@ public class Value implements Serializable {
 	public Boolean getBooleanValue() {
 		return type == DataType.BOOLEAN ? (Boolean) value : null;
 	}
+
+	@Override
+	public String toString() {
+		return "Value [type=" + type + ", value=" + value + "]";
+	}
+
 }

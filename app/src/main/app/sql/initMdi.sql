@@ -1,9 +1,9 @@
 -- General Application Info
-exec xpcasInitMdi null, 'CAS.ico', 'CAS', null, null, null, 3
+exec xpcasInitMdi null, 'CAS', 'CAS', null, null, null, 3
 
 -- Config Menu
 exec xpcasInitMdi 'config', null, '@cas.config', null, 10.0, '#admin', 2
-exec xpcasInitMdi 'ServiceProperties', 'xtcasServiceProperties.ico', '@xtcasServiceProperties', 'config', 10.0, '#admin', 1
+exec xpcasInitMdi 'ServiceProperties', 'xtcasServiceProperties', '@xtcasServiceProperties', 'config', 10.0, '#admin', 1
 
 -- CAS Menu
 exec xpcasInitMdi 'CAS', null, 'CAS', null, 20.0, '#admin', 2

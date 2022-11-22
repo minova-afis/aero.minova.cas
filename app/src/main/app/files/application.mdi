@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<main icon="CAS.ico" titel="CAS">
+<main icon="CAS" titel="CAS">
     <!-- Das ist eine Vorlage. -->
-    <action action="ServiceProperties.xml" generic="true" icon="xtcasServiceProperties.ico" id="ServiceProperties" text="@xtcasServiceProperties"/>
+    <action action="ServiceProperties.xml" generic="true" icon="xtcasServiceProperties" id="ServiceProperties" text="@xtcasServiceProperties"/>
     <action action="ColumnSecurity.xml" generic="true" icon="ColumnSecurity" id="ColumnSecurity" text="ColumnSecurity"/>
     <action action="User.xml" generic="true" icon="LDAPUser" id="User" text="User"/>
     <action action="UserGroup.xml" generic="true" icon="UserGroup" id="UserGroup" text="UserGroup"/>

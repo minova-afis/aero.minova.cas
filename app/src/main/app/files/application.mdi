@@ -7,6 +7,7 @@
     <action action="UserGroup.xml" generic="true" icon="UserGroup" id="UserGroup" text="UserGroup"/>
     <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege" id="UserPrivileges" text="UserPrivilege"/>
     <action action="Users.xml" generic="true" icon="DBUser" id="Users" text="Users"/>
+    <action action="Mdi.xml" generic="true" icon="Menu" id="Mdi" text="xtcasMdi"/>
     <menu id="main">
         <menu id="config" text="@cas.config" position="10.0" override="false">
             <entry id="ServiceProperties" position="10.0" override="false" type="action"/>
@@ -16,6 +17,7 @@
             <entry id="" position="0.0" override="" type="separator"/>
             <entry id="UserGroup" position="25.0" override="false" type="action"/>
             <entry id="UserPrivileges" position="55.0" override="false" type="action"/>
+            <entry id="Mdi" position="56.0" override="false" type="action"/>
         </menu>
         <menu id="Stundenerfassung" text="@Stundenerfassung" position="20.0" override="false">
             <entry id="User" position="15.0" override="false" type="action"/>

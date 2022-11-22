@@ -4,6 +4,8 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- ****-**-**
+
+## [12.55.1] -- 2022-11-22
 * LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException
 * Username Spaltenlänge in Error Table korrigiert
 * Mdi Masken, Tabelle und Prozeduren erstellt(samt Icon und Übersetzung)

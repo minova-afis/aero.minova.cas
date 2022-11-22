@@ -9,7 +9,7 @@
 	<column name="Icon">
 		<varchar length="100" nullable="true"/>
 	</column>
-	<column name="Text">
+	<column name="Label">
 		<varchar length="100" nullable="true"/>
 	</column>
 	<column name="Menu">

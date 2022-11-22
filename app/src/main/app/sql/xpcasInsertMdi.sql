@@ -13,7 +13,7 @@ as
 	declare @ReturnCode int
 	set @ReturnCode = 1
 
-	if not exists (select * from xtcasMdi where LastAction >-1 and KeyText = @KeyText)
+	if not exists (select * from xtcasMdi where LastAction >-1 and ID = @ID)
 	begin
 		insert into xtcasMdi(
 			ID,

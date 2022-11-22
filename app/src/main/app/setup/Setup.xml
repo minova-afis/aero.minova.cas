@@ -83,6 +83,8 @@
 		<script name="xpcasReadMdi" type="procedure" />
 		<script name="xpcasUpdateMdi" type="procedure" />
 		<script name="xvcasMdiIndex" type="view" />
+		<script name="xpcasInitMdi" type="procedure" />
+		<script name="initMdi" type="script" />
 	</sql-code>
 	<schema>
 		<tableschema name="xtcasError" type="table" />

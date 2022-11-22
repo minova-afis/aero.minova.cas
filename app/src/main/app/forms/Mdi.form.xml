@@ -14,6 +14,9 @@
 		<column name="Label" text="@xtcasMdi.Label">
 			<text length="100"/>
 		</column>
+		<column name="Menu" text="@xtcasMdi.Menu">
+			<text length="100"/>
+		</column>
 		<column name="Position" text="@xtcasMdi.Position">
 			<number decimals="5"/>
 		</column>
@@ -44,13 +47,16 @@
 			<field name="Label" sql-index="3" text="@xtcasMdi.Label" number-columns-spanned="4">
 				<text length="100"/>
 			</field>
-			<field name="Position" sql-index="4" text="@xtcasMdi.Position" number-columns-spanned="4">
-				<number decimals="5"/>
-			</field>
-			<field name="SecurityToken" sql-index="5" text="@xtcasMdi.SecurityToken" number-columns-spanned="4">
+			<field name="Menu" sql-index="4" text="@xtcasMdi.Menu" number-columns-spanned="4">
 				<text length="100"/>
 			</field>
-			<field name="MdiTypeKey" sql-index="6" text="@xtcasMdi.MdiTypeKeyText" number-columns-spanned="4">
+			<field name="Position" sql-index="5" text="@xtcasMdi.Position" number-columns-spanned="4">
+				<number decimals="5"/>
+			</field>
+			<field name="SecurityToken" sql-index="6" text="@xtcasMdi.SecurityToken" number-columns-spanned="4">
+				<text length="100"/>
+			</field>
+			<field name="MdiTypeKey" sql-index="7" text="@xtcasMdi.MdiTypeKeyText" required="true" number-columns-spanned="4">
 				<lookup table="xtcasMdiType"/>
 			</field>
 		</head>

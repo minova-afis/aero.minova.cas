@@ -15,7 +15,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,14 +67,16 @@ public class FilesService {
 	private Path zipsFolder;
 	private Path md5Folder;
 
-	public FilesService() {}
+	public FilesService() {
+	}
 
 	public FilesService(String rootPath) {
 		this.rootPath = rootPath;
 	}
 
 	/**
-	 * Initialisiert alle nötigen Ordner. Mit {@link Path#toAbsolutePath()} und {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
+	 * Initialisiert alle nötigen Ordner. Mit {@link Path#toAbsolutePath()} und
+	 * {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
 	 */
 	@PostConstruct
 	public void setUp() {
@@ -141,14 +142,14 @@ public class FilesService {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory. Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
+	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory.
+	 * Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
 	 * ebenfalls aufgelistet
 	 * 
-	 * @param dir
-	 *            das zu durchsuchende Directory
+	 * @param dir das zu durchsuchende Directory
 	 * @return eine Liste an allen Files in dem übergebenen Directory
-	 * @throws FileNotFoundException
-	 *             Falls das Directory nicht existiert oder der übergebene Pfad nicht auf ein Directory zeigt.
+	 * @throws FileNotFoundException Falls das Directory nicht existiert oder der
+	 *                               übergebene Pfad nicht auf ein Directory zeigt.
 	 */
 	public List<Path> populateFilesList(Path dir) throws FileNotFoundException {
 		List<Path> filesListInDir = new ArrayList<>();
@@ -166,13 +167,15 @@ public class FilesService {
 	}
 
 	/**
-	 * Überprüft, ob die angeforderte Datei existiert und ob der Pfad dorthin innerhalb des dedizierten Dateisystems liegt.
+	 * Überprüft, ob die angeforderte Datei existiert und ob der Pfad dorthin
+	 * innerhalb des dedizierten Dateisystems liegt.
 	 * 
-	 * @param path
-	 *            Pfad zur gewünschten Datei.
-	 * @throws Exception
-	 *             RuntimeException, falls User nicht erforderliche Privilegien besitzt, IllegalAccessException, falls der Pfad nicht in das abgegrenzte
-	 *             Dateisystem zeigt, NoSuchFileException, falls gewünschte Datei nicht existiert.
+	 * @param path Pfad zur gewünschten Datei.
+	 * @throws Exception RuntimeException, falls User nicht erforderliche
+	 *                   Privilegien besitzt, IllegalAccessException, falls der Pfad
+	 *                   nicht in das abgegrenzte Dateisystem zeigt,
+	 *                   NoSuchFileException, falls gewünschte Datei nicht
+	 *                   existiert.
 	 */
 	public Path checkLegalPath(Path path) throws Exception {
 		if (permissionCheck) {
@@ -195,14 +198,13 @@ public class FilesService {
 	/**
 	 * Methode zum Zippen einer Datei.
 	 * 
-	 * @param source
-	 *            String, Teil des ursprünglichen Pfades, welcher abgeschnitten werden muss.
-	 * @param zipFile
-	 *            File, gewünschtes finales Zip-File.
-	 * @param fileList
-	 *            List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden sollen.
-	 * @throws RuntimeException
-	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
+	 * @param source   String, Teil des ursprünglichen Pfades, welcher abgeschnitten
+	 *                 werden muss.
+	 * @param zipFile  File, gewünschtes finales Zip-File.
+	 * @param fileList List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden
+	 *                 sollen.
+	 * @throws RuntimeException      Falls eine Datei nicht gezipped werden kann,
+	 *                               zum Beispiel aufgrund eines falschen Pfades.
 	 * @throws FileNotFoundException
 	 */
 	public void zip(String source, File zipFile, List<Path> fileList) throws Exception {
@@ -215,7 +217,8 @@ public class FilesService {
 
 				// noch mehr zipps in einer zip sind sinnlos
 				if (filePath.toFile().isFile() && (!filePath.toString().contains("zip"))) {
-					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()).replace('\\', '/'));
+					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length())
+							.replace('\\', '/'));
 
 					// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen
 					// Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,
@@ -258,12 +261,11 @@ public class FilesService {
 	/**
 	 * Methode zum Entpacken einer Datei.
 	 * 
-	 * @param fileZip
-	 *            File, die gepackte Datei.
-	 * @param destDirName
-	 *            Path, Pfad im Dateisystem, an welchem der Inhalt des Zips gespeichert werden soll.
-	 * @throws IOException
-	 *             Falls das Directory nicht existiert oder kein Directory ist oder falls die Datei nicht entpackt werden kann.
+	 * @param fileZip     File, die gepackte Datei.
+	 * @param destDirName Path, Pfad im Dateisystem, an welchem der Inhalt des Zips
+	 *                    gespeichert werden soll.
+	 * @throws IOException Falls das Directory nicht existiert oder kein Directory
+	 *                     ist oder falls die Datei nicht entpackt werden kann.
 	 */
 	public void unzipFile(File fileZip, Path destDirName) throws IOException {
 		byte[] buffer = new byte[1024];
@@ -318,7 +320,7 @@ public class FilesService {
 		try {
 			result = viewController.getIndexView(mdi);
 		} catch (Exception e) {
-			throw new RuntimeException("Error while trying to access xvcasMDI.", e);
+			throw new RuntimeException("Error while trying to access xtcasMdi.", e);
 		}
 		customLogger.logUserRequest("Generating MDI for User " + user);
 
@@ -329,15 +331,10 @@ public class FilesService {
 		// Rückgabe nach Position sortieren.
 		int position = result.findColumnPosition("Position");
 
-		result.getRows().sort(new Comparator<Row>() {
-
-			@Override
-			public int compare(Row r1, Row r2) {
-				Double position1 = r1.getValues().get(position).getDoubleValue();
-				Double position2 = r2.getValues().get(position).getDoubleValue();
-				return position1.compareTo(position2);
-
-			}
+		result.getRows().sort((r1, r2) -> {
+			Double position1 = r1.getValues().get(position).getDoubleValue();
+			Double position2 = r2.getValues().get(position).getDoubleValue();
+			return position1.compareTo(position2);
 		});
 
 		// Ab hier wird die MDI erstellt.
@@ -346,27 +343,26 @@ public class FilesService {
 		Menu mainMenu = new Menu();
 		mainMenu.setId("main");
 		main.setMenu(mainMenu);
-
 		List<Row> formRows = new ArrayList<>();
 		Map<String, Menu> menuMap = new HashMap<>();
 
 		// TODO: Rekursiven Aufruf später.
 
-		for (Row r : mdi.getRows()) {
-			int mdiKey = mdi.getValue("MdiTypeKey", r).getIntegerValue();
+		for (Row r : result.getRows()) {
+			int mdiKey = result.getValue("MdiTypeKey", r).getIntegerValue();
 			if (mdiKey == 1) {
 				formRows.add(r);
 			} else if (mdiKey == 2) {
 				Menu menu = new Menu();
-				menu.setId(mdi.getValue("ID", r).getStringValue());
-				menu.setText(mdi.getValue("Label", r).getStringValue());
+				menu.setId(result.getValue("ID", r).getStringValue());
+				menu.setText(result.getValue("Label", r).getStringValue());
 
 				// Menupunkt an Hauptmenü anhängen.
 				mainMenu.getMenuOrEntry().add(menu);
 				menuMap.put(menu.getId(), menu);
 			} else if (mdiKey == 3) {
-				main.setIcon(mdi.getValue("Icon", r).getStringValue());
-				main.setTitle(mdi.getValue("Label", r).getStringValue());
+				main.setIcon(result.getValue("Icon", r).getStringValue());
+				main.setTitle(result.getValue("Label", r).getStringValue());
 			} else {
 				throw new IllegalArgumentException("No definition for mdiKey " + mdiKey + "found!");
 			}
@@ -376,14 +372,14 @@ public class FilesService {
 
 		for (Row r : formRows) {
 			Action action = new Action();
-			action.setAction(mdi.getValue("ID", r).getStringValue() + ".xml");
-			action.setId(mdi.getValue("ID", r).getStringValue());
-			action.setIcon(mdi.getValue("Icon", r).getStringValue());
-			action.setText(mdi.getValue("Label", r).getStringValue());
+			action.setAction(result.getValue("ID", r).getStringValue() + ".xml");
+			action.setId(result.getValue("ID", r).getStringValue());
+			action.setIcon(result.getValue("Icon", r).getStringValue());
+			action.setText(result.getValue("Label", r).getStringValue());
 			main.getAction().add(action);
 
 			Entry entry = new Entry();
-			entry.setId(mdi.getValue("ID", r).getStringValue());
+			entry.setId(result.getValue("Menu", r).getStringValue());
 			entry.setType("action");
 			menuMap.get(entry.getId()).getMenuOrEntry().add(entry);
 		}
@@ -398,13 +394,8 @@ public class FilesService {
 			JAXBContext jaxbContext = JAXBContext.newInstance(Main.class);
 			// Create Marshaller
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			// Required formatting??
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, java.lang.Boolean.TRUE);
-			jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
-					"https://raw.githubusercontent.com/minova-afis/aero.minova.xsd/main/form.xsd");
-			jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.w3.org/2001/XMLSchema-instance");
 
-			QName qName = new QName("", "form");
+			QName qName = new QName("", "main");
 			JAXBElement<Main> root = new JAXBElement<>(qName, Main.class, mainXML);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -415,7 +406,6 @@ public class FilesService {
 			customLogger.logError(e.getMessage(), e);
 		}
 
-		return null;
-
+		return new byte[0];
 	}
 }

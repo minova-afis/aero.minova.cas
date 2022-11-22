@@ -2,7 +2,7 @@ alter view dbo.xvcasMdi
 with encryption as
 	select id,
 			icon,
-			text,
+			label,
 			menu,
 			position,
 			securitytoken,

@@ -11,7 +11,7 @@ Im Folgenden wir die Generierung der MDI beschrieben. Die MDI soll vom CAS gener
     - Menu - Menustruktureinträge, kann auch geschachtelt werden
 - Menu: Menupunkt, in welchem die Maske eingetragen wird
 - Position: Position der Form/Maske innerhalb des Menus, kann auch mit Fließkommawert angegeben werden
-- ModulName: Der Name des Moduls/Projekts, das den Eintrag erstellt/geändert hat
+- ModulName: Der Name des Moduls/Projekts, das den Eintrag erstellt/geändert hat. Damit wir nachvollziehen können, wo die Zeile her kommt. Wird beim Generieren nicht verwendet
 - SecurityToken: eindeutiger Benutzer-Token
 - LastAction: Status des Datensatzes, -1 (gelöscht), 1 (neu erstellt) , 2 (upgedated)
 - LastDate: Datum der letzten Änderung

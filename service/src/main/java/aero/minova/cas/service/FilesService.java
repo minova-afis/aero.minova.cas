@@ -29,7 +29,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +37,7 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.mdi.Main;
 import aero.minova.cas.service.mdi.Main.Action;
@@ -48,10 +48,10 @@ import aero.minova.cas.service.mdi.MenuType;
 @Service
 public class FilesService {
 
-	@Value("${aero_minova_core_application_root_path:.}")
+	@org.springframework.beans.factory.annotation.Value("${aero_minova_core_application_root_path:.}")
 	private String rootPath;
 
-	@Value("${files.permission.check:false}")
+	@org.springframework.beans.factory.annotation.Value("${files.permission.check:false}")
 	boolean permissionCheck;
 
 	@Autowired
@@ -335,29 +335,53 @@ public class FilesService {
 
 		// Rückgabe nach Position sortieren.
 		int position = result.findColumnPosition("Position");
+		int idPosition = result.findColumnPosition("ID");
 
 		result.getRows().sort((r1, r2) -> {
-			if (r1.getValues().get(position) == null) {
-				return -1;
-			}
-			if (r2.getValues().get(position) == null) {
-				return 1;
-			}
+			int compareReturn;
+
+			// Auch beachten, wenn eines der Values null ist
 			if (r1.getValues().get(position) == null && r2.getValues().get(position) == null) {
-				return 0;
+				compareReturn = 0;
+			} else if (r1.getValues().get(position) == null) {
+				compareReturn = -1;
+			} else if (r2.getValues().get(position) == null) {
+				compareReturn = 1;
+			} else {
+
+				// "Normalfall", beide Positionen != null -> direkt vergleichen
+				Double position1 = r1.getValues().get(position).getDoubleValue();
+				Double position2 = r2.getValues().get(position).getDoubleValue();
+				compareReturn = position1.compareTo(position2);
 			}
 
-			Double position1 = r1.getValues().get(position).getDoubleValue();
-			Double position2 = r2.getValues().get(position).getDoubleValue();
-			return position1.compareTo(position2);
+			// Bei gleicher Position nach ID sortieren
+			if (compareReturn == 0) {
+				Value id1v = r1.getValues().get(idPosition);
+				Value id2v = r2.getValues().get(idPosition);
+
+				if (id1v == null && id2v == null) {
+					compareReturn = 0;
+				} else if (id1v == null) {
+					compareReturn = -1;
+				} else if (id2v == null) {
+					compareReturn = 1;
+				} else {
+					// Verleich anhand der IDs
+					String id1 = id1v.getStringValue();
+					String id2 = id2v.getStringValue();
+					compareReturn = id1.compareTo(id2);
+				}
+			}
+
+			return compareReturn;
 		});
 
 		// Ab hier wird die MDI erstellt.
 
 		Main main = new Main();
 
-		// Das Menu in Main ist das EINZIGE Menu, dass wirklich von der Menu-Klasse ist.
-		// Alle anderen sind MenuType.
+		// Das Menu in Main ist das EINZIGE Menu, dass wirklich von der Menu-Klasse ist. Alle anderen sind MenuType.
 		Menu mainMenu = new Menu();
 		mainMenu.setId("main");
 		main.setMenu(mainMenu);
@@ -365,8 +389,7 @@ public class FilesService {
 		Map<String, MenuType> menuById = new HashMap<>();
 		Map<String, List<MenuType>> menuBySupermenu = new HashMap<>();
 
-		// Hier das Ergebnis der Abfrage nach den verschiedenen MDITypeKeys
-		// unterscheiden.
+		// Hier das Ergebnis der Abfrage nach den verschiedenen MDITypeKeys unterscheiden.
 		for (Row r : result.getRows()) {
 			int mdiKey = result.getValue("MdiTypeKey", r).getIntegerValue();
 
@@ -386,8 +409,7 @@ public class FilesService {
 
 				menuById.put(menu.getId(), menu);
 
-				// Key = 3 ist der Eintrag ganz oben in der Toolbar. Dieser darf nur einmal
-				// vorhanden sein.
+				// Key = 3 ist der Eintrag ganz oben in der Toolbar. Dieser darf nur einmal vorhanden sein.
 			} else if (mdiKey == 3) {
 				main.setIcon(result.getValue("Icon", r).getStringValue());
 				main.setTitle(result.getValue("Label", r).getStringValue());
@@ -396,8 +418,8 @@ public class FilesService {
 			}
 		}
 
-		// Hier rekursiver Aufruf zum Anhängen der Untermenüs an die Menüs bzw. der
-		// Menüs an das MainMenu.
+		// Hier rekursiver Aufruf zum Anhängen der Untermenüs an die Menüs bzw. der Menüs an das MainMenu.
+		// TODO: Leere Menüs nicht hinzufügen
 		for (MenuType m : menuBySupermenu.get("null")) {
 			mainMenu.getMenuOrEntry().add(m);
 			addMenus(m, menuBySupermenu.get(m.getId()), menuBySupermenu);
@@ -416,7 +438,6 @@ public class FilesService {
 			entry.setId(action);
 			entry.setType("action");
 
-			// TODO Soll man da etwas machen?
 			MenuType menuType = menuById.get(result.getValue("Menu", r).getStringValue());
 			if (menuType != null) {
 				menuType.getEntryOrMenu().add(entry);

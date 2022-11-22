@@ -67,16 +67,14 @@ public class FilesService {
 	private Path zipsFolder;
 	private Path md5Folder;
 
-	public FilesService() {
-	}
+	public FilesService() {}
 
 	public FilesService(String rootPath) {
 		this.rootPath = rootPath;
 	}
 
 	/**
-	 * Initialisiert alle nötigen Ordner. Mit {@link Path#toAbsolutePath()} und
-	 * {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
+	 * Initialisiert alle nötigen Ordner. Mit {@link Path#toAbsolutePath()} und {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
 	 */
 	@PostConstruct
 	public void setUp() {
@@ -142,14 +140,14 @@ public class FilesService {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory.
-	 * Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
+	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory. Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
 	 * ebenfalls aufgelistet
 	 * 
-	 * @param dir das zu durchsuchende Directory
+	 * @param dir
+	 *            das zu durchsuchende Directory
 	 * @return eine Liste an allen Files in dem übergebenen Directory
-	 * @throws FileNotFoundException Falls das Directory nicht existiert oder der
-	 *                               übergebene Pfad nicht auf ein Directory zeigt.
+	 * @throws FileNotFoundException
+	 *             Falls das Directory nicht existiert oder der übergebene Pfad nicht auf ein Directory zeigt.
 	 */
 	public List<Path> populateFilesList(Path dir) throws FileNotFoundException {
 		List<Path> filesListInDir = new ArrayList<>();
@@ -167,15 +165,13 @@ public class FilesService {
 	}
 
 	/**
-	 * Überprüft, ob die angeforderte Datei existiert und ob der Pfad dorthin
-	 * innerhalb des dedizierten Dateisystems liegt.
+	 * Überprüft, ob die angeforderte Datei existiert und ob der Pfad dorthin innerhalb des dedizierten Dateisystems liegt.
 	 * 
-	 * @param path Pfad zur gewünschten Datei.
-	 * @throws Exception RuntimeException, falls User nicht erforderliche
-	 *                   Privilegien besitzt, IllegalAccessException, falls der Pfad
-	 *                   nicht in das abgegrenzte Dateisystem zeigt,
-	 *                   NoSuchFileException, falls gewünschte Datei nicht
-	 *                   existiert.
+	 * @param path
+	 *            Pfad zur gewünschten Datei.
+	 * @throws Exception
+	 *             RuntimeException, falls User nicht erforderliche Privilegien besitzt, IllegalAccessException, falls der Pfad nicht in das abgegrenzte
+	 *             Dateisystem zeigt, NoSuchFileException, falls gewünschte Datei nicht existiert.
 	 */
 	public Path checkLegalPath(Path path) throws Exception {
 		if (permissionCheck) {
@@ -198,13 +194,14 @@ public class FilesService {
 	/**
 	 * Methode zum Zippen einer Datei.
 	 * 
-	 * @param source   String, Teil des ursprünglichen Pfades, welcher abgeschnitten
-	 *                 werden muss.
-	 * @param zipFile  File, gewünschtes finales Zip-File.
-	 * @param fileList List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden
-	 *                 sollen.
-	 * @throws RuntimeException      Falls eine Datei nicht gezipped werden kann,
-	 *                               zum Beispiel aufgrund eines falschen Pfades.
+	 * @param source
+	 *            String, Teil des ursprünglichen Pfades, welcher abgeschnitten werden muss.
+	 * @param zipFile
+	 *            File, gewünschtes finales Zip-File.
+	 * @param fileList
+	 *            List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden sollen.
+	 * @throws RuntimeException
+	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
 	 * @throws FileNotFoundException
 	 */
 	public void zip(String source, File zipFile, List<Path> fileList) throws Exception {
@@ -217,8 +214,7 @@ public class FilesService {
 
 				// noch mehr zipps in einer zip sind sinnlos
 				if (filePath.toFile().isFile() && (!filePath.toString().contains("zip"))) {
-					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length())
-							.replace('\\', '/'));
+					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()).replace('\\', '/'));
 
 					// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen
 					// Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,
@@ -261,11 +257,12 @@ public class FilesService {
 	/**
 	 * Methode zum Entpacken einer Datei.
 	 * 
-	 * @param fileZip     File, die gepackte Datei.
-	 * @param destDirName Path, Pfad im Dateisystem, an welchem der Inhalt des Zips
-	 *                    gespeichert werden soll.
-	 * @throws IOException Falls das Directory nicht existiert oder kein Directory
-	 *                     ist oder falls die Datei nicht entpackt werden kann.
+	 * @param fileZip
+	 *            File, die gepackte Datei.
+	 * @param destDirName
+	 *            Path, Pfad im Dateisystem, an welchem der Inhalt des Zips gespeichert werden soll.
+	 * @throws IOException
+	 *             Falls das Directory nicht existiert oder kein Directory ist oder falls die Datei nicht entpackt werden kann.
 	 */
 	public void unzipFile(File fileZip, Path destDirName) throws IOException {
 		byte[] buffer = new byte[1024];
@@ -388,7 +385,6 @@ public class FilesService {
 	}
 
 	public byte[] xml2byteArray(Main mainXML) {
-
 		try {
 			// Create JAXB Context
 			JAXBContext jaxbContext = JAXBContext.newInstance(Main.class);
@@ -404,8 +400,7 @@ public class FilesService {
 
 		} catch (Exception e) {
 			customLogger.logError(e.getMessage(), e);
+			throw new RuntimeException(e);
 		}
-
-		return new byte[0];
 	}
 }

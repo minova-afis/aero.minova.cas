@@ -68,16 +68,14 @@ public class FilesService {
 	private Path zipsFolder;
 	private Path md5Folder;
 
-	public FilesService() {
-	}
+	public FilesService() {}
 
 	public FilesService(String rootPath) {
 		this.rootPath = rootPath;
 	}
 
 	/**
-	 * Initialisiert alle nötigen Ordner. Mit {@link Path#toAbsolutePath()} und
-	 * {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
+	 * Initialisiert alle nötigen Ordner. Mit {@link Path#toAbsolutePath()} und {@link Path#normalize} werden die Pfade so eindeutig wie möglich.
 	 */
 	@PostConstruct
 	public void setUp() {
@@ -143,14 +141,14 @@ public class FilesService {
 	}
 
 	/**
-	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory.
-	 * Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
+	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory. Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
 	 * ebenfalls aufgelistet
 	 * 
-	 * @param dir das zu durchsuchende Directory
+	 * @param dir
+	 *            das zu durchsuchende Directory
 	 * @return eine Liste an allen Files in dem übergebenen Directory
-	 * @throws FileNotFoundException Falls das Directory nicht existiert oder der
-	 *                               übergebene Pfad nicht auf ein Directory zeigt.
+	 * @throws FileNotFoundException
+	 *             Falls das Directory nicht existiert oder der übergebene Pfad nicht auf ein Directory zeigt.
 	 */
 	public List<Path> populateFilesList(Path dir) throws FileNotFoundException {
 		List<Path> filesListInDir = new ArrayList<>();
@@ -168,15 +166,13 @@ public class FilesService {
 	}
 
 	/**
-	 * Überprüft, ob die angeforderte Datei existiert und ob der Pfad dorthin
-	 * innerhalb des dedizierten Dateisystems liegt.
+	 * Überprüft, ob die angeforderte Datei existiert und ob der Pfad dorthin innerhalb des dedizierten Dateisystems liegt.
 	 * 
-	 * @param path Pfad zur gewünschten Datei.
-	 * @throws Exception RuntimeException, falls User nicht erforderliche
-	 *                   Privilegien besitzt, IllegalAccessException, falls der Pfad
-	 *                   nicht in das abgegrenzte Dateisystem zeigt,
-	 *                   NoSuchFileException, falls gewünschte Datei nicht
-	 *                   existiert.
+	 * @param path
+	 *            Pfad zur gewünschten Datei.
+	 * @throws Exception
+	 *             RuntimeException, falls User nicht erforderliche Privilegien besitzt, IllegalAccessException, falls der Pfad nicht in das abgegrenzte
+	 *             Dateisystem zeigt, NoSuchFileException, falls gewünschte Datei nicht existiert.
 	 */
 	public Path checkLegalPath(Path path) throws Exception {
 		if (permissionCheck) {
@@ -199,13 +195,14 @@ public class FilesService {
 	/**
 	 * Methode zum Zippen einer Datei.
 	 * 
-	 * @param source   String, Teil des ursprünglichen Pfades, welcher abgeschnitten
-	 *                 werden muss.
-	 * @param zipFile  File, gewünschtes finales Zip-File.
-	 * @param fileList List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden
-	 *                 sollen.
-	 * @throws RuntimeException      Falls eine Datei nicht gezipped werden kann,
-	 *                               zum Beispiel aufgrund eines falschen Pfades.
+	 * @param source
+	 *            String, Teil des ursprünglichen Pfades, welcher abgeschnitten werden muss.
+	 * @param zipFile
+	 *            File, gewünschtes finales Zip-File.
+	 * @param fileList
+	 *            List&lt;Path&gt;, Pfade zu Dateien, welche gezipped werden sollen.
+	 * @throws RuntimeException
+	 *             Falls eine Datei nicht gezipped werden kann, zum Beispiel aufgrund eines falschen Pfades.
 	 * @throws FileNotFoundException
 	 */
 	public void zip(String source, File zipFile, List<Path> fileList) throws Exception {
@@ -218,8 +215,7 @@ public class FilesService {
 
 				// noch mehr zipps in einer zip sind sinnlos
 				if (filePath.toFile().isFile() && (!filePath.toString().contains("zip"))) {
-					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length())
-							.replace('\\', '/'));
+					ze = new ZipEntry(filePath.toString().substring(source.length() + 1, filePath.toString().length()).replace('\\', '/'));
 
 					// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen
 					// Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,
@@ -262,11 +258,12 @@ public class FilesService {
 	/**
 	 * Methode zum Entpacken einer Datei.
 	 * 
-	 * @param fileZip     File, die gepackte Datei.
-	 * @param destDirName Path, Pfad im Dateisystem, an welchem der Inhalt des Zips
-	 *                    gespeichert werden soll.
-	 * @throws IOException Falls das Directory nicht existiert oder kein Directory
-	 *                     ist oder falls die Datei nicht entpackt werden kann.
+	 * @param fileZip
+	 *            File, die gepackte Datei.
+	 * @param destDirName
+	 *            Path, Pfad im Dateisystem, an welchem der Inhalt des Zips gespeichert werden soll.
+	 * @throws IOException
+	 *             Falls das Directory nicht existiert oder kein Directory ist oder falls die Datei nicht entpackt werden kann.
 	 */
 	public void unzipFile(File fileZip, Path destDirName) throws IOException {
 		byte[] buffer = new byte[1024];
@@ -302,6 +299,11 @@ public class FilesService {
 		}
 	}
 
+	/**
+	 * Liest die Tabelle xtcasMDI aus und generiert userspezifisch die MDI.
+	 * 
+	 * @return die generierte MDI als byte Array.
+	 */
 	public byte[] readMDI() {
 
 		// TODO: Filter die Zeilen, die wir zurück bekommen.
@@ -334,6 +336,7 @@ public class FilesService {
 		// Rückgabe nach Position sortieren.
 		int position = result.findColumnPosition("Position");
 
+		// TODO: Null- Values abfangen.
 		result.getRows().sort((r1, r2) -> {
 			Double position1 = r1.getValues().get(position).getDoubleValue();
 			Double position2 = r2.getValues().get(position).getDoubleValue();
@@ -343,6 +346,8 @@ public class FilesService {
 		// Ab hier wird die MDI erstellt.
 
 		Main main = new Main();
+
+		// Das Menu in Main ist das EINZIGE Menu, dass wirklich von der Menu-Klasse ist. Alle anderen sind MenuType.
 		Menu mainMenu = new Menu();
 		mainMenu.setId("main");
 		main.setMenu(mainMenu);
@@ -350,21 +355,27 @@ public class FilesService {
 		Map<String, MenuType> menuById = new HashMap<>();
 		Map<String, List<MenuType>> menuBySupermenu = new HashMap<>();
 
+		// Hier das Ergebnis der Abfrage nach den verschiedenen MDITypeKeys unterscheiden.
 		for (Row r : result.getRows()) {
 			int mdiKey = result.getValue("MdiTypeKey", r).getIntegerValue();
+
+			// Key = 1 ist Eintrag, um Maske zu öffen.
 			if (mdiKey == 1) {
 				formRows.add(r);
+
+				// Key = 2 ist Menü / Untermenü.
 			} else if (mdiKey == 2) {
 				MenuType menu = new MenuType();
 				menu.setId(result.getValue("ID", r).getStringValue());
 				menu.setText(result.getValue("Label", r).getStringValue());
 
-				String supermenu = result.getValue("Menu", r) == null ? "null"
-						: result.getValue("Menu", r).getStringValue();
+				String supermenu = result.getValue("Menu", r) == null ? "null" : result.getValue("Menu", r).getStringValue();
 				menuBySupermenu.putIfAbsent(supermenu, new ArrayList<>());
 				menuBySupermenu.get(supermenu).add(menu);
 
 				menuById.put(menu.getId(), menu);
+
+				// Key = 3 ist der Eintrag ganz oben in der Toolbar. Dieser darf nur einmal vorhanden sein.
 			} else if (mdiKey == 3) {
 				main.setIcon(result.getValue("Icon", r).getStringValue());
 				main.setTitle(result.getValue("Label", r).getStringValue());
@@ -373,11 +384,13 @@ public class FilesService {
 			}
 		}
 
+		// Hier rekursiver Aufruf zum Anhängen der Untermenüs an die Menüs bzw. der Menüs an das MainMenu.
 		for (MenuType m : menuBySupermenu.get("null")) {
 			mainMenu.getMenuOrEntry().add(m);
 			addMenus(m, menuBySupermenu.get(m.getId()), menuBySupermenu);
 		}
 
+		// Anhängen von Entries an die Menüs und Erstellen der Actions.
 		for (Row r : formRows) {
 			Action action = new Action();
 			action.setAction(result.getValue("ID", r).getStringValue() + ".xml");
@@ -393,9 +406,20 @@ public class FilesService {
 			menuById.get(result.getValue("Menu", r).getStringValue()).getEntryOrMenu().add(entry);
 		}
 
+		// Umwandeln in byteArray.
 		return xml2byteArray(main);
 	}
 
+	/**
+	 * Fügt durch den rekursiven Aufruf Untermenüs an die Menüs hinzu.
+	 * 
+	 * @param superMenu
+	 *            Obermenü als MenuType.
+	 * @param subMenues
+	 *            Liste an MenuTypes, welche an das superMenu gehängt werden soll.
+	 * @param menuBySupermenu
+	 *            Gesamte Map an anzuhängenden Menüs.
+	 */
 	private void addMenus(MenuType superMenu, List<MenuType> subMenues, Map<String, List<MenuType>> menuBySupermenu) {
 		if (subMenues == null) {
 			return;
@@ -407,6 +431,13 @@ public class FilesService {
 		}
 	}
 
+	/**
+	 * Erzeugt aus der übergebenen Main-Klasse einen byte Array.
+	 * 
+	 * @param mainXML
+	 *            ein "befülltes" Main-Objekt.
+	 * @return die übergebene Main-Klasse als byte Array.
+	 */
 	public byte[] xml2byteArray(Main mainXML) {
 		try {
 			// Create JAXB Context

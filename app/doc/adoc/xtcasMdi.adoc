@@ -1,0 +1,109 @@
+
+
+== Tabelle xtcasMdi ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== ID
+
+Datentyp: nvarchar(100) +
+
+// tag::column.ID[]
+
+// end::column.ID[]
+
+
+==== Icon
+
+Datentyp: nvarchar(100) +
+
+// tag::column.Icon[]
+
+// end::column.Icon[]
+
+
+==== Label
+
+Datentyp: nvarchar(100) +
+
+// tag::column.Label[]
+
+// end::column.Label[]
+
+
+==== Menu
+
+Datentyp: nvarchar(100) +
+
+// tag::column.Menu[]
+
+// end::column.Menu[]
+
+
+==== Position
+
+Datentyp: float +
+
+// tag::column.Position[]
+
+// end::column.Position[]
+
+
+==== SecurityToken
+
+Datentyp: nvarchar(50) +
+
+// tag::column.SecurityToken[]
+
+// end::column.SecurityToken[]
+
+
+==== MdiTypeKey
+
+Datentyp: integer not null +
+
+// tag::column.MdiTypeKey[]
+
+// end::column.MdiTypeKey[]
+
+
+==== LastUser
+
+Datentyp: nvarchar(50) not null +
+Default: `system_user` +
+
+// tag::column.LastUser[]
+
+// end::column.LastUser[]
+
+
+==== LastDate
+
+Datentyp: datetime not null +
+Default: `getdate()` +
+
+// tag::column.LastDate[]
+
+// end::column.LastDate[]
+
+
+==== LastAction
+
+Datentyp: integer not null +
+Default: `1` +
+
+// tag::column.LastAction[]
+
+// end::column.LastAction[]

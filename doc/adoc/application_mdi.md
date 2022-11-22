@@ -21,11 +21,11 @@ Im Folgenden wir die Generierung der MDI beschrieben. Die MDI soll vom CAS gener
 
 | KeyLong | ID | Label | Typ | Icon | Menu | Position | ModulName | SecurityToken | LastAction | LastDate | LastUser |
 |---------|----|----|-----|------|------|----------|---------------|---------------|------------|----------|----------|
-| 1 | driver |@Driver.Administration | Form | Driver |MasterData | 1.2|aero.minova.driver | zdga6737er87gd6zed | 2 | 21.11.2022 12:23:45 |erlanger |
-| 2 | masterdata |@menu.masterdata | Menu| | | 1| h8h7d349hd7e8 | 2 |aero.minova.cas| 21.11.2022 12:34:12 |erlanger |
-| 3 | item |@Item.Administration | Form | Item |MasterData | 3|aero.minova.item| sdferf34534rf4r4 | 2 | 21.11.2022 12:23:45 |erlanger |
-| 4 | vehicle |@Vehicle.Administration | Form | Truck |MasterData |5|aero.minova.vehicle| fsfgerg5t45g4trf3 | 2 | 21.11.2022 12:23:45 |erlanger |
-| 5 | sis |@sis.Title | Application | | | | sdhgwg67438fg8r | 2 |aero.minova.sis| 21.11.2022 12:23:45 |erlanger |
+| 1 | driver |@Driver.Administration | Form | Driver |MasterData | 1.2|aero.minova.driver | #admin | 2 | 21.11.2022 12:23:45 |erlanger |
+| 2 | masterdata |@menu.masterdata | Menu| | | 1|aero.minova.cas| #admin | 2 | 21.11.2022 12:34:12 |erlanger |
+| 3 | item |@Item.Administration | Form | Item |MasterData | 3|aero.minova.item| #verwaltung | 2 | 21.11.2022 12:23:45 |erlanger |
+| 4 | vehicle |@Vehicle.Administration | Form | Truck |MasterData |5|aero.minova.vehicle| #verwaltung | 2 | 21.11.2022 12:23:45 |erlanger |
+| 5 | sis |@sis.Title | Application | | | |aero.minova.sis| #verwaltung | 2 | 21.11.2022 12:23:45 |erlanger |
 
 Aus dem oberen Beispiel sollte die folgende MDI Datei erstellt werden.
 

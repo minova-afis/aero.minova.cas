@@ -9,4 +9,3 @@ with encryption as
 			mdiTypeKey
 	from xtcasMdi 
 	where LastAction > 0
-	order by position asc

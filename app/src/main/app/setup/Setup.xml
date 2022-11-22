@@ -78,6 +78,7 @@
         <script name="xpcasInsertServiceProperties" type="procedure"/>
         <script name="xpcasReadServiceProperties" type="procedure"/>
         <script name="xpcasUpdateServiceProperties" type="procedure"/>
+        <script name="xvcasMdi" type="view"/>
     </sql-code>
     <schema>
         <tableschema name="xtcasError" type="table"/>

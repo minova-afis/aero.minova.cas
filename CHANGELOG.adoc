@@ -4,7 +4,12 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- ****-**-**
-* LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException
+* toString-Methode für Tabellen, Rows und Values.
+* Auslesen der xtcasMDI-Tabelle und augeben von benutzerspezifischen application.mdis.
+* Prüfung auf validen Input für Passwörter beim Inserten und Updaten von DB Usern.
+* Auslesen von UserGroupTokens für DB User bei Anfragen.
+
+* LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException.
 
 ## [12.55.0] -- 2022-11-11
 * Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.

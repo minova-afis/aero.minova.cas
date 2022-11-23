@@ -9,7 +9,7 @@ exec xpcasInitMdi 'ServiceProperties', 'xtcasServiceProperties', '@xtcasServiceP
 exec xpcasInitMdi 'CAS', null, '@CAS', null, 20.0, '#admin', 2, 'aero.minova.cas'
 exec xpcasInitMdi 'ColumnSecurity', 'ColumnSecurity', '@xtcasColumnSecurity', 'CAS', 11.0, '#admin', 1, 'aero.minova.cas'
 exec xpcasInitMdi 'UserGroup', 'UserGroup', '@xtcasUserGroup', 'CAS', 12.0, '#admin', 1, 'aero.minova.cas'
-exec xpcasInitMdi 'UserPrivileges', 'UserPrivilege', '@xtcasUserPrivilege', 'CAS', 13.0, '#admin', 1, 'aero.minova.cas'
+exec xpcasInitMdi 'UserPrivilege', 'UserPrivilege', '@xtcasUserPrivilege', 'CAS', 13.0, '#admin', 1, 'aero.minova.cas'
 exec xpcasInitMdi 'Mdi', 'Menu', '@xtcasMdi', 'CAS', 14.0, '#admin', 1, 'aero.minova.cas'
 exec xpcasInitMdi 'User', 'LDAPUser', '@xtcasUser', 'CAS', 10.0, '#admin', 1, 'aero.minova.cas'
 exec xpcasInitMdi 'Users', 'DBUser', '@xtcasUsers', 'CAS', 10.0, '#admin', 1, 'aero.minova.cas'

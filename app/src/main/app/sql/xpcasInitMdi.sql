@@ -17,26 +17,19 @@ as
 		if exists(select * from xtcasMdi where LastAction > 0 and MdiTypeKey = 3)
 		begin
 			set @Execute = 0
-
-			update xtcasMdi set 
-				Icon = @Icon,
-				Label = @Label,
-				Menu = @Menu,
-				Position = @Position,
-				SecurityToken = @SecurityToken,
-				MdiTypeKey = @MdiTypeKey,
-				ModulName = @ModulName,
-				LastUser = dbo.xfCasUser(),
-				LastDate = getDate(),
-				LastAction = 2
-			where MdiTypeKey = 3 and LastAction > 0
 		end
 	end 
 	
 	if (@Execute = 1)
 		begin
-		if not exists (select * from xtcasMdi where LastAction >-1 and ID = @ID)
+		if not exists (select * from xtcasMdi where LastAction > 0 and ID = @ID)
 		begin
+
+			if (@MdiTypeKey <> 1)
+			begin
+				set @SecurityToken = null 
+			end
+
 			insert into xtcasMdi(
 				ID,
 				Icon,
@@ -63,19 +56,4 @@ as
 				1
 			)
 		end
-		else 
-		begin 
-			update xtcasMdi set 
-					Icon = @Icon,
-					Label = @Label,
-					Menu = @Menu,
-					Position = @Position,
-					SecurityToken = @SecurityToken,
-					MdiTypeKey = @MdiTypeKey,
-					ModulName = @ModulName,
-					LastUser = dbo.xfCasUser(),
-					LastDate = getDate(),
-					LastAction = 2
-				where ID = @Id and LastAction > 0
-		end 
 	end

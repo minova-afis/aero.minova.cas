@@ -9,7 +9,13 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Prüfung auf validen Input für Passwörter beim Inserten und Updaten von DB Usern.
 * Auslesen von UserGroupTokens für DB User bei Anfragen.
 
-* LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException.
+
+## [12.55.1] -- 2022-11-22
+* LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException
+* Username Spaltenlänge in Error Table korrigiert
+* Mdi Masken, Tabelle und Prozeduren erstellt(samt Icon und Übersetzung)
+* Initialisierungs Prozedur und Skript erstellt
+* Icon Schrott beseitigt
 
 ## [12.55.0] -- 2022-11-11
 * Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.

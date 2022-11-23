@@ -418,13 +418,6 @@ public class FilesService {
 			}
 		}
 
-		// Hier rekursiver Aufruf zum Anhängen der Untermenüs an die Menüs bzw. der Menüs an das MainMenu.
-		// TODO: Leere Menüs nicht hinzufügen
-		for (MenuType m : menuBySupermenu.get("null")) {
-			mainMenu.getMenuOrEntry().add(m);
-			addMenus(m, menuBySupermenu.get(m.getId()), menuBySupermenu);
-		}
-
 		// Anhängen von Entries an die Menüs und Erstellen der Actions.
 		for (Row r : formRows) {
 			Action action = new Action();
@@ -444,12 +437,20 @@ public class FilesService {
 			}
 		}
 
+		// Hier rekursiver Aufruf zum Anhängen der Untermenüs an die Menüs bzw. der Menüs an das MainMenu. Leere Menüs werden nicht angehängt.
+		for (MenuType m : menuBySupermenu.get("null")) {
+			addMenus(m, menuBySupermenu.get(m.getId()), menuBySupermenu);
+			if (!m.getEntryOrMenu().isEmpty()) {
+				mainMenu.getMenuOrEntry().add(m);
+			}
+		}
+
 		// Umwandeln in byteArray.
 		return xml2byteArray(main);
 	}
 
 	/**
-	 * Fügt durch den rekursiven Aufruf Untermenüs an die Menüs hinzu.
+	 * Fügt durch den rekursiven Aufruf Untermenüs an die Menüs hinzu. Leere Menüs werden nicht angehängt.
 	 * 
 	 * @param superMenu
 	 *            Obermenü als MenuType.
@@ -464,8 +465,10 @@ public class FilesService {
 		}
 
 		for (MenuType m : subMenues) {
-			superMenu.getEntryOrMenu().add(m);
 			addMenus(m, menuBySupermenu.get(m.getId()), menuBySupermenu);
+			if (!m.getEntryOrMenu().isEmpty()) {
+				superMenu.getEntryOrMenu().add(m);
+			}
 		}
 	}
 

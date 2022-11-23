@@ -4,8 +4,8 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- ****-**-**
-* toString-Methode für Tabellen, Rows und Values.
-* Auslesen der xtcasMDI-Tabelle und augeben von benutzerspezifischen application.mdis.
+* toString-Methode für Tabellen, Rows und Values erstellen.
+* Die Datei application.mdi wird jetzt anhand der xtcasMdi-Tabelle benutzerspezifisch erzeugt.
 * Prüfung auf validen Input für Passwörter beim Inserten und Updaten von DB Usern.
 * Auslesen von UserGroupTokens für DB User bei Anfragen.
 

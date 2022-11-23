@@ -18,7 +18,7 @@ Datentyp: integer (identity) not null +
 
 ==== Username
 
-Datentyp: nvarchar(10) not null +
+Datentyp: nvarchar(50) not null +
 
 // tag::column.Username[]
 

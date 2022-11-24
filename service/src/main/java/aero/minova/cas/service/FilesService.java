@@ -329,7 +329,7 @@ public class FilesService {
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to access xtcasMdi.", e);
 		}
-		customLogger.logUserRequest("Generating MDI for User " + user);
+		customLogger.logFiles("Generating MDI for User " + user);
 
 		if (result.getRows().isEmpty()) {
 			throw new RuntimeException("No MDI definition for " + user);
@@ -433,10 +433,14 @@ public class FilesService {
 			entry.setId(action);
 			entry.setType("action");
 
-			MenuType menuType = menuById.get(result.getValue("Menu", r).getStringValue());
-			if (menuType != null) {
-				menuType.getEntryOrMenu().add(entry);
+			if (result.getValue("Menu", r) != null && menuById.get(result.getValue("Menu", r).getStringValue()) != null) {
+				menuById.get(result.getValue("Menu", r).getStringValue()).getEntryOrMenu().add(entry);
+			} else {
+				RuntimeException e = new RuntimeException("No menutype found for Action with ID " + action.getAction());
+				customLogger.logError("Error while trying to build Mdi. Action not supported.", e);
+				throw e;
 			}
+
 		}
 
 		// Hier rekursiver Aufruf zum Anhängen der Untermenüs an die Menüs bzw. der Menüs an das MainMenu. Leere Menüs werden nicht angehängt.
@@ -444,6 +448,8 @@ public class FilesService {
 			addMenus(m, menuBySupermenu.get(m.getId()), menuBySupermenu);
 			if (!m.getEntryOrMenu().isEmpty()) {
 				mainMenu.getMenuOrEntry().add(m);
+			} else {
+				customLogger.logFiles("Menu " + m.getId() + " is empty and has no Actions. It will not be pickable over the main menu.");
 			}
 		}
 
@@ -470,6 +476,8 @@ public class FilesService {
 			addMenus(m, menuBySupermenu.get(m.getId()), menuBySupermenu);
 			if (!m.getEntryOrMenu().isEmpty()) {
 				superMenu.getEntryOrMenu().add(m);
+			} else {
+				customLogger.logFiles("Menu " + m.getId() + " is empty and will not be in the finished Mdi.");
 			}
 		}
 	}

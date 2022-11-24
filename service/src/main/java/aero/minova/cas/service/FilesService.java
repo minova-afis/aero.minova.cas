@@ -436,11 +436,15 @@ public class FilesService {
 			if (result.getValue("Menu", r) != null && menuById.get(result.getValue("Menu", r).getStringValue()) != null) {
 				menuById.get(result.getValue("Menu", r).getStringValue()).getEntryOrMenu().add(entry);
 			} else {
-				RuntimeException e = new RuntimeException("No menutype found for Action with ID " + action.getAction());
-				customLogger.logError("Error while trying to build Mdi. Action not supported.", e);
-				throw e;
+				customLogger.logFiles("No menutype found for Action with ID " + action.getAction() + ". The mask will not be chooseable.");
 			}
 
+		}
+
+		if (menuBySupermenu.isEmpty()) {
+			RuntimeException e = new RuntimeException("No main menu defined. Mdi cannot be build!");
+			customLogger.logError("Error while building mdi for user " + user + ".", e);
+			throw e;
 		}
 
 		// Hier rekursiver Aufruf zum Anhängen der Untermenüs an die Menüs bzw. der Menüs an das MainMenu. Leere Menüs werden nicht angehängt.

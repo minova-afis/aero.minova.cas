@@ -439,7 +439,7 @@ public class FilesService {
 		}
 
 		if (menuBySupermenu.isEmpty()) {
-			RuntimeException e = new RuntimeException("No main menu defined. Mdi cannot be build!");
+			RuntimeException e = new RuntimeException("No menu defined. Mdi cannot be build!");
 			customLogger.logError("Error while building mdi for user " + user + ".", e);
 			throw e;
 		}

@@ -47,6 +47,9 @@ public class FilesController {
 	@Autowired
 	SqlProcedureController spc;
 
+	@org.springframework.beans.factory.annotation.Value("${generate.mdi.per.user:false}")
+	boolean generateMDIPerUser;
+
 	// TODO Extension vorerst entfernt, aber für später aufheben
 	// TODO Bytes in JSON durch BASE64 darstellen
 //	@PostConstruct
@@ -143,8 +146,12 @@ public class FilesController {
 	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
 		path = path.replace('\\', '/');
 
-		if (path.contains("application.mdi")) {
-			return fileService.readMDI();
+		if (generateMDIPerUser && path.contains("application.mdi")) {
+			try {
+				return fileService.readMDI();
+			} catch (Exception e) {
+				customLogger.logError("Mdi could not be red. It will be loaded from the system file path.", e);
+			}
 		}
 
 		String extension = FilenameUtils.getExtension(path);

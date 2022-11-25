@@ -46,7 +46,7 @@ public class CommunicationController {
 		try {
 			securityService.loadAllPrivileges();
 		} catch (Exception e) {
-			customLogger.logError("Erorr while trying to laod privileges!", e);
+			customLogger.logError("Erorr while trying to load privileges!", e);
 			throw new RuntimeException(e);
 		}
 	}

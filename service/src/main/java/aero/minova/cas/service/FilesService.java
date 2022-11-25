@@ -423,7 +423,7 @@ public class FilesService {
 				main.setIcon(mdiData.getValue("Icon", r).getStringValue());
 				main.setTitle(mdiData.getValue("Label", r).getStringValue());
 			} else {
-				throw new IllegalArgumentException("No mdiKey " + mdiKey + " not implemented!");
+				throw new IllegalArgumentException("MdiKey " + mdiKey + " not implemented!");
 			}
 		}
 

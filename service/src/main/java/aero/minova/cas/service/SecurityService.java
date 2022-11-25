@@ -80,21 +80,49 @@ public class SecurityService {
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		Table userPrivileges = new Table();
-		userPrivileges.setName("xvcasUserPrivileges");
+		userPrivileges.setName("xvcasUserSecurity");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
-		columns.add(new Column("KeyText", DataType.STRING));
+		columns.add(new Column("SecurityToken", DataType.STRING));
 		columns.add(new Column("RowLevelSecurity", DataType.BOOLEAN));
 		columns.add(Column.AND_FIELD);
 		userPrivileges.setColumns(columns);
 
 		for (GrantedAuthority ga : allUserAuthorities) {
+
+			// Überprüfen, ob der SecurityToken an irgendeiner Position in der SecurityToken-Spalte auftaucht.
 			Row tableNameAndUserToken = new Row();
+
+			// Token ist in der Mitte des Strings.
+			tableNameAndUserToken.setValues(
+					asList(new Value(privilegeName, null), new Value("%#" + ga.getAuthority() + "#%", null), new Value("", null), new Value(false, null)));
+			// Token ist am Ende des Strings
 			tableNameAndUserToken
-					.setValues(asList(new Value(privilegeName, null), new Value(ga.getAuthority(), null), new Value("", null), new Value(false, null)));
+					.setValues(asList(new Value(privilegeName, null), new Value("%#" + ga.getAuthority(), null), new Value("", null), new Value(false, null)));
+//			tableNameAndUserToken d), new Value("#" + ga.getAuthority(), null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
-		return unsecurelyGetIndexView(userPrivileges).getRows();
+
+		// Hier bekommen wir Rows zurück, die in irgendeiner Weise unsere Tokens enthalten.
+		List<Row> queryResult = unsecurelyGetIndexView(userPrivileges).getRows();
+
+		// Hier filtern wir noch alle SecurityToken raus, die nicht unserem Benutzer gehören.
+		List<Row> returnRows = new ArrayList<>();
+		for (Row r : queryResult) {
+			List<String> resultAuthorities = Stream.of(r.getValues().get(1).getStringValue().split("#"))//
+					.map(elem -> new String(elem))//
+					.collect(Collectors.toList());
+
+			for (String authority : resultAuthorities) {
+				if (authority != null && !authority.isBlank() && allUserAuthorities.contains(new SimpleGrantedAuthority(authority))) {
+					r.getValues().set(1, new Value(authority, null));
+					returnRows.add(r);
+				}
+			}
+
+		}
+
+		return returnRows;
 	}
 
 	/**
@@ -283,7 +311,7 @@ public class SecurityService {
 		if (!requestingRoles.isEmpty()) {
 			rowSec.append("\r\nor ( SecurityToken IN (");
 			for (String r : requestingRoles) {
-				rowSec.append("'").append(r.trim()).append("',");
+				rowSec.append("'").append(r.replace('#', ' ').trim()).append("',");
 			}
 			rowSec.deleteCharAt(rowSec.length() - 1);
 			rowSec.append(") )");

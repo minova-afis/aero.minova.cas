@@ -16,6 +16,7 @@
         <script name="spMinovaCheckData" type="procedure"/>
         <script name="xfCasUser" type="function"/>
         <script name="xvcasUserPrivileges" type="view"/>
+        <script name="xvcasUserSecurity" type="view"/>
         <script name="xpcasReadUser" type="procedure"/>
         <script name="xpcasInsertUser" type="procedure"/>
         <script name="xpcasUpdateUser" type="procedure"/>

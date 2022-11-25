@@ -47,14 +47,14 @@ public class SecurityService {
 
 	/**
 	 * Prüft, ob die minimal notwendigen Datenbank-Objekte für die Privileg-Prüfung in der Datenbank aufgesetzt wurden. Dazu prüft man, ob die
-	 * `xvcasUserPrivileges` vorhanden ist.
+	 * `xvcasUserSecurity` vorhanden ist.
 	 *
 	 * @return Dies ist wahr, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
 	 * @throws Exception
 	 *             Fehler bei der Ermittelung
 	 */
 	public boolean arePrivilegeStoresSetup() throws Exception {
-		return isTablePresent("xvcasuserprivileges");
+		return isTablePresent("xvcasusersecurity");
 	}
 
 	public boolean isTablePresent(String tableName) throws Exception {
@@ -67,9 +67,9 @@ public class SecurityService {
 
 	/**
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt. Die Abfrage sieht
-	 * folgendermaßen aus: select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserPrivileges where (PrivilegeKeyText = privilegeName and KeyText =
-	 * UserSecurityToken1) or (PrivilegeKeyText = privilegeName and KeyText = UserSecurityToken2) or ... Die erzeugten Rows haben folgendes Format: Row r =
-	 * [Tabellenname,UserSecurityToken,RowLevelSecurity], Beispiel: Row r = ["tTestTabelle","User1",1], Row r2 = ["tTestTabelle","User2",0]
+	 * folgendermaßen aus: select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserSecurity where (PrivilegeKeyText = privilegeName and SecurityToken =
+	 * UserSecurityToken1) or (PrivilegeKeyText = privilegeName and SecurityToken = UserSecurityToken2) or ... Die erzeugten Rows haben folgendes Format: Row r
+	 * = [Tabellenname,UserSecurityToken,RowLevelSecurity], Beispiel: Row r = ["tTestTabelle","User1",1], Row r2 = ["tTestTabelle","User2",0]
 	 *
 	 * @param privilegeName
 	 *            Das Privilege, für das ein Recht eingefordert wird.

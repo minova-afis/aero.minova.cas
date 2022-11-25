@@ -56,8 +56,8 @@ Dies geschieht mit der Methode _checkPrivilege(Table_ _inputTable)_ in folgender
 [source, sql]
 ----
 select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserSecurity
-where (PrivilegeKeyText = 'inputTable.getName()' and KeyText='admin')
-or    (PrivilegeKeyText = 'inputTable.getName()' and KeyText='verwaltung')
+where (PrivilegeKeyText = 'inputTable.getName()' and SecurityToken='admin')
+or    (PrivilegeKeyText = 'inputTable.getName()' and SecurityToken='verwaltung')
 or    ...
 ----
 
@@ -65,8 +65,7 @@ or    ...
 * *KeyText*: eine der Rollen des Users
 * *RowLevelSecurity*: ein Bit, welches darauf hinweist, ob diese Rolle auf der angefragten Tabelle nur bestimmte Zeilen sehen darf; siehe <<Row-Level-Security>>
 
-Diese Liste an Tripeln wird dann an die dafür vorgesehenen Methoden weiter gereicht. 
-
+Diese Liste an Tripeln wird dann an die dafür vorgesehenen Methoden weiter gereicht.
 
 === Row-Level-Security
 
@@ -85,6 +84,36 @@ and ( (SecurityToken in NULL)
 
 Hierfür brauchen die betroffenen Tabellen natürlich eine Spalte '_SecurityToken_', in welcher diese hinterlegt werden können.
 Auf eine Spalte mit dem SecurityToken *NULL* darf jeder User zugreifen.
+
+
+Hier der Zugriff noch einmal als Aktivitätsdiagramm:
+
+[plantuml,cloud-service-infrastructure,svg]
+.Gestrichelte Linien bedeuten, dass etwas auf der Datenbank ausgeführt wird.
+....
+@startuml
+User -> CAS: Schickt Anfrage auf View vBeispel an CAS
+CAS --> xtcasUser: Falls LDAP User
+CAS --> xtcasUsers: Falls Datenbank User
+
+CAS <-- xtcasUser: Gibt KeyText für UserGroup zurück
+CAS <-- xtcasUsers: Gibt KeyText für UserGroup zurück
+
+CAS --> xtcasUserGroup: Fragt anhand des Keytexts die SecurityTokens der Gruppe an
+CAS <-- xtcasUserGroup: Gibt SecurityTokens zurück
+
+CAS --> xvcasUserSecurity: Prüft anhand der SecurityTokens, ob User berechtigt ist auf vBeispel zuzugreifen
+CAS <-- xvcasUserSecurity: Vergleicht, welche SecurityTokens des Users berechtigt sind und gibt diese zurück. Sind sie leer ist der User nicht berechtigt.
+
+
+CAS --> vBeispel: Schickt Anfrage an vBeispel mit berechtigten SecurityTokens in where Bedingung
+CAS <-- vBeispel: Liefert alle Einträge von vBeispel gefiltert anhand der SecurityTokens
+
+CAS -> User: Liefert gefiltertes Ergebnis
+@enduml
+....
+
+IMPORTANT: Haben zwei UserGoups einen gemeinsamen SecurityToken, aber nur eine der beiden Gruppem hat eine bestimmte Berechtigung, erhält die andere Gruppe ebenfalls die Berechtigung, da sie sich einen SecurityToken teilen. Durch das Teilen des Tokens wird die eine Gruppe defacto zur Untergruppe der anderen Gruppe.
 
 === Column-Level-Security
 

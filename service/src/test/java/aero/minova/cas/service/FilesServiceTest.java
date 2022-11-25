@@ -229,6 +229,6 @@ public class FilesServiceTest extends BaseTest {
 
 		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.readMDI());
 		thrown.expect(RuntimeException.class);
-		assertEquals("No main menu defined. Mdi cannot be build!", exception.getMessage());
+		assertEquals("No menu defined. Mdi cannot be build!", exception.getMessage());
 	}
 }

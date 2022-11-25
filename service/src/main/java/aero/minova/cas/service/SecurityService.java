@@ -116,7 +116,7 @@ public class SecurityService {
 				if (authority != null && !authority.isBlank() && allUserAuthorities.contains(new SimpleGrantedAuthority(authority))) {
 					r.getValues().set(1, new Value(authority, null));
 					Row newRow = new Row();
-					newRow.setValues(asList(r.getValues().get(0), new Value(authority, null), r.getValues().get(2), r.getValues().get(3)));
+					newRow.setValues(asList(r.getValues().get(0), new Value(authority, null), r.getValues().get(2)));
 					returnRows.add(newRow);
 				}
 			}

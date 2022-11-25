@@ -147,6 +147,8 @@ public class FilesController {
 		path = path.replace('\\', '/');
 
 		if (generateMDIPerUser && path.contains("application.mdi")) {
+
+			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
 				return fileService.readMDI();
 			} catch (Exception e) {

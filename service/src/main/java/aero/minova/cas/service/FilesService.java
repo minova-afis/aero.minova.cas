@@ -1,6 +1,7 @@
 package aero.minova.cas.service;
 
 import static java.nio.file.Files.isDirectory;
+import static java.util.Arrays.asList;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -309,34 +310,43 @@ public class FilesService {
 	public byte[] readMDI() {
 		String user = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		Table mdi = new Table();
-		mdi.setName("xtcasMdi");
+		Table mdiQuery = new Table();
+		mdiQuery.setName("xtcasMdi");
 
-		mdi.addColumn(new Column("ID", DataType.STRING));
-		mdi.addColumn(new Column("Icon", DataType.STRING));
-		mdi.addColumn(new Column("Label", DataType.STRING));
-		mdi.addColumn(new Column("Menu", DataType.STRING));
-		mdi.addColumn(new Column("Position", DataType.DOUBLE));
-		mdi.addColumn(new Column("SecurityToken", DataType.STRING));
-		mdi.addColumn(new Column("MdiTypeKey", DataType.INTEGER));
+		mdiQuery.addColumn(new Column("ID", DataType.STRING));
+		mdiQuery.addColumn(new Column("Icon", DataType.STRING));
+		mdiQuery.addColumn(new Column("Label", DataType.STRING));
+		mdiQuery.addColumn(new Column("Menu", DataType.STRING));
+		mdiQuery.addColumn(new Column("Position", DataType.DOUBLE));
+		mdiQuery.addColumn(new Column("SecurityToken", DataType.STRING));
+		mdiQuery.addColumn(new Column("MdiTypeKey", DataType.INTEGER));
+		mdiQuery.addColumn(new Column("LastAction", DataType.INTEGER));
 
-		Table result;
+		// Es muss nach Lastaction > 0 geschaut werden.
+		Row mdiRow = new Row();
+		mdiRow.setValues(asList(null, null, null, null, null, null, null, new Value(0, ">")));
+
+		List<Row> queryRows = new ArrayList<>();
+		queryRows.add(mdiRow);
+		mdiQuery.setRows(queryRows);
+
+		Table mdiData;
 		try {
-			result = viewController.getIndexView(mdi);
+			mdiData = viewController.getIndexView(mdiQuery);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to access xtcasMdi.", e);
 		}
 		customLogger.logFiles("Generating MDI for User " + user);
 
-		if (result.getRows().isEmpty()) {
+		if (mdiData.getRows().isEmpty()) {
 			throw new RuntimeException("No MDI definition for " + user);
 		}
 
 		// Rückgabe nach Position sortieren.
-		int position = result.findColumnPosition("Position");
-		int idPosition = result.findColumnPosition("ID");
+		int position = mdiData.findColumnPosition("Position");
+		int idPosition = mdiData.findColumnPosition("ID");
 
-		result.getRows().sort((r1, r2) -> {
+		mdiData.getRows().sort((r1, r2) -> {
 			int compareReturn;
 
 			// Auch beachten, wenn eines der Values null ist
@@ -389,8 +399,8 @@ public class FilesService {
 		Map<String, List<MenuType>> menuBySupermenu = new HashMap<>();
 
 		// Hier das Ergebnis der Abfrage nach den verschiedenen MDITypeKeys unterscheiden.
-		for (Row r : result.getRows()) {
-			int mdiKey = result.getValue("MdiTypeKey", r).getIntegerValue();
+		for (Row r : mdiData.getRows()) {
+			int mdiKey = mdiData.getValue("MdiTypeKey", r).getIntegerValue();
 
 			// Key = 1 ist Eintrag, um Maske zu öffen.
 			if (mdiKey == 1) {
@@ -399,10 +409,10 @@ public class FilesService {
 				// Key = 2 ist Menü / Untermenü.
 			} else if (mdiKey == 2) {
 				MenuType menu = new MenuType();
-				menu.setId(result.getValue("ID", r).getStringValue());
-				menu.setText(result.getValue("Label", r).getStringValue());
+				menu.setId(mdiData.getValue("ID", r).getStringValue());
+				menu.setText(mdiData.getValue("Label", r).getStringValue());
 
-				String supermenu = result.getValue("Menu", r) == null ? "null" : result.getValue("Menu", r).getStringValue();
+				String supermenu = mdiData.getValue("Menu", r) == null ? "null" : mdiData.getValue("Menu", r).getStringValue();
 				menuBySupermenu.putIfAbsent(supermenu, new ArrayList<>());
 				menuBySupermenu.get(supermenu).add(menu);
 
@@ -410,8 +420,8 @@ public class FilesService {
 
 				// Key = 3 ist der Eintrag ganz oben in der Toolbar. Dieser darf nur einmal vorhanden sein.
 			} else if (mdiKey == 3) {
-				main.setIcon(result.getValue("Icon", r).getStringValue());
-				main.setTitle(result.getValue("Label", r).getStringValue());
+				main.setIcon(mdiData.getValue("Icon", r).getStringValue());
+				main.setTitle(mdiData.getValue("Label", r).getStringValue());
 			} else {
 				throw new IllegalArgumentException("No mdiKey " + mdiKey + " not implemented!");
 			}
@@ -420,18 +430,18 @@ public class FilesService {
 		// Anhängen von Entries an die Menüs und Erstellen der Actions.
 		for (Row r : formRows) {
 			Action action = new Action();
-			action.setAction(result.getValue("ID", r).getStringValue() + ".xml");
-			action.setId(result.getValue("ID", r).getStringValue());
-			action.setIcon(result.getValue("Icon", r).getStringValue());
-			action.setText(result.getValue("Label", r).getStringValue());
+			action.setAction(mdiData.getValue("ID", r).getStringValue() + ".xml");
+			action.setId(mdiData.getValue("ID", r).getStringValue());
+			action.setIcon(mdiData.getValue("Icon", r).getStringValue());
+			action.setText(mdiData.getValue("Label", r).getStringValue());
 			main.getAction().add(action);
 
 			Entry entry = new Entry();
 			entry.setId(action);
 			entry.setType("action");
 
-			if (result.getValue("Menu", r) != null && menuById.get(result.getValue("Menu", r).getStringValue()) != null) {
-				menuById.get(result.getValue("Menu", r).getStringValue()).getEntryOrMenu().add(entry);
+			if (mdiData.getValue("Menu", r) != null && menuById.get(mdiData.getValue("Menu", r).getStringValue()) != null) {
+				menuById.get(mdiData.getValue("Menu", r).getStringValue()).getEntryOrMenu().add(entry);
 			} else {
 				customLogger.logFiles("No menutype found for Action with ID " + action.getAction() + ". The mask will not be chooseable.");
 			}

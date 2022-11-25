@@ -307,9 +307,6 @@ public class FilesService {
 	 * @return die generierte MDI als byte Array.
 	 */
 	public byte[] readMDI() {
-
-		// TODO: Filter die Zeilen, die wir zurück bekommen.
-
 		String user = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		Table mdi = new Table();

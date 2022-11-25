@@ -99,7 +99,6 @@ public class SecurityService {
 			// Token ist am Ende des Strings
 			tableNameAndUserToken
 					.setValues(asList(new Value(privilegeName, null), new Value("%#" + ga.getAuthority(), null), new Value("", null), new Value(false, null)));
-//			tableNameAndUserToken d), new Value("#" + ga.getAuthority(), null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
 
@@ -110,13 +109,15 @@ public class SecurityService {
 		List<Row> returnRows = new ArrayList<>();
 		for (Row r : queryResult) {
 			List<String> resultAuthorities = Stream.of(r.getValues().get(1).getStringValue().split("#"))//
-					.map(elem -> new String(elem))//
+					.map(String::new)//
 					.collect(Collectors.toList());
 
 			for (String authority : resultAuthorities) {
 				if (authority != null && !authority.isBlank() && allUserAuthorities.contains(new SimpleGrantedAuthority(authority))) {
 					r.getValues().set(1, new Value(authority, null));
-					returnRows.add(r);
+					Row newRow = new Row();
+					newRow.setValues(asList(r.getValues().get(0), new Value(authority, null), r.getValues().get(2)));
+					returnRows.add(newRow);
 				}
 			}
 
@@ -132,7 +133,7 @@ public class SecurityService {
 		try {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			if (authentication != null) {
-				List<String> userSecurityTokens = new ArrayList<String>();
+				List<String> userSecurityTokens = new ArrayList<>();
 
 				// Je nachdem, ob per LDAP oder Database authoriziert wird, wird entweder auf der xtcasUser abgefragt oder auf der xtcasUsers.
 				if (dataSource.equalsIgnoreCase("ldap")) {
@@ -385,11 +386,7 @@ public class SecurityService {
 	public boolean isRowAccessValid(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn) {
 		if (!userSecurityTokens.isEmpty()) {
 			String securityTokenValue = rowToBeChecked.getValues().get(securityTokenInColumn).getStringValue();
-			if (securityTokenValue == null || userSecurityTokens.contains(securityTokenValue.toLowerCase())) {
-				return true;
-			} else {
-				return false;
-			}
+			return securityTokenValue == null || userSecurityTokens.contains(securityTokenValue.toLowerCase());
 		} else {
 			return true;
 		}

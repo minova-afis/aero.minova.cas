@@ -77,7 +77,7 @@ ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
 
 * generate.mdi.per.user
 
-** *Default*: `false`
+** *Default*: `true`
 
 ** *Wertebereich*: `true/false` Entscheided, ob die Mdi aus der Datenbank oder aus dem Filesystem gelesen wird.
 

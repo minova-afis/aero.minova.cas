@@ -47,7 +47,7 @@ public class FilesController {
 	@Autowired
 	SqlProcedureController spc;
 
-	@org.springframework.beans.factory.annotation.Value("${generate.mdi.per.user:false}")
+	@org.springframework.beans.factory.annotation.Value("${generate.mdi.per.user:true}")
 	boolean generateMDIPerUser;
 
 	// TODO Extension vorerst entfernt, aber für später aufheben

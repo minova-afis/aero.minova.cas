@@ -48,4 +48,9 @@ public class Column implements Serializable {
 	public void setOutputType(OutputType outputType) {
 		this.outputType = outputType;
 	}
+
+	@Override
+	public String toString() {
+		return "Row [name=" + name + ",type =" + type + ", outputType = " + outputType + "]";
+	}
 }

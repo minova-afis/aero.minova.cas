@@ -56,8 +56,7 @@ public class SqlProcedureController {
 	 */
 	private final Map<String, Function<Table, ResponseEntity>> extensions = new HashMap<>();
 	/**
-	 * Wird nur verwendet, falls die Tabelle "xvcasUserPrivileges" nicht vorhanden ist. In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt
-	 * ist.
+	 * Wird nur verwendet, falls die Tabelle "xvcasUserSecurity" nicht vorhanden ist. In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt ist.
 	 */
 	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
 

@@ -50,12 +50,12 @@ image::images/xtcasusergroup-example.png[]
 
 === Tabellenzugriffserlaubnis
 
-Bei jedem Aufruf der Methode _getIndexView(Table_ _inputTable)_ wird auf der View xvcasUserPrivileges nach den nötigen Berechtigungen gesucht.
+Bei jedem Aufruf der Methode _getIndexView(Table_ _inputTable)_ wird auf der View xvcasUserSecurity nach den nötigen Berechtigungen gesucht.
 Dies geschieht mit der Methode _checkPrivilege(Table_ _inputTable)_ in folgender Form:
 
 [source, sql]
 ----
-select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserPrivileges
+select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserSecurity
 where (PrivilegeKeyText = 'inputTable.getName()' and KeyText='admin')
 or    (PrivilegeKeyText = 'inputTable.getName()' and KeyText='verwaltung')
 or    ...

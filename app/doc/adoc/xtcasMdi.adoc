@@ -61,15 +61,6 @@ Datentyp: float +
 // end::column.Position[]
 
 
-==== SecurityToken
-
-Datentyp: nvarchar(50) +
-
-// tag::column.SecurityToken[]
-
-// end::column.SecurityToken[]
-
-
 ==== MdiTypeKey
 
 Datentyp: integer not null +
@@ -77,6 +68,24 @@ Datentyp: integer not null +
 // tag::column.MdiTypeKey[]
 
 // end::column.MdiTypeKey[]
+
+
+==== ModulName
+
+Datentyp: nvarchar(500) not null +
+
+// tag::column.ModulName[]
+
+// end::column.ModulName[]
+
+
+==== SecurityToken
+
+Datentyp: nvarchar(50) +
+
+// tag::column.SecurityToken[]
+
+// end::column.SecurityToken[]
 
 
 ==== LastUser

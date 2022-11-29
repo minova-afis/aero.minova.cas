@@ -20,6 +20,16 @@ public class Table implements Serializable {
 		this.name = name;
 	}
 
+	public Value getValue(String columnName, Row row) {
+		for (int i = 0; i < columns.size(); i++) {
+			if (columns.get(i).getName().equalsIgnoreCase(columnName)) {
+				return row.getValues().get(i);
+			}
+		}
+
+		return null;
+	}
+
 	public void fillMetaData(Table inputTable, int limit, int totalResults, int page) {
 		if (inputTable.getMetaData() == null) {
 			metaData = new TableMetaData();

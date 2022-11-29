@@ -18,11 +18,14 @@
 	<column name="Position">
 		<float decimals="5" nullable="true"/>
 	</column>
-	<column name="SecurityToken">
-		<varchar length="50" nullable="true"/>
-	</column>
 	<column name="MdiTypeKey">
 		<integer nullable="false"/>
+	</column>
+	<column name="ModulName">
+		<varchar length="500" nullable="false"/>
+	</column>
+	<column name="SecurityToken">
+		<varchar length="50" nullable="true"/>
 	</column>
 	<column name="LastUser" default="system_user">
 		<varchar length="50" nullable="false"/>

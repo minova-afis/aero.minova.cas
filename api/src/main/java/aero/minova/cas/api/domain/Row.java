@@ -19,4 +19,10 @@ public class Row implements Serializable {
 	public void setValues(List<Value> values) {
 		this.values = values;
 	}
+
+	@Override
+	public String toString() {
+		return "Row [values=" + values + "]";
+	}
+
 }

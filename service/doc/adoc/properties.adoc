@@ -70,10 +70,16 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 * files.permission.check
 
-** *Default*: 'false'
+** *Default*: `false`
 
 ** *Wertebereich*: `true/false` Schalter für die files/read- und files/hash-Anfragen, welcher bestimmt, 
 ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
+
+* generate.mdi.per.user
+
+** *Default*: `true`
+
+** *Wertebereich*: `true/false` Entscheided, ob die Mdi aus der Datenbank oder aus dem Filesystem gelesen wird.
 
 == Profiles
 

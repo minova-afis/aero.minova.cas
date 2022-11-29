@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,16 +42,19 @@ public class SecurityService {
 	@Autowired
 	public CustomLogger customLogger;
 
+	@org.springframework.beans.factory.annotation.Value("${login_dataSource:}")
+	private String dataSource;
+
 	/**
 	 * Prüft, ob die minimal notwendigen Datenbank-Objekte für die Privileg-Prüfung in der Datenbank aufgesetzt wurden. Dazu prüft man, ob die
-	 * `xvcasUserPrivileges` vorhanden ist.
+	 * `xvcasUserSecurity` vorhanden ist.
 	 *
 	 * @return Dies ist wahr, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
 	 * @throws Exception
 	 *             Fehler bei der Ermittelung
 	 */
 	public boolean arePrivilegeStoresSetup() throws Exception {
-		return isTablePresent("xvcasuserprivileges");
+		return isTablePresent("xvcasusersecurity");
 	}
 
 	public boolean isTablePresent(String tableName) throws Exception {
@@ -62,33 +67,103 @@ public class SecurityService {
 
 	/**
 	 * Überprüft, ob es in der vCASUserPrivileges mindestens einen Eintrag für die User Group des momentan eingeloggten Users gibt. Die Abfrage sieht
-	 * folgendermaßen aus: select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserPrivileges where (PrivilegeKeyText = privilegeName and KeyText =
-	 * UserSecurityToken1) or (PrivilegeKeyText = privilegeName and KeyText = UserSecurityToken2) or ... Die erzeugten Rows haben folgendes Format: Row r =
-	 * [Tabellenname,UserSecurityToken,RowLevelSecurity], Beispiel: Row r = ["tTestTabelle","User1",1], Row r2 = ["tTestTabelle","User2",0]
+	 * folgendermaßen aus: select PrivilegeKeyText,KeyText,RowLevelSecurity from xvcasUserSecurity where (PrivilegeKeyText = privilegeName and SecurityToken =
+	 * UserSecurityToken1) or (PrivilegeKeyText = privilegeName and SecurityToken = UserSecurityToken2) or ... Die erzeugten Rows haben folgendes Format: Row r
+	 * = [Tabellenname,UserSecurityToken,RowLevelSecurity], Beispiel: Row r = ["tTestTabelle","User1",1], Row r2 = ["tTestTabelle","User2",0]
 	 *
 	 * @param privilegeName
 	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
 	 **/
 	public List<Row> getPrivilegePermissions(String privilegeName) {
+		loadAllPrivileges();
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 		Table userPrivileges = new Table();
-		userPrivileges.setName("xvcasUserPrivileges");
+		userPrivileges.setName("xvcasUserSecurity");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("PrivilegeKeyText", DataType.STRING));
-		columns.add(new Column("KeyText", DataType.STRING));
+		columns.add(new Column("SecurityToken", DataType.STRING));
 		columns.add(new Column("RowLevelSecurity", DataType.BOOLEAN));
 		columns.add(Column.AND_FIELD);
 		userPrivileges.setColumns(columns);
 
 		for (GrantedAuthority ga : allUserAuthorities) {
+
+			// Überprüfen, ob der SecurityToken an irgendeiner Position in der SecurityToken-Spalte auftaucht.
 			Row tableNameAndUserToken = new Row();
+
+			// Token ist in der Mitte des Strings.
+			tableNameAndUserToken.setValues(
+					asList(new Value(privilegeName, null), new Value("%#" + ga.getAuthority() + "#%", null), new Value("", null), new Value(false, null)));
+			// Token ist am Ende des Strings
 			tableNameAndUserToken
-					.setValues(asList(new Value(privilegeName, null), new Value(ga.getAuthority(), null), new Value("", null), new Value(false, null)));
+					.setValues(asList(new Value(privilegeName, null), new Value("%#" + ga.getAuthority(), null), new Value("", null), new Value(false, null)));
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
-		return unsecurelyGetIndexView(userPrivileges).getRows();
+
+		// Hier bekommen wir Rows zurück, die in irgendeiner Weise unsere Tokens enthalten.
+		List<Row> queryResult = unsecurelyGetIndexView(userPrivileges).getRows();
+
+		// Hier filtern wir noch alle SecurityToken raus, die nicht unserem Benutzer gehören.
+		List<Row> returnRows = new ArrayList<>();
+		for (Row r : queryResult) {
+			List<String> resultAuthorities = Stream.of(r.getValues().get(1).getStringValue().split("#"))//
+					.map(String::new)//
+					.collect(Collectors.toList());
+
+			for (String authority : resultAuthorities) {
+				if (authority != null && !authority.isBlank() && allUserAuthorities.contains(new SimpleGrantedAuthority(authority))) {
+					r.getValues().set(1, new Value(authority, null));
+					Row newRow = new Row();
+					newRow.setValues(asList(r.getValues().get(0), new Value(authority, null), r.getValues().get(2)));
+					returnRows.add(newRow);
+				}
+			}
+
+		}
+
+		return returnRows;
+	}
+
+	/**
+	 * Lädt für LDAP- und Datenbankbankbenutzer die Rollen der User Groups in den SecurityContext.
+	 */
+	public void loadAllPrivileges() {
+		try {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (authentication != null) {
+				List<String> userSecurityTokens = new ArrayList<>();
+
+				// Je nachdem, ob per LDAP oder Database authoriziert wird, wird entweder auf der xtcasUser abgefragt oder auf der xtcasUsers.
+				if (dataSource.equalsIgnoreCase("ldap")) {
+					userSecurityTokens = loadLDAPUserTokens(authentication.getName());
+				} else if (dataSource.equalsIgnoreCase("database")) {
+					userSecurityTokens = loadDatabaseUserTokens(authentication.getName());
+				}
+
+				List<GrantedAuthority> oldAuthorities = (List<GrantedAuthority>) authentication.getAuthorities();
+
+				// Hier werden die SecurityTokens der Gruppen ausgelesen.
+				List<GrantedAuthority> grantedAuthorities = loadUserGroupPrivileges(authentication.getName(), userSecurityTokens, oldAuthorities);
+
+				// GrantedAuthorities zu SimpleGrantedAuthorities ummappen, da Typecasting in diesem Fall nicht funktioniert.
+				List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<>();
+				for (GrantedAuthority ga : grantedAuthorities) {
+					SimpleGrantedAuthority authority = new SimpleGrantedAuthority(ga.getAuthority());
+					updatedAuthorities.add(authority);
+				}
+
+				// Neue Authentication mit den alten Logindaten erstellen und in den Context setzen.
+				Authentication newAuth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(),
+						updatedAuthorities);
+
+				SecurityContextHolder.getContext().setAuthentication(newAuth);
+			}
+		} catch (Exception e) {
+			throw new IllegalArgumentException("No User found, please login");
+		}
+
 	}
 
 	/**
@@ -237,7 +312,7 @@ public class SecurityService {
 		if (!requestingRoles.isEmpty()) {
 			rowSec.append("\r\nor ( SecurityToken IN (");
 			for (String r : requestingRoles) {
-				rowSec.append("'").append(r.trim()).append("',");
+				rowSec.append("'").append(r.replace('#', ' ').trim()).append("',");
 			}
 			rowSec.deleteCharAt(rowSec.length() - 1);
 			rowSec.append(") )");
@@ -311,11 +386,7 @@ public class SecurityService {
 	public boolean isRowAccessValid(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn) {
 		if (!userSecurityTokens.isEmpty()) {
 			String securityTokenValue = rowToBeChecked.getValues().get(securityTokenInColumn).getStringValue();
-			if (securityTokenValue == null || userSecurityTokens.contains(securityTokenValue.toLowerCase())) {
-				return true;
-			} else {
-				return false;
-			}
+			return securityTokenValue == null || userSecurityTokens.contains(securityTokenValue.toLowerCase());
 		} else {
 			return true;
 		}
@@ -327,49 +398,22 @@ public class SecurityService {
 	 *
 	 * @param username
 	 *            Der Username dessen Rollen geladen werden sollen.
+	 * @param userSecurityTokens
 	 * @param authorities
 	 *            Die Liste an GrantedAuthorities, die der User bereits besitzt.
 	 * @return Die Liste an bereits vorhandenen GrantedAuthorities vereint mit den neuen Authorities.
 	 */
-	public List<GrantedAuthority> loadPrivileges(String username, List<GrantedAuthority> authorities) {
-		Table tUser = new Table();
-		tUser.setName("xtcasUser");
-		List<Column> columns = new ArrayList<>();
-		columns.add(new Column("KeyText", DataType.STRING));
-		columns.add(new Column("UserSecurityToken", DataType.STRING));
-		columns.add(new Column("Memberships", DataType.STRING));
-		tUser.setColumns(columns);
-		Row userEntry = new Row();
-		userEntry.setValues(Arrays.asList(new Value(username, null), new Value("", null), new Value("", null)));
-		tUser.addRow(userEntry);
-
-		// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
-		Table membershipsFromUser = unsecurelyGetIndexView(tUser);
-		List<String> userSecurityTokens = new ArrayList<>();
-
-		if (!membershipsFromUser.getRows().isEmpty()) {
-			String result = membershipsFromUser.getRows().get(0).getValues().get(2).getStringValue();
-
-			// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
-			userSecurityTokens = Stream.of(result.split("#"))//
-					.map(String::trim)//
-					.collect(Collectors.toList());
-
-			// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
-			String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().replace("#", "").trim();
-			if (!userSecurityTokens.contains(uniqueUserToken))
-				userSecurityTokens.add(uniqueUserToken);
-		} else {
-			// falls der User nicht in der Datenbank gefunden wurde, wird sein Benutzername als einzigartiger userSecurityToken verwendet
-			userSecurityTokens.add(username);
+	public List<GrantedAuthority> loadUserGroupPrivileges(String username, List<String> userSecurityTokens, List<GrantedAuthority> authorities) {
+		// Füge der Liste der ausgelesenen Authorites aus der Datenbnak die Authorities hinzu, welche bereits vorhanden waren.
+		if (authorities != null) {
+			for (GrantedAuthority ga : authorities) {
+				if (!userSecurityTokens.contains(ga.getAuthority())) {
+					userSecurityTokens.add(ga.getAuthority());
+				}
+			}
 		}
 
-		// füge die authorities hinzu, welche aus dem Active Directory kommen
-		for (GrantedAuthority ga : authorities) {
-			userSecurityTokens.add(ga.getAuthority());
-		}
-
-		// die Berechtigungen der Gruppen noch herausfinden
+		// Hier werden die Berechtigungen der Gruppen noch herausgesucht anhand der userSecurityToken-Liste.
 		Table groups = new Table();
 		groups.setName("xtcasUserGroup");
 		List<Column> groupcolumns = new ArrayList<>();
@@ -388,14 +432,15 @@ public class SecurityService {
 			List<String> groupSecurityTokens = new ArrayList<>();
 			for (Row r : groupTokens) {
 				String memberships = r.getValues().get(1).getStringValue();
-				// alle SecurityToken einer Gruppe der Liste hinzufügen
+				// Die Memberships-Spalte in der xtcasUserGroup ist ein langer String. Hier wird der String beim Zeichen '#' getrennt und dann werden alle
+				// SecurityToken einer Gruppe der Liste hinzufügen
 				val membershipsAsList = Stream.of(memberships.split("#"))//
 						.map(String::trim)//
 						.collect(Collectors.toList());
 				groupSecurityTokens.addAll(membershipsAsList);
 			}
 
-			// verschiedene Rollen/Gruppen können dieselbe Berechtigung haben, deshalb rausfiltern
+			// Verschiedene Rollen/Gruppen können dieselbe Berechtigung haben, deshalb rausfiltern. Wir wollen keine Einträge doppelt haben.
 			for (String string : groupSecurityTokens) {
 				if (!userSecurityTokens.contains(string))
 					userSecurityTokens.add(string);
@@ -409,5 +454,86 @@ public class SecurityService {
 		}
 
 		return grantedAuthorities;
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 */
+	public List<String> loadDatabaseUserTokens(String username) {
+		Table dataBaseTable = new Table();
+		dataBaseTable.setName("xtcasAuthorities");
+		List<Column> columns = new ArrayList<>();
+		columns.add(new Column("Username", DataType.STRING));
+		columns.add(new Column("Authority", DataType.STRING));
+		dataBaseTable.setColumns(columns);
+		Row userEntry = new Row();
+		userEntry.setValues(Arrays.asList(new Value(username, null), null));
+		dataBaseTable.addRow(userEntry);
+
+		// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
+		Table membershipsFromUser = unsecurelyGetIndexView(dataBaseTable);
+		List<String> userSecurityTokens = new ArrayList<>();
+
+		if (!membershipsFromUser.getRows().isEmpty()) {
+			for (Row userGroupRow : membershipsFromUser.getRows()) {
+				Value userGroupName = userGroupRow.getValues().get(1);
+				if (userGroupName != null && !userGroupName.getStringValue().strip().isBlank()) {
+					userSecurityTokens.add(userGroupName.getStringValue().strip());
+				}
+			}
+
+			// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
+			String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().replace("#", "").trim();
+			if (!userSecurityTokens.contains(uniqueUserToken))
+				userSecurityTokens.add(uniqueUserToken);
+		} else {
+			// falls der User nicht in der Datenbank gefunden wurde, wird sein Benutzername als einzigartiger userSecurityToken verwendet
+			userSecurityTokens.add(username);
+		}
+		return userSecurityTokens;
+	}
+
+	/**
+	 * @param username
+	 * @return
+	 */
+	public List<String> loadLDAPUserTokens(String username) {
+		Table tUser = new Table();
+		tUser.setName("xtcasUsers");
+		List<Column> columns = new ArrayList<>();
+		columns.add(new Column("KeyText", DataType.STRING));
+		columns.add(new Column("UserSecurityToken", DataType.STRING));
+		columns.add(new Column("Memberships", DataType.STRING));
+		tUser.setColumns(columns);
+		Row userEntry = new Row();
+		userEntry.setValues(Arrays.asList(new Value(username, null), new Value("", null), new Value("", null)));
+		tUser.addRow(userEntry);
+
+		// dabei sollte nur eine ROW rauskommen, da jeder User eindeutig sein müsste
+		Table membershipsFromUser = unsecurelyGetIndexView(tUser);
+		List<String> userSecurityTokens = new ArrayList<>();
+
+		if (!membershipsFromUser.getRows().isEmpty()) {
+			String result = membershipsFromUser.getRows().get(0).getValues().get(2) != null
+					? membershipsFromUser.getRows().get(0).getValues().get(2).getStringValue()
+					: "";
+
+			// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
+			userSecurityTokens = Stream.of(result.split("#"))//
+					.map(String::trim)//
+					.collect(Collectors.toList());
+
+			// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
+			String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1) != null
+					? membershipsFromUser.getRows().get(0).getValues().get(1).getStringValue().replace("#", "").trim()
+					: "";
+			if (!userSecurityTokens.contains(uniqueUserToken))
+				userSecurityTokens.add(uniqueUserToken);
+		} else {
+			// falls der User nicht in der Datenbank gefunden wurde, wird sein Benutzername als einzigartiger userSecurityToken verwendet
+			userSecurityTokens.add(username);
+		}
+		return userSecurityTokens;
 	}
 }

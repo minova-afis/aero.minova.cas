@@ -24,6 +24,9 @@
 		<column name="MdiTypeKeyText" text="@xtcasMdi.MdiTypeKeyText">
 			<text length="50"/>
 		</column>
+		<column name="ModulName" text="@xtcasMdi.ModulName">
+			<text length="500"/>
+		</column>
 		<column name="LastDate" text="@xtcasMdi.LastDate">
 			<date-time/>
 		</column>

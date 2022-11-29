@@ -5,7 +5,8 @@ alter procedure dbo.xpcasInitMdi (
 	@Menu nvarchar(100),
 	@Position float,
 	@SecurityToken nvarchar(50),
-	@MdiTypeKey int
+	@MdiTypeKey int,
+	@ModulName nvarchar(500)
 )
 with encryption
 as
@@ -19,10 +20,16 @@ as
 		end
 	end 
 	
-	if not exists (select * from xtcasMdi where LastAction >-1 and ID = @ID)
-	begin
-		if (@Execute = 1)
+	if (@Execute = 1)
 		begin
+		if not exists (select * from xtcasMdi where LastAction > 0 and ID = @ID)
+		begin
+
+			if (@MdiTypeKey <> 1)
+			begin
+				set @SecurityToken = null 
+			end
+
 			insert into xtcasMdi(
 				ID,
 				Icon,
@@ -31,6 +38,7 @@ as
 				Position,
 				SecurityToken,
 				MdiTypeKey,
+				ModulName,
 				LastUser,
 				LastDate,
 				LastAction
@@ -42,6 +50,7 @@ as
 				@Position,
 				@SecurityToken,
 				@MdiTypeKey,
+				@ModulName,
 				dbo.xfCasUser(),
 				getDate(),
 				1

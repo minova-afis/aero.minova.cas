@@ -8,6 +8,7 @@ with encryption as
 			m.Position,
 			m.SecurityToken,
 			mt.KeyText as MdiTypeKeyText,
+			m.ModulName,
 			m.LastUser,
 			m.LastDate
 	from xtcasMdi m

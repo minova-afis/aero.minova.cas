@@ -332,3 +332,20 @@ Im WFC:
 
 Beim Login im *WFC* sollte auch besonders darauf geachtet werden, dass der Benutzer richtig eingegeben wird, z.B. muss man auch auf Groß- und Kleinschreibung achten. 
 Oft hat der Benutzer folgende Struktur: AD-NAME/Benutzername. Hier könnte man auch versuchen, den AD-NAMEN und den Slash weg zu lassen. 
+
+### Generelle Probleme mit AD / LDAP
+
+Es gibt in Spring-Boot diesbezüglich keine gute Debug/Trace-Logs.
+Die einzigen Optionen sind:
+
+```
+logging.level.org.springframework.security=trace
+logging.level.org.springframework.security.ldap=trace
+```
+
+Allerdings ist das Log nicht besonders genau.
+Folgendes Vorgehen ist am besten:
+* Stack-Trace für den LDAP/AD-Fehler finden.
+* Im Stack-Trace die Methode für die Verbindung und Anmeldung finden und
+  Break-Point an dieser stelle setzen.
+* Im Debug-Modus die Anmelde-Daten etc. in den Variablen prüfen.

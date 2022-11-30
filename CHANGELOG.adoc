@@ -8,6 +8,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Die Datei application.mdi wird jetzt anhand der xtcasMdi-Tabelle benutzerspezifisch erzeugt.
 * Prüfung auf validen Input für Passwörter beim Inserten und Updaten von DB Usern.
 * Auslesen von UserGroupTokens für DB User bei Anfragen.
+* SQL-Fehler beim Setup beheben.
 
 
 ## [12.55.1] -- 2022-11-22

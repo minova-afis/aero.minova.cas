@@ -4,6 +4,9 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+
+## [12.56.0] -- 2022-12-01
 * toString-Methode für Tabellen, Columns, Rows und Values erstellen.
 * Die Datei application.mdi wird jetzt anhand der xtcasMdi-Tabelle benutzerspezifisch erzeugt.
 * Prüfung auf validen Input für Passwörter beim Inserten und Updaten von DB Usern.

@@ -26,14 +26,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.CustomLogger;
-import aero.minova.cas.service.SecurityService;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
@@ -494,6 +493,7 @@ class SecurityServiceTests {
 		mockResult.add(inputRow);
 
 		Mockito.doAnswer(returnsFirstArg()).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		Mockito.doNothing().when(spyController).loadAllPrivileges();
 
 		List<Row> result = spyController.getPrivilegePermissions("test");
 		assertThat(result).hasSize(3);
@@ -508,6 +508,7 @@ class SecurityServiceTests {
 	void test_getPrivilegePermissionNoPermissions() {
 
 		Mockito.doAnswer(returnsFirstArg()).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		Mockito.doNothing().when(spyController).loadAllPrivileges();
 
 		List<Row> result = spyController.getPrivilegePermissions("test");
 		assertThat(result).hasSize(0);

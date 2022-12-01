@@ -56,8 +56,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		assertThat(testSubject.getFile("Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
@@ -89,8 +89,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		testSubject.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.xbs"));
@@ -124,8 +124,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(serviceFolder.resolve("beispielLog.log"), new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
 		testSubject.createZip(Paths.get("Shared Data/Program Files/.metadata"));
@@ -156,8 +156,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(zipsFolder);
 
 		final val testSubject = new FilesController();
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		Assertions.assertThrows(IllegalAccessException.class, () -> assertThat(testSubject.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs")));
 	}
@@ -179,8 +179,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(zipsFolder);
 
 		final val testSubject = new FilesController();
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		Assertions.assertThrows(NoSuchFileException.class, () -> testSubject.hashFile(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs")));
 	}
@@ -211,8 +211,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));
@@ -223,7 +223,7 @@ public class FilesControllerTest extends BaseTest {
 
 		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
 		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
-		testSubject.unzipFile(tempFile, tempFolder);
+		testSubject.fileService.unzipFile(tempFile, tempFolder);
 
 		assertThat(Files.exists(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS"))).isTrue();
 		assertThat(Files.exists(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").resolve("AFIS.xbs"))).isTrue();
@@ -257,8 +257,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
@@ -270,7 +270,7 @@ public class FilesControllerTest extends BaseTest {
 
 		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
 		Files.write(tempFile.toPath(), testSubject.getZip("Shared Data/Program Files/AFIS.zip"));
-		testSubject.unzipFile(tempFile, tempFolder);
+		testSubject.fileService.unzipFile(tempFile, tempFolder);
 
 		assertThat(tempFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS").toFile().exists()).isTrue();
 
@@ -298,8 +298,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(zipsFolder);
 
 		final val testSubject = new FilesController();
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		assertThrows(java.io.FileNotFoundException.class, () -> testSubject.createZip(serviceFolder.resolve("AFIS.xbs")));
 	}
@@ -330,8 +330,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
@@ -369,8 +369,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		write(serviceFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
@@ -422,8 +422,8 @@ public class FilesControllerTest extends BaseTest {
 		createDirectories(md5Folder);
 		createDirectories(zipsFolder);
 
-		testSubject.files = new FilesService(rootFolder.toString());
-		testSubject.files.setUp();
+		testSubject.fileService = new FilesService(rootFolder.toString());
+		testSubject.fileService.setUp();
 
 		write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
 		testSubject.createZip(Paths.get("Shared Data/Program Files/AFIS"));

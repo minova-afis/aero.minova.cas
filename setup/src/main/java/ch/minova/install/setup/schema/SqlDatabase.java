@@ -100,7 +100,15 @@ public class SqlDatabase {
 
 			// An dieser Stelle wird die Spalte definiert!
 			column = new SqlDatabaseColumn(tablename, columnname, nullable, type, length, collation);
-			if (defaultName != null) {
+			/* Früher wurde SqlDatabase#getColumnDefault verwendet, um festzustellen, ob sich der DefaultValue
+			 * geändert hat. In diesem Fall wurde früher ein komplett anderer SQl-Update-Code ausgeführt.
+			 * Inzwischen werden die Constraints immer gelöscht und anschliessend neu erstellt.
+			 *
+			 * Wir haben "defaultValue != null" eingebaut, da der defaultValue beim Auslesen manchmal null ist und
+			 * der Grund dafür nicht bekannt ist.
+			 * Dadurch wird eine NullPointerException verhindert.
+			 */
+			if (defaultName != null && defaultValue != null) {
 				columnDefault = new SqlDefault(column, defaultName, defaultValue);
 				column.setColumnDefault(columnDefault);
 			}

@@ -1,0 +1,77 @@
+
+
+== Tabelle xtcasMdiType ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== KeyText
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.KeyText[]
+
+// end::column.KeyText[]
+
+
+==== Description
+
+Datentyp: nvarchar(100) not null +
+
+// tag::column.Description[]
+
+// end::column.Description[]
+
+
+==== LastUser
+
+Datentyp: nvarchar(50) not null +
+Default: `system_user` +
+
+// tag::column.LastUser[]
+
+// end::column.LastUser[]
+
+
+==== LastDate
+
+Datentyp: datetime not null +
+Default: `getdate()` +
+
+// tag::column.LastDate[]
+
+// end::column.LastDate[]
+
+
+==== LastAction
+
+Datentyp: integer not null +
+Default: `1` +
+
+// tag::column.LastAction[]
+
+// end::column.LastAction[]
+
+
+=== Zeilen
+
+Folgende Zeilen werden automatisch angelegt:
+
+[options="header"]
+|======
+| KeyLong | KeyText | Description   
+| 1 | form | Form of Menu   
+| 2 | menu | Menu of WFC   
+| 3 | application | General Application Info 
+|======

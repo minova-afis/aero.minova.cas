@@ -11,10 +11,7 @@ with encryption as
 	declare @Username nvarchar(50)
 	select @Username=Username from xtcasUsers where KeyLong = @UsersKey
 
-	update xtcasAuthorities
-	set	LastAction = -1,
-		LastUser = dbo.xfCasUser(),
-		LastDate = getdate()
+	delete from xtcasAuthorities
 	where Username = @Username
 	and Authority = @UserGroupText
 

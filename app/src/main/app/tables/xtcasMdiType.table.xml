@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<table name="xtcasMdiType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="table.xsd">
+    <column name="KeyLong">
+        <integer nullable="false" identity="true"/>
+    </column>
+    <column name="KeyText">
+        <varchar length="50" nullable="false"/>
+    </column>
+    <column name="Description">
+        <varchar length="100" nullable="false"/>
+    </column>
+    <column name="LastUser" default="system_user">
+        <varchar length="50" nullable="false"/>
+    </column>
+    <column name="LastDate" default="getdate()">
+        <datetime nullable="false"/>
+    </column>
+    <column name="LastAction" default="1">
+        <integer nullable="false"/>
+    </column>
+    <primarykey>
+        <column>KeyLong</column>
+    </primarykey>
+    <values>
+        <column refid="KeyLong"/>
+        <column refid="KeyText"/>
+        <column refid="Description"/>
+        <row>
+            <value>1</value>
+            <value>form</value>
+            <value>Form of Menu</value>
+        </row>
+        <row>
+            <value>2</value>
+            <value>menu</value>
+            <value>Menu of WFC</value>
+        </row>
+        <row>
+            <value>3</value>
+            <value>application</value>
+            <value>General Application Info</value>
+        </row>
+    </values>
+</table>

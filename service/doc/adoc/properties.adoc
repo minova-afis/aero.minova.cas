@@ -82,6 +82,12 @@ ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
 ** *Wertebereich*: `MSSQL/postgresql/other` Schalter für den Datenbankkontext. Wird für JOOQ verwendet. 
 Falls es sich nicht um eine MSSQL oder POSTGRESQL Datenbank handelt, muss statt *other* der dementsprechende Kontext angegeben werden.
 
+* generate.mdi.per.user
+
+** *Default*: `true`
+
+** *Wertebereich*: `true/false` Entscheided, ob die Mdi aus der Datenbank oder aus dem Filesystem gelesen wird.
+
 
 == Profiles
 

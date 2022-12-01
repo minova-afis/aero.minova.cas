@@ -24,6 +24,11 @@
     
     
         
+* link:xtcasMdi.adoc[]
+
+    
+    
+        
 * link:xtcasLuUserPrivilegeUserGroup.adoc[]
 
     
@@ -50,6 +55,11 @@
     
         
 * link:xtcasUserGroup.adoc[]
+
+    
+    
+        
+* link:xtcasMdiType.adoc[]
 
     
     

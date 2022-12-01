@@ -58,8 +58,7 @@ public class SecurityConfig {
 
 	public void configureAuthStandard(AuthenticationManagerBuilder auth) throws Exception {
 		if (dataSource.equals("ldap")) {
-			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain,
-					ldapServerAddress);
+			ActiveDirectoryLdapAuthenticationProvider acldap = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
 			acldap.setConvertSubErrorCodesToExceptions(true);
 			acldap.setUserDetailsContextMapper(this.userDetailsContextMapper());
 			auth.authenticationProvider(acldap);
@@ -77,9 +76,7 @@ public class SecurityConfig {
 	public void configureHttpSecStandard(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers("/actuator/**").permitAll();
 
-		http.authorizeRequests()
-				.antMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
-				.permitAll();
+		http.authorizeRequests().antMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll();
 		http.authorizeRequests().anyRequest().fullyAuthenticated();
 		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
 		http.formLogin()//
@@ -168,9 +165,10 @@ public class SecurityConfig {
 		return new LdapUserDetailsMapper() {
 			@SuppressWarnings("unchecked")
 			@Override
-			public UserDetails mapUserFromContext(DirContextOperations ctx, String username,
-					Collection<? extends GrantedAuthority> authorities) throws RuntimeException {
-				List<GrantedAuthority> grantedAuthorities = securityService.loadPrivileges(username,
+			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
+					throws RuntimeException {
+				List<String> userSecurityTokens = securityService.loadLDAPUserTokens(username);
+				List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username, userSecurityTokens,
 						(List<GrantedAuthority>) authorities);
 				return super.mapUserFromContext(ctx, username, grantedAuthorities);
 			}

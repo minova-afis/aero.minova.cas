@@ -1,20 +1,16 @@
 package aero.minova.cas.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.PingResponse;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
@@ -26,10 +22,13 @@ public class CommunicationController {
 	String homePath;
 
 	@Autowired
+	SqlProcedureController spc;
+
+	@Autowired
 	SecurityService securityService;
 
 	@Autowired
-	SqlProcedureController spc;
+	CustomLogger customLogger;
 
 	/**
 	 * Hiermit kann geprüft werden, ob die Kommunikation mit und die Anmeldung an den CAS funktioniert.
@@ -43,14 +42,12 @@ public class CommunicationController {
 
 	@PostMapping(value = "loadPrivileges")
 	public void loadPrivileges() throws Exception {
+
 		try {
-			// Abfrage mur für jUnit-Tests, da dabei Authentication = null
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			if (authentication != null) {
-				securityService.loadPrivileges(authentication.getName(), (List<GrantedAuthority>) authentication.getAuthorities());
-			}
+			securityService.loadAllPrivileges();
 		} catch (Exception e) {
-			throw new IllegalArgumentException("No User found, please login");
+			customLogger.logError("Erorr while trying to load privileges!", e);
+			throw new RuntimeException(e);
 		}
 	}
 

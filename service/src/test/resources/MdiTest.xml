@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<main icon="SIS" title="@cussom97286.Title">
+    <action id="cussom97286Voucher" text="@xtcussom97286Voucher" action="cussom97286Voucher.xml" icon="Voucher"/>
+    <action id="cussom97286TrafficMeasurement" text="@xtcussom97286TrafficMeasurement" action="cussom97286TrafficMeasurement.xml" icon="TrafficMeasurement"/>
+    <menu id="main">
+        <menu id="cussom97286Tables" text="@cussom97286.mdi.Tables">
+            <entry id="cussom97286Voucher" type="action"/>
+            <entry id="cussom97286TrafficMeasurement" type="action"/>
+        </menu>
+    </menu>
+</main>

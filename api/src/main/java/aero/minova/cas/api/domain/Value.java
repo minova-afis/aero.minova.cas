@@ -1,12 +1,12 @@
 package aero.minova.cas.api.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Der Wert kann auch null sein. Wenn dass nicht so wäre, könnten wir optionale Werte in einer {@link Table} nicht darstellen.
@@ -193,4 +193,10 @@ public class Value implements Serializable {
 	public Boolean getBooleanValue() {
 		return type == DataType.BOOLEAN ? (Boolean) value : null;
 	}
+
+	@Override
+	public String toString() {
+		return "Value [type=" + type + ", value=" + value + ", rule=" + rule + " ]";
+	}
+
 }

@@ -12,6 +12,12 @@ with encryption as
 		return -1
 	end
 
+	if (len(@Password)<60 or LEFT(@Password, 2)<>'$2')
+	begin
+		raiserror('ADO | 25 | msg.sql.PasswordNotEncrypted!', 16, 1) with seterror
+		return -1
+	end
+
 	insert into xtcasUsers (
 		Username,
 		Password

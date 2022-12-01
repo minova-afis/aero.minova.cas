@@ -9,7 +9,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Prüfung auf validen Input für Passwörter beim Inserten und Updaten von DB Usern.
 * Auslesen von UserGroupTokens für DB User bei Anfragen.
 * SQL-Fehler beim Setup beheben.
-
+* Erhöhe Jackson-dataformat-xml von Version 2.13.3 nach 2.14.0
 
 ## [12.55.1] -- 2022-11-22
 * LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException

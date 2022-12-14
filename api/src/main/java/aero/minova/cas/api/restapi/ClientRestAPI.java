@@ -68,7 +68,7 @@ public class ClientRestAPI {
 	private HttpHeaders createHeaders(String username, String password) {
 		HttpHeaders headers = new HttpHeaders();
 		String auth = username + ":" + password;
-		byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
+		byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8), false);
 		String authHeader = "Basic " + new String(encodedAuth);
 		headers.set("Authorization", authHeader);
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -191,7 +191,8 @@ public class ClientRestAPI {
 	public HttpStatus sendUploadLogRequest(byte[] log) {
 		HttpEntity<byte[]> request = new HttpEntity<>(log, createHeaders(username, password));
 		ResponseEntity<Void> response = restTemplate.exchange(url + "/upload/logs", HttpMethod.POST, request, Void.class);
-		return response.getStatusCode();
+
+		return HttpStatus.valueOf(response.getStatusCode().value());
 	}
 
 	public void setGson(Gson gson) {

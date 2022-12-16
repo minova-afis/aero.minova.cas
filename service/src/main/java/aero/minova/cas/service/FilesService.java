@@ -23,11 +23,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import javax.annotation.PostConstruct;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
+import jakarta.annotation.PostConstruct;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,6 +45,8 @@ import aero.minova.cas.service.mdi.Main.Entry;
 import aero.minova.cas.service.mdi.Main.Menu;
 import aero.minova.cas.service.mdi.MenuType;
 import lombok.Setter;
+
+import javax.xml.namespace.QName;
 
 @Service
 @Setter

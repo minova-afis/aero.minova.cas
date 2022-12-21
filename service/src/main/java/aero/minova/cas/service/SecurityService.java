@@ -328,7 +328,7 @@ public class SecurityService {
 			 * Falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen. Ist dies der Fall, können wir
 			 * ruhig eine leere Liste zurückgeben, da deren Inhalt die UserSecurityTokens wären, nach welchen gefiltert werden würde.
 			 */
-			if (Boolean.FALSE.equals(authority.getValues().get(2))) {
+			if (true != authority.getValues().get(2).getBooleanValue()) {
 				return new ArrayList<>();
 			}
 			// Hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen.

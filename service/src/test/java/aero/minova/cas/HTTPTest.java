@@ -18,7 +18,7 @@ class HTTPTest {
 	private int port;
 
 	@Test
-	public void http1Test() throws IOException, InterruptedException {
+	void http1Test() throws IOException, InterruptedException {
 
 		java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder().build();
 		java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/ping")).build();

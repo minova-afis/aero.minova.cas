@@ -29,7 +29,7 @@ import aero.minova.cas.api.restapi.ClientRestAPI;
 @ActiveProfiles("test")
 @ContextConfiguration
 @WebAppConfiguration
-public class ErrorMessageTest {
+class ErrorMessageTest {
 
 	Gson gson;
 
@@ -70,7 +70,7 @@ public class ErrorMessageTest {
 	}
 
 	@Test
-	public void testSqlErrorMessage1() {
+	void testSqlErrorMessage1() {
 		Exception e = new Exception("ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext");
 
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
@@ -90,7 +90,7 @@ public class ErrorMessageTest {
 	}
 
 	@Test
-	public void testSqlErrorMessage2() {
+	void testSqlErrorMessage2() {
 		Exception e = new Exception("ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.");
 
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
@@ -106,7 +106,7 @@ public class ErrorMessageTest {
 	}
 
 	@Test
-	public void testProgramMessage() {
+	void testProgramMessage() {
 		Exception e = new Exception("msg.PrivilegeError");
 
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);

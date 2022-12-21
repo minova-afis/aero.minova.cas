@@ -4,6 +4,7 @@ import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
@@ -44,12 +45,6 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
-	@Autowired
-	SecurityService securityService;
-
-	@Autowired
-	SystemDatabase systemDatabase;
-
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
@@ -77,7 +72,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public UserDetailsManager userDetailsManager() throws SQLException {
+	public UserDetailsManager userDetailsManager(SystemDatabase systemDatabase) throws SQLException {
 		if ("ldap".equals(dataSource)) {
 			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(ldapServerAddress);
 			contextSource.afterPropertiesSet();
@@ -102,10 +97,11 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
+	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
+	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(UserDetailsContextMapper userDetailsContextMapper) {
 		ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
 		provider.setConvertSubErrorCodesToExceptions(true);
-		provider.setUserDetailsContextMapper(this.userDetailsContextMapper());
+		provider.setUserDetailsContextMapper(userDetailsContextMapper);
 
 		return provider;
 	}
@@ -116,7 +112,7 @@ public class SecurityConfig {
 	}
 
 	@Bean("ldapUser")
-	public UserDetailsContextMapper userDetailsContextMapper() throws RuntimeException {
+	UserDetailsContextMapper userDetailsContextMapper(SecurityService securityService) throws RuntimeException {
 		return new LdapUserDetailsMapper() {
 			@SuppressWarnings("unchecked")
 			@Override

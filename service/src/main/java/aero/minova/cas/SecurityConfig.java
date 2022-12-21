@@ -2,6 +2,7 @@ package aero.minova.cas;
 
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -23,11 +24,16 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 	private static final String ADMIN = "admin";
@@ -43,6 +49,11 @@ public class SecurityConfig {
 
 	@Value("${server.port:8084}")
 	private String serverPort;
+
+	@Value("${spring.profiles.active}")
+	private String activeProfile;
+
+	final CustomLogger customLogger;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -67,6 +78,12 @@ public class SecurityConfig {
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
 
+		if ("dev".equals(activeProfile)) {
+			customLogger.logError("Never use profile '" + activeProfile + "' in production!", new Exception());
+
+			// Enables CorsConfigurationSource to be used
+			http.cors();
+		}
 		return http.build();
 	}
 
@@ -123,5 +140,19 @@ public class SecurityConfig {
 				return super.mapUserFromContext(ctx, username, grantedAuthorities);
 			}
 		};
+	}
+
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
+		corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+		corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		// Register mapping(s) to be added to cors whitelist e.g /cas/ping or /**
+		source.registerCorsConfiguration("/**", corsConfiguration);
+
+		return source;
 	}
 }

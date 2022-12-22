@@ -3,6 +3,7 @@ package aero.minova.cas.service;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,7 @@ import aero.minova.cas.controller.BaseTest;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
 class ProcedureServiceTest extends BaseTest {
 	@Autowired
 	ProcedureService testSubject;

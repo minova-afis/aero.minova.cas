@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,8 +26,8 @@ import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
-public class XSqlProcedureControllerTest extends BaseTest {
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
+class XSqlProcedureControllerTest extends BaseTest {
 	@Autowired
 	XSqlProcedureController testSubject;
 
@@ -34,12 +35,13 @@ public class XSqlProcedureControllerTest extends BaseTest {
 	Gson gson;
 
 	@Test
-	public void testFillInDependencies() {
+	void testFillInDependencies() {
 
-		Type xSqlProcedureResultType = new TypeToken<ArrayList<XSqlProcedureResult>>() {}.getType();
+		Type xSqlProcedureResultType = new TypeToken<ArrayList<XSqlProcedureResult>>() {
+		}.getType();
 		final List<XSqlProcedureResult> xSqlProcedureResults = gson.fromJson(new Scanner(getClass()//
-				.getClassLoader()//
-				.getResourceAsStream("xprocedureExample.json"), "UTF-8")//
+						.getClassLoader()//
+						.getResourceAsStream("xprocedureExample.json"), "UTF-8")//
 						.useDelimiter("\\A")//
 						.next()//
 				, xSqlProcedureResultType);
@@ -62,7 +64,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testFindxsqlResultSetValid() {
+	void testFindxsqlResultSetValid() {
 		List<XSqlProcedureResult> results = new ArrayList<>();
 
 		Table inputTable = new Table();
@@ -87,7 +89,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testFindxsqlResultSetInvalid() {
+	void testFindxsqlResultSetInvalid() {
 		List<XSqlProcedureResult> results = new ArrayList<>();
 
 		Table inputTable = new Table();
@@ -112,7 +114,7 @@ public class XSqlProcedureControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testFindxsqlResultSetByNameValid() {
+	void testFindxsqlResultSetByNameValid() {
 		List<XSqlProcedureResult> results = new ArrayList<>();
 
 		Table inputTable = new Table();
@@ -145,11 +147,12 @@ public class XSqlProcedureControllerTest extends BaseTest {
 		results.add(xRes);
 		List<XSqlProcedureResult> testres = testSubject.findxSqlResultSetByName("Test Test", results);
 
-		assertThat(testres.size()).isEqualTo(2);
+		assertThat(testres)
+				.hasSize(2);
 	}
 
 	@Test
-	public void testFindValueValid() {
+	void testFindValueValid() {
 		Table inputTable = new Table();
 		inputTable.setName("spTest");
 		inputTable.addColumn(new Column("TestText", DataType.STRING));

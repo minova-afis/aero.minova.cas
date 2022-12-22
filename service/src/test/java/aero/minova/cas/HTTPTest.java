@@ -11,14 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 class HTTPTest {
 
 	@LocalServerPort
 	private int port;
 
 	@Test
-	public void http1Test() throws IOException, InterruptedException {
+	void http1Test() throws IOException, InterruptedException {
 
 		java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder().build();
 		java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/ping")).build();

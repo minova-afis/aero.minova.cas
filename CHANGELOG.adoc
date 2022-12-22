@@ -4,6 +4,7 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Spring Security: Umstellung von `WebSecurityConfigurerAdapter` auf Komponenten-basierende Sicherheit
 * Update auf SpringBoot 3.0.0
 
 ## [12.56.0] -- 2022-12-01

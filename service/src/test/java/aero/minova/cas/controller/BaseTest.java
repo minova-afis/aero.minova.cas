@@ -11,8 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import aero.minova.cas.service.FilesService;
 
-@SpringBootTest
-public class BaseTest {
+public abstract class BaseTest {
 
 	@AfterClass
 	public static void cleanInternalFolder() throws Exception {
@@ -32,5 +31,4 @@ public class BaseTest {
 			internalFolder.toFile().delete();
 		}
 	}
-
 }

@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -31,7 +32,7 @@ import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
 class ViewServiceTest extends BaseTest {
 
 	@Autowired
@@ -175,7 +176,8 @@ class ViewServiceTest extends BaseTest {
 		aero.minova.cas.api.domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
-		} catch (ProcedureException e) {}
+		} catch (ProcedureException e) {
+		}
 		assertThat(testResult.getValues()).hasSize(1);
 		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
 	}
@@ -229,9 +231,10 @@ class ViewServiceTest extends BaseTest {
 		aero.minova.cas.api.domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
-		} catch (ProcedureException e) {}
+		} catch (ProcedureException e) {
+		}
 		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
-		assertThat(testResult.getValues().get(1).getBooleanValue()).isEqualTo(true);
+		assertThat(testResult.getValues().get(1).getBooleanValue()).isTrue();
 		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);
 		assertThat(testResult.getValues().get(3).getIntegerValue()).isEqualTo(5);
 		assertThat(testResult.getValues().get(4).getLongValue()).isEqualTo(7L);
@@ -251,35 +254,17 @@ class ViewServiceTest extends BaseTest {
 
 	@Test
 	void test_SearchViaString() {
-		val intputTable = new Table();
-		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		val row = new Row();
-		row.addValue(new Value("1", null));
-		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong like ?)");
+		helperForPrepareWhereClause("1", null, "\r\nwhere ((KeyLong like ?)");
 	}
 
 	@Test
 	void test_whereWithIn() {
-		val intputTable = new Table();
-		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		val row = new Row();
-		row.addValue(new Value("1,2,3", "in()"));
-		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong in(?, ?, ?))");
+		helperForPrepareWhereClause("1,2,3", "in()", "\r\nwhere ((KeyLong in(?, ?, ?))");
 	}
 
 	@Test
 	void test_whereWithBetween() {
-		val intputTable = new Table();
-		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		val row = new Row();
-		row.addValue(new Value("1,2,3", "between()"));
-		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong between ? and ?)");
+		helperForPrepareWhereClause("1,2,3", "between()", "\r\nwhere ((KeyLong between ? and ?)");
 	}
 
 	@Test
@@ -390,5 +375,15 @@ class ViewServiceTest extends BaseTest {
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
 						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 0");
+	}
+
+	private void helperForPrepareWhereClause(String stringValue, String rule, String expectedWhereClause) {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		val row = new Row();
+		row.addValue(new Value(stringValue, rule));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo(expectedWhereClause);
 	}
 }

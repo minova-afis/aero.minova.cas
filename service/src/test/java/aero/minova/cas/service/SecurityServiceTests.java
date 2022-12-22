@@ -1,7 +1,6 @@
 package aero.minova.cas.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,11 +11,10 @@ import static org.mockito.Mockito.spy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
+import aero.minova.cas.CoreApplicationSystemApplication;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -36,25 +34,18 @@ import aero.minova.cas.api.domain.Value;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
-@ContextConfiguration
-@WebAppConfiguration
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
 class SecurityServiceTests {
-
 	@Autowired
-	SecurityService testSubject;
+	private SecurityService securityService;
 
 	@Spy
-	SecurityService spyController;
+	private SecurityService spySecurityService;
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		spyController = spy(testSubject);
-
+		spySecurityService = spy(securityService);
 	}
 
 	@DisplayName("Row-Level-Security ohne Rollen")
@@ -63,9 +54,9 @@ class SecurityServiceTests {
 	void test_rowLevelSecurityWithNoRoles() {
 		List<Row> userGroups = new ArrayList<>();
 
-		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
+		assertThat(securityService.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL ) )");
-		assertThat(testSubject.rowLevelSecurity(true, userGroups))//
+		assertThat(securityService.rowLevelSecurity(true, userGroups))//
 				.isEqualTo("\r\nand ( ( SecurityToken IS NULL ) )");
 	}
 
@@ -91,9 +82,9 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
+		assertThat(securityService.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('user','dispatcher','codemonkey') ) )");
-		assertThat(testSubject.rowLevelSecurity(true, userGroups))//
+		assertThat(securityService.rowLevelSecurity(true, userGroups))//
 				.isEqualTo("\r\nand ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('user','dispatcher','codemonkey') ) )");
 	}
 
@@ -119,8 +110,8 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(testSubject.rowLevelSecurity(false, userGroups))//
-				.isEqualTo("");
+		assertThat(securityService.rowLevelSecurity(false, userGroups))//
+				.isEmpty();
 	}
 
 	@DisplayName("Frage nach mehreren Spalten, bekomme alle zurück.")
@@ -145,9 +136,10 @@ class SecurityServiceTests {
 		resultColumns.add(new Column("ServiceKey", DataType.STRING));
 		resultColumns.add(new Column("ChargedQuantity", DataType.STRING));
 
-		doReturn(inputTable).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(inputTable).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Table result = spyController.columnSecurity(inputTable, userGroups);
+		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
+		// TODO Rainer @Kerstin: fix test condition
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -174,9 +166,10 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Table result = spyController.columnSecurity(inputTable, userGroups);
+		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
+		// TODO Rainer @Kerstin: fix test condition
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -210,9 +203,10 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Table result = spyController.columnSecurity(inputTable, userGroups);
+		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
+		// TODO Rainer @Kerstin: fix test condition
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -248,9 +242,10 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Table result = spyController.columnSecurity(inputTable, userGroups);
+		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
+		// TODO Rainer @Kerstin: fix test condition
 		assertThat(result.getColumns().equals(resultColumns));
 	}
 
@@ -281,13 +276,13 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 
 		CustomLogger logger = Mockito.mock(CustomLogger.class);
-		spyController.customLogger = logger;
+		spySecurityService.customLogger = logger;
 
-		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Throwable exception = assertThrows(RuntimeException.class, () -> spyController.columnSecurity(inputTable, userGroups));
-		thrown.expect(RuntimeException.class);
-		assertEquals("msg.ColumnSecurityError %admin %vJournalIndexTest", exception.getMessage());
+		Throwable exception = assertThrows(RuntimeException.class, () -> spySecurityService.columnSecurity(inputTable, userGroups));
+		assertThat(exception)
+				.hasMessage("msg.ColumnSecurityError %admin %vJournalIndexTest");
 
 	}
 
@@ -311,11 +306,11 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Table result = spyController.columnSecurity(inputTable, userGroups);
+		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
+		// TODO Rainer @Kerstin: fix test condition
 		assertThat(result.getColumns().equals(resultColumns));
-
 	}
 
 	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, bekomme alle zurück, da berechtigt, aber eine Rolle hätte keine Berechtigung.")
@@ -355,11 +350,11 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Table result = spyController.columnSecurity(inputTable, userGroups);
+		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
+		// TODO Rainer @Kerstin: fix test condition
 		assertThat(result.getColumns().equals(resultColumns));
-
 	}
 
 	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, bekomme alle zurück, da eine Rolle für die gesamte Table berechtigt ist.")
@@ -403,11 +398,11 @@ class SecurityServiceTests {
 		Table mockResult = new Table();
 		mockResult.addColumns(resultColumns);
 
-		doReturn(mockResult).when(spyController).unsecurelyGetIndexView(Mockito.any());
+		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
-		Table result = spyController.columnSecurity(inputTable, userGroups);
+		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
+		// TODO Rainer @Kerstin: fix test condition
 		assertThat(result.getColumns().equals(resultColumns));
-
 	}
 
 	@DisplayName("ExtractUserTokens keine Ausnahmen")
@@ -432,11 +427,10 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
-		List<String> resultList = testSubject.extractUserTokens(userGroups);
-		assertThat(resultList).hasSize(3);
-		assertThat(resultList.get(2)).isEqualTo("codemonkey");
-		assertThat(resultList.get(1)).isEqualTo("dispatcher");
-		assertThat(resultList.get(0)).isEqualTo("user");
+		List<String> resultList = securityService.extractUserTokens(userGroups);
+		assertThat(resultList)
+				.hasSize(3)
+				.containsExactly("user", "dispatcher", "codemonkey");
 	}
 
 	@DisplayName("ExtractUserTokens eine Ausnahmen")
@@ -461,8 +455,10 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
-		List<String> resultList = testSubject.extractUserTokens(userGroups);
-		assertThat(resultList).hasSize(0);
+		List<String> resultList = securityService.extractUserTokens(userGroups);
+
+		assertThat(resultList)
+				.isEmpty();
 	}
 
 	@DisplayName("getPrivilegePermission-Rows überprüfen, ob alle Privilegien übernommen werden")
@@ -492,10 +488,10 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value(true, null));
 		mockResult.add(inputRow);
 
-		Mockito.doAnswer(returnsFirstArg()).when(spyController).unsecurelyGetIndexView(Mockito.any());
-		Mockito.doNothing().when(spyController).loadAllPrivileges();
+		Mockito.doAnswer(returnsFirstArg()).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
+		Mockito.doNothing().when(spySecurityService).loadAllPrivileges();
 
-		List<Row> result = spyController.getPrivilegePermissions("test");
+		List<Row> result = spySecurityService.getPrivilegePermissions("test");
 		assertThat(result).hasSize(3);
 		assertThat(result.get(2).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(0).getValues().get(1).getStringValue());
 		assertThat(result.get(1).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(1).getValues().get(1).getStringValue());
@@ -507,11 +503,11 @@ class SecurityServiceTests {
 	@Test
 	void test_getPrivilegePermissionNoPermissions() {
 
-		Mockito.doAnswer(returnsFirstArg()).when(spyController).unsecurelyGetIndexView(Mockito.any());
-		Mockito.doNothing().when(spyController).loadAllPrivileges();
+		Mockito.doAnswer(returnsFirstArg()).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
+		Mockito.doNothing().when(spySecurityService).loadAllPrivileges();
 
-		List<Row> result = spyController.getPrivilegePermissions("test");
-		assertThat(result).hasSize(0);
+		List<Row> result = spySecurityService.getPrivilegePermissions("test");
+		assertThat(result).isEmpty();
 	}
 
 	@DisplayName("Finde Spalte mit SecurityToken per findSecurityTokenColumn")
@@ -526,7 +522,7 @@ class SecurityServiceTests {
 		inputTable.addColumn(new Column("SecurityToken", DataType.STRING));
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 
-		int result = spyController.findSecurityTokenColumn(inputTable);
+		int result = spySecurityService.findSecurityTokenColumn(inputTable);
 		assertThat(result).isEqualTo(3);
 	}
 
@@ -542,11 +538,11 @@ class SecurityServiceTests {
 		inputTable.addColumn(new Column("&", DataType.BOOLEAN));
 
 		CustomLogger logger = Mockito.mock(CustomLogger.class);
-		spyController.customLogger = logger;
+		spySecurityService.customLogger = logger;
 
-		Throwable exception = assertThrows(ProcedureException.class, () -> spyController.findSecurityTokenColumn(inputTable));
-		thrown.expect(ProcedureException.class);
-		assertEquals("msg.MissingSecurityTokenColumn", exception.getMessage());
+		Throwable exception = assertThrows(ProcedureException.class, () -> spySecurityService.findSecurityTokenColumn(inputTable));
+		assertThat(exception)
+				.hasMessage("msg.MissingSecurityTokenColumn");
 	}
 
 	@DisplayName("Überprüfe, ob SecurityToken in Row übereinstimmt mit vorhandenen SecurityTokens")
@@ -566,7 +562,7 @@ class SecurityServiceTests {
 		rowToBeChecked.addValue(new Value("", null));
 		rowToBeChecked.addValue(new Value(true, null));
 
-		assertTrue(spyController.isRowAccessValid(userGroups, rowToBeChecked, 1));
+		assertTrue(spySecurityService.isRowAccessValid(userGroups, rowToBeChecked, 1));
 	}
 
 	@DisplayName("Überprüfe, ob SecurityToken in Row übereinstimmt mit vorhandenen SecurityTokens")
@@ -586,6 +582,6 @@ class SecurityServiceTests {
 		rowToBeChecked.addValue(new Value("", null));
 		rowToBeChecked.addValue(new Value(true, null));
 
-		assertFalse(spyController.isRowAccessValid(userGroups, rowToBeChecked, 1));
+		assertFalse(spySecurityService.isRowAccessValid(userGroups, rowToBeChecked, 1));
 	}
 }

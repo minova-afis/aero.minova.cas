@@ -7,18 +7,19 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "server.http2.enabled=true" })
-public class HTTP2Test {
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT, properties = { "server.http2.enabled=true" })
+class HTTP2Test {
 
 	@LocalServerPort
 	private int port;
 
 	@Test
-	public void http2Test() throws IOException, InterruptedException {
+	void http2Test() throws IOException, InterruptedException {
 
 		java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder().build();
 		java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/ping")).build();

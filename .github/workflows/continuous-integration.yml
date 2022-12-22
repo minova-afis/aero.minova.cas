@@ -47,22 +47,30 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Maven build and SonarQube scan
+      - name: Maven build
         run: |
-          cd $GITHUB_WORKSPACE
           mvn --batch-mode verify \
-          dependency-check:aggregate \
-          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -P repo-github \
-          -Dusername=$GITHUB_ACCESS_TOKEN \
-          -Dsonar.projectKey=${{env.ACCOUNT}}_${{github.event.repository.name}} \
-          -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
-          --file pom.xml \
-          --settings .github/settings.xml
+            -P repo-github -P all-tests \
+            -Dusername=$GITHUB_ACCESS_TOKEN \
+            --file pom.xml \
+            --settings .github/settings.xml
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+
+      - name: SonarQube scan
+        run: |
+          mvn --batch-mode --no-transfer-progress \
+            dependency-check:aggregate \
+            sonar:sonar \
+            -P repo-github -P all-tests \
+            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
+            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
+            --settings .github/settings.xml
+        env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}

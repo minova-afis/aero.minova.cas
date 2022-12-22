@@ -57,17 +57,11 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
-				.antMatchers("/actuator/**")
-				.permitAll();
-
-		http.authorizeRequests()
-				.antMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
-				.permitAll();
-
-		http.authorizeRequests()
-				.anyRequest()
-				.fullyAuthenticated();
+		http.authorizeHttpRequests(requests -> requests
+				.requestMatchers("/actuator/**").permitAll()
+				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll()
+				.anyRequest().fullyAuthenticated()
+		);
 
 		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
 		http.formLogin()//

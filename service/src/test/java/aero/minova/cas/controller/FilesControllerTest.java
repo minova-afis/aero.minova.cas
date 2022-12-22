@@ -44,8 +44,8 @@ class FilesControllerTest extends BaseTest {
 	Path serviceFolder;
 
 	@BeforeEach
-	private void setup() throws IOException {
-		final val rootPath = new TemporaryFolder();
+	void setup() throws IOException {
+		val rootPath = new TemporaryFolder();
 		rootPath.create();
 		rootFolder = rootPath.getRoot().toPath();
 
@@ -69,14 +69,14 @@ class FilesControllerTest extends BaseTest {
 
 	@Test
 	void testLegal() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo(
 				"<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
 	void testLegalHash() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 		filesController.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.xbs"));
 		assertThat(filesController.getHash("Shared Data/Program Files/AFIS/AFIS.xbs"))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
@@ -84,11 +84,11 @@ class FilesControllerTest extends BaseTest {
 
 	@Test
 	void testLegalLog() throws Exception {
-		final val metaDataFolder = programFilesFolder.resolve(".metadata");
+		val metaDataFolder = programFilesFolder.resolve(".metadata");
 		Files.createDirectories(metaDataFolder);
 
 		Files.write(metaDataFolder.resolve("beispielLog.log"),
-				new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
+				"<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
 		filesController.createZip(Paths.get("Shared Data/Program Files/.metadata"));
 
 		// dabei wird der Logs Ordner erzeugt
@@ -97,25 +97,25 @@ class FilesControllerTest extends BaseTest {
 		File found = findFile("beispielLog.log", internalFolder.resolve("UserLogs").toFile());
 		assertThat(found).isNotNull();
 		assertThat(Files.readAllBytes(found.toPath()))
-				.isEqualTo(new String("<text>Oh nein!Ein Fehler in der Anwendung!</text>").getBytes(StandardCharsets.UTF_8));
+				.isEqualTo("<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
-	void testIllegal() throws Exception {
-		Assertions.assertThrows(IllegalAccessException.class, () -> assertThat(filesController.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs")));
+	void testIllegal() {
+		Assertions.assertThrows(IllegalAccessException.class, () -> filesController.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs"));
 	}
 
 	@Test
-	void testIllegalHash() throws Exception {
+	void testIllegalHash() {
 		Assertions.assertThrows(NoSuchFileException.class, () -> filesController.hashFile(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs")));
 	}
 
 	@Test
 	void testLegalZip() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 		filesController.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
-		final val tempFolder = programFilesFolder.resolve("temp");
+		val tempFolder = programFilesFolder.resolve("temp");
 		Files.createDirectories(tempFolder);
 		assertThat(Files.exists(tempFolder.resolve("AFIS"))).isFalse();
 
@@ -131,12 +131,12 @@ class FilesControllerTest extends BaseTest {
 
 	@Test
 	void testLegalZipExists() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		Files.write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS.zip"), "".getBytes(StandardCharsets.UTF_8));
 
 		filesController.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
-		final val tempFolder = programFilesFolder.resolve("temp");
+		val tempFolder = programFilesFolder.resolve("temp");
 		Files.createDirectories(tempFolder);
 
 		File tempFile = tempFolder.resolve("tempZipFile.zip").toFile();
@@ -148,19 +148,19 @@ class FilesControllerTest extends BaseTest {
 		byte[] unzipped = Files.readAllBytes(findFile("AFIS.xbs", tempFolder.toFile()).toPath());
 		assertThat(Files.readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"))).isEqualTo(unzipped);
 		assertThat(Files.readAllBytes(zipsFolder.resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip")))
-				.isNotEqualTo(new String("").getBytes(StandardCharsets.UTF_8));
+				.isNotEqualTo("".getBytes(StandardCharsets.UTF_8));
 		assertThat(unzipped).isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
-	void testIllegalZip() throws Exception {
+	void testIllegalZip() {
 		assertThrows(java.io.FileNotFoundException.class, () -> filesController.createZip(serviceFolder.resolve("AFIS.xbs")));
 	}
 
 	@Test
 	void testLegalZipAll() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		Files.write(programFilesFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS.zip"), "".getBytes(StandardCharsets.UTF_8));
 		int hexOld = Files.readAllBytes(programFilesFolder.resolve("AFIS.zip")).hashCode();
 
 		filesController.zipAll();
@@ -174,9 +174,9 @@ class FilesControllerTest extends BaseTest {
 		filesController.fileService = new FilesService(rootFolder.toString());
 		filesController.fileService.setUp();
 
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
-		Files.write(serviceFolder.resolve("AFIS.zip"), new String("").getBytes(StandardCharsets.UTF_8));
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"), new String("").getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		Files.write(serviceFolder.resolve("AFIS.zip"), "".getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"), "".getBytes(StandardCharsets.UTF_8));
 		byte[] old = Files.readAllBytes(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs.md5"));
 
 		filesController.zipAll();
@@ -200,7 +200,7 @@ class FilesControllerTest extends BaseTest {
 
 	@Test
 	void getZipBackCompatability() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), new String("<preferences></preferences>").getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 		filesController.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
 		assertThat(filesController.getFile("Shared Data/Program Files/AFIS.zip")).isEqualTo(filesController.getZip("Shared Data/Program Files/AFIS"));

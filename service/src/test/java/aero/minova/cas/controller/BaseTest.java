@@ -7,14 +7,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.AfterClass;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import aero.minova.cas.service.FilesService;
 
 public abstract class BaseTest {
 
 	@AfterClass
-	public static void cleanInternalFolder() throws Exception {
+	protected static void cleanInternalFolder() throws Exception {
 		Path internalFolder = Paths.get(new File("Internal").getAbsolutePath());
 		if (internalFolder.toFile().exists()) {
 			FilesService fs = new FilesService();

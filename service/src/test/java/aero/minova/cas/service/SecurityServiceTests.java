@@ -11,6 +11,7 @@ import static org.mockito.Mockito.spy;
 import java.util.ArrayList;
 import java.util.List;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,9 +34,7 @@ import aero.minova.cas.api.domain.Value;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
-@ContextConfiguration
-@WebAppConfiguration
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
 class SecurityServiceTests {
 	@Autowired
 	private SecurityService securityService;
@@ -112,7 +111,7 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(securityService.rowLevelSecurity(false, userGroups))//
-				.isEqualTo("");
+				.isEmpty();
 	}
 
 	@DisplayName("Frage nach mehreren Spalten, bekomme alle zurück.")
@@ -140,7 +139,8 @@ class SecurityServiceTests {
 		doReturn(inputTable).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
-		assertThat(result.getColumns().equals(resultColumns));
+		assertThat(result.getColumns())
+				.equals(resultColumns);
 	}
 
 	@DisplayName("Frage nach mehreren Spalten, bekomme aber nur die mit Berechtigung zurück.")
@@ -169,7 +169,8 @@ class SecurityServiceTests {
 		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
-		assertThat(result.getColumns().equals(resultColumns));
+		assertThat(result.getColumns())
+				.equals(resultColumns);
 	}
 
 	@DisplayName("Mehrere Rollen mit Einschränkungen")
@@ -205,7 +206,8 @@ class SecurityServiceTests {
 		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
-		assertThat(result.getColumns().equals(resultColumns));
+		assertThat(result.getColumns())
+				.equals(resultColumns);
 	}
 
 	@DisplayName("Frage nach geblockter Spalte mit Wert, bekomme nur sichtbare Spalten ohne Abfrage auf Wert")
@@ -243,7 +245,8 @@ class SecurityServiceTests {
 		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
-		assertThat(result.getColumns().equals(resultColumns));
+		assertThat(result.getColumns())
+				.equals(resultColumns);
 	}
 
 	@DisplayName("User hat keine Berechtigung, um auf Tabelle zuzugreifen, aber hat einen Eintrag in der tColumnSecurity")
@@ -306,8 +309,8 @@ class SecurityServiceTests {
 		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
-		assertThat(result.getColumns().equals(resultColumns));
-
+		assertThat(result.getColumns())
+				.equals(resultColumns);
 	}
 
 	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, bekomme alle zurück, da berechtigt, aber eine Rolle hätte keine Berechtigung.")
@@ -350,8 +353,8 @@ class SecurityServiceTests {
 		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
-		assertThat(result.getColumns().equals(resultColumns));
-
+		assertThat(result.getColumns())
+				.equals(resultColumns);
 	}
 
 	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, bekomme alle zurück, da eine Rolle für die gesamte Table berechtigt ist.")
@@ -398,7 +401,8 @@ class SecurityServiceTests {
 		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Table result = spySecurityService.columnSecurity(inputTable, userGroups);
-		assertThat(result.getColumns().equals(resultColumns));
+		assertThat(result.getColumns())
+				.equals(resultColumns);
 
 	}
 

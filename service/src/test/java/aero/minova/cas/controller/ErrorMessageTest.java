@@ -8,6 +8,7 @@ import static org.mockito.Mockito.spy;
 
 import java.util.Scanner;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -25,10 +26,8 @@ import aero.minova.cas.ControllerExceptionHandler;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.restapi.ClientRestAPI;
 
-@SpringBootTest
+@SpringBootTest(classes = CoreApplicationSystemApplication.class)
 @ActiveProfiles("test")
-@ContextConfiguration
-@WebAppConfiguration
 class ErrorMessageTest {
 
 	Gson gson;

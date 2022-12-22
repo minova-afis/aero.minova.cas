@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +30,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -50,10 +52,8 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
-	@Value("${spring.profiles.active}")
-	private String activeProfile;
-
-	final CustomLogger customLogger;
+	private final Environment environment;
+	private final CustomLogger customLogger;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -78,12 +78,19 @@ public class SecurityConfig {
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
 
-		if ("dev".equals(activeProfile)) {
-			customLogger.logError("Never use profile '" + activeProfile + "' in production!", new Exception());
+		Arrays.stream(environment.getActiveProfiles())
+				.filter("dev"::equals)
+				.forEach(profile -> {
+					customLogger.logError("Never use profile '" + profile + "' in production!", new Exception());
 
-			// Enables CorsConfigurationSource to be used
-			http.cors();
-		}
+					try {
+						// Enables CorsConfigurationSource to be used
+						http.cors();
+					} catch (Exception e) {
+						customLogger.logError(e.getMessage(), e);
+						throw new RuntimeException(e);
+					}
+				});
 		return http.build();
 	}
 
@@ -113,6 +120,11 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
 	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
 	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(UserDetailsContextMapper userDetailsContextMapper) {
 		ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
@@ -122,12 +134,8 @@ public class SecurityConfig {
 		return provider;
 	}
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
 	@Bean("ldapUser")
+	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
 	UserDetailsContextMapper userDetailsContextMapper(SecurityService securityService) throws RuntimeException {
 		return new LdapUserDetailsMapper() {
 			@SuppressWarnings("unchecked")

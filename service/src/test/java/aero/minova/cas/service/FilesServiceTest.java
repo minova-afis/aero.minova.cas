@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import java.io.File;
 import java.io.FileInputStream;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ import aero.minova.cas.controller.BaseTest;
 import aero.minova.cas.controller.SqlViewController;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
 class FilesServiceTest extends BaseTest {
 
 	@Autowired

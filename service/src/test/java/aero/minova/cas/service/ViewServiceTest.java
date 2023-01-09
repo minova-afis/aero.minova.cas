@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,7 +26,6 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.BaseTest;
-import aero.minova.cas.service.ViewService;
 import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
@@ -165,7 +163,7 @@ class ViewServiceTest extends BaseTest {
 	}
 
 	@Test
-	void testConvertSqlResultToRow_UnsupportedTypes() throws SQLException {
+	void testConvertSqlResultToRow_UnsupportedTypes() throws Exception {
 		val outputTable = new Table();
 		outputTable.setName("vWorkingTimeIndex2");
 		outputTable.addColumn(new Column("LastDate", null));
@@ -173,11 +171,8 @@ class ViewServiceTest extends BaseTest {
 		val time = Instant.ofEpochMilli(1598613904487L).toString();
 		when(sqlSet.getString("LastDate")).thenReturn(time);
 		@val
-		aero.minova.cas.api.domain.Row testResult = null;
-		try {
-			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
-		} catch (ProcedureException e) {
-		}
+		aero.minova.cas.api.domain.Row testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+
 		assertThat(testResult.getValues()).hasSize(1);
 		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
 	}
@@ -208,7 +203,7 @@ class ViewServiceTest extends BaseTest {
 	}
 
 	@Test
-	void testAllDataTypes() throws SQLException {
+	void testAllDataTypes() throws Exception {
 		val outputTable = new Table();
 		outputTable.setName("vWorkingTimeIndex2");
 		outputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
@@ -228,11 +223,7 @@ class ViewServiceTest extends BaseTest {
 		when(sqlSet.getString("STRING")).thenReturn("string");
 		when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
 		@val
-		aero.minova.cas.api.domain.Row testResult = null;
-		try {
-			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
-		} catch (ProcedureException e) {
-		}
+		aero.minova.cas.api.domain.Row testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
 		assertThat(testResult.getValues().get(1).getBooleanValue()).isTrue();
 		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);
@@ -254,17 +245,17 @@ class ViewServiceTest extends BaseTest {
 
 	@Test
 	void test_SearchViaString() {
-		helperForPrepareWhereClause("1", null, "\r\nwhere ((KeyLong like ?)");
+		testWhereWithOneCondition("1", null, "\r\nwhere ((KeyLong like ?)");
 	}
 
 	@Test
 	void test_whereWithIn() {
-		helperForPrepareWhereClause("1,2,3", "in()", "\r\nwhere ((KeyLong in(?, ?, ?))");
+		testWhereWithOneCondition("1,2,3", "in()", "\r\nwhere ((KeyLong in(?, ?, ?))");
 	}
 
 	@Test
 	void test_whereWithBetween() {
-		helperForPrepareWhereClause("1,2,3", "between()", "\r\nwhere ((KeyLong between ? and ?)");
+		testWhereWithOneCondition("1,2,3", "between()", "\r\nwhere ((KeyLong between ? and ?)");
 	}
 
 	@Test
@@ -377,7 +368,7 @@ class ViewServiceTest extends BaseTest {
 						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 0");
 	}
 
-	private void helperForPrepareWhereClause(String stringValue, String rule, String expectedWhereClause) {
+	private void testWhereWithOneCondition(String stringValue, String rule, String expectedWhereClause) {
 		val intputTable = new Table();
 		intputTable.setName("vWorkingTimeIndex2");
 		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));

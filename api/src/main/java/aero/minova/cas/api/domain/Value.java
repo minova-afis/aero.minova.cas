@@ -196,7 +196,7 @@ public class Value implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Value [type=" + type + ", value=" + value + ", rule=" + rule + " ]";
+		return "Value [type=" + type + ", value=" + value + ", rule=" + rule + "]";
 	}
 
 }

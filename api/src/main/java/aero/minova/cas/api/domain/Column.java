@@ -51,6 +51,6 @@ public class Column implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Row [name=" + name + ",type =" + type + ", outputType = " + outputType + "]";
+		return "Column [name=" + name + ", type=" + type + ", outputType=" + outputType + "]";
 	}
 }

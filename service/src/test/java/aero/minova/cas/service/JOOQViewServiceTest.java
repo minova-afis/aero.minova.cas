@@ -172,7 +172,9 @@ public class JOOQViewServiceTest extends BaseTest {
 		aero.minova.cas.api.domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
-		} catch (ProcedureException e) {}
+		} catch (ProcedureException e) {
+			throw new RuntimeException(e);
+		}
 		assertThat(testResult.getValues()).hasSize(1);
 		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
 	}
@@ -226,7 +228,9 @@ public class JOOQViewServiceTest extends BaseTest {
 		aero.minova.cas.api.domain.Row testResult = null;
 		try {
 			testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
-		} catch (ProcedureException e) {}
+		} catch (ProcedureException e) {
+			throw new RuntimeException(e);
+		}
 		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
 		assertThat(testResult.getValues().get(1).getBooleanValue()).isEqualTo(true);
 		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);

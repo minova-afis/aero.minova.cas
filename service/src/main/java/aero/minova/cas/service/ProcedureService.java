@@ -36,6 +36,8 @@ import lombok.val;
 @Service
 public class ProcedureService {
 
+	private static String POSTGRESQL = "postgresql";
+
 	@Autowired
 	CustomLogger customLogger;
 
@@ -61,7 +63,7 @@ public class ProcedureService {
 	 */
 	public void setUserContextFor(Connection connection) throws SQLException {
 		CallableStatement userContextSetter;
-		if (databaseKind.equalsIgnoreCase("postgresql")) {
+		if (databaseKind.equalsIgnoreCase(POSTGRESQL)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");

@@ -122,10 +122,10 @@ public class JOOQViewService implements ViewServiceInterface {
 		return result;
 	}
 
-	public Condition rowLevelSecurity(List<Row> requestingAtuhorities) {
+	public Condition rowLevelSecurity(List<Row> requestingAuthorities) {
 		List<String> requestingRoles = new ArrayList<>();
-		if (!requestingAtuhorities.isEmpty()) {
-			requestingRoles = securityService.extractUserTokens(requestingAtuhorities);
+		if (!requestingAuthorities.isEmpty()) {
+			requestingRoles = securityService.extractUserTokens(requestingAuthorities);
 			// Falls die Liste leer ist, darf der User alle Spalten sehen.
 			if (requestingRoles.isEmpty()) {
 				return null;

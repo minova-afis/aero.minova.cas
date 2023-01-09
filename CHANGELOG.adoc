@@ -4,7 +4,8 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-
+* Tabellen um Hilfsmethoden erweitert, mit der leichter auf Values zugegriffen werden kann
+* toString Methoden Tabellen, Columns, Rows und Values ausbessern
 
 ## [12.56.0] -- 2022-12-01
 * toString-Methode für Tabellen, Columns, Rows und Values erstellen.

@@ -8,8 +8,8 @@ import aero.minova.cas.api.domain.Table;
 public interface ViewServiceInterface {
 
 	/**
-	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage, um die maximale Länge zu erhalten Ist nur für die Sicherheitsabfragen gedacht,
-	 * um nicht zu viele unnötige SQL-Abfrgane zu machen.
+	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage und ohne die maximale Anzahl der ausgegebenen Zeilen zu beschränken. Ist nur für
+	 * die Sicherheitsabfragen gedacht, um nicht zu viele unnötige SQL-Abfrgane zu machen.
 	 *
 	 * @param inputTable
 	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
@@ -27,7 +27,9 @@ public interface ViewServiceInterface {
 	 */
 	public String prepareWhereClause(Table params, boolean autoLike);
 
-	public String prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities);
+	default String prepareViewString(Table params, boolean autoLike, int maxRows, List<Row> authorities) {
+		return prepareViewString(params, autoLike, maxRows, false, authorities);
+	}
 
 	/**
 	 * @param params

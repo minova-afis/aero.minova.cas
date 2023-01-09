@@ -41,7 +41,7 @@ public class JOOQViewService implements ViewServiceInterface {
 		this.securityService = securityService;
 	}
 
-	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
+	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean isCounting, List<Row> authorities) throws IllegalArgumentException {
 
 		if (params.getName() == null || params.getName().trim().length() == 0) {
 			throw new IllegalArgumentException("msg.ViewNullName");
@@ -73,7 +73,7 @@ public class JOOQViewService implements ViewServiceInterface {
 		// Hier wird nur unterschieden, ob die Einträge gezählt werden sollen oder nicht.
 		// Wenn eine condition leer ist und die toString()-Methode auf diese angewandt wird, kommt ein "(true)" dabei raus. Das wollen wir nicht in unserer
 		// Abfrage haben.
-		if (count) {
+		if (isCounting) {
 			if (condition != null && condition != DSL.noCondition() && !condition.toString().equals("(true)")) {
 				query = DSL.selectCount().from(params.getName()).where(condition);
 			} else {

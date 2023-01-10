@@ -10,6 +10,10 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Update auf SpringBoot 3.0.0
 * Tabellen um Hilfsmethoden erweitert, mit der leichter auf Values zugegriffen werden kann
 * toString Methoden Tabellen, Columns, Rows und Values ausbessern
+* Auch "com.minova" bei @EntityScan und @EnableJpaRepositories beachten
+
+## [12.56.1] -- 2023-12-09
+* Richtiger Release zum Verwenden von CAS als Abhängigkeit
 
 ## [12.56.0] -- 2022-12-01
 * toString-Methode für Tabellen, Columns, Rows und Values erstellen.

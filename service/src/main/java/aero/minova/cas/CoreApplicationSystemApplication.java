@@ -11,8 +11,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @ComponentScan({ "aero.minova", "com.minova" })
-@EntityScan("aero.minova")
-@EnableJpaRepositories("aero.minova")
+@EntityScan({ "aero.minova", "com.minova" })
+@EnableJpaRepositories({ "aero.minova", "com.minova" })
+@Configuration
 @EnableScheduling
 public class CoreApplicationSystemApplication {
 	public static void main(String[] args) {

@@ -4,8 +4,15 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+
+## [12.56.2] -- 2023-01-10
 * Tabellen um Hilfsmethoden erweitert, mit der leichter auf Values zugegriffen werden kann
 * toString Methoden Tabellen, Columns, Rows und Values ausbessern
+* Auch "com.minova" bei @EntityScan und @EnableJpaRepositories beachten
+
+## [12.56.1] -- 2023-12-09
+* Richtiger Release zum Verwenden von CAS als Abhängigkeit
 
 ## [12.56.0] -- 2022-12-01
 * toString-Methode für Tabellen, Columns, Rows und Values erstellen.
@@ -14,7 +21,6 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Auslesen von UserGroupTokens für DB User bei Anfragen.
 * SQL-Fehler beim Setup beheben.
 * Erhöhe Jackson-dataformat-xml von Version 2.13.3 nach 2.14.0
-* Auch "com.minova" bei @EntityScan und @EnableJpaRepositories beachten
 
 ## [12.55.1] -- 2022-11-22
 * LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException

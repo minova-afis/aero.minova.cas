@@ -13,8 +13,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @ComponentScan({ "aero.minova", "com.minova" })
-@EntityScan("aero.minova")
-@EnableJpaRepositories("aero.minova")
+@EntityScan({ "aero.minova", "com.minova" })
+@EnableJpaRepositories({ "aero.minova", "com.minova" })
 @Configuration
 @EnableScheduling
 public class CoreApplicationSystemApplication {

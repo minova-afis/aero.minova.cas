@@ -60,7 +60,7 @@ class SecurityConfigWithActiveProfileDevITest {
 				.andExpect(content().string(""));
 	}
 
-	@SpringBootApplication(scanBasePackages = { "the.packages" })
+	@SpringBootApplication
 	@Controller
 	static class TestApplication {
 

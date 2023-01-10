@@ -13,6 +13,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Auslesen von UserGroupTokens für DB User bei Anfragen.
 * SQL-Fehler beim Setup beheben.
 * Erhöhe Jackson-dataformat-xml von Version 2.13.3 nach 2.14.0
+* Auch "com.minova" bei @EntityScan und @EnableJpaRepositories beachten
 
 ## [12.55.1] -- 2022-11-22
 * LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException

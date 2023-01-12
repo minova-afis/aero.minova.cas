@@ -45,21 +45,21 @@ class AuthorizationTest {
 
 		String username = "Testusername";
 
-		controller.createUserPrivilege("xvcorTEST");
-		controller.createUserPrivilege("xpcorAnotherone");
+		controller.findOrCreateUserPrivilege("xvcorTEST");
+		controller.findOrCreateUserPrivilege("xpcorAnotherone");
 
-		controller.createAdminUser(username, "asfiusdhvn");
+		controller.createOrUpdateAdminUser(username, "asfiusdhvn");
 
 		// Wurde Nutzer erstellt?
-		Users user = usersRepository.findByUsername(username);
+		Users user = usersRepository.findByUsername(username).get();
 		assertNotNull(user);
 
 		// Wurde Admin Gruppe erstellt?
-		UserGroup group = userGroupRepository.findByKeyText("admin");
+		UserGroup group = userGroupRepository.findByKeyText("admin").get();
 		assertNotNull(group);
 
 		// Wurde Nutzer der admin-Gruppe zugeordnet?
-		Authorities auth = authoritiesRepository.findByUsernameAndAuthority(username, "admin");
+		Authorities auth = authoritiesRepository.findByUsernameAndAuthority(username, "admin").get();
 		assertNotNull(auth);
 
 		// Wurden die beiden Privilegien angelegt?
@@ -71,8 +71,8 @@ class AuthorizationTest {
 			assertEquals(group.getKeyLong(), lu.getUsergroup().getKeyLong());
 		}
 
-		controller.createUserPrivilege("xpcorLastOne");
-		controller.createAdminUser(username, "asfiusdhvn"); // Recht auf neues Privileg
+		controller.findOrCreateUserPrivilege("xpcorLastOne");
+		controller.createOrUpdateAdminUser(username, "asfiusdhvn"); // Recht auf neues Privileg
 
 		// Hat Admin-Nutzer auch Rechte auf das neue Privileg?
 		findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findAllWithLastActionGreaterZero();
@@ -88,16 +88,16 @@ class AuthorizationTest {
 		String username = "PasswortTest";
 
 		// User mit erstem Passwort erstellen
-		controller.createUser(username, "firstPW");
-		Users user = usersRepository.findByUsername(username);
+		controller.findOrCreateUser(username, "firstPW");
+		Users user = usersRepository.findByUsername(username).get();
 		assertNotNull(user);
 		assertEquals("firstPW", user.getPassword());
 
-		// Passwort ändern
-		controller.createUser(username, "secondPW");
-		user = usersRepository.findByUsername(username);
+		// Passwort NICHT geändern
+		controller.findOrCreateUser(username, "secondPW");
+		user = usersRepository.findByUsername(username).get();
 		assertNotNull(user);
-		assertEquals("secondPW", user.getPassword());
+		assertEquals("firstPW", user.getPassword());
 
 	}
 
@@ -106,27 +106,27 @@ class AuthorizationTest {
 
 		String groupName = "testGroup";
 
-		controller.createUserGroup(groupName, "#FirstToken");
+		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
 
-		UserGroup group = userGroupRepository.findByKeyText(groupName);
+		UserGroup group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
 		assertEquals("#FirstToken", group.getSecuritytoken());
 
 		// Sicherstellen, dass keine Duplikat-Token angehängt werden
-		controller.createUserGroup(groupName, "#FirstToken");
-		group = userGroupRepository.findByKeyText(groupName);
+		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
+		group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
 		assertEquals("#FirstToken", group.getSecuritytoken());
 
 		// Sicherstellen, dass neuer Token angehängt wird
-		controller.createUserGroup(groupName, "#SecondToken");
-		group = userGroupRepository.findByKeyText(groupName);
+		controller.createOrUpdateUserGroup(groupName, "#SecondToken");
+		group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
 		assertEquals("#FirstToken#SecondToken", group.getSecuritytoken());
 
 		// Nochmal keine Duplikate testen
-		controller.createUserGroup(groupName, "#FirstToken");
-		group = userGroupRepository.findByKeyText(groupName);
+		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
+		group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
 		assertEquals("#FirstToken#SecondToken", group.getSecuritytoken());
 	}

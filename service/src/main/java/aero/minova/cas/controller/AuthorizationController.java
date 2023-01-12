@@ -2,6 +2,7 @@ package aero.minova.cas.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,12 +37,28 @@ public class AuthorizationController {
 	UsersRepository usersRepository;
 
 	/**
+	 * Erstellt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View
+	 * 
+	 * @param maskname
+	 * @param procedurePrefix
+	 * @param viewPrefix
+	 */
+	public void createDefaultPrivilegesForMask(String maskname, String procedurePrefix, String viewPrefix) {
+		findOrCreateUserPrivilege(procedurePrefix + "Insert" + maskname);
+		findOrCreateUserPrivilege(procedurePrefix + "Update" + maskname);
+		findOrCreateUserPrivilege(procedurePrefix + "Read" + maskname);
+		findOrCreateUserPrivilege(procedurePrefix + "Delete" + maskname);
+
+		findOrCreateUserPrivilege(viewPrefix + maskname + "Index");
+	}
+
+	/**
 	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
 	 * 
 	 * @param privilegeName
 	 */
-	public UserPrivilege createUserPrivilege(String privilegeName) {
-		UserPrivilege privilege = userPrivilegeRepository.findByKeyText(privilegeName);
+	public UserPrivilege findOrCreateUserPrivilege(String privilegeName) {
+		UserPrivilege privilege = userPrivilegeRepository.findByKeyText(privilegeName).orElseGet(null);
 
 		if (privilege == null) {
 			privilege = new UserPrivilege();
@@ -54,47 +71,62 @@ public class AuthorizationController {
 
 	/**
 	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle xtCasUserPrivilege
-	 * eingetragen sein (Methode {@link #createUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen
+	 * eingetragen sein (Methode {@link #findOrCreateUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen
 	 * erteilt und das Passwort aktualisiert
 	 * 
 	 * @param username
 	 * @param encryptedPassword
 	 */
-	public void createAdminUser(String username, String encryptedPassword) {
+	public void createOrUpdateAdminUser(String username, String encryptedPassword) {
 
-		// 1. Neuen "Users" erstellen
-		createUser(username, encryptedPassword);
+		findOrCreateUser(username, encryptedPassword);
 
-		// 2. Admin-Gruppe erstellen
-		UserGroup userGroup = createUserGroup("admin", "#admin");
+		UserGroup userGroup = createOrUpdateUserGroup("admin", "#admin");
 
-		// 3. Neuen Nutzer der Admin-Gruppe zuweisen
-		createAuthority(username, "admin");
+		findOrCreateAuthority(username, "admin");
 
-		// 4: Admin-Gruppe alle Rechte zuweisen
 		for (UserPrivilege priv : userPrivilegeRepository.findAllWithLastActionGreaterZero()) {
-			createLuUserPrivilegeUserGroup(userGroup, priv);
+			findOrCreateLuUserPrivilegeUserGroup(userGroup, priv);
 		}
 	}
 
 	/**
-	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein Nutzer mit dem Namen existiert. Ansonsten wird das Passwort aktualisiert.
+	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein Nutzer mit dem Namen existiert. Ansonsten wird das Passwort auch NICHT
+	 * aktualisiert.
 	 * 
 	 * @param username
 	 * @param encryptedPassword
 	 * @return
 	 */
-	public Users createUser(String username, String encryptedPassword) {
-		Users newUser = usersRepository.findByUsername(username);
+	public Users findOrCreateUser(String username, String encryptedPassword) {
+		Users newUser = usersRepository.findByUsername(username).orElseGet(null);
 
 		if (newUser == null) {
 			newUser = new Users();
 			newUser.setUsername(username);
+			newUser.setPassword(encryptedPassword);
+			usersRepository.save(newUser);
 		}
 
-		newUser.setPassword(encryptedPassword);
-		usersRepository.save(newUser);
 		return newUser;
+	}
+
+	/**
+	 * Aktualisiert das Passwort des Benutzers (für datasource="database")
+	 * 
+	 * @param username
+	 * @param encryptedPassword
+	 * @return
+	 * @throws NoSuchElementException
+	 *             wenn der Benutzer nicht existiert
+	 */
+	public Users updateUserPassword(String username, String encryptedPassword) throws NoSuchElementException {
+		Users user = usersRepository.findByUsername(username).get();
+
+		user.setPassword(encryptedPassword);
+		usersRepository.save(user);
+
+		return user;
 	}
 
 	/**
@@ -104,8 +136,8 @@ public class AuthorizationController {
 	 * @param securitytoken
 	 * @return
 	 */
-	public UserGroup createUserGroup(String keyText, String securitytoken) {
-		UserGroup usergroup = userGroupRepository.findByKeyText(keyText);
+	public UserGroup createOrUpdateUserGroup(String keyText, String securitytoken) {
+		UserGroup usergroup = userGroupRepository.findByKeyText(keyText).orElseGet(null);
 
 		if (usergroup == null) {
 			usergroup = new UserGroup();
@@ -134,8 +166,8 @@ public class AuthorizationController {
 	 * @param authority
 	 * @return
 	 */
-	public Authorities createAuthority(String username, String authorityName) {
-		Authorities authority = authoritiesRepository.findByUsernameAndAuthority(username, authorityName);
+	public Authorities findOrCreateAuthority(String username, String authorityName) {
+		Authorities authority = authoritiesRepository.findByUsernameAndAuthority(username, authorityName).orElseGet(null);
 
 		if (authority == null) {
 			authority = new Authorities();
@@ -153,8 +185,8 @@ public class AuthorizationController {
 	 * @param userGroup
 	 * @param priv
 	 */
-	public LuUserPrivilegeUserGroup createLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
-		LuUserPrivilegeUserGroup lu = luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong());
+	public LuUserPrivilegeUserGroup findOrCreateLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
+		LuUserPrivilegeUserGroup lu = luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong()).orElseGet(null);
 
 		if (lu == null) {
 			lu = new LuUserPrivilegeUserGroup();

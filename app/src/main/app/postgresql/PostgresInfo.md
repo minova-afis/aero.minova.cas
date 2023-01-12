@@ -21,3 +21,9 @@ Option 2 (JPA bzw. Controller im CAS, muss aus CAS-Extension aufgerufen werden)
 3. Über `authorizationController.createAdminUser("username", "encryptedPassword")` einen Nutzer erstellen, der alle erstellten Berechtigungen besitzt 
 
 Dieser Code kann bei jedem Start aufgerufen werden.
+
+**WICHTIG**: in den `application.properties` muss folgender Eintrag stehen, damit in Postgres Namen von Tabellen/Prozeduren/Spalten/... nicht mit `_` generiert werden:
+
+````
+spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+````

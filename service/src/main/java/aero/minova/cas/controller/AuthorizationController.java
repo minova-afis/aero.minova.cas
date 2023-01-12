@@ -55,7 +55,7 @@ public class AuthorizationController {
 	/**
 	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle xtCasUserPrivilege
 	 * eingetragen sein (Methode {@link #createUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen
-	 * erteilt
+	 * erteilt und das Passwort aktualisiert
 	 * 
 	 * @param username
 	 * @param encryptedPassword

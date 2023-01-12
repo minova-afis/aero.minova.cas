@@ -148,6 +148,7 @@
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
+            <!-- Seit SpringBoot 3.0.0 muss eine spezielle Version angegeben werden, damit Spring funktioniert. -->
             <classifier>jakarta</classifier>
         </dependency>
         <dependency>

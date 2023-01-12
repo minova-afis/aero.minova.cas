@@ -10,10 +10,10 @@ import aero.minova.cas.service.model.UserPrivilege;
 
 public interface UserPrivilegeRepository extends CrudRepository<UserPrivilege, Long> {
 
-	@Query("select u from UserPrivilege u where u.lastaction > 0")
+	@Query("select u from UserPrivilege u where u.lastAction > 0")
 	public List<UserPrivilege> findAllWithLastActionGreaterZero();
 
-	@Query("select u from UserPrivilege u where u.keytext = :keytext and u.lastaction > 0")
+	@Query("select u from UserPrivilege u where u.keyText = :keytext and u.lastAction > 0")
 	public Optional<UserPrivilege> findByKeyText(String keytext);
 
 }

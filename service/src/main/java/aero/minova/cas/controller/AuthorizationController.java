@@ -3,6 +3,7 @@ package aero.minova.cas.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,15 +59,16 @@ public class AuthorizationController {
 	 * @param privilegeName
 	 */
 	public UserPrivilege findOrCreateUserPrivilege(String privilegeName) {
-		UserPrivilege privilege = userPrivilegeRepository.findByKeyText(privilegeName).orElseGet(null);
+		Optional<UserPrivilege> priv = userPrivilegeRepository.findByKeyText(privilegeName);
 
-		if (privilege == null) {
-			privilege = new UserPrivilege();
+		if (priv.isEmpty()) {
+			UserPrivilege privilege = new UserPrivilege();
 			privilege.setKeyText(privilegeName);
 			userPrivilegeRepository.save(privilege);
+			return privilege;
 		}
 
-		return privilege;
+		return priv.get();
 	}
 
 	/**
@@ -99,16 +101,17 @@ public class AuthorizationController {
 	 * @return
 	 */
 	public Users findOrCreateUser(String username, String encryptedPassword) {
-		Users newUser = usersRepository.findByUsername(username).orElseGet(null);
+		Optional<Users> user = usersRepository.findByUsername(username);
 
-		if (newUser == null) {
-			newUser = new Users();
+		if (user.isEmpty()) {
+			Users newUser = new Users();
 			newUser.setUsername(username);
 			newUser.setPassword(encryptedPassword);
 			usersRepository.save(newUser);
+			return newUser;
 		}
 
-		return newUser;
+		return user.get();
 	}
 
 	/**
@@ -137,12 +140,16 @@ public class AuthorizationController {
 	 * @return
 	 */
 	public UserGroup createOrUpdateUserGroup(String keyText, String securitytoken) {
-		UserGroup usergroup = userGroupRepository.findByKeyText(keyText).orElseGet(null);
+		Optional<UserGroup> group = userGroupRepository.findByKeyText(keyText);
 
-		if (usergroup == null) {
+		UserGroup usergroup;
+
+		if (group.isEmpty()) {
 			usergroup = new UserGroup();
 			usergroup.setSecuritytoken("");
 			usergroup.setKeyText(keyText);
+		} else {
+			usergroup = group.get();
 		}
 
 		// Neue Tokens anhängen, dabei aber keine duplikate erstellen
@@ -167,16 +174,17 @@ public class AuthorizationController {
 	 * @return
 	 */
 	public Authorities findOrCreateAuthority(String username, String authorityName) {
-		Authorities authority = authoritiesRepository.findByUsernameAndAuthority(username, authorityName).orElseGet(null);
+		Optional<Authorities> auth = authoritiesRepository.findByUsernameAndAuthority(username, authorityName);
 
-		if (authority == null) {
-			authority = new Authorities();
+		if (auth.isEmpty()) {
+			Authorities authority = new Authorities();
 			authority.setUsername(username);
 			authority.setAuthority(authorityName);
 			authoritiesRepository.save(authority);
+			return authority;
 		}
 
-		return authority;
+		return auth.get();
 	}
 
 	/**
@@ -186,15 +194,16 @@ public class AuthorizationController {
 	 * @param priv
 	 */
 	public LuUserPrivilegeUserGroup findOrCreateLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
-		LuUserPrivilegeUserGroup lu = luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong()).orElseGet(null);
+		Optional<LuUserPrivilegeUserGroup> luOptional = luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong());
 
-		if (lu == null) {
-			lu = new LuUserPrivilegeUserGroup();
+		if (luOptional.isEmpty()) {
+			LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
 			lu.setUsergroup(userGroup);
 			lu.setUserprivilege(priv);
 			luUserPrivilegeUserGroupRepository.save(lu);
+			return lu;
 		}
 
-		return lu;
+		return luOptional.get();
 	}
 }

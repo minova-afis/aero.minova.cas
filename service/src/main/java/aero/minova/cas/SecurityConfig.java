@@ -28,6 +28,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -54,6 +55,11 @@ public class SecurityConfig {
 
 	private final Environment environment;
 	private final CustomLogger customLogger;
+
+	@Bean
+	public SpringSecurityDialect springSecurityDialect() {
+		return new SpringSecurityDialect();
+	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

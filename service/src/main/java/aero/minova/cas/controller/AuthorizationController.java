@@ -36,6 +36,23 @@ public class AuthorizationController {
 	UsersRepository usersRepository;
 
 	/**
+	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
+	 * 
+	 * @param privilegeName
+	 */
+	public UserPrivilege createUserPrivilege(String privilegeName) {
+		UserPrivilege privilege = userPrivilegeRepository.findByKeyText(privilegeName);
+
+		if (privilege == null) {
+			privilege = new UserPrivilege();
+			privilege.setKeyText(privilegeName);
+			userPrivilegeRepository.save(privilege);
+		}
+
+		return privilege;
+	}
+
+	/**
 	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle xtCasUserPrivilege
 	 * eingetragen sein (Methode {@link #createUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen
 	 * erteilt
@@ -45,34 +62,18 @@ public class AuthorizationController {
 	 */
 	public void createAdminUser(String username, String encryptedPassword) {
 
-		// 1. Create xtcasUsers Eintrag
+		// 1. Neuen "Users" erstellen
 		createUser(username, encryptedPassword);
 
-		// 2. xtcasUserGroup securitytoken="#admin" keytext="admin"
+		// 2. Admin-Gruppe erstellen
 		UserGroup userGroup = createUserGroup("admin", "#admin");
 
-		// 3. xtcasAuthorities username=username des neuen Nutzers, authority = Gruppenname (="admin")
+		// 3. Neuen Nutzer der Admin-Gruppe zuweisen
 		createAuthority(username, "admin");
 
-		// Ende: Einträge in xtcasLuUserPrivilegeUserGroup für alle Einträge in xtCasUserPrivilege
+		// 4: Admin-Gruppe alle Rechte zuweisen
 		for (UserPrivilege priv : userPrivilegeRepository.findAllWithLastActionGreaterZero()) {
 			createLuUserPrivilegeUserGroup(userGroup, priv);
-		}
-	}
-
-	/**
-	 * Erstellt einen Eintrag in xtcasLuUserPrivilegeUser, damit die Gruppe Rechte auf das Privileg (Prozedur, View, ...) hat
-	 * 
-	 * @param userGroup
-	 * @param priv
-	 */
-	public void createLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
-		LuUserPrivilegeUserGroup lu = luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong());
-		if (lu == null) {
-			lu = new LuUserPrivilegeUserGroup();
-			lu.setUsergroup(userGroup);
-			lu.setUserprivilege(priv);
-			luUserPrivilegeUserGroupRepository.save(lu);
 		}
 	}
 
@@ -112,6 +113,7 @@ public class AuthorizationController {
 			usergroup.setKeyText(keyText);
 		}
 
+		// Neue Tokens anhängen, dabei aber keine duplikate erstellen
 		List<String> newTokens = Arrays.asList(securitytoken.split("#"));
 		List<String> oldTokens = Arrays.asList(usergroup.getSecuritytoken().split("#"));
 		for (String newToken : newTokens) {
@@ -126,14 +128,13 @@ public class AuthorizationController {
 	}
 
 	/**
-	 * Erstellt eine Authority (Zuorndung zwischen Benutzer und BenutzerGruppe).
+	 * Erstellt eine Authority (Zuorndung zwischen Benutzer und BenutzerGruppe), wenn diese noch nicht existiert
 	 * 
 	 * @param username
 	 * @param authority
 	 * @return
 	 */
 	public Authorities createAuthority(String username, String authorityName) {
-
 		Authorities authority = authoritiesRepository.findByUsernameAndAuthority(username, authorityName);
 
 		if (authority == null) {
@@ -144,24 +145,24 @@ public class AuthorizationController {
 		}
 
 		return authority;
-
 	}
 
 	/**
-	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
+	 * Erstellt einen Eintrag in xtcasLuUserPrivilegeUser, damit die Gruppe Rechte auf das Privileg (Prozedur, View, ...) hat, wenn noch nicht vorhanden
 	 * 
-	 * @param privilegeName
+	 * @param userGroup
+	 * @param priv
 	 */
-	public UserPrivilege createUserPrivilege(String privilegeName) {
-		UserPrivilege privilege = userPrivilegeRepository.findByKeyText(privilegeName);
+	public LuUserPrivilegeUserGroup createLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
+		LuUserPrivilegeUserGroup lu = luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong());
 
-		if (privilege == null) {
-			privilege = new UserPrivilege();
-			privilege.setKeyText(privilegeName);
-			userPrivilegeRepository.save(privilege);
+		if (lu == null) {
+			lu = new LuUserPrivilegeUserGroup();
+			lu.setUsergroup(userGroup);
+			lu.setUserprivilege(priv);
+			luUserPrivilegeUserGroupRepository.save(lu);
 		}
 
-		return privilege;
+		return lu;
 	}
-
 }

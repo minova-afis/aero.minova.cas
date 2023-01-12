@@ -1,6 +1,7 @@
 package aero.minova.cas.service.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -13,6 +14,6 @@ public interface AuthoritiesRepository extends CrudRepository<Authorities, Long>
 	public List<Authorities> findAllWithLastActionGreaterZero();
 
 	@Query("select a from Authorities a where a.username = :username and a.authority = :authority and a.lastaction > 0")
-	public Authorities findByUsernameAndAuthority(String username, String authority);
+	public Optional<Authorities> findByUsernameAndAuthority(String username, String authority);
 
 }

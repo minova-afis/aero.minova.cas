@@ -3,12 +3,12 @@ package aero.minova.cas.service.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
 
-public interface LuUserPrivilegeUserGroupRepository extends CrudRepository<LuUserPrivilegeUserGroup, Long> {
+public interface LuUserPrivilegeUserGroupRepository extends JpaRepository<LuUserPrivilegeUserGroup, Long> {
 
 	@Query("select lu from LuUserPrivilegeUserGroup lu where lu.lastaction > 0")
 	public List<LuUserPrivilegeUserGroup> findAllWithLastActionGreaterZero();

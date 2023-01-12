@@ -3,12 +3,14 @@ package aero.minova.cas.service.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import aero.minova.cas.service.model.Authorities;
 
-public interface AuthoritiesRepository extends CrudRepository<Authorities, Long> {
+@Repository
+public interface AuthoritiesRepository extends JpaRepository<Authorities, Long> {
 
 	@Query("select a from Authorities a where a.lastaction > 0")
 	public List<Authorities> findAllWithLastActionGreaterZero();

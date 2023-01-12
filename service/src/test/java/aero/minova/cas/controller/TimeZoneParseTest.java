@@ -1,5 +1,7 @@
 package aero.minova.cas.controller;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Timestamp;
@@ -9,17 +11,12 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
-import org.junit.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
-public class TimeZoneParseTest extends BaseTest {
-
+class TimeZoneParseTest {
 	// Die alte System-Zeitzone war bei mir z.b. 'Europe/Berlin'
-	public static ZoneId zone = ZoneId.of("Europe/Berlin");
+	private static ZoneId zone = ZoneId.of("Europe/Berlin");
 
 	@Test
-	public void testParseWithWrongTimeZone() {
+	void testParseWithWrongTimeZone() {
 		TimeZone.setDefault(TimeZone.getTimeZone(zone));
 		Instant i = Instant.now();
 		Timestamp oldTime = Timestamp.from(i);
@@ -36,7 +33,7 @@ public class TimeZoneParseTest extends BaseTest {
 	}
 
 	@Test
-	public void testParseWithUtcOnly() {
+	void testParseWithUtcOnly() {
 		// Setzten der UTC Zeitzone
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
@@ -53,8 +50,8 @@ public class TimeZoneParseTest extends BaseTest {
 		assertThat(zdOld.toString()).isNotEqualTo(zdNew.toString());
 
 		// mit der neuen Zeitzone bleibt die Uhrzeit(In diesem Fall die Stunden) beim Parsen zwischen den Typen gleich
-		assertThat(instantHours).isEqualTo(zdHours);
-		assertThat(instantHours).isEqualTo(timestampHours);
+		assertThat(instantHours)
+				.isEqualTo(zdHours)
+				.isEqualTo(timestampHours);
 	}
-
 }

@@ -3,12 +3,12 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 
 <head>
-<div th:replace="layout :: head" />
+<div th:replace="~{layout :: head}" />
 <title th:value="${@environment.getProperty('spring.application.name')}"></title>
 </head>
 
 <body class="d-flex flex-column h-100 bg-light">
-	<header th:replace="layout :: header"></header>
+	<header th:replace="~{layout :: head}"></header>
 	<main role="main" class="flex-shrink-0">
 		<div class="container" sec:authorize="isAuthenticated()">
 			<ul class="list-group" sec:authorize="isAuthenticated()">

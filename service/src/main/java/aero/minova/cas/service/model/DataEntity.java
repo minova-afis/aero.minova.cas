@@ -1,6 +1,7 @@
 package aero.minova.cas.service.model;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -16,7 +17,7 @@ import lombok.Data;
 public abstract class DataEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "KeyLong")
 	private Long keyLong;
 
@@ -31,6 +32,6 @@ public abstract class DataEntity {
 	String lastUser = "CAS_JPA";
 
 	@Column(name = "LastDate")
-	LocalDateTime lastDate = LocalDateTime.now();
+	public Timestamp lastdate = Timestamp.from(Instant.now());
 
 }

@@ -5,7 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import lombok.Data;
+
 @Entity
+@Data
 @Table(name = "xtcasUserPrivilege")
 public class UserPrivilege extends DataEntity {
 

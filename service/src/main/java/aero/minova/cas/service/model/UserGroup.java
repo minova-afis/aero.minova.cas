@@ -6,7 +6,10 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.Data;
+
 @Entity
+@Data
 @Table(name = "xtcasUserGroup")
 public class UserGroup extends DataEntity {
 

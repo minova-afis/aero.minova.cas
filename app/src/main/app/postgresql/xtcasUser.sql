@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS public.xtcasuser
     lastdate timestamp without time zone NOT NULL DEFAULT now(),
     lastaction integer DEFAULT 1,
     CONSTRAINT xtcasuser_pkey PRIMARY KEY (keylong)
-)
+);

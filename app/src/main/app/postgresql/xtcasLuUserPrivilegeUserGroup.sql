@@ -16,4 +16,4 @@ CREATE TABLE IF NOT EXISTS public.xtcasluuserprivilegeusergroup
         REFERENCES public.xtcasuserprivilege (keylong) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);

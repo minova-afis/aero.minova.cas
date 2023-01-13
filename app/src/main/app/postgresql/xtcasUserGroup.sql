@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS public.xtcasusergroup
     lastaction integer DEFAULT 1,
     CONSTRAINT xtcasusergroup_pkey PRIMARY KEY (keylong),
     CONSTRAINT xtcasusergroup_keytext_key UNIQUE (keytext)
-)
+);

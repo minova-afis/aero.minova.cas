@@ -1,0 +1,19 @@
+package aero.minova.cas.service.model;
+
+import javax.validation.constraints.Size;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+@Entity
+@Data
+@Table(name = "xtcasUserPrivilege")
+public class UserPrivilege extends DataEntity {
+
+	@Size(max = 100)
+	@Column(name = "TransactionChecker")
+	public String transactionchecker;
+
+}

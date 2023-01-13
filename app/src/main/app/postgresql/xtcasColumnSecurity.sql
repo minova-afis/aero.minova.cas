@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS public.xtcascolumnsecurity
     lastdate timestamp without time zone NOT NULL DEFAULT now(),
     lastaction integer NOT NULL DEFAULT 1,
     CONSTRAINT xtcascolumnsecurity_pkey PRIMARY KEY (keylong)
-)
+);

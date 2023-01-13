@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS public.xtcasuserprivilege
     lastdate timestamp without time zone DEFAULT now(),
     transactionchecker character varying(100) COLLATE pg_catalog."default",
     CONSTRAINT xtcasuserprivilege_pkey PRIMARY KEY (keylong)
-)
+);

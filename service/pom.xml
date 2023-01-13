@@ -175,6 +175,11 @@
             <version>0.8.8</version>
             <scope>test</scope>
         </dependency>
+		<dependency>
+		    <groupId>javax.validation</groupId>
+		    <artifactId>validation-api</artifactId>
+		    <version>2.0.1.Final</version>
+		</dependency>
     </dependencies>
 
     <build>
@@ -187,6 +192,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+ 				<configuration>
+	                <parameters>true</parameters>
+	            </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -16,4 +16,4 @@ CREATE TABLE IF NOT EXISTS public.xtcasauthorities
         REFERENCES public.xtcasusers (username) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);

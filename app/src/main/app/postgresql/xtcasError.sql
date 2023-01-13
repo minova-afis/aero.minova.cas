@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS public.xtcaserror
     errormessage character varying(250) COLLATE pg_catalog."default" NOT NULL,
     date timestamp without time zone NOT NULL DEFAULT now(),
     CONSTRAINT xtcaserror_pkey PRIMARY KEY (keylong)
-)
+);

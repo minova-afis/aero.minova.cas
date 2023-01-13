@@ -10,6 +10,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Update auf SpringBoot 3.0.0
 * `@SpringBootApplication` Annotation OHNE `exclude = { DataSourceAutoConfiguration.class }`, damit automatisch eine `entityManagerFactory` erstellt wird.
 * BUGFIX: Für die LDAP-Gruppen wird `xtcasUser` statt der `xtcasUsers` ausgelesen, um die SecurityTokens zu bestimmen.
+* Rechtevergabe durch AuthorizationController erleichtern, indem dies durch JPA umgesetzt wird und somit auch Datenbank unabhängig ist.
 
 ## [12.56.2] -- 2023-01-10
 * Tabellen um Hilfsmethoden erweitert, mit der leichter auf Values zugegriffen werden kann

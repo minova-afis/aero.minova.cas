@@ -8,7 +8,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
 import aero.minova.cas.service.model.UserGroup;
@@ -19,7 +21,8 @@ import aero.minova.cas.service.repository.UserGroupRepository;
 import aero.minova.cas.service.repository.UserPrivilegeRepository;
 import aero.minova.cas.service.repository.UsersRepository;
 
-@SpringBootTest
+@SpringBootTest(classes = CoreApplicationSystemApplication.class)
+@ActiveProfiles("test")
 class AuthorizationTest {
 
 	@Autowired

@@ -27,23 +27,35 @@ public class ValueSerializer extends com.fasterxml.jackson.databind.JsonSerializ
 		if (value == null || type == null || value.getValue() == null || value.getType() == null) {
 			return null;
 		}
+
+		String ruleString = "";
+		if (value.getRule() != null) {
+			String rule = value.getRule();
+			if (rule.equals("like")) {
+				rule = "~";
+			} else if (rule.equals("not like")) {
+				rule = "!~";
+			}
+			ruleString = "f-" + rule + "-";
+		}
+
 		switch (value.getType()) {
 		case INTEGER:
-			return new JsonPrimitive("n-" + value.getIntegerValue());
+			return new JsonPrimitive(ruleString + "n-" + value.getIntegerValue());
 		case DOUBLE:
-			return new JsonPrimitive("d-" + value.getDoubleValue());
+			return new JsonPrimitive(ruleString + "d-" + value.getDoubleValue());
 		case STRING:
-			return new JsonPrimitive("s-" + value.getStringValue());
+			return new JsonPrimitive(ruleString + "s-" + value.getStringValue());
 		case INSTANT:
-			return new JsonPrimitive("i-" + value.getInstantValue().toString());
+			return new JsonPrimitive(ruleString + "i-" + value.getInstantValue().toString());
 		case ZONED:
-			return new JsonPrimitive("z-" + value.getZonedDateTimeValue().toString());
+			return new JsonPrimitive(ruleString + "z-" + value.getZonedDateTimeValue().toString());
 		case BOOLEAN:
-			return new JsonPrimitive("b-" + value.getBooleanValue().toString());
+			return new JsonPrimitive(ruleString + "b-" + value.getBooleanValue().toString());
 		case BIGDECIMAL:
-			return new JsonPrimitive("m-" + value.getBigDecimalValue().toString());
+			return new JsonPrimitive(ruleString + "m-" + value.getBigDecimalValue().toString());
 		case LONG:
-			return new JsonPrimitive("l-" + value.getLongValue().toString());
+			return new JsonPrimitive(ruleString + "l-" + value.getLongValue().toString());
 		default:
 			return null;
 		}

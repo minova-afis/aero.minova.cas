@@ -175,9 +175,9 @@ public class XSqlProcedureController {
 
 			// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunen wurde, normal ausführen.
 			if (extensionResult != null) {
-				resultSets.add(new XSqlProcedureResult(xt.getId(), (SqlProcedureResult) extensionResult.getBody()));
+				result = (SqlProcedureResult) extensionResult.getBody();
 			} else {
-				result = (SqlProcedureResult) procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+				result = procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
 			}
 			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompabilität da, damit hier keine NullPointerException geworfen wird.
 			if (inputTablesWithResults != null) {
@@ -193,6 +193,7 @@ public class XSqlProcedureController {
 
 			// SqlProcedureResult wird in Liste hinzugefügt, um dessen Werte später in andere Values schreiben zu können.
 			resultSets.add(new XSqlProcedureResult(xt.getId(), result));
+
 		}
 		return resultSets;
 	}

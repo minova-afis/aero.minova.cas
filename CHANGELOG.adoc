@@ -4,6 +4,9 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+
+## [12.57.0] -- 2023-01-13
 * Spring Security: Umstellung von `WebSecurityConfigurerAdapter` auf Komponenten-basierende Sicherheit
 * Aktualisierung Java 11 LTS auf Java 17 LTS
 * Aktualisierung von JavaX auf Jakarta

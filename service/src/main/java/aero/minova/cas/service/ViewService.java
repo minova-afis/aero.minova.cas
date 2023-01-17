@@ -1,8 +1,11 @@
 package aero.minova.cas.service;
 
 import java.sql.CallableStatement;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -132,16 +135,7 @@ public class ViewService {
 				if (iVal != null) {
 					val rule = iVal.getRule();
 					String stringValue = iVal.getValue() + "";
-					if (rule == null) {
-						if (!stringValue.trim().isEmpty()) {
-							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
-							preparedStatement.setString(i + parameterOffset, stringValue);
-						} else {
-							// i tickt immer eins hoch, selbst wenn ein Value den Wert 'null', '' hat
-							// damit die Position beim Einfügen also stimmt, muss parameterOffset um 1 verringert werden
-							parameterOffset--;
-						}
-					} else if (rule.contains("in")) {
+					if (rule != null && rule.contains("in")) {
 						List<String> inBetweenValues;
 						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
 								.collect(Collectors.toList());
@@ -152,7 +146,7 @@ public class ViewService {
 						}
 						// i zählt als nächstes hoch, deswegem muss parameterOffset wieder um 1 verringert werden
 						parameterOffset--;
-					} else if (rule.contains("between")) {
+					} else if (rule != null && rule.contains("between")) {
 						List<String> inBetweenValues;
 						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
 								.collect(Collectors.toList());
@@ -166,7 +160,32 @@ public class ViewService {
 					} else {
 						if (!stringValue.trim().isEmpty()) {
 							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
-							preparedStatement.setString(i + parameterOffset, stringValue);
+
+							// Für Postgres muss der Datentyp genau passen
+							switch (iVal.getType()) {
+							case INTEGER:
+								preparedStatement.setInt(i + parameterOffset, iVal.getIntegerValue());
+								break;
+							case BOOLEAN:
+								preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
+								break;
+							case BIGDECIMAL:
+								preparedStatement.setDouble(i + parameterOffset, iVal.getBigDecimalValue().doubleValue());
+								break;
+							case DOUBLE:
+								preparedStatement.setDouble(i + parameterOffset, iVal.getDoubleValue());
+								break;
+							case ZONED:
+								preparedStatement.setDate(i + parameterOffset, Date.valueOf(iVal.getZonedDateTimeValue().toLocalDate()));
+								break;
+							case INSTANT:
+								preparedStatement.setDate(i + parameterOffset, Date.valueOf(LocalDate.ofInstant(iVal.getInstantValue(), ZoneId.of("UTC"))));
+								break;
+							default:
+								preparedStatement.setString(i + parameterOffset, stringValue);
+								break;
+							}
+
 						} else {
 							parameterOffset--;
 						}

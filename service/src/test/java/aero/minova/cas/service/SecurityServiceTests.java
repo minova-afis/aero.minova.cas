@@ -8,10 +8,10 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +21,9 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 
-import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
@@ -116,7 +117,7 @@ class SecurityServiceTests {
 	@DisplayName("Frage nach mehreren Spalten, bekomme alle zurück.")
 	@WithMockUser(username = "user", roles = { "dispatcher" })
 	@Test
-	void test_ViewStringWithAuthenticatedUser() throws SQLException {
+	void test_ViewStringWithAuthenticatedUser() {
 		val inputTable = new Table();
 		inputTable.setName("vJournalIndexTest");
 		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
@@ -145,7 +146,7 @@ class SecurityServiceTests {
 	@DisplayName("Frage nach mehreren Spalten, bekomme aber nur die mit Berechtigung zurück.")
 	@WithMockUser(username = "admin")
 	@Test
-	void test_ViewStringWithAuthenticatedUserButOneBlockedColumn() throws SQLException {
+	void test_ViewStringWithAuthenticatedUserButOneBlockedColumn() {
 		val inputTable = new Table();
 		inputTable.setName("vJournalIndexTest");
 		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
@@ -175,7 +176,7 @@ class SecurityServiceTests {
 	@DisplayName("Mehrere Rollen mit Einschränkungen")
 	@WithMockUser(username = "admin", roles = { "admin", "dispo" })
 	@Test
-	void test_ViewStringWithAuthenticatedUserButMultipleBlockedColumn() throws SQLException {
+	void test_ViewStringWithAuthenticatedUserButMultipleBlockedColumn() {
 		val inputTable = new Table();
 		inputTable.setName("vJournalIndexTest");
 		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
@@ -212,7 +213,7 @@ class SecurityServiceTests {
 	@DisplayName("Frage nach geblockter Spalte mit Wert, bekomme nur sichtbare Spalten ohne Abfrage auf Wert")
 	@WithMockUser(username = "admin", roles = { "admin" })
 	@Test
-	void test_ViewStringWithAuthenticatedUserButBlockedWhereClause() throws SQLException {
+	void test_ViewStringWithAuthenticatedUserButBlockedWhereClause() {
 		val inputTable = new Table();
 		inputTable.setName("vJournalIndexTest");
 		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
@@ -280,14 +281,15 @@ class SecurityServiceTests {
 		doReturn(mockResult).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 
 		Throwable exception = assertThrows(RuntimeException.class, () -> spySecurityService.columnSecurity(inputTable, userGroups));
-		assertThat(exception).hasMessage("msg.ColumnSecurityError %admin %vJournalIndexTest");
+		assertThat(exception)
+				.hasMessage("msg.ColumnSecurityError %admin %vJournalIndexTest");
 
 	}
 
 	@DisplayName("Frage nach Tabelle (*), bekomme berechitgte Spalten zurück.")
 	@WithMockUser(username = "admin", roles = { "admin" })
 	@Test
-	void test_ViewStringWithAuthenticatedUserWithNoHead() throws SQLException {
+	void test_ViewStringWithAuthenticatedUserWithNoHead() {
 		val inputTable = new Table();
 		inputTable.setName("vJournalIndexTest");
 		List<Row> userGroups = new ArrayList<>();
@@ -314,7 +316,7 @@ class SecurityServiceTests {
 	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, bekomme alle zurück, da berechtigt, aber eine Rolle hätte keine Berechtigung.")
 	@WithMockUser(username = "admin", roles = { "dispatcher", "user" })
 	@Test
-	void test_ViewStringWithOneAuthenticatedUserWithNoBlockedColumns() throws SQLException {
+	void test_ViewStringWithOneAuthenticatedUserWithNoBlockedColumns() {
 		val inputTable = new Table();
 		inputTable.setName("vJournalIndexTest");
 		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
@@ -358,7 +360,7 @@ class SecurityServiceTests {
 	@DisplayName("Frage nach mehreren Spalten mit bestimmten Werten, bekomme alle zurück, da eine Rolle für die gesamte Table berechtigt ist.")
 	@WithMockUser(username = "admin", roles = { "admin", "dispatcher", "user" })
 	@Test
-	void test_ViewStringWithMultipleAuthenticatedUserWithNoBlockedColumns() throws SQLException {
+	void test_ViewStringWithMultipleAuthenticatedUserWithNoBlockedColumns() {
 		val inputTable = new Table();
 		inputTable.setName("vJournalIndexTest");
 		inputTable.addColumn(new Column("OrderReceiverKey", DataType.INTEGER));
@@ -426,7 +428,9 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		List<String> resultList = securityService.extractUserTokens(userGroups);
-		assertThat(resultList).hasSize(3).containsExactly("user", "dispatcher", "codemonkey");
+		assertThat(resultList)
+				.hasSize(3)
+				.containsExactly("user", "dispatcher", "codemonkey");
 	}
 
 	@DisplayName("ExtractUserTokens eine Ausnahmen")
@@ -453,13 +457,14 @@ class SecurityServiceTests {
 		userGroups.add(inputRow);
 		List<String> resultList = securityService.extractUserTokens(userGroups);
 
-		assertThat(resultList).isEmpty();
+		assertThat(resultList)
+				.isEmpty();
 	}
 
 	@DisplayName("getPrivilegePermission-Rows überprüfen, ob alle Privilegien übernommen werden")
 	@WithMockUser(username = "user", roles = { "user", "dispatcher", "codemonkey" })
 	@Test
-	void test_getPrivilegePermission() throws SQLException {
+	void test_getPrivilegePermission() {
 
 		List<Row> mockResult = new ArrayList<>();
 		Row inputRow = new Row();
@@ -496,7 +501,7 @@ class SecurityServiceTests {
 	@DisplayName("getPrivilegePermission-Rows überprüfen, aber es gibt keine UserGruppen")
 	@WithMockUser(username = "user", roles = {})
 	@Test
-	void test_getPrivilegePermissionNoPermissions() throws SQLException {
+	void test_getPrivilegePermissionNoPermissions() {
 
 		Mockito.doAnswer(returnsFirstArg()).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
 		Mockito.doNothing().when(spySecurityService).loadAllPrivileges();
@@ -536,7 +541,8 @@ class SecurityServiceTests {
 		spySecurityService.customLogger = logger;
 
 		Throwable exception = assertThrows(ProcedureException.class, () -> spySecurityService.findSecurityTokenColumn(inputTable));
-		assertThat(exception).hasMessage("msg.MissingSecurityTokenColumn");
+		assertThat(exception)
+				.hasMessage("msg.MissingSecurityTokenColumn");
 	}
 
 	@DisplayName("Überprüfe, ob SecurityToken in Row übereinstimmt mit vorhandenen SecurityTokens")

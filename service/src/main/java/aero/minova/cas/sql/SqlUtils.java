@@ -78,7 +78,6 @@ public class SqlUtils {
 			}
 			return row;
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new ProcedureException("msg.ConvertTableError");
 		}
 	}

@@ -75,7 +75,7 @@ public class SecurityService {
 	 * @param privilegeName
 	 *            Das Privilege, für das ein Recht eingefordert wird.
 	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
-	 * @throws SQLException 
+	 * @throws SQLException
 	 **/
 	public List<Row> getPrivilegePermissions(String privilegeName) throws SQLException {
 		loadAllPrivileges();
@@ -163,8 +163,7 @@ public class SecurityService {
 				SecurityContextHolder.getContext().setAuthentication(newAuth);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IllegalArgumentException("No User found, please login");
+			throw new IllegalArgumentException("No User found, please login", e);
 		}
 
 	}
@@ -196,7 +195,6 @@ public class SecurityService {
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			result = svc.convertSqlResultToTable(inputTable, resultSet);
 		} catch (Exception e) {
-			e.printStackTrace();
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
 		} finally {
@@ -221,7 +219,7 @@ public class SecurityService {
 	 *            Die Nutzer-Gruppen/Rollen, welche Zugriff auf die Tabelle haben wollen.
 	 * @return Diese Tabelle enhtält die Spalten, welche für die Index-View von diesem User verwendet werden dürfen.
 	 * @author weber
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public Table columnSecurity(Table inputTable, List<Row> userGroups) throws SQLException {
 		Table columnSec = new Table();
@@ -409,9 +407,10 @@ public class SecurityService {
 	 * @param authorities
 	 *            Die Liste an GrantedAuthorities, die der User bereits besitzt.
 	 * @return Die Liste an bereits vorhandenen GrantedAuthorities vereint mit den neuen Authorities.
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
-	public List<GrantedAuthority> loadUserGroupPrivileges(String username, List<String> userSecurityTokens, List<GrantedAuthority> authorities) throws SQLException {
+	public List<GrantedAuthority> loadUserGroupPrivileges(String username, List<String> userSecurityTokens, List<GrantedAuthority> authorities)
+			throws SQLException {
 		// Füge der Liste der ausgelesenen Authorites aus der Datenbnak die Authorities hinzu, welche bereits vorhanden waren.
 		if (authorities != null) {
 			for (GrantedAuthority ga : authorities) {
@@ -467,7 +466,7 @@ public class SecurityService {
 	/**
 	 * @param username
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public List<String> loadDatabaseUserTokens(String username) throws SQLException {
 		Table dataBaseTable = new Table();
@@ -506,7 +505,7 @@ public class SecurityService {
 	/**
 	 * @param username
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public List<String> loadLDAPUserTokens(String username) throws SQLException {
 		Table tUser = new Table();

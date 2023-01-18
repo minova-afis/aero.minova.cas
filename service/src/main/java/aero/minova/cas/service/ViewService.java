@@ -101,7 +101,6 @@ public class ViewService {
 			result.fillMetaData(result, limit, totalResults, page);
 
 		} catch (Throwable e) {
-			e.printStackTrace();
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);
 		} finally {

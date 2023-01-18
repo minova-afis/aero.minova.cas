@@ -4,6 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -38,10 +39,11 @@ public class ViewService {
 	@Autowired
 	private SecurityService securityService;
 
-	public Table executeView(Table inputTable, List<Row> authoritiesForThisTable) throws TableException {
+	public Table executeView(Table inputTable, List<Row> authoritiesForThisTable) throws TableException, SQLException {
 		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
+		PreparedStatement preparedViewStatement = null;
 		try {
 			inputTable = securityService.columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
@@ -73,7 +75,7 @@ public class ViewService {
 			// weswegen dann Fehlermeldungen geworfen werden. Deshalb wird ab jetzt einfach die prepareViewString-Methode verwendet.
 			String viewQuery = prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
+			preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
 			customLogger.logSql("Executing statements: " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 
@@ -99,9 +101,11 @@ public class ViewService {
 			result.fillMetaData(result, limit, totalResults, page);
 
 		} catch (Throwable e) {
+			e.printStackTrace();
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);
 		} finally {
+			connection.close();
 			systemDatabase.freeUpConnection(connection);
 		}
 		return result;

@@ -1,8 +1,11 @@
 package aero.minova.cas;
 
-import aero.minova.cas.service.SecurityService;
-import aero.minova.cas.sql.SystemDatabase;
-import lombok.RequiredArgsConstructor;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -30,11 +33,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
@@ -63,11 +64,9 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(requests -> requests
-				.requestMatchers("/actuator/**").permitAll()
-				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll()
-				.anyRequest().fullyAuthenticated()
-		);
+		http.authorizeHttpRequests(requests -> requests.requestMatchers("/actuator/**").permitAll()
+				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll().anyRequest()
+				.fullyAuthenticated());
 
 		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
 		http.formLogin()//
@@ -78,19 +77,17 @@ public class SecurityConfig {
 		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
 		http.logout().permitAll();
 
-		Arrays.stream(environment.getActiveProfiles())
-				.filter("dev"::equals)
-				.forEach(profile -> {
-					customLogger.logError("Never use profile '" + profile + "' in production!", new Exception());
+		Arrays.stream(environment.getActiveProfiles()).filter("dev"::equals).forEach(profile -> {
+			customLogger.logError("Never use profile '" + profile + "' in production!", new Exception());
 
-					try {
-						// Enables CorsConfigurationSource to be used
-						http.cors();
-					} catch (Exception e) {
-						customLogger.logError(e.getMessage(), e);
-						throw new RuntimeException(e);
-					}
-				});
+			try {
+				// Enables CorsConfigurationSource to be used
+				http.cors();
+			} catch (Exception e) {
+				customLogger.logError(e.getMessage(), e);
+				throw new RuntimeException(e);
+			}
+		});
 		return http.build();
 	}
 
@@ -108,12 +105,7 @@ public class SecurityConfig {
 
 			return jdbcUserDetailsManager;
 		} else if (ADMIN.equals(dataSource)) {
-			UserDetails user = User
-					.withUsername(ADMIN)
-					.password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi"))
-					.roles(ADMIN)
-					.authorities(ADMIN)
-					.build();
+			UserDetails user = User.withUsername(ADMIN).password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles(ADMIN).authorities(ADMIN).build();
 			return new InMemoryUserDetailsManager(user);
 		}
 		throw new IllegalArgumentException("dataSource contains unknown parameter '" + dataSource + "'");
@@ -142,10 +134,14 @@ public class SecurityConfig {
 			@Override
 			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
 					throws RuntimeException {
-				List<String> userSecurityTokens = securityService.loadLDAPUserTokens(username);
-				List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username, userSecurityTokens,
-						(List<GrantedAuthority>) authorities);
-				return super.mapUserFromContext(ctx, username, grantedAuthorities);
+				try {
+					List<String> userSecurityTokens = securityService.loadLDAPUserTokens(username);
+					List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username, userSecurityTokens,
+							(List<GrantedAuthority>) authorities);
+					return super.mapUserFromContext(ctx, username, grantedAuthorities);
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		};
 	}

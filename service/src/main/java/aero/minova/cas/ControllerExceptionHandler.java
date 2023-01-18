@@ -156,7 +156,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				.collect(Collectors.toList());
 		error.setTrace(trace);
 		outputTable.setReturnErrorMessage(error);
-		saveErrorInDatabase(ex);
+		try {
+			saveErrorInDatabase(ex);
+		} catch (SQLException e) {
+			customLogger.logError("Could not save error: ", e);
+		}
 		return outputTable;
 	}
 
@@ -313,8 +317,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	 * 
 	 * @param e
 	 *            Die Exception, welche geworfen wurde.
+	 * @throws SQLException
 	 */
-	public void saveErrorInDatabase(Exception e) {
+	public void saveErrorInDatabase(Exception e) throws SQLException {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username;
@@ -349,6 +354,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			e1.printStackTrace(pw);
 			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw.toString(), e1);
 		} finally {
+			connection.close();
 			systemDatabase.freeUpConnection(connection);
 		}
 	}

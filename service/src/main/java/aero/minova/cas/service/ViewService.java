@@ -4,6 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -97,12 +98,17 @@ public class ViewService {
 			}
 
 			result.fillMetaData(result, limit, totalResults, page);
-
+			systemDatabase.freeUpConnection(connection);
 		} catch (Throwable e) {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e1) {
+					customLogger.logError("Connection could not be closed: ", e1);
+				}
+			}
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

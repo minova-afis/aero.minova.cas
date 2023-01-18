@@ -5,7 +5,6 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Index Filtern mit Postgres ermöglichen
-* Bei allen Datenbankabfragen im finally-Block die Verbindung schließen
 
 ## [12.57.1] -- 2023-01-16
 * Erhöhen der Springboot Version auf 3.0.1, da Artefakt org.springframework.security:spring-security-bom:pom:6.0.0-RC2 in Springboot 3.0.0 nicht gefunden werden konnte und zu Fehlern beim Bauen auf Entwicklerrechnern führte.

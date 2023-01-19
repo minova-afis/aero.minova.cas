@@ -44,6 +44,11 @@ public class Table implements Serializable {
 		return null;
 	}
 
+	public void setValue(Value v, String columName, int rowIndex) {
+		int colIndxByName = findColumnPosition(columName);
+		rows.get(rowIndex).getValues().set(colIndxByName, v);
+	}
+
 	public void fillMetaData(Table inputTable, int limit, int totalResults, int page) {
 		if (inputTable.getMetaData() == null) {
 			metaData = new TableMetaData();

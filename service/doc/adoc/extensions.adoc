@@ -7,6 +7,7 @@ Ist dies der Fall wird diese aufgerufen, anstatt den SQL-Server zu befragen.
 
 Es reicht in der Regel nicht, wenn die Erweiterung im Klassenpfad ist,
 da diese beim Prozedur oder View-Aufruf sonst nicht aktiv sind.
+Es muss beim entsprechenden Controller die registerExtension()-Methode innerhalb der Extension aufgerufen werden.
 
 == Zweck von Erweiterungen
 
@@ -17,7 +18,7 @@ Folgendes sind legitime Einsatzzwecke:
 * SQL mit JPA-Code ersetzen, wobei große Funktionalitäten, wie die Bestandsaufnahme (`aero.minova.stock.service`),
   in eigene Dienste gesteckt werden sollen.
 * Nachrichten an andere Dienste schicken, wenn bestimmte Anfragen an das CAS kommen.
-* Ein vorläufiger Ersatz um kleine Jobs und Ähnliches umsetzen.
+* Ein vorläufiger Ersatz um kleine Jobs und Ähnliches umzusetzen.
 
 == Aufbau von Erweiterungen
 

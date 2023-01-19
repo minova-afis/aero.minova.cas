@@ -95,17 +95,16 @@ public class XSqlProcedureController {
 					queueService.accept(mapEntry.getKey(), new ResponseEntity(result, HttpStatus.ACCEPTED));
 				}
 			}
-
+			systemDatabase.freeUpConnection(connection);
 		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			if (connection != null) {
 				try {
 					connection.rollback();
-					systemDatabase.freeUpConnection(connection);
 				} catch (Exception e1) {
 					customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
-					connection.close();
 				}
+				connection.close();
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
 		}

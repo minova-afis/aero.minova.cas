@@ -16,19 +16,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <!-- Diese BOM wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>bom</artifactId>
-                <version>2.19.24</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>aero.minova</groupId>
@@ -169,11 +156,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
-        </dependency>
-        <dependency>
-            <!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
         </dependency>
 
         <dependency>

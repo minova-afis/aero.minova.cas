@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Update auf SpringBoot 3.0.2
+* Added AWS SDK's BOM
 
 ## [12.57.2] -- 2023-01-20
 * Index Filtern mit Postgres ermöglichen

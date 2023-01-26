@@ -20,6 +20,6 @@
 	
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-		<tag>v12.40.2</tag>
+		<tag>HEAD</tag>
 	</scm>
 </project>

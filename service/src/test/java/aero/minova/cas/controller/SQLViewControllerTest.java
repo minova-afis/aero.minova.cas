@@ -1,6 +1,6 @@
 package aero.minova.cas.controller;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class SQLViewControllerTest {
 		Table indexViewResult = testSubject.getIndexView(indexView);
 
 		// Es muss mindestens das eine eben erstellte Recht geben
-		assertTrue(!indexViewResult.getRows().isEmpty());
+		assertFalse(indexViewResult.getRows().isEmpty());
 	}
 
 }

@@ -162,7 +162,7 @@ public class SecurityService {
 				SecurityContextHolder.getContext().setAuthentication(newAuth);
 			}
 		} catch (Exception e) {
-			throw new IllegalArgumentException("No User found, please login");
+			throw new IllegalArgumentException("No User found, please login", e);
 		}
 
 	}

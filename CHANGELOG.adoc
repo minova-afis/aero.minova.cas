@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Proof of Concept Test für SQLViewController#getIndexView
+* Kopieren in MDI-Maske ermöglichen, um die Bedienung zu vereinfachen
+
 
 ## [12.58.0] -- 2023-01-27
 * Update auf SpringBoot 3.0.2

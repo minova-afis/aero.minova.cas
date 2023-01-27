@@ -69,6 +69,13 @@ jobs:
     # - run: |
     #     echo "Run, Build Application using script"
     #     ./location_of_script_within_repo/buildscript.sh
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: 17
+        java-package: 'jdk'
+        cache: 'maven'
+          
     - name: Maven build
       run: |
         mvn --batch-mode verify \

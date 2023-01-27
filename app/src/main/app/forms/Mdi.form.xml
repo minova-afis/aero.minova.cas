@@ -34,7 +34,7 @@
 			<text length="50"/>
 		</column>
 	</index-view>
-	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="Mdi">
+	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="Mdi" button-copy-visible="true">
 		<head>
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>

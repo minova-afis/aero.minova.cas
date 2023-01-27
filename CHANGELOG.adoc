@@ -4,7 +4,10 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+## [12.58.0] -- 2023-01-27
 * Update auf SpringBoot 3.0.2
+* S3 Abhängigkeit aus AWS SDK's BOM für Erweiterungen bereitstellen.
 
 ## [12.57.2] -- 2023-01-20
 * Index Filtern mit Postgres ermöglichen

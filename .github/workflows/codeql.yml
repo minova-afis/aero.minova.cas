@@ -33,6 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         language: [ 'java' ]
+        java-version: ['17']
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Use only 'java' to analyze code written in Java, Kotlin or both
         # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
@@ -41,6 +42,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -72,14 +75,14 @@ jobs:
     - uses: actions/setup-java@v2
       with:
         distribution: 'adopt'
-        java-version: 17
+        java-version: ${{ matrix.java-version }}
         java-package: 'jdk'
         cache: 'maven'
           
     - name: Maven build
       run: |
-        mvn --batch-mode verify \
-          -P repo-github -P all-tests \
+        mvn --batch-mode compile \
+          -P repo-github \
           -Dusername=$GITHUB_ACCESS_TOKEN \
           --file pom.xml \
           --settings .github/settings.xml

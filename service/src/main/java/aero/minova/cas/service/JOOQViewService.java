@@ -201,4 +201,9 @@ public class JOOQViewService implements ViewServiceInterface {
 		}
 		return condition.toString();
 	}
+
+	@Override
+	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
+		return "Not implemented yet";
+	}
 }

@@ -213,4 +213,50 @@ public class MssqlViewService implements ViewServiceInterface {
 		return where.toString();
 	}
 
+	/*
+	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen. Wird NICHT für den "normalen" Index-Aufruf verwendet, da immer
+	 * davon ausgegangen wird, dass ein KeyLong in der View/Table vorhanden ist.
+	 */
+	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
+		final StringBuffer sb = new StringBuffer();
+		if (params.getName() == null || params.getName().trim().length() == 0) {
+			throw new IllegalArgumentException("msg.ViewNullName");
+		}
+		sb.append("select ");
+		val outputFormat = params.getColumns().stream()//
+				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
+				.collect(Collectors.toList());
+		if (outputFormat.isEmpty()) {
+			sb.append("* from ");
+		} else {
+			sb.append(//
+					outputFormat.stream()//
+							.map(Column::getName)//
+							.collect(Collectors.joining(", ")));
+			sb.append(" from ");
+		}
+
+		sb.append("( select Row_Number() over (order by KeyLong) as RowNum, * from ").append(params.getName());
+		boolean whereClauseExists = false;
+		if (!params.getColumns().isEmpty() && !params.getRows().isEmpty()) {
+			final String where = prepareWhereClause(params, autoLike);
+			sb.append(where);
+			if (!where.trim().equals("")) {
+				whereClauseExists = true;
+				sb.append(")");
+			}
+		}
+		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
+		sb.append(onlyAuthorizedRows);
+		sb.append(" ) as RowConstraintResult");
+
+		if (page > 0) {
+			sb.append("\r\nwhere RowNum > " + ((page - 1) * maxRows));
+			// bei 0 sollen einfach alle Ergebnisse ausgegeben werden
+			if (maxRows > 0) {
+				sb.append("\r\nand RowNum <= " + (page * maxRows) + " order by RowNum");
+			}
+		}
+		return sb.toString();
+	}
 }

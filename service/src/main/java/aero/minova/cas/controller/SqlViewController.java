@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,11 +47,6 @@ public class SqlViewController {
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
 	 */
 	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
-
-	@PostConstruct
-	public void init() {
-		securityService.setSvc(this);
-	}
 
 	/**
 	 * Hiermit lassen sich Erweiterungen für Views registrieren, die ausgeführt werden, wenn eine View mit der Namen der Registrierung ausgeführt werden soll.

@@ -74,19 +74,19 @@ public class JOOQViewService implements ViewServiceInterface {
 		// Wenn eine condition leer ist und die toString()-Methode auf diese angewandt wird, kommt ein "(true)" dabei raus. Das wollen wir nicht in unserer
 		// Abfrage haben.
 		if (isCounting) {
-			if (condition != null && condition != DSL.noCondition() && !condition.toString().equals("(true)")) {
+			if (condition != null && !condition.toString().equals("(true)")) {
 				query = DSL.selectCount().from(params.getName()).where(condition);
 			} else {
 				query = DSL.selectCount().from(params.getName());
 			}
 		} else if (maxRows > 0) {
-			if (condition != null && condition != DSL.noCondition() && !condition.toString().equals("(true)")) {
+			if (condition != null && !condition.toString().equals("(true)")) {
 				query = DSL.select(fields).from(params.getName()).where(condition).limit(maxRows);
 			} else {
 				query = DSL.select(fields).from(params.getName()).limit(maxRows);
 			}
 		} else {
-			if (condition != null && condition != DSL.noCondition() && !condition.toString().equals("(true)")) {
+			if (condition != null && !condition.toString().equals("(true)")) {
 				query = DSL.select(fields).from(params.getName()).where(condition);
 			} else {
 				query = DSL.select(fields).from(params.getName());

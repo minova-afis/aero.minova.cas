@@ -179,4 +179,18 @@ public class ExampleController {
 
 ----
 
+== How to Debug
 
+Wenn man eine Extension debuggen möchte, muss die Konfiguration in Eclipse folgendermaßen erstellt werden:
+
+1. Auf die Main-Klasse (CoreApplicationSystemApplication.java) im dem CAS-Projekt rechtsklick -> Run As/Debug As -> Java Application. Warten bis sich etwas in der Console tut und dann direkt abbrechen. Falls für das CAS bereits eine Debug Configuration existiert, kann dies einfach kopiert werden.
+
+2. In die gerade erstellte Debug-Configuration gehen (In der Taskleiste neben dem grünen Käfer auf den Pfeil nach unten klicken, das Drop-Down-Menü öffnen und dann ganz unten "Debug Configurations...") und dort als Projekt den Namen der zu debuggenden Extension eintragen, siehe Abbildung. 
+
+image:./images/Extension.png[extension,800,250]
+
+3. In den Dependencies-Tab wechseln, dort auf "Add Projects ..." klicken und das extension-Projekt hinzufügen.
+
+image:./images/Dependencies.png[dependencies,800,800]
+
+Jetzt kann gedebugged werden. 

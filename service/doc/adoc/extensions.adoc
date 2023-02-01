@@ -140,7 +140,7 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 
 Durch das Hinzufügen dieses Plugins, wird beim Bauen des gesamten Projektes die Jar der Extension bereits in das richtige Verzeichnis geschoben. 
 
-3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController und/oder den SqlProceudreController eintragen. Hier das @Autowired nicht vergessen.
+3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
 
 4. Eine Setup-Methode erstellen, welche mit der @PostConstruct-Annotation gekennziechet ist. Diese muss die *'registerExtension'*-Methode des vorher importierten Controllers aufrufen und damit die Extension mit dem dazugehörigen Keyword registrieren. 
 

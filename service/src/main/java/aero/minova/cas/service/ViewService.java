@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
-import io.micrometer.core.instrument.MultiGauge.Row;
 import jakarta.annotation.PostConstruct;
 import lombok.val;
 

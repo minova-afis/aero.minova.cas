@@ -38,7 +38,6 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.24</version>
 		</dependency>
 		<dependency>
 			<!-- Diese Abhängigkeit wird für Erweiterungen bereitgestellt: service/doc/adoc/extensions.adoc -->
@@ -185,19 +184,16 @@
 		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jooq</artifactId>
-			<version>3.16.0</version>
 		</dependency>
 
 		<!-- These may not be required, unless you use the GenerationTool manually for code generation -->
 		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jooq-meta</artifactId>
-			<version>3.16.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jooq-codegen</artifactId>
-			<version>3.16.0</version>
 		</dependency>
 
 		<dependency>

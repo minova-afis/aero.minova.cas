@@ -20,9 +20,12 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
+import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
-import io.micrometer.core.instrument.MultiGauge.Row;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 import lombok.val;
 
 public class SqlUtils {

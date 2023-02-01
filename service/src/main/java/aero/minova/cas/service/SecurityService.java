@@ -18,10 +18,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.SystemDatabase;
-import io.micrometer.core.instrument.MultiGauge.Row;
 import lombok.Setter;
 import lombok.val;
 

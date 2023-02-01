@@ -100,21 +100,19 @@ public class ProcedureService {
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
+			systemDatabase.freeUpConnection(connection);
 		} catch (Exception e) {
 			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
 			if (connection != null) {
 				try {
 					connection.rollback();
-					systemDatabase.freeUpConnection(connection);
 				} catch (Exception e1) {
 					customLogger.logError("Couldn't roll back procedure execution", e);
-					connection.close();
 				}
+				connection.close();
 			}
 			throw new ProcedureException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
-		}
+		} 
 		return result;
 	}
 

@@ -14,7 +14,6 @@
 			<unit id="org.eclipse.jdt.junit5.runtime" version="0.0.0"/>
 			<unit id="jakarta.xml.bind" version="2.3.3.v20201118-1818"/>
     		<unit id="com.sun.xml.bind" version="2.3.3.v20201118-1818"/>
-    		<unit id="javax.activation" version="1.2.2.v20201119-1642"/>
 		</location>
 		
 		<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">

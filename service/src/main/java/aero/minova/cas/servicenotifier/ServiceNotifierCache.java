@@ -2,7 +2,7 @@ package aero.minova.cas.servicenotifier;
 
 import java.util.HashMap;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

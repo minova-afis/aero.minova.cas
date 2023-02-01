@@ -6,6 +6,43 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [UNRELEASED] -- XXXX-XX-XX
 * #362 Zugriff auf weitere Datenbanken unterstzützen (zumindest über Views).
 * Property aero.minova.database.kind durch spring.jooq.sql-dialect ersetzt.
+* Proof of Concept Test für SQLViewController#getIndexView
+* Kopieren in MDI-Maske ermöglichen, um die Bedienung zu vereinfachen
+
+
+## [12.58.0] -- 2023-01-27
+* Update auf SpringBoot 3.0.2
+* S3 Abhängigkeit aus AWS SDK's BOM für Erweiterungen bereitstellen.
+
+## [12.57.2] -- 2023-01-20
+* Index Filtern mit Postgres ermöglichen
+* connection.close() im Fehlerfall immer aufrufen, systemDatabase.freeUpConnection(connection) nur, wenn alles funktioniert hat. Hintergrund: Bislang haben nach einer fehlerhaften View-Anfrage auch alle weiteren Views nicht mehr funktioniert.
+* link:https://github.com/minova-afis/aero.minova.cas/issues/425[\#425]: Die xref:service/doc/adoc/extensions.adoc#[Doku für CAS-Erweiterungen] wurde vervollständigt.
+  Vor allem wurde das Verwenden von Abhängigkeiten in Erweiterungen dokumentiert,
+  um Auslieferungs-Probleme in der Zukunft zu vermeiden.
+* Hilfsmethode setValue() in Table
+
+## [12.57.1] -- 2023-01-16
+* Erhöhen der Springboot Version auf 3.0.1, da Artefakt org.springframework.security:spring-security-bom:pom:6.0.0-RC2 in Springboot 3.0.0 nicht gefunden werden konnte und zu Fehlern beim Bauen auf Entwicklerrechnern führte.
+* BUGFIX: XProcedures mit Extension korrekt verarbeiten
+* ValueSerializer um "rule" ergänzen
+
+## [12.57.0] -- 2023-01-13 -- DO NOT USE!
+* Spring Security: Umstellung von `WebSecurityConfigurerAdapter` auf Komponenten-basierende Sicherheit
+* Aktualisierung Java 11 LTS auf Java 17 LTS
+* Aktualisierung von JavaX auf Jakarta
+* Update auf SpringBoot 3.0.0
+* `@SpringBootApplication` Annotation OHNE `exclude = { DataSourceAutoConfiguration.class }`, damit automatisch eine `entityManagerFactory` erstellt wird.
+* BUGFIX: Für die LDAP-Gruppen wird `xtcasUser` statt der `xtcasUsers` ausgelesen, um die SecurityTokens zu bestimmen.
+* Rechtevergabe durch AuthorizationController erleichtern, indem dies durch JPA umgesetzt wird und somit auch Datenbank unabhängig ist.
+
+## [12.56.2] -- 2023-01-10
+* Tabellen um Hilfsmethoden erweitert, mit der leichter auf Values zugegriffen werden kann
+* toString Methoden Tabellen, Columns, Rows und Values ausbessern
+* Auch "com.minova" bei @EntityScan und @EnableJpaRepositories beachten
+
+## [12.56.1] -- 2023-12-09
+* Richtiger Release zum Verwenden von CAS als Abhängigkeit
 
 ## [12.56.0] -- 2022-12-01
 * toString-Methode für Tabellen, Columns, Rows und Values erstellen.

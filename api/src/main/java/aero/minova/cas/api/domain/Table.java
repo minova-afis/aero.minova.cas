@@ -30,6 +30,25 @@ public class Table implements Serializable {
 		return null;
 	}
 
+	public Value getValue(int columnIndex, int rowIndex) {
+		return getRows().get(rowIndex).getValues().get(columnIndex);
+	}
+
+	public Value getValue(String columnName, int rowIndex) {
+		for (int i = 0; i < columns.size(); i++) {
+			if (columns.get(i).getName().equalsIgnoreCase(columnName)) {
+				return rows.get(rowIndex).getValues().get(i);
+			}
+		}
+
+		return null;
+	}
+
+	public void setValue(Value v, String columName, int rowIndex) {
+		int colIndxByName = findColumnPosition(columName);
+		rows.get(rowIndex).getValues().set(colIndxByName, v);
+	}
+
 	public void fillMetaData(Table inputTable, int limit, int totalResults, int page) {
 		if (inputTable.getMetaData() == null) {
 			metaData = new TableMetaData();
@@ -117,5 +136,18 @@ public class Table implements Serializable {
 
 	public void setReturnErrorMessage(ErrorMessage errorMessage) {
 		this.returnErrorMessage = errorMessage;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder columnsString = new StringBuilder("\n");
+		for (Column c : columns) {
+			columnsString.append(c + " ");
+		}
+		StringBuilder rowString = new StringBuilder("\n");
+		for (Row r : rows) {
+			rowString.append(r + "\n");
+		}
+		return "Table " + name + columnsString.toString() + rowString.toString();
 	}
 }

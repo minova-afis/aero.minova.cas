@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import java.io.File;
 import java.io.FileInputStream;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ import aero.minova.cas.controller.BaseTest;
 import aero.minova.cas.controller.SqlViewController;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false" })
-public class FilesServiceTest extends BaseTest {
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
+class FilesServiceTest extends BaseTest {
 
 	@Autowired
 	FilesService testSubject;
@@ -42,7 +43,7 @@ public class FilesServiceTest extends BaseTest {
 	@DisplayName("MDI Test mit Masken und Actions")
 	@WithMockUser(username = "user", roles = {})
 	@Test
-	public void testMdi() throws Exception {
+	void testMdi() throws Exception {
 
 		Table mockResult = new Table();
 		mockResult.addColumn(new Column("ID", DataType.STRING));
@@ -116,7 +117,7 @@ public class FilesServiceTest extends BaseTest {
 	@DisplayName("MDI Test ohne Menu Eintrag in Action")
 	@WithMockUser(username = "user", roles = {})
 	@Test
-	public void testMdiWithoutMenuEntryInAction() throws Exception {
+	void testMdiWithoutMenuEntryInAction() throws Exception {
 
 		Table mockResult = new Table();
 		mockResult.addColumn(new Column("ID", DataType.STRING));
@@ -190,7 +191,7 @@ public class FilesServiceTest extends BaseTest {
 	@DisplayName("MDI Test ohne Hauptmenu")
 	@WithMockUser(username = "user", roles = {})
 	@Test
-	public void testMdiWithoutMainMenu() throws Exception {
+	void testMdiWithoutMainMenu() throws Exception {
 
 		Table mockResult = new Table();
 		mockResult.addColumn(new Column("ID", DataType.STRING));
@@ -228,7 +229,7 @@ public class FilesServiceTest extends BaseTest {
 		testSubject.setViewController(mockController);
 
 		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.readMDI());
-		thrown.expect(RuntimeException.class);
-		assertEquals("No menu defined. Mdi cannot be build!", exception.getMessage());
+		assertThat(exception)
+				.hasMessage("No menu defined. Mdi cannot be build!");
 	}
 }

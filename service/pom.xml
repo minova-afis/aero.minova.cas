@@ -1,20 +1,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cas.service</artifactId>
-	<version> 12.56.1-SNAPSHOT</version>
+	<version>12.58.1-SNAPSHOT</version>
 
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>cas.parent</artifactId>
-		<version>12.56.1-SNAPSHOT</version>
+		<version>12.58.1-SNAPSHOT</version>
 	</parent>
 
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git
-		</developerConnection>
-		<tag>v12.40.2</tag>
+        </developerConnection>
+		<tag>HEAD</tag>
 	</scm>
+
+		<dependencyManagement>
+			<dependencies>
+				<dependency>
+					<!-- Diese BOM wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
+					<groupId>software.amazon.awssdk</groupId>
+					<artifactId>bom</artifactId>
+					<version>2.19.25</version>
+					<type>pom</type>
+					<scope>import</scope>
+				</dependency>
+			</dependencies>
+		</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -28,6 +41,7 @@
 			<version>1.18.24</version>
 		</dependency>
 		<dependency>
+			<!-- Diese Abhängigkeit wird für Erweiterungen bereitgestellt: service/doc/adoc/extensions.adoc -->
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
@@ -47,6 +61,13 @@
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
 		</dependency>
+		<!-- Eine Datenbank-Abhängigkeit wird für SpringBoot 3.x benötigt, auch wenn diese nicht verwendet wird. Dies führt vor
+        allem dazu, dass eine entityManagerFactory bereitgestellt wird, welche von der JdbcUserDetailsManager benötigt wird -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -57,8 +78,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
-			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
-			<version>3.0.4.RELEASE</version>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -77,17 +97,18 @@
 			<artifactId>spring-security-ldap</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			<!-- Diese Abhängigkeit wird für Erweiterungen bereitgestellt: service/doc/adoc/extensions.adoc -->
 			<groupId>org.apache.ws.commons.util</groupId>
 			<artifactId>ws-commons-util</artifactId>
 			<version>1.0.2</version>
-			<!-- ohne die Exclusion würde die DocumentBuilderFactory-Klasse und die 
-				Document-Klasse nicht importiert werden können, da das falsche/ ein veraltetes 
-				Paket genommen werden würde. -->
+			<!-- ohne die Exclusion würde die DocumentBuilderFactory-Klasse und die
+                Document-Klasse nicht importiert werden können, da das falsche/ ein veraltetes
+                Paket genommen werden würde. -->
 			<exclusions>
 				<exclusion>
 					<groupId>xml-apis</groupId>
@@ -100,6 +121,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<!-- Diese Abhängigkeit wird für Erweiterungen bereitgestellt: service/doc/adoc/extensions.adoc -->
 			<groupId>org.apache.xmlrpc</groupId>
 			<artifactId>xmlrpc-client</artifactId>
 			<version>3.1.3</version>
@@ -117,29 +139,44 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.cache</groupId>
-			<artifactId>cache-api</artifactId>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<version>2.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
+			<!-- Seit SpringBoot 3.0.0 muss eine spezielle Version angegeben werden, damit Spring funktioniert. -->
+			<classifier>jakarta</classifier>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.11.0</version>
 		</dependency>
+		<dependency>
+			<!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -162,6 +199,17 @@
 			<artifactId>jooq-codegen</artifactId>
 			<version>3.16.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<!--  must be on the classpath test coverage  -->
 			<groupId>org.jacoco</groupId>
@@ -169,6 +217,11 @@
 			<classifier>runtime</classifier>
 			<version>0.8.8</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
 		</dependency>
 	</dependencies>
 
@@ -182,6 +235,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<parameters>true</parameters>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -195,7 +251,7 @@
 						</goals>
 						<configuration>
 							<outputDirectory>${project.build.directory}/libs
-							</outputDirectory>
+                            </outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

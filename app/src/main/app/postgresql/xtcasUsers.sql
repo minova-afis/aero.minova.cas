@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS public.xtcasusers
     lastdate timestamp without time zone NOT NULL DEFAULT now(),
     CONSTRAINT "xtcasUsers_pkey" PRIMARY KEY (keylong),
     CONSTRAINT xtcasusers_username_key UNIQUE (username)
-)
+);

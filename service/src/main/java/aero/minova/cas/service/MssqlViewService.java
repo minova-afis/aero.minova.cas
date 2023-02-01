@@ -1,6 +1,7 @@
 package aero.minova.cas.service;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,10 +57,15 @@ public class MssqlViewService implements ViewServiceInterface {
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
 		} catch (Exception e) {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e1) {
+					customLogger.logError("Connection could not be closed: ", e1);
+				}
+			}
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

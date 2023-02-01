@@ -3,24 +3,22 @@ package aero.minova.cas.service;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Column;
-import aero.minova.cas.api.domain.Row;
-import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
+import io.micrometer.core.instrument.MultiGauge.Row;
+import jakarta.annotation.PostConstruct;
 import lombok.val;
 
 @Service
@@ -111,12 +109,17 @@ public class ViewService {
 			}
 
 			result.fillMetaData(result, limit, totalResults, page);
-
+			systemDatabase.freeUpConnection(connection);
 		} catch (Throwable e) {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e1) {
+					customLogger.logError("Connection could not be closed: ", e1);
+				}
+			}
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}
@@ -137,6 +140,7 @@ public class ViewService {
 	 */
 	public PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
 		return SqlUtils.fillPreparedViewString(inputTable, preparedStatement, query, sb, customLogger.getErrorLogger());
+
 	}
 
 	@Deprecated

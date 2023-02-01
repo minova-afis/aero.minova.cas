@@ -18,13 +18,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
-import aero.minova.cas.api.domain.Row;
-import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.SystemDatabase;
+import io.micrometer.core.instrument.MultiGauge.Row;
 import lombok.Setter;
 import lombok.val;
 
@@ -159,7 +156,7 @@ public class SecurityService {
 				SecurityContextHolder.getContext().setAuthentication(newAuth);
 			}
 		} catch (Exception e) {
-			throw new IllegalArgumentException("No User found, please login");
+			throw new IllegalArgumentException("No User found, please login", e);
 		}
 
 	}
@@ -174,6 +171,7 @@ public class SecurityService {
 	 */
 	public Table unsecurelyGetIndexView(Table inputTable) {
 		return viewService.unsecurelyGetIndexView(inputTable);
+
 	}
 
 	/**
@@ -218,7 +216,7 @@ public class SecurityService {
 				columnRestrictionsForThisUserAndThisTable.addAll(tokenSpecificAuthorities);
 			}
 		}
-		List<String> grantedColumns = new ArrayList<String>();
+		List<String> grantedColumns = new ArrayList<>();
 		// die Spaltennamen, welche wir durch den Select erhalten haben in eine List packen, dabei darauf achten,
 		// dass verschiedene SecurityTokens dieselbe Erlaubnis haben können, deshalb Doppelte rausfiltern
 		for (Row row : columnRestrictionsForThisUserAndThisTable) {
@@ -229,7 +227,7 @@ public class SecurityService {
 		}
 
 		// wenn SELECT *, dann ist wantedColumns leer
-		List<Column> wantedColumns = new ArrayList<Column>(inputTable.getColumns());
+		List<Column> wantedColumns = new ArrayList<>(inputTable.getColumns());
 		if (wantedColumns.isEmpty())
 			for (String s : grantedColumns) {
 				inputTable.addColumn(new Column(s, DataType.STRING));
@@ -312,7 +310,7 @@ public class SecurityService {
 			 * Falls auch nur einmal false in der RowLevelSecurity-Spalte vorkommt, darf der User die komplette Tabelle sehen. Ist dies der Fall, können wir
 			 * ruhig eine leere Liste zurückgeben, da deren Inhalt die UserSecurityTokens wären, nach welchen gefiltert werden würde.
 			 */
-			if (!authority.getValues().get(2).getBooleanValue()) {
+			if (!Boolean.TRUE.equals(authority.getValues().get(2).getBooleanValue())) {
 				return new ArrayList<>();
 			}
 			// Hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen.
@@ -476,7 +474,7 @@ public class SecurityService {
 	 */
 	public List<String> loadLDAPUserTokens(String username) {
 		Table tUser = new Table();
-		tUser.setName("xtcasUsers");
+		tUser.setName("xtcasUser");
 		List<Column> columns = new ArrayList<>();
 		columns.add(new Column("KeyText", DataType.STRING));
 		columns.add(new Column("UserSecurityToken", DataType.STRING));

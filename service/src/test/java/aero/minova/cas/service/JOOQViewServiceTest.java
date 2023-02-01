@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.ProcedureException;
@@ -31,7 +32,7 @@ import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(properties = { "application.runner.enabled=false", "spring.jooq.sql-dialect:POSTGRE" })
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false", "spring.jooq.sql-dialect:POSTGRES" })
 public class JOOQViewServiceTest extends BaseTest {
 
 	@Autowired

@@ -44,10 +44,10 @@ public class ViewService {
 
 	@PostConstruct
 	private void init() {
-		if (!context.equalsIgnoreCase(MSSQL)) {
-			viewService = new JOOQViewService(systemDatabase, customLogger, securityService);
-		} else {
+		if (context.equalsIgnoreCase(MSSQL)) {
 			viewService = new MssqlViewService(systemDatabase, customLogger, securityService);
+		} else {
+			viewService = new JOOQViewService(systemDatabase, customLogger, securityService);
 		}
 		securityService.setViewService(viewService);
 	}

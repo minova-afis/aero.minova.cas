@@ -40,6 +40,7 @@ dass die API möglichst stabil gehalten wird.
 * xref:./api/doc/adoc/index.adoc#[CAS API]
 * xref:./service/doc/adoc/index.adoc#[CAS-Dienst]
 * xref:./service/doc/adoc/installation.adoc#[Installation]
+* xref:./service/doc/adoc/extensions.adoc#[How to Extensions]
 * xref:./doc/adoc/projectStructure.adoc#[Projektstruktur]
 * xref:./doc/adoc/structure.adoc#[Strukturübersicht]
 * xref:./app/doc/adoc/table-index.adoc#[Tabellen-Index]

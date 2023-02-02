@@ -100,12 +100,13 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 2. In der POM des *app*-Projektes ist folgendes Plugin erforderlich:
 
 ----
-<plugin>
-	<artifactId>maven-resources-plugin</artifactId>
-	<version>3.3.0</version>
-	<executions>
-		<execution>
-			<id>copy-extensions</id>
+<plugins>
+	<plugin>
+		<artifactId>maven-resources-plugin</artifactId>
+		<version>3.3.0</version>
+		<executions>
+			<execution>
+				<id>copy-extensions</id>
 				<phase>generate-resources</phase>
 				<goals>
 					<goal>copy-resources</goal>
@@ -134,8 +135,9 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 					</resources>
 				</configuration>
 			</execution>
-	</executions>
-</plugin>	
+		</executions>
+	</plugin>
+</plugins>	
 ----
 
 Durch das Hinzufügen dieses Plugins, wird beim Bauen des gesamten Projektes die Jar der Extension bereits in das richtige Verzeichnis geschoben. 
@@ -168,7 +170,6 @@ public class ExampleController {
 
 	@PostConstruct
 	public void setup() {
-
 		// fügt Extension hinzu
 		sqlProcedureController.registerExtension("xpcasBeispiel", this::doSomething);
 	}
@@ -183,7 +184,9 @@ public class ExampleController {
 
 Wenn man eine Extension debuggen möchte, muss die Konfiguration in Eclipse folgendermaßen erstellt werden:
 
-1. Auf die Main-Klasse (CoreApplicationSystemApplication.java) im dem CAS-Projekt rechtsklick -> Run As/Debug As -> Java Application. Warten bis sich etwas in der Console tut und dann direkt abbrechen. Falls für das CAS bereits eine Debug Configuration existiert, kann dies einfach kopiert werden.
+1. Auf die Main-Klasse (CoreApplicationSystemApplication.java) im dem CAS-Projekt rechtsklick -> Run As/Debug As -> Java Application. 
+Warten bis sich etwas in der Console tut und dann direkt abbrechen. 
+Falls für das CAS bereits eine Debug Configuration existiert, kann dies einfach kopiert werden.
 
 2. In die gerade erstellte Debug-Configuration gehen (In der Taskleiste neben dem grünen Käfer auf den Pfeil nach unten klicken, das Drop-Down-Menü öffnen und dann ganz unten "Debug Configurations...") und dort als Projekt den Namen der zu debuggenden Extension eintragen, siehe Abbildung. 
 

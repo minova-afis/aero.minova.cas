@@ -99,3 +99,7 @@ Falls es sich nicht um eine MSSQL oder POSTGRESQL Datenbank handelt, muss statt 
 aus Entwicklungszwecken. Niemals im Produktivbetrieb benutzen!
 
 
+== POSTGRE
+
+Falls eine Postgre-Datenbank verwendet wird, müssen die Properties wie xref:./installation.postgre.adoc#[hier] gesetzt werden.
+

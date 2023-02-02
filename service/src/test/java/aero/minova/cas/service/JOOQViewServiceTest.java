@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +72,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where (EmployeeText like 'AVM%') limit ?");
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
@@ -98,8 +97,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo(
-						"select EmployeeText, CustomerText from vWorkingTimeIndex2 where ((\n  EmployeeText like 'AVM%'\n  and CustomerText like 'MIN%'\n)) limit ?");
+				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where (EmployeeText like ? and CustomerText like ?) limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -107,17 +105,17 @@ public class JOOQViewServiceTest extends BaseTest {
 	void testPrepareViewString_withSelectByMultipleConditionsOnSameAttribute() {
 		Table inputTable = new Table();
 		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("BookingDate", DataType.STRING));
+		inputTable.addColumn(new Column("BookingDate", DataType.INSTANT));
 		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(LocalDate.of(2020, 7, 31).toString(), "<="));
+			inputRow.addValue(new Value(Instant.parse("2020-07-31T00:00:00.00Z"), "<="));
 			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
-			inputRow.addValue(new Value(LocalDate.of(2020, 7, 29).toString(), ">"));
+			inputRow.addValue(new Value(Instant.parse("2020-07-29T00:00:00.00Z"), ">"));
 			inputRow.addValue(new Value(true, null));
 			inputTable.addRow(inputRow);
 		}
@@ -128,8 +126,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo(
-						"select BookingDate from vWorkingTimeIndex2 where ((\n  BookingDate like '2020-07-31%'\n  and BookingDate like '2020-07-29%'\n)) limit ?");
+				.isEqualTo("select BookingDate from vWorkingTimeIndex2 where (BookingDate <= ? and BookingDate > ?) limit ?");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -158,7 +155,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where ((\n  EmployeeText like 'AVM%'\n  and EmployeeText like 'WIS%'\n)) limit ?");
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where (EmployeeText like ? and EmployeeText like ?) limit ?");
 	}
 
 	@Test
@@ -202,7 +199,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where (EmployeeText like 'AVM%') limit ?");
+				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
 	}
 
 	@Test

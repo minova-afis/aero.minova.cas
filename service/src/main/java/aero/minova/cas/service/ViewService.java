@@ -186,4 +186,24 @@ public class ViewService {
 	public Table unsecurelyGetIndexView(Table inputTable) {
 		return viewService.unsecurelyGetIndexView(inputTable);
 	}
+
+	/**
+	 * Ist nur im MssqlViewService implementiert.
+	 * 
+	 * @param params
+	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
+	 * @param autoLike
+	 *            wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
+	 * @param maxRows
+	 *            maximale Anzahl Ergebnisse (Zeilen), die die Abfrage liefern soll, 0 für unbegrenzt
+	 * @param count
+	 *            Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
+	 * @param page
+	 *            Die Seite, welche man zurückerhalten möchte.
+	 * @param authorities
+	 * @return
+	 */
+	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
+		return viewService.pagingWithSeek(params, autoLike, maxRows, count, page, authorities);
+	}
 }

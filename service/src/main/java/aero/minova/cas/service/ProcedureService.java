@@ -36,13 +36,15 @@ import lombok.val;
 @Service
 public class ProcedureService {
 
+	private static String POSTGRESQL = "postgresql";
+
 	@Autowired
 	CustomLogger customLogger;
 
 	@Autowired
 	SystemDatabase systemDatabase;
 
-	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mssql}")
+	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:mssql}")
 	String databaseKind;
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.maxresultsetcount:512}")
@@ -61,7 +63,7 @@ public class ProcedureService {
 	 */
 	public void setUserContextFor(Connection connection) throws SQLException {
 		CallableStatement userContextSetter;
-		if (databaseKind.equals("postgresql")) {
+		if (databaseKind.equalsIgnoreCase(POSTGRESQL)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");

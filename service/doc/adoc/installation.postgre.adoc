@@ -8,9 +8,20 @@ Die für Postgre angepassten Skripte zur Installation der sicherheitrelevanten T
 
 Diese müssen dann von Hand auf der Datenbank ausgeführt werden.
 
+Da Postgresql RowCount als Funktion verwendet, wird eine andere Methode zum Zusammenbauen des preparedStatements verwendet und zwar die prepareViewString-Methode.
+
+=== Properties
+
 Die application.properties müssen desweiteren mit folgenden Properties geändert werden:
 
-* aero.minova.database.kind=postgresql
+* spring.jooq.sql-dialect=POSTGRESQL
 * aero_minova_database_url=jdbc:postgresql://URLZurDatenbank/DatenbankName
+* spring.datasource.url=jdbc:postgresql://URLZurDatenbank/DatenbankName
+* spring.datasource.username=UsernameVonPostgreDatenbank
+* spring.datasource.password=PasswortDesBenutzersDerPostgreDatenbank
 
-DA Postgresql RowCount als Funktion verwendet, wird eine andere Methode zum Zusammenbauen des preparedStatements verwendet und zwar die prepareViewString-Methode.
+JOOQ ist selbst in der Lage den richtigen Dialekt zum Interpretieren der Query zu ermitteln.
+
+Falls dies aus unerfindlichen Gründen doch nicht geschieht, muss folgende Property hinzugefügt werden:
+
+*spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect*

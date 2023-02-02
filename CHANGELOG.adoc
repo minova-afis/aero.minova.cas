@@ -4,8 +4,10 @@ All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* Proof of Concept Test für SQLViewController#getIndexView
-* Kopieren in MDI-Maske ermöglichen, um die Bedienung zu vereinfachen
+* Proof of Concept Test für SQLViewController#getIndexView.
+* Kopieren in MDI-Maske ermöglichen, um die Bedienung zu vereinfachen.
+* Extension-Doku erweitern.
+* Prozedur xpcasInsertAllPrivilegesToUserGroup anpassen, sodass immer LastAction 1 beim Neueintragen von Privilegien gesetzt wird.
 
 
 ## [12.58.0] -- 2023-01-27

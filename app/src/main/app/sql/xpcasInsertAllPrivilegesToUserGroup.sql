@@ -8,22 +8,21 @@ alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
     end
 
     insert into xtcasUserPrivilege (
-        KeyText)
-    select r.SPECIFIC_NAME
+        KeyText, LastAction)
+    select r.SPECIFIC_NAME, 1
     from INFORMATION_SCHEMA.ROUTINES r
     left join xtcasUserPrivilege p on p.KeyText = r.SPECIFIC_NAME
     where p.KeyLong is null
 
-    insert into xtCasUserPrivilege (
-        KeyText)
-    select t.TABLE_NAME
+    insert into xtCasUserPrivilege (KeyText, LastAction)
+    select t.TABLE_NAME, 1
     from INFORMATION_SCHEMA.TABLES t
     left join xtcasUserPrivilege p on p.KeyText = t.TABLE_NAME
     where p.KeyText is null
 
     if not exists (select * from xtcasUserGroup where KeyText = @UserGroup)
     begin
-        insert into xtcasUserGroup (KeyText,SecurityToken) VALUES (@UserGroup, '#' + @SecurityToken)
+        insert into xtcasUserGroup (KeyText,SecurityToken, LastUser) VALUES (@UserGroup, '#' + @SecurityToken, 1)
     end
 
 
@@ -51,7 +50,7 @@ alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
 
         if not exists (select * from xtcasLuUserPrivilegeUserGroup where UserPrivilegeKey = @UserPrivilegeKey and UserGroupKey=@UserGroupKey)
             begin
-            insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey,UserGroupKey) values (@UserPrivilegeKey, @UserGroupKey )
+            insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey,UserGroupKey, LastAction) values (@UserPrivilegeKey, @UserGroupKey, 1)
             end
 
         fetch NEXT from temp_cursor into @UserPrivilegeKey

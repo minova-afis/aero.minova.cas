@@ -102,10 +102,8 @@ public class SqlViewController {
 	@PostMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
-		List<Row> authoritiesForThisTable;
 		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
-
-		authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
+		List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
 		if (authoritiesForThisTable.isEmpty()) {
 			throw new TableException(new RuntimeException("msg.PrivilegeError %" + inputTable.getName()));
 		}

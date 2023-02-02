@@ -8,11 +8,11 @@ import aero.minova.cas.api.domain.Table;
 public interface ViewServiceInterface {
 
 	// Wenn IFLESSTHANZEROTHANMAXROWS kleiner als 0 ist, werden bei View-Aufrufen immer alle Einträge zurückgegeben.
-	static final int IFLESSTHANZEROTHANMAXROWS = -1;
+	static final int IF_LESS_THAN_ZERO_THEN_MAX_ROWS = -1;
 
 	/**
 	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage und ohne die maximale Anzahl der ausgegebenen Zeilen zu beschränken. Ist nur für
-	 * die Sicherheitsabfragen gedacht, um nicht zu viele unnötige SQL-Abfrgane zu machen.
+	 * die Sicherheitsabfragen gedacht, um nicht zu viele unnötige SQL-Abfrage zu machen.
 	 *
 	 * @param inputTable
 	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
@@ -47,7 +47,7 @@ public interface ViewServiceInterface {
 	 *            wenn true, dann werden alle String-Parameter, die noch kein % haben, mit einem '%' am Ende versehen
 	 * @param maxRows
 	 *            maximale Anzahl Ergebnisse (Zeilen), die die Abfrage liefern soll, alles kleiner als 0 für unbegrenzt. Hier wird meistens einfach die
-	 *            IFLESSTHANZEROTHANMAXROWS Konstante verwendet.
+	 *            {@link #IF_LESS_THAN_ZERO_THEN_MAX_ROWS} Konstante verwendet.
 	 * @param count
 	 *            Gibt an ob nur die Anzahl der Ergebniss (Zeilen), gezählt werden sollen.
 	 * @param authorities

@@ -121,7 +121,7 @@ public class JOOQViewService implements ViewServiceInterface {
 			userCondition = userCondition.and(DSL.field("SecurityToken").isNull());
 
 			// Nach allen relevanten SecurityTokens suchen.
-			userCondition = userCondition.and(DSL.field("SecurityToken").in(requestingRoles));
+			userCondition = userCondition.or(DSL.field("SecurityToken").in(requestingRoles));
 
 			return userCondition;
 		} else {
@@ -144,6 +144,11 @@ public class JOOQViewService implements ViewServiceInterface {
 
 				if (value != null && !params.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
 					String rule = (r.getValues().get(i).getRule() != null ? r.getValues().get(i).getRule() : null);
+
+					// Falls rule null ist und der value auch null ist ... dann ist doch gar nichts zu machen.
+					if (rule == null && (value.getValue() == null || value.getValue().toString() == null || value.getValue().toString().isBlank())) {
+						continue;
+					}
 
 					// Is Null und is not Null muss zuerst geprüft werden, da es egal ist, ob etwas im Value steht.
 					if (rule != null && rule.contains("!null")) {

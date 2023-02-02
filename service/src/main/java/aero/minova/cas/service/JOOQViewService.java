@@ -48,9 +48,7 @@ public class JOOQViewService implements ViewServiceInterface {
 		}
 
 		// Hier wird auch schon die RowLevelSecurity mit rein gepackt.
-		String whereClause = prepareWhereClause(params, autoLike);
-
-		Condition condition = DSL.condition(whereClause);
+		Condition condition = prepareWhereClauseGetCondition(params, autoLike);
 
 		// Hier passiert die RowLevelSecurity.
 		if (!authorities.isEmpty()) {
@@ -71,26 +69,12 @@ public class JOOQViewService implements ViewServiceInterface {
 		Query query;
 
 		// Hier wird nur unterschieden, ob die Einträge gezählt werden sollen oder nicht.
-		// Wenn eine condition leer ist und die toString()-Methode auf diese angewandt wird, kommt ein "(true)" dabei raus. Das wollen wir nicht in unserer
-		// Abfrage haben.
 		if (isCounting) {
-			if (condition != null && !condition.toString().equals("(true)")) {
-				query = DSL.selectCount().from(params.getName()).where(condition);
-			} else {
-				query = DSL.selectCount().from(params.getName());
-			}
+			query = DSL.selectCount().from(params.getName()).where(condition);
 		} else if (maxRows > 0) {
-			if (condition != null && !condition.toString().equals("(true)")) {
-				query = DSL.select(fields).from(params.getName()).where(condition).limit(maxRows);
-			} else {
-				query = DSL.select(fields).from(params.getName()).limit(maxRows);
-			}
+			query = DSL.select(fields).from(params.getName()).where(condition).limit(maxRows);
 		} else {
-			if (condition != null && !condition.toString().equals("(true)")) {
-				query = DSL.select(fields).from(params.getName()).where(condition);
-			} else {
-				query = DSL.select(fields).from(params.getName());
-			}
+			query = DSL.select(fields).from(params.getName()).where(condition);
 		}
 
 		return query.getSQL();
@@ -147,6 +131,11 @@ public class JOOQViewService implements ViewServiceInterface {
 
 	@Override
 	public String prepareWhereClause(Table params, boolean autoLike) {
+
+		return prepareWhereClauseGetCondition(params, autoLike).toString();
+	}
+
+	private Condition prepareWhereClauseGetCondition(Table params, boolean autoLike) {
 		Condition condition = DSL.noCondition();
 
 		for (Row r : params.getRows()) {
@@ -199,7 +188,7 @@ public class JOOQViewService implements ViewServiceInterface {
 				}
 			}
 		}
-		return condition.toString();
+		return condition;
 	}
 
 	@Override

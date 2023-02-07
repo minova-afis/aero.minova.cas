@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+## [12.59.0] -- 2023-02-07
 * #362 Zugriff auf weitere Datenbanken unterstützen (zumindest über Views).
 * Property `aero.minova.database.kind` durch `spring.jooq.sql-dialect` ersetzt.
 * Proof of Concept Test für SQLViewController#getIndexView

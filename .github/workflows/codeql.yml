@@ -75,7 +75,7 @@ jobs:
     #     ./location_of_script_within_repo/buildscript.sh
     - uses: actions/setup-java@v3
       with:
-        distribution: 'adopt'
+        distribution: 'temurin'
         java-version: ${{ matrix.java-version }}
         java-package: 'jdk'
         cache: 'maven'

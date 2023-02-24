@@ -1,0 +1,14 @@
+name: Java/Maven CI triggering CD-GitOps
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  Build:
+    uses: minova-afis/aero.minova.github.workflows/.github/workflows/java-continuous-integration.yml@main
+    secrets: inherit

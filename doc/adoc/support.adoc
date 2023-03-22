@@ -181,6 +181,20 @@ in diesem Fall sollte man alle Abhängigkeiten auf den neuesten Stand bringen.
 In diesem Fall muss der Pfad aktualisiert werden:
 `<arguments>-cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>`
 
+### com.microsoft.sqlserver.jdbc.SQLServerException: Parameter @ProcedureName was not defined for stored procedure spMinovaCheckProcedure
+
+Aus Gründen wird das cas.app-Projekt nicht zuerst ausgeführt. 
+Dieses Projekt MUSS aber immer als erstes Projekt installiert werden, da in diesem auch die Prozeduren stecken, welche überprüfen, ob es Einträge in der tVersion10 für benötigte Prozeudren/Views gibt.
+
+Um zu Überprüfen, welche Abhängigkeit für diesen Fehler sorgt, kann man nach und nach die Abhängigkeiten aus der POM löschen und damit das Testen etwas schneller geht, kann man, statt immer wieder den setup-Befehl auszuführen, folgenden Maven Befel in der Shell im betroffenen Projekt ausführen: 
+*mvn depgraph:graph -DshowDuplicates -DshowConflicts*
+
+Durch diesen wird in dem Projekt eine dependency-graph.dot erstellt, welche man öffnen kann und im Online-Tool https://dreampuf.github.io/GraphvizOnline/#digraph  den Graph visualisieren kann.
+Hier muss man nur darauf schauen, ob der Knoten data.schema mit einem Pfeil (egal ob rot oder schwarz) auf cas.app zeigt.
+Falls es keinen solchen Pfeil gibt, müssen weitere Abhängigkeiten ausprobiert werden.
+
+Ist die Abhängigkeit gefunden, sollte in dieser die data.schema.app-Abhängigkeit aktualisiert werden und auch darauf geachtet werden, dass keine zirkulären Abhängigkeiten existieren.
+
 ## NoSuchBeanException
 
 ### Für RestTemplate

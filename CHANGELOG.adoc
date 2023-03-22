@@ -4,8 +4,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* Update auf SpringBoot 3.0.4
-* Feld ModulName in MDI-Maske hinzugefügt
+* Update auf SpringBoot 3.0.4.
+* Feld ModulName in MDI-Maske hinzugefügt.
+* Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.29.
 
 ## [12.59.0] -- 2023-02-07
 * #362 Zugriff auf weitere Datenbanken unterstützen (zumindest über Views).

@@ -1,0 +1,24 @@
+{
+	"name": "Error",
+    "columns": 
+    	[
+    		{
+      			"name": "International Message",
+            	"type": "STRING"
+        	},
+			{
+            	"name": "DEFAULT",
+            	"type": "STRING"
+        	}
+    	],
+    "rows": 
+    	[
+        	{
+                "values": 
+                [
+                    "s-msg.sql.51103",
+                    "s-msg.sql.51103"
+                ]
+            }
+        ]
+}

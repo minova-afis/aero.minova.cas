@@ -123,22 +123,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			errorMessage = "msg.NoErrorMessageAvailable";
 		}
 
-		boolean hasMsg = false;
-
-		// Alles vor 'msg.' wegschmeißen.
-		if (errorMessage.contains("msg.")) {
-			errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
-			// Neues drittes Format benötigt eine Markierung, ob der Part mit 'ADO | ... |' abgeschnitten wurde.
-			hasMsg = true;
-		}
-
 		/*
-		 * Es gibt drei Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'
-		 * 3.'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.'
+		 * Es gibt vier Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'
+		 * 3.'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.' 4.'ADO | 25 | msg.sql.51103'
 		 */
 		if (errorMessage.contains("|")) {
-			// Verarbeiten der Fehlermeldungen in Form: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext'
-			outputTable = handleSqlErrorMessage(outputTable, errorMessage, hasMsg);
+			// Verarbeiten der Fehlermeldungen in Form: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext', 3. oder 4.
+			outputTable = handleSqlErrorMessage(outputTable, errorMessage);
 		} else {
 			// Verarbeiten der Fehlermeldungen in Form: 2. 'msg.PrivilegeError %tBeispiel'
 			outputTable = handleGenericErrorMessage(outputTable, errorMessage);
@@ -176,7 +167,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		// raus gefiltert und kommen in ihre eigene Zeile.
 		List<String> errorMessageParts = Stream.of(errorMessage.split("%"))//
 				.map(String::trim)//
-				.collect(Collectors.toList());
+				.toList();
 
 		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
 		// Hinzufügen der Spalten für die InputParameter der Internationalierung
@@ -195,38 +186,28 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
-	 * Bringt das Format 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' in Form einer Table noch ohne Stacktrace und returnErrorMessage.
-	 * Es gibt allerdings noch ein Format, welches sehr ähnlich ist, nur dass 'msg.' fehlt: 'ADO | 30 | delaycode.description.comma | Commas are not allowed in
-	 * the description.'
+	 * Bringt das Format <br>
+	 * 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' <br>
+	 * in Form einer Table noch ohne Stacktrace und returnErrorMessage. <br>
+	 * Es gibt allerdings noch ein Format, welches sehr ähnlich ist, nur dass 'msg.' fehlt: <br>
+	 * 'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.'<br>
+	 * Außerdem kann vorkommen, dass kein Default-Text gegeben ist: <br>
+	 * 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg'
 	 * 
 	 * @param outputTable
-	 *            Die bisher gebaute Table, welche dann auch uzrückgegeben wird.
+	 *            Die bisher gebaute Table, welche dann auch zurückgegeben wird.
 	 * @param errorMessage
 	 *            Die Fehlermeldung, welche auseinander gebaut werden muss.
-	 * @param hasMsg
-	 *            Signalisiert, ob der Part vor msg. abgeschnitten wurde, oder nicht.
 	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
 	 */
-	public Table handleSqlErrorMessage(Table outputTable, String errorMessage, boolean hasMsg) {
+	public Table handleSqlErrorMessage(Table outputTable, String errorMessage) {
 
 		List<String> sqlErrorMessage = Stream.of(errorMessage.split("\\|"))//
 				.map(String::trim)//
-				.collect(Collectors.toList());
-
-		// Ab hier benutzen wir den ersten Teil der sqlErrorMessage.
-		int errorMessagePart;
-		int standardErrorMessage;
-
-		if (hasMsg) {
-			errorMessagePart = 0;
-			standardErrorMessage = 1;
-		} else {
-			errorMessagePart = 2;
-			standardErrorMessage = 3;
-		}
+				.toList();
 
 		// Splitte den String überall da, wo ein @ vorkommt.
-		String[] types = sqlErrorMessage.get(errorMessagePart).split("@");
+		String[] types = sqlErrorMessage.get(2).split("@");
 
 		Row internatMsg = new Row();
 
@@ -245,8 +226,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		// Die Column MUSS 'DEFAULT' heißen.
 		outputTable.addColumn(new Column("DEFAULT", DataType.STRING));
 
-		// Die Standard-Fehlermeldung hinzufügen
-		internatMsg.addValue(new Value(sqlErrorMessage.get(standardErrorMessage), null));
+		// Die Standard-Fehlermeldung hinzufügen, ist keine Default-Übersetzung gegeben die "normale" Nachricht verwenden
+		internatMsg.addValue(new Value(sqlErrorMessage.get(sqlErrorMessage.size() == 4 ? 3 : 2), null));
 
 		outputTable.addRow(internatMsg);
 		return outputTable;

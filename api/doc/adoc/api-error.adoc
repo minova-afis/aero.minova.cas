@@ -249,7 +249,7 @@ Das Sql-Fehler Format wird dann auftreten, wenn es einen Fehler in einer oder me
 Das CAS wird diesen in folgender Form ausgeben:
 
 
-.Sql-Fehler-Format2
+.Sql-Fehler-Format3
 [source,json]
 ----
 {

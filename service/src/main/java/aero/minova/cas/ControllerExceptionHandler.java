@@ -161,6 +161,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
 	 */
 	private Table handleGenericErrorMessage(Table outputTable, String errorMessage) {
+
+		// Alles vor 'msg.' wegschmeißen.
+		if (errorMessage.contains("msg.")) {
+			errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
+		}
+
 		Row parameterValues = new Row();
 
 		// Falls in der Message noch Parameter mit '%' vorkommen, z.B.: 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird', werden sie hier

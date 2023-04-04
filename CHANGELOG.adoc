@@ -8,6 +8,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Feld ModulName in MDI-Maske hinzugefügt.
 * Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.29.
 * SQL-Fehlermeldungen ohne Default-Übersetzung verarbeiten
+* Connections freigeben nach unsicherem Viewaufruf. Hierdurch soll das Hängenbleiben des CAS verhindert werden.
 
 ## [12.59.0] -- 2023-02-07
 * #362 Zugriff auf weitere Datenbanken unterstützen (zumindest über Views).

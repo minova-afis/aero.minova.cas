@@ -84,31 +84,32 @@ public class ViewService {
 			// weswegen dann Fehlermeldungen geworfen werden. Deshalb wird ab jetzt einfach die prepareViewString-Methode verwendet.
 			String viewQuery = viewService.prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb);
-			customLogger.logSql("Executing statements: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
+			try (PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
+				customLogger.logSql("Executing statements: " + sb.toString());
+				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 
-			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
 
-			int totalResults = 0;
-			if (!result.getRows().isEmpty()) {
-				totalResults = result.getRows().size();
-			}
-
-			// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
-			if (limit > 0) {
-				List<Row> resultRows = new ArrayList<>();
-				for (int i = 0; i < limit; i++) {
-					int rowPointer = i + (limit * (page - 1));
-					if (rowPointer < result.getRows().size()) {
-						resultRows.add(result.getRows().get(rowPointer));
+					int totalResults = 0;
+					if (!result.getRows().isEmpty()) {
+						totalResults = result.getRows().size();
 					}
-				}
-				result.setRows(resultRows);
-			}
 
-			result.fillMetaData(result, limit, totalResults, page);
-			systemDatabase.freeUpConnection(connection);
+					// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
+					if (limit > 0) {
+						List<Row> resultRows = new ArrayList<>();
+						for (int i = 0; i < limit; i++) {
+							int rowPointer = i + (limit * (page - 1));
+							if (rowPointer < result.getRows().size()) {
+								resultRows.add(result.getRows().get(rowPointer));
+							}
+						}
+						result.setRows(resultRows);
+					}
+
+					result.fillMetaData(result, limit, totalResults, page);
+				}
+			}
 		} catch (Throwable e) {
 			if (connection != null) {
 				try {
@@ -119,6 +120,8 @@ public class ViewService {
 			}
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new TableException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

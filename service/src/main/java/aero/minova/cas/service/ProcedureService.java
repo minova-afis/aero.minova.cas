@@ -100,6 +100,8 @@ public class ProcedureService {
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
+
+			systemDatabase.freeUpConnection(connection);
 		} catch (Exception e) {
 			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
 			if (connection != null) {
@@ -111,8 +113,6 @@ public class ProcedureService {
 				connection.close();
 			}
 			throw new ProcedureException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,11 +94,13 @@ public class JOOQViewService implements ViewServiceInterface {
 		try {
 			final String viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb, customLogger.getErrorLogger());
-			customLogger.logPrivilege("Executing SQL-statement for view: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
-			systemDatabase.freeUpConnection(connection);
+			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
+					customLogger.getErrorLogger())) {
+				customLogger.logPrivilege("Executing SQL-statement for view: " + sb.toString());
+				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+				}
+			}
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);

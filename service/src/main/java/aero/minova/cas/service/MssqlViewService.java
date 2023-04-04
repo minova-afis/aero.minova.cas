@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -52,11 +53,13 @@ public class MssqlViewService implements ViewServiceInterface {
 		try {
 			final val viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb, customLogger.getErrorLogger());
-			customLogger.logPrivilege("Executing SQL-statement for view:  " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
-			systemDatabase.freeUpConnection(connection);
+			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
+					customLogger.getErrorLogger())) {
+				customLogger.logPrivilege("Executing SQL-statement for view:  " + sb.toString());
+				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+				}
+			}
 		} catch (Exception e) {
 			if (connection != null) {
 				try {
@@ -67,6 +70,8 @@ public class MssqlViewService implements ViewServiceInterface {
 			}
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

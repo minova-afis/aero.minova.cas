@@ -95,7 +95,6 @@ public class XSqlProcedureController {
 					queueService.accept(mapEntry.getKey(), new ResponseEntity(result, HttpStatus.ACCEPTED));
 				}
 			}
-			systemDatabase.freeUpConnection(connection);
 		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
 			if (connection != null) {
@@ -107,6 +106,8 @@ public class XSqlProcedureController {
 				connection.close();
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
 	}

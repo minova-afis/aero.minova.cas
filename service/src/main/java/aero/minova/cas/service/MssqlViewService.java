@@ -8,15 +8,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jooq.DataType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Column;
-import aero.minova.cas.api.domain.DataType;
-import aero.minova.cas.api.domain.Row;
-import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
@@ -56,6 +52,7 @@ public class MssqlViewService implements ViewServiceInterface {
 			customLogger.logPrivilege("Executing SQL-statement for view:  " + sb.toString());
 			ResultSet resultSet = preparedViewStatement.executeQuery();
 			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+			systemDatabase.freeUpConnection(connection);
 		} catch (Exception e) {
 			if (connection != null) {
 				try {

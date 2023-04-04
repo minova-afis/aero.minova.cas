@@ -3,16 +3,17 @@ package aero.minova.cas.setup;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
 
-import aero.minova.cas.setup.xml.setup.SetupType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
+import aero.minova.cas.setup.xml.setup.SetupType;
 import aero.minova.cas.sql.SystemDatabase;
 import ch.minova.install.setup.BaseSetup;
 
@@ -38,41 +39,47 @@ public class InstallToolIntegration {
 	 *            Die "Setup.xml" welche installiert wird.
 	 */
 	public void installSetup(Path setupXml) {
+		final Connection connection = systemDatabase.getConnection();
 		try {
-			final Connection connection = systemDatabase.getConnection();
-			try {
-				connection.setAutoCommit(true);
-				BaseSetup.parameter = System.getProperties();
-				if (!BaseSetup.parameter.containsKey("fs")) {
-					BaseSetup.parameter.put("fs", "value");
-				}
-				final SetupType setupDocument = SetupType.parse(setupXml);
-
-				BaseSetup.hashModules = new Hashtable<>();
-				BaseSetup.hashtables = new Hashtable<>();
-				BaseSetup.tablevector = new Vector<>();
-				final BaseSetup setup = new BaseSetup();
-				setup.setSetupDocument(setupDocument);
-				setup.readSchema();
-				final ResultSet rs = connection.createStatement()
-						.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'");
-				rs.next();
-				final Optional<Path> tableLibrary = Optional.of(files.getSystemFolder().resolve("tables"));
-				final Optional<Path> sqlLibrary = Optional.of(files.getSystemFolder().resolve("sql"));
-				setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
-				if (rs.getInt("Anzahl") == 0) {
-					setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
-					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getName());
-				} else {
-					setup.readoutSchema(connection, tableLibrary, sqlLibrary);
-					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getName());
-				}
-				setup.handleSqlScripts(connection, sqlLibrary);
-				connection.commit();
-			} finally {
-				systemDatabase.freeUpConnection(connection);
+			connection.setAutoCommit(true);
+			BaseSetup.parameter = System.getProperties();
+			if (!BaseSetup.parameter.containsKey("fs")) {
+				BaseSetup.parameter.put("fs", "value");
 			}
+			final SetupType setupDocument = SetupType.parse(setupXml);
+
+			BaseSetup.hashModules = new Hashtable<>();
+			BaseSetup.hashtables = new Hashtable<>();
+			BaseSetup.tablevector = new Vector<>();
+			final BaseSetup setup = new BaseSetup();
+			setup.setSetupDocument(setupDocument);
+			setup.readSchema();
+			final ResultSet rs = connection.createStatement()
+					.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'");
+			rs.next();
+			final Optional<Path> tableLibrary = Optional.of(files.getSystemFolder().resolve("tables"));
+			final Optional<Path> sqlLibrary = Optional.of(files.getSystemFolder().resolve("sql"));
+			setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
+			if (rs.getInt("Anzahl") == 0) {
+				setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
+				logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getName());
+			} else {
+				setup.readoutSchema(connection, tableLibrary, sqlLibrary);
+				logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getName());
+			}
+			setup.handleSqlScripts(connection, sqlLibrary);
+			connection.commit();
+
+			systemDatabase.freeUpConnection(connection);
+
 		} catch (Exception e) {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e1) {
+					logger.logError("Connection could not be closed: ", e1);
+				}
+			}
 			throw new RuntimeException(e);
 		}
 	}

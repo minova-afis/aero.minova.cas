@@ -60,6 +60,7 @@ public class MssqlViewService implements ViewServiceInterface {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
 				}
 			}
+			systemDatabase.freeUpConnection(connection);
 		} catch (Exception e) {
 			if (connection != null) {
 				try {
@@ -70,8 +71,6 @@ public class MssqlViewService implements ViewServiceInterface {
 			}
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

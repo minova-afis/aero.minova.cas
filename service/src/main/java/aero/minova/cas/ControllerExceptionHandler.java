@@ -330,7 +330,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();
-			systemDatabase.freeUpConnection(connection);
 		} catch (SQLException e1) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
@@ -343,6 +342,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			}
 
 			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw.toString(), e1);
+		} finally {
+			systemDatabase.freeUpConnection(connection);
 		}
 	}
 }

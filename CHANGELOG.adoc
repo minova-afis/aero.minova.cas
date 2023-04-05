@@ -4,9 +4,12 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Korrektur der Connectionfreigabe.
+
+## [12.59.1] -- 2023-04-04
 * Update auf SpringBoot 3.0.4.
 * Feld ModulName in MDI-Maske hinzugefügt.
-* Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.29.
+* Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.38.
 * SQL-Fehlermeldungen ohne Default-Übersetzung verarbeiten
 * Connections freigeben nach unsicherem Viewaufruf. Hierdurch soll das Hängenbleiben des CAS verhindert werden.
 

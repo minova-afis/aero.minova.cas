@@ -1,6 +1,8 @@
 package aero.minova.cas.service;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,15 +95,24 @@ public class JOOQViewService implements ViewServiceInterface {
 		try {
 			final String viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb, customLogger.getErrorLogger());
-			customLogger.logPrivilege("Executing SQL-statement for view: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
+					customLogger.getErrorLogger())) {
+				customLogger.logPrivilege("Executing SQL-statement for view: " + sb.toString());
+				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+				}
+			}
+			systemDatabase.freeUpConnection(connection);
 		} catch (Exception e) {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (SQLException e1) {
+					customLogger.logError("Connection could not be closed: ", e1);
+				}
+			}
 			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
 			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.freeUpConnection(connection);
 		}
 		return result;
 	}

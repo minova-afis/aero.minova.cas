@@ -1,6 +1,6 @@
 # CAS für die Entwicklungsumgebung aufsetzen.
 
-Es wird Java 11 und Maven benötigt.
+Es wird Java 17 und Maven benötigt.
 
 ## In Eclipse ausführen und debuggen.
 

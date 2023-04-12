@@ -48,6 +48,7 @@ class AuthorizationTest {
 
 		// Erst die Tabelle leeren, damit andere Tests nicht in die Quere kommen
 		luUserPrivilegeUserGroupRepository.deleteAll();
+		userPrivilegeRepository.deleteAll();
 
 		String username = "Testusername";
 

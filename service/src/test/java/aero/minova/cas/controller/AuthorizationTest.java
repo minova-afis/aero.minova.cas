@@ -46,6 +46,9 @@ class AuthorizationTest {
 	@Test
 	void testAdminUser() {
 
+		// Erst die Tabelle leeren, damit andere Tests nicht in die Quere kommen
+		luUserPrivilegeUserGroupRepository.deleteAll();
+
 		String username = "Testusername";
 
 		controller.findOrCreateUserPrivilege("xvcorTEST");

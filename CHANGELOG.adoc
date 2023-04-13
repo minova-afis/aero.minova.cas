@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Korrektur der Connectionfreigabe.
+* AuthorizationTest ausbessern (Tabelle leeren, damit andere Tests nicht das Ergebnis beeinflussen)
 * `aero_minova_database_` properties entfernen (sind durch `spring.datasource.` abgedeckt)
 
 ## [12.59.1] -- 2023-04-04

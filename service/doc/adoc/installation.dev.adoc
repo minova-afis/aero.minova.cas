@@ -26,9 +26,9 @@ Folgendes ist eine häufig nützliche minimal Konfiguration:
 [source,properties]
 ```
 login_dataSource=admin
-aero_minova_database_url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
-aero_minova_database_user_name=<Datenbank-Nutzer>
-aero_minova_database_user_password=<Passwort>
+spring.datasource.url``=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
+spring.datasource.username=<Datenbank-Nutzer>
+spring.datasource.password=<Passwort>
 logging_level_root=DEBUG
 aero_minova_core_application_root_path=<Testsystem-Ordner>/system-files
 ```
@@ -51,9 +51,9 @@ docker run \
     --name=localtest \
     --publish=8084:8084 \
     --env login_dataSource='admin' \
-    --env aero_minova_database_url='jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test' \
-    --env aero_minova_database_user_name='Nutzer' \
-    --env aero_minova_database_user_password='Passwort' \
+    --env spring.datasource.url='jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test' \
+    --env spring.datasource.username='Nutzer' \
+    --env spring.datasource.password='Passwort' \
     --env logging_level_root=DEBUG \
     localtest
 ----
@@ -88,9 +88,9 @@ docker run \
     --name=dev_cas3 \
     --publish=8084:8084 \
     --env login_dataSource='admin' \
-    --env aero_minova_database_url='jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test' \
-    --env aero_minova_database_user_name='Nutzer' \
-    --env aero_minova_database_user_password='Passwort' \
+    --env spring.datasource.url='jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test' \
+    --env spring.datasource.username='Nutzer' \
+    --env spring.datasource.password='Passwort' \
     --env logging_level_root=DEBUG \
     --env aero_minova_core_application_root_path='/opt/aero.minova.cas/system-files-override/' \
     -v "$(pwd)/target/docker-layer/:/opt/aero.minova.cas/system-files-override/" \
@@ -111,9 +111,9 @@ docker build --tag=dev_cas2 .
 docker run --name=dev_cas3 `
         --publish=8084:8084 `
         --env login_dataSource='admin' `
-        --env aero_minova_database_url='jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=AFIS_GDN' `
-        --env aero_minova_database_user_name='sa' `
-        --env aero_minova_database_user_password='Minova+0' `
+        --env spring.datasource.url='jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=AFIS_GDN' `
+        --env spring.datasource.username='sa' `
+        --env spring.datasource.password='Minova+0' `
         --env logging_level_root=DEBUG `
         --env app_log_root='./target/logs' `
         --env aero_minova_core_application_root_path='/opt/aero.minova.cas/system-files-override/' `

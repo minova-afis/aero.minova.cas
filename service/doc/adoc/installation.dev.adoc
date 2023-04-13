@@ -26,7 +26,7 @@ Folgendes ist eine häufig nützliche minimal Konfiguration:
 [source,properties]
 ```
 login_dataSource=admin
-spring.datasource.url``=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
+spring.datasource.url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
 spring.datasource.username=<Datenbank-Nutzer>
 spring.datasource.password=<Passwort>
 logging_level_root=DEBUG

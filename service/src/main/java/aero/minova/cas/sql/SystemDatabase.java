@@ -19,12 +19,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SystemDatabase {
-	@Value("${aero_minova_database_url:jdbc:sqlserver://localhost;encrypt=false;databaseName=AFIS_HAM}")
+	@Value("${spring.datasource.url:jdbc:sqlserver://localhost;encrypt=false;databaseName=AFIS_HAM}")
 	String connectionString;
 
-	@Value("${aero_minova_database_user_name:sa}")
+	@Value("${spring.datasource.username:sa}")
 	String userName;
-	@Value("${aero_minova_database_user_password:password}")
+	@Value("${spring.datasource.password:password}")
 	String userPassword;
 
 	@Value("${spring.jooq.sql-dialect:mssql}")

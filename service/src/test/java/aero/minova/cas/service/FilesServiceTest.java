@@ -1,14 +1,12 @@
 package aero.minova.cas.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
 import java.io.FileInputStream;
 
-import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
@@ -102,7 +101,7 @@ class FilesServiceTest extends BaseTest {
 
 		testSubject.setViewController(mockController);
 
-		File testFile = new File(getClass().getClassLoader().getResource("MdiTest.xml").getFile());
+		File testFile = new File(getClass().getClassLoader().getResource("xmls/MdiTest.xml").getFile());
 
 		FileInputStream fl = new FileInputStream(testFile);
 		byte[] awatingResult = new byte[(int) testFile.length()];
@@ -176,7 +175,7 @@ class FilesServiceTest extends BaseTest {
 
 		testSubject.setViewController(mockController);
 
-		File testFile = new File(getClass().getClassLoader().getResource("MdiTestActionWithoutMenu.xml").getFile());
+		File testFile = new File(getClass().getClassLoader().getResource("xmls/MdiTestActionWithoutMenu.xml").getFile());
 
 		FileInputStream fl = new FileInputStream(testFile);
 		byte[] awatingResult = new byte[(int) testFile.length()];
@@ -229,7 +228,6 @@ class FilesServiceTest extends BaseTest {
 		testSubject.setViewController(mockController);
 
 		Throwable exception = assertThrows(RuntimeException.class, () -> testSubject.readMDI());
-		assertThat(exception)
-				.hasMessage("No menu defined. Mdi cannot be build!");
+		assertThat(exception).hasMessage("No menu defined. Mdi cannot be build!");
 	}
 }

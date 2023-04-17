@@ -44,7 +44,7 @@ public class SqlProcedureController {
 	ProcedureService procedureService;
 
 	@Autowired
-	SecurityService securityService;
+	public SecurityService securityService;
 
 	@Setter
 	QueueService queueService;

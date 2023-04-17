@@ -1,6 +1,8 @@
 package aero.minova.cas.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,17 @@ class SQLViewControllerTest {
 
 	@Autowired
 	AuthorizationController authorizationController;
+
+	@DisplayName("Keine doppelten Extensionnamen erlauben.")
+	@Test
+	void testDoubleExtensionWithSameName() throws Exception {
+
+		testSubject.registerExtension("test", null);
+
+		Throwable exception = assertThrows(IllegalArgumentException.class, () -> testSubject.registerExtension("test", null));
+		assertThat(exception).hasMessage("Cannot register two extensions with the same name: test");
+
+	}
 
 	@Test
 	@DisplayName("Methode getIndexView() testen")

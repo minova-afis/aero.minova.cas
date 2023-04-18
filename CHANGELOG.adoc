@@ -6,6 +6,9 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [UNRELEASED] -- XXXX-XX-XX
 * Update auf SpringBoot 3.0.5.
 * Korrektur der Connectionfreigabe.
+* AuthorizationTest ausbessern (Tabelle leeren, damit andere Tests nicht das Ergebnis beeinflussen)
+* `aero_minova_database_` properties entfernen (sind durch `spring.datasource.` abgedeckt)
+* Fehlermeldung bei Laden von Privilegien verbessern
 
 ## [12.59.1] -- 2023-04-04
 * Update auf SpringBoot 3.0.4.

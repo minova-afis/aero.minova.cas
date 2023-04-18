@@ -295,9 +295,9 @@ sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid
 ```
 
 ==== Lösung
-Bei der Konfiguration von `aero_minova_database_url` den Parameter `encrypt` auf `false` setzen, z.B.:
+Bei der Konfiguration von `spring.datasource.url` den Parameter `encrypt` auf `false` setzen, z.B.:
 ```
-aero_minova_database_url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
+spring.datasource.url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
 ```
 
 ## Port already in use

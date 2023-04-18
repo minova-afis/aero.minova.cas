@@ -44,9 +44,9 @@ image::images/sql-server-tcp-config.jpg[]
 .Minimal-Vorlage
 --------
 aero_minova_core_application_root_path=<Pfad zum Kundensystem>/Shared Data/Program Files/SIS
-aero_minova_database_url=<URL aus der Connection.xbs ohne Benutzername und Passwort>
-aero_minova_database_user_name=<SQL-Benutzer aus der Connection.xbs>
-aero_minova_database_user_password=<Passwort aus der Connection.xbs>
+spring.datasource.url=<URL aus der Connection.xbs ohne Benutzername und Passwort>
+spring.datasource.username=<SQL-Benutzer aus der Connection.xbs>
+spring.datasource.password=<Passwort aus der Connection.xbs>
 
 login_dataSource=<database|admin|ldap>
 --------

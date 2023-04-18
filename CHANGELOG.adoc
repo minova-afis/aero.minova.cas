@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Update auf SpringBoot 3.0.5.
 * Korrektur der Connectionfreigabe.
 * AuthorizationTest ausbessern (Tabelle leeren, damit andere Tests nicht das Ergebnis beeinflussen)
 * `aero_minova_database_` properties entfernen (sind durch `spring.datasource.` abgedeckt)
@@ -11,6 +12,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [12.59.1] -- 2023-04-04
 * Update auf SpringBoot 3.0.4.
+
 * Feld ModulName in MDI-Maske hinzugefügt.
 * Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.38.
 * SQL-Fehlermeldungen ohne Default-Übersetzung verarbeiten

@@ -30,7 +30,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
-import java.sql.SQLException;
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,13 +48,14 @@ public class SecurityConfig {
 	private String ldapServerAddress;
 
 	@Value("${login_dataSource:}")
-	private String dataSource;
+	private String loginDataSource;
 
 	@Value("${server.port:8084}")
 	private String serverPort;
 
 	private final Environment environment;
 	private final CustomLogger customLogger;
+	private final DataSource dataSource;
 
 	@Bean
 	public SpringSecurityDialect springSecurityDialect() {
@@ -95,19 +96,19 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public UserDetailsManager userDetailsManager(SystemDatabase systemDatabase) throws SQLException {
-		if ("ldap".equals(dataSource)) {
+	public UserDetailsManager userDetailsManager() {
+		if ("ldap".equals(loginDataSource)) {
 			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(ldapServerAddress);
 			contextSource.afterPropertiesSet();
 
 			return new LdapUserDetailsManager(contextSource);
-		} else if ("database".equals(dataSource)) {
-			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(systemDatabase.getDataSource());
+		} else if ("database".equals(loginDataSource)) {
+			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 			jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?");
 			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
 
 			return jdbcUserDetailsManager;
-		} else if (ADMIN.equals(dataSource)) {
+		} else if (ADMIN.equals(loginDataSource)) {
 			UserDetails user = User
 					.withUsername(ADMIN)
 					.password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi"))
@@ -116,7 +117,7 @@ public class SecurityConfig {
 					.build();
 			return new InMemoryUserDetailsManager(user);
 		}
-		throw new IllegalArgumentException("dataSource contains unknown parameter '" + dataSource + "'");
+		throw new IllegalArgumentException("dataSource contains unknown parameter '" + loginDataSource + "'");
 	}
 
 	@Bean

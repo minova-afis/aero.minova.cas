@@ -36,7 +36,7 @@ import lombok.val;
 @Service
 public class ProcedureService {
 
-	private static String POSTGRESQL = "postgresql";
+	private static final String POSTGRESQL = "postgresql";
 
 	@Autowired
 	CustomLogger customLogger;
@@ -99,20 +99,12 @@ public class ProcedureService {
 			connection = systemDatabase.getConnection();
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
-			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
-
-			systemDatabase.freeUpConnection(connection);
+			customLogger.logSql("Procedure succesfully executed: " + sb);
 		} catch (Exception e) {
-			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
-			if (connection != null) {
-				try {
-					connection.rollback();
-				} catch (Exception e1) {
-					customLogger.logError("Couldn't roll back procedure execution", e);
-				}
-				connection.close();
-			}
+			customLogger.logError("Procedure could not be executed: " + sb, e);
 			throw new ProcedureException(e);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
@@ -126,6 +118,7 @@ public class ProcedureService {
 	 * @return SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
+	 * @deprecated TODO @Kerstin: was sollte anstelle dieser Methode verwendet werden?
 	 */
 	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
@@ -169,7 +162,7 @@ public class ProcedureService {
 			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
 
-		result.setReturnCodes(new ArrayList<Integer>());
+		result.setReturnCodes(new ArrayList<>());
 		result.setReturnCode(0);
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
@@ -215,7 +208,7 @@ public class ProcedureService {
 			{
 				int i = 0;
 				while (preparedStatement.getResultSet() == null) {
-					if ((preparedStatement.getMoreResults() == false) && (preparedStatement.getUpdateCount() == -1)) {
+					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
 						// Es gibt kein nächstes Result gibt.
 						break;
 					}
@@ -305,7 +298,7 @@ public class ProcedureService {
 						.getColumns()//
 						.stream()//
 						.map(c -> c.getOutputType() == OutputType.OUTPUT)//
-						.collect(toList());
+						.toList();
 
 				val outputValues = new Row();
 				outputParameters.setColumns(inputTable.getColumns());
@@ -325,7 +318,7 @@ public class ProcedureService {
 				if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 					resultRow = outputValues;
 				} else {
-					for (Value element : outputValues.getValues()) {
+					for (Value ignored : outputValues.getValues()) {
 						resultRow.addValue(null);
 					}
 				}
@@ -466,7 +459,6 @@ public class ProcedureService {
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append('{')//
-				.append("")//
 				.append(returnRequired ? "? = call " : "call ")//
 				.append(params.getName())//
 				.append("(");

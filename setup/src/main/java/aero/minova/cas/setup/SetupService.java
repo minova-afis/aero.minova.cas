@@ -138,16 +138,15 @@ public class SetupService {
 			final Optional<Path> result = Files.walk(dependencySetupsDir, 1).map(dir -> {
 				if (dir.getFileName().toString().startsWith(adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency)) {
 					try {
-						Optional<Path> setup = Files.walk(dir)//
-								.filter(f -> f.getFileName().toString().toLowerCase().equals("setup.xml"))//
+						return Files.walk(dir)//
+								.filter(f -> f.getFileName().toString().equalsIgnoreCase("setup.xml"))//
 								.findFirst();
-						return setup;
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 				}
 				return Optional.<Path> empty();
-			}).filter(setup -> !setup.isEmpty()).map(setup -> setup.get()).findFirst();
+			}).filter(Optional::isPresent).map(Optional::get).findFirst();
 			if (result.isEmpty()) {
 				throw new NoSuchFileException("No setup file found with the name " + niceSetupFile);
 			}
@@ -203,7 +202,7 @@ public class SetupService {
 		for (String procedureName : procedures) {
 			Path sqlFile = dependencySqlDir.resolve(procedureName);
 			if (sqlFile.toFile().exists()) {
-				final val connection = database.getConnection();
+				val connection = database.getConnection();
 				try {
 					// Den Sql-Code aus der Datei auslesen und ausführen.
 					String procedure = Files.readString(sqlFile);
@@ -226,7 +225,7 @@ public class SetupService {
 				} catch (Exception e) {
 					throw new RuntimeException("Error in " + procedureName + ". The file could not be red.", e);
 				} finally {
-					database.freeUpConnection(connection);
+					database.closeConnection(connection);
 				}
 
 			} else {

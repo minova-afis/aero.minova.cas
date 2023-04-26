@@ -3,7 +3,6 @@ package aero.minova.cas.setup;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
@@ -35,8 +34,7 @@ public class InstallToolIntegration {
 	 * Installiert eine gegebene "Setup.xml" mit dem Install-Tool. Es wird der Code möglichst so ausgeführt, als würde man das Tool mit update schema (us),
 	 * update database (ud) und module only (mo). Es wird also nur die SQL-Datenbank der "Setup.xml" installiert und die Abhängkeiten ignoriert.
 	 *
-	 * @param setupXml
-	 *            Die "Setup.xml" welche installiert wird.
+	 * @param setupXml Die "Setup.xml" welche installiert wird.
 	 */
 	public void installSetup(Path setupXml) {
 		final Connection connection = systemDatabase.getConnection();
@@ -54,33 +52,27 @@ public class InstallToolIntegration {
 			final BaseSetup setup = new BaseSetup();
 			setup.setSetupDocument(setupDocument);
 			setup.readSchema();
-			final ResultSet rs = connection.createStatement()
-					.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'");
-			rs.next();
-			final Optional<Path> tableLibrary = Optional.of(files.getSystemFolder().resolve("tables"));
-			final Optional<Path> sqlLibrary = Optional.of(files.getSystemFolder().resolve("sql"));
-			setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
-			if (rs.getInt("Anzahl") == 0) {
+			try (final ResultSet rs = connection.createStatement()
+					.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'")) {
+				rs.next();
+				final Optional<Path> tableLibrary = Optional.of(files.getSystemFolder().resolve("tables"));
+				final Optional<Path> sqlLibrary = Optional.of(files.getSystemFolder().resolve("sql"));
+
 				setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
-				logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getName());
-			} else {
-				setup.readoutSchema(connection, tableLibrary, sqlLibrary);
-				logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getName());
-			}
-			setup.handleSqlScripts(connection, sqlLibrary);
-			connection.commit();
-
-			systemDatabase.freeUpConnection(connection);
-
-		} catch (Exception e) {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e1) {
-					logger.logError("Connection could not be closed: ", e1);
+				if (rs.getInt("Anzahl") == 0) {
+					setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
+					logger.logSql("Schema angelegt auf Datenbank: " + setupDocument.getName());
+				} else {
+					setup.readoutSchema(connection, tableLibrary, sqlLibrary);
+					logger.logSql("Schema aktualisiert auf Datenbank: " + setupDocument.getName());
 				}
+				setup.handleSqlScripts(connection, sqlLibrary);
 			}
+			connection.commit();
+		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 	}
 }

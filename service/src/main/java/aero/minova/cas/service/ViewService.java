@@ -3,7 +3,6 @@ package aero.minova.cas.service;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class ViewService {
 	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MSSQL}")
 	String context;
 
-	private static String MSSQL = "MSSQL";
+	private static final String MSSQL = "MSSQL";
 
 	@PostConstruct
 	private void init() {
@@ -85,7 +84,7 @@ public class ViewService {
 			String viewQuery = viewService.prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			try (PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
-				customLogger.logSql("Executing statements: " + sb.toString());
+				customLogger.logSql("Executing statements: " + sb);
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
@@ -111,17 +110,10 @@ public class ViewService {
 				}
 			}
 		} catch (Throwable e) {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e1) {
-					customLogger.logError("Connection could not be closed: ", e1);
-				}
-			}
-			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
+			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new TableException(e);
 		} finally {
-			systemDatabase.freeUpConnection(connection);
+			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
@@ -137,8 +129,6 @@ public class ViewService {
 	 *            Das bereits fertig aufgebaute Sql Statement, welches statt der Werte '?' enthält. Diese werden hier 'ersetzt'.
 	 * @param sb
 	 *            Ein StringBuilder zum Loggen der inputParameter.
-	 * @param Logger
-	 *            Ein Logger, welcher bei Fehlern die Exception loggen kann.
 	 */
 	public PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
 		return SqlUtils.fillPreparedViewString(inputTable, preparedStatement, query, sb, customLogger.getErrorLogger());

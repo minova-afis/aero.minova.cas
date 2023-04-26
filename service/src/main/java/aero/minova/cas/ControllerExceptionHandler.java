@@ -313,7 +313,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		String errorStatement = "INSERT INTO xtcasError (Username, ErrorMessage, Date) VALUES (?,?,?)";
 
-		final val connection = systemDatabase.getConnection();
+		val connection = systemDatabase.getConnection();
 		try {
 			Timestamp timeOfError = Timestamp.from(Instant.now());
 			CallableStatement callableErrorStatement = connection.prepareCall(errorStatement);
@@ -326,23 +326,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				e.printStackTrace(pw);
 				customLogger.logSql("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
 				// Der Stacktrace wird nicht in der Datenbank gespeichert, da das Feld einfach viel zu lang ist. Deswegen geben wir ihn im ErrorLog aus.
-				customLogger.logError("CAS: Showing Stacktrace : " + sw.toString(), e);
+				customLogger.logError("CAS: Showing Stacktrace : " + sw, e);
 			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();
-			systemDatabase.freeUpConnection(connection);
 		} catch (SQLException e1) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e1.printStackTrace(pw);
 
-			try {
-				connection.close();
-			} catch (SQLException e2) {
-				customLogger.logError("Connection could not be closed: ", e2);
-			}
-
-			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw.toString(), e1);
+			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw, e1);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 	}
 }

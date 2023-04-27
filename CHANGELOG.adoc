@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+## [12.60.1] -- 2023-04-27
 * Konfiguration der DataSource SpringBoot überlassen
 * Verwaltung der JDBC Connections HikariCP überlassen
 

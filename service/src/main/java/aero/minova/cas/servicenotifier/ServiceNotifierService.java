@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +21,9 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.service.model.ServiceMessageReceiverLoginType;
+import aero.minova.cas.service.repository.ServiceMessageReceiverLoginTypeRepository;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class ServiceNotifierService {
@@ -39,6 +40,8 @@ public class ServiceNotifierService {
 	@Autowired
 	ProcedureService procedureService;
 
+	ServiceMessageReceiverLoginTypeRepository serviceMessageReceiverLoginTypeRepo;
+
 	/**
 	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
 	 */
@@ -52,6 +55,8 @@ public class ServiceNotifierService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
 	private void setup() {
+		fillServiceMessageReceiverLoginTypes();
+
 		spc.registerExtension("xpcasRegisterService", inputTable -> {
 			try {
 				int keyLong = registerService(inputTable);
@@ -107,6 +112,32 @@ public class ServiceNotifierService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
+		});
+	}
+
+	/**
+	 * Befüllt das Repo mit den bisherigen Authentifizierungstypen.
+	 */
+	private void fillServiceMessageReceiverLoginTypes() {
+		serviceMessageReceiverLoginTypeRepo.findByKeyText("None");
+		serviceMessageReceiverLoginTypeRepo.findByKeyText("Basic Auth");
+		serviceMessageReceiverLoginTypeRepo.findByKeyText("OAuth2");
+
+	}
+
+	/**
+	 * Findet Einträge im ServiceMessageReceiverLoginTypeRepository oder legt sie an, falls diese nicht existieren.
+	 * 
+	 * @param loginType
+	 *            Der gesuchte Name als String.
+	 * @return ein ServiceMessageReceiverLoginType-Objekt.
+	 */
+	public ServiceMessageReceiverLoginType findOrCreateServiceMessageReceiverLoginType(String loginType) {
+		return serviceMessageReceiverLoginTypeRepo.findByKeyText(loginType).orElseGet(() -> {
+			ServiceMessageReceiverLoginType serviceMessageLoginType = new ServiceMessageReceiverLoginType();
+			serviceMessageLoginType.setKeyText(loginType);
+			serviceMessageReceiverLoginTypeRepo.save(serviceMessageLoginType);
+			return serviceMessageLoginType;
 		});
 	}
 

@@ -29,15 +29,15 @@ class SQLViewControllerTest {
 	SqlViewController testSubject;
 
 	@Autowired
-	AuthorizationService authorizationController;
+	AuthorizationService authorizationService;
 
 	@Test
 	@DisplayName("Methode getIndexView() testen")
 	void getIndexView() throws Exception {
 
 		// Recht und Admin-Nutzer erstellen
-		authorizationController.findOrCreateUserPrivilege("xvcasUserSecurity");
-		authorizationController.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
+		authorizationService.findOrCreateUserPrivilege("xvcasUserSecurity");
+		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
 
 		// Tabelle für Index-Anfrage erstellen
 		Table indexView = new Table();

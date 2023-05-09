@@ -15,6 +15,7 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.service.AuthorizationService;
 
 @SpringBootTest(classes = CoreApplicationSystemApplication.class)
 @ActiveProfiles("test")
@@ -28,7 +29,7 @@ class SQLViewControllerTest {
 	SqlViewController testSubject;
 
 	@Autowired
-	AuthorizationController authorizationController;
+	AuthorizationService authorizationController;
 
 	@Test
 	@DisplayName("Methode getIndexView() testen")

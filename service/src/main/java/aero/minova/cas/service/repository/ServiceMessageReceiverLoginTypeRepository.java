@@ -9,7 +9,7 @@ import aero.minova.cas.service.model.ServiceMessageReceiverLoginType;
 
 public interface ServiceMessageReceiverLoginTypeRepository extends JpaRepository<ServiceMessageReceiverLoginType, Long> {
 
-	@Query("select u from ServiceMessageReceiverLoginType u where u.keyText = :keytext and u.lastAction > 0")
+	@Query("select u from ServiceMessageReceiverLoginType u where u.keyText = :keytext and u.lastaction > 0")
 	public Optional<ServiceMessageReceiverLoginType> findByKeyText(String keytext);
 
 }

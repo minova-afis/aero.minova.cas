@@ -40,6 +40,7 @@ public class ServiceNotifierService {
 	@Autowired
 	ProcedureService procedureService;
 
+	@Autowired
 	ServiceMessageReceiverLoginTypeRepository serviceMessageReceiverLoginTypeRepo;
 
 	/**

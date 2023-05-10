@@ -1,6 +1,6 @@
 alter procedure dbo.xpcasInsertUser (
 	@KeyLong int output,
-	@KeyText nvarchar(10) = null,
+	@KeyText nvarchar(50) = null,
 	@UserSecurityToken nvarchar(50) = null,
 	@Memberships nvarchar(250) = null
 )

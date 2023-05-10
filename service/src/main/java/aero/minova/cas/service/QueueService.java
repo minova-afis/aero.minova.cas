@@ -3,7 +3,9 @@ package aero.minova.cas.service;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
@@ -21,6 +24,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
@@ -110,7 +116,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			@Override
 			public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
+				// Hier muss bisher nicht implementiert werden.
 			}
 
 			@Override
@@ -135,7 +141,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			@Override
 			public Collection<? extends GrantedAuthority> getAuthorities() {
-				return null;
+				return Collections.emptyList();
 			}
 		});
 
@@ -273,8 +279,20 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		messagesRequest.addColumn(new Column("isSent", DataType.BOOLEAN));
 		messagesRequest.addColumn(new Column("NumberOfAttempts", DataType.INTEGER));
 		messagesRequest.addColumn(new Column("MessageCreationDate", DataType.INSTANT));
+		messagesRequest.addColumn(new Column("ServiceMessageReceiverLoginTypeKey", DataType.INTEGER));
+		messagesRequest.addColumn(new Column("Username", DataType.STRING));
+		messagesRequest.addColumn(new Column("Password", DataType.STRING));
+		messagesRequest.addColumn(new Column("ClientID", DataType.STRING));
+		messagesRequest.addColumn(new Column("ClientSecret", DataType.STRING));
+		messagesRequest.addColumn(new Column("TokenURL", DataType.STRING));
 
 		Row messagesRow = new Row();
+		messagesRow.addValue(null);
+		messagesRow.addValue(null);
+		messagesRow.addValue(null);
+		messagesRow.addValue(null);
+		messagesRow.addValue(null);
+		messagesRow.addValue(null);
 		messagesRow.addValue(null);
 		messagesRow.addValue(null);
 		messagesRow.addValue(null);
@@ -304,7 +322,6 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 * @return true, falls der Versandt erfolgreich war. Andernfalls false.
 	 */
 	private boolean sendMessage(Row nextMessage) {
-		RestTemplate restTemplate = new RestTemplate();
 		// URL + : + Port
 		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getIntegerValue();
 		String message = nextMessage.getValues().get(5).getStringValue();
@@ -323,19 +340,44 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
 			header.add("Authorization", "Basic " + encodedAuth);
 
-			request = new HttpEntity<Object>(message, header);
+			request = new HttpEntity<>(message, header);
 
 			// Falls OAuth2:
 		} else if (serviceMessageReceiverLoginTypeKey == 3) {
 
-			request = new HttpEntity<Object>(message);
+			// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
+			String credentials = nextMessage.getValues().get(10).getStringValue() + ":" + nextMessage.getValues().get(11).getIntegerValue();
+			byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+			headers.add("Authorization", "Basic " + encodedAuth);
+
+			HttpEntity<String> tokenRequest = new HttpEntity<>(headers);
+			String accessTokenUrl = nextMessage.getValues().get(14).getStringValue();
+			ResponseEntity<String> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, tokenRequest, String.class);
+
+			// Access Token aus der JSON response lesen.
+			ObjectMapper mapper = new ObjectMapper();
+			String token;
+			try {
+				JsonNode node = mapper.readTree(response.getBody());
+				token = node.path("access_token").asText();
+			} catch (Exception e) {
+				throw new IllegalArgumentException("QueueService was not able to read the access token from tokenurl " + accessTokenUrl);
+			}
+
+			// Access Token in eigentlichen Aufruf setzen.
+			HttpHeaders headers1 = new HttpHeaders();
+			headers1.add("Authorization", "Bearer " + token);
+			request = new HttpEntity<>(message, headers1);
+
 		} else {
-			request = new HttpEntity<Object>(message);
+			request = new HttpEntity<>(message);
 		}
 		logger.logQueueService("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
 		try {
 			logger.logQueueService("Sending message: " + message);
-			restTemplate.exchange(url + "/cas-event-listener", HttpMethod.POST, request, Void.class);
+			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
 		} catch (Exception e) {
 			logger.logError("Could not send message to " + url, e);
 			return false;

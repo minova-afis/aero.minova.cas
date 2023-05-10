@@ -54,6 +54,18 @@ public class CASServices {
 	@Column(name = "Password")
 	public String password;
 
+	@Size(max = 50)
+	@Column(name = "ClientID")
+	public String clientId;
+
+	@Size(max = 50)
+	@Column(name = "ClientSecret")
+	public String clientSecret;
+
+	@Size(max = 50)
+	@Column(name = "TokenURL")
+	public String tokenURL;
+
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "LastUser")

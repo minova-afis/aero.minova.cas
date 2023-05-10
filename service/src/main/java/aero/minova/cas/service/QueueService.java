@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -8,10 +9,10 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import jakarta.annotation.PostConstruct;
-
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,6 +30,7 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
@@ -146,8 +148,10 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 				// Falls die Nachricht älter ist als das allowedMessageAge und falls die NumberOfAttempts höher ist als die allowedNumberOfAttempts, muss die
 				// Nachricht gelöscht werden.
-				if (pendingMessage.getValues().get(8).getInstantValue().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))
-						|| pendingMessage.getValues().get(7).getIntegerValue() >= allowedNumberOfAttempts) {
+				if (pendingMessage.getValues().get(messagesToBeSend.findColumnPosition("MessageCreationDate")).getInstantValue()
+						.isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))
+						|| pendingMessage.getValues().get(messagesToBeSend.findColumnPosition("NumberOfAttempts"))
+								.getIntegerValue() >= allowedNumberOfAttempts) {
 					deleteMessage(pendingMessage);
 					continue;
 				}
@@ -301,10 +305,33 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 */
 	private boolean sendMessage(Row nextMessage) {
 		RestTemplate restTemplate = new RestTemplate();
+		// URL + : + Port
 		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getIntegerValue();
 		String message = nextMessage.getValues().get(5).getStringValue();
 
-		HttpEntity<?> request = new HttpEntity<Object>(message);
+		int serviceMessageReceiverLoginTypeKey = nextMessage.getValues().get(9).getIntegerValue();
+
+		HttpEntity<?> request;
+
+		// Falls BasicAuth:
+		if (serviceMessageReceiverLoginTypeKey == 2) {
+
+			// Username + : + Password
+			String credentials = nextMessage.getValues().get(10).getStringValue() + ":" + nextMessage.getValues().get(11).getIntegerValue();
+
+			HttpHeaders header = new HttpHeaders();
+			byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
+			header.add("Authorization", "Basic " + encodedAuth);
+
+			request = new HttpEntity<Object>(message, header);
+
+			// Falls OAuth2:
+		} else if (serviceMessageReceiverLoginTypeKey == 3) {
+
+			request = new HttpEntity<Object>(message);
+		} else {
+			request = new HttpEntity<Object>(message);
+		}
 		logger.logQueueService("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
 		try {
 			logger.logQueueService("Sending message: " + message);

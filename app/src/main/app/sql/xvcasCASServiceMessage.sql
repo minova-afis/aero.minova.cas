@@ -9,7 +9,10 @@ select
     sm.Message,
     sm.isSent,
     sm.NumberOfAttempts,
-    sm.MessageCreationDate
+    sm.MessageCreationDate,
+    cs.ServiceMessageReceiverLoginTypeKey,
+    cs.Username,
+    cs.Password
 from xtcasCASServices cs
 left join xtcasServiceMessage sm on sm.CASServiceKey = cs.KeyLong
 where cs.LastAction >=0

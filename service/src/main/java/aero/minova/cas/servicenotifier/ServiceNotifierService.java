@@ -159,12 +159,14 @@ public class ServiceNotifierService {
 		registerSerivceTable.addColumn(new Column("KeyText", DataType.STRING));
 		registerSerivceTable.addColumn(new Column("ServiceURL", DataType.STRING));
 		registerSerivceTable.addColumn(new Column("Port", DataType.INTEGER));
+		registerSerivceTable.addColumn(new Column("ServiceMessageReceiverLoginTypeKey", DataType.INTEGER));
 
 		Row registerRow = new Row();
 		registerRow.addValue(null);
 		registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
 		registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
 		registerRow.addValue(inputTable.getRows().get(0).getValues().get(2));
+		registerRow.addValue(inputTable.getRows().get(0).getValues().get(3));
 
 		registerSerivceTable.addRow(registerRow);
 		try {

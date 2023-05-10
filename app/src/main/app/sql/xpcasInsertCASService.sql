@@ -2,13 +2,15 @@ alter procedure dbo.xpcasInsertCASService (
 	@KeyLong int output,
 	@KeyText nvarchar(50),
 	@ServiceURL nvarchar(50),
-    @Port int
+    @Port int,
+	@ServiceMessageReceiverLoginTypeKey int
 )
 with encryption as
 if exists(select * from xtcasCASServices
 	where KeyText = @KeyText
       and ServiceURL = @ServiceURL
       and Port = @Port
+	  and ServiceMessageReceiverLoginTypeKey = @ServiceMessageReceiverLoginTypeKey
       and LastAction > 0 
 	)
 begin
@@ -20,6 +22,7 @@ if exists(select * from xtcasCASServices
 		where KeyText = @KeyText
           and ServiceURL = @ServiceURL
           and Port = @Port
+		  and ServiceMessageReceiverLoginTypeKey = @ServiceMessageReceiverLoginTypeKey
           and LastAction < 0 
 		)
 begin
@@ -27,7 +30,8 @@ begin
 	from xtcasCASServices 
     where KeyText = @KeyText
       and ServiceURL = @ServiceURL
-      and Port = @Port 
+      and Port = @Port
+	  and ServiceMessageReceiverLoginTypeKey = @ServiceMessageReceiverLoginTypeKey
 
     update xtcasCASServices
     set LastAction = 1
@@ -38,11 +42,13 @@ begin
 	insert into xtcasCASServices (
 		KeyText,
 		ServiceURL,
-		Port
+		Port,
+		ServiceMessageReceiverLoginTypeKey
 	) values (
 		@KeyText,
 		@ServiceURL,
-		@Port
+		@Port,
+		@ServiceMessageReceiverLoginTypeKey
 	)
 	select @KeyLong = @@identity
 end 

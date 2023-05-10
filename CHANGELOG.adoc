@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Update auf SpringBoot 3.0.6.
+* KeyText in xtcasUser von 10 auf 50 Zeichen verlängert
 
 ## [12.60.1] -- 2023-04-27
 * Konfiguration der DataSource SpringBoot überlassen

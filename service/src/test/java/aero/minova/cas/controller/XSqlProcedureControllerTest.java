@@ -41,7 +41,7 @@ class XSqlProcedureControllerTest extends BaseTest {
 	SystemDatabase systemDatabase;
 
 	@Test
-	void testAutoConnect() throws SQLException {
+	void checkAutoCommitDisabled() throws SQLException {
 		// Autocommit muss per Default ausgeschaltet sein
 		assertTrue(!systemDatabase.getConnection().getAutoCommit());
 	}

@@ -11,7 +11,6 @@ updates:
       interval: "daily"
     assignees:
       - "weber-minova"
-      - "martins-1992"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

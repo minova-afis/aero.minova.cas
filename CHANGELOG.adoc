@@ -4,6 +4,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben
+
+## [12.61.0] -- 2023-05-11
 * AuthorizationController zu AuthorizationService umbenennen, da es kein Controller ist.
 * Kein Autocommit bei Transaktionen
 

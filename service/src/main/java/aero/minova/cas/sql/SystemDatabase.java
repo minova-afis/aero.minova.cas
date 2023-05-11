@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
-import aero.minova.cas.CustomLogger;
+import org.springframework.stereotype.Component;
+
 import com.zaxxer.hikari.HikariDataSource;
+
+import aero.minova.cas.CustomLogger;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
@@ -20,7 +22,10 @@ public class SystemDatabase {
 		try {
 			Map<String, Object> properties = entityManager.getEntityManagerFactory().getProperties();
 			HikariDataSource dataSource = (HikariDataSource) properties.get("javax.persistence.nonJtaDataSource");
-			return dataSource.getConnection();
+
+			Connection connection = dataSource.getConnection();
+			connection.setAutoCommit(false);
+			return connection;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

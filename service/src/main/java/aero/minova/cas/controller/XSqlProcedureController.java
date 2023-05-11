@@ -77,9 +77,9 @@ public class XSqlProcedureController {
 
 		try {
 			connection = systemDatabase.getConnection();
-			
-			// Es darf erst commited werden, wenn alle Prozeuduren und Checks erfolgreich waren
-			connection.setAutoCommit(false); 
+
+			// Es darf erst commited werden, wenn alle Prozeduren und Checks erfolgreich waren
+			connection.setAutoCommit(false);
 
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
 

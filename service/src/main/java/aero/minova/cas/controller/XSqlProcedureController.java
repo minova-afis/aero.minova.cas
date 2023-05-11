@@ -78,7 +78,7 @@ public class XSqlProcedureController {
 		try {
 			connection = systemDatabase.getConnection();
 
-			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap();
+			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
 
 			// Hier wird die Anfrage bearbeitet.
 			resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);

@@ -20,6 +20,9 @@ public class SystemDatabase {
 		try {
 			Map<String, Object> properties = entityManager.getEntityManagerFactory().getProperties();
 			HikariDataSource dataSource = (HikariDataSource) properties.get("javax.persistence.nonJtaDataSource");
+			Connection conn = dataSource.getConnection();
+
+			conn.setAutoCommit(false);
 			return dataSource.getConnection();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

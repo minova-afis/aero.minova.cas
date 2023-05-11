@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * AuthorizationController zu AuthorizationService umbenennen, da es kein Controller ist.
+* Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben
 
 ## [12.60.2] -- 2023-05-10
 * Update auf SpringBoot 3.0.6.

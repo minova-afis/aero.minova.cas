@@ -3,11 +3,13 @@ package aero.minova.cas.app.helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.osgi.service.component.annotations.Component;
 
@@ -38,23 +40,19 @@ public class CASUsersHelper implements IHelper {
 	@Inject
 	IDataService dataService;
 
-	@Inject
-	Logger logger;
+	ILog logger = Platform.getLog(this.getClass());
 
 	@Inject
 	IEventBroker eventBroker;
 
 	WFCDetailCASRequestsUtil detailUtil;
-	private MDetail mDetail;
 
 	private MField password;
 
 	@Override
 	public void setControls(MDetail mDetail) {
-		this.mDetail = mDetail;
 		detailUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
 		password = mDetail.getField("Password");
-
 	}
 
 	@Override
@@ -65,15 +63,13 @@ public class CASUsersHelper implements IHelper {
 				encryptPassword(password.getValue());
 			}
 			break;
-		case BEFOREREAD:
-		case AFTERREAD:
+		case BEFOREREAD, AFTERREAD:
 			password.setRequired(false);
 			break;
 		default:
 			password.setRequired(true);
 			break;
 		}
-
 	}
 
 	private void encryptPassword(Value stringValue) {
@@ -105,9 +101,11 @@ public class CASUsersHelper implements IHelper {
 			eventBroker.send(Constants.BROKER_SHOWERRORMESSAGE,
 					"Passwort konnte nicht verschlüsselt werden. Bitte versuchen Sie es erneut oder mit einem anderen Passwort.");
 
-		} catch (Exception e) {
-			logger.error(e);
-			eventBroker.send(Constants.BROKER_SHOWERRORMESSAGE, e.getMessage()); // Fehlermeldung
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+			Thread.currentThread().interrupt();
+		} catch (ExecutionException e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 

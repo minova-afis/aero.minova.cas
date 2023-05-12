@@ -9,8 +9,8 @@ import javax.inject.Inject;
 
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.osgi.service.component.annotations.Component;
 
 import aero.minova.rcp.constants.Constants;
@@ -35,9 +35,6 @@ import aero.minova.rcp.rcp.util.WFCDetailCASRequestsUtil;
 public class CASUsersHelper implements IHelper {
 
 	@Inject
-	MPerspective mPerspective;
-
-	@Inject
 	IDataService dataService;
 
 	ILog logger = Platform.getLog(this.getClass());
@@ -45,13 +42,14 @@ public class CASUsersHelper implements IHelper {
 	@Inject
 	IEventBroker eventBroker;
 
+	@Optional
+	@Inject
 	WFCDetailCASRequestsUtil detailUtil;
 
 	private MField password;
 
 	@Override
 	public void setControls(MDetail mDetail) {
-		detailUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
 		password = mDetail.getField("Password");
 	}
 

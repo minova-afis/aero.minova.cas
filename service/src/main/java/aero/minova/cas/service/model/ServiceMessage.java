@@ -50,6 +50,10 @@ public class ServiceMessage {
 	public Timestamp messagecreationdate;
 
 	@NotNull
+	@Column(name = "Failed")
+	public boolean failed = false;
+
+	@NotNull
 	@Size(max = 50)
 	@Column(name = "LastUser")
 	public String lastuser = "CAS_JPA";

@@ -1,5 +1,9 @@
 package aero.minova.cas.service.repository;
 
-public class ServiceMessageRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import aero.minova.cas.service.model.ServiceMessage;
+
+public interface ServiceMessageRepository extends JpaRepository<ServiceMessage, Long> {
 
 }

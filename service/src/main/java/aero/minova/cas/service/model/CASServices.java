@@ -41,9 +41,8 @@ public class CASServices {
 	@Column(name = "Port")
 	public int port;
 
-	@NotNull
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "ServiceMessageReceiverLoginTypeKey", nullable = false)
+	@JoinColumn(name = "ServiceMessageReceiverLoginTypeKey", nullable = true)
 	public ServiceMessageReceiverLoginType receiverLoginType;
 
 	@Size(max = 50)

@@ -8,6 +8,6 @@ import aero.minova.cas.service.model.CASServices;
 @Repository
 public interface CASServicesRepository extends JpaRepository<CASServices, Long> {
 
-	public CASServices findByKeyLong(int keyLong);
+	public CASServices findByKeylong(int keyLong);
 
 }

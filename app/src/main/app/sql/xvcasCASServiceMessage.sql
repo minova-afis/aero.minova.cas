@@ -10,6 +10,7 @@ select
     sm.isSent,
     sm.NumberOfAttempts,
     sm.MessageCreationDate,
+    sm.Failed,
     cs.ServiceMessageReceiverLoginTypeKey,
     cs.Username,
     cs.Password,
@@ -18,6 +19,6 @@ select
     cs.TokenURL
 from xtcasCASServices cs
 left join xtcasServiceMessage sm on sm.CASServiceKey = cs.KeyLong
-where cs.LastAction >=0
-  and sm.LastAction >=0
+where cs.LastAction >0
+  and sm.LastAction >0
   and sm.isSent = 0

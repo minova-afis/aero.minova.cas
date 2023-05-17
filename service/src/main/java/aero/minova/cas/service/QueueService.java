@@ -35,6 +35,9 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.service.model.ServiceMessage;
+import aero.minova.cas.service.repository.CASServicesRepository;
+import aero.minova.cas.service.repository.ServiceMessageRepository;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
 import jakarta.annotation.PostConstruct;
 
@@ -67,6 +70,10 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 	// Map<ProzedurName, Map< ServiceName, BiFunction>>
 	Map<String, Map<String, BiFunction<Table, ResponseEntity<Object>, String>>> serviceMessageCreators = new HashMap<>();
+
+	ServiceMessageRepository serviceMessageRepo;
+
+	CASServicesRepository casServiceRepo;
 
 	@PostConstruct
 	public void init() {
@@ -211,22 +218,16 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, null, new Value(topic, null), null, null);
 
 		for (Row services : servicesToBeNotified.getRows()) {
-			Table setSent = new Table();
-			setSent.setName("xpcasInsertServiceMessage");
-			setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
-			setSent.addColumn(new Column("CASServiceKey", DataType.INTEGER));
-			setSent.addColumn(new Column("Message", DataType.STRING));
-
-			Row setSentRow = new Row();
-			setSentRow.addValue(null);
-			setSentRow.addValue(services.getValues().get(0));
-			setSentRow.addValue(new Value(message, null));
-
-			setSent.addRow(setSentRow);
 			try {
+				casServiceRepo.findByKeyLong(services.getValues().get(0).getIntegerValue());
+
+				ServiceMessage serviceMessage = new ServiceMessage();
+				serviceMessage.setMessage(message);
+
+				serviceMessageRepo.save(serviceMessage);
+
 				logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
 						+ procedureName + ": '" + message + "'");
-				procedureService.unsecurelyProcessProcedure(setSent);
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
 				logger.logError("Error while trying to save message " + message, e);

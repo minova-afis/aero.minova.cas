@@ -14,4 +14,6 @@ public interface ServiceMessageReceiverLoginTypeRepository extends JpaRepository
 	@Query("select u from ServiceMessageReceiverLoginType u where u.keyText = :keytext and u.lastaction > 0")
 	public Optional<ServiceMessageReceiverLoginType> findByKeyText(String keytext);
 
+	public ServiceMessageReceiverLoginType findByKeylong(int keylong);
+
 }

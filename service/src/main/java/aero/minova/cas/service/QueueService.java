@@ -30,10 +30,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.service.model.NewsfeedListener;
 import aero.minova.cas.service.model.ServiceMessage;
 import aero.minova.cas.service.repository.CASServicesRepository;
 import aero.minova.cas.service.repository.ServiceMessageRepository;
@@ -218,19 +218,19 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 *            Das Topic, welches verändert wurde.
 	 */
 	private void saveMessage(String message, String procedureName, String topic) {
-		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, null, new Value(topic, null), null, null);
+		List<NewsfeedListener> servicesToBeNotified = serviceNotifierService.findViewEntry(null, null, new Value(topic, null), null, null);
 
-		for (Row services : servicesToBeNotified.getRows()) {
+		for (NewsfeedListener services : servicesToBeNotified) {
 			try {
-				casServiceRepo.findByKeylong(services.getValues().get(0).getIntegerValue());
+				casServiceRepo.findByKeylong(services.getCasservice().getKeylong());
 
 				ServiceMessage serviceMessage = new ServiceMessage();
 				serviceMessage.setMessage(message);
 
 				serviceMessageRepo.saveAndFlush(serviceMessage);
 
-				logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
-						+ procedureName + ": '" + message + "'");
+				logger.logQueueService("Saving message for " + topic + " for service " + services.getCasservice().getKeytext() + "  because of " + procedureName
+						+ ": '" + message + "'");
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
 				logger.logError("Error while trying to save message " + message, e);

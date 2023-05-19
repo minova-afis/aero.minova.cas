@@ -12,4 +12,6 @@ public interface ProcedureNewsfeedRepository extends JpaRepository<ProcedureNews
 
 	List<ProcedureNewsfeed> findAllByProcedurenameAndTopicAndLastaction(String procedurename, String topic, int lastaction);
 
+	List<ProcedureNewsfeed> findAllByTopicAndLastaction(String topic, int lastaction);
+
 }

@@ -45,16 +45,12 @@ public class CASUsersHelper implements IHelper {
 	IEventBroker eventBroker;
 
 	WFCDetailCASRequestsUtil detailUtil;
-	private MDetail mDetail;
 
 	private MField password;
 
 	@Override
 	public void setControls(MDetail mDetail) {
-		this.mDetail = mDetail;
-		detailUtil = mPerspective.getContext().get(WFCDetailCASRequestsUtil.class);
 		password = mDetail.getField("Password");
-
 	}
 
 	@Override
@@ -65,8 +61,7 @@ public class CASUsersHelper implements IHelper {
 				encryptPassword(password.getValue());
 			}
 			break;
-		case BEFOREREAD:
-		case AFTERREAD:
+		case BEFOREREAD, AFTERREAD:
 			password.setRequired(false);
 			break;
 		default:

@@ -1,0 +1,3 @@
+if not exists(select * from xtcasServiceMessageReceiverLoginType where KeyText = 'None') insert into xtcasServiceMessageReceiverLoginType (KeyText) values ('None')
+if not exists(select * from xtcasServiceMessageReceiverLoginType where KeyText = 'BasicAuth') insert into xtcasServiceMessageReceiverLoginType (KeyText) values ('BasicAuth')
+if not exists(select * from xtcasServiceMessageReceiverLoginType where KeyText = 'OAuth2') insert into xtcasServiceMessageReceiverLoginType (KeyText) values ('OAuth2')

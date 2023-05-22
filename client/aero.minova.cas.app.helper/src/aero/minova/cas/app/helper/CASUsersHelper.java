@@ -28,8 +28,8 @@ public class CASUsersHelper implements IHelper {
 	@Inject
 	IEventBroker eventBroker;
 
-	@Optional
 	@Inject
+	@Optional
 	WFCDetailCASRequestsUtil detailUtil;
 
 	private MField password;

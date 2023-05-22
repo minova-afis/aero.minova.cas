@@ -25,7 +25,6 @@ updates:
       interval: "daily"
     assignees:
       - "weber-minova"
-      - "janiak-minova"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

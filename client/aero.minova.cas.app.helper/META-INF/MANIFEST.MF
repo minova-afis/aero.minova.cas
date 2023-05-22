@@ -5,20 +5,17 @@ Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/aero.minova.cas.app.helper.CASUsersHelper.xml
 Require-Bundle: org.eclipse.e4.core.services,
-                 org.eclipse.core.runtime,
-                 org.eclipse.pde.core,
-                 org.eclipse.e4.core.contexts,
-                 org.eclipse.e4.core.di.annotations,
-                 org.eclipse.osgi.services,
-                 org.apache.commons.logging,
-                 javax.inject,
-                 aero.minova.rcp.constant,
-                 aero.minova.rcp.model,
-                 aero.minova.rcp.dataservice,
-                 aero.minova.rcp.rcp
-Import-Package: aero.minova.rcp.dataservice,
- aero.minova.rcp.rcp.util,
- javax.inject,
+ org.eclipse.core.runtime,
+ org.eclipse.pde.core,
  org.eclipse.e4.core.contexts,
- org.eclipse.e4.ui.model.application.ui.advanced
-
+ org.eclipse.e4.core.di.annotations,
+ org.eclipse.osgi.services,
+ org.apache.commons.logging,
+ javax.inject,
+ aero.minova.rcp.constant,
+ aero.minova.rcp.model,
+ aero.minova.rcp.dataservice,
+ aero.minova.rcp.rcp
+Bundle-ClassPath: lib/spring-security-crypto.jar,
+ .
+ 

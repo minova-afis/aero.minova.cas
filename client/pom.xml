@@ -33,6 +33,33 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>copy-libraries</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems> 
+								<item> 
+									<groupId>org.springframework.security</groupId>
+									<artifactId>spring-security-crypto</artifactId>
+									<version>6.0.3</version>
+								</item>
+							</artifactItems>
+							<outputDirectory>/aero.minova.cas.app.helper/lib</outputDirectory> <!-- Name des Output-Ordners -->
+							<stripVersion>true</stripVersion>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho.version}</version>

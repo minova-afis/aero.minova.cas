@@ -9,6 +9,7 @@ import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.service.model.NewsfeedListener;
 import aero.minova.cas.service.model.ProcedureNewsfeed;
+import aero.minova.cas.service.repository.NewsfeedListenerRepository;
 import aero.minova.cas.service.repository.ProcedureNewsfeedRepository;
 import jakarta.annotation.PostConstruct;
 
@@ -28,6 +29,8 @@ public class ServiceNotifierCache {
 
 	ProcedureNewsfeedRepository procedureNewsfeedRepo;
 
+	NewsfeedListenerRepository newsfeedListenerRepo;
+
 	/**
 	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
 	 */
@@ -36,12 +39,9 @@ public class ServiceNotifierCache {
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.servicenotifier = new HashMap<>();
-				List<NewsfeedListener> servicenotifierTable = service.findViewEntry(null, null, null, null, null);
-				for (NewsfeedListener newsfeedListener : servicenotifierTable) {
-					List<ProcedureNewsfeed> procedureNewsfeeds = procedureNewsfeedRepo.findAllByTopicAndLastaction(null, 0);
-					for (ProcedureNewsfeed newsfeed : procedureNewsfeeds) {
-						service.registerServicenotifier(newsfeed.getKeytext(), newsfeedListener.getTopic());
-					}
+				List<ProcedureNewsfeed> servicenotifierTable = procedureNewsfeedRepo.findAllByLastaction(0);
+				for (ProcedureNewsfeed procedureNewsfeed : servicenotifierTable) {
+					service.registerServicenotifier(procedureNewsfeed.getKeytext(), procedureNewsfeed.getTopic());
 				}
 			}
 		} catch (Exception e) {
@@ -58,7 +58,7 @@ public class ServiceNotifierCache {
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.newsfeeds = new HashMap<>();
-				List<NewsfeedListener> newsfeedsTable = service.findViewEntry(null, null, null, null, null);
+				List<NewsfeedListener> newsfeedsTable = newsfeedListenerRepo.findAllByLastaction(0);
 				for (NewsfeedListener newsfeedListener : newsfeedsTable) {
 					service.registerNewsfeed(newsfeedListener.getCasservice().getKeytext(), newsfeedListener.getTopic());
 				}

@@ -65,8 +65,6 @@ public class ServiceNotifierService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
 	private void setup() {
-		fillServiceMessageReceiverLoginTypes();
-
 		spc.registerExtension("xpcasRegisterService", inputTable -> {
 			try {
 				int keyLong = registerService(inputTable);
@@ -123,17 +121,6 @@ public class ServiceNotifierService {
 				throw new RuntimeException(e);
 			}
 		});
-	}
-
-	/**
-	 * Befüllt das Repo mit den bisherigen Authentifizierungstypen.
-	 */
-	private void fillServiceMessageReceiverLoginTypes() {
-		// TODO: Richtig befüllen
-		serviceMessageReceiverLoginTypeRepo.findByKeyText("None");
-		serviceMessageReceiverLoginTypeRepo.findByKeyText("Basic Auth");
-		serviceMessageReceiverLoginTypeRepo.findByKeyText("OAuth2");
-
 	}
 
 	/**
@@ -362,7 +349,8 @@ public class ServiceNotifierService {
 			for (Row inputRow : inputTable.getRows()) {
 
 				// Wir finden erst einmal heraus, welche NewsfeedListener mit dem Service in Verbindung stehen.
-				List<NewsfeedListener> newsfeedListeners = findViewEntry(inputRow.getValues().get(0), null, inputRow.getValues().get(1), null, null);
+				List<NewsfeedListener> newsfeedListeners = findViewEntry(inputRow.getValues().get(0).getStringValue(),
+						inputRow.getValues().get(1).getStringValue());
 
 				for (NewsfeedListener toDelete : newsfeedListeners) {
 					toDelete.setLastaction(-1);
@@ -391,7 +379,7 @@ public class ServiceNotifierService {
 	private CASServices findServiceEntry(String casServiceName) {
 		try {
 			// Die ServiceNamen müssen eindeutig sein, deswegen nehmen wir hier einfach den Ersten, den wir finden.
-			return casServiceRepo.findByKeytext(casServiceName).get(0);
+			return casServiceRepo.findByKeytext(casServiceName);
 		} catch (Exception e) {
 			logger.logError("Error while trying to find service " + casServiceName + " in xtcasCASServices!", e);
 			throw new RuntimeException(e);
@@ -400,14 +388,14 @@ public class ServiceNotifierService {
 
 	/**
 	 * Sucht in der xvCASServices die Einträge anhand der übergebenen Values heraus. Die Values müssen hierfür String-Values sein. Wichtig hierbei ist, dass
-	 * nicht jeder Value übergeben werden muss. Falls man die gesamte View haben möchte, kann man auch einfach 'null' in allen Übergabeparametern übergeben.
+	 * nicht jeder Value übergeben werden muss.
 	 * 
 	 * @param casServiceName
-	 *            Der Name des Dienstes als String-Value.
+	 *            Der Name des Dienstes als String.
 	 * @param procedureName
-	 *            Der Name der Prozedur als String-Value.
+	 *            Der Name der Prozedur als String.
 	 * @param topic
-	 *            Der Name der Table als String-Value.
+	 *            Der Name der Table als String.
 	 * @param serviceURL
 	 *            Die URL eines Dienstes.
 	 * @param port
@@ -415,11 +403,24 @@ public class ServiceNotifierService {
 	 * @return Eine Table mit den jeweiligen gefilterten Einträgen. Die Reihenfolge der Values ist folgende: CASServiceKey, NewsfeedListenerKey,
 	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, topic, ServiceURL, Port
 	 */
-	public List<NewsfeedListener> findViewEntry(Value casServiceName, Value procedureName, Value topic, Value serviceURL, Value port) {
+	public List<NewsfeedListener> findViewEntry(String casServiceName, String topic) {
 		try {
 
-			return newsfeedListenerRepo.findAllByKeytextAndProcedurenameAndTopicAndServiceurlAndPortAndLastaction(casServiceName.getStringValue(),
-					procedureName.getStringValue(), topic.getStringValue(), serviceURL.getStringValue(), port.getIntegerValue(), 0);
+			if (topic.isBlank()) {
+				if (casServiceName.isBlank()) {
+					return newsfeedListenerRepo.findAllByLastaction(0);
+				} else {
+					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);
+					return newsfeedListenerRepo.findAllByCasservice(findMe);
+				}
+			} else {
+				if (casServiceName.isBlank()) {
+					return newsfeedListenerRepo.findAllByTopicAndLastactionGreaterThan(topic, 0);
+				} else {
+					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);
+					return newsfeedListenerRepo.findAllByCasserviceAndTopicAndLastactionGreaterThan(findMe, topic, 0);
+				}
+			}
 		} catch (Exception e) {
 			logger.logError("Error while trying to access view xtcasCASServices!", e);
 			throw new RuntimeException(e);
@@ -440,7 +441,7 @@ public class ServiceNotifierService {
 	public List<ProcedureNewsfeed> findProcedureEntry(Value procedureName, Value topic) {
 
 		try {
-			return procedureNewsfeedRepo.findAllByProcedurenameAndTopicAndLastaction(procedureName.getStringValue(), topic.getStringValue(), 0);
+			return procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastaction(procedureName.getStringValue(), topic.getStringValue(), 0);
 
 		} catch (Exception e) {
 			logger.logError("Error while trying to access view xtcasProcedureNewsfeed!", e);

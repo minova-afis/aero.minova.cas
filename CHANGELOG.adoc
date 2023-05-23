@@ -4,8 +4,10 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* PasswordEncoderExtension entfernen, Passwort schon im Helper verschlüsseln
+* PasswordEncoderExtension entfernen, Passwort wird schon im Helper verschlüsselt, damit Passwörter nicht in Klartext im Log stehen.
 * Update auf SpringBoot 3.1.0.
+* QueueService auf JPA umstellen.
+* Erweitern des QueueService um BasicAuth und OAuth2.
 
 ## [12.61.1] -- 2023-05-12
 * Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben

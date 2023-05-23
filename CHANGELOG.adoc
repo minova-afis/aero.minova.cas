@@ -8,6 +8,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Update auf SpringBoot 3.1.0.
 * QueueService auf JPA umstellen.
 * Erweitern des QueueService um BasicAuth und OAuth2.
+* Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
+
 
 ## [12.61.1] -- 2023-05-12
 * Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben

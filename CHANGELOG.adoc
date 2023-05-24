@@ -5,6 +5,9 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [Unreleased] -- XXXX-XX-XX
 
+## [12.61.3] -- 2023-05-23
+* Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird
+
 ## [12.61.2] -- 2023-05-23
 * PasswordEncoderExtension entfernen, Passwort schon im Helper verschlüsseln
 * Update auf SpringBoot 3.1.0.

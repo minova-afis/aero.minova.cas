@@ -60,7 +60,7 @@ public class DependencyOrder {
 			List<String> dependenciesWithoutFurtherDependencies = findVerticesWithoutIncomingEdges(graph);
 
 			if (dependenciesWithoutFurtherDependencies.isEmpty())
-				throw new RuntimeException("Cyclic link?");
+				throw new RuntimeException("INTERNAL: Cyclic link?");
 			Collections.sort(dependenciesWithoutFurtherDependencies);
 			orderedDependencies.addAll(dependenciesWithoutFurtherDependencies);
 			graph.removeAllVertices(dependenciesWithoutFurtherDependencies);

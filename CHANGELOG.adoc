@@ -4,9 +4,13 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+### Changed
+* Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt.
+* Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
+
+### Security
 * PasswordEncoderExtension entfernen, Passwort schon im Helper verschlüsseln
 * Update auf SpringBoot 3.1.0.
-* Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
 
 ## [12.61.1] -- 2023-05-12
 * Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben

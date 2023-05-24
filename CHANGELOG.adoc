@@ -3,7 +3,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [UNRELEASED] -- XXXX-XX-XX
+## [Unreleased] -- XXXX-XX-XX
+
+## [12.61.2] -- 2023-05-23
 * PasswordEncoderExtension entfernen, Passwort schon im Helper verschlüsseln
 * Update auf SpringBoot 3.1.0.
 * Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten

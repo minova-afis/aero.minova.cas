@@ -46,7 +46,11 @@ public class DependencyOrder {
 
 		directedGraph.removeVertex("aero.minova.app.build");
 
-		return orderDependencies(directedGraph);
+		List<String> dependencyOrder = orderDependencies(directedGraph);
+
+		// Das Modul entfernen, für welche die Abhängigkeiten bestimmt werden.
+		dependencyOrder.remove(dependencyOrder.size() - 1);
+		return dependencyOrder;
 	}
 
 	private static List<String> orderDependencies(Graph<String, DefaultEdge> graph) {
@@ -92,14 +96,13 @@ public class DependencyOrder {
 	private static Graph<String, DefaultEdge> convertRelationsToDirectedGraph(Map<String, Set<String>> dependencyRelations) {
 		final Graph<String, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
-		dependencyRelations.entrySet().forEach(
-				entry -> {
-					graph.addVertex(entry.getKey());
-					entry.getValue().forEach(value -> {
-						graph.addVertex(value);
-						graph.addEdge(entry.getKey(), value);
-					});
-				});
+		for (Map.Entry<String, Set<String>> entry : dependencyRelations.entrySet()) {
+			graph.addVertex(entry.getKey());
+			entry.getValue().forEach(value -> {
+				graph.addVertex(value);
+				graph.addEdge(entry.getKey(), value);
+			});
+		}
 
 		return new EdgeReversedGraph<>(graph);
 	}
@@ -110,6 +113,9 @@ public class DependencyOrder {
 				.toList();
 
 		removableKeys.forEach(dependencyRelations::remove);
+		dependencyRelations.values().forEach(value ->
+				value.removeAll(removableKeys)
+		);
 	}
 
 	private static boolean isThirdPartyDependency(String dependency) {

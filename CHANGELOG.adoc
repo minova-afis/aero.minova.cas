@@ -3,7 +3,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [Unreleased] -- XXXX-XX-XX
+## [UNRELEASED] -- XXXX-XX-XX
+### Fixed
+* Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
 
 ## [12.61.3] -- 2023-05-23
 * Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird

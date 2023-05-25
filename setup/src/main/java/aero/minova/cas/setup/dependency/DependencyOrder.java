@@ -71,10 +71,8 @@ public class DependencyOrder {
 	private static List<String> findVerticesWithoutIncomingEdges(Graph<String, DefaultEdge> graph) {
 		List<String> verticesWithoutIncomingEdges = new ArrayList<>();
 
-		// Iterate over all vertices in the graph
 		Set<String> vertices = graph.vertexSet();
 		for (String vertex : vertices) {
-			// Check if there are any Incoming edges from the vertex
 			if (graph.incomingEdgesOf(vertex).isEmpty()) {
 				verticesWithoutIncomingEdges.add(vertex);
 			}

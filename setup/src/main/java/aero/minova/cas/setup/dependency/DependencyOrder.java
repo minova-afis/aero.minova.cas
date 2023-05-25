@@ -85,7 +85,7 @@ public class DependencyOrder {
 		CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(graph);
 
 		boolean cyclesDetected = cycleDetector.detectCycles();
-		if (cycleDetector.detectCycles()) {
+		if (cyclesDetected) {
 			throw new RuntimeException("Cycles within following vertices detected: " + String.join(", ", cycleDetector.findCycles()));
 		}
 		return cyclesDetected;

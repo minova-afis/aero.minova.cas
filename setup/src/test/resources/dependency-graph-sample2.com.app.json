@@ -1,5 +1,5 @@
 {
-  "graphName": "skyber.awb.app",
+  "graphName": "sample2.com.app",
   "artifacts": [
     {
       "id": "aero.minova:cas.app:jar:app",
@@ -1180,10 +1180,10 @@
       ]
     },
     {
-      "id": "com.minova:skyber.awb.app:jar",
+      "id": "com.minova:sample2.com.app:jar",
       "numericId": 71,
       "groupId": "com.minova",
-      "artifactId": "skyber.awb.app",
+      "artifactId": "sample2.com.app",
       "version": "12.0.0-SNAPSHOT",
       "optional": false,
       "scopes": [
@@ -3479,7 +3479,7 @@
       "resolution": "OMITTED_FOR_CONFLICT"
     },
     {
-      "from": "com.minova:skyber.awb.app:jar",
+      "from": "com.minova:sample2.com.app:jar",
       "to": "com.minova:afis:jar:app",
       "numericFrom": 70,
       "numericTo": 3,
@@ -3493,7 +3493,7 @@
       "resolution": "OMITTED_FOR_DUPLICATE"
     },
     {
-      "from": "com.minova:skyber.awb.app:jar",
+      "from": "com.minova:sample2.com.app:jar",
       "to": "aero.minova:app.build:jar",
       "numericFrom": 70,
       "numericTo": 2,
@@ -3528,7 +3528,7 @@
       "resolution": "INCLUDED"
     },
     {
-      "from": "com.minova:skyber.awb.app:jar",
+      "from": "com.minova:sample2.com.app:jar",
       "to": "org.junit.jupiter:junit-jupiter-api:jar",
       "numericFrom": 70,
       "numericTo": 72,
@@ -3549,7 +3549,7 @@
       "resolution": "OMITTED_FOR_DUPLICATE"
     },
     {
-      "from": "com.minova:skyber.awb.app:jar",
+      "from": "com.minova:sample2.com.app:jar",
       "to": "org.junit.jupiter:junit-jupiter-params:jar",
       "numericFrom": 70,
       "numericTo": 76,
@@ -3598,7 +3598,7 @@
       "resolution": "OMITTED_FOR_DUPLICATE"
     },
     {
-      "from": "com.minova:skyber.awb.app:jar",
+      "from": "com.minova:sample2.com.app:jar",
       "to": "org.junit.jupiter:junit-jupiter-engine:jar",
       "numericFrom": 70,
       "numericTo": 78,
@@ -3612,7 +3612,7 @@
       "resolution": "INCLUDED"
     },
     {
-      "from": "com.minova:skyber.awb.app:jar",
+      "from": "com.minova:sample2.com.app:jar",
       "to": "org.assertj:assertj-core:jar",
       "numericFrom": 70,
       "numericTo": 71,

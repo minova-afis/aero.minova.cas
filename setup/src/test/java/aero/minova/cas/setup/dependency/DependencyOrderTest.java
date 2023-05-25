@@ -12,7 +12,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 class DependencyOrderTest {
 	@Test
 	void determineDependencyOrderWithSimpleExampleTest() throws Exception {
-		final var result = determineDependencyOrder(retrieveContentFromResource("dependency-graph-oiltanking.swb.json"));
+		final var result = determineDependencyOrder(retrieveContentFromResource("dependency-graph-sample1.com.json"));
 		assertThat(result)
 				.containsExactly(
 						"aero.minova.app.i18n", //
@@ -25,7 +25,7 @@ class DependencyOrderTest {
 
 	@Test
 	void determineDependencyOrderWithComplexExampleTest() throws Exception {
-		final var result = determineDependencyOrder(retrieveContentFromResource("dependency-graph-skyber.awb.app.json"));
+		final var result = determineDependencyOrder(retrieveContentFromResource("dependency-graph-sample2.com.app.json"));
 		assertThat(result)
 				.containsExactly(//
 						"aero.minova.app.i18n",

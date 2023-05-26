@@ -22,6 +22,11 @@
         </dependency>
         <dependency>
             <groupId>aero.minova</groupId>
+            <artifactId>service.event.dispatcher</artifactId>
+            <version>12.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>aero.minova</groupId>
             <artifactId>cas.service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>

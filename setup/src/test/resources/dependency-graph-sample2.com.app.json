@@ -1,0 +1,3622 @@
+{
+  "graphName": "sample2.com.app",
+  "artifacts": [
+    {
+      "id": "aero.minova:cas.app:jar:app",
+      "numericId": 1,
+      "groupId": "aero.minova",
+      "artifactId": "cas.app",
+      "version": "12.61.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:app.i18n:jar:app",
+      "numericId": 2,
+      "groupId": "aero.minova",
+      "artifactId": "app.i18n",
+      "version": "12.15.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:app.build:jar",
+      "numericId": 3,
+      "groupId": "aero.minova",
+      "artifactId": "app.build",
+      "version": "12.2.0",
+      "optional": false,
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "com.minova:afis:jar:app",
+      "numericId": 4,
+      "groupId": "com.minova",
+      "artifactId": "afis",
+      "version": "12.1.14",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:data.schema.app:jar:app",
+      "numericId": 5,
+      "groupId": "aero.minova",
+      "artifactId": "data.schema.app",
+      "version": "12.8.16",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:install:jar:app",
+      "numericId": 6,
+      "groupId": "aero.minova",
+      "artifactId": "install",
+      "version": "12.1.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:common:jar:app",
+      "numericId": 7,
+      "groupId": "aero.minova",
+      "artifactId": "common",
+      "version": "12.0.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:driver:jar:app",
+      "numericId": 8,
+      "groupId": "aero.minova",
+      "artifactId": "driver",
+      "version": "12.3.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:contact:jar:app",
+      "numericId": 9,
+      "groupId": "aero.minova",
+      "artifactId": "contact",
+      "version": "12.0.16",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:supplier:jar:app",
+      "numericId": 10,
+      "groupId": "aero.minova",
+      "artifactId": "supplier",
+      "version": "12.3.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:orderpartner:jar:app",
+      "numericId": 11,
+      "groupId": "aero.minova",
+      "artifactId": "orderpartner",
+      "version": "12.0.7",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:customer:jar:app",
+      "numericId": 12,
+      "groupId": "aero.minova",
+      "artifactId": "customer",
+      "version": "12.3.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:orderreceiver:jar:app",
+      "numericId": 13,
+      "groupId": "aero.minova",
+      "artifactId": "orderreceiver",
+      "version": "12.0.12",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truck:jar:app",
+      "numericId": 14,
+      "groupId": "aero.minova",
+      "artifactId": "truck",
+      "version": "12.2.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:vehicle:jar:app",
+      "numericId": 15,
+      "groupId": "aero.minova",
+      "artifactId": "vehicle",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truck.truckmeter:jar:app",
+      "numericId": 16,
+      "groupId": "aero.minova",
+      "artifactId": "truck.truckmeter",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truck.truckmeterreading:jar:app",
+      "numericId": 17,
+      "groupId": "aero.minova",
+      "artifactId": "truck.truckmeterreading",
+      "version": "12.1.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:item:jar:app",
+      "numericId": 18,
+      "groupId": "aero.minova",
+      "artifactId": "item",
+      "version": "12.2.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:airport:jar:app",
+      "numericId": 19,
+      "groupId": "aero.minova",
+      "artifactId": "airport",
+      "version": "12.0.3",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:flightfieldposition:jar:app",
+      "numericId": 20,
+      "groupId": "aero.minova",
+      "artifactId": "flightfieldposition",
+      "version": "12.0.3",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:aircrafttype:jar:app",
+      "numericId": 21,
+      "groupId": "aero.minova",
+      "artifactId": "aircrafttype",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:taxcode:jar:app",
+      "numericId": 22,
+      "groupId": "aero.minova",
+      "artifactId": "taxcode",
+      "version": "12.1.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:creditcardcompany:jar:app",
+      "numericId": 23,
+      "groupId": "aero.minova",
+      "artifactId": "creditcardcompany",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:delaycode:jar:app",
+      "numericId": 24,
+      "groupId": "aero.minova",
+      "artifactId": "delaycode",
+      "version": "12.2.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:vat:jar:app",
+      "numericId": 25,
+      "groupId": "aero.minova",
+      "artifactId": "vat",
+      "version": "12.0.5",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:afis.shipment:jar:app",
+      "numericId": 26,
+      "groupId": "aero.minova",
+      "artifactId": "afis.shipment",
+      "version": "12.3.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:entry:jar:app",
+      "numericId": 27,
+      "groupId": "aero.minova",
+      "artifactId": "entry",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:loadingpermission:jar:app",
+      "numericId": 28,
+      "groupId": "aero.minova",
+      "artifactId": "loadingpermission",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:vat.site:jar:app",
+      "numericId": 29,
+      "groupId": "aero.minova",
+      "artifactId": "vat.site",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:stockexit:jar:app",
+      "numericId": 30,
+      "groupId": "aero.minova",
+      "artifactId": "stockexit",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:shipment.driverefficiency:jar:app",
+      "numericId": 31,
+      "groupId": "aero.minova",
+      "artifactId": "shipment.driverefficiency",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:afis.dispatch:jar:app",
+      "numericId": 32,
+      "groupId": "aero.minova",
+      "artifactId": "afis.dispatch",
+      "version": "12.0.6",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:shippingagency:jar:app",
+      "numericId": 33,
+      "groupId": "aero.minova",
+      "artifactId": "shippingagency",
+      "version": "12.1.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:blockeddata:jar:app",
+      "numericId": 34,
+      "groupId": "aero.minova",
+      "artifactId": "blockeddata",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:tank:jar:app",
+      "numericId": 35,
+      "groupId": "aero.minova",
+      "artifactId": "tank",
+      "version": "12.1.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:shorttank:jar:app",
+      "numericId": 36,
+      "groupId": "aero.minova",
+      "artifactId": "shorttank",
+      "version": "12.1.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:taxresponsable:jar:app",
+      "numericId": 37,
+      "groupId": "aero.minova",
+      "artifactId": "taxresponsable",
+      "version": "12.2.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:automatic:jar:app",
+      "numericId": 38,
+      "groupId": "aero.minova",
+      "artifactId": "automatic",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:entry.partunloading:jar:app",
+      "numericId": 39,
+      "groupId": "aero.minova",
+      "artifactId": "entry.partunloading",
+      "version": "12.1.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:loading:jar:app",
+      "numericId": 40,
+      "groupId": "aero.minova",
+      "artifactId": "loading",
+      "version": "12.0.4",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:order:jar:app",
+      "numericId": 41,
+      "groupId": "aero.minova",
+      "artifactId": "order",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:idcard:jar:app",
+      "numericId": 42,
+      "groupId": "aero.minova",
+      "artifactId": "idcard",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:internalmerge:jar:app",
+      "numericId": 43,
+      "groupId": "aero.minova",
+      "artifactId": "internalmerge",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:stock:jar:app",
+      "numericId": 44,
+      "groupId": "aero.minova",
+      "artifactId": "stock",
+      "version": "12.0.3",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:logbook:jar:app",
+      "numericId": 45,
+      "groupId": "aero.minova",
+      "artifactId": "logbook",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truckpool:jar:app",
+      "numericId": 46,
+      "groupId": "aero.minova",
+      "artifactId": "truckpool",
+      "version": "12.1.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:flightschedule:jar:app",
+      "numericId": 47,
+      "groupId": "aero.minova",
+      "artifactId": "flightschedule",
+      "version": "12.1.6",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truck.disposition:jar:app",
+      "numericId": 48,
+      "groupId": "aero.minova",
+      "artifactId": "truck.disposition",
+      "version": "12.1.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truck.adr:jar:app",
+      "numericId": 49,
+      "groupId": "aero.minova",
+      "artifactId": "truck.adr",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truck.truckvehiclecompartment:jar:app",
+      "numericId": 50,
+      "groupId": "aero.minova",
+      "artifactId": "truck.truckvehiclecompartment",
+      "version": "12.0.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:virtualtruck:jar:app",
+      "numericId": 51,
+      "groupId": "aero.minova",
+      "artifactId": "virtualtruck",
+      "version": "12.0.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:vehicle.stockadjustment:jar:app",
+      "numericId": 52,
+      "groupId": "aero.minova",
+      "artifactId": "vehicle.stockadjustment",
+      "version": "12.1.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:truckconfiguration:jar:app",
+      "numericId": 53,
+      "groupId": "aero.minova",
+      "artifactId": "truckconfiguration",
+      "version": "12.0.1",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:lucustomerflightnumber:jar:app",
+      "numericId": 54,
+      "groupId": "aero.minova",
+      "artifactId": "lucustomerflightnumber",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:customer:jar",
+      "numericId": 55,
+      "groupId": "aero.minova",
+      "artifactId": "customer",
+      "version": "12.2.0",
+      "optional": false,
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:afis.productivity:jar:app",
+      "numericId": 56,
+      "groupId": "aero.minova",
+      "artifactId": "afis.productivity",
+      "version": "12.0.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:lusuppliercustomer:jar:app",
+      "numericId": 57,
+      "groupId": "aero.minova",
+      "artifactId": "lusuppliercustomer",
+      "version": "12.0.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:aircraft:jar:app",
+      "numericId": 58,
+      "groupId": "aero.minova",
+      "artifactId": "aircraft",
+      "version": "12.0.4",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:service.jobexecutor.app:jar:app",
+      "numericId": 59,
+      "groupId": "aero.minova",
+      "artifactId": "service.jobexecutor.app",
+      "version": "12.3.3",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:jobresult.app:jar:app",
+      "numericId": 60,
+      "groupId": "aero.minova",
+      "artifactId": "jobresult.app",
+      "version": "12.0.11",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:jobdestination:jar:app",
+      "numericId": 61,
+      "groupId": "aero.minova",
+      "artifactId": "jobdestination",
+      "version": "12.0.10",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:data.job.jobexecutor:jar:app",
+      "numericId": 62,
+      "groupId": "aero.minova",
+      "artifactId": "data.job.jobexecutor",
+      "version": "12.1.0",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:afis.flightschedulelog.app:jar:app",
+      "numericId": 63,
+      "groupId": "aero.minova",
+      "artifactId": "afis.flightschedulelog.app",
+      "version": "12.0.3",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:site.app:jar:app",
+      "numericId": 64,
+      "groupId": "aero.minova",
+      "artifactId": "site.app",
+      "version": "12.0.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:app.i18n:jar",
+      "numericId": 65,
+      "groupId": "aero.minova",
+      "artifactId": "app.i18n",
+      "version": "12.11.1",
+      "optional": false,
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:data.closing:jar:app",
+      "numericId": 66,
+      "groupId": "aero.minova",
+      "artifactId": "data.closing",
+      "version": "12.0.5",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:data.schema.app:jar",
+      "numericId": 67,
+      "groupId": "aero.minova",
+      "artifactId": "data.schema.app",
+      "version": "12.5.8",
+      "optional": false,
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:job.closing:jar:app",
+      "numericId": 68,
+      "groupId": "aero.minova",
+      "artifactId": "job.closing",
+      "version": "12.0.3",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:tim:jar:app",
+      "numericId": 69,
+      "groupId": "aero.minova",
+      "artifactId": "tim",
+      "version": "12.3.2",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "aero.minova:job.closingprocedureexecutor.app:jar:app",
+      "numericId": 70,
+      "groupId": "aero.minova",
+      "artifactId": "job.closingprocedureexecutor.app",
+      "version": "12.0.3",
+      "optional": false,
+      "classifiers": [
+        "app"
+      ],
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "com.minova:sample2.com.app:jar",
+      "numericId": 71,
+      "groupId": "com.minova",
+      "artifactId": "sample2.com.app",
+      "version": "12.0.0-SNAPSHOT",
+      "optional": false,
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.assertj:assertj-core:jar",
+      "numericId": 72,
+      "groupId": "org.assertj",
+      "artifactId": "assertj-core",
+      "version": "3.24.2",
+      "optional": false,
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.junit.jupiter:junit-jupiter-api:jar",
+      "numericId": 73,
+      "groupId": "org.junit.jupiter",
+      "artifactId": "junit-jupiter-api",
+      "version": "5.9.3",
+      "optional": false,
+      "scopes": [
+        "test"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.opentest4j:opentest4j:jar",
+      "numericId": 74,
+      "groupId": "org.opentest4j",
+      "artifactId": "opentest4j",
+      "version": "1.2.0",
+      "optional": false,
+      "scopes": [
+        "test"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.junit.platform:junit-platform-commons:jar",
+      "numericId": 75,
+      "groupId": "org.junit.platform",
+      "artifactId": "junit-platform-commons",
+      "version": "1.9.3",
+      "optional": false,
+      "scopes": [
+        "test"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.apiguardian:apiguardian-api:jar",
+      "numericId": 76,
+      "groupId": "org.apiguardian",
+      "artifactId": "apiguardian-api",
+      "version": "1.1.2",
+      "optional": false,
+      "scopes": [
+        "test"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.junit.jupiter:junit-jupiter-params:jar",
+      "numericId": 77,
+      "groupId": "org.junit.jupiter",
+      "artifactId": "junit-jupiter-params",
+      "version": "5.9.3",
+      "optional": false,
+      "scopes": [
+        "test"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.junit.platform:junit-platform-engine:jar",
+      "numericId": 78,
+      "groupId": "org.junit.platform",
+      "artifactId": "junit-platform-engine",
+      "version": "1.9.3",
+      "optional": false,
+      "scopes": [
+        "test"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "org.junit.jupiter:junit-jupiter-engine:jar",
+      "numericId": 79,
+      "groupId": "org.junit.jupiter",
+      "artifactId": "junit-jupiter-engine",
+      "version": "5.9.3",
+      "optional": false,
+      "scopes": [
+        "test"
+      ],
+      "types": [
+        "jar"
+      ]
+    },
+    {
+      "id": "net.bytebuddy:byte-buddy:jar",
+      "numericId": 80,
+      "groupId": "net.bytebuddy",
+      "artifactId": "byte-buddy",
+      "version": "1.12.21",
+      "optional": false,
+      "scopes": [
+        "compile"
+      ],
+      "types": [
+        "jar"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "aero.minova:cas.app:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 0,
+      "numericTo": 1,
+      "version": "12.11.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:cas.app:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 0,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:cas.app:jar:app",
+      "numericFrom": 3,
+      "numericTo": 0,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:app.i18n:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 1,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 3,
+      "numericTo": 1,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:data.schema.app:jar:app",
+      "to": "aero.minova:cas.app:jar:app",
+      "numericFrom": 4,
+      "numericTo": 0,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:data.schema.app:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 4,
+      "numericTo": 1,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:data.schema.app:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 4,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 3,
+      "numericTo": 4,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:install:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 5,
+      "numericTo": 4,
+      "version": "12.8.15",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:install:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 5,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:install:jar:app",
+      "numericFrom": 3,
+      "numericTo": 5,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:common:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 6,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:common:jar:app",
+      "numericFrom": 3,
+      "numericTo": 6,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:driver:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 7,
+      "numericTo": 4,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:contact:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 8,
+      "numericTo": 4,
+      "version": "0.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:contact:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 8,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:driver:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 7,
+      "numericTo": 8,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:driver:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 7,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:driver:jar:app",
+      "numericFrom": 3,
+      "numericTo": 7,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:supplier:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 9,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:supplier:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 9,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:supplier:jar:app",
+      "to": "aero.minova:orderpartner:jar:app",
+      "numericFrom": 9,
+      "numericTo": 10,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:supplier:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 9,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:supplier:jar:app",
+      "numericFrom": 3,
+      "numericTo": 9,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:customer:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 11,
+      "numericTo": 4,
+      "version": "12.4.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:customer:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 11,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:customer:jar:app",
+      "to": "aero.minova:supplier:jar:app",
+      "numericFrom": 11,
+      "numericTo": 9,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:customer:jar:app",
+      "to": "aero.minova:orderreceiver:jar:app",
+      "numericFrom": 11,
+      "numericTo": 12,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:customer:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 11,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:customer:jar:app",
+      "numericFrom": 3,
+      "numericTo": 11,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 13,
+      "numericTo": 4,
+      "version": "12.4.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 13,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:vehicle:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 14,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:vehicle:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 14,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck:jar:app",
+      "to": "aero.minova:vehicle:jar:app",
+      "numericFrom": 13,
+      "numericTo": 14,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 13,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 3,
+      "numericTo": 13,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck.truckmeter:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 15,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.truckmeter:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 15,
+      "numericTo": 13,
+      "version": "12.0.3",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.truckmeter:jar:app",
+      "to": "aero.minova:truck.truckmeterreading:jar:app",
+      "numericFrom": 15,
+      "numericTo": 16,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.truckmeter:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 15,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truck.truckmeter:jar:app",
+      "numericFrom": 3,
+      "numericTo": 15,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck.truckmeterreading:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 16,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.truckmeterreading:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 16,
+      "numericTo": 13,
+      "version": "12.0.3",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.truckmeterreading:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 16,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truck.truckmeterreading:jar:app",
+      "numericFrom": 3,
+      "numericTo": 16,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:item:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 17,
+      "numericTo": 4,
+      "version": "12.4.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:item:jar:app",
+      "to": "aero.minova:common:jar:app",
+      "numericFrom": 17,
+      "numericTo": 6,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:item:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 17,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:item:jar:app",
+      "numericFrom": 3,
+      "numericTo": 17,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:airport:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 18,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:airport:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 18,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:airport:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 18,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:airport:jar:app",
+      "numericFrom": 3,
+      "numericTo": 18,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:flightfieldposition:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 19,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:flightfieldposition:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 19,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:flightfieldposition:jar:app",
+      "numericFrom": 3,
+      "numericTo": 19,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:aircrafttype:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 20,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:aircrafttype:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 20,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:aircrafttype:jar:app",
+      "numericFrom": 3,
+      "numericTo": 20,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:taxcode:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 21,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:taxcode:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 21,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:taxcode:jar:app",
+      "numericFrom": 3,
+      "numericTo": 21,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:creditcardcompany:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 22,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:creditcardcompany:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 22,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:creditcardcompany:jar:app",
+      "numericFrom": 3,
+      "numericTo": 22,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:delaycode:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 23,
+      "numericTo": 4,
+      "version": "12.4.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:delaycode:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 23,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:delaycode:jar:app",
+      "numericFrom": 3,
+      "numericTo": 23,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:vat:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 24,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:vat:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 24,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:vat:jar:app",
+      "numericFrom": 3,
+      "numericTo": 24,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 25,
+      "numericTo": 4,
+      "version": "12.4.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:supplier:jar:app",
+      "numericFrom": 25,
+      "numericTo": 9,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:airport:jar:app",
+      "numericFrom": 25,
+      "numericTo": 18,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:aircrafttype:jar:app",
+      "numericFrom": 25,
+      "numericTo": 20,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:customer:jar:app",
+      "numericFrom": 25,
+      "numericTo": 11,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:flightfieldposition:jar:app",
+      "numericFrom": 25,
+      "numericTo": 19,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:driver:jar:app",
+      "numericFrom": 25,
+      "numericTo": 7,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:item:jar:app",
+      "numericFrom": 25,
+      "numericTo": 17,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:taxcode:jar:app",
+      "numericFrom": 25,
+      "numericTo": 21,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:vat:jar:app",
+      "numericFrom": 25,
+      "numericTo": 24,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:entry:jar:app",
+      "numericFrom": 25,
+      "numericTo": 26,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:loadingpermission:jar:app",
+      "numericFrom": 25,
+      "numericTo": 27,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 25,
+      "numericTo": 13,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:truck.truckmeter:jar:app",
+      "numericFrom": 25,
+      "numericTo": 15,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:vat.site:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 28,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:vat.site:jar:app",
+      "to": "aero.minova:vat:jar:app",
+      "numericFrom": 28,
+      "numericTo": 24,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:vat.site:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 28,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:vat.site:jar:app",
+      "numericFrom": 25,
+      "numericTo": 28,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:stockexit:jar:app",
+      "numericFrom": 25,
+      "numericTo": 29,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:shipment.driverefficiency:jar:app",
+      "numericFrom": 25,
+      "numericTo": 30,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:afis.dispatch:jar:app",
+      "numericFrom": 25,
+      "numericTo": 31,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.shipment:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 25,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:afis.shipment:jar:app",
+      "numericFrom": 3,
+      "numericTo": 25,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:shippingagency:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 32,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:shippingagency:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 32,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:shippingagency:jar:app",
+      "to": "aero.minova:blockeddata:jar:app",
+      "numericFrom": 32,
+      "numericTo": 33,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:shippingagency:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 32,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:shippingagency:jar:app",
+      "numericFrom": 3,
+      "numericTo": 32,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:tank:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 34,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:tank:jar:app",
+      "to": "aero.minova:install:jar:app",
+      "numericFrom": 34,
+      "numericTo": 5,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:tank:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 34,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:tank:jar:app",
+      "numericFrom": 3,
+      "numericTo": 34,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:shorttank:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 35,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:shorttank:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 35,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:shorttank:jar:app",
+      "numericFrom": 3,
+      "numericTo": 35,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:taxresponsable:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 36,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:taxresponsable:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 36,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:taxresponsable:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 36,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:taxresponsable:jar:app",
+      "numericFrom": 3,
+      "numericTo": 36,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:orderpartner:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 10,
+      "numericTo": 4,
+      "version": "12.3.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:orderpartner:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 10,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:orderpartner:jar:app",
+      "to": "aero.minova:orderreceiver:jar:app",
+      "numericFrom": 10,
+      "numericTo": 12,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:orderpartner:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 10,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:orderpartner:jar:app",
+      "numericFrom": 3,
+      "numericTo": 10,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:blockeddata:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 33,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:blockeddata:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 33,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:blockeddata:jar:app",
+      "numericFrom": 3,
+      "numericTo": 33,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:automatic:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 37,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:automatic:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 37,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:automatic:jar:app",
+      "numericFrom": 3,
+      "numericTo": 37,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:entry:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 26,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:entry:jar:app",
+      "to": "aero.minova:install:jar:app",
+      "numericFrom": 26,
+      "numericTo": 5,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:entry:jar:app",
+      "to": "aero.minova:common:jar:app",
+      "numericFrom": 26,
+      "numericTo": 6,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:entry:jar:app",
+      "to": "aero.minova:entry.partunloading:jar:app",
+      "numericFrom": 26,
+      "numericTo": 38,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:entry:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 26,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:entry:jar:app",
+      "numericFrom": 3,
+      "numericTo": 26,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:entry.partunloading:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 38,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:entry.partunloading:jar:app",
+      "to": "aero.minova:install:jar:app",
+      "numericFrom": 38,
+      "numericTo": 5,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:entry.partunloading:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 38,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:entry.partunloading:jar:app",
+      "numericFrom": 3,
+      "numericTo": 38,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:loading:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 39,
+      "numericTo": 4,
+      "version": "12.5.8",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:order:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 40,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:order:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 40,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:loading:jar:app",
+      "to": "aero.minova:order:jar:app",
+      "numericFrom": 39,
+      "numericTo": 40,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:loading:jar:app",
+      "to": "aero.minova:loadingpermission:jar:app",
+      "numericFrom": 39,
+      "numericTo": 27,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:loading:jar:app",
+      "to": "aero.minova:idcard:jar:app",
+      "numericFrom": 39,
+      "numericTo": 41,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:loading:jar:app",
+      "to": "aero.minova:internalmerge:jar:app",
+      "numericFrom": 39,
+      "numericTo": 42,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:loading:jar:app",
+      "to": "aero.minova:stock:jar:app",
+      "numericFrom": 39,
+      "numericTo": 43,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:loading:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 39,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:loading:jar:app",
+      "numericFrom": 3,
+      "numericTo": 39,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:loadingpermission:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 27,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:loadingpermission:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 27,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:loadingpermission:jar:app",
+      "numericFrom": 3,
+      "numericTo": 27,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:idcard:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 41,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:idcard:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 41,
+      "numericTo": 13,
+      "version": "12.0.3",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:idcard:jar:app",
+      "to": "aero.minova:automatic:jar:app",
+      "numericFrom": 41,
+      "numericTo": 37,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:idcard:jar:app",
+      "to": "aero.minova:blockeddata:jar:app",
+      "numericFrom": 41,
+      "numericTo": 33,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:idcard:jar:app",
+      "to": "aero.minova:logbook:jar:app",
+      "numericFrom": 41,
+      "numericTo": 44,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:idcard:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 41,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:idcard:jar:app",
+      "numericFrom": 3,
+      "numericTo": 41,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:logbook:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 44,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:logbook:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 44,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:logbook:jar:app",
+      "numericFrom": 3,
+      "numericTo": 44,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:internalmerge:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 42,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:internalmerge:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 42,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:internalmerge:jar:app",
+      "numericFrom": 3,
+      "numericTo": 42,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:shipment.driverefficiency:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 30,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:shipment.driverefficiency:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 30,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:shipment.driverefficiency:jar:app",
+      "numericFrom": 3,
+      "numericTo": 30,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:stock:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 43,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stock:jar:app",
+      "to": "aero.minova:taxresponsable:jar:app",
+      "numericFrom": 43,
+      "numericTo": 36,
+      "version": "12.0.2",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stock:jar:app",
+      "to": "aero.minova:supplier:jar:app",
+      "numericFrom": 43,
+      "numericTo": 9,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stock:jar:app",
+      "to": "aero.minova:tank:jar:app",
+      "numericFrom": 43,
+      "numericTo": 34,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stock:jar:app",
+      "to": "aero.minova:shorttank:jar:app",
+      "numericFrom": 43,
+      "numericTo": 35,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stock:jar:app",
+      "to": "aero.minova:item:jar:app",
+      "numericFrom": 43,
+      "numericTo": 17,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stock:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 43,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:stock:jar:app",
+      "numericFrom": 3,
+      "numericTo": 43,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:stockexit:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 29,
+      "numericTo": 4,
+      "version": "12.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stockexit:jar:app",
+      "to": "aero.minova:common:jar:app",
+      "numericFrom": 29,
+      "numericTo": 6,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:stockexit:jar:app",
+      "to": "aero.minova:loading:jar:app",
+      "numericFrom": 29,
+      "numericTo": 39,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:stockexit:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 29,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:stockexit:jar:app",
+      "numericFrom": 3,
+      "numericTo": 29,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truckpool:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 45,
+      "numericTo": 4,
+      "version": "12.3.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truckpool:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 45,
+      "numericTo": 13,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truckpool:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 45,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truckpool:jar:app",
+      "numericFrom": 3,
+      "numericTo": 45,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:flightschedule:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 46,
+      "numericTo": 4,
+      "version": "12.3.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:flightschedule:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 46,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:flightschedule:jar:app",
+      "numericFrom": 3,
+      "numericTo": 46,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck.disposition:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 47,
+      "numericTo": 4,
+      "version": "12.5.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.disposition:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 47,
+      "numericTo": 13,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.disposition:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 47,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truck.disposition:jar:app",
+      "numericFrom": 3,
+      "numericTo": 47,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck.adr:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 48,
+      "numericTo": 4,
+      "version": "12.5.3",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.adr:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 48,
+      "numericTo": 13,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.adr:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 48,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truck.adr:jar:app",
+      "numericFrom": 3,
+      "numericTo": 48,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck.truckvehiclecompartment:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 49,
+      "numericTo": 4,
+      "version": "12.5.3",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.truckvehiclecompartment:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 49,
+      "numericTo": 13,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:virtualtruck:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 50,
+      "numericTo": 1,
+      "version": "12.9.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:virtualtruck:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 50,
+      "numericTo": 4,
+      "version": "12.5.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:virtualtruck:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 50,
+      "numericTo": 13,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:virtualtruck:jar:app",
+      "to": "aero.minova:vehicle:jar:app",
+      "numericFrom": 50,
+      "numericTo": 14,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:virtualtruck:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 50,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:virtualtruck:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 50,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truck.truckvehiclecompartment:jar:app",
+      "to": "aero.minova:virtualtruck:jar:app",
+      "numericFrom": 49,
+      "numericTo": 50,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truck.truckvehiclecompartment:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 49,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truck.truckvehiclecompartment:jar:app",
+      "numericFrom": 3,
+      "numericTo": 49,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:vehicle.stockadjustment:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 51,
+      "numericTo": 4,
+      "version": "12.5.3",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:vehicle.stockadjustment:jar:app",
+      "to": "aero.minova:truck:jar:app",
+      "numericFrom": 51,
+      "numericTo": 13,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:vehicle.stockadjustment:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 51,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:vehicle.stockadjustment:jar:app",
+      "numericFrom": 3,
+      "numericTo": 51,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:truckconfiguration:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 52,
+      "numericTo": 4,
+      "version": "12.5.8",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:truckconfiguration:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 52,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:truckconfiguration:jar:app",
+      "numericFrom": 3,
+      "numericTo": 52,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:lucustomerflightnumber:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 53,
+      "numericTo": 4,
+      "version": "12.5.8",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:lucustomerflightnumber:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 53,
+      "numericTo": 1,
+      "version": "12.11.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:customer:jar",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 54,
+      "numericTo": 4,
+      "version": "12.4.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:customer:jar",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 54,
+      "numericTo": 8,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:customer:jar",
+      "to": "aero.minova:supplier:jar:app",
+      "numericFrom": 54,
+      "numericTo": 9,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:customer:jar",
+      "to": "aero.minova:orderreceiver:jar:app",
+      "numericFrom": 54,
+      "numericTo": 12,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:customer:jar",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 54,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:lucustomerflightnumber:jar:app",
+      "to": "aero.minova:customer:jar",
+      "numericFrom": 53,
+      "numericTo": 54,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:lucustomerflightnumber:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 53,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:lucustomerflightnumber:jar:app",
+      "numericFrom": 3,
+      "numericTo": 53,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:afis.productivity:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 55,
+      "numericTo": 4,
+      "version": "12.5.9",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.productivity:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 55,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:afis.productivity:jar:app",
+      "numericFrom": 3,
+      "numericTo": 55,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:lusuppliercustomer:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 56,
+      "numericTo": 4,
+      "version": "12.5.9",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:lusuppliercustomer:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 56,
+      "numericTo": 1,
+      "version": "12.11.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:lusuppliercustomer:jar:app",
+      "to": "aero.minova:supplier:jar:app",
+      "numericFrom": 56,
+      "numericTo": 9,
+      "version": "12.2.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:lusuppliercustomer:jar:app",
+      "to": "aero.minova:customer:jar:app",
+      "numericFrom": 56,
+      "numericTo": 11,
+      "version": "12.2.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:lusuppliercustomer:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 56,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:lusuppliercustomer:jar:app",
+      "numericFrom": 3,
+      "numericTo": 56,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:aircraft:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 57,
+      "numericTo": 4,
+      "version": "12.5.8",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:aircraft:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 57,
+      "numericTo": 1,
+      "version": "12.11.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:aircraft:jar:app",
+      "to": "aero.minova:aircrafttype:jar:app",
+      "numericFrom": 57,
+      "numericTo": 20,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:aircraft:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 57,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:aircraft:jar:app",
+      "numericFrom": 3,
+      "numericTo": 57,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:orderreceiver:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 12,
+      "numericTo": 4,
+      "version": "0.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:orderreceiver:jar:app",
+      "to": "aero.minova:contact:jar:app",
+      "numericFrom": 12,
+      "numericTo": 8,
+      "version": "12.0.4",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:orderreceiver:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 12,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:orderreceiver:jar:app",
+      "numericFrom": 3,
+      "numericTo": 12,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:service.jobexecutor.app:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 58,
+      "numericTo": 4,
+      "version": "12.8.14",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:service.jobexecutor.app:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 58,
+      "numericTo": 1,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:jobresult.app:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 59,
+      "numericTo": 4,
+      "version": "12.8.9",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:jobdestination:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 60,
+      "numericTo": 4,
+      "version": "0.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:jobdestination:jar:app",
+      "to": "aero.minova:data.job.jobexecutor:jar:app",
+      "numericFrom": 60,
+      "numericTo": 61,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:jobdestination:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 60,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:jobresult.app:jar:app",
+      "to": "aero.minova:jobdestination:jar:app",
+      "numericFrom": 59,
+      "numericTo": 60,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:jobresult.app:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 59,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:service.jobexecutor.app:jar:app",
+      "to": "aero.minova:jobresult.app:jar:app",
+      "numericFrom": 58,
+      "numericTo": 59,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:data.job.jobexecutor:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 61,
+      "numericTo": 4,
+      "version": "12.8.11",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:data.job.jobexecutor:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 61,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:service.jobexecutor.app:jar:app",
+      "to": "aero.minova:data.job.jobexecutor:jar:app",
+      "numericFrom": 58,
+      "numericTo": 61,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:service.jobexecutor.app:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 58,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:service.jobexecutor.app:jar:app",
+      "numericFrom": 3,
+      "numericTo": 58,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:afis.flightschedulelog.app:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 62,
+      "numericTo": 4,
+      "version": "12.8.14",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.flightschedulelog.app:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 62,
+      "numericTo": 1,
+      "version": "12.12.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.flightschedulelog.app:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 62,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:afis.flightschedulelog.app:jar:app",
+      "numericFrom": 3,
+      "numericTo": 62,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:afis.dispatch:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 31,
+      "numericTo": 4,
+      "version": "12.8.12",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:afis.dispatch:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 31,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:afis.dispatch:jar:app",
+      "numericFrom": 3,
+      "numericTo": 31,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:site.app:jar:app",
+      "to": "aero.minova:cas.app:jar:app",
+      "numericFrom": 63,
+      "numericTo": 0,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:site.app:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 63,
+      "numericTo": 4,
+      "version": "12.8.15",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:site.app:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 63,
+      "numericTo": 1,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:site.app:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 63,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:site.app:jar:app",
+      "numericFrom": 3,
+      "numericTo": 63,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:app.i18n:jar",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 64,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:data.closing:jar:app",
+      "to": "aero.minova:app.i18n:jar",
+      "numericFrom": 65,
+      "numericTo": 64,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:data.schema.app:jar",
+      "to": "aero.minova:cas.app:jar:app",
+      "numericFrom": 66,
+      "numericTo": 0,
+      "version": "12.44.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:data.schema.app:jar",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 66,
+      "numericTo": 1,
+      "version": "12.7.2",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:data.schema.app:jar",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 66,
+      "numericTo": 2,
+      "version": "0.2.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:data.closing:jar:app",
+      "to": "aero.minova:data.schema.app:jar",
+      "numericFrom": 65,
+      "numericTo": 66,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:job.closing:jar:app",
+      "to": "aero.minova:service.jobexecutor.app:jar:app",
+      "numericFrom": 67,
+      "numericTo": 58,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:job.closing:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 67,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:data.closing:jar:app",
+      "to": "aero.minova:job.closing:jar:app",
+      "numericFrom": 65,
+      "numericTo": 67,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:data.closing:jar:app",
+      "to": "aero.minova:service.jobexecutor.app:jar:app",
+      "numericFrom": 65,
+      "numericTo": 58,
+      "version": "12.0.1",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:data.closing:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 65,
+      "numericTo": 2,
+      "version": "12.0.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:data.closing:jar:app",
+      "numericFrom": 3,
+      "numericTo": 65,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:tim:jar:app",
+      "to": "aero.minova:data.schema.app:jar:app",
+      "numericFrom": 68,
+      "numericTo": 4,
+      "version": "12.8.15",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:tim:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 68,
+      "numericTo": 1,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:job.closingprocedureexecutor.app:jar:app",
+      "to": "aero.minova:app.i18n:jar:app",
+      "numericFrom": 69,
+      "numericTo": 1,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:job.closingprocedureexecutor.app:jar:app",
+      "to": "aero.minova:service.jobexecutor.app:jar:app",
+      "numericFrom": 69,
+      "numericTo": 58,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "aero.minova:job.closingprocedureexecutor.app:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 69,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "aero.minova:tim:jar:app",
+      "to": "aero.minova:job.closingprocedureexecutor.app:jar:app",
+      "numericFrom": 68,
+      "numericTo": 69,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:tim:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 68,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:tim:jar:app",
+      "numericFrom": 3,
+      "numericTo": 68,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "com.minova:afis:jar:app",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 3,
+      "numericTo": 2,
+      "version": "12.1.0",
+      "resolution": "OMITTED_FOR_CONFLICT"
+    },
+    {
+      "from": "com.minova:sample2.com.app:jar",
+      "to": "com.minova:afis:jar:app",
+      "numericFrom": 70,
+      "numericTo": 3,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "aero.minova:app.build:jar",
+      "to": "org.assertj:assertj-core:jar",
+      "numericFrom": 2,
+      "numericTo": 71,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "com.minova:sample2.com.app:jar",
+      "to": "aero.minova:app.build:jar",
+      "numericFrom": 70,
+      "numericTo": 2,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-api:jar",
+      "to": "org.opentest4j:opentest4j:jar",
+      "numericFrom": 72,
+      "numericTo": 73,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "org.junit.platform:junit-platform-commons:jar",
+      "to": "org.apiguardian:apiguardian-api:jar",
+      "numericFrom": 74,
+      "numericTo": 75,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-api:jar",
+      "to": "org.junit.platform:junit-platform-commons:jar",
+      "numericFrom": 72,
+      "numericTo": 74,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-api:jar",
+      "to": "org.apiguardian:apiguardian-api:jar",
+      "numericFrom": 72,
+      "numericTo": 75,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "com.minova:sample2.com.app:jar",
+      "to": "org.junit.jupiter:junit-jupiter-api:jar",
+      "numericFrom": 70,
+      "numericTo": 72,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-params:jar",
+      "to": "org.junit.jupiter:junit-jupiter-api:jar",
+      "numericFrom": 76,
+      "numericTo": 72,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-params:jar",
+      "to": "org.apiguardian:apiguardian-api:jar",
+      "numericFrom": 76,
+      "numericTo": 75,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "com.minova:sample2.com.app:jar",
+      "to": "org.junit.jupiter:junit-jupiter-params:jar",
+      "numericFrom": 70,
+      "numericTo": 76,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "org.junit.platform:junit-platform-engine:jar",
+      "to": "org.opentest4j:opentest4j:jar",
+      "numericFrom": 77,
+      "numericTo": 73,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "org.junit.platform:junit-platform-engine:jar",
+      "to": "org.junit.platform:junit-platform-commons:jar",
+      "numericFrom": 77,
+      "numericTo": 74,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "org.junit.platform:junit-platform-engine:jar",
+      "to": "org.apiguardian:apiguardian-api:jar",
+      "numericFrom": 77,
+      "numericTo": 75,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-engine:jar",
+      "to": "org.junit.platform:junit-platform-engine:jar",
+      "numericFrom": 78,
+      "numericTo": 77,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-engine:jar",
+      "to": "org.junit.jupiter:junit-jupiter-api:jar",
+      "numericFrom": 78,
+      "numericTo": 72,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "org.junit.jupiter:junit-jupiter-engine:jar",
+      "to": "org.apiguardian:apiguardian-api:jar",
+      "numericFrom": 78,
+      "numericTo": 75,
+      "resolution": "OMITTED_FOR_DUPLICATE"
+    },
+    {
+      "from": "com.minova:sample2.com.app:jar",
+      "to": "org.junit.jupiter:junit-jupiter-engine:jar",
+      "numericFrom": 70,
+      "numericTo": 78,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "org.assertj:assertj-core:jar",
+      "to": "net.bytebuddy:byte-buddy:jar",
+      "numericFrom": 71,
+      "numericTo": 79,
+      "resolution": "INCLUDED"
+    },
+    {
+      "from": "com.minova:sample2.com.app:jar",
+      "to": "org.assertj:assertj-core:jar",
+      "numericFrom": 70,
+      "numericTo": 71,
+      "resolution": "INCLUDED"
+    }
+  ]
+}

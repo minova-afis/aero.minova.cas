@@ -115,7 +115,9 @@ public class SqlProcedureController {
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
 		try {
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
 			procedureService.unsecurelyProcessProcedure(extensionSetupTable);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);

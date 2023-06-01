@@ -269,7 +269,9 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 */
 	private boolean sendMessage(ServiceMessage pendingMessage) {
 		// URL + : + Port
-		String url = pendingMessage.getCasservice().getServiceurl() + ":" + pendingMessage.getCasservice().getPort();
+		String url = pendingMessage.getCasservice().getPort() != 0
+				? pendingMessage.getCasservice().getServiceurl() + ":" + pendingMessage.getCasservice().getPort()
+				: pendingMessage.getCasservice().getServiceurl();
 		String message = pendingMessage.getMessage();
 
 		int serviceMessageReceiverLoginTypeKey = pendingMessage.getCasservice().getReceiverLoginType() != null

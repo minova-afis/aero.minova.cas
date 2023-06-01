@@ -4,10 +4,24 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* PasswordEncoderExtension entfernen, Passwort wird schon im Helper verschlüsselt, damit Passwörter nicht in Klartext im Log stehen.
-* Update auf SpringBoot 3.1.0.
 * QueueService auf JPA umstellen.
 * Erweitern des QueueService um BasicAuth und OAuth2.
+
+## [12.63.0] -- 2023-05-26
+* Eventhandling von Ncore für Extensions über `aero.minova.service.event.dispatcher` bereitstellen.
+
+## [12.62.0] -- 2023-05-25
+* Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
+
+## [12.61.3] -- 2023-05-23
+* Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird
+
+## [12.61.2] -- 2023-05-23
+* PasswordEncoderExtension entfernen, Passwort wird schon im Helper verschlüsselt, damit Passwörter nicht in Klartext im Log stehen.
+* Update auf SpringBoot 3.1.0.
+* Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
+* Für Azure Authentifiezierung fehlende Lib hinzufügen
+
 
 ## [12.61.1] -- 2023-05-12
 * Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben

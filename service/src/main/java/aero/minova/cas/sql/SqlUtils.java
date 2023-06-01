@@ -3,13 +3,11 @@ package aero.minova.cas.sql;
 import static java.time.ZoneId.systemDefault;
 
 import java.sql.CallableStatement;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -198,7 +196,7 @@ public class SqlUtils {
 							preparedStatement.setString(i + parameterOffset, string);
 							parameterOffset++;
 						}
-						// i zählt als nächstes hoch, deswegem muss parameterOffset wieder um 1 verringert werden
+						// i zählt als nächstes hoch, deswegen muss parameterOffset wieder um 1 verringert werden
 						parameterOffset--;
 					} else if (rule != null && rule.contains("between")) {
 						List<String> inBetweenValues;
@@ -213,33 +211,40 @@ public class SqlUtils {
 						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(inBetweenValues.size() - 1));
 					} else {
 						if (!stringValue.trim().isEmpty()) {
-							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + stringValue);
+							Object usedValue;
 
 							// Für Postgres muss der Datentyp genau passen
 							switch (iVal.getType()) {
 							case INTEGER:
-								preparedStatement.setInt(i + parameterOffset, iVal.getIntegerValue());
+								usedValue = iVal.getIntegerValue();
+								preparedStatement.setInt(i + parameterOffset, (int) usedValue);
 								break;
 							case BOOLEAN:
-								preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
+								usedValue = iVal.getBooleanValue();
+								preparedStatement.setBoolean(i + parameterOffset, (boolean) usedValue);
 								break;
 							case BIGDECIMAL:
-								preparedStatement.setDouble(i + parameterOffset, iVal.getBigDecimalValue().doubleValue());
+								usedValue = iVal.getBigDecimalValue().doubleValue();
+								preparedStatement.setDouble(i + parameterOffset, (double) usedValue);
 								break;
 							case DOUBLE:
-								preparedStatement.setDouble(i + parameterOffset, iVal.getDoubleValue());
+								usedValue = iVal.getDoubleValue();
+								preparedStatement.setDouble(i + parameterOffset, (double) usedValue);
 								break;
 							case ZONED:
-								preparedStatement.setDate(i + parameterOffset, Date.valueOf(iVal.getZonedDateTimeValue().toLocalDate()));
+								usedValue = Timestamp.from(iVal.getZonedDateTimeValue().toInstant());
+								preparedStatement.setTimestamp(i + parameterOffset, (Timestamp) usedValue);
 								break;
 							case INSTANT:
-								preparedStatement.setDate(i + parameterOffset, Date.valueOf(LocalDate.ofInstant(iVal.getInstantValue(), ZoneId.of("UTC"))));
+								usedValue = Timestamp.from(iVal.getInstantValue());
+								preparedStatement.setTimestamp(i + parameterOffset, (Timestamp) usedValue);
 								break;
 							default:
-								preparedStatement.setString(i + parameterOffset, stringValue);
+								usedValue = stringValue;
+								preparedStatement.setString(i + parameterOffset, (String) usedValue);
 								break;
 							}
-
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + usedValue);
 						} else {
 							parameterOffset--;
 						}

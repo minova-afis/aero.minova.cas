@@ -67,7 +67,9 @@ public class CommunicationController {
 		setupTable.setName("setup");
 		boolean success = true;
 		try {
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
 			spc.executeProcedure(setupTable);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 		} catch (Exception e) {
 			success = false;
 		}

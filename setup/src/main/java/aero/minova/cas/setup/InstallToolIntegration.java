@@ -52,7 +52,7 @@ public class InstallToolIntegration {
 			final BaseSetup setup = new BaseSetup();
 			setup.setSetupDocument(setupDocument);
 			setup.readSchema();
-			// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schenidet stattdessen diese direkt ab.
+			// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.
 			// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
 			connection.createStatement().execute("set ANSI_WARNINGS off");
 			try (final ResultSet rs = connection.createStatement()

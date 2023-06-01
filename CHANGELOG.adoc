@@ -7,6 +7,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ### Fixed
 * Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
 * Eventhandling von Ncore für Extensions über `aero.minova.service.event.dispatcher` bereitstellen.
+* Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
 
 ## [12.61.3] -- 2023-05-23
 * Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird

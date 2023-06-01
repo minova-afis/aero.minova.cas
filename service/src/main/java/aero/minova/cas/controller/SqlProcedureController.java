@@ -31,6 +31,7 @@ import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.ExecuteStrategy;
+import aero.minova.cas.sql.SystemDatabase;
 import lombok.Setter;
 import lombok.val;
 
@@ -46,6 +47,9 @@ public class SqlProcedureController {
 	@Autowired
 	SecurityService securityService;
 
+	@Autowired
+	public SystemDatabase database;
+	
 	@Setter
 	QueueService queueService;
 
@@ -156,6 +160,9 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
+		if(inputTable.getName().equals("setup")) {
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+		}
 		customLogger.logUserRequest("data/procedure: ", inputTable);
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
@@ -168,6 +175,9 @@ public class SqlProcedureController {
 
 			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
+			if(inputTable.getName().equals("setup")) {
+				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
+			}
 			return result;
 		} catch (Throwable e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);

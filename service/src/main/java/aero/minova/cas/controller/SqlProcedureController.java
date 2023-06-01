@@ -140,7 +140,9 @@ public class SqlProcedureController {
 			adminSetupRow.addValue(new Value("admin", null));
 
 			adminPrivilegeTable.addRow(adminSetupRow);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
 			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup privileges for admin!", e);
 			throw new RuntimeException(e);

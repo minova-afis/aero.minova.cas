@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 ### Fixed
+
+## [12.63.2] -- 2023-06-01
 * Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
 
 ## [12.63.1] -- 2023-06-01

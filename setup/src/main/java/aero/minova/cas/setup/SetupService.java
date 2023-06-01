@@ -63,6 +63,8 @@ public class SetupService {
 		spc.registerExtension(PROCEDURE_NAME, inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
+				// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.
+				// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
 				database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
 				readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
 						, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//

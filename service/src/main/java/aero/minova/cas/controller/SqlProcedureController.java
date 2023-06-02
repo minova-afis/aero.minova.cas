@@ -254,7 +254,7 @@ public class SqlProcedureController {
 	 */
 	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
-		return procedureService.unsecurelyProcessProcedure(inputTable, false);
+		return procedureService.unsecurelyProcessProcedure(inputTable);
 	}
 
 	/**
@@ -286,7 +286,7 @@ public class SqlProcedureController {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return new ResponseEntity(procedureService.processSqlProcedureRequest(inputTable, authority, false), HttpStatus.ACCEPTED);
+		return new ResponseEntity(procedureService.processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
 	}
 
 	/**

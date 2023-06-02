@@ -51,7 +51,7 @@
 									<version>6.1.0</version>
 								</item>
 							</artifactItems>
-							<outputDirectory>/aero.minova.cas.app.helper/lib</outputDirectory> <!-- Name des Output-Ordners -->
+							<outputDirectory>/aero.minova.cas.app.helper/lib/</outputDirectory> <!-- Name des Output-Ordners -->
 							<stripVersion>true</stripVersion>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>

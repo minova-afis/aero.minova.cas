@@ -5,10 +5,14 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 ### Fixed
+* Workflow ReleaseAppAndHelper veröffentlicht die Dockerfile auf Docker.io
+
+## [12.63.8] -- 2023-06-02
 * Helper Version Updaten
+* Workflow ReleaseAppAndHelper korrigiert
 * Tycho-Version im Client auf 3.0.4 erhöhen
 
-## [12.63.1 - 12.63.7] -- 2023-06-02
+## [12.63.7] -- 2023-06-02
 * Abschneiden von Daten beim Setup direkt in der Methode processSqlProcedureRequest erlauben
 
 ## [12.63.1 - 12.63.6] -- 2023-06-01

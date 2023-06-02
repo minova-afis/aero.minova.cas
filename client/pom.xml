@@ -46,6 +46,7 @@
 						<configuration>
 							<artifactItems> 
 								<item> 
+									<overWrite>true</overWrite>
 									<groupId>org.springframework.security</groupId>
 									<artifactId>spring-security-crypto</artifactId>
 									<version>6.1.0</version>

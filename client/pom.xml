@@ -53,7 +53,7 @@
 									<destFileName>spring-security-crypto.jar</destFileName>
 								</item>
 							</artifactItems>
-							<outputDirectory>/aero.minova.cas.app.helper/lib</outputDirectory> <!-- Name des Output-Ordners -->
+							<outputDirectory>${basedir}/aero.minova.cas.app.helper/lib</outputDirectory> <!-- Name des Output-Ordners -->
 							<stripVersion>true</stripVersion>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>

@@ -216,7 +216,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			try {
 				logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
 						+ procedureName + ": '" + message + "'");
-				procedureService.unsecurelyProcessProcedure(setSent);
+				procedureService.unsecurelyProcessProcedure(setSent, false);
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
 				logger.logError("Error while trying to save message " + message, e);
@@ -243,7 +243,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		messageToDelete.addRow(setSentRow);
 		try {
 			logger.logQueueService("Deleting message with key " + pendingMessage.getValues().get(4).getIntegerValue());
-			procedureService.unsecurelyProcessProcedure(messageToDelete);
+			procedureService.unsecurelyProcessProcedure(messageToDelete, false);
 		} catch (Exception e) {
 			logger.logError("The message with key " + pendingMessage.getValues().get(4).getIntegerValue() + " could not be deleted!", e);
 			throw new RuntimeException(e);
@@ -340,7 +340,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		setSent.addRow(setSentRow);
 		try {
-			procedureService.unsecurelyProcessProcedure(setSent);
+			procedureService.unsecurelyProcessProcedure(setSent, false);
 		} catch (Exception e) {
 			logger.logError("Could not update message with key " + nextMessage.getValues().get(4).getStringValue() + ".", e);
 			throw new RuntimeException(e);

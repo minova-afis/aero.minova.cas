@@ -90,16 +90,22 @@ public class ProcedureService {
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */
-	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
+	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest, boolean isSetup) throws Exception {
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
 		try {
 			connection = systemDatabase.getConnection();
+			if(isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS off");
+			}
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb);
+			if(isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS on");
+			}
 		} catch (Exception e) {
 			customLogger.logError("Procedure could not be executed: " + sb, e);
 			throw new ProcedureException(e);
@@ -121,7 +127,7 @@ public class ProcedureService {
 	 * @deprecated TODO @Kerstin: was sollte anstelle dieser Methode verwendet werden?
 	 */
 	@Deprecated
-	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable, boolean isSetup) throws Exception {
 
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
@@ -135,7 +141,7 @@ public class ProcedureService {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return processSqlProcedureRequest(inputTable, authority);
+		return processSqlProcedureRequest(inputTable, authority, isSetup);
 	}
 
 	/**

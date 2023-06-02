@@ -136,7 +136,7 @@ public class ServiceNotifierService {
 
 		registerSerivceTable.addRow(registerRow);
 		try {
-			registerResult = procedureService.unsecurelyProcessProcedure(registerSerivceTable);
+			registerResult = procedureService.unsecurelyProcessProcedure(registerSerivceTable, false);
 		} catch (Exception e) {
 			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
 			throw new RuntimeException(e);
@@ -169,7 +169,7 @@ public class ServiceNotifierService {
 			unregisterSerivceTable.addRow(unregisterRow);
 
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterSerivceTable);
+			procedureService.unsecurelyProcessProcedure(unregisterSerivceTable, false);
 		} catch (Exception e) {
 			logger.logError("The service " + serviceName + " could not be unregistered!", e);
 			throw new RuntimeException(e);
@@ -217,7 +217,7 @@ public class ServiceNotifierService {
 			registerProcedureNewsfeedTable.addRow(registerRow);
 		}
 		try {
-			procedureService.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(registerProcedureNewsfeedTable, false);
 		} catch (Exception e) {
 			logger.logError("Error while trying to register procedures: ", e);
 			throw new RuntimeException(e);
@@ -259,7 +259,7 @@ public class ServiceNotifierService {
 				unregisterProcedureNewsfeedTable.addRow(unregisterRow);
 			}
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable, false);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister procedures: ", e);
 			throw new RuntimeException(e);
@@ -290,7 +290,7 @@ public class ServiceNotifierService {
 				}
 			}
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable, false);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister procedures: ", e);
 			throw new RuntimeException(e);
@@ -328,7 +328,7 @@ public class ServiceNotifierService {
 			registerNewsfeedTable.addRow(registerRow);
 		}
 		try {
-			procedureService.unsecurelyProcessProcedure(registerNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(registerNewsfeedTable, false);
 		} catch (Exception e) {
 			logger.logError("Error while trying to register a newsfeed: ", e);
 			throw new RuntimeException(e);
@@ -365,7 +365,7 @@ public class ServiceNotifierService {
 				unregisterNewsfeedTable.addRow(unregisterRow);
 			}
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterNewsfeedTable);
+			procedureService.unsecurelyProcessProcedure(unregisterNewsfeedTable, false);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister newsfeed: ", e);
 			throw new RuntimeException(e);

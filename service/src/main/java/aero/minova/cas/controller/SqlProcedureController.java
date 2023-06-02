@@ -116,7 +116,7 @@ public class SqlProcedureController {
 		}
 		try {
 			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
-			procedureService.unsecurelyProcessProcedure(extensionSetupTable);
+			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
 			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
@@ -141,7 +141,7 @@ public class SqlProcedureController {
 
 			adminPrivilegeTable.addRow(adminSetupRow);
 			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
-			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable);
+			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
 			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup privileges for admin!", e);
@@ -254,7 +254,7 @@ public class SqlProcedureController {
 	 */
 	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
-		return procedureService.unsecurelyProcessProcedure(inputTable);
+		return procedureService.unsecurelyProcessProcedure(inputTable, false);
 	}
 
 	/**
@@ -286,7 +286,7 @@ public class SqlProcedureController {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return new ResponseEntity(procedureService.processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
+		return new ResponseEntity(procedureService.processSqlProcedureRequest(inputTable, authority, false), HttpStatus.ACCEPTED);
 	}
 
 	/**
@@ -316,7 +316,7 @@ public class SqlProcedureController {
 	 */
 	@Deprecated
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		return procedureService.processSqlProcedureRequest(inputTable, privilegeRequest);
+		return procedureService.processSqlProcedureRequest(inputTable, privilegeRequest, false);
 	}
 
 	/**

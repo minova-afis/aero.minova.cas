@@ -49,7 +49,6 @@
 									<overWrite>true</overWrite>
 									<groupId>org.springframework.security</groupId>
 									<artifactId>spring-security-crypto</artifactId>
-									<version>6.1.0</version>
 								</item>
 							</artifactItems>
 							<outputDirectory>/aero.minova.cas.app.helper/lib/</outputDirectory> <!-- Name des Output-Ordners -->

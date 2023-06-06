@@ -10,7 +10,7 @@ import aero.minova.cas.service.model.ProcedureNewsfeed;
 @Repository
 public interface ProcedureNewsfeedRepository extends JpaRepository<ProcedureNewsfeed, Long> {
 
-	List<ProcedureNewsfeed> findAllByKeytextAndTopicAndLastaction(String keytext, String topic, int lastaction);
+	List<ProcedureNewsfeed> findAllByKeytextAndTopicAndLastactionGreaterThan(String keytext, String topic, int lastaction);
 
 	List<ProcedureNewsfeed> findAllByTopicAndLastaction(String topic, int lastaction);
 

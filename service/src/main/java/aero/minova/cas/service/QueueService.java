@@ -61,13 +61,16 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.number.of.attempts:10}")
 	int allowedNumberOfAttempts;
 
+	@Autowired
 	RestTemplate restTemplate;
 
 	// Map<ProzedurName, Map< ServiceName, BiFunction>>
 	Map<String, Map<String, BiFunction<Table, ResponseEntity<Object>, String>>> serviceMessageCreators = new HashMap<>();
 
+	@Autowired
 	ServiceMessageRepository serviceMessageRepo;
 
+	@Autowired
 	CASServicesRepository casServiceRepo;
 
 	@PostConstruct

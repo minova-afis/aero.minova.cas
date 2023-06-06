@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* In CAS Prozeduren die Last* Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden
 * Helper-Version in Manifest an Helper-pom anpassen
 
 ## [12.63.10] -- 2023-06-05

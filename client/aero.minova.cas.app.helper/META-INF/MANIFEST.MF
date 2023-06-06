@@ -1,5 +1,5 @@
 Bundle-SymbolicName: aero.minova.cas.app.helper
-Bundle-Version: 12.63.10.qualifier
+Bundle-Version: 12.63.11.qualifier
 Automatic-Module-Name: aero.minova.cas.app.helper
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy

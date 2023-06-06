@@ -229,10 +229,20 @@ public class ServiceNotifierService {
 	public void registerProcedureNewsfeed(Table inputTable) {
 		try {
 			for (Row inputRow : inputTable.getRows()) {
+
+				String keyText = inputRow.getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue();
+				String topic = inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue();
+
+				List<ProcedureNewsfeed> existingNewsfeeds = procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastactionGreaterThan(keyText, topic, 0);
+
+				// Diese Einträge sind bereits vorhanden. Wir wollen keine doppelten Einträge, also return.
+				if (!existingNewsfeeds.isEmpty()) {
+					return;
+				}
 				ProcedureNewsfeed newProcedureNewsfeed = new ProcedureNewsfeed();
 
-				newProcedureNewsfeed.setKeytext(inputRow.getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue());
-				newProcedureNewsfeed.setTopic(inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue());
+				newProcedureNewsfeed.setKeytext(keyText);
+				newProcedureNewsfeed.setTopic(topic);
 
 				procedureNewsfeedRepo.saveAndFlush(newProcedureNewsfeed);
 
@@ -319,10 +329,18 @@ public class ServiceNotifierService {
 			CASServices serviceKey = findServiceEntry(inputTable.getRows().get(0).getValues().get(0).getStringValue());
 
 			for (Row inputRow : inputTable.getRows()) {
-				NewsfeedListener newListener = new NewsfeedListener();
+				String topic = inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue();
 
+				List<NewsfeedListener> existingListeners = newsfeedListenerRepo.findAllByCasserviceAndTopicAndLastactionGreaterThan(serviceKey, topic, 0);
+
+				// Diese Einträge sind bereits vorhanden. Wir wollen keine doppelten Einträge, also return.
+				if (!existingListeners.isEmpty()) {
+					return;
+				}
+
+				NewsfeedListener newListener = new NewsfeedListener();
 				newListener.setCasservice(serviceKey);
-				newListener.setTopic(inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue());
+				newListener.setTopic(topic);
 
 				newsfeedListenerRepo.saveAndFlush(newListener);
 			}
@@ -441,7 +459,7 @@ public class ServiceNotifierService {
 	public List<ProcedureNewsfeed> findProcedureEntry(Value procedureName, Value topic) {
 
 		try {
-			return procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastaction(procedureName.getStringValue(), topic.getStringValue(), 0);
+			return procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastactionGreaterThan(procedureName.getStringValue(), topic.getStringValue(), 0);
 
 		} catch (Exception e) {
 			logger.logError("Error while trying to access view xtcasProcedureNewsfeed!", e);

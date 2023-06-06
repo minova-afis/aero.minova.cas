@@ -21,7 +21,9 @@ if exists(select * from xtcasNewsfeedListener
 	)
 begin
     update xtcasNewsfeedListener
-    set LastAction = 1
+    set LastAction = 1,
+		LastUser = dbo.xfCasUser(),
+		LastDate = getDate()
     where CASServiceKey = @CASServiceKey
       and Topic = @Topic
 end 
@@ -29,10 +31,16 @@ else
 begin 
 	insert into xtcasNewsfeedListener (
 		CASServiceKey,
-		Topic
+		Topic,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@CASServiceKey,
-		@Topic
+		@Topic,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 	select @KeyLong = @@identity
 end

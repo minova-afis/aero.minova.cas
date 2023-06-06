@@ -8,7 +8,30 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Erweitern des QueueService um BasicAuth und OAuth2.
 
 ## [12.63.0] -- 2023-05-26
+* In CAS Prozeduren die Last* Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden
+* Helper-Version in Manifest an Helper-pom anpassen
+
+## [12.63.10] -- 2023-06-05
+* Helper-Manifest ausbessern
+
+## [12.63.9] -- 2023-06-02
+* Workflow ReleaseAppAndHelper veröffentlicht die Dockerfile auf Docker.io
+
+## [12.63.8] -- 2023-06-02
+* Helper Version Updaten
+* Workflow ReleaseAppAndHelper korrigiert
+* Tycho-Version im Client auf 3.0.4 erhöhen
+
+## [12.63.7] -- 2023-06-02
+* Abschneiden von Daten beim Setup direkt in der Methode processSqlProcedureRequest erlauben
+
+## [12.63.1 - 12.63.6] -- 2023-06-01
+* Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## [12.62.0] -- 2023-05-25
+* Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
 * Eventhandling von Ncore für Extensions über `aero.minova.service.event.dispatcher` bereitstellen.
+* Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
 
 ## [12.62.0] -- 2023-05-25
 * Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.

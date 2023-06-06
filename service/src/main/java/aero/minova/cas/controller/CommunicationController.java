@@ -14,6 +14,7 @@ import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.PingResponse;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
 
 @RestController
 public class CommunicationController {
@@ -29,6 +30,9 @@ public class CommunicationController {
 
 	@Autowired
 	CustomLogger customLogger;
+	
+	@Autowired
+	public SystemDatabase database;
 
 	/**
 	 * Hiermit kann geprüft werden, ob die Kommunikation mit und die Anmeldung an den CAS funktioniert.

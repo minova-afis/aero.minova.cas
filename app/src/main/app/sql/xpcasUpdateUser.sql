@@ -17,6 +17,9 @@ with encryption as
 	update xtcasUser
 	set KeyText = @KeyText,
 		UserSecurityToken = @UserSecurityToken,
-		Memberships = @Memberships
+		Memberships = @Memberships,
+		LastAction = 2,
+		LastDate = getDate(),
+		LastUser = dbo.xfCasUser()
 	where KeyLong = @KeyLong
 return @@error

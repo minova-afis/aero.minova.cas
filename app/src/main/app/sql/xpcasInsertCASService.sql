@@ -9,34 +9,41 @@ alter procedure dbo.xpcasInsertCASService (
 	@TokenURL nvarchar(250)
 )
 with encryption as
-if exists(select * from xtcasCASServices
-	where KeyText = @KeyText
-      and ServiceURL = @ServiceURL
-      and Port = @Port
-      and LastAction > 0 
-	)
-begin
-	raiserror('ADO | 25 | msg.DuplicateService | Es besteht bereits ein Dienst mit diesen Parametern!', 16, 1) with seterror
-	return -1
-end
+	if exists(select * from xtcasCASServices
+		where KeyText = @KeyText
+		and ServiceURL = @ServiceURL
+		and Port = @Port
+		and LastAction > 0 
+		)
+	begin
+		raiserror('ADO | 25 | msg.DuplicateService | Es besteht bereits ein Dienst mit diesen Parametern!', 16, 1) with seterror
+		return -1
+	end
 
-insert into xtcasCASServices (
-	KeyText,
-	ServiceURL,
-	Port,
-	ServiceMessageReceiverLoginTypeKey,
-  	ClientID,
-  	ClientSecret,
-    TokenURL
-) values (
-	@KeyText,
-	@ServiceURL,
-	@Port,
-	@ServiceMessageReceiverLoginTypeKey,
- 	@ClientID,
-  	@ClientSecret,
-    @TokenURL
-)
-select @KeyLong = @@identity
+
+	insert into xtcasCASServices (
+		KeyText,
+		ServiceURL,
+		Port,
+		ServiceMessageReceiverLoginTypeKey,
+		ClientID,
+		ClientSecret,
+		TokenURL,
+		LastAction,
+		LastDate,
+		LastUser
+	) values (
+		@KeyText,
+		@ServiceURL,
+		@Port,
+		@ServiceMessageReceiverLoginTypeKey,
+		@ClientID,
+		@ClientSecret,
+		@TokenURL,
+		1,
+		getDate(),
+		dbo.xfCasUser()
+	)
+	select @KeyLong = @@identity
 
 return @@error

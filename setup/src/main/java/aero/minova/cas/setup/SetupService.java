@@ -63,6 +63,9 @@ public class SetupService {
 		spc.registerExtension(PROCEDURE_NAME, inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
+				// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.
+				// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
+				database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
 				readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
 						, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
 						, service.getSystemFolder().resolve("setup")//
@@ -72,6 +75,7 @@ public class SetupService {
 
 				// Diese Methode darf erst ganz zum Schluss ausgeführt werden, damit sichergestellt werden kann, dass der Admin tatsächlich ALLE Rechte bekommt.
 				spc.setupPrivileges();
+				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -79,7 +83,7 @@ public class SetupService {
 		});
 		spc.registerExtensionBootstrapCheck(PROCEDURE_NAME, inputTable -> true);
 	}
-
+	
 	/**
 	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
 	 *

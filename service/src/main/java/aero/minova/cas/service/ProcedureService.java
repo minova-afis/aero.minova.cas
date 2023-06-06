@@ -91,15 +91,39 @@ public class ProcedureService {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
+		return processSqlProcedureRequest(inputTable, privilegeRequest, false);
+	}
+
+	/**
+	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
+	 * zurückgegeben.
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @param privilegeRequest
+	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
+	 * @param isSetup
+	 *            True falls es sich um einen Aufruf im Rahmend es Setup handelt
+	 * @return Resultat SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler bei der Ausführung
+	 */
+	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest, boolean isSetup) throws Exception {
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
 		try {
 			connection = systemDatabase.getConnection();
+			if (isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS off");
+			}
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
 			customLogger.logSql("Procedure succesfully executed: " + sb);
+			if (isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS on");
+			}
 		} catch (Exception e) {
 			customLogger.logError("Procedure could not be executed: " + sb, e);
 			throw new ProcedureException(e);
@@ -122,6 +146,24 @@ public class ProcedureService {
 	 */
 	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+		return unsecurelyProcessProcedure(inputTable, false);
+	}
+
+	/**
+	 * Diese Methode ist NICHT geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben. CHECKT KEINE EXTENSIONS!!!
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @param isSetup
+	 *            True falls es sich um einen Aufruf im Rahmend es Setup handelt
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 * @deprecated TODO @Kerstin: was sollte anstelle dieser Methode verwendet werden?
+	 */
+	@Deprecated
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable, boolean isSetup) throws Exception {
 
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
@@ -135,7 +177,7 @@ public class ProcedureService {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return processSqlProcedureRequest(inputTable, authority);
+		return processSqlProcedureRequest(inputTable, authority, isSetup);
 	}
 
 	/**

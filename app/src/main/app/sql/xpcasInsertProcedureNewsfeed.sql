@@ -21,7 +21,9 @@ if exists(select * from xtcasProcedureNewsfeed
 	)
 begin
     update xtcasProcedureNewsfeed
-    set LastAction = 1
+    set LastAction = 1,
+		LastUser = dbo.xfCasUser(),
+		LastDate = getDate()
     where KeyText = @KeyText
       and Topic = @Topic
 end 
@@ -29,10 +31,16 @@ else
 begin 
 	insert into xtcasProcedureNewsfeed (
 		KeyText,
-		Topic
+		Topic,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@KeyText,
-		@Topic
+		@Topic,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 	select @KeyLong = @@identity
 end 

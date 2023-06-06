@@ -84,7 +84,7 @@ public class SqlViewController {
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
 		try {
-			procedureService.unsecurelyProcessProcedure(extensionSetupTable);
+			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);

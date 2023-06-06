@@ -15,6 +15,9 @@ with encryption as
 	end
 
 	update xtcasAuthorities
-	set	Authority = @Authority
+	set	Authority = @Authority,
+		LastUser = dbo.xfCasUser(),
+		LastDate = getDate(),
+		LastAction = 2
 	where KeyLong = @KeyLong
 	return @@error

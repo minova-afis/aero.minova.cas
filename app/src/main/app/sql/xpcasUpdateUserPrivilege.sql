@@ -15,6 +15,9 @@ with encryption as
 
 	update xtcasUserPrivilege
 	set KeyText = @KeyText,
-		Description = @Description
+		Description = @Description,
+		LastAction = 2,
+		LastDate = getDate(),
+		LastUser = dbo.xfCasUser()
 	where KeyLong = @KeyLong
 return @@error

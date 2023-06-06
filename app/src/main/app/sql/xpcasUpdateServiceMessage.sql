@@ -7,5 +7,8 @@ with encryption as
 
 update xtcasServiceMessage
 set IsSent = @IsSent,
-	NumberOfAttempts = @NumberOfAttempts
+	NumberOfAttempts = @NumberOfAttempts,
+	LastAction = 2,
+	LastDate = getDate(),
+	LastUser = dbo.xfCasUser()
 where KeyLong = @KeyLong

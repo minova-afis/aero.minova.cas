@@ -38,11 +38,17 @@ begin
 	insert into xtcasCASServices (
 		KeyText,
 		ServiceURL,
-		Port
+		Port,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@KeyText,
 		@ServiceURL,
-		@Port
+		@Port,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 	select @KeyLong = @@identity
 end 

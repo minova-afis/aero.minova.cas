@@ -18,6 +18,9 @@ with encryption as
 	update xtcasColumnSecurity
 	set TableName = @TableName,
 		ColumnName = @ColumnName,
-		SecurityToken = @SecurityToken
+		SecurityToken = @SecurityToken,
+		LastUser = dbo.xfCasUser(),
+		LastDate = getDate(),
+		LastAction = 2
 	where KeyLong = @KeyLong
 return @@error

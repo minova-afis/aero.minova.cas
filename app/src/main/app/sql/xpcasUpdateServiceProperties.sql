@@ -8,7 +8,10 @@ with encryption as
     update xtcasServiceProperties
     set Service = @Service,
         Property = @Property,
-        Val = @Val
+        Val = @Val,
+		LastAction = 2,
+		LastDate = getDate(),
+		LastUser = dbo.xfCasUser()
     where KeyLong = @KeyLong
 
     return @@error

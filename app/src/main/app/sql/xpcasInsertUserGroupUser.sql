@@ -21,7 +21,10 @@ alter procedure dbo.xpcasInsertUserGroupUser (
         select @Memberships = CONCAT(@Memberships, @UserGroupToken );
 
         update xtcasUser
-        set Memberships = @Memberships
+        set Memberships = @Memberships,
+			LastUser = dbo.xfCasUser(),
+			LastDate = getDate(),
+			LastAction = 2
         where KeyLong = @UserKey 
     end
 

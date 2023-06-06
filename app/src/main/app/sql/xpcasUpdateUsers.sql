@@ -29,7 +29,10 @@ with encryption as
 	if exists( select * from xtcasUsers where Username = @Username and LastAction > 0)
 	begin 
 		update xtcasUsers
-		set	Password = coalesce(@Password, @OldPassword)
+		set	Password = coalesce(@Password, @OldPassword),
+			LastAction = 2,
+			LastDate = getDate(),
+			LastUser = dbo.xfCasUser()
 		where KeyLong = @KeyLong
 
 	end

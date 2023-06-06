@@ -15,8 +15,8 @@ with encryption as
 		where UserPrivilegeKey = @UserPrivilegeKey
 		  and UserGroupKey = @UserGroupKey))
 	begin
-		insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey, RowLevelSecurity)
-		values (@UserPrivilegeKey, @UserGroupKey, @RowLevelSecurity)
+		insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey, UserGroupKey, RowLevelSecurity,LastAction, LastDate, LastUser)
+		values (@UserPrivilegeKey, @UserGroupKey, @RowLevelSecurity, 1, getDate(), dbo.xfCasUser())
 	end
 	else if (exists(select 1 from xtcasLuUserPrivilegeUserGroup
 		where UserPrivilegeKey = @UserPrivilegeKey
@@ -24,7 +24,10 @@ with encryption as
 		  and LastAction < 0))
 	begin
 		update xtcasLuUserPrivilegeUserGroup
-		set RowLevelSecurity = @RowLevelSecurity
+		set RowLevelSecurity = @RowLevelSecurity,
+			LastAction = 2,
+			LastDate = getDate(),
+			LastUser = dbo.xfCasUser()
 		where UserPrivilegeKey = @UserPrivilegeKey
 		  and UserGroupKey = @UserGroupKey
 	end
@@ -32,7 +35,10 @@ with encryption as
 		update xtcasLuUserPrivilegeUserGroup
 		set UserPrivilegeKey = @UserPrivilegeKey,
 			UserGroupKey = @UserGroupKey,
-			RowLevelSecurity = @RowLevelSecurity
+			RowLevelSecurity = @RowLevelSecurity,
+			LastAction = 2,
+			LastDate = getDate(),
+			LastUser = dbo.xfCasUser()
 		where KeyLong = @KeyLong
 	end
 return @@error

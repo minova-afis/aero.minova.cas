@@ -56,15 +56,15 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 ** *Wertebereich*: `admin/database/ldap` Jeweils einen dieser drei Werte für einen anderen Login-Modus
 
-* aero_minova_database_url
+* spring.datasource.url
 
 ** *Default*: `jdbc:sqlserver://localhost;encrypt=false;databaseName=AFIS_HAM`
 
-* aero_minova_database_user_name
+* spring.datasource.username
 
 ** *Default*: `sa`
 
-* aero_minova_database_user_password
+* spring.datasource.password
 
 ** *Default*: `password`
 

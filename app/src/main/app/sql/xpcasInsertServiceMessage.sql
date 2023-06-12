@@ -9,12 +9,18 @@ insert into xtcasServiceMessage (
 	CASServiceKey,
 	Message,
 	MessageCreationDate,
-	IsSent
+	IsSent,
+	LastAction,
+	LastDate,
+	LastUser
 ) values (
 	@CASServiceKey,
 	@Message,
 	getDate(),
-	0
+	0,
+	1,
+	getDate(),
+	dbo.xfCasUser()
 )
 select @KeyLong = @@identity
 return @@error

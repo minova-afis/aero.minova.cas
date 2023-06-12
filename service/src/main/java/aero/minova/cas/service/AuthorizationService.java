@@ -1,4 +1,4 @@
-package aero.minova.cas.controller;
+package aero.minova.cas.service;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +19,7 @@ import aero.minova.cas.service.repository.UserPrivilegeRepository;
 import aero.minova.cas.service.repository.UsersRepository;
 
 @Controller
-public class AuthorizationController {
+public class AuthorizationService {
 
 	@Autowired
 	AuthoritiesRepository authoritiesRepository;

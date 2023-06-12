@@ -16,7 +16,10 @@ with encryption as
 	select @Memberships = REPLACE(@Memberships, '#'+@UserGroupText, '')
 		
 	update xtcasUser
-	set Memberships = @Memberships
+	set Memberships = @Memberships,
+		LastAction = 2,
+		LastDate = getDate(),
+		LastUser = dbo.xfCasUser()
 	where KeyLong = @UserKey
 
 	return @@error

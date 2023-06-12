@@ -1,11 +1,13 @@
 package aero.minova.cas.service;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.Query;
 import org.jooq.SelectField;
@@ -23,23 +25,12 @@ import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.val;
 
+@RequiredArgsConstructor
 @Service
 public class JOOQViewService implements ViewServiceInterface {
-
-	@Autowired
-	SystemDatabase systemDatabase;
-
-	@Autowired
-	CustomLogger customLogger;
-
-	@Autowired
-	private SecurityService securityService;
-
-	public JOOQViewService(SystemDatabase systemDatabase, CustomLogger customLogger, SecurityService securityService) {
-		this.systemDatabase = systemDatabase;
-		this.customLogger = customLogger;
-		this.securityService = securityService;
-	}
+	private final SystemDatabase systemDatabase;
+	private final CustomLogger customLogger;
+	private final SecurityService securityService;
 
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean isCounting, List<Row> authorities) throws IllegalArgumentException {
 
@@ -93,23 +84,26 @@ public class JOOQViewService implements ViewServiceInterface {
 		try {
 			final String viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb, customLogger.getErrorLogger());
-			customLogger.logPrivilege("Executing SQL-statement for view: " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
+					customLogger.getErrorLogger())) {
+				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
+				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+				}
+			}
+
 		} catch (Exception e) {
-			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
+			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new RuntimeException(e);
 		} finally {
-			systemDatabase.freeUpConnection(connection);
+			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
 
 	public Condition rowLevelSecurity(List<Row> requestingAuthorities) {
-		List<String> requestingRoles = new ArrayList<>();
 		if (!requestingAuthorities.isEmpty()) {
-			requestingRoles = securityService.extractUserTokens(requestingAuthorities);
+			List<String> requestingRoles = securityService.extractUserTokens(requestingAuthorities);
 			// Falls die Liste leer ist, darf der User alle Spalten sehen.
 			if (requestingRoles.isEmpty()) {
 				return null;
@@ -181,10 +175,10 @@ public class JOOQViewService implements ViewServiceInterface {
 					} else if (rule.equals("<>")) {
 						condition.and(DSL.field(params.getColumns().get(i).getName()).ne(r.getValues().get(i).getValue().toString()));
 					} else if (rule.equals("between()")) {
-						List<String> betweenValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
+						List<String> betweenValues = Stream.of(value.getValue().toString().split(",")).toList();
 						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).between(betweenValues.get(0), betweenValues.get(1)));
 					} else if (rule.equals("in()")) {
-						List<String> inValues = Stream.of(value.getValue().toString().split(",")).collect(Collectors.toList());
+						List<String> inValues = Stream.of(value.getValue().toString().split(",")).toList();
 
 						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).in(inValues));
 					} else {

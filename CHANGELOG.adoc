@@ -4,7 +4,69 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* Update auf SpringBoot 3.0.3
+* In CAS Prozeduren die Last* Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden
+* Helper-Version in Manifest an Helper-pom anpassen
+
+## [12.63.10] -- 2023-06-05
+* Helper-Manifest ausbessern
+
+## [12.63.9] -- 2023-06-02
+* Workflow ReleaseAppAndHelper veröffentlicht die Dockerfile auf Docker.io
+
+## [12.63.8] -- 2023-06-02
+* Helper Version Updaten
+* Workflow ReleaseAppAndHelper korrigiert
+* Tycho-Version im Client auf 3.0.4 erhöhen
+
+## [12.63.7] -- 2023-06-02
+* Abschneiden von Daten beim Setup direkt in der Methode processSqlProcedureRequest erlauben
+
+## [12.63.1 - 12.63.6] -- 2023-06-01
+* Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## [12.62.0] -- 2023-05-25
+* Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
+* Eventhandling von Ncore für Extensions über `aero.minova.service.event.dispatcher` bereitstellen.
+* Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## [12.61.3] -- 2023-05-23
+* Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird
+
+## [12.61.2] -- 2023-05-23
+* PasswordEncoderExtension entfernen, Passwort schon im Helper verschlüsseln
+* Update auf SpringBoot 3.1.0.
+* Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
+* Für Azure Authentifiezierung fehlende Lib hinzufügen
+
+## [12.61.1] -- 2023-05-12
+* Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben
+* Autocommit per default auf `false` stellen
+
+## [12.61.0] -- 2023-05-11
+* AuthorizationController zu AuthorizationService umbenennen, da es kein Controller ist.
+
+## [12.60.2] -- 2023-05-10
+* Update auf SpringBoot 3.0.6.
+* KeyText in xtcasUser von 10 auf 50 Zeichen verlängert
+
+## [12.60.1] -- 2023-04-27
+* Konfiguration der DataSource SpringBoot überlassen
+* Verwaltung der JDBC Connections HikariCP überlassen
+
+## [12.60.0] -- 2023-04-21
+* Update auf SpringBoot 3.0.5.
+* Korrektur der Connectionfreigabe.
+* AuthorizationTest ausbessern (Tabelle leeren, damit andere Tests nicht das Ergebnis beeinflussen)
+* `aero_minova_database_` properties entfernen (sind durch `spring.datasource.` abgedeckt)
+* Fehlermeldung bei Laden von Privilegien verbessern
+
+## [12.59.1] -- 2023-04-04
+* Update auf SpringBoot 3.0.4.
+
+* Feld ModulName in MDI-Maske hinzugefügt.
+* Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.38.
+* SQL-Fehlermeldungen ohne Default-Übersetzung verarbeiten
+* Connections freigeben nach unsicherem Viewaufruf. Hierdurch soll das Hängenbleiben des CAS verhindert werden.
 
 ## [12.59.0] -- 2023-02-07
 * #362 Zugriff auf weitere Datenbanken unterstützen (zumindest über Views).

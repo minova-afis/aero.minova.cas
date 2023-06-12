@@ -31,6 +31,7 @@ import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.ExecuteStrategy;
+import aero.minova.cas.sql.SystemDatabase;
 import lombok.Setter;
 import lombok.val;
 
@@ -46,6 +47,9 @@ public class SqlProcedureController {
 	@Autowired
 	SecurityService securityService;
 
+	@Autowired
+	public SystemDatabase database;
+	
 	@Setter
 	QueueService queueService;
 
@@ -111,7 +115,9 @@ public class SqlProcedureController {
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
 		try {
-			procedureService.unsecurelyProcessProcedure(extensionSetupTable);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);
@@ -134,7 +140,9 @@ public class SqlProcedureController {
 			adminSetupRow.addValue(new Value("admin", null));
 
 			adminPrivilegeTable.addRow(adminSetupRow);
-			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup privileges for admin!", e);
 			throw new RuntimeException(e);
@@ -156,6 +164,9 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
+		if(inputTable.getName().equals("setup")) {
+			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+		}
 		customLogger.logUserRequest("data/procedure: ", inputTable);
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
@@ -168,6 +179,9 @@ public class SqlProcedureController {
 
 			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
+			if(inputTable.getName().equals("setup")) {
+				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
+			}
 			return result;
 		} catch (Throwable e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
@@ -302,7 +316,7 @@ public class SqlProcedureController {
 	 */
 	@Deprecated
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
-		return procedureService.processSqlProcedureRequest(inputTable, privilegeRequest);
+		return procedureService.processSqlProcedureRequest(inputTable, privilegeRequest, false);
 	}
 
 	/**

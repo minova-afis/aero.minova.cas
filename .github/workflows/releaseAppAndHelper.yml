@@ -46,6 +46,12 @@ jobs:
                       -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
                       -Darguments="-Dmaven.javadoc.skip=true" \
                       --settings .github/settings.xml
+          git pull
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }} \
+            --build-arg casVersion=${{ github.event.inputs.releaseVersion }} \
+            "."
+          docker push ${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }}
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}

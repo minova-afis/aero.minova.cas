@@ -15,6 +15,7 @@ Das Rückgabeformat der Tabelle, welche an den *Client* gesendet wird, kann folg
  1. Sql-Fehler-Format1
  2. Programm-Fehler-Format
  3. Sql-Fehler-Format2
+ 4. Sql-Fehler-Format3
 
 === Sql-Fehler-Format1
 
@@ -224,6 +225,73 @@ Der wesentliche Unterschied zwischen den beiden ist, dass die *International Mes
 Die Verarbeitung der '@[Datentyp]'-Parameter bleibt aber gleich.
 
 Dementsprechend ist der Ablauf und die Rückgabe der Werte derselbe wie bei Sql-Fehler-Format1.
+
+==== returnErrorMessage/detailsMessage
+
+Die DetailsMessage der Exception, die geworfen wurde.
+
+==== returnErrorMessage/cause
+
+Der Grund, weshalb die Exception geworfen wurde, z.b.:
+_java.lang.NullPointerException_.
+
+==== returnErrorMessage/trace
+
+=== Sql-Fehler-Format3
+
+.Ursprünglich Fehlermeldung
+[source]
+----
+ADO | 30 | msg.sql.1234
+----
+
+Das Sql-Fehler Format wird dann auftreten, wenn es einen Fehler in einer oder mehreren Prozeduren gibt.
+
+Das CAS wird diesen in folgender Form ausgeben:
+
+
+.Sql-Fehler-Format3
+[source,json]
+----
+{
+    "resultSet": {
+        "name": "Error",
+        "columns": [
+            {
+                "name": "International Message",
+                "type": "STRING"
+            },
+            {
+                "name": "DEFAULT",
+                "type": "STRING"
+            }
+        ],
+        "rows": [
+            {
+                "values": [
+                    "s-msg.sql.1234",
+                    "s-msg.sql.1234"
+                ]
+            }
+        ],
+	"returnErrorMessage": {
+		"detailsMessage": "ExceptionMessage",
+		"cause": "ExceptionCause",
+		"trace": [
+			"StackTraceMessages",
+			...
+		]
+	},
+    "returnCodes": [
+        -1
+    ],
+    "returnCode": -1
+}
+----
+
+In diesem Fall ist kein Default gegeben. 
+Deshalb wird die message selbst auch als Default ans WFC geliefert.
+Der Ablauf und die Rückgabe der Werte derselbe wie bei Sql-Fehler-Format1.
 
 ==== returnErrorMessage/detailsMessage
 

@@ -63,15 +63,19 @@ public class SetupService {
 		spc.registerExtension(PROCEDURE_NAME, inputTable -> {
 			try {
 				SqlProcedureResult result = new SqlProcedureResult();
+				// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.
+				// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
+				database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
 				readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
-				, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
-				, service.getSystemFolder().resolve("setup")//
-				, true);
+						, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
+						, service.getSystemFolder().resolve("setup")//
+						, true);
 				svc.setupExtensions();
 				spc.setupExtensions();
 
 				// Diese Methode darf erst ganz zum Schluss ausgeführt werden, damit sichergestellt werden kann, dass der Admin tatsächlich ALLE Rechte bekommt.
 				spc.setupPrivileges();
+				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -79,14 +83,12 @@ public class SetupService {
 		});
 		spc.registerExtensionBootstrapCheck(PROCEDURE_NAME, inputTable -> true);
 	}
-
+	
 	/**
 	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
 	 *
-	 * @param arg
-	 *            Ein String, in welchem die benötigten Dependencies stehen.
-	 * @throws IOException
-	 *             Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
+	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
+	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
 	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = DependencyOrder.determineDependencyOrder(Files.readString(dependencyList));
@@ -110,7 +112,7 @@ public class SetupService {
 			List<String> newProcedures = readProceduresToList(setupFile);
 			procedures.addAll(newProcedures);
 		} else {
-			throw new NoSuchFileException("No main-setup file found!");
+			throw new NoSuchFileException("No main-setup file '" + setupFile.getCanonicalPath() + "' found!");
 		}
 		return procedures;
 	}
@@ -118,8 +120,7 @@ public class SetupService {
 	/**
 	 * Das ist ein Hack, wil wir Probleme haben über Maven die gewünschte Ordnerstruktur zu bekommen. Wir wollen, dass es erstmal grundsätzlich läuft.
 	 *
-	 * @param dependency
-	 *            Name der Abhängigkeit.
+	 * @param dependency Name der Abhängigkeit.
 	 * @return Setup.xml der Abhängigkeit.
 	 */
 	private Path findSetupXml(String dependency, Path dependencySetupsDir) {
@@ -138,16 +139,15 @@ public class SetupService {
 			final Optional<Path> result = Files.walk(dependencySetupsDir, 1).map(dir -> {
 				if (dir.getFileName().toString().startsWith(adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency)) {
 					try {
-						Optional<Path> setup = Files.walk(dir)//
-								.filter(f -> f.getFileName().toString().toLowerCase().equals("setup.xml"))//
+						return Files.walk(dir)//
+								.filter(f -> f.getFileName().toString().equalsIgnoreCase("setup.xml"))//
 								.findFirst();
-						return setup;
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 				}
-				return Optional.<Path> empty();
-			}).filter(setup -> !setup.isEmpty()).map(setup -> setup.get()).findFirst();
+				return Optional.<Path>empty();
+			}).filter(Optional::isPresent).map(Optional::get).findFirst();
 			if (result.isEmpty()) {
 				throw new NoSuchFileException("No setup file found with the name " + niceSetupFile);
 			}
@@ -160,8 +160,7 @@ public class SetupService {
 	/**
 	 * Liest ein einzelnes Setup-File und gibt eine Liste von benötigten SQl-Dateien zurück.
 	 *
-	 * @param dependencySetupFile
-	 *            Das Setup-File, welches gescannt werden soll.
+	 * @param dependencySetupFile Das Setup-File, welches gescannt werden soll.
 	 * @return Die Liste an SQL-Dateinamen für das gescannte Setup-File.
 	 */
 	List<String> readProceduresToList(File dependencySetupFile) {
@@ -192,10 +191,8 @@ public class SetupService {
 	/**
 	 * TODO Entfernen Liest die übergebene Liste an SQL-Dateinamen und installiert die jeweils dazugehörige Datei.
 	 *
-	 * @param procedures
-	 *            Die Liste an SQL-Dateinamen.
-	 * @throws NoSuchFileException
-	 *             Falls die Datei passend zum Namen nicht existiert.
+	 * @param procedures Die Liste an SQL-Dateinamen.
+	 * @throws NoSuchFileException Falls die Datei passend zum Namen nicht existiert.
 	 */
 	@Deprecated
 	void runScripts(List<String> procedures) throws NoSuchFileException {
@@ -203,7 +200,7 @@ public class SetupService {
 		for (String procedureName : procedures) {
 			Path sqlFile = dependencySqlDir.resolve(procedureName);
 			if (sqlFile.toFile().exists()) {
-				final val connection = database.getConnection();
+				val connection = database.getConnection();
 				try {
 					// Den Sql-Code aus der Datei auslesen und ausführen.
 					String procedure = Files.readString(sqlFile);
@@ -226,7 +223,7 @@ public class SetupService {
 				} catch (Exception e) {
 					throw new RuntimeException("Error in " + procedureName + ". The file could not be red.", e);
 				} finally {
-					database.freeUpConnection(connection);
+					database.closeConnection(connection);
 				}
 
 			} else {

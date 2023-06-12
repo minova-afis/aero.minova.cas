@@ -1,7 +1,7 @@
 package aero.minova.cas.service;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -48,24 +48,22 @@ public class MssqlViewService implements ViewServiceInterface {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		Table result = new Table();
-		final val connection = systemDatabase.getConnection();
+		val connection = systemDatabase.getConnection();
 		try {
-			final val viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
+			val viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
-			val preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb, customLogger.getErrorLogger());
-			customLogger.logPrivilege("Executing SQL-statement for view:  " + sb.toString());
-			ResultSet resultSet = preparedViewStatement.executeQuery();
-			result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
-		} catch (Exception e) {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e1) {
-					customLogger.logError("Connection could not be closed: ", e1);
+			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
+					customLogger.getErrorLogger())) {
+				customLogger.logPrivilege("Executing SQL-statement for view:  " + sb);
+				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
 				}
 			}
-			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
+		} catch (Exception e) {
+			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new RuntimeException(e);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
@@ -115,7 +113,7 @@ public class MssqlViewService implements ViewServiceInterface {
 	}
 
 	public String prepareWhereClause(Table params, boolean autoLike) {
-		final StringBuffer where = new StringBuffer();
+		final StringBuilder where = new StringBuilder();
 		final boolean hasAndClause;
 		// TODO Check size
 		val andFields = params.getColumns().stream()//
@@ -141,7 +139,7 @@ public class MssqlViewService implements ViewServiceInterface {
 			}
 
 			// Eine where Zeile aufbauen
-			final StringBuffer clause = new StringBuffer();
+			final StringBuilder clause = new StringBuilder();
 			COLS: for (int colI = 0; colI < r.getValues().size(); ++colI) {
 				val def = r.getValues().get(colI);
 				val col = params.getColumns().get(colI);
@@ -207,7 +205,7 @@ public class MssqlViewService implements ViewServiceInterface {
 				} else {
 					where.append(and ? "\r\n  and " : "\r\n   or ");
 				}
-				where.append('(').append(clause.toString()).append(')');
+				where.append('(').append(clause).append(')');
 			}
 		}
 		return where.toString();
@@ -218,14 +216,14 @@ public class MssqlViewService implements ViewServiceInterface {
 	 * davon ausgegangen wird, dass ein KeyLong in der View/Table vorhanden ist.
 	 */
 	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
 			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 		sb.append("select ");
 		val outputFormat = params.getColumns().stream()//
 				.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
-				.collect(Collectors.toList());
+				.toList();
 		if (outputFormat.isEmpty()) {
 			sb.append("* from ");
 		} else {

@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.service.model.CASServices;
 import aero.minova.cas.service.model.NewsfeedListener;
 import aero.minova.cas.service.model.ServiceMessage;
 import aero.minova.cas.service.repository.CASServicesRepository;
@@ -224,9 +225,10 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		for (NewsfeedListener services : servicesToBeNotified) {
 			try {
-				casServiceRepo.findByKeylong(services.getCasservice().getKeylong());
-
+				CASServices service = casServiceRepo.findByKeylong(services.getCasservice().getKeylong());
 				ServiceMessage serviceMessage = new ServiceMessage();
+
+				serviceMessage.setCasservice(service);
 				serviceMessage.setMessage(message);
 
 				serviceMessageRepo.saveAndFlush(serviceMessage);

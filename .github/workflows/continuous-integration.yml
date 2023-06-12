@@ -8,65 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java-version: ['17']
-
-    steps:
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v6.5
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.java-version }}
-          java-package: 'jdk'
-          cache: 'maven'
-
-      - name: Cache SonarQube packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-
-      - name: Maven build
-        run: |
-          mvn --batch-mode verify \
-            -P repo-github -P all-tests \
-            -Dusername=$GITHUB_ACCESS_TOKEN \
-            --file pom.xml \
-            --settings .github/settings.xml
-        env:
-          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
-          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-
-      - name: SonarQube scan
-        run: |
-          mvn --batch-mode --no-transfer-progress \
-            dependency-check:aggregate \
-            sonar:sonar \
-            -P repo-github -P all-tests \
-            -Dsonar.projectKey=${{github.repository_owner}}_${{github.event.repository.name}} \
-            -Dsonar.branch.name=${{steps.branch-name.outputs.current_branch}} \
-            --settings .github/settings.xml
-        env:
-          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
-          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
-
-      - name: Store report of Dependency Check
-        uses: actions/upload-artifact@v3
-        with:
-          name: dependency-check-report.html
-          path: target/dependency-check-report.html
+  Build:
+    uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/java-continuous-integration.yml@main
+    secrets: inherit

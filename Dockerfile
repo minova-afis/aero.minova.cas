@@ -6,7 +6,7 @@ FROM eclipse-temurin:17-jre-alpine
     # Wir verwenden die alpine-Variante, um die Größe des Docker-Images zu minimieren.
 
 LABEL org.opencontainers.image.source=https://github.com/minova-afis/aero.minova.cas
-LABEL maintainer=weber@minova.com
+LABEL maintainer=service@minova.com
 
 COPY service/target/libs /opt/aero.minova.cas/lib/
 COPY service/target/*.jar /opt/aero.minova.cas/lib/

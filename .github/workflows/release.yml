@@ -23,18 +23,23 @@ jobs:
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE
           mvn --batch-mode release:prepare release:perform -P repo-github \
-            -Dusername=$GITHUB_ACCESS_TOKEN \
-            -Dpassword=$GITHUB_ACCESS_TOKEN \
-            -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
-            -Darguments="-Dmaven.javadoc.skip=true" \
-            --settings .github/settings.xml
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
+                      -Darguments="-Dmaven.javadoc.skip=true" \
+                      --settings .github/settings.xml
           git pull
-          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}
-          docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }} \
-            --build-arg casVersion=${{ github.event.inputs.releaseVersion }} \
-            "."
-          docker push ${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }}
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+
+      - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: 'aero.minova.cas.app'
+          tags: ${{ github.event.inputs.releaseVersion }}
+          registry: 'docker.io'
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          buildArgs: 'casVersion=${{ github.event.inputs.releaseVersion }}'

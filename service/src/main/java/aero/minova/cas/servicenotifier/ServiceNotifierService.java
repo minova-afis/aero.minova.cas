@@ -425,14 +425,14 @@ public class ServiceNotifierService {
 		try {
 
 			if (topic.isBlank()) {
-				if (casServiceName.isBlank()) {
+				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByLastaction(0);
 				} else {
 					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);
 					return newsfeedListenerRepo.findAllByCasservice(findMe);
 				}
 			} else {
-				if (casServiceName.isBlank()) {
+				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByTopicAndLastactionGreaterThan(topic, 0);
 				} else {
 					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);

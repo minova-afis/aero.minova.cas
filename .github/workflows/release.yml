@@ -35,7 +35,7 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
 
       - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
-        uses: mr-smithers-excellent/docker-build-push@v5
+        uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: 'aero.minova.cas.app'
           tags: ${{ github.event.inputs.releaseVersion }}

@@ -1,7 +1,9 @@
 package aero.minova.cas.service;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collection;
@@ -230,6 +232,8 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 				serviceMessage.setCasservice(service);
 				serviceMessage.setMessage(message);
+
+				serviceMessage.setMessagecreationdate(Timestamp.valueOf(LocalDateTime.now()));
 
 				serviceMessageRepo.saveAndFlush(serviceMessage);
 

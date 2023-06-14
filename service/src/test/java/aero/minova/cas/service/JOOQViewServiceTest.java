@@ -87,14 +87,14 @@ public class JOOQViewServiceTest extends BaseTest {
 			Row inputRow = new Row();
 			inputRow.addValue(new Value("AVM", null));
 			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
+			inputRow.addValue(new Value(true, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where (EmployeeText like ? and CustomerText like ?) limit ?");
@@ -139,20 +139,20 @@ public class JOOQViewServiceTest extends BaseTest {
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value(false, null));
+			inputRow.addValue(new Value(true, null));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value("WIS", null));
-			inputRow.addValue(new Value(false, null));
+			inputRow.addValue(new Value(true, null));
 			inputTable.addRow(inputRow);
 		}
 		Row inputRow = new Row();
 		List<Row> userGroups = new ArrayList<>();
 		inputRow.addValue(new Value("", null));
 		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
+		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where (EmployeeText like ? and EmployeeText like ?) limit ?");
@@ -287,11 +287,27 @@ public class JOOQViewServiceTest extends BaseTest {
 		intputTable.setName("vWorkingTimeIndex2");
 		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
 		intputTable.addColumn(new Column("KeyText", DataType.STRING));
+		intputTable.addColumn(Column.AND_FIELD);
 		val row = new Row();
 		row.addValue(new Value("", "is !null"));
 		row.addValue(new Value("", "is null"));
+		row.addValue(new Value(true, null));
 		intputTable.getRows().add(row);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip()).isEqualTo("(\n  KeyLong is not null\n  and KeyText is null\n)");
 	}
 
+	@Test
+	void test_whereOr() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		intputTable.addColumn(new Column("KeyText", DataType.STRING));
+		intputTable.addColumn(Column.AND_FIELD);
+		val row = new Row();
+		row.addValue(new Value("", "is !null"));
+		row.addValue(new Value("", "is null"));
+		row.addValue(new Value(false, null));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip()).isEqualTo("(\n  KeyLong is not null\n  or KeyText is null\n)");
+	}
 }

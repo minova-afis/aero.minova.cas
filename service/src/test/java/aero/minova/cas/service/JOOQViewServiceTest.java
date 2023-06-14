@@ -305,9 +305,14 @@ public class JOOQViewServiceTest extends BaseTest {
 		intputTable.addColumn(Column.AND_FIELD);
 		val row = new Row();
 		row.addValue(new Value("", "is !null"));
-		row.addValue(new Value("", "is null"));
+		row.addValue(new Value("", null));
 		row.addValue(new Value(false, null));
 		intputTable.getRows().add(row);
+		val row2 = new Row();
+		row2.addValue(new Value("", null));
+		row2.addValue(new Value("", "is null"));
+		row2.addValue(new Value(false, null));
+		intputTable.getRows().add(row2);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip()).isEqualTo("(\n  KeyLong is not null\n  or KeyText is null\n)");
 	}
 }

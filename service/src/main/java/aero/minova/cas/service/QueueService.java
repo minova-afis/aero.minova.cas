@@ -288,53 +288,59 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				: 0;
 
 		HttpEntity<?> request;
-
-		// Falls BasicAuth:
-		if (serviceMessageReceiverLoginTypeKey == 2) {
-
-			// Username + : + Password
-			String credentials = pendingMessage.getCasservice().getUsername() + ":" + pendingMessage.getCasservice().getPassword();
-
-			HttpHeaders header = new HttpHeaders();
-			byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
-			header.add("Authorization", "Basic " + encodedAuth);
-
-			request = new HttpEntity<>(message, header);
-
-			// Falls OAuth2:
-		} else if (serviceMessageReceiverLoginTypeKey == 3) {
-
-			// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
-			String credentials = pendingMessage.getCasservice().getUsername() + ":" + pendingMessage.getCasservice().getPassword();
-			byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
-			HttpHeaders headers = new HttpHeaders();
-			headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-			headers.add("Authorization", "Basic " + encodedAuth);
-
-			HttpEntity<String> tokenRequest = new HttpEntity<>(headers);
-			String accessTokenUrl = pendingMessage.getCasservice().getTokenURL();
-			ResponseEntity<String> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, tokenRequest, String.class);
-
-			// Access Token aus der JSON response lesen.
-			ObjectMapper mapper = new ObjectMapper();
-			String token;
-			try {
-				JsonNode node = mapper.readTree(response.getBody());
-				token = node.path("access_token").asText();
-			} catch (Exception e) {
-				throw new IllegalArgumentException("QueueService was not able to read the access token from tokenurl " + accessTokenUrl);
-			}
-
-			// Access Token in eigentlichen Aufruf setzen.
-			HttpHeaders headers1 = new HttpHeaders();
-			headers1.add("Authorization", "Bearer " + token);
-			request = new HttpEntity<>(message, headers1);
-
-		} else {
-			request = new HttpEntity<>(message);
-		}
-		logger.logQueueService("Trying to send message with key " + pendingMessage.getKeylong() + " to " + url);
 		try {
+
+			// Falls BasicAuth:
+			if (serviceMessageReceiverLoginTypeKey == 2) {
+
+				// Username + : + Password
+				String credentials = pendingMessage.getCasservice().getUsername() + ":" + pendingMessage.getCasservice().getPassword();
+
+				HttpHeaders header = new HttpHeaders();
+				byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
+				header.add("Authorization", "Basic " + encodedAuth);
+
+				request = new HttpEntity<>(message, header);
+
+				// Falls OAuth2:
+			} else if (serviceMessageReceiverLoginTypeKey == 3) {
+
+				// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
+				String credentials = pendingMessage.getCasservice().getUsername() + ":" + pendingMessage.getCasservice().getPassword();
+				byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+				headers.add("Authorization", "Basic " + encodedAuth);
+				headers.add("Content-Type", "application/x-www-form-urlencoded");
+				headers.add("username", pendingMessage.getCasservice().getUsername());
+				headers.add("password", pendingMessage.getCasservice().getPassword());
+
+				HttpEntity<String> tokenRequest = new HttpEntity<>("grant_type=client_credentials&client_id=" + pendingMessage.getCasservice().getClientId()
+						+ "&client_secret=" + pendingMessage.getCasservice().getClientSecret(), headers);
+				String accessTokenUrl = pendingMessage.getCasservice().getTokenURL();
+
+				ResponseEntity<String> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, tokenRequest, String.class);
+
+				// Access Token aus der JSON response lesen.
+				ObjectMapper mapper = new ObjectMapper();
+				String token;
+				try {
+					JsonNode node = mapper.readTree(response.getBody());
+					token = node.path("access_token").asText();
+				} catch (Exception e) {
+					throw new IllegalArgumentException("QueueService was not able to read the access token from tokenurl " + accessTokenUrl);
+				}
+
+				// Access Token in eigentlichen Aufruf setzen.
+				HttpHeaders headers1 = new HttpHeaders();
+				headers1.add("Authorization", "Bearer " + token);
+				request = new HttpEntity<>(message, headers1);
+
+			} else {
+				request = new HttpEntity<>(message);
+			}
+			logger.logQueueService("Trying to send message with key " + pendingMessage.getKeylong() + " to " + url);
+
 			logger.logQueueService("Sending message: " + message);
 			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
 		} catch (Exception e) {

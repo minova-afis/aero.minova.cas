@@ -18,37 +18,16 @@ jobs:
           java-version: '17'
           java-package: 'jdk'
           
-      - name: Build Helper and Copy to plugins
-        run: |
-          cd client && mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion="${{ github.event.inputs.releaseVersion }}.qualifier"
-          mvn --batch-mode --update-snapshots verify --file pom.xml
-          cd ..
-          rm app/src/main/app/plugins/*
-          cp client/aero.minova.cas.app.helper/target/*.jar app/src/main/app/plugins/
-          git config user.email "service@minova.com"
-          git config user.name "minova-worker"
-          git add . 
-          git commit -m "add .jar to plugin-folder"
-          git push
+      - uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/release-with-helper-java.yml.yml@main
+        with:
+          release-version: ${{ github.event.inputs.release-version }}
       
-      - name: Build
-        run: |
-          git config --global user.email "service@minova.com"
-          git config --global user.name "minova-worker"
-          cd $GITHUB_WORKSPACE/
-          mvn --batch-mode release:prepare release:perform -P repo-github \
-                      -Dusername=$GITHUB_ACCESS_TOKEN \
-                      -Dpassword=$GITHUB_ACCESS_TOKEN \
-                      -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
-                      -Darguments="-Dmaven.javadoc.skip=true" \
-                      --settings .github/settings.xml
-          git pull
-          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}
-          docker build --tag=${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }} \
-            --build-arg casVersion=${{ github.event.inputs.releaseVersion }} \
-            "."
-          docker push ${{ secrets.DOCKER_USERNAME }}/aero.minova.cas.app:${{ github.event.inputs.releaseVersion }}
-        env:
-          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
-          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+      - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: 'aero.minova.cas.app'
+          tags: ${{ github.event.inputs.releaseVersion }}
+          registry: 'docker.io'
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          buildArgs: 'casVersion=${{ github.event.inputs.releaseVersion }}'

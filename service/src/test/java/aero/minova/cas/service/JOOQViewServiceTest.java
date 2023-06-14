@@ -315,4 +315,25 @@ public class JOOQViewServiceTest extends BaseTest {
 		intputTable.getRows().add(row2);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip()).isEqualTo("(\n  KeyLong is not null\n  or KeyText is null\n)");
 	}
+
+	@Test
+	void test_whereOrWithMultipleRows() {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+		intputTable.addColumn(new Column("KeyText", DataType.STRING));
+		intputTable.addColumn(Column.AND_FIELD);
+		val row = new Row();
+		row.addValue(new Value("", "is !null"));
+		row.addValue(new Value("test", null));
+		row.addValue(new Value(false, null));
+		intputTable.getRows().add(row);
+		val row2 = new Row();
+		row2.addValue(new Value("test", null));
+		row2.addValue(new Value("", "is null"));
+		row2.addValue(new Value(false, null));
+		intputTable.getRows().add(row2);
+		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip())
+				.isEqualTo("(\n  (\n    KeyLong is not null\n    and KeyText like 'test%'\n  )\n  or (\n    KeyLong = 'test'\n    and KeyText is null\n  )\n)");
+	}
 }

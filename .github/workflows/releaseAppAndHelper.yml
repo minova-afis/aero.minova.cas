@@ -8,10 +8,11 @@ on:
         default: ''
 
 jobs:
-  checkout:
+  Release:
     uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/release-java.yml@main
+    secrets: inherit
     with:
-      release-version: ${{ github.event.inputs.releaseVersion }}
+      release-version: ${{ github.event.inputs.release-version }}
   build:
     runs-on: ubuntu-latest
     steps:
@@ -21,8 +22,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           java-package: 'jdk'
-          
-      - uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/release-with-helper-java.yml.yml@main
   
       - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
         uses: mr-smithers-excellent/docker-build-push@v6

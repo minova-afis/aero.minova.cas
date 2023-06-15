@@ -28,9 +28,9 @@ jobs:
       - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: 'minova/aero.minova.cas.app'
+          image: minova/aero.minova.cas.app
           tags: ${{ github.event.inputs.releaseVersion }}
-          registry: 'docker.io'
+          registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
           buildArgs: 'casVersion=${{ github.event.inputs.releaseVersion }}'

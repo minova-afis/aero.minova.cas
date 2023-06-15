@@ -13,12 +13,12 @@
         <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>cas.service</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>cas.setup</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

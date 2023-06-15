@@ -4,15 +4,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
 import org.jooq.Query;
 import org.jooq.SelectField;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
@@ -23,6 +20,7 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 
 @RequiredArgsConstructor
@@ -130,10 +128,22 @@ public class JOOQViewService implements ViewServiceInterface {
 	}
 
 	private Condition prepareWhereClauseGetCondition(Table params, boolean autoLike) {
-		Condition condition = DSL.noCondition();
+		List<Condition> whereConditions = new ArrayList<>();
 
+		Condition returnCondition = DSL.noCondition();
+
+		int columnAndField = params.findColumnPosition(Column.AND_FIELD_NAME);
 		for (Row r : params.getRows()) {
+
+			Condition condition = DSL.noCondition();
+
+			boolean hasAndValue = false;
+			if (columnAndField > 0) {
+				hasAndValue = r.getValues().get(columnAndField) != null && r.getValues().get(columnAndField).getBooleanValue();
+			}
+
 			for (int i = 0; i < r.getValues().size(); i++) {
+
 				Value value = r.getValues().get(i);
 
 				if (value != null && !params.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
@@ -184,10 +194,19 @@ public class JOOQViewService implements ViewServiceInterface {
 					} else {
 						throw new IllegalArgumentException("Invalid rule " + rule + " for value" + value.getValue().toString() + " !");
 					}
+
 				}
+
 			}
+			if (hasAndValue) {
+				returnCondition = returnCondition.and(condition);
+			} else {
+				returnCondition = returnCondition.or(condition);
+			}
+			whereConditions.add(condition);
 		}
-		return condition;
+
+		return returnCondition;
 	}
 
 	@Override

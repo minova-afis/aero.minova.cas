@@ -15,7 +15,6 @@ jobs:
       release-version: ${{ github.event.inputs.release-version }}
   build:
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -23,14 +22,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           java-package: 'jdk'
-   
+
       ### Docker IO Release
       - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: 'minova/aero.minova.cas.app'
+          image: minova/aero.minova.cas.app
           tags: ${{ github.event.inputs.releaseVersion }}
-          registry: 'docker.io'
+          registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
           buildArgs: 'casVersion=${{ github.event.inputs.releaseVersion }}'

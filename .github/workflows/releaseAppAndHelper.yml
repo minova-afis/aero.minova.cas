@@ -8,6 +8,10 @@ on:
         default: ''
 
 jobs:
+  checkout:
+    uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/release-java.yml@main
+    with:
+      release-version: ${{ github.event.inputs.releaseVersion }}
   build:
     runs-on: ubuntu-latest
     steps:
@@ -19,9 +23,7 @@ jobs:
           java-package: 'jdk'
           
       - uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/release-with-helper-java.yml.yml@main
-        with:
-          release-version: ${{ github.event.inputs.release-version }}
-      
+  
       - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
         uses: mr-smithers-excellent/docker-build-push@v6
         with:

@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>aero.minova</groupId>
 			<artifactId>cas.api</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

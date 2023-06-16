@@ -1,4 +1,4 @@
-package aero.minova.cas.controller;
+package aero.minova.cas;
 
 import java.io.File;
 import java.nio.file.Path;

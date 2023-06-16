@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import aero.minova.cas.BaseTest;
 import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;

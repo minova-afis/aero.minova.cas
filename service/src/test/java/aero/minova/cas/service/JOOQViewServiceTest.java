@@ -32,7 +32,7 @@ import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false", "spring.jooq.sql-dialect:POSTGRES" })
-public class JOOQViewServiceTest extends BaseTest {
+class JOOQViewServiceTest extends BaseTest {
 
 	@Autowired
 	JOOQViewService testSubject;
@@ -72,7 +72,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
@@ -97,7 +97,8 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where (EmployeeText like ? and CustomerText like ?) limit ?");
+				.isEqualTo(
+						"select EmployeeText, CustomerText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? and cast(CustomerText as varchar) ilike ?) limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -155,7 +156,8 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where (EmployeeText like ? and EmployeeText like ?) limit ?");
+				.isEqualTo(
+						"select EmployeeText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? and cast(EmployeeText as varchar) ilike ?) limit ?");
 	}
 
 	@Test
@@ -199,7 +201,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where EmployeeText like ? limit ?");
+				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? limit ?");
 	}
 
 	@Test
@@ -230,7 +232,7 @@ public class JOOQViewServiceTest extends BaseTest {
 			throw new RuntimeException(e);
 		}
 		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
-		assertThat(testResult.getValues().get(1).getBooleanValue()).isEqualTo(true);
+		assertThat(testResult.getValues().get(1).getBooleanValue()).isTrue();
 		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);
 		assertThat(testResult.getValues().get(3).getIntegerValue()).isEqualTo(5);
 		assertThat(testResult.getValues().get(4).getLongValue()).isEqualTo(7L);
@@ -252,11 +254,11 @@ public class JOOQViewServiceTest extends BaseTest {
 	void test_SearchViaString() {
 		val intputTable = new Table();
 		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("KeyLong", DataType.STRING));
+		intputTable.addColumn(new Column("KeyText", DataType.STRING));
 		val row = new Row();
-		row.addValue(new Value("1", ""));
+		row.addValue(new Value("test", ""));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("KeyLong like '1%'");
+		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("cast(KeyText as varchar) ilike 'test%'");
 	}
 
 	@Test
@@ -334,6 +336,7 @@ public class JOOQViewServiceTest extends BaseTest {
 		row2.addValue(new Value(false, null));
 		intputTable.getRows().add(row2);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip())
-				.isEqualTo("(\n  (\n    KeyLong is not null\n    and KeyText like 'test%'\n  )\n  or (\n    KeyLong = 'test'\n    and KeyText is null\n  )\n)");
+				.isEqualTo("(\n" + "  (\n" + "    KeyLong is not null\n" + "    and cast(KeyText as varchar) ilike 'test%'\n" + "  )\n" + "  or (\n"
+						+ "    lower(cast(KeyLong as varchar)) = lower('test')\n" + "    and KeyText is null\n" + "  )\n" + ")");
 	}
 }

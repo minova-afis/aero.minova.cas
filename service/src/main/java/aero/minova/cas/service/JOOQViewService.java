@@ -147,52 +147,69 @@ public class JOOQViewService implements ViewServiceInterface {
 				Value value = r.getValues().get(i);
 
 				if (value != null && !params.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
-					String rule = (r.getValues().get(i).getRule() != null ? r.getValues().get(i).getRule() : null);
+					String rule = value.getRule();
+					String valueString = value.getValue().toString();
+					String columnName = params.getColumns().get(i).getName();
 
 					// Falls rule null ist und der value auch null ist ... dann ist doch gar nichts zu machen.
-					if (rule == null && (value.getValue() == null || value.getValue().toString() == null || value.getValue().toString().isBlank())) {
+					if (rule == null && (value.getValue() == null || valueString == null || valueString.isBlank())) {
 						continue;
 					}
 
 					// Is Null und is not Null muss zuerst geprüft werden, da es egal ist, ob etwas im Value steht.
 					if (rule != null && rule.contains("!null")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNotNull());
+						condition = condition.and(DSL.field(columnName).isNotNull());
 						continue;
 					} else if (rule != null && rule.contains("null")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).isNull());
+						condition = condition.and(DSL.field(columnName).isNull());
 						continue;
 					}
 
-					if (autoLike && params.getColumns().get(i).getType().equals(DataType.STRING) && !value.getValue().toString().isBlank()
+					// Bei autoLike ggf. ein % anhängen, rule entsprechend setzten
+					if (autoLike && params.getColumns().get(i).getType().equals(DataType.STRING) && !valueString.isBlank()
 							&& (!value.getStringValue().contains("%"))) {
+						rule = "~";
 						value = new Value(value.getStringValue() + "%", rule);
+						valueString = value.getValue().toString();
 					}
 
-					if (rule == null && !value.getValue().toString().contains("%")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).eq(r.getValues().get(i).getValue().toString()));
-					} else if (value.getValue().toString().contains("%") || rule.equals("~")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).like(value.getValue().toString()));
-					} else if (rule.equals("!~")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).notLike(value.getValue().toString()));
-					} else if (rule.equals(">")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).gt(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals(">=")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).ge(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("<")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).lt(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("<=")) {
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).le(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("<>")) {
-						condition.and(DSL.field(params.getColumns().get(i).getName()).ne(r.getValues().get(i).getValue().toString()));
-					} else if (rule.equals("between()")) {
-						List<String> betweenValues = Stream.of(value.getValue().toString().split(",")).toList();
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).between(betweenValues.get(0), betweenValues.get(1)));
-					} else if (rule.equals("in()")) {
-						List<String> inValues = Stream.of(value.getValue().toString().split(",")).toList();
+					if (rule == null || rule.isBlank()) {
+						if (!valueString.contains("%") && !valueString.contains("_")) {
+							rule = "=";
+						} else {
+							rule = "~";
+						}
+					}
 
-						condition = condition.and(DSL.field(params.getColumns().get(i).getName()).in(inValues));
+					if (rule.equals("~") || rule.equals("like")) {
+						condition = condition.and(DSL.field(columnName).likeIgnoreCase(valueString));
+					} else if (rule.equals("!~") || rule.equals("not like")) {
+						condition = condition.and(DSL.field(columnName).notLikeIgnoreCase(valueString));
+					} else if (rule.equals("=")) {
+						if (value.getType().equals(DataType.STRING)) {
+							condition = condition.and(DSL.field(columnName).equalIgnoreCase(valueString));
+						} else {
+							condition = condition.and(DSL.field(columnName).eq(valueString));
+						}
+					} else if (rule.equals(">")) {
+						condition = condition.and(DSL.field(columnName).gt(valueString));
+					} else if (rule.equals(">=")) {
+						condition = condition.and(DSL.field(columnName).ge(valueString));
+					} else if (rule.equals("<")) {
+						condition = condition.and(DSL.field(columnName).lt(valueString));
+					} else if (rule.equals("<=")) {
+						condition = condition.and(DSL.field(columnName).le(valueString));
+					} else if (rule.equals("<>")) {
+						condition.and(DSL.field(columnName).ne(valueString));
+					} else if (rule.equals("between()")) {
+						List<String> betweenValues = Stream.of(valueString.split(",")).toList();
+						condition = condition.and(DSL.field(columnName).between(betweenValues.get(0), betweenValues.get(1)));
+					} else if (rule.equals("in()")) {
+						List<String> inValues = Stream.of(valueString.split(",")).toList();
+
+						condition = condition.and(DSL.field(columnName).in(inValues));
 					} else {
-						throw new IllegalArgumentException("Invalid rule " + rule + " for value" + value.getValue().toString() + " !");
+						throw new IllegalArgumentException("Invalid rule " + rule + " for value " + valueString + "!");
 					}
 
 				}

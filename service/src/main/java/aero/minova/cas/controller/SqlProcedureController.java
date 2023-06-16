@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class SqlProcedureController {
 
 	@Autowired
 	public SystemDatabase database;
-	
+
 	@Setter
 	QueueService queueService;
 
@@ -58,7 +59,7 @@ public class SqlProcedureController {
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
 	 */
-	private final Map<String, Function<Table, ResponseEntity>> extensions = new HashMap<>();
+	private final Map<String, Function<Table, ResponseEntity>> extensions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	/**
 	 * Wird nur verwendet, falls die Tabelle "xvcasUserSecurity" nicht vorhanden ist. In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt ist.
 	 */
@@ -164,7 +165,7 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		if(inputTable.getName().equals("setup")) {
+		if (inputTable.getName().equals("setup")) {
 			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
 		}
 		customLogger.logUserRequest("data/procedure: ", inputTable);
@@ -179,7 +180,7 @@ public class SqlProcedureController {
 
 			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
-			if(inputTable.getName().equals("setup")) {
+			if (inputTable.getName().equals("setup")) {
 				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
 			}
 			return result;

@@ -1,6 +1,8 @@
 package aero.minova.cas.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.slf4j.helpers.NOPLogger.NOP_LOGGER;
 
@@ -13,8 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jooq.impl.DSL;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,17 +43,58 @@ class JOOQViewServiceTest extends BaseTest {
 	@Autowired
 	JOOQViewService testSubject;
 
+	static List<Row> userGroups = new ArrayList<>();
+
+	@BeforeAll
+	static void setup() {
+		userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
+		userGroups.add(inputRow);
+	}
+
+	@Test
+	void testPrepareViewString_exceptions() {
+		// Tabellenname darf nicht null sein
+		Table inputTable = new Table();
+		assertThrows(IllegalArgumentException.class, () -> testSubject.prepareViewString(inputTable, true, 1000, userGroups));
+
+		// Tabellenname darf nicht leer sein
+		inputTable.setName(" ");
+		assertThrows(IllegalArgumentException.class, () -> testSubject.prepareViewString(inputTable, true, 1000, userGroups));
+
+		// Regel muss definiert sein
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("", "Quatsch-Regel"));
+		inputTable.addRow(inputRow);
+		assertThrows(IllegalArgumentException.class, () -> testSubject.prepareViewString(inputTable, true, 1000, userGroups));
+	}
+
+	@Test
+	void testPrepareViewString_Count() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("AVM", null));
+		inputRow.addValue(new Value(false, null));
+		inputTable.addRow(inputRow);
+
+		assertThat(testSubject.prepareViewString(inputTable, true, 1000, true, userGroups))//
+				.isEqualTo("select count(*) from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ?");
+	}
+
 	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")
 	@Test
 	void testPrepareViewString_withStarSelect() {
 		Table inputTable = new Table();
 		inputTable.setName("vWorkingTimeIndex2");
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select * from vWorkingTimeIndex2 limit ?");
 	}
@@ -59,18 +106,12 @@ class JOOQViewServiceTest extends BaseTest {
 		inputTable.setName("vWorkingTimeIndex2");
 		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
 		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
+
 		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("AVM", null));
 		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
+		inputTable.addRow(inputRow);
+
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? limit ?");
 	}
@@ -83,19 +124,13 @@ class JOOQViewServiceTest extends BaseTest {
 		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
 		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
 		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(true, null));
-			inputTable.addRow(inputRow);
-		}
+
 		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("AVM", null));
+		inputRow.addValue(new Value("MIN", null));
 		inputRow.addValue(new Value(true, null));
-		userGroups.add(inputRow);
+		inputTable.addRow(inputRow);
+
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo(
 						"select EmployeeText, CustomerText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? and cast(CustomerText as varchar) ilike ?) limit ?");
@@ -107,27 +142,35 @@ class JOOQViewServiceTest extends BaseTest {
 		Table inputTable = new Table();
 		inputTable.setName("vWorkingTimeIndex2");
 		inputTable.addColumn(new Column("BookingDate", DataType.INSTANT));
-		inputTable.addColumn(Column.AND_FIELD);
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(Instant.parse("2020-07-31T00:00:00.00Z"), "<="));
-			inputRow.addValue(new Value(false, null));
+			inputTable.addRow(inputRow);
+		}
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value(Instant.parse("2020-07-29T00:00:00.00Z"), "<"));
+			inputTable.addRow(inputRow);
+		}
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value(Instant.parse("2020-07-29T00:00:00.00Z"), ">="));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value(Instant.parse("2020-07-29T00:00:00.00Z"), ">"));
-			inputRow.addValue(new Value(true, null));
 			inputTable.addRow(inputRow);
 		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
+		{
+			Row inputRow = new Row();
+			inputRow.addValue(new Value(Instant.parse("2020-07-29T00:00:00.00Z"), "<>"));
+			inputTable.addRow(inputRow);
+		}
+
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select BookingDate from vWorkingTimeIndex2 where (BookingDate <= ? and BookingDate > ?) limit ?");
+				.isEqualTo(
+						"select BookingDate from vWorkingTimeIndex2 where (BookingDate <= ? or BookingDate < ? or BookingDate >= ? or BookingDate > ? or BookingDate <> ?) limit ?");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -140,24 +183,35 @@ class JOOQViewServiceTest extends BaseTest {
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value(true, null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
 		{
 			Row inputRow = new Row();
 			inputRow.addValue(new Value("WIS", null));
-			inputRow.addValue(new Value(true, null));
+			inputRow.addValue(new Value(false, null));
 			inputTable.addRow(inputRow);
 		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(true, null));
-		userGroups.add(inputRow);
+
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo(
-						"select EmployeeText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? and cast(EmployeeText as varchar) ilike ?) limit ?");
+						"select EmployeeText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? or cast(EmployeeText as varchar) ilike ?) limit ?");
+	}
+
+	@Test
+	void testPrepareViewString_negativLimitDoesNothing() {
+		Table inputTable = new Table();
+		inputTable.setName("vWorkingTimeIndex2");
+		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+		inputTable.addColumn(Column.AND_FIELD);
+
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("AVM", ""));
+		inputRow.addValue(new Value(false, null));
+		inputTable.addRow(inputRow);
+
+		assertThat(testSubject.prepareViewString(inputTable, true, -1, userGroups))//
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ?");
 	}
 
 	@Test
@@ -250,15 +304,29 @@ class JOOQViewServiceTest extends BaseTest {
 		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo(DSL.noCondition().toString());
 	}
 
-	@Test
-	void test_SearchViaString() {
+	@ParameterizedTest
+	@NullSource
+	@ValueSource(strings = { "", "~", "like" })
+	void test_SearchViaString(String rule) {
 		val intputTable = new Table();
 		intputTable.setName("vWorkingTimeIndex2");
 		intputTable.addColumn(new Column("KeyText", DataType.STRING));
 		val row = new Row();
-		row.addValue(new Value("test", ""));
+		row.addValue(new Value("test", rule));
 		intputTable.getRows().add(row);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("cast(KeyText as varchar) ilike 'test%'");
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "!~", "not like" })
+	void test_SearchViaStringNotLike(String rule) {
+		val intputTable = new Table();
+		intputTable.setName("vWorkingTimeIndex2");
+		intputTable.addColumn(new Column("KeyText", DataType.STRING));
+		val row = new Row();
+		row.addValue(new Value("test", rule));
+		intputTable.getRows().add(row);
+		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("cast(KeyText as varchar) not ilike 'test%'");
 	}
 
 	@Test
@@ -311,11 +379,12 @@ class JOOQViewServiceTest extends BaseTest {
 		row.addValue(new Value(false, null));
 		intputTable.getRows().add(row);
 		val row2 = new Row();
-		row2.addValue(new Value("", null));
+		row2.addValue(new Value(0, "="));
 		row2.addValue(new Value("", "is null"));
 		row2.addValue(new Value(false, null));
 		intputTable.getRows().add(row2);
-		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip()).isEqualTo("(\n  KeyLong is not null\n  or KeyText is null\n)");
+		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip())
+				.isEqualTo("(\n" + "  KeyLong is not null\n" + "  or (\n" + "    KeyLong = '0'\n" + "    and KeyText is null\n" + "  )\n" + ")");
 	}
 
 	@Test
@@ -326,7 +395,7 @@ class JOOQViewServiceTest extends BaseTest {
 		intputTable.addColumn(new Column("KeyText", DataType.STRING));
 		intputTable.addColumn(Column.AND_FIELD);
 		val row = new Row();
-		row.addValue(new Value("", "is !null"));
+		row.addValue(new Value(0, "is !null"));
 		row.addValue(new Value("test", null));
 		row.addValue(new Value(false, null));
 		intputTable.getRows().add(row);
@@ -337,6 +406,11 @@ class JOOQViewServiceTest extends BaseTest {
 		intputTable.getRows().add(row2);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip())
 				.isEqualTo("(\n" + "  (\n" + "    KeyLong is not null\n" + "    and cast(KeyText as varchar) ilike 'test%'\n" + "  )\n" + "  or (\n"
-						+ "    lower(cast(KeyLong as varchar)) = lower('test')\n" + "    and KeyText is null\n" + "  )\n" + ")");
+						+ "    cast(KeyLong as varchar) ilike 'test'\n" + "    and KeyText is null\n" + "  )\n" + ")");
+	}
+
+	@Test
+	void testPagingWithSeek() {
+		assertEquals("Not implemented yet", testSubject.pagingWithSeek(null, false, 0, false, 0, userGroups));
 	}
 }

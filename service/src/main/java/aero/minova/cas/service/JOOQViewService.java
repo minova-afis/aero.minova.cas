@@ -40,14 +40,12 @@ public class JOOQViewService implements ViewServiceInterface {
 		Condition condition = prepareWhereClauseGetCondition(params, autoLike);
 
 		// Hier passiert die RowLevelSecurity.
-		if (!authorities.isEmpty()) {
-			Condition userCondition = rowLevelSecurity(authorities);
-			if (userCondition != null) {
-				condition = condition.and(userCondition);
-			}
+		Condition userCondition = rowLevelSecurity(authorities);
+		if (userCondition != null) {
+			condition = condition.and(userCondition);
 		}
 
-		List<SelectField> fields = new ArrayList();
+		List<SelectField<Object>> fields = new ArrayList<>();
 
 		for (Column column : params.getColumns()) {
 			if (!column.getName().equals(Column.AND_FIELD_NAME)) {
@@ -100,30 +98,29 @@ public class JOOQViewService implements ViewServiceInterface {
 	}
 
 	public Condition rowLevelSecurity(List<Row> requestingAuthorities) {
-		if (!requestingAuthorities.isEmpty()) {
-			List<String> requestingRoles = securityService.extractUserTokens(requestingAuthorities);
-			// Falls die Liste leer ist, darf der User alle Spalten sehen.
-			if (requestingRoles.isEmpty()) {
-				return null;
-			}
-
-			Condition userCondition = DSL.noCondition();
-
-			// Wenn SecurityToken null, dann darf jeder User die Spalte sehen.
-			userCondition = userCondition.and(DSL.field("SecurityToken").isNull());
-
-			// Nach allen relevanten SecurityTokens suchen.
-			userCondition = userCondition.or(DSL.field("SecurityToken").in(requestingRoles));
-
-			return userCondition;
-		} else {
+		if (requestingAuthorities.isEmpty()) {
 			return null;
 		}
+
+		List<String> requestingRoles = securityService.extractUserTokens(requestingAuthorities);
+		// Falls die Liste leer ist, darf der User alle Spalten sehen.
+		if (requestingRoles.isEmpty()) {
+			return null;
+		}
+
+		Condition userCondition = DSL.noCondition();
+
+		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen.
+		userCondition = userCondition.and(DSL.field("SecurityToken").isNull());
+
+		// Nach allen relevanten SecurityTokens suchen.
+		userCondition = userCondition.or(DSL.field("SecurityToken").in(requestingRoles));
+
+		return userCondition;
 	}
 
 	@Override
 	public String prepareWhereClause(Table params, boolean autoLike) {
-
 		return prepareWhereClauseGetCondition(params, autoLike).toString();
 	}
 
@@ -152,7 +149,7 @@ public class JOOQViewService implements ViewServiceInterface {
 					String columnName = params.getColumns().get(i).getName();
 
 					// Falls rule null ist und der value auch null ist ... dann ist doch gar nichts zu machen.
-					if (rule == null && (value.getValue() == null || valueString == null || valueString.isBlank())) {
+					if (rule == null && (valueString == null || valueString.isBlank())) {
 						continue;
 					}
 
@@ -165,14 +162,6 @@ public class JOOQViewService implements ViewServiceInterface {
 						continue;
 					}
 
-					// Bei autoLike ggf. ein % anhängen, rule entsprechend setzten
-					if (autoLike && params.getColumns().get(i).getType().equals(DataType.STRING) && !valueString.isBlank()
-							&& (!value.getStringValue().contains("%"))) {
-						rule = "~";
-						value = new Value(value.getStringValue() + "%", rule);
-						valueString = value.getValue().toString();
-					}
-
 					if (rule == null || rule.isBlank()) {
 						if (!valueString.contains("%") && !valueString.contains("_")) {
 							rule = "=";
@@ -181,13 +170,24 @@ public class JOOQViewService implements ViewServiceInterface {
 						}
 					}
 
+					// Bei autoLike ggf. ein % anhängen, rule entsprechend setzten
+					if (autoLike && //
+							params.getColumns().get(i).getType().equals(DataType.STRING) && //
+							(!value.getStringValue().contains("%"))) {
+						if (rule.equals("~") || rule.equals("like")) {
+							rule = "~";
+						}
+						value = new Value(value.getStringValue() + "%", rule);
+						valueString = value.getValue().toString();
+					}
+
 					if (rule.equals("~") || rule.equals("like")) {
 						condition = condition.and(DSL.field(columnName).likeIgnoreCase(valueString));
 					} else if (rule.equals("!~") || rule.equals("not like")) {
 						condition = condition.and(DSL.field(columnName).notLikeIgnoreCase(valueString));
 					} else if (rule.equals("=")) {
 						if (value.getType().equals(DataType.STRING)) {
-							condition = condition.and(DSL.field(columnName).equalIgnoreCase(valueString));
+							condition = condition.and(DSL.field(columnName).likeIgnoreCase(valueString));
 						} else {
 							condition = condition.and(DSL.field(columnName).eq(valueString));
 						}
@@ -200,13 +200,12 @@ public class JOOQViewService implements ViewServiceInterface {
 					} else if (rule.equals("<=")) {
 						condition = condition.and(DSL.field(columnName).le(valueString));
 					} else if (rule.equals("<>")) {
-						condition.and(DSL.field(columnName).ne(valueString));
+						condition = condition.and(DSL.field(columnName).ne(valueString));
 					} else if (rule.equals("between()")) {
 						List<String> betweenValues = Stream.of(valueString.split(",")).toList();
 						condition = condition.and(DSL.field(columnName).between(betweenValues.get(0), betweenValues.get(1)));
 					} else if (rule.equals("in()")) {
 						List<String> inValues = Stream.of(valueString.split(",")).toList();
-
 						condition = condition.and(DSL.field(columnName).in(inValues));
 					} else {
 						throw new IllegalArgumentException("Invalid rule " + rule + " for value " + valueString + "!");

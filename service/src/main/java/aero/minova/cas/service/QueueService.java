@@ -305,19 +305,21 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				// Falls OAuth2:
 			} else if (serviceMessageReceiverLoginTypeKey == 3) {
 
+				CASServices service = pendingMessage.getCasservice();
+
 				// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
-				String credentials = pendingMessage.getCasservice().getUsername() + ":" + pendingMessage.getCasservice().getPassword();
+				String credentials = service.getClientId() + ":" + service.getClientSecret();
 				byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
 				HttpHeaders headers = new HttpHeaders();
 				headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 				headers.add("Authorization", "Basic " + encodedAuth);
 				headers.add("Content-Type", "application/x-www-form-urlencoded");
-				headers.add("username", pendingMessage.getCasservice().getUsername());
-				headers.add("password", pendingMessage.getCasservice().getPassword());
 
-				HttpEntity<String> tokenRequest = new HttpEntity<>("grant_type=client_credentials&client_id=" + pendingMessage.getCasservice().getClientId()
-						+ "&client_secret=" + pendingMessage.getCasservice().getClientSecret(), headers);
-				String accessTokenUrl = pendingMessage.getCasservice().getTokenURL();
+				String authBody = "grant_type: \"password\" \n username: \"" + service.getUsername() + "\" \n password:\" " + service.getPassword()
+						+ "\" \n scope: \"token\"";
+
+				HttpEntity<String> tokenRequest = new HttpEntity<>(authBody, headers);
+				String accessTokenUrl = service.getTokenURL();
 
 				ResponseEntity<String> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, tokenRequest, String.class);
 

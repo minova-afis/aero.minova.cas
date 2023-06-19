@@ -136,7 +136,9 @@ public class JOOQViewService implements ViewServiceInterface {
 
 			boolean hasAndValue = false;
 			if (columnAndField >= 0) {
-				hasAndValue = r.getValues().get(columnAndField) != null && r.getValues().get(columnAndField).getBooleanValue();
+				hasAndValue = r.getValues().get(columnAndField) != null && //
+						r.getValues().get(columnAndField).getBooleanValue() != null && //
+						r.getValues().get(columnAndField).getBooleanValue();
 			}
 
 			for (int i = 0; i < r.getValues().size(); i++) {

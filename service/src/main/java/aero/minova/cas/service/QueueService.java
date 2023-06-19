@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +25,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -313,16 +314,19 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 					// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
 					String credentials = service.getClientId() + ":" + service.getClientSecret();
-					byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
+					String encodedAuth = new String(Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false));
 					HttpHeaders headers = new HttpHeaders();
-					headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+					headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 					headers.add("Authorization", "Basic " + encodedAuth);
 					headers.add("Content-Type", "application/x-www-form-urlencoded");
 
-					String authBody = "grant_type: \"password\" \n username: \"" + service.getUsername() + "\" \n password:\" " + service.getPassword()
-							+ "\" \n scope: \"token\"";
+					MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+					map.add("grant_type", "password");
+					map.add("username", service.getUsername());
+					map.add("password", service.getPassword());
+					map.add("scope", "test");
 
-					HttpEntity<String> tokenRequest = new HttpEntity<>(authBody, headers);
+					HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(map, headers);
 					String accessTokenUrl = service.getTokenURL();
 
 					try {
@@ -333,7 +337,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 						JsonNode node = mapper.readTree(response.getBody());
 						token = node.path("access_token").asText();
 
-						String expiryDate = response.getHeaders().getValuesAsList("Expires").get(0);
+						String expiryDate = response.getHeaders().getValuesAsList("Expires").get(1);
 
 						OAuth2Token oauth2Token = new OAuth2Token(token, expiryDate);
 

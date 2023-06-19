@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 public class OAuth2Token {
 
-	private static final DateTimeFormatter OAUTHSERVERFORMAT = DateTimeFormatter.ofPattern("EEE dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+	private static final DateTimeFormatter OAUTHSERVERFORMAT = DateTimeFormatter.ofPattern("ddMMMyyyyHH:mm:ssz", Locale.ENGLISH);
 
 	String token;
 

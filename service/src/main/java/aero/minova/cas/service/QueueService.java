@@ -353,6 +353,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				// Access Token in eigentlichen Aufruf setzen.
 				HttpHeaders headers1 = new HttpHeaders();
 				headers1.add("Authorization", "Bearer " + token);
+				headers1.setContentType(MediaType.APPLICATION_JSON);
 				request = new HttpEntity<>(message, headers1);
 
 			} else {

@@ -27,6 +27,7 @@ import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
+//IGNORECASE=true, damit sich H2-Datenbank wie SQL verhält
 @SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = {	"application.runner.enabled=false",
 																					"spring.datasource.url=jdbc:h2:mem:testdb;IGNORECASE=true" })
 class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {

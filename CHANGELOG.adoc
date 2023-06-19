@@ -4,6 +4,10 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* JOOQViewService ignoriert Cases -> Bei Privilegienprüfung ist Case egal
+* Extensions werden ausgeführt, egal ob Cases der Namen zusammenpassen
+
+## [12.64.1] -- 2023-06-15
 * In CAS Prozeduren die Last* Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden.
 * Helper-Version in Manifest an Helper-pom anpassen.
 * Gemeinsame GitHub Workflows aus https://github.com/minova-afis/aero.minova.os.github.workflows verwenden.

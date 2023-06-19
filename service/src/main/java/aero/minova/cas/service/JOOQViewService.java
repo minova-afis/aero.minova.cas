@@ -135,7 +135,7 @@ public class JOOQViewService implements ViewServiceInterface {
 			Condition condition = DSL.noCondition();
 
 			boolean hasAndValue = false;
-			if (columnAndField > 0) {
+			if (columnAndField >= 0) {
 				hasAndValue = r.getValues().get(columnAndField) != null && r.getValues().get(columnAndField).getBooleanValue();
 			}
 
@@ -163,20 +163,18 @@ public class JOOQViewService implements ViewServiceInterface {
 					}
 
 					if (rule == null || rule.isBlank()) {
-						if (!valueString.contains("%") && !valueString.contains("_")) {
-							rule = "=";
-						} else {
+						if ((autoLike || valueString.contains("%") || valueString.contains("_"))
+								&& params.getColumns().get(i).getType().equals(DataType.STRING)) {
 							rule = "~";
+						} else {
+							rule = "=";
 						}
 					}
 
-					// Bei autoLike ggf. ein % anhängen, rule entsprechend setzten
+					// Bei autoLike ggf. ein % anhängen
 					if (autoLike && //
 							params.getColumns().get(i).getType().equals(DataType.STRING) && //
 							(!value.getStringValue().contains("%"))) {
-						if (rule.equals("~") || rule.equals("like")) {
-							rule = "~";
-						}
 						value = new Value(value.getStringValue() + "%", rule);
 						valueString = value.getValue().toString();
 					}
@@ -187,7 +185,7 @@ public class JOOQViewService implements ViewServiceInterface {
 						condition = condition.and(DSL.field(columnName).notLikeIgnoreCase(valueString));
 					} else if (rule.equals("=")) {
 						if (value.getType().equals(DataType.STRING)) {
-							condition = condition.and(DSL.field(columnName).likeIgnoreCase(valueString));
+							condition = condition.and(DSL.field(columnName).equalIgnoreCase(valueString));
 						} else {
 							condition = condition.and(DSL.field(columnName).eq(valueString));
 						}
@@ -200,7 +198,11 @@ public class JOOQViewService implements ViewServiceInterface {
 					} else if (rule.equals("<=")) {
 						condition = condition.and(DSL.field(columnName).le(valueString));
 					} else if (rule.equals("<>")) {
-						condition = condition.and(DSL.field(columnName).ne(valueString));
+						if (value.getType().equals(DataType.STRING)) {
+							condition = condition.and(DSL.field(columnName).notEqualIgnoreCase(valueString));
+						} else {
+							condition = condition.and(DSL.field(columnName).ne(valueString));
+						}
 					} else if (rule.equals("between()")) {
 						List<String> betweenValues = Stream.of(valueString.split(",")).toList();
 						condition = condition.and(DSL.field(columnName).between(betweenValues.get(0), betweenValues.get(1)));

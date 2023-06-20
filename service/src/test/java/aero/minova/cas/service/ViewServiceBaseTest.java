@@ -76,16 +76,16 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	@DisplayName("Und Verknüpfung von mehreren Zeilen überprüfen")
 	void testAndMultipleRows() throws Exception {
 		Table indexView = getTableForRequest();
-		indexView.setValue(new Value("test", "="), "Authority", 0);
+		indexView.setValue(new Value("test", null), "Authority", 0);
 		indexView.addRow(getEmptyRow(7));
 		indexView.setValue(new Value(true, null), Column.AND_FIELD_NAME, 1);
-		indexView.setValue(new Value(1, "="), "KeyLong", 1);
+		indexView.setValue(new Value(2, ">="), "KeyLong", 1);
 
 		Table indexViewResult = viewController.getIndexView(indexView);
 		assertTrue(indexViewResult.getRows().size() >= 1);
 		for (Row r : indexViewResult.getRows()) {
 			assertTrue("test".equalsIgnoreCase(indexViewResult.getValue("Authority", r).getStringValue()));
-			assertEquals(1, indexViewResult.getValue("KeyLong", r).getIntegerValue());
+			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() >= 2);
 		}
 	}
 
@@ -140,7 +140,7 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	}
 
 	@ParameterizedTest
-	@DisplayName("String Operationen (keine wildcards) überprüfen")
+	@DisplayName("Like/Equal-String Operationen (ohne wildcards) überprüfen")
 	@NullSource
 	@ValueSource(strings = { "", "~", "like", "=" })
 	void testStringOperationsNoWildcards(String rule) throws Exception {
@@ -154,7 +154,7 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	}
 
 	@ParameterizedTest
-	@DisplayName("String Operationen (mit wildcards) überprüfen")
+	@DisplayName("Like-String Operationen (mit wildcards) überprüfen")
 	@NullSource
 	@ValueSource(strings = { "", "~", "like" })
 	void testStringOperationsWithWildcards(String rule) throws Exception {
@@ -176,9 +176,22 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	}
 
 	@ParameterizedTest
-	@DisplayName("Not Like String Operationen überprüfen")
+	@DisplayName("Not Like String Operationen (ohne wildcards) überprüfen")
+	@ValueSource(strings = { "<>", "!~", "not like" })
+	void testStringOperationsNotLikeWithoutWildcards(String rule) throws Exception {
+		Table indexView = getTableForRequest();
+		indexView.setValue(new Value("test", rule), "Authority", 0);
+		Table indexViewResult = viewController.getIndexView(indexView);
+		assertTrue(indexViewResult.getRows().size() >= 3);
+		for (Row r : indexViewResult.getRows()) {
+			assertNotEquals("test", indexViewResult.getValue("Authority", r).getStringValue().toLowerCase());
+		}
+	}
+
+	@ParameterizedTest
+	@DisplayName("Not Like String Operationen (mit wildcards) überprüfen")
 	@ValueSource(strings = { "!~", "not like" })
-	void testStringOperationsNotLike(String rule) throws Exception {
+	void testStringOperationsNotLikeWithWildcards(String rule) throws Exception {
 		Table indexView = getTableForRequest();
 		indexView.setValue(new Value("test%", rule), "Authority", 0);
 		Table indexViewResult = viewController.getIndexView(indexView);
@@ -188,7 +201,7 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		}
 
 		indexView = getTableForRequest();
-		indexView.setValue(new Value("test", rule), "Authority", 0);
+		indexView.setValue(new Value("t_st", rule), "Authority", 0);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertTrue(indexViewResult.getRows().size() >= 3);
 		for (Row r : indexViewResult.getRows()) {
@@ -201,11 +214,11 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	void testStringOperations() throws Exception {
 
 		Table indexView = getTableForRequest();
-		indexView.setValue(new Value("test", "<>"), "Authority", 0);
+		indexView.setValue(new Value("test%", "<>"), "Authority", 0);
 		Table indexViewResult = viewController.getIndexView(indexView);
-		assertTrue(indexViewResult.getRows().size() >= 3);
+		assertTrue(indexViewResult.getRows().size() >= 5);
 		for (Row r : indexViewResult.getRows()) {
-			assertFalse("test".equalsIgnoreCase(indexViewResult.getValue("Authority", r).getStringValue()));
+			assertFalse("test%".equalsIgnoreCase(indexViewResult.getValue("Authority", r).getStringValue()));
 		}
 
 		indexView = getTableForRequest();

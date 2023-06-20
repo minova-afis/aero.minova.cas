@@ -8,7 +8,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Erweitern des QueueService um BasicAuth und OAuth2.
 
 ## [12.63.0] -- 2023-05-26
-* In CAS Prozeduren die Last* Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden
+* In CAS Prozeduren die Last* Spalten füllen, um Truncated Fehler auf Azure zu vermeiden
 * Helper-Version in Manifest an Helper-pom anpassen
 
 ## [12.63.10] -- 2023-06-05

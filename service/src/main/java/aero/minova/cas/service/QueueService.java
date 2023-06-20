@@ -170,11 +170,15 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			for (ServiceMessage pendingMessage : messagesToBeSend) {
 
-				// Falls die Nachricht älter ist als das allowedMessageAge und falls die NumberOfAttempts höher ist als die allowedNumberOfAttempts, muss
-				// die
-				// Nachricht gelöscht werden.
-				if (pendingMessage.getMessagecreationdate().toInstant().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))
-						|| pendingMessage.getNumberofattempts() >= allowedNumberOfAttempts) {
+				// Wenn die allowedNumberOfAttempts zu hoch wird, setzen wir Failed auf true und die Nachricht soll nicht weiter versucht werden zu verschicken.
+				if (pendingMessage.getNumberofattempts() >= allowedNumberOfAttempts) {
+					pendingMessage.setFailed(true);
+					serviceMessageRepo.saveAndFlush(pendingMessage);
+					continue;
+				}
+
+				// Falls die Nachricht älter ist als das allowedMessageAge muss die Nachricht gelöscht werden.
+				if (pendingMessage.getMessagecreationdate().toInstant().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))) {
 					deleteMessage(pendingMessage);
 					continue;
 				}

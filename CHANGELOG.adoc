@@ -7,17 +7,20 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * QueueService auf JPA umstellen.
 * Erweitern des QueueService um BasicAuth und OAuth2.
 
-## [12.63.0] -- 2023-05-26
-* In CAS Prozeduren die Last* Spalten füllen, um Truncated Fehler auf Azure zu vermeiden
-* Helper-Version in Manifest an Helper-pom anpassen
+## [12.64.2] -- 2023-06-20
 * JOOQViewService ignoriert Cases -> Bei Privilegienprüfung ist Case egal
 * Extensions werden ausgeführt, egal ob Cases der Namen zusammenpassen
+* mr-smithers-excellent Release Workflow für Releases verwenden.
+* Basis-Test für ViewServiceInterface-Implementierungen
 
 ## [12.64.1] -- 2023-06-15
 * In CAS Prozeduren die Last* Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden.
 * Helper-Version in Manifest an Helper-pom anpassen.
 * Gemeinsame GitHub Workflows aus https://github.com/minova-afis/aero.minova.os.github.workflows verwenden.
 * JOOQViewService kann nun mit 'OR'-Fällen umgehen. Vorher konnte er Queries nur mit 'AND' verbinden.
+
+## [12.64.0] -- 2023-06-14
+* Testrelease mit neuem Workflow
 
 ## [12.63.10] -- 2023-06-05
 * Helper-Manifest ausbessern
@@ -35,6 +38,10 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [12.63.1 - 12.63.6] -- 2023-06-01
 * Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## [12.63.0] -- 2023-05-26
+* In CAS Prozeduren die Last* Spalten füllen, um Truncated Fehler auf Azure zu vermeiden
+* Helper-Version in Manifest an Helper-pom anpassen
 
 ## [12.62.0] -- 2023-05-25
 * Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.

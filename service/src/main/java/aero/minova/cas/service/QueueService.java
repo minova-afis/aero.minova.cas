@@ -308,47 +308,18 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				// Falls OAuth2:
 			} else if (serviceMessageReceiverLoginTypeKey == 3) {
 
-				String token;
+				OAuth2Token oauth2Token;
 				CASServices service = pendingMessage.getCasservice();
+
 				if (!oauth2TokenList.containsKey(service)) {
+					oauth2Token = getOAuth2Token(service);
+					oauth2TokenList.put(service, oauth2Token);
 
-					// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
-					String credentials = service.getClientId() + ":" + service.getClientSecret();
-					String encodedAuth = new String(Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false));
-					HttpHeaders headers = new HttpHeaders();
-					headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-					headers.add("Authorization", "Basic " + encodedAuth);
-					headers.add("Content-Type", "application/x-www-form-urlencoded");
-
-					MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-					map.add("grant_type", "password");
-					map.add("username", service.getUsername());
-					map.add("password", service.getPassword());
-					map.add("scope", "test");
-
-					HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(map, headers);
-					String accessTokenUrl = service.getTokenURL();
-
-					try {
-						ResponseEntity<String> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, tokenRequest, String.class);
-
-						// Access Token aus der JSON response lesen.
-						ObjectMapper mapper = new ObjectMapper();
-						JsonNode node = mapper.readTree(response.getBody());
-						token = node.path("access_token").asText();
-
-						String expiryDate = response.getHeaders().getValuesAsList("Expires").get(1);
-
-						OAuth2Token oauth2Token = new OAuth2Token(token, expiryDate);
-
-						oauth2TokenList.put(service, oauth2Token);
-
-					} catch (Exception e) {
-						throw new IllegalArgumentException("QueueService was not able to read the access token from tokenurl " + accessTokenUrl);
-					}
-				} else {
-					token = oauth2TokenList.get(service).getToken();
+				} else if (oauth2TokenList.get(service).getExpiryDate().isBefore(Instant.now())) {
+					oauth2Token = getOAuth2Token(service);
+					oauth2TokenList.replace(service, oauth2Token);
 				}
+				String token = oauth2TokenList.get(service).getToken();
 
 				// Access Token in eigentlichen Aufruf setzen.
 				HttpHeaders headers1 = new HttpHeaders();
@@ -368,6 +339,47 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Anfrage an einen im übergebenen Service definierten Server schicken, um einen neuen OAuth2 Token zu erhalten.
+	 * 
+	 * @param service,
+	 *            ein CASServices Objekt.
+	 * @return ein gültiges OAuth2Token Objekt, ansonsten wird eine IllegalArgumentException geworfen.
+	 */
+	private OAuth2Token getOAuth2Token(CASServices service) {
+		try {
+			// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
+			String credentials = service.getClientId() + ":" + service.getClientSecret();
+			String encodedAuth = new String(Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false));
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			headers.add("Authorization", "Basic " + encodedAuth);
+			headers.add("Content-Type", "application/x-www-form-urlencoded");
+
+			MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+			map.add("grant_type", "password");
+			map.add("username", service.getUsername());
+			map.add("password", service.getPassword());
+			map.add("scope", "test");
+
+			HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(map, headers);
+			String accessTokenUrl = service.getTokenURL();
+
+			ResponseEntity<String> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, tokenRequest, String.class);
+
+			// Access Token aus der JSON response lesen.
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode node = mapper.readTree(response.getBody());
+			String token = node.path("access_token").asText();
+
+			String expiryDate = response.getHeaders().getValuesAsList("Expires").get(1);
+
+			return new OAuth2Token(token, expiryDate);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("QueueService was not able to read the access token from tokenurl " + service.getTokenURL());
+		}
 	}
 
 	/**

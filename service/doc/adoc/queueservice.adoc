@@ -9,5 +9,6 @@ Nachdem sie versendet wurden, werden die Nachrichten wieder gelöscht.
 
 Der QueueService versucht in einem zeitlichen Abstand von 1 Minute, welcher auch selbst in den application.properties gesetzt werden kann, eine Nachricht zu verschicken. Die dazugehörige Property heißt *aero.minova.check.message.intervall*.
 
-Desweiteren werden Nachrichten gelöscht, welche entweder zu alt (standartmäßig älter als 7 Tage) sind oder zu oft versucht wurden zu verschicken (standartmäßig 10 Versuche).
+Desweiteren werden Nachrichten gelöscht, welche entweder zu alt (standartmäßig älter als 7 Tage) sind.
+Werden sie zu oft versucht, zu verschicken (standartmäßig 10 Versuche), werden sie noch solange behalten, bis sie das Lösch-Alter erreicht haben und solange auf LastAction =  -1 gesetzt.
 Die dafür interessanten Propterties sind *aero.minova.number.of.attempts* und *aero.minova.message.age*.

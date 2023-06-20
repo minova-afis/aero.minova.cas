@@ -84,7 +84,7 @@ public class MssqlViewService implements ViewServiceInterface {
 			}
 			val outputFormat = params.getColumns().stream()//
 					.filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
-					.collect(Collectors.toList());
+					.toList();
 			if (outputFormat.isEmpty()) {
 				sb.append("* from ");
 			} else {
@@ -118,7 +118,7 @@ public class MssqlViewService implements ViewServiceInterface {
 		// TODO Check size
 		val andFields = params.getColumns().stream()//
 				.filter(c -> Objects.equals(c.getName(), Column.AND_FIELD_NAME))//
-				.collect(Collectors.toList());
+				.toList();
 		final Column andField;
 		if (andFields.isEmpty()) {
 			hasAndClause = false;
@@ -132,7 +132,7 @@ public class MssqlViewService implements ViewServiceInterface {
 			final Row r = params.getRows().get(rowI);
 			// TODO Nicht annehmen, dass die spezielle &-Spalte die letzte Spalte ist.
 			final boolean and;
-			if (hasAndClause) {
+			if (hasAndClause && r.getValues().get(andFieldIndex) != null && r.getValues().get(andFieldIndex).getBooleanValue() != null) {
 				and = r.getValues().get(andFieldIndex).getBooleanValue();
 			} else {
 				and = false;
@@ -150,6 +150,12 @@ public class MssqlViewService implements ViewServiceInterface {
 				final Object valObj = r.getValues().get(colI).getValue();
 				String strValue = valObj.toString().trim();
 				String ruleValue = r.getValues().get(colI).getRule();
+				if (Objects.equals(ruleValue, "~")) {
+					ruleValue = "like";
+				} else if (Objects.equals(ruleValue, "!~")) {
+					ruleValue = "not like";
+				}
+
 				if (strValue != null && strValue.length() != 0) {
 					if (clause.length() > 0) {
 						clause.append(" and ");

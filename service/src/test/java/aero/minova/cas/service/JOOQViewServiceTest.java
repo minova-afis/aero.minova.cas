@@ -22,7 +22,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import aero.minova.cas.CoreApplicationSystemApplication;
@@ -32,16 +31,12 @@ import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.controller.BaseTest;
 import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false", "spring.jooq.sql-dialect:POSTGRES" })
-class JOOQViewServiceTest extends BaseTest {
-
-	@Autowired
-	JOOQViewService testSubject;
+class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 
 	static List<Row> userGroups = new ArrayList<>();
 
@@ -400,13 +395,13 @@ class JOOQViewServiceTest extends BaseTest {
 		row.addValue(new Value(false, null));
 		intputTable.getRows().add(row);
 		val row2 = new Row();
-		row2.addValue(new Value("test", null));
+		row2.addValue(new Value(3, null));
 		row2.addValue(new Value("", "is null"));
 		row2.addValue(new Value(false, null));
 		intputTable.getRows().add(row2);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip())
 				.isEqualTo("(\n" + "  (\n" + "    KeyLong is not null\n" + "    and cast(KeyText as varchar) ilike 'test%'\n" + "  )\n" + "  or (\n"
-						+ "    cast(KeyLong as varchar) ilike 'test'\n" + "    and KeyText is null\n" + "  )\n" + ")");
+						+ "    KeyLong = '3'\n" + "    and KeyText is null\n" + "  )\n" + ")");
 	}
 
 	@Test

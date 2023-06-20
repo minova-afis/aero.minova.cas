@@ -21,8 +21,9 @@ import aero.minova.cas.service.AuthorizationService;
 @ActiveProfiles("test")
 @WithMockUser(username = "admin", password = "rqgzxTf71EAx8chvchMi", authorities = { "admin" }) // Wichtig ist "authorities" statt "roles" zu nutzen, da die
 																								// Authority ansonsten "ROLE_admin" heißt
-@Sql({ "/xvcasUserSecurity.sql" }) // Die View muss erstellt/eingespielt werden. In diesem Fall ohne LastAction-Filter, da die LastAction-Spalte beim Erstellen
-									// über JPA nicht gesetzt wird
+@Sql({ "/xvcasUserSecurityForTest.sql" }) // Die View muss erstellt/eingespielt werden. In diesem Fall ohne LastAction-Filter, da die LastAction-Spalte beim
+											// Erstellen
+// über JPA nicht gesetzt wird
 class SQLViewControllerTest {
 
 	@Autowired

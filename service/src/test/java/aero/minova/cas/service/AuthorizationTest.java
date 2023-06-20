@@ -1,4 +1,4 @@
-package aero.minova.cas.controller;
+package aero.minova.cas.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;

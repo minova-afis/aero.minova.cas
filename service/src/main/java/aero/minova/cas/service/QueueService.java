@@ -332,9 +332,8 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				request = new HttpEntity<>(message);
 			}
 			logger.logQueueService("Trying to send message with key " + pendingMessage.getKeylong() + " to " + url);
-
-			logger.logQueueService("Sending message: " + message);
 			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
+			logger.logQueueService("Sending message: " + message);
 		} catch (Exception e) {
 			logger.logError("Could not send message to " + url, e);
 			return false;
@@ -392,12 +391,15 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 *            Eine ServiceMessage.
 	 */
 	private void safeAsSent(boolean isSent, ServiceMessage nextMessage) {
-
 		try {
-			nextMessage.setIssent(isSent);
-			nextMessage.setNumberofattempts(nextMessage.getNumberofattempts() + 1);
+			if (isSent) {
+				serviceMessageRepo.delete(nextMessage);
+			} else {
+				nextMessage.setIssent(isSent);
+				nextMessage.setNumberofattempts(nextMessage.getNumberofattempts() + 1);
 
-			serviceMessageRepo.saveAndFlush(nextMessage);
+				serviceMessageRepo.saveAndFlush(nextMessage);
+			}
 		} catch (Exception e) {
 			logger.logError("Could not update message with key " + nextMessage.getKeylong() + ".", e);
 			throw new RuntimeException(e);

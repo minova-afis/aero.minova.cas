@@ -259,12 +259,9 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 *            Eine ServiceMessage, die es zu 'löschen' gilt.
 	 */
 	private void deleteMessage(ServiceMessage pendingMessage) {
-
 		try {
-			pendingMessage.setFailed(true);
-
-			serviceMessageRepo.saveAndFlush(pendingMessage);
 			logger.logQueueService("Deleting message with key " + pendingMessage.getKeylong());
+			serviceMessageRepo.delete(pendingMessage);
 		} catch (Exception e) {
 			logger.logError("The message with key " + pendingMessage.getKeylong() + " could not be deleted!", e);
 			throw new RuntimeException(e);

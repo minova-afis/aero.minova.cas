@@ -6,10 +6,7 @@ on:
         description: 'Release Version'
         required: true
         default: ''
-      nextDevelopmentVersion:
-        description: 'Next Development Version ("-SNAPSHOT" muss nicht angegeben werden.)'
-        required: true
-        default: ''
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,7 +40,6 @@ jobs:
                       -Dusername=$GITHUB_ACCESS_TOKEN \
                       -Dpassword=$GITHUB_ACCESS_TOKEN \
                       -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
-                      -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT \
                       -Darguments="-Dmaven.javadoc.skip=true" \
                       --settings .github/settings.xml
           git pull

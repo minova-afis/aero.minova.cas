@@ -114,7 +114,7 @@ public class ClientRestAPI {
 	 * die Größe des ResultSets eingestellt werden kann? Oder kommt <i>immer alles</i> zurück?
 	 *
 	 * @param inputTable
-	 *            Die Table, für welche eine View zurückgegeben werden soll.
+	 *            Die Table, für welche eine View zurückgegeben werden soll, und deren Abfrage Parameter.
 	 * @return Eine Table mit dem gesamten Inhalt der View.
 	 */
 	public ResponseEntity<Table> sendViewRequest(Table inputTable) {
@@ -128,7 +128,7 @@ public class ClientRestAPI {
 	 * Sendet einen Request, um eine Prozedur auszuführen.
 	 *
 	 * @param inputTable
-	 *            Die Table mit den Parametern der Prozedur.
+	 *            Die Table mit den Parametern der Prozedur, und deren Abfrage Parameter.
 	 * @return Die OutputParameter und das SqlProcedureResult der Prozedur als Table.
 	 * @throws URISyntaxException
 	 */
@@ -141,7 +141,7 @@ public class ClientRestAPI {
 	 * Sendet einen Request, um eine Prozedur auszuführen.
 	 *
 	 * @param inputTable
-	 *            Die Table mit den Parametern der Prozedur.
+	 *            Die Table mit den Parametern der Prozedur, und deren Abfrage Parameter.
 	 * @return Die OutputParameter und das SqlProcedureResult der Prozedur als Table.
 	 */
 	public <T> ResponseEntity<T> sendGenericProcedureRequest(Table inputTable, Class<T> type) {

@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import aero.minova.cas.BaseTest;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
 import lombok.val;

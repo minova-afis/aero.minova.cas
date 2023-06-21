@@ -80,6 +80,7 @@ server.ssl.key-store-password=<Passwort des Keystores>
 ** XML-Konfigurations-Datei für den Wrapper erstellen.
 Der Prefix der Konfigurations-Datei muss mit der Wrapper-Exe übereinstimmen.
 Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml`
+oder `cas-test.exe` und `cas-test.xml`
 
 [source,xml]
 --------
@@ -88,7 +89,7 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 	<id>ID des Windows-Dienstes ohne Leerzeichen</id>
 	<name>Name des Windows-Dienstes</name>
 	<description>Beschreibung des Windows-Dienstes</description>
-	<executable>Pfad zur java.exe.</executable>
+	<executable>Pfad zur java.exe</executable>
 	<!-- Nur eines der beiden Argumente verwenden. -->
 	<!-- Die erste Variante ist für den Fall, dass eine single fat Jar-Version verwendet wird. -->
 	<arguments>-Dloader.path="lib/" -jar aero.minova.cas.service.jar</arguments>
@@ -102,7 +103,12 @@ Wenn alles bereit steht,
 kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
 Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
 
-Windows-Dienst starten und die `data/procedure` Setup ausführen.
+Windows-Dienst starten
+
+* über die Windows-Dienste unter dem in `<name>` angegebenen Dienstname
+* mit `<exe> start`
+
+und die `data/procedure` Setup ausführen.
 
 [#Datenbank-initialisieren]
 == Datenbank initialisieren.

@@ -100,8 +100,8 @@ oder `cas-test.exe` und `cas-test.xml`
 --------
 
 Wenn alles bereit steht,
-kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
-Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
+kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
+Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
 
 Windows-Dienst starten
 
@@ -113,9 +113,16 @@ und die `data/procedure` Setup ausführen.
 [#Datenbank-initialisieren]
 == Datenbank initialisieren.
 
-Mit den `setup`-Befehl (`data/procedure`) wird die Datenbank aufgesetzt.
+Einige Tabellen müssen über JPA installiert werden.
+Beim erstmaligen Initialisieren der Datenbank muss in der application.properties folgende Zeile eingefügt werden, damit das weitere Setup funktioniert.
+[source]
+----
+spring.jpa.hibernate.ddl-auto=create
+----
+
+Mit dem `setup`-Befehl (`data/procedure`) wird die Datenbank aufgesetzt.
 Dieser kann über einen Webbrowser ausgeführt werden.
-Der `setup`-Befehl darf von jeden gültigen Nutzer ausgeführt werden,
+Der `setup`-Befehl darf von jedem gültigen Nutzer ausgeführt werden,
 falls der `setup`-Befehl vorher nicht auf der Datenbank ausgeführt wurde.
 Alternativ, dazu kann auch ein REST-Client verwendet werden.
 

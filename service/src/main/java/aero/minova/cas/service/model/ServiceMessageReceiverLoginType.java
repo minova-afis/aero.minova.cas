@@ -11,16 +11,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "xtcasServiceMessage")
-public class ServiceMessage {
+@Table(name = "xtcasServiceMessageReceiverLoginType")
+public class ServiceMessageReceiverLoginType {
 
 	@Id
 	@NotNull
@@ -29,42 +27,17 @@ public class ServiceMessage {
 	public int keylong;
 
 	@NotNull
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "CASServiceKey", nullable = false)
-	public CASServices casservice;
+	@Size(max = 20)
+	@Column(name = "KeyText")
+	public String keyText;
 
-	@NotNull
-	@Lob
-	@Column(name = "Message")
-	public String message;
-
-	@NotNull
-	@Column(name = "IsSent")
-	public boolean issent = false;
-
-	@NotNull
-	@Column(name = "NumberOfAttempts")
-	public int numberofattempts = 0;
-
-	@NotNull
-	@Column(name = "MessageCreationDate")
-	public Timestamp messagecreationdate;
-
-	@NotNull
-	@Column(name = "Failed")
-	public boolean failed = false;
-
-	@NotNull
 	@Size(max = 50)
 	@Column(name = "LastUser")
 	public String lastuser = "CAS_JPA";
 
-	@NotNull
 	@Column(name = "LastDate")
 	public Timestamp lastdate = Timestamp.from(Instant.now());
 
-	@NotNull
 	@Column(name = "LastAction")
 	public int lastaction = 1;
-
 }

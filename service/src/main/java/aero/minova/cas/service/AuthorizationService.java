@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
@@ -18,7 +18,7 @@ import aero.minova.cas.service.repository.UserGroupRepository;
 import aero.minova.cas.service.repository.UserPrivilegeRepository;
 import aero.minova.cas.service.repository.UsersRepository;
 
-@Controller
+@Service
 public class AuthorizationService {
 
 	@Autowired

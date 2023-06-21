@@ -4,7 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-
+* QueueService auf JPA umstellen.
+* Erweitern des QueueService um BasicAuth und OAuth2.
 
 ## [12.64.2] -- 2023-06-20
 * JOOQViewService ignoriert Cases -> Bei Privilegienprüfung ist Case egal
@@ -38,6 +39,10 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [12.63.1 - 12.63.6] -- 2023-06-01
 * Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
 
+## [12.63.0] -- 2023-05-26
+* In CAS Prozeduren die Last* Spalten füllen, um Truncated Fehler auf Azure zu vermeiden
+* Helper-Version in Manifest an Helper-pom anpassen
+
 ## [12.62.0] -- 2023-05-25
 * Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
 * Eventhandling von Ncore für Extensions über `aero.minova.service.event.dispatcher` bereitstellen.
@@ -47,10 +52,11 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird
 
 ## [12.61.2] -- 2023-05-23
-* PasswordEncoderExtension entfernen, Passwort schon im Helper verschlüsseln
+* PasswordEncoderExtension entfernen, Passwort wird schon im Helper verschlüsselt, damit Passwörter nicht in Klartext im Log stehen.
 * Update auf SpringBoot 3.1.0.
 * Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
 * Für Azure Authentifiezierung fehlende Lib hinzufügen
+
 
 ## [12.61.1] -- 2023-05-12
 * Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben

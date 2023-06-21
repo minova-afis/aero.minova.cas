@@ -97,6 +97,32 @@ class DependencyOrderTest {
 				);
 	}
 
+	@Test
+	void determineDependencyOrderWithComplexExampleTest2() throws Exception {
+		final var result = determineDependencyOrder(retrieveContentFromResource("dependency-graph-sample3.json"));
+		assertThat(result).containsExactly( //
+				"aero.minova.app.i18n", //
+				"aero.minova.cas.app", //
+				"aero.minova.data.schema.app", //
+				"aero.minova.trac.app", //
+				"aero.minova.contact", //
+				"aero.minova.data.service", //
+				"aero.minova.github", //
+				"aero.minova.serviceobject", //
+				"aero.minova.journal", //
+				"aero.minova.orderreceiver", //
+				"aero.minova.servicecontract", //
+				"aero.minova.serviceprovider", //
+				"aero.minova.workingtime", //
+				"aero.minova.sis.spellingcontrol.app", //
+				"aero.minova.workingtime.github.app", //
+				"aero.minova.cas.api", //
+				"aero.minova.cas.service", //
+				"aero.minova.trac.extension", //
+				"aero.minova.workingtime.github.extension" //
+		);
+	}
+
 	private String retrieveContentFromResource(String filename) throws IOException {
 		return IOUtils.resourceToString(filename, StandardCharsets.UTF_8, getClass().getClassLoader());
 	}

@@ -18,8 +18,8 @@ dokumentiert.
 * Generelle Spring Boot spezifische Einstellungen sind in den Projekten link:https://github.com/minova-afis/aero.minova.spring.maven.root/[spirng.maven.root]
 und link:https://github.com/minova-afis/aero.minova.spring.service/blob/master/doc/adoc/index.adoc[spring.services]
 dokumentiert.
-* Spezialfall: xref:installation.postgre.adoc[Postgre-Datenbank]
-Postgre wird allerdings nicht so gut wie MsSql unterstützt. Es unterstützt bisher lediglich die Rechteprüfung und Extensions.
+* Spezialfall: xref:installation.postgre.adoc[Postgres-Datenbank]
+PostgreSQL wird allerdings nicht so gut wie MsSql unterstützt. Es unterstützt bisher lediglich die Rechteprüfung und Extensions.
 
 * <<CAS-als-Windows-Dienst-installieren>>
 * xref:installation.dev.adoc[CAS für die Entwicklungsumgebung aufsetzen.]

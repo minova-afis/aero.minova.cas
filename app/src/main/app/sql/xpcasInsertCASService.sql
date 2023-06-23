@@ -1,7 +1,7 @@
 alter procedure dbo.xpcasInsertCASService (
 	@KeyLong int output,
 	@KeyText nvarchar(50),
-	@ServiceURL nvarchar(50),
+	@ServiceURL nvarchar(250),
     @Port int,
 	@ServiceMessageReceiverLoginTypeKey int,
 	@ClientID nvarchar(50),

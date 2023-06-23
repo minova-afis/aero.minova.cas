@@ -27,7 +27,7 @@ Datentyp: nvarchar(50) not null +
 
 ==== ServiceURL
 
-Datentyp: nvarchar(50) not null +
+Datentyp: nvarchar(250) not null +
 
 // tag::column.ServiceURL[]
 

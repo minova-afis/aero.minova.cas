@@ -8,7 +8,7 @@
 		<varchar length="50" nullable="false"/>
 	</column>
 	<column name="ServiceURL">
-		<varchar length="50" nullable="false"/>
+		<varchar length="250" nullable="false"/>
 	</column>
 	<column name="Port">
 		<integer nullable="false"/>

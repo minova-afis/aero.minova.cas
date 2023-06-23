@@ -33,7 +33,7 @@ public class CASServices {
 	public String keytext;
 
 	@NotNull
-	@Size(max = 50)
+	@Size(max = 250)
 	@Column(name = "ServiceURL")
 	public String serviceurl;
 

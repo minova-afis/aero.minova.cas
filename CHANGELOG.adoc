@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Extensions können nun ServiceProperties über das dazugehörige Interface ServicePropertiesRepo abfragen.
+* In der Table xtcasCASServices wurde die Spalte ServiceURL von 50 auf 250 Zeichen erhöht.
 
 ## [12.65.0] -- 2023-06-21
 * QueueService auf JPA umstellen.

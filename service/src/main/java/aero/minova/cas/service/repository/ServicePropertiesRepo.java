@@ -11,6 +11,6 @@ import aero.minova.cas.service.model.ServiceProperties;
 @Repository
 public interface ServicePropertiesRepo extends JpaRepository<ServiceProperties, Long> {
 
-	public List<ServiceMessage> findAllByKeytextAndLastactionGreaterThan(String keytext, int lastaction);
+	public List<ServiceMessage> findAllByServiceAndLastactionGreaterThan(String service, int lastaction);
 
 }

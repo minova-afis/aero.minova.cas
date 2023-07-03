@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<table name="xtcasServiceMessageReceiverLoginType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="table.xsd">
+    <description><de>Hier wird gelistet, welche Protokolle für die Authentifizierung möglich sind,
+        wenn ein anderer Dienst vom CAS angesprochen wird.</de></description>
+    <column name="KeyLong">
+        <integer nullable="false" identity="true"/>
+    </column>
+    <column name="KeyText">
+        <varchar length="50" nullable="false"/>
+    </column>
+    <column name="LastUser" default="system_user">
+        <varchar length="50" nullable="false"/>
+    </column>
+    <column name="LastDate" default="getdate()">
+        <datetime nullable="false"/>
+    </column>
+    <column name="LastAction" default="1">
+        <integer nullable="false"/>
+    </column>
+    <primarykey>
+        <column>KeyLong</column>
+    </primarykey>
+</table>

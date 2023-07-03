@@ -22,10 +22,29 @@
 	<column name="LastAction" default="1">
 		<integer nullable="false"/>
 	</column>
+	<column name="ServiceMessageReceiverLoginTypeKey">
+		<integer nullable="true"/>
+	</column>
+	<column name="Username">
+		<varchar length="50" nullable="true"/>
+	</column>
+	<column name="Password">
+		<varchar length="50" nullable="true"/>
+	</column>
+	<column name="ClientID">
+		<varchar length="50" nullable="true"/>
+	</column>
+	<column name="ClientSecret">
+		<varchar length="50" nullable="true"/>
+	</column>
+	<column name="TokenURL">
+		<varchar length="50" nullable="true"/>
+	</column>
 	<primarykey>
 		<column>KeyLong</column>
 	</primarykey>
 	<uniquekey name="UQ_xtcasCASServices">
 		<column>KeyText</column>
 	</uniquekey>
+	<foreignkey refid="ServiceMessageReceiverLoginTypeKey" table="xtcasServiceMessageReceiverLoginType"/>
 </table>

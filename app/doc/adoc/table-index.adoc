@@ -54,6 +54,11 @@
     
     
         
+* link:xtcasServiceMessageReceiverLoginType.adoc[]
+
+    
+    
+        
 * link:xtcasServiceProperties.adoc[]
 
     

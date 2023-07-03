@@ -110,8 +110,7 @@ class FilesServiceTest extends BaseTest {
 		fl.read(awatingResult);
 		fl.close();
 
-		assertThat(testSubject.readMDI())//
-				.isEqualTo(awatingResult);
+		assertThat(new String(testSubject.readMDI())).isEqualToNormalizingNewlines(new String(awatingResult));
 	}
 
 	@DisplayName("MDI Test ohne Menu Eintrag in Action")
@@ -184,8 +183,7 @@ class FilesServiceTest extends BaseTest {
 		fl.read(awatingResult);
 		fl.close();
 
-		assertThat(testSubject.readMDI())//
-				.isEqualTo(awatingResult);
+		assertThat(new String(testSubject.readMDI())).isEqualToNormalizingNewlines(new String(awatingResult));
 	}
 
 	@DisplayName("MDI Test ohne Hauptmenu")

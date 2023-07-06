@@ -5,6 +5,10 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * link:https://github.com/minova-afis/aero.minova.cas/pull/617[Indirekte Abhängigkeiten von den App-Projekten beim Setup vom CAS ignorieren.]
+* Setup-XMLs vom CAS-App-Projekt vervollständigen, um das Setup von Tabellen zu korrigieren.
+Dabei ist herausgekommen, dass `spring.jpa.hibernate.ddl-auto=create` zusammen mit dem Setup nicht funktioniert.
+Folglich sollten die Tabellen im CAS oder dessen Erweiterungen,
+nicht mit JPA aufgesetzt werden und somit `spring.jpa.hibernate.ddl-auto=none` immer gelten.
 
 ## [12.65.1] -- 2023-06-26
 * Spring Boot Version erhöhen auf 3.1.1

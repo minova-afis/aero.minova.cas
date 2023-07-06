@@ -4,7 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* [Indirekte Abhängigkeiten von den App-Projekten beim Setup vom CAS ignorieren.](https://github.com/minova-afis/aero.minova.cas/pull/617)
+* link:https://github.com/minova-afis/aero.minova.cas/pull/617[Indirekte Abhängigkeiten von den App-Projekten beim Setup vom CAS ignorieren.]
 
 ## [12.65.1] -- 2023-06-26
 * Spring Boot Version erhöhen auf 3.1.1

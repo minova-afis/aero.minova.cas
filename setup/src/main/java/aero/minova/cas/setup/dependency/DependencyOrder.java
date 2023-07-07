@@ -38,8 +38,6 @@ public class DependencyOrder {
 	public static List<String> determineDependencyOrder(String json) {
 		Map<String, Set<String>> dependencyRelations = extractDependencyRelationsFromJson(json);
 
-		stripOffThirdPartyDependencies(dependencyRelations);
-
 		Graph<String, DefaultEdge> directedGraph = convertRelationsToDirectedGraph(dependencyRelations);
 
 		checkForCycles(directedGraph);
@@ -47,6 +45,8 @@ public class DependencyOrder {
 		directedGraph.removeVertex("aero.minova.app.build");
 
 		List<String> dependencyOrder = orderDependencies(directedGraph);
+
+		stripOffThirdPartyDependencies(dependencyOrder);
 
 		// Das Modul entfernen, für welche die Abhängigkeiten bestimmt werden.
 		dependencyOrder.remove(dependencyOrder.size() - 1);
@@ -105,15 +105,12 @@ public class DependencyOrder {
 		return new EdgeReversedGraph<>(graph);
 	}
 
-	private static void stripOffThirdPartyDependencies(Map<String, Set<String>> dependencyRelations) {
-		List<String> removableKeys = dependencyRelations.keySet().stream()
-				.filter(DependencyOrder::isThirdPartyDependency)
-				.toList();
-
-		removableKeys.forEach(dependencyRelations::remove);
-		dependencyRelations.values().forEach(value ->
-				value.removeAll(removableKeys)
-		);
+	private static void stripOffThirdPartyDependencies(List<String> dependencyOrder) {
+		List<String> removableKeys = dependencyOrder.stream()
+			.filter(DependencyOrder::isThirdPartyDependency)
+			.toList();
+		
+		dependencyOrder.removeAll(removableKeys);
 	}
 
 	private static boolean isThirdPartyDependency(String dependency) {

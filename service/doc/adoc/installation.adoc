@@ -113,13 +113,6 @@ und die `data/procedure` Setup ausführen.
 [#Datenbank-initialisieren]
 == Datenbank initialisieren.
 
-Einige Tabellen müssen über JPA installiert werden.
-Beim erstmaligen Initialisieren der Datenbank muss in der application.properties folgende Zeile eingefügt werden, damit das weitere Setup funktioniert.
-[source]
-----
-spring.jpa.hibernate.ddl-auto=create
-----
-
 Mit dem `setup`-Befehl (`data/procedure`) wird die Datenbank aufgesetzt.
 Dieser kann über einen Webbrowser ausgeführt werden.
 Der `setup`-Befehl darf von jedem gültigen Nutzer ausgeführt werden,

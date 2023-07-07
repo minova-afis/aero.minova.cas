@@ -31,6 +31,9 @@
 	<column name="LastAction" default="1">
 		<integer nullable="false"/>
 	</column>
+	<column name="Failed" default="0">
+		<boolean nullable="false"/>
+	</column>
 	<primarykey>
 		<column>KeyLong</column>
 	</primarykey>

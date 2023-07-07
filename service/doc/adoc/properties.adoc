@@ -89,6 +89,12 @@ Falls es sich nicht um eine MSSQL oder POSTGRESQL Datenbank handelt, muss statt 
 ** *Wertebereich*: `true/false` Entscheided, ob die Mdi aus der Datenbank oder aus dem Filesystem gelesen wird.
 
 
+* aero.minova.cas.setup.logging
+
+** *Default*: `false`
+
+** *Wertebereich*: `true/false` Erweitert das Logging beim Setup, wenn auf true.
+
 == Profiles
 
 * spring.profiles.active

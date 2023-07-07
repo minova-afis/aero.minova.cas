@@ -30,11 +30,15 @@ public class InstallToolIntegration {
 	@Autowired
 	FilesService files;
 
+	@org.springframework.beans.factory.annotation.Value("${aero.minova.cas.setup.logging:false}")
+	String verbose;
+
 	/**
 	 * Installiert eine gegebene "Setup.xml" mit dem Install-Tool. Es wird der Code möglichst so ausgeführt, als würde man das Tool mit update schema (us),
 	 * update database (ud) und module only (mo). Es wird also nur die SQL-Datenbank der "Setup.xml" installiert und die Abhängkeiten ignoriert.
 	 *
-	 * @param setupXml Die "Setup.xml" welche installiert wird.
+	 * @param setupXml
+	 *            Die "Setup.xml" welche installiert wird.
 	 */
 	public void installSetup(Path setupXml) {
 		final Connection connection = systemDatabase.getConnection();
@@ -44,6 +48,11 @@ public class InstallToolIntegration {
 			if (!BaseSetup.parameter.containsKey("fs")) {
 				BaseSetup.parameter.put("fs", "value");
 			}
+
+			if (verbose.equals("true")) {
+				BaseSetup.parameter.put("verbose", "value");
+			}
+
 			final SetupType setupDocument = SetupType.parse(setupXml);
 
 			BaseSetup.hashModules = new Hashtable<>();

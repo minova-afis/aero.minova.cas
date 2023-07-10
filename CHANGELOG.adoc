@@ -4,7 +4,10 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* Login erweitern über Value aero.minova.cas.setup.logging. 
+* xpcasInsertAllPrivilegesToUserGroup an neue Tabellenstrukturen anpassen.
+
+## [12.65.3] -- 2023-07-07
+* Login erweitern über Value aero.minova.cas.setup.logging.  
 
 ## [12.65.2] -- 2023-07-07
 * Setup-XMLs vom CAS-App-Projekt vervollständigen, um das Setup von Tabellen zu korrigieren.

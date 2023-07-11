@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * xpcasInsertAllPrivilegesToUserGroup an neue Tabellenstrukturen anpassen, um Setup-Fehler zu beheben.
+* ServiceMessageReceiverLoginType Initialisierung über Java Code statt data.sql File durchführen. Damit funktioniert die Initialisierung, egal welche Datenbank verwendet wird
 
 ## [12.65.3] -- 2023-07-07
 * Login erweitern über Value aero.minova.cas.setup.logging.  

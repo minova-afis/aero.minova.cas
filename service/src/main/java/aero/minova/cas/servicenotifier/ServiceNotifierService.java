@@ -65,6 +65,11 @@ public class ServiceNotifierService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
 	private void setup() {
+
+		findOrCreateServiceMessageReceiverLoginType("None");
+		findOrCreateServiceMessageReceiverLoginType("BasicAuth");
+		findOrCreateServiceMessageReceiverLoginType("OAuth2");
+
 		spc.registerExtension("xpcasRegisterService", inputTable -> {
 			try {
 				int keyLong = registerService(inputTable);

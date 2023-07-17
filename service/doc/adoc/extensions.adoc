@@ -1,8 +1,7 @@
 = Extensions bzw. Erweiterungen
 
-Es können beim CAS Erweiterungen, sowohl für Prozeduren, als auch für Views registiert werden.
-Wenn eine Prozedur oder View aufgerufen wird,
-wird im CAS geprüft, ob es eine passende Erweiterung dazu gibt.
+Es können beim CAS Erweiterungen, sowohl für Prozeduren, als auch für Views und ganze Transaktionen registiert werden.
+Wenn eine Prozedur oder View aufgerufen wird, wird im CAS geprüft, ob es eine passende Erweiterung dazu gibt.
 Ist dies der Fall wird diese aufgerufen, anstatt den SQL-Server zu befragen.
 
 Es reicht in der Regel nicht, wenn die Erweiterung im Klassenpfad ist,
@@ -33,8 +32,7 @@ da dies zu Versionen-Konflikten führen wird
 
 Somit stellt das CAS alle Abhängigkeiten wie JPA und ähnliches zur Verfügung.
 Fehlt eine Abhängigkeit, muss diese in den CAS-Dienst selber mit eingebaut werden.
-Allerdings, ist es eine Einzelfall-Entscheidung,
-ob diese zusätzliche Abhängigkeit übernommen wird oder nicht.
+Allerdings, ist es eine Einzelfall-Entscheidung, ob diese zusätzliche Abhängigkeit übernommen wird oder nicht.
 Damit wird verhindert, dass das CAS unnötig aufgebläht wird.
 
 ```xml
@@ -138,7 +136,7 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 
 Durch das Hinzufügen dieses Plugins, wird beim Bauen des gesamten Projektes die Jar der Extension bereits in das richtige Verzeichnis geschoben. 
 
-3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
+3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController, den XSqlProcedureController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
 
 4. Eine Setup-Methode erstellen, welche mit der @PostConstruct-Annotation gekennziechet ist. Diese muss die *'registerExtension'*-Methode des vorher importierten Controllers aufrufen und damit die Extension mit dem dazugehörigen Keyword registrieren. 
 
@@ -157,6 +155,9 @@ public class ExampleController {
 
 	@Autowired
 	SqlProcedureController sqlProcedureController;
+	
+	@Autowired
+	XSqlProcedureController xsqlProcedureController;
 
 	@Autowired
 	SqlViewController sqlViewController;
@@ -170,11 +171,20 @@ public class ExampleController {
 		sqlProcedureController.registerExtension("xpcasBeispiel", this::doSomething);
 	}
 
-	private void doSomething(Table inputTable) {
+	private ResponseEntity<SqlProcedureResult> doSomething(Table inputTable) {
 		customLogger.logUserRequest("Hier wird etwas gemacht!");
+		return ResponseEntity//
+				.ok()//
+				.contentType(MediaType.APPLICATION_JSON)//
+				.body(new SqlProcedureResult());
 	}
 
 ----
+
+== Besonderheiten
+
+* Die Extensions sind selbst dafür verwantwortlich, im Fehlerfall Rollbacks durchzuführen.
+* Gibt eine Extension null zurück, so wird die Prozedur/Transaktion zusätzlich als SQL ausgeführt
 
 == How to Debug
 

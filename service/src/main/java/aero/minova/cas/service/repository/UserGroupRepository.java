@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import aero.minova.cas.service.model.UserGroup;
 
+@Repository
 public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
 
 	@Query("select u from UserGroup u where u.lastAction > 0")

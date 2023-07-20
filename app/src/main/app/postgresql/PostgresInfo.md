@@ -16,9 +16,9 @@ Option 1 (über SQL Skripte)
 5. Für jeden Privileg einen Eintrag in `xtcasLuUserPrivilegeUserGroup` erstellen, das Privileg mit der Gruppe verbindet
 
 Option 2 (JPA bzw. Controller im CAS, muss aus CAS-Extension aufgerufen werden)
-1. `AuthorizationController` über `@Autowired` laden
-2. Über `authorizationController.createUserPrivilege("privilegeName")` alle Privilegien erstellen
-3. Über `authorizationController.createAdminUser("username", "encryptedPassword")` einen Nutzer erstellen, der alle erstellten Berechtigungen besitzt 
+1. `AuthorizationService` über `@Autowired` laden
+2. Über `AuthorizationService.createUserPrivilege("privilegeName")` alle Privilegien erstellen
+3. Über `AuthorizationService.createAdminUser("username", "encryptedPassword")` einen Nutzer erstellen, der alle erstellten Berechtigungen besitzt 
 
 Dieser Code kann bei jedem Start aufgerufen werden.
 

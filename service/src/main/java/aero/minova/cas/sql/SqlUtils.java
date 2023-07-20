@@ -3,11 +3,18 @@ package aero.minova.cas.sql;
 import static java.time.ZoneId.systemDefault;
 
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -17,6 +24,7 @@ import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
+import lombok.val;
 
 public class SqlUtils {
 
@@ -127,4 +135,129 @@ public class SqlUtils {
 		}
 	}
 
+	public static Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet, Logger logger, Object conversionUser) {
+		try {
+			Table outputTable = new Table();
+			outputTable.setName(inputTable.getName());
+			outputTable.setColumns(//
+					inputTable.getColumns().stream()//
+							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
+							.collect(Collectors.toList()));
+			while (sqlSet.next()) {
+				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, logger, conversionUser));
+			}
+			return outputTable;
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Das Prepared Statement wird mit den dafür vorgesehenen Parametern befüllt. Diese werden aus der übergebenen inputTable gezogen.
+	 *
+	 * @param inputTable
+	 *            die Table, welche vom getIndexView aufgerufen wurde
+	 * @param preparedStatement
+	 *            das Prepared Statement, welches nur noch befüllt werden muss
+	 * @param query
+	 *            Das bereits fertig aufgebaute Sql Statement, welches statt der Werte '?' enthält. Diese werden hier 'ersetzt'.
+	 * @param sb
+	 *            Ein StringBuilder zum Loggen der inputParameter.
+	 * @param Logger
+	 *            Ein Logger, welcher bei Fehlern die Exception loggen kann.
+	 * @return das befüllte, ausführbare Prepared Statement
+	 */
+	public static PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb,
+			Logger logger) {
+		int parameterOffset = 1;
+		sb.append(query);
+
+		List<Value> inputValues = new ArrayList<>();
+		for (Row row : inputTable.getRows()) {
+			for (int i = 0; i < row.getValues().size(); i++) {
+				// nur die Values von den Spalten, welche nicht die AND_FIELD Spalte ist, interessiert uns
+				if (!inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
+					inputValues.add(row.getValues().get(i));
+				}
+			}
+		}
+		for (int i = 0; i < inputValues.size(); i++) {
+			try {
+				val iVal = inputValues.get(i);
+				if (iVal != null) {
+					val rule = iVal.getRule();
+					String stringValue = iVal.getValue() + "";
+					if (rule != null && rule.contains("in")) {
+						List<String> inBetweenValues;
+						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
+								.collect(Collectors.toList());
+						for (String string : inBetweenValues) {
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + string);
+							preparedStatement.setString(i + parameterOffset, string);
+							parameterOffset++;
+						}
+						// i zählt als nächstes hoch, deswegen muss parameterOffset wieder um 1 verringert werden
+						parameterOffset--;
+					} else if (rule != null && rule.contains("between")) {
+						List<String> inBetweenValues;
+						inBetweenValues = Stream.of(iVal.getStringValue().split(","))//
+								.collect(Collectors.toList());
+						// bei between vertrauen wir nicht darauf, dass der Nutzer wirklich nur zwei Werte einträgt,
+						// sondern nehmen den ersten und den letzten Wert
+						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(0));
+						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(0));
+						parameterOffset++;
+						sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + inBetweenValues.get(inBetweenValues.size() - 1));
+						preparedStatement.setString(i + parameterOffset, inBetweenValues.get(inBetweenValues.size() - 1));
+					} else {
+						if (!stringValue.trim().isEmpty()) {
+							Object usedValue;
+
+							// Für Postgres muss der Datentyp genau passen
+							switch (iVal.getType()) {
+							case INTEGER:
+								usedValue = iVal.getIntegerValue();
+								preparedStatement.setInt(i + parameterOffset, (int) usedValue);
+								break;
+							case BOOLEAN:
+								usedValue = iVal.getBooleanValue();
+								preparedStatement.setBoolean(i + parameterOffset, (boolean) usedValue);
+								break;
+							case BIGDECIMAL:
+								usedValue = iVal.getBigDecimalValue().doubleValue();
+								preparedStatement.setDouble(i + parameterOffset, (double) usedValue);
+								break;
+							case DOUBLE:
+								usedValue = iVal.getDoubleValue();
+								preparedStatement.setDouble(i + parameterOffset, (double) usedValue);
+								break;
+							case ZONED:
+								usedValue = Timestamp.from(iVal.getZonedDateTimeValue().toInstant());
+								preparedStatement.setTimestamp(i + parameterOffset, (Timestamp) usedValue);
+								break;
+							case INSTANT:
+								usedValue = Timestamp.from(iVal.getInstantValue());
+								preparedStatement.setTimestamp(i + parameterOffset, (Timestamp) usedValue);
+								break;
+							default:
+								usedValue = stringValue;
+								preparedStatement.setString(i + parameterOffset, (String) usedValue);
+								break;
+							}
+							sb.append(" ; Position: " + (i + parameterOffset) + ", Value:" + usedValue);
+						} else {
+							parameterOffset--;
+						}
+					}
+				} else {
+					parameterOffset--;
+				}
+			} catch (Exception e) {
+				logger.error("Statement could not be filled: " + sb.toString(), e);
+				throw new RuntimeException("msg.ParseError %" + (i + parameterOffset));
+			}
+		}
+		sb.append("\n");
+		return preparedStatement;
+	}
 }

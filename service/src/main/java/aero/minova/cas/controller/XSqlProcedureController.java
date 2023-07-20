@@ -78,7 +78,7 @@ public class XSqlProcedureController {
 		try {
 			connection = systemDatabase.getConnection();
 
-			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap();
+			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
 
 			// Hier wird die Anfrage bearbeitet.
 			resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
@@ -95,18 +95,18 @@ public class XSqlProcedureController {
 					queueService.accept(mapEntry.getKey(), new ResponseEntity(result, HttpStatus.ACCEPTED));
 				}
 			}
-			systemDatabase.freeUpConnection(connection);
 		} catch (Throwable e) {
-			customLogger.logError("XSqlProcedure could not be executed: " + sb.toString(), e);
+			customLogger.logError("XSqlProcedure could not be executed: " + sb, e);
 			if (connection != null) {
 				try {
 					connection.rollback();
 				} catch (Exception e1) {
 					customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
 				}
-				connection.close();
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
 	}
@@ -157,9 +157,8 @@ public class XSqlProcedureController {
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) throws Exception {
 		for (XTable xt : inputTables) {
 			SqlProcedureResult result = new SqlProcedureResult();
-			Table filledTable = new Table();
 			// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
-			filledTable = fillInDependencies(xt, resultSets);
+			Table filledTable = fillInDependencies(xt, resultSets);
 
 			// Rechteprüfung
 			final List<Row> privilegeRequest = new ArrayList<>();
@@ -184,7 +183,7 @@ public class XSqlProcedureController {
 				if (inputTablesWithResults.containsKey(filledTable)) {
 					inputTablesWithResults.get(filledTable).add(result);
 				} else {
-					List<SqlProcedureResult> resultList = new ArrayList<SqlProcedureResult>();
+					List<SqlProcedureResult> resultList = new ArrayList<>();
 					resultList.add(result);
 					inputTablesWithResults.put(filledTable, resultList);
 				}

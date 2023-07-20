@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import aero.minova.cas.service.model.UserPrivilege;
 
+@Repository
 public interface UserPrivilegeRepository extends JpaRepository<UserPrivilege, Long> {
 
 	@Query("select u from UserPrivilege u where u.lastAction > 0")

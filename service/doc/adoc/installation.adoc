@@ -18,8 +18,8 @@ dokumentiert.
 * Generelle Spring Boot spezifische Einstellungen sind in den Projekten link:https://github.com/minova-afis/aero.minova.spring.maven.root/[spirng.maven.root]
 und link:https://github.com/minova-afis/aero.minova.spring.service/blob/master/doc/adoc/index.adoc[spring.services]
 dokumentiert.
-* Spezialfall: xref:installation.postgre.adoc[Postgre-Datenbank]
-Postgre wird allerdings nicht so gut wie MsSql unterstützt. Es unterstützt bisher lediglich die Rechteprüfung und Extensions.
+* Spezialfall: xref:installation.postgre.adoc[Postgres-Datenbank]
+PostgreSQL wird allerdings nicht so gut wie MsSql unterstützt. Es unterstützt bisher lediglich die Rechteprüfung und Extensions.
 
 * <<CAS-als-Windows-Dienst-installieren>>
 * xref:installation.dev.adoc[CAS für die Entwicklungsumgebung aufsetzen.]
@@ -44,9 +44,9 @@ image::images/sql-server-tcp-config.jpg[]
 .Minimal-Vorlage
 --------
 aero_minova_core_application_root_path=<Pfad zum Kundensystem>/Shared Data/Program Files/SIS
-aero_minova_database_url=<URL aus der Connection.xbs ohne Benutzername und Passwort>
-aero_minova_database_user_name=<SQL-Benutzer aus der Connection.xbs>
-aero_minova_database_user_password=<Passwort aus der Connection.xbs>
+spring.datasource.url=<URL aus der Connection.xbs ohne Benutzername und Passwort>
+spring.datasource.username=<SQL-Benutzer aus der Connection.xbs>
+spring.datasource.password=<Passwort aus der Connection.xbs>
 
 login_dataSource=<database|admin|ldap>
 --------
@@ -64,12 +64,14 @@ server.ssl.key-store-password=<Passwort des Keystores>
 
 === lib-Ordner erstellen
 
-** Release verwenden: Die Release Jars aus einem Docker-Image kopieren.
-** Entwickler-Version verwenden:
-CAS-Dienst mit `mvn clean verify` bauen.
-`target/libs/*` in den lib Ordner kopieren.
-`target/aero.minova.cas.service.jar.original` kopieren und `original` Suffix entfernen.
-
+* Release verwenden: Die Release Jars aus einem Docker-Image kopieren.
+* Entwickler-Version verwenden:
+** CAS-Dienst (aero.minova.cas) mit `mvn clean verify` bauen.
+*** die Module api, service, setup werden benötigt
+*** jeweils `target/<modul>.jar` in den lib-Ordner kopieren.
+*** jeweils `target/libs/*` in den lib-Ordner kopieren.
+** evtl. benötigte Abhängigkeiten bauen.
+*** jars wie oben in den lib-Ordner kopieren.
 
 === Windows-Dienst erstellen
 
@@ -78,6 +80,7 @@ CAS-Dienst mit `mvn clean verify` bauen.
 ** XML-Konfigurations-Datei für den Wrapper erstellen.
 Der Prefix der Konfigurations-Datei muss mit der Wrapper-Exe übereinstimmen.
 Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml`
+oder `cas-test.exe` und `cas-test.xml`
 
 [source,xml]
 --------
@@ -86,7 +89,7 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 	<id>ID des Windows-Dienstes ohne Leerzeichen</id>
 	<name>Name des Windows-Dienstes</name>
 	<description>Beschreibung des Windows-Dienstes</description>
-	<executable>Pfad zur java.exe.</executable>
+	<executable>Pfad zur java.exe</executable>
 	<!-- Nur eines der beiden Argumente verwenden. -->
 	<!-- Die erste Variante ist für den Fall, dass eine single fat Jar-Version verwendet wird. -->
 	<arguments>-Dloader.path="lib/" -jar aero.minova.cas.service.jar</arguments>
@@ -97,17 +100,22 @@ Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml
 --------
 
 Wenn alles bereit steht,
-kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
-Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
+kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
+Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.
 
-Windows-Dienst starten und die `data/procedure` Setup ausführen.
+Windows-Dienst starten
+
+* über die Windows-Dienste unter dem in `<name>` angegebenen Dienstname
+* mit `<exe> start`
+
+und die `data/procedure` Setup ausführen.
 
 [#Datenbank-initialisieren]
 == Datenbank initialisieren.
 
-Mit den `setup`-Befehl (`data/procedure`) wird die Datenbank aufgesetzt.
+Mit dem `setup`-Befehl (`data/procedure`) wird die Datenbank aufgesetzt.
 Dieser kann über einen Webbrowser ausgeführt werden.
-Der `setup`-Befehl darf von jeden gültigen Nutzer ausgeführt werden,
+Der `setup`-Befehl darf von jedem gültigen Nutzer ausgeführt werden,
 falls der `setup`-Befehl vorher nicht auf der Datenbank ausgeführt wurde.
 Alternativ, dazu kann auch ein REST-Client verwendet werden.
 

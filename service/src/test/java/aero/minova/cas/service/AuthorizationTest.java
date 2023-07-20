@@ -1,4 +1,4 @@
-package aero.minova.cas.controller;
+package aero.minova.cas.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import aero.minova.cas.CoreApplicationSystemApplication;
+import aero.minova.cas.service.AuthorizationService;
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
 import aero.minova.cas.service.model.UserGroup;
@@ -26,7 +27,7 @@ import aero.minova.cas.service.repository.UsersRepository;
 class AuthorizationTest {
 
 	@Autowired
-	AuthorizationController controller;
+	AuthorizationService controller;
 
 	@Autowired
 	AuthoritiesRepository authoritiesRepository;
@@ -45,6 +46,10 @@ class AuthorizationTest {
 
 	@Test
 	void testAdminUser() {
+
+		// Erst die Tabelle leeren, damit andere Tests nicht in die Quere kommen
+		luUserPrivilegeUserGroupRepository.deleteAll();
+		userPrivilegeRepository.deleteAll();
 
 		String username = "Testusername";
 

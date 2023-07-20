@@ -20,6 +20,7 @@ import org.springframework.security.ldap.authentication.LdapAuthenticator;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 
+import aero.minova.cas.BaseTest;
 import aero.minova.cas.SecurityConfig;
 
 @SpringBootTest

@@ -3,12 +3,10 @@ package aero.minova.cas.controller;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
-
-import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,12 +46,7 @@ public class SqlViewController {
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine View mit den Namen der Registrierung ausgeführt werden soll.
 	 */
-	private final Map<String, Function<Table, Table>> extensions = new HashMap<>();
-
-	@PostConstruct
-	public void init() {
-		securityService.setSvc(this);
-	}
+	private final Map<String, Function<Table, Table>> extensions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
 	/**
 	 * Hiermit lassen sich Erweiterungen für Views registrieren, die ausgeführt werden, wenn eine View mit der Namen der Registrierung ausgeführt werden soll.
@@ -91,13 +84,14 @@ public class SqlViewController {
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
 		try {
-			procedureService.unsecurelyProcessProcedure(extensionSetupTable);
+			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);
 		}
 	}
 
+	@Deprecated
 	@GetMapping(value = "data/index", produces = "application/json")
 	public Table getIndexViewGet(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(
@@ -108,7 +102,6 @@ public class SqlViewController {
 	@PostMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
-
 		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
 		List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
 		if (authoritiesForThisTable.isEmpty()) {
@@ -119,7 +112,6 @@ public class SqlViewController {
 				return extensions.get(inputTable.getName()).apply(inputTable);
 			}
 		}
-
 		return viewService.executeView(inputTable, authoritiesForThisTable);
 	}
 

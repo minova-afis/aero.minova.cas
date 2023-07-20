@@ -31,7 +31,10 @@ with encryption as
 	begin 
 		update xtcasUsers
 		set	Password = coalesce(@Password, @OldPassword),
-		Description = @Description
+			Description = @Description,
+			LastAction = 2,
+			LastDate = getDate(),
+			LastUser = dbo.xfCasUser()
 		where KeyLong = @KeyLong
 
 	end

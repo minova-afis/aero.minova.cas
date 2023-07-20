@@ -36,13 +36,15 @@ import lombok.val;
 @Service
 public class ProcedureService {
 
+	private static final String POSTGRESQL = "postgresql";
+
 	@Autowired
 	CustomLogger customLogger;
 
 	@Autowired
 	SystemDatabase systemDatabase;
 
-	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.kind:mssql}")
+	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:mssql}")
 	String databaseKind;
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.maxresultsetcount:512}")
@@ -61,7 +63,7 @@ public class ProcedureService {
 	 */
 	public void setUserContextFor(Connection connection) throws SQLException {
 		CallableStatement userContextSetter;
-		if (databaseKind.equals("postgresql")) {
+		if (databaseKind.equalsIgnoreCase(POSTGRESQL)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
@@ -89,28 +91,45 @@ public class ProcedureService {
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
+		return processSqlProcedureRequest(inputTable, privilegeRequest, false);
+	}
+
+	/**
+	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
+	 * zurückgegeben.
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @param privilegeRequest
+	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
+	 * @param isSetup
+	 *            True falls es sich um einen Aufruf im Rahmend es Setup handelt
+	 * @return Resultat SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler bei der Ausführung
+	 */
+	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest, boolean isSetup) throws Exception {
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
 		try {
 			connection = systemDatabase.getConnection();
+			if (isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS off");
+			}
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
-			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
-			systemDatabase.freeUpConnection(connection);
-		} catch (Exception e) {
-			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
-			if (connection != null) {
-				try {
-					connection.rollback();
-				} catch (Exception e1) {
-					customLogger.logError("Couldn't roll back procedure execution", e);
-				}
-				connection.close();
+			customLogger.logSql("Procedure succesfully executed: " + sb);
+			if (isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS on");
 			}
+		} catch (Exception e) {
+			customLogger.logError("Procedure could not be executed: " + sb, e);
 			throw new ProcedureException(e);
-		} 
+		} finally {
+			systemDatabase.closeConnection(connection);
+		}
 		return result;
 	}
 
@@ -123,9 +142,28 @@ public class ProcedureService {
 	 * @return SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
+	 * @deprecated TODO @Kerstin: was sollte anstelle dieser Methode verwendet werden?
 	 */
 	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+		return unsecurelyProcessProcedure(inputTable, false);
+	}
+
+	/**
+	 * Diese Methode ist NICHT geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben. CHECKT KEINE EXTENSIONS!!!
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @param isSetup
+	 *            True falls es sich um einen Aufruf im Rahmend es Setup handelt
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 * @deprecated TODO @Kerstin: was sollte anstelle dieser Methode verwendet werden?
+	 */
+	@Deprecated
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable, boolean isSetup) throws Exception {
 
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
@@ -139,7 +177,7 @@ public class ProcedureService {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return processSqlProcedureRequest(inputTable, authority);
+		return processSqlProcedureRequest(inputTable, authority, isSetup);
 	}
 
 	/**
@@ -166,7 +204,7 @@ public class ProcedureService {
 			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
 
-		result.setReturnCodes(new ArrayList<Integer>());
+		result.setReturnCodes(new ArrayList<>());
 		result.setReturnCode(0);
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
@@ -212,7 +250,7 @@ public class ProcedureService {
 			{
 				int i = 0;
 				while (preparedStatement.getResultSet() == null) {
-					if ((preparedStatement.getMoreResults() == false) && (preparedStatement.getUpdateCount() == -1)) {
+					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
 						// Es gibt kein nächstes Result gibt.
 						break;
 					}
@@ -302,7 +340,7 @@ public class ProcedureService {
 						.getColumns()//
 						.stream()//
 						.map(c -> c.getOutputType() == OutputType.OUTPUT)//
-						.collect(toList());
+						.toList();
 
 				val outputValues = new Row();
 				outputParameters.setColumns(inputTable.getColumns());
@@ -322,7 +360,7 @@ public class ProcedureService {
 				if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 					resultRow = outputValues;
 				} else {
-					for (Value element : outputValues.getValues()) {
+					for (Value ignored : outputValues.getValues()) {
 						resultRow.addValue(null);
 					}
 				}
@@ -463,7 +501,6 @@ public class ProcedureService {
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append('{')//
-				.append("")//
 				.append(returnRequired ? "? = call " : "call ")//
 				.append(params.getName())//
 				.append("(");

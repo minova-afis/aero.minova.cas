@@ -8,7 +8,6 @@ import static org.mockito.Mockito.spy;
 
 import java.util.Scanner;
 
-import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -17,12 +16,11 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.google.gson.Gson;
 
 import aero.minova.cas.ControllerExceptionHandler;
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.restapi.ClientRestAPI;
 
@@ -54,7 +52,7 @@ class ErrorMessageTest {
 		mockSubject = mock(ControllerExceptionHandler.class);
 
 		doCallRealMethod().when(mockSubject).prepareExceptionReturnTable(any(Exception.class));
-		doCallRealMethod().when(mockSubject).handleSqlErrorMessage(any(Table.class), any(String.class), any(Boolean.class));
+		doCallRealMethod().when(mockSubject).handleSqlErrorMessage(any(Table.class), any(String.class));
 	}
 
 	@SuppressWarnings("resource")
@@ -95,6 +93,22 @@ class ErrorMessageTest {
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
 
 		Table sqlError1 = readTableFromExampleJson("SqlError2");
+
+		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
+		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
+		assertThat(sqlError1.getRows().get(0).getValues().get(0).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(0).getStringValue().trim());
+		assertThat(sqlError1.getRows().get(0).getValues().get(1).getStringValue().trim())
+				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(1).getStringValue().trim());
+	}
+
+	@Test
+	void testSqlErrorMessage3() {
+		Exception e = new Exception("ADO | 25 | msg.sql.51103");
+
+		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
+
+		Table sqlError1 = readTableFromExampleJson("SqlError3");
 
 		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
 		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());

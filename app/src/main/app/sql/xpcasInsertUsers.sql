@@ -22,11 +22,17 @@ with encryption as
 	insert into xtcasUsers (
 		Username,
 		Password,
-		Description
+		Description,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@Username,
 		@Password,
-		@Description
+		@Description,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

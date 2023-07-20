@@ -1,15 +1,17 @@
 package aero.minova.cas.servicenotifier;
 
 import java.util.HashMap;
-
-import jakarta.annotation.PostConstruct;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Row;
-import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.service.model.NewsfeedListener;
+import aero.minova.cas.service.model.ProcedureNewsfeed;
+import aero.minova.cas.service.repository.NewsfeedListenerRepository;
+import aero.minova.cas.service.repository.ProcedureNewsfeedRepository;
+import jakarta.annotation.PostConstruct;
 
 // @Component - Der Cache wird bisher nicht verwendet, da er momentan auch noch nicht benötigt wird.
 // Außerdem würde er, wenn er angeschalten ist, zu Testfehlern führen (aufgrund der PostConstruct-Annotation), welche schwierig zu lösen sind und wofür wir momentan keine Zeit haben.
@@ -25,6 +27,10 @@ public class ServiceNotifierCache {
 	@Autowired
 	SecurityService securityService;
 
+	ProcedureNewsfeedRepository procedureNewsfeedRepo;
+
+	NewsfeedListenerRepository newsfeedListenerRepo;
+
 	/**
 	 * Wenn das CAS neu gestartet wird, müssen die Servicenotifier wieder aus der Datenbank ausgelesen werden, da die Map sonst leer ist.
 	 */
@@ -33,11 +39,9 @@ public class ServiceNotifierCache {
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.servicenotifier = new HashMap<>();
-				Table servicenotifierTable = service.findViewEntry(null, null, null, null, null);
-				for (Row row : servicenotifierTable.getRows()) {
-					if (row.getValues().get(4) != null && row.getValues().get(5) != null) {
-						service.registerServicenotifier(row.getValues().get(4).getStringValue(), row.getValues().get(5).getStringValue());
-					}
+				List<ProcedureNewsfeed> servicenotifierTable = procedureNewsfeedRepo.findAllByLastaction(0);
+				for (ProcedureNewsfeed procedureNewsfeed : servicenotifierTable) {
+					service.registerServicenotifier(procedureNewsfeed.getKeytext(), procedureNewsfeed.getTopic());
 				}
 			}
 		} catch (Exception e) {
@@ -54,9 +58,9 @@ public class ServiceNotifierCache {
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.newsfeeds = new HashMap<>();
-				Table newsfeedsTable = service.findViewEntry(null, null, null, null, null);
-				for (Row row : newsfeedsTable.getRows()) {
-					service.registerNewsfeed(row.getValues().get(3).getStringValue(), row.getValues().get(5).getStringValue());
+				List<NewsfeedListener> newsfeedsTable = newsfeedListenerRepo.findAllByLastaction(0);
+				for (NewsfeedListener newsfeedListener : newsfeedsTable) {
+					service.registerNewsfeed(newsfeedListener.getCasservice().getKeytext(), newsfeedListener.getTopic());
 				}
 			}
 

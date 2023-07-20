@@ -8,11 +8,17 @@ with encryption as
 	insert into xtcasServiceProperties (
 		Service,
 		Property,
-		Val
+		Val,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@Service,
 		@Property,
-		@Val
+		@Val,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

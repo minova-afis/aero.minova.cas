@@ -17,11 +17,17 @@ with encryption as
 	insert into xtcasColumnSecurity (
 		TableName,
 		ColumnName,
-		SecurityToken
+		SecurityToken,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@TableName,
 		@ColumnName,
-		@SecurityToken
+		@SecurityToken,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

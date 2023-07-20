@@ -7,7 +7,7 @@ alter procedure dbo.xpcasDeleteLuUserPrivilegeUserGroup (
 with encryption as
 	update xtcasLuUserPrivilegeUserGroup
 	set	LastAction = -1,
-		LastUser = system_user,
+		LastUser = dbo.xfCasUser(),
 		LastDate = getdate()
 	where KeyLong = @KeyLong
 return @@error

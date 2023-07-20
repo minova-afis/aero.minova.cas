@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +13,20 @@ import org.springframework.stereotype.Service;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
-import aero.minova.cas.api.domain.OutputType;
 import aero.minova.cas.api.domain.Row;
-import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
-import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.service.model.CASServices;
+import aero.minova.cas.service.model.NewsfeedListener;
+import aero.minova.cas.service.model.ProcedureNewsfeed;
+import aero.minova.cas.service.model.ServiceMessageReceiverLoginType;
+import aero.minova.cas.service.repository.CASServicesRepository;
+import aero.minova.cas.service.repository.NewsfeedListenerRepository;
+import aero.minova.cas.service.repository.ProcedureNewsfeedRepository;
+import aero.minova.cas.service.repository.ServiceMessageReceiverLoginTypeRepository;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class ServiceNotifierService {
@@ -37,7 +41,16 @@ public class ServiceNotifierService {
 	SecurityService securityService;
 
 	@Autowired
-	ProcedureService procedureService;
+	ServiceMessageReceiverLoginTypeRepository serviceMessageReceiverLoginTypeRepo;
+
+	@Autowired
+	CASServicesRepository casServiceRepo;
+
+	@Autowired
+	NewsfeedListenerRepository newsfeedListenerRepo;
+
+	@Autowired
+	ProcedureNewsfeedRepository procedureNewsfeedRepo;
 
 	/**
 	 * Enthält Tupel aus Prozedurenamen und Tabellennamen. Wird eine der enthaltenen Prozeduren ausgeführt, muss der dazugehörige Dienst angetriggert werden.
@@ -52,6 +65,11 @@ public class ServiceNotifierService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
 	private void setup() {
+
+		findOrCreateServiceMessageReceiverLoginType("None");
+		findOrCreateServiceMessageReceiverLoginType("BasicAuth");
+		findOrCreateServiceMessageReceiverLoginType("OAuth2");
+
 		spc.registerExtension("xpcasRegisterService", inputTable -> {
 			try {
 				int keyLong = registerService(inputTable);
@@ -111,6 +129,22 @@ public class ServiceNotifierService {
 	}
 
 	/**
+	 * Findet Einträge im ServiceMessageReceiverLoginTypeRepository oder legt sie an, falls diese nicht existieren.
+	 * 
+	 * @param loginType
+	 *            Der gesuchte Name als String.
+	 * @return ein ServiceMessageReceiverLoginType-Objekt.
+	 */
+	public ServiceMessageReceiverLoginType findOrCreateServiceMessageReceiverLoginType(String loginType) {
+		return serviceMessageReceiverLoginTypeRepo.findByKeyText(loginType).orElseGet(() -> {
+			ServiceMessageReceiverLoginType serviceMessageLoginType = new ServiceMessageReceiverLoginType();
+			serviceMessageLoginType.setKeyText(loginType);
+			serviceMessageReceiverLoginTypeRepo.save(serviceMessageLoginType);
+			return serviceMessageLoginType;
+		});
+	}
+
+	/**
 	 * Registriert einen Dienst beim CAS und schreibt die dazugehörigen Daten in die xtcasCASServices Tabelle. Die übergebene Table muss dafür in der ersten
 	 * Spalte den Namen des Dienstes beinhalten, in der Zweiten die ServiceURL und in der Dritten den Port.
 	 * 
@@ -119,57 +153,54 @@ public class ServiceNotifierService {
 	 * @return Den KeyLong des Dienstes als int.
 	 */
 	public int registerService(Table inputTable) {
-		SqlProcedureResult registerResult = new SqlProcedureResult();
-
-		Table registerSerivceTable = new Table();
-		registerSerivceTable.setName("xpcasInsertCASService");
-		registerSerivceTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
-		registerSerivceTable.addColumn(new Column("KeyText", DataType.STRING));
-		registerSerivceTable.addColumn(new Column("ServiceURL", DataType.STRING));
-		registerSerivceTable.addColumn(new Column("Port", DataType.INTEGER));
-
-		Row registerRow = new Row();
-		registerRow.addValue(null);
-		registerRow.addValue(inputTable.getRows().get(0).getValues().get(0));
-		registerRow.addValue(inputTable.getRows().get(0).getValues().get(1));
-		registerRow.addValue(inputTable.getRows().get(0).getValues().get(2));
-
-		registerSerivceTable.addRow(registerRow);
 		try {
-			registerResult = procedureService.unsecurelyProcessProcedure(registerSerivceTable);
+
+			CASServices newService = new CASServices();
+
+			newService.setKeytext(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue());
+			newService.setServiceurl(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceURL")).getStringValue());
+			newService.setPort(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("Port")).getIntegerValue());
+
+			int loginTypeKey = inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceMessageReceiverLoginType")) != null
+					? inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceMessageReceiverLoginType")).getIntegerValue()
+					: 0;
+			ServiceMessageReceiverLoginType loginType = serviceMessageReceiverLoginTypeRepo.findByKeylong(loginTypeKey);
+			newService.setReceiverLoginType(loginType);
+
+			newService.setUsername(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("Username")).getStringValue());
+			newService.setPassword(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("Password")).getStringValue());
+			newService.setClientId(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ClientID")).getStringValue());
+			newService.setClientSecret(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ClientSecret")).getStringValue());
+			newService.setTokenURL(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("TokenURL")).getStringValue());
+
+			casServiceRepo.saveAndFlush(newService);
+
+			return newService.getKeylong();
+
 		} catch (Exception e) {
-			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered", e);
+			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered.", e);
 			throw new RuntimeException(e);
 		}
-
-		return registerResult.getOutputParameters().getRows().get(0).getValues().get(0).getIntegerValue();
 	}
 
 	/**
 	 * Löscht den Eintrag des Dienstes aus der Datenbank und meldet ihn vom CAS ab.
 	 * 
 	 * @param inputTable
-	 *            eine Table, welche in der ersten Spalte den Dienstnamen, in der Zweiten die ServiceURL und in der dritten Column den Port benötigt.
+	 *            eine Table, welche den Dienstnamen,die ServiceURL und den Port benötigt.
 	 */
 	public void unregisterService(Table inputTable) {
 
-		String serviceName = inputTable.getRows().get(0).getValues().get(0).getStringValue();
-
+		String serviceName = inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue();
 		try {
+
 			// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
-			Value keyLong = findServiceEntry(serviceName);
+			CASServices toDelete = findServiceEntry(serviceName);
 
-			Table unregisterSerivceTable = new Table();
-			unregisterSerivceTable.setName("xpcasDeleteCASService");
-			unregisterSerivceTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-
-			Row unregisterRow = new Row();
-			unregisterRow.addValue(keyLong);
-
-			unregisterSerivceTable.addRow(unregisterRow);
+			toDelete.setLastaction(-1);
+			casServiceRepo.saveAndFlush(toDelete);
 
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterSerivceTable);
 		} catch (Exception e) {
 			logger.logError("The service " + serviceName + " could not be unregistered!", e);
 			throw new RuntimeException(e);
@@ -201,23 +232,26 @@ public class ServiceNotifierService {
 	 *            Eine Table, welche den Prozedurnamen und den Tabellennamen enthält.
 	 */
 	public void registerProcedureNewsfeed(Table inputTable) {
-		Table registerProcedureNewsfeedTable = new Table();
-		registerProcedureNewsfeedTable.setName("xpcasInsertProcedureNewsfeed");
-		registerProcedureNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
-		registerProcedureNewsfeedTable.addColumn(new Column("KeyText", DataType.STRING));
-		registerProcedureNewsfeedTable.addColumn(new Column("Topic", DataType.STRING));
-
-		for (Row inputRow : inputTable.getRows()) {
-
-			Row registerRow = new Row();
-			registerRow.addValue(null);
-			registerRow.addValue(inputRow.getValues().get(0));
-			registerRow.addValue(inputRow.getValues().get(1));
-
-			registerProcedureNewsfeedTable.addRow(registerRow);
-		}
 		try {
-			procedureService.unsecurelyProcessProcedure(registerProcedureNewsfeedTable);
+			for (Row inputRow : inputTable.getRows()) {
+
+				String keyText = inputRow.getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue();
+				String topic = inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue();
+
+				List<ProcedureNewsfeed> existingNewsfeeds = procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastactionGreaterThan(keyText, topic, 0);
+
+				// Diese Einträge sind bereits vorhanden. Wir wollen keine doppelten Einträge, also return.
+				if (!existingNewsfeeds.isEmpty()) {
+					return;
+				}
+				ProcedureNewsfeed newProcedureNewsfeed = new ProcedureNewsfeed();
+
+				newProcedureNewsfeed.setKeytext(keyText);
+				newProcedureNewsfeed.setTopic(topic);
+
+				procedureNewsfeedRepo.saveAndFlush(newProcedureNewsfeed);
+
+			}
 		} catch (Exception e) {
 			logger.logError("Error while trying to register procedures: ", e);
 			throw new RuntimeException(e);
@@ -237,29 +271,23 @@ public class ServiceNotifierService {
 	 */
 	public void unregisterProcedureNewsfeed(Table inputTable) {
 
-		Table unregisterProcedureNewsfeedTable = new Table();
-		unregisterProcedureNewsfeedTable.setName("xpcasDeleteProcedureNewsfeed");
-		unregisterProcedureNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-
 		try {
 			for (Row inputRow : inputTable.getRows()) {
 
 				// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
-				Table keyTable = findProcedureEntry(inputRow.getValues().get(0), inputRow.getValues().get(1));
+				List<ProcedureNewsfeed> procedureNewsfeedList = findProcedureEntry(inputRow.getValues().get(0), inputRow.getValues().get(1));
 
-				if (keyTable.getRows().isEmpty()) {
+				if (procedureNewsfeedList.isEmpty()) {
 					throw new RuntimeException("The combination of procedurename and topic could not be found! " + inputRow.getValues().get(0).getStringValue()
 							+ " " + inputRow.getValues().get(1).getStringValue());
 				}
-				Value keyLong = keyTable.getRows().get(0).getValues().get(0);
 
-				Row unregisterRow = new Row();
-				unregisterRow.addValue(keyLong);
-
-				unregisterProcedureNewsfeedTable.addRow(unregisterRow);
+				for (ProcedureNewsfeed toDelete : procedureNewsfeedList) {
+					toDelete.setLastaction(-1);
+					// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
+					procedureNewsfeedRepo.saveAndFlush(toDelete);
+				}
 			}
-			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister procedures: ", e);
 			throw new RuntimeException(e);
@@ -272,25 +300,16 @@ public class ServiceNotifierService {
 	}
 
 	public void unregisterProcedureNewsfeedCompletely(Table inputTable) {
-
-		Table unregisterProcedureNewsfeedTable = new Table();
-		unregisterProcedureNewsfeedTable.setName("xpcasDeleteProcedureNewsfeed");
-		unregisterProcedureNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-
 		try {
 			for (Row inputRow : inputTable.getRows()) {
 				// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
-				Table tableWithKeyLongs = findProcedureEntry(inputRow.getValues().get(0), null);
-				for (Row keyRow : tableWithKeyLongs.getRows()) {
-
-					Row unregisterRow = new Row();
-					unregisterRow.addValue(keyRow.getValues().get(0));
-
-					unregisterProcedureNewsfeedTable.addRow(unregisterRow);
+				List<ProcedureNewsfeed> procedureNewsfeeds = findProcedureEntry(inputRow.getValues().get(0), null);
+				for (ProcedureNewsfeed toDelete : procedureNewsfeeds) {
+					toDelete.setLastaction(-1);
+					// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
+					procedureNewsfeedRepo.saveAndFlush(toDelete);
 				}
 			}
-			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterProcedureNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister procedures: ", e);
 			throw new RuntimeException(e);
@@ -310,27 +329,28 @@ public class ServiceNotifierService {
 	 */
 	public void registerNewsfeedListener(Table inputTable) {
 
-		// Key zum CASServiceName herausfinden.
-		Value serviceKey = findServiceEntry(inputTable.getRows().get(0).getValues().get(0).getStringValue());
-
-		Table registerNewsfeedTable = new Table();
-		registerNewsfeedTable.setName("xpcasInsertNewsfeedListener");
-		registerNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
-		registerNewsfeedTable.addColumn(new Column("CASServiceKey", DataType.INTEGER));
-		registerNewsfeedTable.addColumn(new Column("Topic", DataType.STRING));
-
-		for (Row inputRow : inputTable.getRows()) {
-			Row registerRow = new Row();
-			registerRow.addValue(null);
-			registerRow.addValue(serviceKey);
-			registerRow.addValue(inputRow.getValues().get(1));
-
-			registerNewsfeedTable.addRow(registerRow);
-		}
 		try {
-			procedureService.unsecurelyProcessProcedure(registerNewsfeedTable);
+			// CASService finden und in neuen NewsfeedListener einfügen.
+			CASServices serviceKey = findServiceEntry(inputTable.getRows().get(0).getValues().get(0).getStringValue());
+
+			for (Row inputRow : inputTable.getRows()) {
+				String topic = inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue();
+
+				List<NewsfeedListener> existingListeners = newsfeedListenerRepo.findAllByCasserviceAndTopicAndLastactionGreaterThan(serviceKey, topic, 0);
+
+				// Diese Einträge sind bereits vorhanden. Wir wollen keine doppelten Einträge, also return.
+				if (!existingListeners.isEmpty()) {
+					return;
+				}
+
+				NewsfeedListener newListener = new NewsfeedListener();
+				newListener.setCasservice(serviceKey);
+				newListener.setTopic(topic);
+
+				newsfeedListenerRepo.saveAndFlush(newListener);
+			}
 		} catch (Exception e) {
-			logger.logError("Error while trying to register a newsfeed: ", e);
+			logger.logError("Error while trying to register a new newsfeed: ", e);
 			throw new RuntimeException(e);
 		}
 
@@ -348,24 +368,19 @@ public class ServiceNotifierService {
 	 */
 	public void unregisterNewsfeedListener(Table inputTable) {
 
-		Table unregisterNewsfeedTable = new Table();
-		unregisterNewsfeedTable.setName("xpcasDeleteNewsfeedListener");
-		unregisterNewsfeedTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-
 		try {
 			for (Row inputRow : inputTable.getRows()) {
 
-				// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
-				Value keyLong = findViewEntry(inputRow.getValues().get(0), null, inputRow.getValues().get(1), null, null)//
-						.getRows().get(0).getValues().get(0);
+				// Wir finden erst einmal heraus, welche NewsfeedListener mit dem Service in Verbindung stehen.
+				List<NewsfeedListener> newsfeedListeners = findViewEntry(inputRow.getValues().get(0).getStringValue(),
+						inputRow.getValues().get(1).getStringValue());
 
-				Row unregisterRow = new Row();
-				unregisterRow.addValue(keyLong);
-
-				unregisterNewsfeedTable.addRow(unregisterRow);
+				for (NewsfeedListener toDelete : newsfeedListeners) {
+					toDelete.setLastaction(-1);
+					// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht. LastAction wird einfach nur auf -1 gesetzt.
+					newsfeedListenerRepo.saveAndFlush(toDelete);
+				}
 			}
-			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
-			procedureService.unsecurelyProcessProcedure(unregisterNewsfeedTable);
 		} catch (Exception e) {
 			logger.logError("Error while trying to unregister newsfeed: ", e);
 			throw new RuntimeException(e);
@@ -384,43 +399,26 @@ public class ServiceNotifierService {
 	 *            Der ServiceName, zu welchem man den KeyLong finden möchte.
 	 * @return Den passenden KeyLong zum casServiceName.
 	 */
-	private Value findServiceEntry(String casServiceName) {
-		Table viewResult = new Table();
-
-		Table viewTable = new Table();
-		viewTable.setName("xtcasCASServices");
-		viewTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		viewTable.addColumn(new Column("KeyText", DataType.STRING));
-
-		Row viewRow = new Row();
-		viewRow.addValue(null);
-		viewRow.addValue(new Value(casServiceName, null));
-
-		viewTable.addRow(viewRow);
+	private CASServices findServiceEntry(String casServiceName) {
 		try {
-			viewResult = securityService.unsecurelyGetIndexView(viewTable);
+			// Die ServiceNamen müssen eindeutig sein, deswegen nehmen wir hier einfach den Ersten, den wir finden.
+			return casServiceRepo.findByKeytext(casServiceName);
 		} catch (Exception e) {
-			logger.logError("Error while trying to access view xtcasCASServices!", e);
+			logger.logError("Error while trying to find service " + casServiceName + " in xtcasCASServices!", e);
 			throw new RuntimeException(e);
-		}
-		// Da die ServiceNamen eindeutig sein müssen, kann man beruhigt den ersten KeyLong zurückgeben, den man findet.
-		if (viewResult.getRows().isEmpty()) {
-			throw new RuntimeException("No service with the name " + casServiceName + " registered.");
-		} else {
-			return viewResult.getRows().get(0).getValues().get(0);
 		}
 	}
 
 	/**
 	 * Sucht in der xvCASServices die Einträge anhand der übergebenen Values heraus. Die Values müssen hierfür String-Values sein. Wichtig hierbei ist, dass
-	 * nicht jeder Value übergeben werden muss. Falls man die gesamte View haben möchte, kann man auch einfach 'null' in allen Übergabeparametern übergeben.
+	 * nicht jeder Value übergeben werden muss.
 	 * 
 	 * @param casServiceName
-	 *            Der Name des Dienstes als String-Value.
+	 *            Der Name des Dienstes als String.
 	 * @param procedureName
-	 *            Der Name der Prozedur als String-Value.
+	 *            Der Name der Prozedur als String.
 	 * @param topic
-	 *            Der Name der Table als String-Value.
+	 *            Der Name der Table als String.
 	 * @param serviceURL
 	 *            Die URL eines Dienstes.
 	 * @param port
@@ -428,38 +426,28 @@ public class ServiceNotifierService {
 	 * @return Eine Table mit den jeweiligen gefilterten Einträgen. Die Reihenfolge der Values ist folgende: CASServiceKey, NewsfeedListenerKey,
 	 *         ProcedureNewsfeedKey, CASServiceName, ProcedureName, topic, ServiceURL, Port
 	 */
-	public Table findViewEntry(Value casServiceName, Value procedureName, Value topic, Value serviceURL, Value port) {
-		Table viewResult = new Table();
-
-		Table viewTable = new Table();
-		viewTable.setName("xvcasCASServices");
-		viewTable.addColumn(new Column("CASServiceKey", DataType.INTEGER));
-		viewTable.addColumn(new Column("NewsfeedListenerKey", DataType.STRING));
-		viewTable.addColumn(new Column("ProcedureNewsfeedKey", DataType.STRING));
-		viewTable.addColumn(new Column("CASServiceName", DataType.STRING));
-		viewTable.addColumn(new Column("ProcedureName", DataType.STRING));
-		viewTable.addColumn(new Column("Topic", DataType.STRING));
-		viewTable.addColumn(new Column("ServiceURL", DataType.STRING));
-		viewTable.addColumn(new Column("Port", DataType.INTEGER));
-
-		Row viewRow = new Row();
-		viewRow.addValue(null);
-		viewRow.addValue(null);
-		viewRow.addValue(null);
-		viewRow.addValue(casServiceName);
-		viewRow.addValue(procedureName);
-		viewRow.addValue(topic);
-		viewRow.addValue(serviceURL);
-		viewRow.addValue(port);
-
-		viewTable.addRow(viewRow);
+	public List<NewsfeedListener> findViewEntry(String casServiceName, String topic) {
 		try {
-			viewResult = securityService.unsecurelyGetIndexView(viewTable);
+
+			if (topic.isBlank()) {
+				if (casServiceName == null || casServiceName.isBlank()) {
+					return newsfeedListenerRepo.findAllByLastaction(0);
+				} else {
+					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);
+					return newsfeedListenerRepo.findAllByCasservice(findMe);
+				}
+			} else {
+				if (casServiceName == null || casServiceName.isBlank()) {
+					return newsfeedListenerRepo.findAllByTopicAndLastactionGreaterThan(topic, 0);
+				} else {
+					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);
+					return newsfeedListenerRepo.findAllByCasserviceAndTopicAndLastactionGreaterThan(findMe, topic, 0);
+				}
+			}
 		} catch (Exception e) {
-			logger.logError("Error while trying to access view xvcasCASServices!", e);
+			logger.logError("Error while trying to access view xtcasCASServices!", e);
 			throw new RuntimeException(e);
 		}
-		return viewResult;
 	}
 
 	/**
@@ -473,30 +461,15 @@ public class ServiceNotifierService {
 	 *            Der Name der Table als String-Value.
 	 * @return Eine Table mit den gültigen KeyLongs zu der übergebenen Kombination.
 	 */
-	public Table findProcedureEntry(Value procedureName, Value topic) {
-		Table viewResult = new Table();
+	public List<ProcedureNewsfeed> findProcedureEntry(Value procedureName, Value topic) {
 
-		Table viewTable = new Table();
-		viewTable.setName("xtcasProcedureNewsfeed");
-		viewTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		viewTable.addColumn(new Column("KeyText", DataType.STRING));
-		viewTable.addColumn(new Column("Topic", DataType.STRING));
-		viewTable.addColumn(new Column("LastAction", DataType.INTEGER));
-
-		Row viewRow = new Row();
-		viewRow.addValue(null);
-		viewRow.addValue(procedureName);
-		viewRow.addValue(topic);
-		viewRow.addValue(new Value("0", ">="));
-
-		viewTable.addRow(viewRow);
 		try {
-			viewResult = securityService.unsecurelyGetIndexView(viewTable);
+			return procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastactionGreaterThan(procedureName.getStringValue(), topic.getStringValue(), 0);
+
 		} catch (Exception e) {
 			logger.logError("Error while trying to access view xtcasProcedureNewsfeed!", e);
 			throw new RuntimeException(e);
 		}
-		return viewResult;
 	}
 
 	/**

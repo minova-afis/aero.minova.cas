@@ -1,9 +1,128 @@
 # Changelog
-All wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
+Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+
+## [12.65.5] -- 2023-07-11
+* ServiceMessageReceiverLoginType Initialisierung über Java Code statt data.sql File durchführen. Damit funktioniert die Initialisierung, egal welche Datenbank verwendet wird
+
+## [12.65.4] -- 2023-07-10
+* xpcasInsertAllPrivilegesToUserGroup an neue Tabellenstrukturen anpassen, um Setup-Fehler zu beheben.
+
+## [12.65.3] -- 2023-07-07
+* Login erweitern über Value aero.minova.cas.setup.logging.  
+
+## [12.65.2] -- 2023-07-07
+* Setup-XMLs vom CAS-App-Projekt vervollständigen, um das Setup von Tabellen zu korrigieren.
+Dabei ist herausgekommen, dass `spring.jpa.hibernate.ddl-auto=create` zusammen mit dem Setup nicht funktioniert.
+Folglich sollten die Tabellen im CAS oder dessen Erweiterungen,
+nicht mit JPA aufgesetzt werden und somit `spring.jpa.hibernate.ddl-auto=none` immer gelten.
+
+## [12.65.1] -- 2023-06-26
+* Spring Boot Version erhöhen auf 3.1.1
+* Extensions können nun ServiceProperties über das dazugehörige Interface ServicePropertiesRepo abfragen.
+* In der Table xtcasCASServices wurde die Spalte ServiceURL von 50 auf 250 Zeichen erhöht.
+
+## [12.65.0] -- 2023-06-21
+* QueueService auf JPA umstellen.
+* Erweitern des QueueService um BasicAuth und OAuth2.
+
+## [12.64.2] -- 2023-06-20
+* JOOQViewService ignoriert Cases -> Bei Privilegienprüfung ist Case egal
+* Extensions werden ausgeführt, egal ob Cases der Namen zusammenpassen
+* mr-smithers-excellent Release Workflow für Releases verwenden.
+* Basis-Test für ViewServiceInterface-Implementierungen
+
+## [12.64.1] -- 2023-06-15
+* In CAS Prozeduren die Last* Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden.
+* Helper-Version in Manifest an Helper-pom anpassen.
+* Gemeinsame GitHub Workflows aus https://github.com/minova-afis/aero.minova.os.github.workflows verwenden.
+* JOOQViewService kann nun mit 'OR'-Fällen umgehen. Vorher konnte er Queries nur mit 'AND' verbinden.
+
+## [12.64.0] -- 2023-06-14
+* Testrelease mit neuem Workflow
+
+## [12.63.10] -- 2023-06-05
+* Helper-Manifest ausbessern
+
+## [12.63.9] -- 2023-06-02
+* Workflow ReleaseAppAndHelper veröffentlicht die Dockerfile auf Docker.io
+
+## [12.63.8] -- 2023-06-02
+* Helper Version Updaten
+* Workflow ReleaseAppAndHelper korrigiert
+* Tycho-Version im Client auf 3.0.4 erhöhen
+
+## [12.63.7] -- 2023-06-02
+* Abschneiden von Daten beim Setup direkt in der Methode processSqlProcedureRequest erlauben
+
+## [12.63.1 - 12.63.6] -- 2023-06-01
+* Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## [12.63.0] -- 2023-05-26
+* In CAS Prozeduren die Last* Spalten füllen, um Truncated Fehler auf Azure zu vermeiden
+* Helper-Version in Manifest an Helper-pom anpassen
+
+## [12.62.0] -- 2023-05-25
+* Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
+* Eventhandling von Ncore für Extensions über `aero.minova.service.event.dispatcher` bereitstellen.
+* Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## [12.61.3] -- 2023-05-23
+* Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird
+
+## [12.61.2] -- 2023-05-23
+* PasswordEncoderExtension entfernen, Passwort wird schon im Helper verschlüsselt, damit Passwörter nicht in Klartext im Log stehen.
+* Update auf SpringBoot 3.1.0.
+* Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
+* Für Azure Authentifiezierung fehlende Lib hinzufügen
+
+
+## [12.61.1] -- 2023-05-12
+* Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben
+* Autocommit per default auf `false` stellen
+
+## [12.61.0] -- 2023-05-11
+* AuthorizationController zu AuthorizationService umbenennen, da es kein Controller ist.
+
+## [12.60.2] -- 2023-05-10
+* Update auf SpringBoot 3.0.6.
+* KeyText in xtcasUser von 10 auf 50 Zeichen verlängert
+
+## [12.60.1] -- 2023-04-27
+* Konfiguration der DataSource SpringBoot überlassen
+* Verwaltung der JDBC Connections HikariCP überlassen
+
+## [12.60.0] -- 2023-04-21
+* Update auf SpringBoot 3.0.5.
+* Korrektur der Connectionfreigabe.
+* AuthorizationTest ausbessern (Tabelle leeren, damit andere Tests nicht das Ergebnis beeinflussen)
+* `aero_minova_database_` properties entfernen (sind durch `spring.datasource.` abgedeckt)
+* Fehlermeldung bei Laden von Privilegien verbessern
+
+## [12.59.1] -- 2023-04-04
+* Update auf SpringBoot 3.0.4.
+
+* Feld ModulName in MDI-Maske hinzugefügt.
+* Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.38.
+* SQL-Fehlermeldungen ohne Default-Übersetzung verarbeiten
+* Connections freigeben nach unsicherem Viewaufruf. Hierdurch soll das Hängenbleiben des CAS verhindert werden.
+
+## [12.59.0] -- 2023-02-07
+* #362 Zugriff auf weitere Datenbanken unterstützen (zumindest über Views).
+* Property `aero.minova.database.kind` durch `spring.jooq.sql-dialect` ersetzt.
+* Proof of Concept Test für SQLViewController#getIndexView
+* Kopieren in MDI-Maske ermöglichen, um die Bedienung zu vereinfachen
+* Extension-Doku erweitern.
+* Prozedur xpcasInsertAllPrivilegesToUserGroup anpassen, sodass immer LastAction 1 beim Neueintragen von Privilegien gesetzt wird.
+* CI-Pipeline Updates: `AdoptOpenJDK` wird zu `Eclipse Temurin`.
+* Erhöhe Lombok Version von 1.18.24 auf 1.18.26.
+* Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.19.32.
+
+## [12.58.0] -- 2023-01-27
 * Update auf SpringBoot 3.0.2
 * S3 Abhängigkeit aus AWS SDK's BOM für Erweiterungen bereitstellen.
 

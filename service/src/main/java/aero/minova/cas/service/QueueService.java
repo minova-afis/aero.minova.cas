@@ -1,34 +1,47 @@
 package aero.minova.cas.service;
 
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import jakarta.annotation.PostConstruct;
-
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Column;
-import aero.minova.cas.api.domain.DataType;
-import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.service.model.CASServices;
+import aero.minova.cas.service.model.NewsfeedListener;
+import aero.minova.cas.service.model.ServiceMessage;
+import aero.minova.cas.service.repository.CASServicesRepository;
+import aero.minova.cas.service.repository.ServiceMessageRepository;
 import aero.minova.cas.servicenotifier.ServiceNotifierService;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
@@ -45,9 +58,6 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	@Autowired
 	private SqlProcedureController spc;
 
-	@Autowired
-	private ProcedureService procedureService;
-
 	// Hierbei handelt es sich um Tage
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.message.age:7}")
 	int allowedMessageAge;
@@ -55,10 +65,19 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.number.of.attempts:10}")
 	int allowedNumberOfAttempts;
 
+	@Autowired
 	RestTemplate restTemplate;
 
 	// Map<ProzedurName, Map< ServiceName, BiFunction>>
 	Map<String, Map<String, BiFunction<Table, ResponseEntity<Object>, String>>> serviceMessageCreators = new HashMap<>();
+
+	@Autowired
+	ServiceMessageRepository serviceMessageRepo;
+
+	@Autowired
+	CASServicesRepository casServiceRepo;
+
+	Map<CASServices, OAuth2Token> oauth2TokenList = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
@@ -108,7 +127,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			@Override
 			public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
+				// Hier muss bisher nicht implementiert werden.
 			}
 
 			@Override
@@ -133,21 +152,33 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 			@Override
 			public Collection<? extends GrantedAuthority> getAuthorities() {
-				return null;
+				return Collections.emptyList();
 			}
 		});
 
-		// Holt sich alle Nachrichten, die noch nicht versandt wurden.
-		Table messagesToBeSend = getNextMessage();
+		List<ServiceMessage> messagesToBeSend;
 
-		if (messagesToBeSend != null && !messagesToBeSend.getRows().isEmpty()) {
+		try {
+			// Holt sich alle Nachrichten, die noch nicht versandt wurden oder noch nicht gefailed sind.
+			messagesToBeSend = serviceMessageRepo.findAllByIssentFalseAndFailedFalseAndLastactionGreaterThan(0);
+		} catch (Exception e) {
+			logger.logError("Could not read next message. The QueueService could not read tServiceMessage.", e);
+			throw new RuntimeException(e);
+		}
 
-			for (Row pendingMessage : messagesToBeSend.getRows()) {
+		if (messagesToBeSend != null && !messagesToBeSend.isEmpty()) {
 
-				// Falls die Nachricht älter ist als das allowedMessageAge und falls die NumberOfAttempts höher ist als die allowedNumberOfAttempts, muss die
-				// Nachricht gelöscht werden.
-				if (pendingMessage.getValues().get(8).getInstantValue().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))
-						|| pendingMessage.getValues().get(7).getIntegerValue() >= allowedNumberOfAttempts) {
+			for (ServiceMessage pendingMessage : messagesToBeSend) {
+
+				// Wenn die allowedNumberOfAttempts zu hoch wird, setzen wir Failed auf true und die Nachricht soll nicht weiter versucht werden zu verschicken.
+				if (pendingMessage.getNumberofattempts() >= allowedNumberOfAttempts) {
+					pendingMessage.setFailed(true);
+					serviceMessageRepo.saveAndFlush(pendingMessage);
+					continue;
+				}
+
+				// Falls die Nachricht älter ist als das allowedMessageAge muss die Nachricht gelöscht werden.
+				if (pendingMessage.getMessagecreationdate().toInstant().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))) {
 					deleteMessage(pendingMessage);
 					continue;
 				}
@@ -158,10 +189,11 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 					safeAsSent(true, pendingMessage);
 				} else {
 					safeAsSent(false, pendingMessage);
-					logger.logQueueService(pendingMessage.getValues().get(1).getStringValue() + " is not reachable!");
+					logger.logQueueService(pendingMessage.getCasservice().getKeytext() + " is not reachable!");
 				}
 			}
 		}
+
 	}
 
 	/**
@@ -179,7 +211,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				// Wenn eine Prozedur ausgeführt wurde, müssen Nachrichten für alle betroffenen Dienste generiert werden.
 				for (Map.Entry<String, BiFunction<Table, ResponseEntity<Object>, String>> entry : topicSpecificMessages.entrySet()) {
 
-					String message = entry.getValue().apply(t, u).toString();
+					String message = entry.getValue().apply(t, u);
 					saveMessage(message, t.getName(), entry.getKey());
 				}
 			}
@@ -198,25 +230,22 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 *            Das Topic, welches verändert wurde.
 	 */
 	private void saveMessage(String message, String procedureName, String topic) {
-		Table servicesToBeNotified = serviceNotifierService.findViewEntry(null, null, new Value(topic, null), null, null);
+		List<NewsfeedListener> servicesToBeNotified = serviceNotifierService.findViewEntry(null, topic);
 
-		for (Row services : servicesToBeNotified.getRows()) {
-			Table setSent = new Table();
-			setSent.setName("xpcasInsertServiceMessage");
-			setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
-			setSent.addColumn(new Column("CASServiceKey", DataType.INTEGER));
-			setSent.addColumn(new Column("Message", DataType.STRING));
-
-			Row setSentRow = new Row();
-			setSentRow.addValue(null);
-			setSentRow.addValue(services.getValues().get(0));
-			setSentRow.addValue(new Value(message, null));
-
-			setSent.addRow(setSentRow);
+		for (NewsfeedListener services : servicesToBeNotified) {
 			try {
-				logger.logQueueService("Saving message for " + topic + " for service " + services.getValues().get(3).getStringValue() + "  because of "
-						+ procedureName + ": '" + message + "'");
-				procedureService.unsecurelyProcessProcedure(setSent);
+				CASServices service = casServiceRepo.findByKeylong(services.getCasservice().getKeylong());
+				ServiceMessage serviceMessage = new ServiceMessage();
+
+				serviceMessage.setCasservice(service);
+				serviceMessage.setMessage(message);
+
+				serviceMessage.setMessagecreationdate(Timestamp.valueOf(LocalDateTime.now()));
+
+				serviceMessageRepo.saveAndFlush(serviceMessage);
+
+				logger.logQueueService("Saving message for " + topic + " for service " + services.getCasservice().getKeytext() + "  because of " + procedureName
+						+ ": '" + message + "'");
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
 				logger.logError("Error while trying to save message " + message, e);
@@ -227,88 +256,84 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	}
 
 	/**
-	 * Löscht eine Nachricht aus der Datenbank, damit nicht mehr versucht wird sie zu versenden.
+	 * Löscht eine Nachricht aus der Datenbank, damit nicht mehr versucht wird sie zu versenden. NEUERUNG: Wir löschen Nachrichten nicht mehr, sondern setzen
+	 * sie nur noch auf 'Failed'.
 	 * 
 	 * @param pendingMessage
-	 *            Eine Row, bei welcher der KeyLong der Nachricht an 5.Stelle steht.
+	 *            Eine ServiceMessage, die es zu 'löschen' gilt.
 	 */
-	private void deleteMessage(Row pendingMessage) {
-		Table messageToDelete = new Table();
-		messageToDelete.setName("xpcasDeleteServiceMessage");
-		messageToDelete.addColumn(new Column("KeyLong", DataType.INTEGER));
-
-		Row setSentRow = new Row();
-		setSentRow.addValue(pendingMessage.getValues().get(4));
-
-		messageToDelete.addRow(setSentRow);
+	private void deleteMessage(ServiceMessage pendingMessage) {
 		try {
-			logger.logQueueService("Deleting message with key " + pendingMessage.getValues().get(4).getIntegerValue());
-			procedureService.unsecurelyProcessProcedure(messageToDelete);
+			logger.logQueueService("Deleting message with key " + pendingMessage.getKeylong());
+			serviceMessageRepo.delete(pendingMessage);
 		} catch (Exception e) {
-			logger.logError("The message with key " + pendingMessage.getValues().get(4).getIntegerValue() + " could not be deleted!", e);
+			logger.logError("The message with key " + pendingMessage.getKeylong() + " could not be deleted!", e);
 			throw new RuntimeException(e);
 		}
-	}
-
-	/**
-	 * Liest alle nicht versendeten Nachrichten aus der Datenbank.
-	 * 
-	 * @return Eine Table, bei welcher jede Row eine nicht versandte Nachricht ist.
-	 */
-	private Table getNextMessage() {
-		Table unsendMessages;
-
-		Table messagesRequest = new Table();
-		messagesRequest.setName("xvcasCASServiceMessage");
-		messagesRequest.addColumn(new Column("CASServiceKey", DataType.INTEGER));
-		messagesRequest.addColumn(new Column("CASServiceName", DataType.STRING));
-		messagesRequest.addColumn(new Column("ServiceURL", DataType.STRING));
-		messagesRequest.addColumn(new Column("Port", DataType.INTEGER));
-		messagesRequest.addColumn(new Column("MessageKey", DataType.INTEGER));
-		messagesRequest.addColumn(new Column("Message", DataType.STRING));
-		messagesRequest.addColumn(new Column("isSent", DataType.BOOLEAN));
-		messagesRequest.addColumn(new Column("NumberOfAttempts", DataType.INTEGER));
-		messagesRequest.addColumn(new Column("MessageCreationDate", DataType.INSTANT));
-
-		Row messagesRow = new Row();
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-		messagesRow.addValue(null);
-
-		messagesRequest.addRow(messagesRow);
-		try {
-			unsendMessages = securityService.unsecurelyGetIndexView(messagesRequest);
-		} catch (Exception e) {
-			logger.logError("Could not read next message. The QueueService could not access the view " + messagesRequest.getName(), e);
-			throw new RuntimeException(e);
-		}
-		return unsendMessages;
 	}
 
 	/**
 	 * Versendet eine Nachricht.
 	 * 
-	 * @param nextMessage
+	 * @param pendingMessage
 	 *            Eine Row, in der folgende Übergabeparamtern enthalten sind:CASServiceKey, CASServiceName, ServiceURL, Port, MessageKey, Message, isSent,
 	 *            NumberOfAttempts, MessageCreationDate
 	 * @return true, falls der Versandt erfolgreich war. Andernfalls false.
 	 */
-	private boolean sendMessage(Row nextMessage) {
-		RestTemplate restTemplate = new RestTemplate();
-		String url = nextMessage.getValues().get(2).getStringValue() + ":" + nextMessage.getValues().get(3).getIntegerValue();
-		String message = nextMessage.getValues().get(5).getStringValue();
+	private boolean sendMessage(ServiceMessage pendingMessage) {
+		// URL + : + Port
+		String url = pendingMessage.getCasservice().getPort() != 0
+				? pendingMessage.getCasservice().getServiceurl() + ":" + pendingMessage.getCasservice().getPort()
+				: pendingMessage.getCasservice().getServiceurl();
+		String message = pendingMessage.getMessage();
 
-		HttpEntity<?> request = new HttpEntity<Object>(message);
-		logger.logQueueService("Trying to send message with key " + nextMessage.getValues().get(4).getIntegerValue() + " to " + url);
+		int serviceMessageReceiverLoginTypeKey = pendingMessage.getCasservice().getReceiverLoginType() != null
+				? pendingMessage.getCasservice().getReceiverLoginType().getKeylong()
+				: 0;
+
+		HttpEntity<?> request;
 		try {
+
+			// Falls BasicAuth:
+			if (serviceMessageReceiverLoginTypeKey == 2) {
+
+				// Username + : + Password
+				String credentials = pendingMessage.getCasservice().getUsername() + ":" + pendingMessage.getCasservice().getPassword();
+
+				HttpHeaders header = new HttpHeaders();
+				byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
+				header.add("Authorization", "Basic " + encodedAuth);
+
+				request = new HttpEntity<>(message, header);
+
+				// Falls OAuth2:
+			} else if (serviceMessageReceiverLoginTypeKey == 3) {
+
+				OAuth2Token oauth2Token;
+				CASServices service = pendingMessage.getCasservice();
+
+				if (!oauth2TokenList.containsKey(service)) {
+					oauth2Token = getOAuth2Token(service);
+					oauth2TokenList.put(service, oauth2Token);
+
+				} else if (oauth2TokenList.get(service).getExpiryDate().isBefore(Instant.now())) {
+					oauth2Token = getOAuth2Token(service);
+					oauth2TokenList.replace(service, oauth2Token);
+				}
+				String token = oauth2TokenList.get(service).getToken();
+
+				// Access Token in eigentlichen Aufruf setzen.
+				HttpHeaders headers1 = new HttpHeaders();
+				headers1.add("Authorization", "Bearer " + token);
+				headers1.setContentType(MediaType.APPLICATION_JSON);
+				request = new HttpEntity<>(message, headers1);
+
+			} else {
+				request = new HttpEntity<>(message);
+			}
+			logger.logQueueService("Trying to send message with key " + pendingMessage.getKeylong() + " to " + url);
+			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
 			logger.logQueueService("Sending message: " + message);
-			restTemplate.exchange(url + "/cas-event-listener", HttpMethod.POST, request, Void.class);
 		} catch (Exception e) {
 			logger.logError("Could not send message to " + url, e);
 			return false;
@@ -317,32 +342,66 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	}
 
 	/**
+	 * Anfrage an einen im übergebenen Service definierten Server schicken, um einen neuen OAuth2 Token zu erhalten.
+	 * 
+	 * @param service,
+	 *            ein CASServices Objekt.
+	 * @return ein gültiges OAuth2Token Objekt, ansonsten wird eine IllegalArgumentException geworfen.
+	 */
+	private OAuth2Token getOAuth2Token(CASServices service) {
+		try {
+			// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
+			String credentials = service.getClientId() + ":" + service.getClientSecret();
+			String encodedAuth = new String(Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false));
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			headers.add("Authorization", "Basic " + encodedAuth);
+			headers.add("Content-Type", "application/x-www-form-urlencoded");
+
+			MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+			map.add("grant_type", "password");
+			map.add("username", service.getUsername());
+			map.add("password", service.getPassword());
+			map.add("scope", "test");
+
+			HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(map, headers);
+			String accessTokenUrl = service.getTokenURL();
+
+			ResponseEntity<String> response = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, tokenRequest, String.class);
+
+			// Access Token aus der JSON response lesen.
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode node = mapper.readTree(response.getBody());
+			String token = node.path("access_token").asText();
+
+			String expiryDate = response.getHeaders().getValuesAsList("Expires").get(1);
+
+			return new OAuth2Token(token, expiryDate);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("QueueService was not able to read the access token from tokenurl " + service.getTokenURL());
+		}
+	}
+
+	/**
 	 * Speichert den Status einer Nachricht als 'isSent' in der Datenbank. Erhöht gleichzeitig auch die NumberOfAttempts.
 	 * 
 	 * @param isSent
 	 *            True, falls die Nachricht erfolgreich versandt wurde. False, wenn nicht.
 	 * @param nextMessage
-	 *            Eine Row, bei welcher der KeyLong der Nachricht an 5. Stelle und die NumberOfAttempts an 8.Stelle stehen.
+	 *            Eine ServiceMessage.
 	 */
-	private void safeAsSent(boolean isSent, Row nextMessage) {
-		int attempts = nextMessage.getValues().get(7).getIntegerValue() + 1;
-
-		Table setSent = new Table();
-		setSent.setName("xpcasUpdateServiceMessage");
-		setSent.addColumn(new Column("KeyLong", DataType.INTEGER));
-		setSent.addColumn(new Column("isSent", DataType.BOOLEAN));
-		setSent.addColumn(new Column("NumberOfAttempts", DataType.INTEGER));
-
-		Row setSentRow = new Row();
-		setSentRow.addValue(nextMessage.getValues().get(4));
-		setSentRow.addValue(new Value(isSent, null));
-		setSentRow.addValue(new Value(attempts, null));
-
-		setSent.addRow(setSentRow);
+	private void safeAsSent(boolean isSent, ServiceMessage nextMessage) {
 		try {
-			procedureService.unsecurelyProcessProcedure(setSent);
+			if (isSent) {
+				serviceMessageRepo.delete(nextMessage);
+			} else {
+				nextMessage.setIssent(isSent);
+				nextMessage.setNumberofattempts(nextMessage.getNumberofattempts() + 1);
+
+				serviceMessageRepo.saveAndFlush(nextMessage);
+			}
 		} catch (Exception e) {
-			logger.logError("Could not update message with key " + nextMessage.getValues().get(4).getStringValue() + ".", e);
+			logger.logError("Could not update message with key " + nextMessage.getKeylong() + ".", e);
 			throw new RuntimeException(e);
 		}
 	}

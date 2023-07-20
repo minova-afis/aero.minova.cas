@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import java.io.File;
 import java.io.FileInputStream;
 
+import aero.minova.cas.BaseTest;
 import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +25,6 @@ import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.controller.BaseTest;
 import aero.minova.cas.controller.SqlViewController;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
@@ -110,8 +110,7 @@ class FilesServiceTest extends BaseTest {
 		fl.read(awatingResult);
 		fl.close();
 
-		assertThat(testSubject.readMDI())//
-				.isEqualTo(awatingResult);
+		assertThat(new String(testSubject.readMDI())).isEqualToNormalizingNewlines(new String(awatingResult));
 	}
 
 	@DisplayName("MDI Test ohne Menu Eintrag in Action")
@@ -184,8 +183,7 @@ class FilesServiceTest extends BaseTest {
 		fl.read(awatingResult);
 		fl.close();
 
-		assertThat(testSubject.readMDI())//
-				.isEqualTo(awatingResult);
+		assertThat(new String(testSubject.readMDI())).isEqualToNormalizingNewlines(new String(awatingResult));
 	}
 
 	@DisplayName("MDI Test ohne Hauptmenu")

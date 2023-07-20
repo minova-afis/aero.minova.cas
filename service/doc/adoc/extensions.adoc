@@ -85,7 +85,111 @@ Alle registierten Erweiterungen werden beim 'Setup' automatisch als Recht mit in
 Denn bevor eine Extension ausgeführt wird, werden die Rollen des Nutzers, der die Anfrage stellt, erst einmal darauf überprüft,
 ob das entsprechende Recht für die Extension vorhanden ist.
 
-== Standard-Prozedur-Erweiterungen
-* xpcasEncodePassword: nimmt eine Tabelle mit den Spalten `password` und `encodedPassword` entgegen.
-Die Passwörter in der Spalte `password` werden kodiert und das Ergebnis in `encodedPassword` abgelegt.
-Die so gehashten Passwörter können in `xtcasUsers.Password` verwendet werden.
+
+
+== Step by step - Anleitung
+
+Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[Template-Projekt] vernwendet wird, können Schritt 1 und 2 übersprungen werden.
+
+1. Eine Extension wird in den Maven-Unterprojekt 'extension' erstellt. 
+
+2. In der POM des *app*-Projektes ist folgendes Plugin erforderlich:
+
+----
+<plugins>
+	<plugin>
+		<artifactId>maven-resources-plugin</artifactId>
+		<version>3.3.0</version>
+		<executions>
+			<execution>
+				<id>copy-extensions</id>
+				<phase>generate-resources</phase>
+				<goals>
+					<goal>copy-resources</goal>
+				</goals>
+				<configuration>
+					<outputDirectory>${project.build.directory}/extensions</outputDirectory>
+					<resources>
+						<resource>
+							<directory>${project.build.directory}/../../extension/target</directory>
+							<includes>
+								<include>*.jar</include>
+							</includes>
+							<excludes>
+								<exclude>*sources.jar</exclude>
+							</excludes>
+						</resource>
+						<resource>
+							<directory>${project.build.directory}/../../extension/target/libs</directory>
+							<includes>
+								<include>*.jar</include>
+							</includes>
+							<excludes>
+								<exclude>*sources.jar</exclude>
+							</excludes>
+						</resource>
+					</resources>
+				</configuration>
+			</execution>
+		</executions>
+	</plugin>
+</plugins>	
+----
+
+Durch das Hinzufügen dieses Plugins, wird beim Bauen des gesamten Projektes die Jar der Extension bereits in das richtige Verzeichnis geschoben. 
+
+3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
+
+4. Eine Setup-Methode erstellen, welche mit der @PostConstruct-Annotation gekennziechet ist. Diese muss die *'registerExtension'*-Methode des vorher importierten Controllers aufrufen und damit die Extension mit dem dazugehörigen Keyword registrieren. 
+
+5. Wenn in einer Extension etwas geloggt werden muss, wird dies über den CustomLogger gemacht. Welche Methode des Loggers für welchen Fall verwendet werden müssen, wird xref:./logs.adoc#[hier] erklärt. 
+
+Die Klasse sollte am Ende ungefähr so aussehen:
+----
+import org.springframework.web.bind.annotation.RestController;
+
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.controller.SqlViewController;
+
+@RestController
+public class ExampleController {
+
+	@Autowired
+	SqlProcedureController sqlProcedureController;
+
+	@Autowired
+	SqlViewController sqlViewController;
+
+	@Autowired
+	CustomLogger customLogger;
+
+	@PostConstruct
+	public void setup() {
+		// fügt Extension hinzu
+		sqlProcedureController.registerExtension("xpcasBeispiel", this::doSomething);
+	}
+
+	private void doSomething(Table inputTable) {
+		customLogger.logUserRequest("Hier wird etwas gemacht!");
+	}
+
+----
+
+== How to Debug
+
+Wenn man eine Extension debuggen möchte, muss die Konfiguration in Eclipse folgendermaßen erstellt werden:
+
+1. Auf die Main-Klasse (CoreApplicationSystemApplication.java) im dem CAS-Projekt rechtsklick -> Run As/Debug As -> Java Application. 
+Warten bis sich etwas in der Console tut und dann direkt abbrechen. 
+Falls für das CAS bereits eine Debug Configuration existiert, kann dies einfach kopiert werden.
+
+2. In die gerade erstellte Debug-Configuration gehen (In der Taskleiste neben dem grünen Käfer auf den Pfeil nach unten klicken, das Drop-Down-Menü öffnen und dann ganz unten "Debug Configurations...") und dort als Projekt den Namen der zu debuggenden Extension eintragen, siehe Abbildung. 
+
+image:./images/Extension.png[extension,800,250]
+
+3. In den Dependencies-Tab wechseln, dort auf "Add Projects ..." klicken und das extension-Projekt hinzufügen.
+
+image:./images/Dependencies.png[dependencies,800,800]
+
+Jetzt kann gedebugged werden. 

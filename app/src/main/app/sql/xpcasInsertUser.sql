@@ -1,6 +1,6 @@
 alter procedure dbo.xpcasInsertUser (
 	@KeyLong int output,
-	@KeyText nvarchar(10) = null,
+	@KeyText nvarchar(50) = null,
 	@UserSecurityToken nvarchar(50) = null,
 	@Memberships nvarchar(250) = null
 )
@@ -16,11 +16,17 @@ with encryption as
 	insert into xtcasUser (
 		KeyText,
 		UserSecurityToken,
-		Memberships
+		Memberships,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@KeyText,
 		@UserSecurityToken,
-		@Memberships
+		@Memberships,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

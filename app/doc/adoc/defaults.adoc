@@ -98,3 +98,18 @@ Datentyp: nvarchar(50) not null +
 In diesem Feld wird bei jeder relevanten Änderung durch einen Benutzer dessen Anmeldename gespeichert.
         
 // end::column.LastUser[]
+
+
+==== SecurityToken
+
+Bezeichnung: Tag für die RowLevelSecurity +
+Datentyp: nvarchar(10) +
+
+// tag::column.SecurityToken[]
+
+In dieser Spalte werden den verschiedenen Einträgen SecurityToken zugesprochen, mithilfe derer man die Einträge nur für bestimmte Nutzer und Nutzergruppen zugänglich machen kann. 
+Ist die Spalte leer, darf jeder sie sehen. 
+Damit auf die RowLevelSecurity geachtet wird muss das RowLevelSecurity-Flag in der xtcasLuUserPrivilegeUserGroup auf 1 gesetzt werden.
+Ansonsten wird die Spalte ignoriert.
+
+// end::column.SecurityToken[]

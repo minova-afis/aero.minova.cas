@@ -25,6 +25,15 @@ Datentyp: nvarchar(50) not null +
 // end::column.Username[]
 
 
+==== Description
+
+Datentyp: nvarchar(50) +
+
+// tag::column.Description[]
+
+// end::column.Description[]
+
+
 ==== Password
 
 Datentyp: nvarchar(100) not null +

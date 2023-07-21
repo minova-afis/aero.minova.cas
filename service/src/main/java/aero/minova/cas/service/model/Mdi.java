@@ -28,19 +28,19 @@ public class Mdi {
 	public int keylong;
 
 	@Size(max = 100)
-	@Column(name = "ID")
+	@Column(name = "ID", length = 100)
 	public String id;
 
 	@Size(max = 100)
-	@Column(name = "Icon")
+	@Column(name = "Icon", length = 100)
 	public String icon;
 
 	@Size(max = 100)
-	@Column(name = "Label")
+	@Column(name = "Label", length = 100)
 	public String label;
 
 	@Size(max = 100)
-	@Column(name = "Menu")
+	@Column(name = "Menu", length = 100)
 	public String menu;
 
 	@Column(name = "Position")
@@ -53,16 +53,16 @@ public class Mdi {
 
 	@NotNull
 	@Size(max = 500)
-	@Column(name = "ModulName")
+	@Column(name = "ModulName", length = 500)
 	public String modulname;
 
 	@Size(max = 50)
-	@Column(name = "SecurityToken")
+	@Column(name = "SecurityToken", length = 50)
 	public String securitytoken;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	public String lastuser = "CAS_JPA";
 
 	@NotNull

@@ -3,6 +3,7 @@ package aero.minova.cas.service.model;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import jakarta.persistence.Column;
@@ -19,16 +20,18 @@ public abstract class DataEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "KeyLong")
-	private Long keyLong;
+	private int keyLong;
 
-	@Column(name = "KeyText")
-	private String keyText;
+	@NotNull
+	@Size(max = 10)
+	@Column(name = "KeyText", length = 50)
+	public String keytext;
 
 	@Column(name = "LastAction")
 	private Integer lastAction = 1;
 
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	String lastUser = "CAS_JPA";
 
 	@Column(name = "LastDate")

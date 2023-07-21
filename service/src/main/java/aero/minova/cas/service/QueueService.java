@@ -288,7 +288,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		String message = pendingMessage.getMessage();
 
 		int serviceMessageReceiverLoginTypeKey = pendingMessage.getCasservice().getReceiverLoginType() != null
-				? pendingMessage.getCasservice().getReceiverLoginType().getKeylong()
+				? pendingMessage.getCasservice().getReceiverLoginType().getKeyLong()
 				: 0;
 
 		HttpEntity<?> request;

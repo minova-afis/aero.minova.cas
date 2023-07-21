@@ -34,7 +34,7 @@ public class NewsfeedListener {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "Topic")
+	@Column(name = "Topic", length = 50)
 	public String topic;
 
 	@NotNull

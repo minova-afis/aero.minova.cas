@@ -27,22 +27,22 @@ public class ColumnSecurity {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "TableName")
+	@Column(name = "TableName", length = 50)
 	public String tablename;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "ColumnName")
+	@Column(name = "ColumnName", length = 50)
 	public String columnname;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "SecurityToken")
+	@Column(name = "SecurityToken", length = 50)
 	public String securitytoken;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	public String lastuser = "CAS_JPA";
 
 	@NotNull

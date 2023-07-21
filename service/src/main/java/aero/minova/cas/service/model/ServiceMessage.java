@@ -56,7 +56,7 @@ public class ServiceMessage {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	public String lastuser = "CAS_JPA";
 
 	@NotNull

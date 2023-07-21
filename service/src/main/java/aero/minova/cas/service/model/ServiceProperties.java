@@ -27,21 +27,21 @@ public class ServiceProperties {
 
 	@NotNull
 	@Size(max = 128)
-	@Column(name = "Service")
+	@Column(name = "Service", length = 128)
 	public String service;
 
 	@NotNull
 	@Size(max = 256)
-	@Column(name = "Property")
+	@Column(name = "Property", length = 256)
 	public String property;
 
 	@NotNull
 	@Size(max = 1024)
-	@Column(name = "Val")
+	@Column(name = "Val", length = 1024)
 	public String val;
 
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	public String lastuser = "CAS_JPA";
 
 	@Column(name = "LastDate")

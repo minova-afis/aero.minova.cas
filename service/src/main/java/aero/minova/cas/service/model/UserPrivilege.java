@@ -13,7 +13,7 @@ import lombok.Data;
 public class UserPrivilege extends DataEntity {
 
 	@Size(max = 100)
-	@Column(name = "TransactionChecker")
+	@Column(name = "TransactionChecker", length = 100)
 	public String transactionchecker;
 
 }

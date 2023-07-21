@@ -27,17 +27,17 @@ public class ProcedureNewsfeed {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "KeyText")
+	@Column(name = "KeyText", length = 50)
 	public String keytext;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "Topic")
+	@Column(name = "Topic", length = 50)
 	public String topic;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	public String lastuser = "CAS_JPA";
 
 	@NotNull

@@ -29,12 +29,12 @@ public class CASServices {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "KeyText")
+	@Column(name = "KeyText", length = 50)
 	public String keytext;
 
 	@NotNull
 	@Size(max = 250)
-	@Column(name = "ServiceURL")
+	@Column(name = "ServiceURL", length = 250)
 	public String serviceurl;
 
 	@NotNull
@@ -46,28 +46,28 @@ public class CASServices {
 	public ServiceMessageReceiverLoginType receiverLoginType;
 
 	@Size(max = 50)
-	@Column(name = "Username")
+	@Column(name = "Username", length = 50)
 	public String username;
 
 	@Size(max = 50)
-	@Column(name = "Password")
+	@Column(name = "Password", length = 50)
 	public String password;
 
 	@Size(max = 50)
-	@Column(name = "ClientID")
+	@Column(name = "ClientID", length = 50)
 	public String clientId;
 
 	@Size(max = 50)
-	@Column(name = "ClientSecret")
+	@Column(name = "ClientSecret", length = 50)
 	public String clientSecret;
 
 	@Size(max = 50)
-	@Column(name = "TokenURL")
+	@Column(name = "TokenURL", length = 50)
 	public String tokenURL;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	public String lastuser = "CAS_JPA";
 
 	@NotNull

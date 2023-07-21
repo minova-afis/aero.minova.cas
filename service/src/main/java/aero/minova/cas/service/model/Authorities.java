@@ -31,16 +31,16 @@ public class Authorities {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "Username")
+	@Column(name = "Username", length = 50)
 	public String username;
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "Authority")
+	@Column(name = "Authority", length = 50)
 	public String authority;
 
 	@Size(max = 50)
-	@Column(name = "LastUser")
+	@Column(name = "LastUser", length = 50)
 	public String lastuser = "CAS_JPA";
 
 	@Column(name = "LastDate")

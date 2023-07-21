@@ -138,7 +138,7 @@ public class ServiceNotifierService {
 	public ServiceMessageReceiverLoginType findOrCreateServiceMessageReceiverLoginType(String loginType) {
 		return serviceMessageReceiverLoginTypeRepo.findByKeyText(loginType).orElseGet(() -> {
 			ServiceMessageReceiverLoginType serviceMessageLoginType = new ServiceMessageReceiverLoginType();
-			serviceMessageLoginType.setKeyText(loginType);
+			serviceMessageLoginType.setKeytext(loginType);
 			serviceMessageReceiverLoginTypeRepo.save(serviceMessageLoginType);
 			return serviceMessageLoginType;
 		});

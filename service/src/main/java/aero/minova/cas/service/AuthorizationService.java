@@ -60,7 +60,7 @@ public class AuthorizationService {
 	public UserPrivilege findOrCreateUserPrivilege(String privilegeName) {
 		return userPrivilegeRepository.findByKeyText(privilegeName).orElseGet(() -> {
 			UserPrivilege privilege = new UserPrivilege();
-			privilege.setKeyText(privilegeName);
+			privilege.setKeytext(privilegeName);
 			userPrivilegeRepository.save(privilege);
 			return privilege;
 		});
@@ -134,7 +134,7 @@ public class AuthorizationService {
 		UserGroup usergroup = userGroupRepository.findByKeyText(keyText).orElseGet(() -> {
 			UserGroup group = new UserGroup();
 			group.setSecuritytoken("");
-			group.setKeyText(keyText);
+			group.setKeytext(keyText);
 			return group;
 		});
 

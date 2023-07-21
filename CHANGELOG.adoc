@@ -6,8 +6,9 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [UNRELEASED] -- XXXX-XX-XX
 * Automatisch generierte Doku für Tabellen aktualisieren
 
-* DBUser um Description erweitert.
 
+## [12.65.6] -- 2023-07-21
+* DBUser um Description erweitert.
 * Erweiterungen für ganze Transaktionen ermöglichen
 
 ## [12.65.5] -- 2023-07-11

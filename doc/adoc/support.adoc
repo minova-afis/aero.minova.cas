@@ -129,11 +129,11 @@ Dort ist es auch eine Wortsuche möglich.
 
 Das CAS braucht die fehlende Tabelle schon beim Start. 
 
-1.In den application.properties folgendes setzen: spring.jpa.hibernate.ddl-auto=update
-2.CAS starten und warten bis es einmal ganz hoch gefahren ist.
-3.CAS stoppen.
-4.Property setzen: spring.jpa.hibernate.ddl-auto=none
-5.Folgende Query in DB ausführen:
+1. In den application.properties folgendes setzen: spring.jpa.hibernate.ddl-auto=update
+2. CAS starten und warten bis es einmal ganz hoch gefahren ist.
+3. CAS stoppen.
+4. Property setzen: spring.jpa.hibernate.ddl-auto=none
+5. Folgende Query in DB ausführen:
 
 ```
 declare @drop NVARCHAR(MAX) = N'';
@@ -154,7 +154,7 @@ ORDER BY c.[type];
 EXEC sp_executesql @drop;
 ```
 
-6.CAS starten und das Setup ganz normal ausführen.
+6. CAS starten und das Setup ganz normal ausführen.
 
 
 ## ClassNotFoundException - Jar von Abhängigkeit fehlt.

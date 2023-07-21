@@ -147,7 +147,7 @@ INNER JOIN sys.tables AS t
 ON c.parent_object_id = t.[object_id]
 INNER JOIN sys.schemas AS s 
 ON t.[schema_id] = s.[schema_id]
-WHERE c.[type] IN ('F');
+WHERE c.[type] IN ('F')
 and t.name like '%xtcas%'
 ORDER BY c.[type];
 

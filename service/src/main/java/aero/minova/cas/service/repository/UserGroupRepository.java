@@ -15,7 +15,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
 	@Query("select u from UserGroup u where u.lastAction > 0")
 	public List<UserGroup> findAllWithLastActionGreaterZero();
 
-	@Query("select u from UserGroup u where u.keyText =:keytext and u.lastAction > 0")
+	@Query("select u from UserGroup u where u.keytext =:keytext and u.lastAction > 0")
 	public Optional<UserGroup> findByKeyText(String keytext);
 
 }

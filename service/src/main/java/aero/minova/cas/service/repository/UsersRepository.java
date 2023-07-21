@@ -12,10 +12,10 @@ import aero.minova.cas.service.model.Users;
 @Repository
 public interface UsersRepository extends JpaRepository<Users, Long> {
 
-	@Query("select u from Users u where u.lastaction > 0")
+	@Query("select u from Users u where u.lastAction > 0")
 	public List<Users> findAllWithLastActionGreaterZero();
 
-	@Query("select u from Users u where u.username = :username and u.lastaction > 0")
+	@Query("select u from Users u where u.username = :username and u.lastAction > 0")
 	public Optional<Users> findByUsername(String username);
 
 }

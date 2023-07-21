@@ -6,6 +6,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [UNRELEASED] -- XXXX-XX-XX
 * DBUser um Description erweitert.
 
+* Erweiterungen für ganze Transaktionen ermöglichen
 
 ## [12.65.5] -- 2023-07-11
 * ServiceMessageReceiverLoginType Initialisierung über Java Code statt data.sql File durchführen. Damit funktioniert die Initialisierung, egal welche Datenbank verwendet wird

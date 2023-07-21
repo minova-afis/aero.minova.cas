@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+import java.util.function.BiFunction;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,44 +57,80 @@ public class XSqlProcedureController {
 	QueueService queueService;
 
 	/**
-	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden. Erst wenn alle
-	 * Prozeduren - d.h. die Anfrage und die dazugehörigen Checks - erfolgreich ausgeführt wurden, wird ein Commit getätigt. Tritt ein Fehler auf, werden alle
-	 * bereits ausgeführten Prozeduren ge-rollbacked.
+	 * Das sind Registrierungen, die ausgeführt werden, wenn eine eine Prozedur in der Liste mit den Namen der Registrierung ausgeführt werden soll.
+	 */
+	private final Map<String, BiFunction<List<XTable>, Map<Table, List<SqlProcedureResult>>, List<XSqlProcedureResult>>> extensions = new TreeMap<>(
+			String.CASE_INSENSITIVE_ORDER);
+
+	/**
+	 * Hiermit lassen sich Erweiterungen registrieren. Hat eine Tabelle in der Transaktion den registrierten Namen, so wird die gesamte Transaktion an die
+	 * Erweiterung weitergeleitet. Rollbacks oder Checks werden dann NICHT automatisch ausgeführt, dafür ist die Erweiterung selbst zuständig.
+	 * 
+	 * @param name
+	 *            der Name, auf den registriert werden soll (Case insensitive, nur eine Extension pro Name möglich)
+	 * @param ext
+	 *            die Extension. Es gibt zwei Inputs. Zum einen eine Liste aus XTables, die die eigentlichen Input-Daten darstellt. <br>
+	 *            Zum Anderen eine Map aus Tables auf Listen von SqlProcedureResults. Diese ist zu Beginn leer und muss gefüllt werden, wenn Nachrichten über
+	 *            den QueueService verschickt werden sollen. Ist dies nicht der Fall kann die Map ignoriert werden. <br>
+	 *            Die Extension muss eine Liste von XSqlProcedureResults zurückgeben, ein Result pro Input-Tabelle
+	 */
+	public void registerExtension(String name, BiFunction<List<XTable>, Map<Table, List<SqlProcedureResult>>, List<XSqlProcedureResult>> ext) {
+		if (extensions.containsKey(name)) {
+			customLogger.logSetup("Cannot register two extensions with the same name: " + name);
+			throw new IllegalArgumentException(name);
+		}
+		extensions.put(name, ext);
+	}
+
+	/**
+	 * Führt eine Liste von voneinander abhängenden SQL-Prozeduren aus. Die Prozeduren müssen in der richtigen Reihenfolge gesendet werden. <br>
+	 * <br>
+	 * Wurde eine Extension auf die Transaktion registriert so wird diese statt den SQL-Aufrufen durchgeführt, Rollbacks oder Checks werden dann NICHT
+	 * automatisch ausgeführt, dafür ist die Erweiterung selbst zuständig. <br>
+	 * <br>
+	 * Gibt es keine Extension wird ein Commit erst getätigt, wenn alle Prozeduren - d.h. die Anfrage und die dazugehörigen Checks - erfolgreich ausgeführt
+	 * wurden. Tritt ein Fehler auf, werden alle bereits ausgeführten Prozeduren ge-rollbacked.<br>
+	 * <br>
+	 * In jedem Fall werden nach dem erfolgreichen Ausführen der Prozeduren oder der Erweiterungen Nachrichten über den QueueService verschickt.
 	 *
 	 * @param inputTables
 	 *            Liste der Tables mit Namen der Prozeduren und deren Aufruf Parameter
 	 * @return Ergebnis Liste der Ergebnisse der Prozeduren-Aufrufe
 	 * @throws Exception
-	 *             Fehler bei der Ausführung von einer der Prozeduren. Rollback.
+	 *             Fehler bei der Ausführung von einer der Prozeduren. Rollback, falls keine Extension für die gesamte Transaktion ausgeführt wurde
 	 */
-	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/x-procedure")
-	public ResponseEntity executeProcedures(@RequestBody List<XTable> inputTables) throws Exception {
+	public ResponseEntity<List<XSqlProcedureResult>> executeProcedures(@RequestBody List<XTable> inputTables) throws Exception {
 
 		customLogger.logUserRequest("data/x-procedure: ", inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
-		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
-
+		StringBuffer sb = new StringBuffer();
 		try {
-			connection = systemDatabase.getConnection();
 
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
 
-			// Hier wird die Anfrage bearbeitet.
-			resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+			// Soll die Transaktion von einer Erweiterung bearbeitet werden?
+			Optional<List<XSqlProcedureResult>> checkForExtensions = checkForExtensions(inputTables, inputTablesWithResults);
+			if (checkForExtensions.isPresent()) {
+				resultSets = checkForExtensions.get();
 
-			// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
-			checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+			} else { // Ansonsten die Prozeduren einzeln verarbeiten
 
-			// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
-			connection.commit();
+				connection = systemDatabase.getConnection();
+				resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+				// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
+				checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+				// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
+				connection.commit();
+			}
 
-			// Nachdem alle Prozeduren und Folgeprozeduren erfolgreich durchgelaufen sind, kann man die Nachrichten über den QueueService verschicken.
+			// Nachdem alle Prozeduren und Folgeprozeduren bzw. die Erweiterung erfolgreich durchgelaufen sind, kann man die Nachrichten über den QueueService
+			// verschicken.
 			for (Map.Entry<Table, List<SqlProcedureResult>> mapEntry : inputTablesWithResults.entrySet()) {
 				for (SqlProcedureResult result : mapEntry.getValue()) {
-					queueService.accept(mapEntry.getKey(), new ResponseEntity(result, HttpStatus.ACCEPTED));
+					queueService.accept(mapEntry.getKey(), new ResponseEntity<>(result, HttpStatus.ACCEPTED));
 				}
 			}
 		} catch (Throwable e) {
@@ -108,7 +146,46 @@ public class XSqlProcedureController {
 		} finally {
 			systemDatabase.closeConnection(connection);
 		}
-		return new ResponseEntity(resultSets, HttpStatus.ACCEPTED);
+		return new ResponseEntity<>(resultSets, HttpStatus.ACCEPTED);
+	}
+
+	/**
+	 * Überprüft, ob es eine Erweiterung für die Transaktion gibt. Wenn ja, so werden die Privilegien für jede Prozedur der Transaktion geprüft. Wenn alle
+	 * Privilegien, wird die Erweiterung ausgeführt und ihr Ergebnis zurückgegeben.
+	 * 
+	 * @param inputTables
+	 * @param inputTablesWithResults
+	 * @return
+	 * @throws ProcedureException
+	 */
+	private Optional<List<XSqlProcedureResult>> checkForExtensions(List<XTable> inputTables, Map<Table, List<SqlProcedureResult>> inputTablesWithResults)
+			throws ProcedureException {
+
+		List<XSqlProcedureResult> extResult = null;
+		BiFunction<List<XTable>, Map<Table, List<SqlProcedureResult>>, List<XSqlProcedureResult>> extensionFunction = null;
+
+		// Gibt es eine Extension für die Transaktion?
+		for (XTable table : inputTables) {
+			if (extensions.containsKey(table.getTable().getName())) {
+				extensionFunction = extensions.get(table.getTable().getName());
+				break;
+			}
+		}
+
+		// Privilegien Prüfen und Extension ausführen
+		if (extensionFunction != null) {
+			for (XTable table : inputTables) {
+				List<Row> privilegeRequest = new ArrayList<>();
+				privilegeRequest.addAll(securityService.getPrivilegePermissions(table.getTable().getName()));
+				if (privilegeRequest.isEmpty()) {
+					throw new ProcedureException("msg.PrivilegeError %" + table.getTable());
+				}
+			}
+
+			extResult = extensionFunction.apply(inputTables, inputTablesWithResults);
+		}
+
+		return Optional.ofNullable(extResult);
 	}
 
 	/**
@@ -143,7 +220,7 @@ public class XSqlProcedureController {
 	 * @param resultSets
 	 *            Die bisher noch leere Liste an XSqlResultSets, welche in dieser Methode gefüllt weden.
 	 * @param sb
-	 *            Ein StringBuffer.
+	 *            Ein StringBuffer für das Loggen der Prozedur-Aufrufe
 	 * @param connection
 	 *            Eine Connection zur Datenbank.
 	 * @param inputTablesWithResults
@@ -171,7 +248,7 @@ public class XSqlProcedureController {
 
 			ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).orElse(null);
 
-			// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunen wurde, normal ausführen.
+			// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunden wurde, normal ausführen.
 			if (extensionResult != null) {
 				result = (SqlProcedureResult) extensionResult.getBody();
 			} else {

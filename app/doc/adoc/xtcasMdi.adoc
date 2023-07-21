@@ -1,142 +1,118 @@
 
 
-
-
-
-== Tabelle xtcasMdiType ()
-== Tabelle xtcasMdiType ()
-
-
+== Tabelle xtcasMdi ()
 
 
 === Spalten
-=== Spalten
-
 
 In der Tabelle sind folgende Spalten definiert.
-In der Tabelle sind folgende Spalten definiert.
-
 
 ==== KeyLong
-==== KeyLong
-
 
 Datentyp: integer (identity) not null +
-Datentyp: integer (identity) not null +
-
 
 // tag::column.KeyLong[]
-// tag::column.KeyLong[]
 
-
-// end::column.KeyLong[]
 // end::column.KeyLong[]
 
 
+==== ID
+
+Datentyp: nvarchar(100) +
+
+// tag::column.ID[]
+
+// end::column.ID[]
 
 
-==== KeyText
-==== KeyText
+==== Icon
+
+Datentyp: nvarchar(100) +
+
+// tag::column.Icon[]
+
+// end::column.Icon[]
 
 
-Datentyp: nvarchar(50) not null +
-Datentyp: nvarchar(50) not null +
+==== Label
+
+Datentyp: nvarchar(100) +
+
+// tag::column.Label[]
+
+// end::column.Label[]
 
 
-// tag::column.KeyText[]
-// tag::column.KeyText[]
+==== Menu
+
+Datentyp: nvarchar(100) +
+
+// tag::column.Menu[]
+
+// end::column.Menu[]
 
 
-// end::column.KeyText[]
-// end::column.KeyText[]
+==== Position
+
+Datentyp: float +
+
+// tag::column.Position[]
+
+// end::column.Position[]
 
 
+==== MdiTypeKey
+
+Datentyp: integer not null +
+
+// tag::column.MdiTypeKey[]
+
+// end::column.MdiTypeKey[]
 
 
-==== Description
-==== Description
+==== ModulName
+
+Datentyp: nvarchar(500) not null +
+
+// tag::column.ModulName[]
+
+// end::column.ModulName[]
 
 
-Datentyp: nvarchar(100) not null +
-Datentyp: nvarchar(100) not null +
+==== SecurityToken
 
+Datentyp: nvarchar(50) +
 
-// tag::column.Description[]
-// tag::column.Description[]
+// tag::column.SecurityToken[]
 
-
-// end::column.Description[]
-// end::column.Description[]
-
-
+// end::column.SecurityToken[]
 
 
 ==== LastUser
-==== LastUser
-
 
 Datentyp: nvarchar(50) not null +
-Datentyp: nvarchar(50) not null +
-Default: `system_user` +
 Default: `system_user` +
 
-
-// tag::column.LastUser[]
 // tag::column.LastUser[]
 
-
-// end::column.LastUser[]
 // end::column.LastUser[]
 
 
-
-
-==== LastDate
 ==== LastDate
 
-
-Datentyp: datetime not null +
 Datentyp: datetime not null +
 Default: `getdate()` +
-Default: `getdate()` +
-
 
 // tag::column.LastDate[]
-// tag::column.LastDate[]
 
-
-// end::column.LastDate[]
 // end::column.LastDate[]
 
 
-
-
-==== LastAction
 ==== LastAction
 
-
-Datentyp: integer not null +
 Datentyp: integer not null +
 Default: `1` +
-Default: `1` +
-
 
 // tag::column.LastAction[]
-// tag::column.LastAction[]
-
 
 // end::column.LastAction[]
-// end::column.LastAction[]
-
-
-=== Zeilen
-
-Folgende Zeilen werden automatisch angelegt:
-
-[options="header"]
-|======
-| KeyLong | KeyText | Description   
-| 1 | form | Form of Menu   
-| 2 | menu | Menu of WFC   
-| 3 | application | General Application Info 
-|======

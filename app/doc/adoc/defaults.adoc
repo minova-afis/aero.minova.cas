@@ -111,4 +111,5 @@ In dieser Spalte werden den verschiedenen Einträgen SecurityToken zugesprochen,
 Ist die Spalte leer, darf jeder sie sehen. 
 Damit auf die RowLevelSecurity geachtet wird muss das RowLevelSecurity-Flag in der xtcasLuUserPrivilegeUserGroup auf 1 gesetzt werden.
 Ansonsten wird die Spalte ignoriert.
+       
 // end::column.SecurityToken[]

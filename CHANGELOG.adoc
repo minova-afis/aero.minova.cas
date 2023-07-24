@@ -4,8 +4,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* Automatisch generierte Doku für Tabellen aktualisieren
-
+* Automatisch generierte Doku für Tabellen aktualisieren.
+* Workaround fürs Löschen von Benutzern, da sonst das CAS einfriert und man es neu starten muss.
+* Anpassen der Feldergrößen in der Users-Maske.
 
 ## [12.65.6] -- 2023-07-21
 * DBUser um Description erweitert.

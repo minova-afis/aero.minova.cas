@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* jackson-databind-nullable Abhängigkeit für aero.minova.github-Extension einbinden
 
 ## [12.65.7] -- 2023-07-25
 * Automatisch generierte Doku für Tabellen aktualisieren.

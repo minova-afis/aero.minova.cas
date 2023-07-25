@@ -21,10 +21,10 @@ helper-class="aero.minova.cas.app.helper.CASUsersHelper"
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
 			</field>
-			<field name="Username" sql-index="1" text="@xtcasUsers.Username" required="true" key-type="user">
+			<field name="Username" sql-index="1" text="@xtcasUsers.Username" required="true" key-type="user" number-columns-spanned="4" fill="toright">
 				<text length="50"/>
 			</field>
-			<field name="Description" sql-index="3" text="@xtcasUsers.Description" required="false">
+			<field name="Description" sql-index="3" text="@xtcasUsers.Description" required="false" number-columns-spanned="4" fill="toright">
 				<text length="50"/>
 			</field>
 			<field name="Password" sql-index="2" text="@xtcasUsers.Password" number-columns-spanned="4" required="true" fill="toright">

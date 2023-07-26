@@ -253,7 +253,7 @@
 			<!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.github) bereitgestellt: service/doc/adoc/extensions.adoc -->
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.3</version>
+            <version>0.2.6</version>
         </dependency>
 	</dependencies>
 

@@ -127,6 +127,9 @@ Dort ist es auch eine Wortsuche möglich.
 
 ### SQLServerException: Ungültiger Objektname "xtcasServiceMessageReceiverLoginType"
 
+Ist ab Version 12.65.9 gefixed.
+
+Falls die Version, in der der Fehler auftritt, unbedingt verwendet werden muss, kann folgendes getan werden:
 Das CAS braucht die fehlende Tabelle schon beim Start. 
 
 1. In den application.properties folgendes setzen: spring.jpa.hibernate.ddl-auto=update

@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Bekannter Fehler "Ungültiger Objektname "xtcasServiceMessageReceiverLoginType" fixen. Man kann das CAS nun auf einer leeren/alten Datenbank starten und dann ein Setup ausführen, auch wenn die Tabelle nicht existiert.
+* aero.minova.service.event.dispatcher Abhängigkeit von setup nach service verschieben, da diese für Extensions benötigt wird und nicht für das Setup beim CAS.
 
 ## [12.65.8] -- 2023-07-25
 * jackson-databind-nullable Abhängigkeit für aero.minova.github-Extension einbinden

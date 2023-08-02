@@ -40,7 +40,7 @@ import lombok.val;
 @Service
 public class ProcedureService {
 
-	private static final String POSTGRESQL = "PostgreSQLDialect";
+	private static final String POSTGRESQLDIALECT = "PostgreSQLDialect";
 
 	@Autowired
 	CustomLogger customLogger;
@@ -72,7 +72,7 @@ public class ProcedureService {
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
 
 		CallableStatement userContextSetter;
-		if (dialect.contains(POSTGRESQL)) {
+		if (dialect.contains(POSTGRESQLDIALECT)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");

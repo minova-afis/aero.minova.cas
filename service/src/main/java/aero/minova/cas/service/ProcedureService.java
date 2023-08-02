@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Session;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,12 +33,14 @@ import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.val;
 
 @Service
 public class ProcedureService {
 
-	private static final String POSTGRESQL = "postgresql";
+	private static final String POSTGRESQL = "PostgreSQLDialect";
 
 	@Autowired
 	CustomLogger customLogger;
@@ -44,8 +48,8 @@ public class ProcedureService {
 	@Autowired
 	SystemDatabase systemDatabase;
 
-	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:mssql}")
-	String databaseKind;
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.maxresultsetcount:512}")
 	Integer maxResultSetCount;
@@ -62,8 +66,13 @@ public class ProcedureService {
 	 *             Fehler beim setzen des Kontextes für die connection.
 	 */
 	public void setUserContextFor(Connection connection) throws SQLException {
+
+		final Session session = (Session) entityManager.getDelegate();
+		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
+		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
+
 		CallableStatement userContextSetter;
-		if (databaseKind.equalsIgnoreCase(POSTGRESQL)) {
+		if (dialect.contains(POSTGRESQL)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");

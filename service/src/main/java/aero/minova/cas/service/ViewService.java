@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.val;
 
 @Service
@@ -33,14 +37,20 @@ public class ViewService {
 	@Autowired
 	private SecurityService securityService;
 
-	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MSSQL}")
-	String context;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-	private static final String MSSQL = "MSSQL";
+	private static final String MSSQL = "SQLServerDialect";
+	private static final String MSSQL2008 = "SQLServer2008Dialect";
 
 	@PostConstruct
 	private void init() {
-		if (context.equalsIgnoreCase(MSSQL)) {
+
+		final Session session = (Session) entityManager.getDelegate();
+		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
+		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
+
+		if (dialect.toString().contains(MSSQL) || dialect.toString().contains(MSSQL2008)) {
 			viewService = new MssqlViewService(systemDatabase, customLogger, securityService);
 		} else {
 			viewService = new JOOQViewService(systemDatabase, customLogger, securityService);

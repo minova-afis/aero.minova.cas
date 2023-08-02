@@ -40,7 +40,7 @@ public class ViewService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	private static final String MSSQLDIALEKT = "SQLServer";
+	private static final String MSSQLDIALECT = "SQLServer";
 
 	@PostConstruct
 	private void init() {
@@ -49,7 +49,7 @@ public class ViewService {
 		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
 
-		if (dialect.toString().contains(MSSQLDIALEKT)) {
+		if (dialect.toString().contains(MSSQLDIALECT)) {
 			viewService = new MssqlViewService(systemDatabase, customLogger, securityService);
 		} else {
 			viewService = new JOOQViewService(systemDatabase, customLogger, securityService);

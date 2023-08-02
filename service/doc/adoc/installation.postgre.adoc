@@ -14,7 +14,6 @@ Da Postgresql RowCount als Funktion verwendet, wird eine andere Methode zum Zusa
 
 Die application.properties müssen desweiteren mit folgenden Properties geändert werden:
 
-* spring.jooq.sql-dialect=POSTGRESQL
 * spring.datasource.url=jdbc:postgresql://URLZurDatenbank/DatenbankName
 * spring.datasource.username=UsernameVonPostgresDatenbank
 * spring.datasource.password=PasswortDesBenutzersDerPostgresDatenbank

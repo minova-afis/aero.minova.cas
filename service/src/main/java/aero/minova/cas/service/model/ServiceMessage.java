@@ -20,7 +20,7 @@ public class ServiceMessage extends DataEntity {
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "CASServiceKey", nullable = false)
-	public CASServices casservice;
+	public CASServices casService;
 
 	@NotNull
 	@Lob

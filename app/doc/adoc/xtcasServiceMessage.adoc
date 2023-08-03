@@ -16,6 +16,15 @@ Datentyp: integer (identity) not null +
 // end::column.KeyLong[]
 
 
+==== KeyText
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.KeyText[]
+
+// end::column.KeyText[]
+
+
 ==== CASServiceKey
 
 Datentyp: integer not null +

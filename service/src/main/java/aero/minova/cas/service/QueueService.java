@@ -160,7 +160,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		try {
 			// Holt sich alle Nachrichten, die noch nicht versandt wurden oder noch nicht gefailed sind.
-			messagesToBeSend = serviceMessageRepo.findAllByIssentFalseAndFailedFalseAndLastactionGreaterThan(0);
+			messagesToBeSend = serviceMessageRepo.findAllByIsSentFalseAndFailedFalseAndLastActionGreaterThan(0);
 		} catch (Exception e) {
 			logger.logError("Could not read next message. The QueueService could not read tServiceMessage.", e);
 			throw new RuntimeException(e);
@@ -171,14 +171,14 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			for (ServiceMessage pendingMessage : messagesToBeSend) {
 
 				// Wenn die allowedNumberOfAttempts zu hoch wird, setzen wir Failed auf true und die Nachricht soll nicht weiter versucht werden zu verschicken.
-				if (pendingMessage.getNumberofattempts() >= allowedNumberOfAttempts) {
+				if (pendingMessage.getNumberOfAttempts() >= allowedNumberOfAttempts) {
 					pendingMessage.setFailed(true);
 					serviceMessageRepo.saveAndFlush(pendingMessage);
 					continue;
 				}
 
 				// Falls die Nachricht älter ist als das allowedMessageAge muss die Nachricht gelöscht werden.
-				if (pendingMessage.getMessagecreationdate().toInstant().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))) {
+				if (pendingMessage.getMessageCreationDate().toInstant().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))) {
 					deleteMessage(pendingMessage);
 					continue;
 				}
@@ -189,7 +189,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 					safeAsSent(true, pendingMessage);
 				} else {
 					safeAsSent(false, pendingMessage);
-					logger.logQueueService(pendingMessage.getCasservice().getKeytext() + " is not reachable!");
+					logger.logQueueService(pendingMessage.getCasservice().getKeyText() + " is not reachable!");
 				}
 			}
 		}
@@ -234,17 +234,17 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		for (NewsfeedListener services : servicesToBeNotified) {
 			try {
-				CASServices service = casServiceRepo.findByKeylong(services.getCasservice().getKeylong());
+				CASServices service = casServiceRepo.findByKeyLong(services.getCasService().getKeyLong()).get();
 				ServiceMessage serviceMessage = new ServiceMessage();
 
 				serviceMessage.setCasservice(service);
 				serviceMessage.setMessage(message);
 
-				serviceMessage.setMessagecreationdate(Timestamp.valueOf(LocalDateTime.now()));
+				serviceMessage.setMessageCreationDate(Timestamp.valueOf(LocalDateTime.now()));
 
 				serviceMessageRepo.saveAndFlush(serviceMessage);
 
-				logger.logQueueService("Saving message for " + topic + " for service " + services.getCasservice().getKeytext() + "  because of " + procedureName
+				logger.logQueueService("Saving message for " + topic + " for service " + services.getCasService().getKeyText() + "  because of " + procedureName
 						+ ": '" + message + "'");
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {
@@ -264,10 +264,10 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 */
 	private void deleteMessage(ServiceMessage pendingMessage) {
 		try {
-			logger.logQueueService("Deleting message with key " + pendingMessage.getKeylong());
+			logger.logQueueService("Deleting message with key " + pendingMessage.getKeyLong());
 			serviceMessageRepo.delete(pendingMessage);
 		} catch (Exception e) {
-			logger.logError("The message with key " + pendingMessage.getKeylong() + " could not be deleted!", e);
+			logger.logError("The message with key " + pendingMessage.getKeyLong() + " could not be deleted!", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -283,12 +283,12 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	private boolean sendMessage(ServiceMessage pendingMessage) {
 		// URL + : + Port
 		String url = pendingMessage.getCasservice().getPort() != 0
-				? pendingMessage.getCasservice().getServiceurl() + ":" + pendingMessage.getCasservice().getPort()
-				: pendingMessage.getCasservice().getServiceurl();
+				? pendingMessage.getCasservice().getServiceUrl() + ":" + pendingMessage.getCasservice().getPort()
+				: pendingMessage.getCasservice().getServiceUrl();
 		String message = pendingMessage.getMessage();
 
 		int serviceMessageReceiverLoginTypeKey = pendingMessage.getCasservice().getReceiverLoginType() != null
-				? pendingMessage.getCasservice().getReceiverLoginType().getKeylong()
+				? pendingMessage.getCasservice().getReceiverLoginType().getKeyLong()
 				: 0;
 
 		HttpEntity<?> request;
@@ -331,7 +331,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			} else {
 				request = new HttpEntity<>(message);
 			}
-			logger.logQueueService("Trying to send message with key " + pendingMessage.getKeylong() + " to " + url);
+			logger.logQueueService("Trying to send message with key " + pendingMessage.getKeyLong() + " to " + url);
 			restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
 			logger.logQueueService("Sending message: " + message);
 		} catch (Exception e) {
@@ -395,13 +395,13 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			if (isSent) {
 				serviceMessageRepo.delete(nextMessage);
 			} else {
-				nextMessage.setIssent(isSent);
-				nextMessage.setNumberofattempts(nextMessage.getNumberofattempts() + 1);
+				nextMessage.setSent(isSent);
+				nextMessage.setNumberOfAttempts(nextMessage.getNumberOfAttempts() + 1);
 
 				serviceMessageRepo.saveAndFlush(nextMessage);
 			}
 		} catch (Exception e) {
-			logger.logError("Could not update message with key " + nextMessage.getKeylong() + ".", e);
+			logger.logError("Could not update message with key " + nextMessage.getKeyLong() + ".", e);
 			throw new RuntimeException(e);
 		}
 	}

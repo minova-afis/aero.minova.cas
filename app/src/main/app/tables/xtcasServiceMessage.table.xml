@@ -7,6 +7,9 @@
 	<column name="KeyLong">
 		<integer nullable="false" identity="true"/>
 	</column>
+	<column name="KeyText">
+		<varchar length="50" nullable="false"/>
+	</column>
 	<column name="CASServiceKey">
 		<integer nullable="false"/>
 	</column>

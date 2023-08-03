@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * UserContext anhand des JDBC Dialects herausfinden, damit der richige Benutzer nach Ausführen einer Prozedur ermittelt werden kann.
+* Azure Dependency hinzufügen zum besseren Umgehen mit JPA.
 
 ## [12.65.9] -- 2023-08-01
 * Bekannter Fehler "Ungültiger Objektname "xtcasServiceMessageReceiverLoginType" fixen. Man kann das CAS nun auf einer leeren/alten Datenbank starten und dann ein Setup ausführen, auch wenn die Tabelle nicht existiert.

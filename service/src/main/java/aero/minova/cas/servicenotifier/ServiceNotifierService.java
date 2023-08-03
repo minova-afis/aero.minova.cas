@@ -140,7 +140,7 @@ public class ServiceNotifierService {
 	 * @return ein ServiceMessageReceiverLoginType-Objekt.
 	 */
 	public ServiceMessageReceiverLoginType findOrCreateServiceMessageReceiverLoginType(String loginType) {
-		return serviceMessageReceiverLoginTypeRepo.findByKeyText(loginType).orElseGet(() -> {
+		return serviceMessageReceiverLoginTypeRepo.findByKeytextAndLastActionGreaterThan(loginType, 0).orElseGet(() -> {
 			ServiceMessageReceiverLoginType serviceMessageLoginType = new ServiceMessageReceiverLoginType();
 			serviceMessageLoginType.setKeytext(loginType);
 			serviceMessageReceiverLoginTypeRepo.save(serviceMessageLoginType);
@@ -168,7 +168,7 @@ public class ServiceNotifierService {
 			int loginTypeKey = inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceMessageReceiverLoginType")) != null
 					? inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceMessageReceiverLoginType")).getIntegerValue()
 					: 0;
-			ServiceMessageReceiverLoginType loginType = serviceMessageReceiverLoginTypeRepo.findByKeylong(loginTypeKey);
+			ServiceMessageReceiverLoginType loginType = serviceMessageReceiverLoginTypeRepo.findByKeyLongAndLastActionGreaterThan(loginTypeKey, 0);
 			newService.setReceiverLoginType(loginType);
 
 			newService.setUsername(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("Username")).getStringValue());

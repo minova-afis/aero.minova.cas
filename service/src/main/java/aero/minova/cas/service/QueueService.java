@@ -234,7 +234,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		for (NewsfeedListener services : servicesToBeNotified) {
 			try {
-				CASServices service = casServiceRepo.findByKeyLong(services.getCasService().getKeyLong());
+				CASServices service = casServiceRepo.findByKeyLong(services.getCasService().getKeyLong()).get();
 				ServiceMessage serviceMessage = new ServiceMessage();
 
 				serviceMessage.setCasservice(service);

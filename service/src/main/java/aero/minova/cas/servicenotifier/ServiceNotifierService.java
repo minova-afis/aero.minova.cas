@@ -406,7 +406,7 @@ public class ServiceNotifierService {
 	private CASServices findServiceEntry(String casServiceName) {
 		try {
 			// Die ServiceNamen müssen eindeutig sein, deswegen nehmen wir hier einfach den Ersten, den wir finden.
-			return casServiceRepo.findByKeyText(casServiceName);
+			return casServiceRepo.findByKeyText(casServiceName).get();
 		} catch (Exception e) {
 			logger.logError("Error while trying to find service " + casServiceName + " in xtcasCASServices!", e);
 			throw new RuntimeException(e);
@@ -437,14 +437,14 @@ public class ServiceNotifierService {
 				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByLastActionGreaterThan(0);
 				} else {
-					CASServices findMe = casServiceRepo.findByKeyText(casServiceName);
+					CASServices findMe = casServiceRepo.findByKeyText(casServiceName).get();
 					return newsfeedListenerRepo.findAllByCasService(findMe);
 				}
 			} else {
 				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByTopicAndLastActionGreaterThan(topic, 0);
 				} else {
-					CASServices findMe = casServiceRepo.findByKeyText(casServiceName);
+					CASServices findMe = casServiceRepo.findByKeyText(casServiceName).get();
 					return newsfeedListenerRepo.findAllByCasServiceAndTopicAndLastActionGreaterThan(findMe, topic, 0);
 				}
 			}

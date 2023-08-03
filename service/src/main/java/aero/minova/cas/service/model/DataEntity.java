@@ -36,5 +36,4 @@ public abstract class DataEntity {
 
 	@Column(name = "LastDate")
 	public Timestamp lastDate = Timestamp.from(Instant.now());
-
 }

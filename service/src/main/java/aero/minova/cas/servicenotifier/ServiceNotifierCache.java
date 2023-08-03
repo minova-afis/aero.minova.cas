@@ -39,9 +39,9 @@ public class ServiceNotifierCache {
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.servicenotifier = new HashMap<>();
-				List<ProcedureNewsfeed> servicenotifierTable = procedureNewsfeedRepo.findAllByLastaction(0);
+				List<ProcedureNewsfeed> servicenotifierTable = procedureNewsfeedRepo.findAllByLastAction(0);
 				for (ProcedureNewsfeed procedureNewsfeed : servicenotifierTable) {
-					service.registerServicenotifier(procedureNewsfeed.getKeytext(), procedureNewsfeed.getTopic());
+					service.registerServicenotifier(procedureNewsfeed.getKeyText(), procedureNewsfeed.getTopic());
 				}
 			}
 		} catch (Exception e) {
@@ -60,7 +60,7 @@ public class ServiceNotifierCache {
 				service.newsfeeds = new HashMap<>();
 				List<NewsfeedListener> newsfeedsTable = newsfeedListenerRepo.findAllByLastaction(0);
 				for (NewsfeedListener newsfeedListener : newsfeedsTable) {
-					service.registerNewsfeed(newsfeedListener.getCasservice().getKeytext(), newsfeedListener.getTopic());
+					service.registerNewsfeed(newsfeedListener.getCasservice().getKeyText(), newsfeedListener.getTopic());
 				}
 			}
 

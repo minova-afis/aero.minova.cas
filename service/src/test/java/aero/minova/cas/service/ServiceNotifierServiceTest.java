@@ -22,9 +22,9 @@ class ServiceNotifierServiceTest {
 
 	@Test
 	void assureLoginTypesAreCreated() {
-		assertTrue(serviceMessageReceiverLoginTypeRepository.findByKeytextAndLastActionGreaterThan("None", 0).isPresent());
-		assertTrue(serviceMessageReceiverLoginTypeRepository.findByKeytextAndLastActionGreaterThan("BasicAuth", 0).isPresent());
-		assertTrue(serviceMessageReceiverLoginTypeRepository.findByKeytextAndLastActionGreaterThan("OAuth2", 0).isPresent());
+		assertTrue(serviceMessageReceiverLoginTypeRepository.findByKeyTextAndLastActionGreaterThan("None", 0).isPresent());
+		assertTrue(serviceMessageReceiverLoginTypeRepository.findByKeyTextAndLastActionGreaterThan("BasicAuth", 0).isPresent());
+		assertTrue(serviceMessageReceiverLoginTypeRepository.findByKeyTextAndLastActionGreaterThan("OAuth2", 0).isPresent());
 	}
 
 }

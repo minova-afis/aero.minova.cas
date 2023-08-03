@@ -25,7 +25,7 @@ public abstract class DataEntity {
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "KeyText", length = 50)
-	public String keytext;
+	public String keyText;
 
 	@Column(name = "LastAction")
 	private Integer lastAction = 1;
@@ -35,6 +35,6 @@ public abstract class DataEntity {
 	String lastUser = "CAS_JPA";
 
 	@Column(name = "LastDate")
-	public Timestamp lastdate = Timestamp.from(Instant.now());
+	public Timestamp lastDate = Timestamp.from(Instant.now());
 
 }

@@ -189,7 +189,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 					safeAsSent(true, pendingMessage);
 				} else {
 					safeAsSent(false, pendingMessage);
-					logger.logQueueService(pendingMessage.getCasservice().getKeytext() + " is not reachable!");
+					logger.logQueueService(pendingMessage.getCasservice().getKeyText() + " is not reachable!");
 				}
 			}
 		}
@@ -234,7 +234,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 		for (NewsfeedListener services : servicesToBeNotified) {
 			try {
-				CASServices service = casServiceRepo.findByKeylong(services.getCasservice().getKeylong());
+				CASServices service = casServiceRepo.findByKeyLong(services.getCasservice().getKeyLong());
 				ServiceMessage serviceMessage = new ServiceMessage();
 
 				serviceMessage.setCasservice(service);
@@ -244,7 +244,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 
 				serviceMessageRepo.saveAndFlush(serviceMessage);
 
-				logger.logQueueService("Saving message for " + topic + " for service " + services.getCasservice().getKeytext() + "  because of " + procedureName
+				logger.logQueueService("Saving message for " + topic + " for service " + services.getCasservice().getKeyText() + "  because of " + procedureName
 						+ ": '" + message + "'");
 				logger.logQueueService("Message saved!");
 			} catch (Exception e) {

@@ -140,9 +140,9 @@ public class ServiceNotifierService {
 	 * @return ein ServiceMessageReceiverLoginType-Objekt.
 	 */
 	public ServiceMessageReceiverLoginType findOrCreateServiceMessageReceiverLoginType(String loginType) {
-		return serviceMessageReceiverLoginTypeRepo.findByKeytextAndLastActionGreaterThan(loginType, 0).orElseGet(() -> {
+		return serviceMessageReceiverLoginTypeRepo.findByKeyTextAndLastActionGreaterThan(loginType, 0).orElseGet(() -> {
 			ServiceMessageReceiverLoginType serviceMessageLoginType = new ServiceMessageReceiverLoginType();
-			serviceMessageLoginType.setKeytext(loginType);
+			serviceMessageLoginType.setKeyText(loginType);
 			serviceMessageReceiverLoginTypeRepo.save(serviceMessageLoginType);
 			return serviceMessageLoginType;
 		});
@@ -161,7 +161,7 @@ public class ServiceNotifierService {
 
 			CASServices newService = new CASServices();
 
-			newService.setKeytext(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue());
+			newService.setKeyText(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue());
 			newService.setServiceurl(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceURL")).getStringValue());
 			newService.setPort(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("Port")).getIntegerValue());
 
@@ -179,7 +179,7 @@ public class ServiceNotifierService {
 
 			casServiceRepo.saveAndFlush(newService);
 
-			return newService.getKeylong();
+			return newService.getKeyLong();
 
 		} catch (Exception e) {
 			logger.logError("The service " + inputTable.getRows().get(0).getValues().get(0).getStringValue() + " could not be registered.", e);
@@ -201,7 +201,7 @@ public class ServiceNotifierService {
 			// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
 			CASServices toDelete = findServiceEntry(serviceName);
 
-			toDelete.setLastaction(-1);
+			toDelete.setLastAction(-1);
 			casServiceRepo.saveAndFlush(toDelete);
 
 			// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
@@ -242,7 +242,7 @@ public class ServiceNotifierService {
 				String keyText = inputRow.getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue();
 				String topic = inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue();
 
-				List<ProcedureNewsfeed> existingNewsfeeds = procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastactionGreaterThan(keyText, topic, 0);
+				List<ProcedureNewsfeed> existingNewsfeeds = procedureNewsfeedRepo.findAllByKeyTextAndTopicAndLastActionGreaterThan(keyText, topic, 0);
 
 				// Diese Einträge sind bereits vorhanden. Wir wollen keine doppelten Einträge, also return.
 				if (!existingNewsfeeds.isEmpty()) {
@@ -250,7 +250,7 @@ public class ServiceNotifierService {
 				}
 				ProcedureNewsfeed newProcedureNewsfeed = new ProcedureNewsfeed();
 
-				newProcedureNewsfeed.setKeytext(keyText);
+				newProcedureNewsfeed.setKeyText(keyText);
 				newProcedureNewsfeed.setTopic(topic);
 
 				procedureNewsfeedRepo.saveAndFlush(newProcedureNewsfeed);
@@ -287,7 +287,7 @@ public class ServiceNotifierService {
 				}
 
 				for (ProcedureNewsfeed toDelete : procedureNewsfeedList) {
-					toDelete.setLastaction(-1);
+					toDelete.setLastAction(-1);
 					// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
 					procedureNewsfeedRepo.saveAndFlush(toDelete);
 				}
@@ -309,7 +309,7 @@ public class ServiceNotifierService {
 				// Für die Delete-Prozedur muss der KeyLong rausgefunden werden.
 				List<ProcedureNewsfeed> procedureNewsfeeds = findProcedureEntry(inputRow.getValues().get(0), null);
 				for (ProcedureNewsfeed toDelete : procedureNewsfeeds) {
-					toDelete.setLastaction(-1);
+					toDelete.setLastAction(-1);
 					// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht.
 					procedureNewsfeedRepo.saveAndFlush(toDelete);
 				}
@@ -406,7 +406,7 @@ public class ServiceNotifierService {
 	private CASServices findServiceEntry(String casServiceName) {
 		try {
 			// Die ServiceNamen müssen eindeutig sein, deswegen nehmen wir hier einfach den Ersten, den wir finden.
-			return casServiceRepo.findByKeytext(casServiceName);
+			return casServiceRepo.findByKeyText(casServiceName);
 		} catch (Exception e) {
 			logger.logError("Error while trying to find service " + casServiceName + " in xtcasCASServices!", e);
 			throw new RuntimeException(e);
@@ -437,14 +437,14 @@ public class ServiceNotifierService {
 				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByLastaction(0);
 				} else {
-					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);
+					CASServices findMe = casServiceRepo.findByKeyText(casServiceName);
 					return newsfeedListenerRepo.findAllByCasservice(findMe);
 				}
 			} else {
 				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByTopicAndLastactionGreaterThan(topic, 0);
 				} else {
-					CASServices findMe = casServiceRepo.findByKeytext(casServiceName);
+					CASServices findMe = casServiceRepo.findByKeyText(casServiceName);
 					return newsfeedListenerRepo.findAllByCasserviceAndTopicAndLastactionGreaterThan(findMe, topic, 0);
 				}
 			}
@@ -468,7 +468,7 @@ public class ServiceNotifierService {
 	public List<ProcedureNewsfeed> findProcedureEntry(Value procedureName, Value topic) {
 
 		try {
-			return procedureNewsfeedRepo.findAllByKeytextAndTopicAndLastactionGreaterThan(procedureName.getStringValue(), topic.getStringValue(), 0);
+			return procedureNewsfeedRepo.findAllByKeyTextAndTopicAndLastActionGreaterThan(procedureName.getStringValue(), topic.getStringValue(), 0);
 
 		} catch (Exception e) {
 			logger.logError("Error while trying to access view xtcasProcedureNewsfeed!", e);

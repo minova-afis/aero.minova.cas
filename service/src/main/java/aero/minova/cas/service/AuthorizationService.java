@@ -134,7 +134,7 @@ public class AuthorizationService {
 		UserGroup usergroup = userGroupRepository.findByKeyText(keyText).orElseGet(() -> {
 			UserGroup group = new UserGroup();
 			group.setSecuritytoken("");
-			group.setKeytext(keyText);
+			group.setKeyText(keyText);
 			return group;
 		});
 

@@ -10,7 +10,7 @@ import aero.minova.cas.service.model.ServiceMessageReceiverLoginType;
 @Repository
 public interface ServiceMessageReceiverLoginTypeRepository extends JpaRepository<ServiceMessageReceiverLoginType, Long> {
 
-	public Optional<ServiceMessageReceiverLoginType> findByKeytextAndLastActionGreaterThan(String keytext, int lastAction);
+	public Optional<ServiceMessageReceiverLoginType> findByKeyTextAndLastActionGreaterThan(String keytext, int lastAction);
 
 	public ServiceMessageReceiverLoginType findByKeyLongAndLastActionGreaterThan(int keyLong, int lastAction);
 

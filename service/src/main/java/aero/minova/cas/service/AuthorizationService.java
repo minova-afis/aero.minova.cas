@@ -82,7 +82,7 @@ public class AuthorizationService {
 
 		findOrCreateAuthority(username, "admin");
 
-		for (UserPrivilege priv : userPrivilegeRepository.findAllWithLastActionGreaterThan(0)) {
+		for (UserPrivilege priv : userPrivilegeRepository.findByLastActionGreaterThan(0)) {
 			findOrCreateLuUserPrivilegeUserGroup(userGroup, priv);
 		}
 	}
@@ -175,8 +175,8 @@ public class AuthorizationService {
 	 * @param priv
 	 */
 	public LuUserPrivilegeUserGroup findOrCreateLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
-		return luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroupAndLastActionGreaterThan(priv.getKeyLong(), userGroup.getKeyLong(), 0)
-				.orElseGet(() -> {
+		return luUserPrivilegeUserGroupRepository
+				.findByUserPrivilegeKeyLongAndUserGroupKeyLongAndLastActionGreaterThan(priv.getKeyLong(), userGroup.getKeyLong(), 0).orElseGet(() -> {
 					LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
 					lu.setUserGroup(userGroup);
 					lu.setUserPrivilege(priv);

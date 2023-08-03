@@ -39,7 +39,7 @@ public class ServiceNotifierCache {
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.servicenotifier = new HashMap<>();
-				List<ProcedureNewsfeed> servicenotifierTable = procedureNewsfeedRepo.findAllWithLastActionGreaterThan(0);
+				List<ProcedureNewsfeed> servicenotifierTable = procedureNewsfeedRepo.findByLastActionGreaterThan(0);
 				for (ProcedureNewsfeed procedureNewsfeed : servicenotifierTable) {
 					service.registerServicenotifier(procedureNewsfeed.getKeyText(), procedureNewsfeed.getTopic());
 				}

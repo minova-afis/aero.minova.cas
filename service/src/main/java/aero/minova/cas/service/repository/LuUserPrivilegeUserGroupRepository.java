@@ -9,6 +9,7 @@ import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
 @Repository
 public interface LuUserPrivilegeUserGroupRepository extends DataEntityRepository<LuUserPrivilegeUserGroup> {
 
-	public Optional<LuUserPrivilegeUserGroup> findByPrivilegeAndGroupAndLastActionGreaterThan(long userprivilegekey, long usergroupkey, int lastAction);
+	public Optional<LuUserPrivilegeUserGroup> findByUserPrivilegeKeyLongAndUserGroupKeyLongAndLastActionGreaterThan(long userprivilegekey, long usergroupkey,
+			int lastAction);
 
 }

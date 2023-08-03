@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import aero.minova.cas.service.model.DataEntity;
-import jakarta.persistence.MappedSuperclass;
 
-@MappedSuperclass
+@NoRepositoryBean
 public interface DataEntityRepository<E extends DataEntity> extends JpaRepository<E, Long> {
 
-	public List<E> findAllWithLastActionGreaterThan(int lastAction);
+	public List<E> findByLastActionGreaterThan(int lastAction);
 
 	public Optional<E> findByKeyLong(int keyLong);
 

@@ -70,7 +70,7 @@ class AuthorizationTest {
 		assertNotNull(auth);
 
 		// Wurden die beiden Privilegien angelegt?
-		List<LuUserPrivilegeUserGroup> findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findAllWithLastActionGreaterThan(0);
+		List<LuUserPrivilegeUserGroup> findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findByLastActionGreaterThan(0);
 		assertEquals(2, findAllWithLastActionGreaterZero.size());
 
 		// Hat Admin-Nutzer Rechte auf alle Privilegien?
@@ -82,7 +82,7 @@ class AuthorizationTest {
 		controller.createOrUpdateAdminUser(username, "asfiusdhvn"); // Recht auf neues Privileg
 
 		// Hat Admin-Nutzer auch Rechte auf das neue Privileg?
-		findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findAllWithLastActionGreaterThan(0);
+		findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findByLastActionGreaterThan(0);
 		assertEquals(3, findAllWithLastActionGreaterZero.size());
 		for (LuUserPrivilegeUserGroup lu : findAllWithLastActionGreaterZero) {
 			assertEquals(group.getKeyLong(), lu.getUserGroup().getKeyLong());

@@ -58,9 +58,9 @@ public class ServiceNotifierCache {
 		try {
 			if (areServiceNotifiersStoresSetup()) {
 				service.newsfeeds = new HashMap<>();
-				List<NewsfeedListener> newsfeedsTable = newsfeedListenerRepo.findAllByLastaction(0);
+				List<NewsfeedListener> newsfeedsTable = newsfeedListenerRepo.findAllByLastActionGreaterThan(0);
 				for (NewsfeedListener newsfeedListener : newsfeedsTable) {
-					service.registerNewsfeed(newsfeedListener.getCasservice().getKeyText(), newsfeedListener.getTopic());
+					service.registerNewsfeed(newsfeedListener.getCasService().getKeyText(), newsfeedListener.getTopic());
 				}
 			}
 

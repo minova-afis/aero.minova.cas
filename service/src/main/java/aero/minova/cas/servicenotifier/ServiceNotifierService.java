@@ -162,7 +162,7 @@ public class ServiceNotifierService {
 			CASServices newService = new CASServices();
 
 			newService.setKeyText(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("KeyText")).getStringValue());
-			newService.setServiceurl(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceURL")).getStringValue());
+			newService.setServiceUrl(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceURL")).getStringValue());
 			newService.setPort(inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("Port")).getIntegerValue());
 
 			int loginTypeKey = inputTable.getRows().get(0).getValues().get(inputTable.findColumnPosition("ServiceMessageReceiverLoginType")) != null
@@ -340,7 +340,7 @@ public class ServiceNotifierService {
 			for (Row inputRow : inputTable.getRows()) {
 				String topic = inputRow.getValues().get(inputTable.findColumnPosition("Topic")).getStringValue();
 
-				List<NewsfeedListener> existingListeners = newsfeedListenerRepo.findAllByCasserviceAndTopicAndLastactionGreaterThan(serviceKey, topic, 0);
+				List<NewsfeedListener> existingListeners = newsfeedListenerRepo.findAllByCasServiceAndTopicAndLastActionGreaterThan(serviceKey, topic, 0);
 
 				// Diese Einträge sind bereits vorhanden. Wir wollen keine doppelten Einträge, also return.
 				if (!existingListeners.isEmpty()) {
@@ -348,7 +348,7 @@ public class ServiceNotifierService {
 				}
 
 				NewsfeedListener newListener = new NewsfeedListener();
-				newListener.setCasservice(serviceKey);
+				newListener.setCasService(serviceKey);
 				newListener.setTopic(topic);
 
 				newsfeedListenerRepo.saveAndFlush(newListener);
@@ -380,7 +380,7 @@ public class ServiceNotifierService {
 						inputRow.getValues().get(1).getStringValue());
 
 				for (NewsfeedListener toDelete : newsfeedListeners) {
-					toDelete.setLastaction(-1);
+					toDelete.setLastAction(-1);
 					// Hier wird der Eintrag aus der Datenbank-Tabelle gelöscht. LastAction wird einfach nur auf -1 gesetzt.
 					newsfeedListenerRepo.saveAndFlush(toDelete);
 				}
@@ -435,17 +435,17 @@ public class ServiceNotifierService {
 
 			if (topic.isBlank()) {
 				if (casServiceName == null || casServiceName.isBlank()) {
-					return newsfeedListenerRepo.findAllByLastaction(0);
+					return newsfeedListenerRepo.findAllByLastActionGreaterThan(0);
 				} else {
 					CASServices findMe = casServiceRepo.findByKeyText(casServiceName);
-					return newsfeedListenerRepo.findAllByCasservice(findMe);
+					return newsfeedListenerRepo.findAllByCasService(findMe);
 				}
 			} else {
 				if (casServiceName == null || casServiceName.isBlank()) {
-					return newsfeedListenerRepo.findAllByTopicAndLastactionGreaterThan(topic, 0);
+					return newsfeedListenerRepo.findAllByTopicAndLastActionGreaterThan(topic, 0);
 				} else {
 					CASServices findMe = casServiceRepo.findByKeyText(casServiceName);
-					return newsfeedListenerRepo.findAllByCasserviceAndTopicAndLastactionGreaterThan(findMe, topic, 0);
+					return newsfeedListenerRepo.findAllByCasServiceAndTopicAndLastActionGreaterThan(findMe, topic, 0);
 				}
 			}
 		} catch (Exception e) {

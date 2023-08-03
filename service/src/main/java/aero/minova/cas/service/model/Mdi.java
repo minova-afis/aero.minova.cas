@@ -1,16 +1,10 @@
 package aero.minova.cas.service.model;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -19,13 +13,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "xtcasMdi")
-public class Mdi {
-
-	@Id
-	@NotNull
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "KeyLong")
-	public int keylong;
+public class Mdi extends DataEntity {
 
 	@Size(max = 100)
 	@Column(name = "ID", length = 100)
@@ -49,28 +37,15 @@ public class Mdi {
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "MdiTypeKey", nullable = false)
-	public MdiType mditype;
+	public MdiType mdiType;
 
 	@NotNull
 	@Size(max = 500)
 	@Column(name = "ModulName", length = 500)
-	public String modulname;
+	public String modulName;
 
 	@Size(max = 50)
 	@Column(name = "SecurityToken", length = 50)
-	public String securitytoken;
-
-	@NotNull
-	@Size(max = 50)
-	@Column(name = "LastUser", length = 50)
-	public String lastuser = "CAS_JPA";
-
-	@NotNull
-	@Column(name = "LastDate")
-	public Timestamp lastdate = Timestamp.from(Instant.now());
-
-	@NotNull
-	@Column(name = "LastAction")
-	public int lastaction = 1;
+	public String securityToken;
 
 }

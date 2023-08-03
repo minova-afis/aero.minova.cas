@@ -8,6 +8,6 @@ import aero.minova.cas.service.model.ServiceProperties;
 @Repository
 public interface ServicePropertiesRepository extends JpaRepository<ServiceProperties, Long> {
 
-	public ServiceProperties findByServiceAndPropertyAndLastactionGreaterThan(String service, String property, int lastaction);
+	public ServiceProperties findByServiceAndPropertyAndLastActionGreaterThan(String service, String property, int lastAction);
 
 }

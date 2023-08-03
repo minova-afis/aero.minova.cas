@@ -18,7 +18,7 @@ public class CASServices extends DataEntity {
 	@NotNull
 	@Size(max = 250)
 	@Column(name = "ServiceURL", length = 250)
-	public String serviceurl;
+	public String serviceUrl;
 
 	@NotNull
 	@Column(name = "Port")

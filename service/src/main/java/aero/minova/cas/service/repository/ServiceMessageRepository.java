@@ -10,5 +10,5 @@ import aero.minova.cas.service.model.ServiceMessage;
 @Repository
 public interface ServiceMessageRepository extends JpaRepository<ServiceMessage, Long> {
 
-	public List<ServiceMessage> findAllByIssentFalseAndFailedFalseAndLastactionGreaterThan(int lastaction);
+	public List<ServiceMessage> findAllByIsSentFalseAndFailedFalseAndLastActionGreaterThan(int lastAction);
 }

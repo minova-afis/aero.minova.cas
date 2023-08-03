@@ -11,13 +11,13 @@ import aero.minova.cas.service.model.NewsfeedListener;
 @Repository
 public interface NewsfeedListenerRepository extends JpaRepository<NewsfeedListener, Long> {
 
-	public List<NewsfeedListener> findAllByLastaction(int lastaction);
+	public List<NewsfeedListener> findAllByLastActionGreaterThan(int lastAction);
 
-	public List<NewsfeedListener> findAllByTopicAndLastactionGreaterThan(String topic, int lastaction);
+	public List<NewsfeedListener> findAllByTopicAndLastActionGreaterThan(String topic, int lastAction);
 
 	// @Query("select nl from NewsfeedListener nl where nl.CASServices = :casservicekey and nl.Topic = :topic and nl.lastaction > 0")
-	public List<NewsfeedListener> findAllByCasserviceAndTopicAndLastactionGreaterThan(CASServices casservice, String topic, int lastaction);
+	public List<NewsfeedListener> findAllByCasServiceAndTopicAndLastActionGreaterThan(CASServices casService, String topic, int lastAction);
 
-	public List<NewsfeedListener> findAllByCasservice(CASServices casservice);
+	public List<NewsfeedListener> findAllByCasService(CASServices casService);
 
 }

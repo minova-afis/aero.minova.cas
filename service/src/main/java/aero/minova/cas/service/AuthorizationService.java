@@ -60,7 +60,7 @@ public class AuthorizationService {
 	public UserPrivilege findOrCreateUserPrivilege(String privilegeName) {
 		return userPrivilegeRepository.findByKeyText(privilegeName).orElseGet(() -> {
 			UserPrivilege privilege = new UserPrivilege();
-			privilege.setKeytext(privilegeName);
+			privilege.setKeyText(privilegeName);
 			userPrivilegeRepository.save(privilege);
 			return privilege;
 		});
@@ -133,17 +133,17 @@ public class AuthorizationService {
 	public UserGroup createOrUpdateUserGroup(String keyText, String securitytoken) {
 		UserGroup usergroup = userGroupRepository.findByKeyText(keyText).orElseGet(() -> {
 			UserGroup group = new UserGroup();
-			group.setSecuritytoken("");
+			group.setSecurityToken("");
 			group.setKeyText(keyText);
 			return group;
 		});
 
 		// Neue Tokens anhängen, dabei aber keine duplikate erstellen
 		List<String> newTokens = Arrays.asList(securitytoken.split("#"));
-		List<String> oldTokens = Arrays.asList(usergroup.getSecuritytoken().split("#"));
+		List<String> oldTokens = Arrays.asList(usergroup.getSecurityToken().split("#"));
 		for (String newToken : newTokens) {
 			if (!oldTokens.contains(newToken)) {
-				usergroup.setSecuritytoken(usergroup.getSecuritytoken() + "#" + newToken);
+				usergroup.setSecurityToken(usergroup.getSecurityToken() + "#" + newToken);
 			}
 		}
 
@@ -177,8 +177,8 @@ public class AuthorizationService {
 	public LuUserPrivilegeUserGroup findOrCreateLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
 		return luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong()).orElseGet(() -> {
 			LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
-			lu.setUsergroup(userGroup);
-			lu.setUserprivilege(priv);
+			lu.setUserGroup(userGroup);
+			lu.setUserPrivilege(priv);
 			luUserPrivilegeUserGroupRepository.save(lu);
 			return lu;
 		});

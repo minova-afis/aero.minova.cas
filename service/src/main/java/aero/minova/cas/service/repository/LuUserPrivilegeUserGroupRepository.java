@@ -15,7 +15,7 @@ public interface LuUserPrivilegeUserGroupRepository extends JpaRepository<LuUser
 	@Query("select lu from LuUserPrivilegeUserGroup lu where lu.lastAction > 0")
 	public List<LuUserPrivilegeUserGroup> findAllWithLastActionGreaterZero();
 
-	@Query("select lu from LuUserPrivilegeUserGroup lu where lu.userprivilege.keyLong = :userprivilegekey and lu.usergroup.keyLong = :usergroupkey and lu.lastAction > 0")
+	@Query("select lu from LuUserPrivilegeUserGroup lu where lu.userPrivilege.keyLong = :userprivilegekey and lu.userGroup.keyLong = :usergroupkey and lu.lastAction > 0")
 	public Optional<LuUserPrivilegeUserGroup> findByPrivilegeAndGroup(long userprivilegekey, long usergroupkey);
 
 }

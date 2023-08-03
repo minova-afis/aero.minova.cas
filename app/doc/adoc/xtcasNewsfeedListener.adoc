@@ -25,6 +25,15 @@ Datentyp: integer not null +
 // end::column.CASServiceKey[]
 
 
+==== KeyText
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.KeyText[]
+
+// end::column.KeyText[]
+
+
 ==== Topic
 
 Datentyp: nvarchar(50) not null +

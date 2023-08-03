@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>cas.parent</artifactId>
-		<version>12.65.7-SNAPSHOT</version>
+		<version>12.65.11-SNAPSHOT</version>
 	</parent>
 
     <scm>
@@ -19,11 +19,6 @@
             <groupId>aero.minova</groupId>
             <artifactId>cas.api</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>aero.minova</groupId>
-            <artifactId>service.event.dispatcher</artifactId>
-            <version>12.1.0</version>
         </dependency>
         <dependency>
             <groupId>aero.minova</groupId>

@@ -55,7 +55,7 @@ public class FilesController {
 //	@PostConstruct
 //	public void setup() throws Exception {
 //		// fügt Extension hinzu
-//		spc.registerExctension("files/read", inputTable -> {
+//		spc.registerExtension("files/read", inputTable -> {
 //			try {
 //				SqlProcedureResult result = new SqlProcedureResult();
 //				result.setResultSet(getFiles(inputTable.getRows()));
@@ -65,7 +65,7 @@ public class FilesController {
 //				throw new RuntimeException(e);
 //			}
 //		});
-//		spc.registerExctension("files/hash", inputTable -> {
+//		spc.registerExtension("files/hash", inputTable -> {
 //			try {
 //				SqlProcedureResult result = new SqlProcedureResult();
 //				result.setResultSet(getHashes(inputTable.getRows()));
@@ -134,12 +134,12 @@ public class FilesController {
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
-	 * 
+	 *
 	 * @param path
 	 *            Der Pfad des Files, welches der User anfragt, als String.
 	 * @return byte[] des angefragten Files.
 	 * @throws Exception
-	 *             Entweder eine IllegalAccessException, falls der Pfad außerhalb des System-Ordner liegt, oder FileNotFoundException, falls es keine Datei mit
+	 *             Entweder eine IllegalAccessException, falls der Pfad außerhalb des System-Ordners liegt, oder FileNotFoundException, falls es keine Datei mit
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
@@ -152,12 +152,12 @@ public class FilesController {
 			try {
 				return fileService.readMDI();
 			} catch (Exception e) {
-				customLogger.logError("Mdi could not be red. It will be loaded from the system file path.", e);
+				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
 		}
 
 		String extension = FilenameUtils.getExtension(path);
-		// Zur Abwertskompatibilität Dateieindung überprüfen und, falls diese Zip ist, getZip aufrufen.
+		// Zur Abwärtskompatibilität Dateiendung überprüfen und, falls diese Zip ist, getZip aufrufen.
 		if (extension.equalsIgnoreCase("zip")) {
 			return getZip(path);
 		}
@@ -168,12 +168,12 @@ public class FilesController {
 
 	/**
 	 * Sucht die MD5-Datei bestimmten Files im Internal/MD5-Verzeichnis und gibt diese zurück.
-	 * 
+	 *
 	 * @param path
 	 *            Der Pfad des Files, zu welchem der User die MD5 Datei möchte, als String.
 	 * @return Der MD5 Wert des angefragten Files als byte[].
 	 * @throws Exception
-	 *             Entweder eine IllegalAccessException, falls der Pfad außerhalb des System-Ordner liegt, oder FileNotFoundException, falls es keine Datei mit
+	 *             Entweder eine IllegalAccessException, falls der Pfad außerhalb des System-Ordners liegt, oder FileNotFoundException, falls es keine Datei mit
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
@@ -215,7 +215,7 @@ public class FilesController {
 
 	/**
 	 * Die User-Anfrage zum Uploaden einer Log-Datei des Users. Der User schickt diese Datei als Zip. Die Datei wird dann im Internal/UserLogs gespeichert.
-	 * 
+	 *
 	 * @param log
 	 *            Die gezippte Log-Datei als byte[].
 	 * @throws IOException
@@ -240,7 +240,7 @@ public class FilesController {
 
 	/**
 	 * Erzeugt eine MD5-Datei im Internal/MD5-Directory zu der übergebenen Datei.
-	 * 
+	 *
 	 * @param p
 	 *            Der Pfad der Datei, welche gehashed werden soll.
 	 * @throws Exception
@@ -266,7 +266,7 @@ public class FilesController {
 			customLogger.logFiles("Creating directory " + mdDataName);
 		}
 
-		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon exisitert
+		// erzeugt die Datei, falls sie noch nicht existiert und überschreibt sie, falls sie schon existiert
 		File hashedFile = new File(mdDataName + ".md5");
 		customLogger.logFiles("Hashing: " + hashedFile.getAbsolutePath());
 
@@ -275,7 +275,7 @@ public class FilesController {
 
 	/**
 	 * Hashed beim Starten des CAS alle Dateien und speichert deren MD5-Dateien im Internal/MD5-Ordner.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Falls die MD5-Dateien nicht geschrieben werden können.
 	 */
@@ -300,7 +300,7 @@ public class FilesController {
 
 	/**
 	 * Zipped beim Starten des CAS alle Dateien und speichert deren Zip-Dateien im Internal/Zips.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Falls Dateien nicht gezipped werden konnten oder der Dateipfad außerhalb des Root-Directories zeigt.
 	 */
@@ -314,11 +314,14 @@ public class FilesController {
 			if (path.startsWith(fileService.getZipsFolder().getParent().toString())) {
 				continue;
 			}
-			String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1, path.toString().length());
+
+			// XXX String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1 );
+			String fileSuffix = FilenameUtils.getExtension( path.toString() );
 			// es kann sein, dass von einem vorherigen Start bereits gezippte Dateien vorhanden sind, welche schon gehashed wurden
 			if (fileSuffix.equalsIgnoreCase("md5")) {
 				String filePrefix = path.toString().substring(0, path.toString().lastIndexOf("."));
-				fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1, path.toString().length());
+				// XXX fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1 );
+				fileSuffix = FilenameUtils.getExtension( path.toString() );
 			}
 			// wir wollen nicht noch einen zip von einer zip Datei, wir wollen allerdings hier NUR Directories haben
 			if ((!fileSuffix.toLowerCase().contains("zip")) && (path.toFile().isDirectory())) {
@@ -329,14 +332,14 @@ public class FilesController {
 
 	/**
 	 * Erstellt eine Zip-Datei und speichert diese im Internal/Zips-Ordner.
-	 * 
+	 *
 	 * @param path
 	 *            Die Datei, zu welcher eine Zip-Datei erstellt werden soll.
 	 * @throws Exception
 	 *             Falls gewünschte Datei außerhalb des Dateisystems liegt, sie nicht existiert oder ein Fehler beim Zippen auftritt.
 	 */
 	/*
-	 * Vorsicht! createZip ist nicht determinstisch
+	 * Vorsicht! createZip ist nicht deterministisch
 	 */
 	@RequestMapping(value = "files/createZip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public void createZip(@RequestParam Path path) throws Exception {

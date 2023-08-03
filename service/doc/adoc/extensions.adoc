@@ -54,12 +54,6 @@ Damit wird verhindert, dass das CAS unnötig aufgebläht wird.
 	<dependencies>
 		<dependency>
 			<groupId>aero.minova</groupId>
-			<artifactId>cas.setup</artifactId>
-			<version>12.57.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>aero.minova</groupId>
 			<artifactId>cas.service</artifactId>
 			<version>12.57.0</version>
 			<scope>provided</scope>
@@ -117,15 +111,6 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 								<exclude>*sources.jar</exclude>
 							</excludes>
 						</resource>
-						<resource>
-							<directory>${project.build.directory}/../../extension/target/libs</directory>
-							<includes>
-								<include>*.jar</include>
-							</includes>
-							<excludes>
-								<exclude>*sources.jar</exclude>
-							</excludes>
-						</resource>
 					</resources>
 				</configuration>
 			</execution>
@@ -135,6 +120,14 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 ----
 
 Durch das Hinzufügen dieses Plugins, wird beim Bauen des gesamten Projektes die Jar der Extension bereits in das richtige Verzeichnis geschoben. 
+Weitere Abhängigkeiten sollen **NICHT** mit in den extensions-Ordner kopiert werden. 
+Die einzige Ausnahme ist, wenn eine Abhängigkeit benötigt wird, die nicht vom CAS bereitgestellt wird. 
+Das sollte aber nur selten vorkommen.
+In diesem Fall soll auch nur genau die entsprechende Jar kopiert werden.
+
+Benötigt eine Extension eine Abhängigkeit auf eine andere Extension, so muss diese dependency sowohl in die extension.pom (damit die Extension gebaut werden kann) als auch in die app.pom (damit die entsprechende jar mitausgeliefert wird) eingetragen werden! 
+Hier muss darauf geachtet werden, dass die gleichen Versionen genutzt werden.
+Ausgeliefert wird, was in der app.pom steht.
 
 3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController, den XSqlProcedureController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
 

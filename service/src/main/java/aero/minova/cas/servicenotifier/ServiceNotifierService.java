@@ -66,9 +66,13 @@ public class ServiceNotifierService {
 	@PostConstruct
 	private void setup() {
 
-		findOrCreateServiceMessageReceiverLoginType("None");
-		findOrCreateServiceMessageReceiverLoginType("BasicAuth");
-		findOrCreateServiceMessageReceiverLoginType("OAuth2");
+		try {
+			findOrCreateServiceMessageReceiverLoginType("None");
+			findOrCreateServiceMessageReceiverLoginType("BasicAuth");
+			findOrCreateServiceMessageReceiverLoginType("OAuth2");
+		} catch (Exception e) {
+			logger.logError("Standard values could not be inserted in table xtcasServiceMessageReceiverLoginType.", e);
+		}
 
 		spc.registerExtension("xpcasRegisterService", inputTable -> {
 			try {

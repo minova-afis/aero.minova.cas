@@ -4,9 +4,12 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+
+## [12.65.12] -- 2023-08-04
 * service.event.dispatcher Abhängigkeit entfernen, da dieser selbst vom CAS abhängig ist und Probleme verursacht
 
-
+## [12.65.11] -- 2023-08-03
 * Einige native Queries zu JPA Queries ändern, damit Azure sie auflösen kann. 
 * JPA Data Entities Column Textgrößen und Datenfeldtypen korrigieren.
 

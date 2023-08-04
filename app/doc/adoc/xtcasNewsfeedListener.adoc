@@ -27,7 +27,7 @@ Datentyp: integer not null +
 
 ==== KeyText
 
-Datentyp: nvarchar(50) not null +
+Datentyp: nvarchar(50) +
 
 // tag::column.KeyText[]
 

@@ -2,7 +2,8 @@ alter procedure dbo.xpcasInsertLuUserPrivilegeUserGroup (
 	@KeyLong int output,
 	@UserPrivilegeKey int = null,
 	@UserGroupKey int = null,
-	@RowLevelSecurity bit = 0
+	@RowLevelSecurity bit = 0,
+	@KeyText nvarchar(50) = null
 )
 with encryption as
 	declare @returnCode int
@@ -10,5 +11,6 @@ with encryption as
 		@KeyLong,
 		@UserPrivilegeKey,
 		@UserGroupKey,
-		@RowLevelSecurity
+		@RowLevelSecurity,
+		@KeyText
 return @returnCode

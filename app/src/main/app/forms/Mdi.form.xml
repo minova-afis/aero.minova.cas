@@ -6,6 +6,9 @@
 		<column name="ID" text="@xtcasMdi.ID">
 			<text length="100"/>
 		</column>
+		<column name="KeyText" text="@xtcasMdi.KeyText">
+			<text length="50" />
+		</column>
 		<column name="Icon" text="@xtcasMdi.Icon">
 			<text length="100"/>
 		</column>
@@ -38,6 +41,9 @@
 		<head>
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
+			</field>
+			<field name="KeyText" sql-index="9" text="@xtcasMdi.KeyText" number-columns-spanned="4" required="false" fill="toright">
+				<text length="50" />
 			</field>
 			<field name="ID" sql-index="1" text="@xtcasMdi.ID" number-columns-spanned="4" fill="toright">
 				<text length="100"/>

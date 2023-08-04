@@ -2,7 +2,8 @@ alter procedure dbo.xpcasUpdateUsers (
 	@KeyLong int output,
 	@Username nvarchar(50),
 	@Password nvarchar(100) = null,
-	@Description nvarchar(50) = null
+	@Description nvarchar(50) = null,
+	@KeyText nvarchar(50) = null
 )
 with encryption as
 	if exists(select * from xtcasUsers
@@ -26,12 +27,13 @@ with encryption as
 	from xtcasUsers 
 	where KeyLong = @KeyLong
 
-	-- Nur das Password wird geändert
+	-- Nur das Password, Description und KeyText wird geändert
 	if exists( select * from xtcasUsers where Username = @Username and LastAction > 0)
 	begin 
 		update xtcasUsers
 		set	Password = coalesce(@Password, @OldPassword),
 			Description = @Description,
+			KeyText = @KeyText,
 			LastAction = 2,
 			LastDate = getDate(),
 			LastUser = dbo.xfCasUser()

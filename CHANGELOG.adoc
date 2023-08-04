@@ -4,7 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-
+* Fehlender KeyText in Masken und Prozeduren ergänzen. 
 
 ## [12.65.12] -- 2023-08-04
 * service.event.dispatcher Abhängigkeit entfernen, da dieser selbst vom CAS abhängig ist und Probleme verursacht

@@ -189,7 +189,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 					safeAsSent(true, pendingMessage);
 				} else {
 					safeAsSent(false, pendingMessage);
-					logger.logQueueService(pendingMessage.getCasservice().getKeyText() + " is not reachable!");
+					logger.logQueueService(pendingMessage.getCasService().getKeyText() + " is not reachable!");
 				}
 			}
 		}
@@ -237,7 +237,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				CASServices service = casServiceRepo.findByKeyLong(services.getCasService().getKeyLong()).get();
 				ServiceMessage serviceMessage = new ServiceMessage();
 
-				serviceMessage.setCasservice(service);
+				serviceMessage.setCasService(service);
 				serviceMessage.setMessage(message);
 
 				serviceMessage.setMessageCreationDate(Timestamp.valueOf(LocalDateTime.now()));
@@ -282,13 +282,13 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 	 */
 	private boolean sendMessage(ServiceMessage pendingMessage) {
 		// URL + : + Port
-		String url = pendingMessage.getCasservice().getPort() != 0
-				? pendingMessage.getCasservice().getServiceUrl() + ":" + pendingMessage.getCasservice().getPort()
-				: pendingMessage.getCasservice().getServiceUrl();
+		String url = pendingMessage.getCasService().getPort() != 0
+				? pendingMessage.getCasService().getServiceUrl() + ":" + pendingMessage.getCasService().getPort()
+				: pendingMessage.getCasService().getServiceUrl();
 		String message = pendingMessage.getMessage();
 
-		int serviceMessageReceiverLoginTypeKey = pendingMessage.getCasservice().getReceiverLoginType() != null
-				? pendingMessage.getCasservice().getReceiverLoginType().getKeyLong()
+		int serviceMessageReceiverLoginTypeKey = pendingMessage.getCasService().getReceiverLoginType() != null
+				? pendingMessage.getCasService().getReceiverLoginType().getKeyLong()
 				: 0;
 
 		HttpEntity<?> request;
@@ -298,7 +298,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			if (serviceMessageReceiverLoginTypeKey == 2) {
 
 				// Username + : + Password
-				String credentials = pendingMessage.getCasservice().getUsername() + ":" + pendingMessage.getCasservice().getPassword();
+				String credentials = pendingMessage.getCasService().getUsername() + ":" + pendingMessage.getCasService().getPassword();
 
 				HttpHeaders header = new HttpHeaders();
 				byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
@@ -310,7 +310,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 			} else if (serviceMessageReceiverLoginTypeKey == 3) {
 
 				OAuth2Token oauth2Token;
-				CASServices service = pendingMessage.getCasservice();
+				CASServices service = pendingMessage.getCasService();
 
 				if (!oauth2TokenList.containsKey(service)) {
 					oauth2Token = getOAuth2Token(service);

@@ -7,13 +7,13 @@
 		<column name="TableName" text="@xtcasColumnSecurity.TableName">
 			<text length="50" />
 		</column>
+		<column name="KeyText" text="@xtcasColumnSecurity.KeyText">
+			<text length="50" />
+		</column>
 		<column name="ColumnName" text="@xtcasColumnSecurity.ColumnName">
 			<text length="50" />
 		</column>
 		<column name="SecurityToken" text="@xtcasColumnSecurity.SecurityToken">
-			<text length="50" />
-		</column>
-		<column name="KeyText" text="@xtcasColumnSecurity.KeyText">
 			<text length="50" />
 		</column>
 	</index-view>

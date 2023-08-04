@@ -22,6 +22,9 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>
+			<field name="KeyText" sql-index="4" text="@xtcasUsers.KeyText" number-columns-spanned="4" required="false" fill="toright">
+				<text length="50" />
+			</field>
 			<field name="Username" sql-index="1" text="@xtcasUsers.Username" required="true" key-type="user" number-columns-spanned="4" fill="toright">
 				<text length="50" />
 			</field>
@@ -30,9 +33,6 @@
 			</field>
 			<field name="Password" sql-index="2" text="@xtcasUsers.Password" number-columns-spanned="4" required="true" fill="toright">
 				<text length="100" />
-			</field>
-			<field name="KeyText" sql-index="4" text="@xtcasUsers.KeyText" number-columns-spanned="4" required="false" fill="toright">
-				<text length="50" />
 			</field>
 		</head>
 	</detail>

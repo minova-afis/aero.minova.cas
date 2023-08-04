@@ -8,6 +8,9 @@
 	<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 		<number />
 	</field>
+	<field name="KeyText" sql-index="4" text="@xtcasLuUserGroupForUserPrivilege.KeyText" number-columns-spanned="4" required="false" fill="toright">
+		<text length="50" />
+	</field>
 	<field name="UserPrivilegeKey" sql-index="1" text="@xtcasLuUserPrivilegeForUserGroup.UserPrivilegeKey" key-type="primary" visible="false">
 		<number />
 	</field>

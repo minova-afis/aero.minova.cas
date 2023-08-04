@@ -42,6 +42,9 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
 			</field>
+			<field name="KeyText" sql-index="9" text="@xtcasMdi.KeyText" number-columns-spanned="4" required="false" fill="toright">
+				<text length="50" />
+			</field>
 			<field name="ID" sql-index="1" text="@xtcasMdi.ID" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
@@ -65,9 +68,6 @@
 			</field>
 			<field name="ModulName" sql-index="8" text="@xtcasMdi.ModulName" number-columns-spanned="4" required="true" fill="toright">
 				<text length="500"/>
-			</field>
-			<field name="KeyText" sql-index="9" text="@xtcasMdi.KeyText" number-columns-spanned="4" required="false" fill="toright">
-				<text length="50" />
 			</field>
 		</head>
 	</detail>

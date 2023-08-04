@@ -1,7 +1,8 @@
 alter procedure dbo.xpcasInsertServiceMessage (
 	@KeyLong int output,
 	@CASServiceKey int,
-	@Message nvarchar(1024)
+	@Message nvarchar(1024),
+	@KeyText nvarchar (50) = null
 )
 with encryption as
 
@@ -10,12 +11,14 @@ insert into xtcasServiceMessage (
 	Message,
 	MessageCreationDate,
 	IsSent,
+	KeyText,
 	LastAction,
 	LastDate,
 	LastUser
 ) values (
 	@CASServiceKey,
 	@Message,
+	@KeyText,
 	getDate(),
 	0,
 	1,

@@ -2,18 +2,15 @@ package aero.minova.cas.service.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import aero.minova.cas.service.model.ProcedureNewsfeed;
 
 @Repository
-public interface ProcedureNewsfeedRepository extends JpaRepository<ProcedureNewsfeed, Long> {
+public interface ProcedureNewsfeedRepository extends DataEntityRepository<ProcedureNewsfeed> {
 
-	List<ProcedureNewsfeed> findAllByKeytextAndTopicAndLastactionGreaterThan(String keytext, String topic, int lastaction);
+	List<ProcedureNewsfeed> findAllByKeyTextAndTopicAndLastActionGreaterThan(String keyText, String topic, int lastaction);
 
-	List<ProcedureNewsfeed> findAllByTopicAndLastaction(String topic, int lastaction);
-
-	List<ProcedureNewsfeed> findAllByLastaction(int Lastaction);
+	List<ProcedureNewsfeed> findAllByTopicAndLastAction(String topic, int lastAction);
 
 }

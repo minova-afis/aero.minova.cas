@@ -6,7 +6,8 @@ alter procedure dbo.xpcasReadMdi (
 	@Menu nvarchar(100) output,
 	@Position float output,
 	@SecurityToken nvarchar(50) output,
-	@MdiTypeKey int output
+	@MdiTypeKey int output,
+	@KeyText nvarchar(50) = null output
 )
 with encryption
 as
@@ -17,7 +18,8 @@ as
 		@Menu = Menu,
 		@Position = Position,
 		@SecurityToken = SecurityToken,
-		@MdiTypeKey = MdiTypeKey
+		@MdiTypeKey = MdiTypeKey,
+		@KeyText = KeyText
 	from xtcasMdi
 	where KeyLong = @KeyLong and
 		LastAction > -1

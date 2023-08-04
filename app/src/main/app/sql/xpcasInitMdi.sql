@@ -6,7 +6,8 @@ alter procedure dbo.xpcasInitMdi (
 	@Position float,
 	@SecurityToken nvarchar(50),
 	@MdiTypeKey int,
-	@ModulName nvarchar(500)
+	@ModulName nvarchar(500),
+	@KeyText nvarchar(50) = null
 )
 with encryption
 as
@@ -32,6 +33,7 @@ as
 
 			insert into xtcasMdi(
 				ID,
+				KeyText,
 				Icon,
 				Label,
 				Menu,
@@ -44,6 +46,7 @@ as
 				LastAction
 			) values (
 				@ID,
+				@KeyText,
 				@Icon,
 				@Label,
 				@Menu,

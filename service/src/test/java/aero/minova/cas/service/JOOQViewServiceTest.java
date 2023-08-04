@@ -35,7 +35,7 @@ import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false", "spring.jooq.sql-dialect:POSTGRES" })
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
 class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 
 	static List<Row> userGroups = new ArrayList<>();

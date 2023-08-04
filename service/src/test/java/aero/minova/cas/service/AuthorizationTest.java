@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import aero.minova.cas.CoreApplicationSystemApplication;
-import aero.minova.cas.service.AuthorizationService;
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
 import aero.minova.cas.service.model.UserGroup;
@@ -71,22 +70,22 @@ class AuthorizationTest {
 		assertNotNull(auth);
 
 		// Wurden die beiden Privilegien angelegt?
-		List<LuUserPrivilegeUserGroup> findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findAllWithLastActionGreaterZero();
+		List<LuUserPrivilegeUserGroup> findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findByLastActionGreaterThan(0);
 		assertEquals(2, findAllWithLastActionGreaterZero.size());
 
 		// Hat Admin-Nutzer Rechte auf alle Privilegien?
 		for (LuUserPrivilegeUserGroup lu : findAllWithLastActionGreaterZero) {
-			assertEquals(group.getKeyLong(), lu.getUsergroup().getKeyLong());
+			assertEquals(group.getKeyLong(), lu.getUserGroup().getKeyLong());
 		}
 
 		controller.findOrCreateUserPrivilege("xpcorLastOne");
 		controller.createOrUpdateAdminUser(username, "asfiusdhvn"); // Recht auf neues Privileg
 
 		// Hat Admin-Nutzer auch Rechte auf das neue Privileg?
-		findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findAllWithLastActionGreaterZero();
+		findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findByLastActionGreaterThan(0);
 		assertEquals(3, findAllWithLastActionGreaterZero.size());
 		for (LuUserPrivilegeUserGroup lu : findAllWithLastActionGreaterZero) {
-			assertEquals(group.getKeyLong(), lu.getUsergroup().getKeyLong());
+			assertEquals(group.getKeyLong(), lu.getUserGroup().getKeyLong());
 		}
 	}
 
@@ -118,25 +117,25 @@ class AuthorizationTest {
 
 		UserGroup group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
-		assertEquals("#FirstToken", group.getSecuritytoken());
+		assertEquals("#FirstToken", group.getSecurityToken());
 
 		// Sicherstellen, dass keine Duplikat-Token angehängt werden
 		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
 		group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
-		assertEquals("#FirstToken", group.getSecuritytoken());
+		assertEquals("#FirstToken", group.getSecurityToken());
 
 		// Sicherstellen, dass neuer Token angehängt wird
 		controller.createOrUpdateUserGroup(groupName, "#SecondToken");
 		group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
-		assertEquals("#FirstToken#SecondToken", group.getSecuritytoken());
+		assertEquals("#FirstToken#SecondToken", group.getSecurityToken());
 
 		// Nochmal keine Duplikate testen
 		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
 		group = userGroupRepository.findByKeyText(groupName).get();
 		assertNotNull(group);
-		assertEquals("#FirstToken#SecondToken", group.getSecuritytoken());
+		assertEquals("#FirstToken#SecondToken", group.getSecurityToken());
 	}
 
 }

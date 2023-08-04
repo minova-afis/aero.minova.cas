@@ -1,12 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cas.service</artifactId>
-	<version>12.65.10-SNAPSHOT</version>
 
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>cas.parent</artifactId>
-		<version>12.65.10-SNAPSHOT</version>
+		<version>12.65.14-SNAPSHOT</version>
 	</parent>
 
 	<scm>
@@ -16,18 +15,18 @@
 		<tag>HEAD</tag>
 	</scm>
 
-		<dependencyManagement>
-			<dependencies>
-				<dependency>
-					<!-- Diese BOM wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
-					<groupId>software.amazon.awssdk</groupId>
-					<artifactId>bom</artifactId>
-					<version>2.20.116</version>
-					<type>pom</type>
-					<scope>import</scope>
-				</dependency>
-			</dependencies>
-		</dependencyManagement>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- Diese BOM wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>bom</artifactId>
+				<version>2.20.119</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -148,22 +147,18 @@
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
-			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
-			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
-			<version>6.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -213,14 +208,9 @@
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
 			<version>2.8.0</version>
-		</dependency>        
-		
-		<dependency>			
-		<!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.afis.dailyclosing) bereitgestellt: service/doc/adoc/extensions.adoc -->
-            <groupId>aero.minova</groupId>
-            <artifactId>service.event.dispatcher</artifactId>
-            <version>12.1.0</version>
-        </dependency>
+		</dependency>
+
+
 
 
 		<dependency>
@@ -256,12 +246,20 @@
 			<artifactId>msal4j</artifactId>
 			<version>1.13.9</version>
 		</dependency>
-		<dependency> 
+		<dependency>
 			<!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.github) bereitgestellt: service/doc/adoc/extensions.adoc -->
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.6</version>
-        </dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>spring-cloud-azure-dependencies</artifactId>
+			<version>5.4.0</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

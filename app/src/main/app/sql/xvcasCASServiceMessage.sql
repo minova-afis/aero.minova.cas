@@ -16,7 +16,8 @@ select
     cs.Password,
     cs.ClientID,
     cs.ClientSecret,
-    cs.TokenURL
+    cs.TokenURL,
+    cs.KeyText
 from xtcasCASServices cs
 left join xtcasServiceMessage sm on sm.CASServiceKey = cs.KeyLong
 where cs.LastAction >0

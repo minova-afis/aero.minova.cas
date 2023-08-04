@@ -6,7 +6,8 @@ alter procedure dbo.xpcasUpdateMdi (
 	@Menu nvarchar(100),
 	@Position float,
 	@SecurityToken nvarchar(50),
-	@MdiTypeKey int
+	@MdiTypeKey int,
+	@KeyText NVARCHAR(50) = null
 )
 with encryption
 as
@@ -21,6 +22,7 @@ as
 		Position = @Position,
 		SecurityToken = @SecurityToken,
 		MdiTypeKey = @MdiTypeKey,
+		KeyText = @KeyText,
 		LastUser = dbo.xfCasUser(),
 		LastDate = getDate(),
 		LastAction = 2

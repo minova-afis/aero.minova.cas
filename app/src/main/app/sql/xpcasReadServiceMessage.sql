@@ -5,7 +5,8 @@ alter procedure dbo.xpcasReadServiceMessage (
 	@Message varchar(1024) output,
 	@isSent bit output,
 	@NumberOfAttepts int output,
-	@MessageCreationDate datetime output
+	@MessageCreationDate datetime output,
+	@KeyText nvarchar(50) = null output
 )
 with encryption as
 if (@KeyLong is not null)
@@ -15,7 +16,8 @@ begin
 				@Message = Message,
                 @isSent = isSent,
                 @NumberOfAttepts = NumberOfAttempts,
-				@MessageCreationDate = MessageCreationDate
+				@MessageCreationDate = MessageCreationDate,
+				@KeyText = KeyText
 		from xvcasCASServiceMessage
 		where MessageKey = @KeyLong
 end

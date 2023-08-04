@@ -1,7 +1,8 @@
 alter procedure dbo.xpcasInsertNewsfeedListener (
     @KeyLong int output,
 	@CASServiceKey int,
-	@Topic nvarchar(50)
+	@Topic nvarchar(50),
+	@KeyText nvarchar(50) = null
 )
 with encryption as
 if exists(select * from xtcasNewsfeedListener
@@ -32,12 +33,14 @@ begin
 	insert into xtcasNewsfeedListener (
 		CASServiceKey,
 		Topic,
+		KeyText,
 		LastAction,
 		LastDate,
 		LastUser
 	) values (
 		@CASServiceKey,
 		@Topic,
+		@KeyText,
 		1,
 		getDate(),
 		dbo.xfCasUser()

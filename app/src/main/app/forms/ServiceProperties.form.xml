@@ -14,6 +14,9 @@
 		<column name="Val" text="@xtcasServiceProperties.val">
 			<text length="1024"/>
 		</column>
+		<column name="KeyText" text="@xtcasServiceProperties.KeyText">
+			<text length="50" />
+		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="ServiceProperties">
 		<head>
@@ -28,6 +31,9 @@
 			</field>
 			<field name="Val" sql-index="3" text="@xtcasServiceProperties.val" number-columns-spanned="4" required="true" fill="toright" >
 				<text length="1024"/>
+			</field>
+			<field name="KeyText" sql-index="4" text="@xtcasServiceProperties.KeyText" number-columns-spanned="4" required="false" fill="toright">
+				<text length="50" />
 			</field>
 		</head>
 	</detail>

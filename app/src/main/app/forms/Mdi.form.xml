@@ -33,6 +33,9 @@
 		<column name="LastUser" text="@xtcasMdi.LastUser">
 			<text length="50"/>
 		</column>
+		<column name="KeyText" text="@xtcasMdi.KeyText">
+			<text length="50" />
+		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="Mdi" button-copy-visible="true">
 		<head>
@@ -62,6 +65,9 @@
 			</field>
 			<field name="ModulName" sql-index="8" text="@xtcasMdi.ModulName" number-columns-spanned="4" required="true" fill="toright">
 				<text length="500"/>
+			</field>
+			<field name="KeyText" sql-index="9" text="@xtcasMdi.KeyText" number-columns-spanned="4" required="false" fill="toright">
+				<text length="50" />
 			</field>
 		</head>
 	</detail>

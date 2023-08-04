@@ -8,7 +8,7 @@
 		<integer nullable="false"/>
 	</column>
 	<column name="KeyText">
-		<varchar length="50" nullable="false"/>
+		<varchar length="50" nullable="true"/>
 	</column>
 	<column name="Topic">
 		<varchar length="50" nullable="false"/>

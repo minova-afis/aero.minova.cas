@@ -10,5 +10,8 @@ xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova
     </field>
     <field name="Authority" sql-index="2" text="@xtcasAuthorities.Authority" required="true">
         <lookup table="xtcasUserGroup"/>
-    </field> 
+    </field>   	
+    <field name="KeyText" sql-index="3" text="@xtcasAuthorities.KeyText" >	
+        <text length="50"/>
+    </field>
 </grid>

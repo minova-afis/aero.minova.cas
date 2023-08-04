@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	id="LuUserPrivilegeForUserGroup" icon="UserPrivilegeForUserGroup"
-	title="@LuUserPrivilegeForUserGroup" procedure-prefix="xpcas"
-	procedure-suffix="LuUserPrivilegeUserGroup"
-	read-requires-all-params="true" delete-requires-all-params="true"
-	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">
+<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="LuUserPrivilegeForUserGroup" icon="UserPrivilegeForUserGroup" title="@LuUserPrivilegeForUserGroup" procedure-prefix="xpcas" procedure-suffix="LuUserPrivilegeUserGroup" read-requires-all-params="true" delete-requires-all-params="true" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">
 	<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 		<number />
 	</field>
 	<field name="UserPrivilegeKey" sql-index="1" text="@xtcasLuUserGroupForUserPrivilege.UserPrivilegeKey" key-type="primary" required="true">
 		<lookup table="xtcasUserPrivilege" />
 	</field>
-	<field name="UserGroupKey" sql-index="2" text="@xtcasLuUserGroupForUserPrivilege.UserGroupKey" key-type="primary"  visible="false">
+	<field name="UserGroupKey" sql-index="2" text="@xtcasLuUserGroupForUserPrivilege.UserGroupKey" key-type="primary" visible="false">
 		<number />
 	</field>
 	<field name="RowLevelSecurity" sql-index="3" text="@xtcasLuUserGroupForUserPrivilege.RowLevelSecurity" required="true" default="0">
 		<boolean />
+	</field>
+	<field name="KeyText" sql-index="4" text="@xtcasLuUserGroupForUserPrivilege.KeyText" number-columns-spanned="4" required="false" fill="toright">
+		<text length="50" />
 	</field>
 </grid>

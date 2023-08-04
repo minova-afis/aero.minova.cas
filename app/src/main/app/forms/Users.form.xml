@@ -7,14 +7,14 @@
 		<column name="Username" text="@xtcasUsers.Username">
 			<text length="50" />
 		</column>
+		<column name="KeyText" text="@xtcasUsers.KeyText">
+			<text length="50" />
+		</column>
 		<column name="Description" text="@xtcasUsers.Description">
 			<text length="50" />
 		</column>
 		<column name="Password" text="@xtcasUsers.Password" visible="false">
 			<text length="100" />
-		</column>
-		<column name="KeyText" text="@xtcasUsers.KeyText">
-			<text length="50" />
 		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="Users">

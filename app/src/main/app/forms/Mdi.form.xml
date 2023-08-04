@@ -6,6 +6,9 @@
 		<column name="ID" text="@xtcasMdi.ID">
 			<text length="100"/>
 		</column>
+		<column name="KeyText" text="@xtcasMdi.KeyText">
+			<text length="50" />
+		</column>
 		<column name="Icon" text="@xtcasMdi.Icon">
 			<text length="100"/>
 		</column>
@@ -32,9 +35,6 @@
 		</column>
 		<column name="LastUser" text="@xtcasMdi.LastUser">
 			<text length="50"/>
-		</column>
-		<column name="KeyText" text="@xtcasMdi.KeyText">
-			<text length="50" />
 		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="Mdi" button-copy-visible="true">

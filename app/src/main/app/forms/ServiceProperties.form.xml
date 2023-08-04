@@ -5,6 +5,9 @@
 		<column name="KeyLong" key="true" visible="false">
 			<number/>
 		</column>
+		<column name="KeyText" text="@xtcasServiceProperties.KeyText">
+			<text length="50" />
+		</column>	
 		<column name="Service" text="@xtcasServiceProperties.service">
 			<text length="128"/>
 		</column>
@@ -13,9 +16,6 @@
 		</column>
 		<column name="Val" text="@xtcasServiceProperties.val">
 			<text length="1024"/>
-		</column>
-		<column name="KeyText" text="@xtcasServiceProperties.KeyText">
-			<text length="50" />
 		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="ServiceProperties">

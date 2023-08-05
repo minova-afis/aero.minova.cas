@@ -20,10 +20,10 @@ public class OAuth2Token {
 
 	public OAuth2Token(String token, String expiryDate) {
 		this.token = token;
-		setExipryDate(expiryDate);
+		setExpiryDate(expiryDate);
 	}
 
-	private void setExipryDate(String expiryDate) {
+	private void setExpiryDate(String expiryDate) {
 		try {
 			LocalDateTime ldt = LocalDateTime.parse(expiryDate, OAUTHSERVERFORMAT);
 			ZonedDateTime zdt = ldt.atZone(TimeZone.getDefault().toZoneId());

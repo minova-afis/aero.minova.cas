@@ -16,7 +16,7 @@
 			<text length="100"/>
 		</column>
 		<column name="Position" text="@xtcasMdi.Position">
-			<number decimals="5"/>
+			<number decimals="3"/>
 		</column>
 		<column name="SecurityToken" text="@xtcasMdi.SecurityToken">
 			<text length="50"/>
@@ -52,7 +52,7 @@
 				<text length="100"/>
 			</field>
 			<field name="Position" sql-index="5" text="@xtcasMdi.Position" number-columns-spanned="4">
-				<number decimals="5"/>
+				<number decimals="3"/>
 			</field>
 			<field name="SecurityToken" sql-index="6" text="@xtcasMdi.SecurityToken" number-columns-spanned="4" fill="toright">
 				<text length="100"/>

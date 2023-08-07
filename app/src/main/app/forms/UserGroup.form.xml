@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="UserGroup" title="@UserGroup" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/minova-afis/aero.minova.xsd/main/form.xsd">
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="UserGroup" title="@xtcasUserGroup" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/minova-afis/aero.minova.xsd/main/form.xsd">
 	<index-view id="IndexView" source="xvcasUserGroupIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number />

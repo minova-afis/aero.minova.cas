@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="LuUserPrivilegeForUserGroup" icon="UserPrivilegeForUserGroup" title="@LuUserPrivilegeForUserGroup" procedure-prefix="xpcas" procedure-suffix="LuUserPrivilegeUserGroup" read-requires-all-params="true" delete-requires-all-params="true" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">
+<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="LuUserPrivilegeForUserGroup" icon="UserPrivilegeForUserGroup" title="@xtcasLuUserPrivilegeForUserGroup" procedure-prefix="xpcas" procedure-suffix="LuUserPrivilegeUserGroup" read-requires-all-params="true" delete-requires-all-params="true" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">
 	<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 		<number />
 	</field>

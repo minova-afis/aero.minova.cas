@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	id="LuUserGroupForUserPrivilege" icon="UserGroupForUserPrivilege"
-	title="@LuUserGroupForUserPrivilege" procedure-prefix="xpcas"
+	title="@xtcasLuUserGroupForUserPrivilege" procedure-prefix="xpcas"
 	procedure-suffix="LuUserPrivilegeUserGroup"
 	read-requires-all-params="true" delete-requires-all-params="true"
 	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">

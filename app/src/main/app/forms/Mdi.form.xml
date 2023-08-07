@@ -3,9 +3,6 @@
 		<column name="KeyLong" key="true" visible="false">
 			<number/>
 		</column>
-		<column name="ID" text="@xtcasMdi.ID">
-			<text length="100"/>
-		</column>
 		<column name="KeyText" text="@xtcasMdi.KeyText">
 			<text length="50" />
 		</column>
@@ -42,16 +39,13 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
 			</field>
-			<field name="KeyText" sql-index="9" text="@xtcasMdi.KeyText" number-columns-spanned="4" required="false" fill="toright">
+			<field name="KeyText" sql-index="1" text="@xtcasMdi.KeyText" number-columns-spanned="4"  key-type="user">
 				<text length="50" />
-			</field>
-			<field name="ID" sql-index="1" text="@xtcasMdi.ID" number-columns-spanned="4" fill="toright">
-				<text length="100"/>
 			</field>
 			<field name="Icon" sql-index="2" text="@xtcasMdi.Icon" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
-			<field name="Label" sql-index="3" text="@xtcasMdi.Label" number-columns-spanned="4" fill="toright">
+			<field name="Label" sql-index="3" text="@xtcasMdi.Label" required="true" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
 			<field name="Menu" sql-index="4" text="@xtcasMdi.Menu" number-columns-spanned="4" fill="toright">

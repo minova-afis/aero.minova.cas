@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="DBUser" title="@xtcasUsers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" helper-class="aero.minova.cas.app.helper.CASUsersHelper" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+<form icon="DBUser" title="@xtcasUsers.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" helper-class="aero.minova.cas.app.helper.CASUsersHelper" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
 	<index-view id="IndexView" source="xvcasUsersIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number />

@@ -2,12 +2,12 @@
 <main icon="CAS" titel="CAS">
     <!-- Das ist eine Vorlage. -->
     <action action="ServiceProperties.xml" generic="true" icon="xtcasServiceProperties" id="ServiceProperties" text="@xtcasServiceProperties"/>
-    <action action="ColumnSecurity.xml" generic="true" icon="ColumnSecurity" id="ColumnSecurity" text="ColumnSecurity"/>
-    <action action="User.xml" generic="true" icon="LDAPUser" id="User" text="User"/>
-    <action action="UserGroup.xml" generic="true" icon="UserGroup" id="UserGroup" text="UserGroup"/>
-    <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege" id="UserPrivileges" text="UserPrivilege"/>
-    <action action="Users.xml" generic="true" icon="DBUser" id="Users" text="Users"/>
-    <action action="Mdi.xml" generic="true" icon="Menu" id="Mdi" text="xtcasMdi"/>
+    <action action="ColumnSecurity.xml" generic="true" icon="ColumnSecurity" id="ColumnSecurity" text="@xtcasColumnSecurity"/>
+    <action action="User.xml" generic="true" icon="LDAPUser" id="User" text="@xtcasUser"/>
+    <action action="UserGroup.xml" generic="true" icon="UserGroup" id="UserGroup" text="@xtcasUserGroup"/>
+    <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege" id="UserPrivileges" text="@xtcasUserPrivilege"/>
+    <action action="Users.xml" generic="true" icon="DBUser" id="Users" text="@xtcasUsers"/>
+    <action action="Mdi.xml" generic="true" icon="Menu" id="Mdi" text="@xtcasMdi"/>
     <menu id="main">
         <menu id="config" text="@cas.config" position="10.0" override="false">
             <entry id="ServiceProperties" position="10.0" override="false" type="action"/>

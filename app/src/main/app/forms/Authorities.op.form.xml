@@ -4,10 +4,7 @@ procedure-suffix="Authorities" read-requires-all-params="true" delete-requires-a
 xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">    	
     <field name="KeyLong" key-type="primary" sql-index="0" visible="false">        		
         <number/>        	
-    </field>     	
-    <field name="KeyText" sql-index="3" text="@xtcasAuthorities.KeyText" >	
-        <text length="50"/>
-    </field> 	
+    </field>	
     <field name="Username" sql-index="1" text="@xtcasAuthorities.Username" visible="false" key-type="primary" read-only="true">	
         <text length="50"/>
     </field>

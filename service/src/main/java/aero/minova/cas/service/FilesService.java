@@ -23,10 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,9 +41,11 @@ import aero.minova.cas.service.mdi.Main.Action;
 import aero.minova.cas.service.mdi.Main.Entry;
 import aero.minova.cas.service.mdi.Main.Menu;
 import aero.minova.cas.service.mdi.MenuType;
+import jakarta.annotation.PostConstruct;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
 import lombok.Setter;
-
-import javax.xml.namespace.QName;
 
 @Service
 @Setter
@@ -314,7 +313,7 @@ public class FilesService {
 		Table mdiQuery = new Table();
 		mdiQuery.setName("xtcasMdi");
 
-		mdiQuery.addColumn(new Column("ID", DataType.STRING));
+		mdiQuery.addColumn(new Column("KeyText", DataType.STRING));
 		mdiQuery.addColumn(new Column("Icon", DataType.STRING));
 		mdiQuery.addColumn(new Column("Label", DataType.STRING));
 		mdiQuery.addColumn(new Column("Menu", DataType.STRING));
@@ -345,7 +344,7 @@ public class FilesService {
 
 		// Rückgabe nach Position sortieren.
 		int position = mdiData.findColumnPosition("Position");
-		int idPosition = mdiData.findColumnPosition("ID");
+		int idPosition = mdiData.findColumnPosition("KeyText");
 
 		mdiData.getRows().sort((r1, r2) -> {
 			int compareReturn;
@@ -410,7 +409,7 @@ public class FilesService {
 				// Key = 2 ist Menü / Untermenü.
 			} else if (mdiKey == 2) {
 				MenuType menu = new MenuType();
-				menu.setId(mdiData.getValue("ID", r).getStringValue());
+				menu.setId(mdiData.getValue("KeyText", r).getStringValue());
 				menu.setText(mdiData.getValue("Label", r).getStringValue());
 
 				String supermenu = mdiData.getValue("Menu", r) == null ? "null" : mdiData.getValue("Menu", r).getStringValue();
@@ -431,8 +430,8 @@ public class FilesService {
 		// Anhängen von Entries an die Menüs und Erstellen der Actions.
 		for (Row r : formRows) {
 			Action action = new Action();
-			action.setAction(mdiData.getValue("ID", r).getStringValue() + ".xml");
-			action.setId(mdiData.getValue("ID", r).getStringValue());
+			action.setAction(mdiData.getValue("KeyText", r).getStringValue() + ".xml");
+			action.setId(mdiData.getValue("KeyText", r).getStringValue());
 			action.setIcon(mdiData.getValue("Icon", r).getStringValue());
 			action.setText(mdiData.getValue("Label", r).getStringValue());
 			main.getAction().add(action);

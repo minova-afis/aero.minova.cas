@@ -1,13 +1,12 @@
 alter procedure dbo.xpcasUpdateMdi (
 	@KeyLong int output,
-	@ID nvarchar(100),
+	@KeyText nvarchar(50),
 	@Icon nvarchar(100),
 	@Label nvarchar(100),
 	@Menu nvarchar(100),
 	@Position float,
 	@SecurityToken nvarchar(50),
-	@MdiTypeKey int,
-	@KeyText NVARCHAR(50) = null
+	@MdiTypeKey int
 )
 with encryption
 as
@@ -15,14 +14,13 @@ as
 	set @ReturnCode = 1
 
 	update xtcasMdi
-	set ID = @ID,
+	set KeyText = @KeyText,
 		Icon = @Icon,
 		Label = @Label,
 		Menu = @Menu,
 		Position = @Position,
 		SecurityToken = @SecurityToken,
 		MdiTypeKey = @MdiTypeKey,
-		KeyText = @KeyText,
 		LastUser = dbo.xfCasUser(),
 		LastDate = getDate(),
 		LastAction = 2

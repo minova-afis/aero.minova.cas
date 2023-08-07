@@ -25,15 +25,6 @@ Datentyp: nvarchar(50) +
 // end::column.KeyText[]
 
 
-==== ID
-
-Datentyp: nvarchar(100) +
-
-// tag::column.ID[]
-
-// end::column.ID[]
-
-
 ==== Icon
 
 Datentyp: nvarchar(100) +

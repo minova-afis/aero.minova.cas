@@ -1,17 +1,15 @@
 alter procedure dbo.xpcasReadLuUserPrivilegeUserGroup (
-	@KeyLong int output,
-	@UserPrivilegeKey int output,
-	@UserGroupKey int output,
-	@RowLevelSecurity bit output,
-	@KeyText NVARCHAR(50) =null output
+	@KeyLong int,
+	@UserPrivilegeKey int,
+	@UserGroupKey int
 )
 with encryption as
 	if (@UserPrivilegeKey is not null)
 	begin
-		select	@KeyLong = KeyLong,
-				@UserGroupKey = UserGroupKey,
-				@RowLevelSecurity = RowLevelSecurity,
-				@KeyText = KeyText
+		select	KeyLong,
+				UserGroupKey,
+				RowLevelSecurity,
+				KeyText
 		from xtcasLuUserPrivilegeUserGroup
 		where UserPrivilegeKey = @UserPrivilegeKey
 		  and LastAction > 0

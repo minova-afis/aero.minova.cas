@@ -16,10 +16,6 @@ import lombok.Data;
 public class Mdi extends DataEntity {
 
 	@Size(max = 100)
-	@Column(name = "ID", length = 100)
-	public String id;
-
-	@Size(max = 100)
 	@Column(name = "Icon", length = 100)
 	public String icon;
 

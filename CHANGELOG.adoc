@@ -4,6 +4,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Fehler in CAS Masken korrigeren. 
+
+## [12.65.15] -- 2023-08-04
 * Fehler in Prozedur xpcasInsertServiceMessage korrigieren.
 
 ## [12.65.14] -- 2023-08-04

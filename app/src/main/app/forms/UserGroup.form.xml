@@ -39,7 +39,7 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>
-			<field name="UserKey" sql-index="1" text="@UserKey" required="false" key-type="primary">
+			<field name="UserKey" sql-index="1" text="@UserKey" required="true" key-type="primary">
 				<lookup table="xvcasUserIndex2" />
 			</field>
 		</grid>
@@ -47,7 +47,7 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>
-			<field name="UsersKey" sql-index="1" text="@UsersKey" required="false" key-type="primary">
+			<field name="UsersKey" sql-index="1" text="@UsersKey" required="true" key-type="primary">
 				<lookup table="xvcasUsersIndex2" />
 			</field>
 		</grid>

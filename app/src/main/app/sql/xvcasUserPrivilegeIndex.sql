@@ -7,7 +7,6 @@ with encryption as
 			ug.KeyLong as UserGroupKey,
 			lu.RowLevelSecurity
 	from xtcasUserPrivilege up
-	left join xtcasLuUserPrivilegeUserGroup lu on lu.UserPrivilegeKey = up.KeyLong
-	left join xtcasUserGroup ug on  ug.KeyLong=lu.UserGroupKey
+	left outer join xtcasLuUserPrivilegeUserGroup lu on lu.UserPrivilegeKey = up.KeyLong
+	left outer join xtcasUserGroup ug on ug.KeyLong=lu.UserGroupKey
 	where up.LastAction > 0
-	and ug.LastAction > 0

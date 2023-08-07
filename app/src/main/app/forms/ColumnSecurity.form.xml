@@ -4,10 +4,10 @@
 		<column name="KeyLong" key="true" visible="false">
 			<number />
 		</column>
-		<column name="TableName" text="@xtcasColumnSecurity.TableName">
+		<column name="KeyText" text="@xtcasColumnSecurity.KeyText">
 			<text length="50" />
 		</column>
-		<column name="KeyText" text="@xtcasColumnSecurity.KeyText">
+		<column name="TableName" text="@xtcasColumnSecurity.TableName">
 			<text length="50" />
 		</column>
 		<column name="ColumnName" text="@xtcasColumnSecurity.ColumnName">
@@ -22,7 +22,7 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>
-			<field name="KeyText" sql-index="4" text="@xtcasColumnSecurity.KeyText" number-columns-spanned="4" required="false" fill="toright">
+			<field name="KeyText" sql-index="4" text="@xtcasColumnSecurity.KeyText" key-type="user" number-columns-spanned="4" required="true">
 				<text length="50" />
 			</field>
 			<field name="TableName" sql-index="1" text="@xtcasColumnSecurity.TableName" number-columns-spanned="4" required="true" fill="toright">

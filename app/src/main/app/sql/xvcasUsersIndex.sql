@@ -4,6 +4,6 @@ with encryption as
 			u.KeyText,
 			u.Username,
 			u.Description,
-			'XXXXX' as Passwort
+			'XXXXX' as Password
 	from xtcasUsers u
 	where u.LastAction > 0

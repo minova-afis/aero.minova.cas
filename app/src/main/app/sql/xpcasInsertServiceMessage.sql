@@ -18,9 +18,9 @@ insert into xtcasServiceMessage (
 ) values (
 	@CASServiceKey,
 	@Message,
-	@KeyText,
 	getDate(),
 	0,
+	@KeyText,
 	1,
 	getDate(),
 	dbo.xfCasUser()

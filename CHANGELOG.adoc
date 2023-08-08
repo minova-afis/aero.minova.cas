@@ -4,6 +4,12 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Fehler in Prozedur xpcasInsertServiceMessage korrigieren.
+
+## [12.65.14] -- 2023-08-04
+* Zurückgezogene AWS bom Version zurücksetzen
+
+## [12.65.13] -- 2023-08-04
 * Fehlender KeyText in Masken und Prozeduren ergänzen. 
 
 ## [12.65.12] -- 2023-08-04

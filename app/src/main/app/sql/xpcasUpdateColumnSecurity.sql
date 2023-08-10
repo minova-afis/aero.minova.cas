@@ -2,7 +2,8 @@ alter procedure dbo.xpcasUpdateColumnSecurity (
 	@KeyLong int,
 	@TableName nvarchar(50) = null,
 	@ColumnName nvarchar(50) = null,
-	@SecurityToken nvarchar(50) = null
+	@SecurityToken nvarchar(50) = null,
+	@KeyText nvarchar(50)
 )
 with encryption as
 	if (exists(select * from xtcasColumnSecurity
@@ -19,6 +20,7 @@ with encryption as
 	set TableName = @TableName,
 		ColumnName = @ColumnName,
 		SecurityToken = @SecurityToken,
+		KeyText = @KeyText,
 		LastUser = dbo.xfCasUser(),
 		LastDate = getDate(),
 		LastAction = 2

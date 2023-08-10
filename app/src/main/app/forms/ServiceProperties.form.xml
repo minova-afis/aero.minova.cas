@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="User" title="@User" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<form icon="User" title="@xtcasServiceProperties.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
 	<index-view id="IndexView" source="xvcasServicePropertiesIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number/>
 		</column>
-		<column name="KeyText" text="@xtcasServiceProperties.KeyText">
-			<text length="50" />
-		</column>	
 		<column name="Service" text="@xtcasServiceProperties.service">
 			<text length="128"/>
 		</column>
@@ -22,9 +19,6 @@
 		<head>
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
-			</field>
-			<field name="KeyText" sql-index="4" text="@xtcasServiceProperties.KeyText" number-columns-spanned="4" required="false" fill="toright">
-				<text length="50" />
 			</field>
 			<field name="Service" sql-index="1" text="@xtcasServiceProperties.service" number-columns-spanned="4" required="true" fill="toright">
 				<text length="128"/>

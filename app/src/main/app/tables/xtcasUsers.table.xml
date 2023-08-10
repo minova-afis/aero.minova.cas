@@ -27,7 +27,4 @@
 	<primarykey>
 		<column>KeyLong</column>
 	</primarykey>
-	    <uniquekey name="">
-        <column>Username</column>
-    </uniquekey>
 </table>

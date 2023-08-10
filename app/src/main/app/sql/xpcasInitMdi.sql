@@ -1,13 +1,12 @@
 alter procedure dbo.xpcasInitMdi (
-	@ID nvarchar(100),
+	@KeyText nvarchar(50),
 	@Icon nvarchar(100),
 	@Label nvarchar(100),
 	@Menu nvarchar(100),
 	@Position float,
 	@SecurityToken nvarchar(50),
 	@MdiTypeKey int,
-	@ModulName nvarchar(500),
-	@KeyText nvarchar(50) = null
+	@ModulName nvarchar(500)
 )
 with encryption
 as
@@ -23,7 +22,7 @@ as
 	
 	if (@Execute = 1)
 		begin
-		if not exists (select * from xtcasMdi where LastAction > 0 and ID = @ID)
+		if not exists (select * from xtcasMdi where LastAction > 0 and KeyText = @KeyText)
 		begin
 
 			if (@MdiTypeKey <> 1)
@@ -32,7 +31,6 @@ as
 			end
 
 			insert into xtcasMdi(
-				ID,
 				KeyText,
 				Icon,
 				Label,
@@ -45,7 +43,6 @@ as
 				LastDate,
 				LastAction
 			) values (
-				@ID,
 				@KeyText,
 				@Icon,
 				@Label,

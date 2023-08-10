@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="DBUser" title="@xtcasUsers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" helper-class="aero.minova.cas.app.helper.CASUsersHelper" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+<form icon="DBUser" title="@xtcasUsers.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" helper-class="aero.minova.cas.app.helper.CASUsersHelper" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
 	<index-view id="IndexView" source="xvcasUsersIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number />
 		</column>
 		<column name="Username" text="@xtcasUsers.Username">
-			<text length="50" />
-		</column>
-		<column name="KeyText" text="@xtcasUsers.KeyText">
 			<text length="50" />
 		</column>
 		<column name="Description" text="@xtcasUsers.Description">
@@ -22,10 +19,7 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>
-			<field name="KeyText" sql-index="4" text="@xtcasUsers.KeyText" number-columns-spanned="4" required="false" fill="toright">
-				<text length="50" />
-			</field>
-			<field name="Username" sql-index="1" text="@xtcasUsers.Username" required="true" key-type="user" number-columns-spanned="4" fill="toright">
+			<field name="Username" sql-index="1" text="@xtcasUsers.Username" required="true" key-type="user" number-columns-spanned="4" >
 				<text length="50" />
 			</field>
 			<field name="Description" sql-index="3" text="@xtcasUsers.Description" required="false" number-columns-spanned="4" fill="toright">

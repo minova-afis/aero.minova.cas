@@ -24,7 +24,4 @@
 	<primarykey>
 		<column>KeyLong</column>
 	</primarykey>
-	<uniquekey name="UQ_xtcasUserPrivilege">
-		<column>KeyText</column>
-	</uniquekey>
 </table>

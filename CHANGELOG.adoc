@@ -4,6 +4,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Unique Key aus xtcasUserPrivilege entfernen, da es bei Azure Datenbanken zu Fehlern führt.
+
+## [12.65.16] -- 2023-08-10
 * Fehler in CAS Masken korrigeren. 
 
 ## [12.65.15] -- 2023-08-04

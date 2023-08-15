@@ -47,7 +47,7 @@ public class SecurityService {
 	 * Prüft, ob die minimal notwendigen Datenbank-Objekte für die Privileg-Prüfung in der Datenbank aufgesetzt wurden. Dazu prüft man, ob die
 	 * `xvcasUserSecurity` vorhanden ist.
 	 *
-	 * @return Dies ist wahr, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
+	 * @return <code>true</code>, wenn die Privilegien eines Nutzers anhand der Datenbank geprüft werden können.
 	 * @throws Exception
 	 *             Fehler bei der Ermittelung
 	 */
@@ -71,7 +71,7 @@ public class SecurityService {
 	 *
 	 * @param privilegeName
 	 *            Das Privilege, für das ein Recht eingefordert wird.
-	 * @return Enthält alle Gruppen, die Ein Recht auf das Privileg haben.
+	 * @return Enthält alle Gruppen, die ein Recht auf das Privileg haben.
 	 **/
 	public List<Row> getPrivilegePermissions(String privilegeName) {
 		loadAllPrivileges();
@@ -133,7 +133,7 @@ public class SecurityService {
 			if (authentication != null) {
 				List<String> userSecurityTokens = new ArrayList<>();
 
-				// Je nachdem, ob per LDAP oder Database authoriziert wird, wird entweder auf der xtcasUser abgefragt oder auf der xtcasUsers.
+				// Je nachdem, ob per LDAP oder Database autorisiert wird, wird entweder auf der xtcasUser abgefragt oder auf der xtcasUsers.
 				if (dataSource.equalsIgnoreCase("ldap")) {
 					userSecurityTokens = loadLDAPUserTokens(authentication.getName());
 				} else if (dataSource.equalsIgnoreCase("database")) {
@@ -165,8 +165,8 @@ public class SecurityService {
 	}
 
 	/**
-	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage, um die maximale Länge zu erhalten Ist nur für die Sicherheitsabfragen gedacht,
-	 * um nicht zu viele unnötige SQL-Abfrgane zu machen.
+	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage, um die maximale Länge zu erhalten. Ist nur für die Sicherheitsabfragen gedacht,
+	 * um nicht zu viele unnötige SQL-Abfragen zu machen.
 	 *
 	 * @param inputTable
 	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
@@ -180,17 +180,26 @@ public class SecurityService {
 	/**
 	 * Entfernt alle Spalten der Eingabe-Tabelle, auf die der Nutzer keinen Zugriff hat.
 	 * <p>
-	 * TODO Idee: Mann sollte eine neue Tabelle erstellen, statt die eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht
-	 * geändert wird. Die Sql-Abfrage hat folgendes Format: select TableName, ColumnName, SecurityToken from xtcasColumnSecurity where (TableName =
-	 * inputTableName and SecurityToken = UserSecurityToken1) or (TableName = inputTableName and SecurityToken = UserSecurityToken2) or ... Die Rows der
-	 * zurückgelieferten Table haben folgendes Format: Row r = [Tabellenname,ColumnName,SecurityToken], Beispiel: Row r = ["tTestTabelle","Spalte1","User1"] Row
-	 * r = ["tTestTabelle","Spalte2","User1"]
+	 * TODO Idee: Man sollte eine neue Tabelle erstellen, statt die Eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht
+	 * geändert wird.<br>
+	 * Die Sql-Abfrage hat folgendes Format:<br><code>
+	 * select TableName, ColumnName, SecurityToken from xtcasColumnSecurity where (TableName =
+	 * inputTableName and SecurityToken = UserSecurityToken1) or (TableName = inputTableName and SecurityToken = UserSecurityToken2) or ...
+	 * </code> <br>
+	 * ToDo: kann man nicht schreiben: Select ... from
+	 * where tableName = inputTableName and SecurityToken in ( token1, token2, ... )
+	 *
+	 * <br>
+	 * Die Rows der zurückgelieferten Table haben folgendes Format:<br>
+	 * Row r = [Tabellenname,ColumnName,SecurityToken],<br>
+	 * Beispiel: Row r = ["tTestTabelle","Spalte1","User1"]<br>
+	 * Row r = ["tTestTabelle","Spalte2","User1"]
 	 *
 	 * @param inputTable
 	 *            Enthält den Tabellen-Namen und die Spalten, welche von einem Nutzer angefragt werden.
 	 * @param userGroups
 	 *            Die Nutzer-Gruppen/Rollen, welche Zugriff auf die Tabelle haben wollen.
-	 * @return Diese Tabelle enhtält die Spalten, welche für die Index-View von diesem User verwendet werden dürfen.
+	 * @return Diese Tabelle enthält die Spalten, welche für die Index-View von diesem User verwendet werden dürfen.
 	 * @author weber
 	 */
 	public Table columnSecurity(Table inputTable, List<Row> userGroups) {
@@ -204,7 +213,7 @@ public class SecurityService {
 
 		List<Row> columnRestrictionsForThisUserAndThisTable = new ArrayList<>();
 		for (Row row : userGroups) {
-			// Hier wird darauf abgefragt, welche UserGruppen für die angeforderte Tabelle authorisiert sind. Hierbei sollte die Schreibweise der Tabelle/View
+			// Hier wird darauf abgefragt, welche UserGruppen für die angeforderte Tabelle autorisiert sind. Hierbei sollte die Schreibweise der Tabelle/View
 			// egal sein.
 			if (row.getValues().get(0).getStringValue().equalsIgnoreCase(inputTable.getName())) {
 				Row bar = new Row();
@@ -220,7 +229,7 @@ public class SecurityService {
 			}
 		}
 		List<String> grantedColumns = new ArrayList<>();
-		// die Spaltennamen, welche wir durch den Select erhalten haben in eine List packen, dabei darauf achten,
+		// die Spaltennamen, welche wir durch den Select erhalten haben, in eine List packen, dabei darauf achten,
 		// dass verschiedene SecurityTokens dieselbe Erlaubnis haben können, deshalb Doppelte rausfiltern
 		for (Row row : columnRestrictionsForThisUserAndThisTable) {
 			String grantedColumnFromtColumnSecurity = row.getValues().get(1).getStringValue();
@@ -262,14 +271,14 @@ public class SecurityService {
 	 *
 	 * @param isFirstWhereClause
 	 *            Abhängig davon, ob bereits eine where-Klausel besteht oder nicht, muss 'where' oder 'and' vorne angefügt werden
-	 * @param requestingAtuhorities
+	 * @param requestingAuthorities
 	 *            Die Rollen des Nutzers, welche ein Recht auf einen Zugriff haben.
 	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
 	 */
-	public String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAtuhorities) {
+	public String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAuthorities) {
 		List<String> requestingRoles = new ArrayList<>();
-		if (!requestingAtuhorities.isEmpty()) {
-			requestingRoles = extractUserTokens(requestingAtuhorities);
+		if (!requestingAuthorities.isEmpty()) {
+			requestingRoles = extractUserTokens(requestingAuthorities);
 			// falls die Liste leer ist, darf der User alle Spalten sehen
 			if (requestingRoles.isEmpty()) {
 				return "";
@@ -316,9 +325,9 @@ public class SecurityService {
 			if (!Boolean.TRUE.equals(authority.getValues().get(2).getBooleanValue())) {
 				return new ArrayList<>();
 			}
-			// Hier sind die Rollen/UserSecurityToken, welche authorisiert sind, auf die Tabelle zuzugreifen.
+			// Hier sind die Rollen/UserSecurityToken, welche autorisiert sind, auf die Tabelle zuzugreifen.
 			String value = authority.getValues().get(1).getStringValue().trim().toLowerCase();
-			if (!value.equals("") && !requestingRoles.contains(value)) {
+			if (!value.isEmpty() && !requestingRoles.contains(value)) {
 				requestingRoles.add(authority.getValues().get(1).getStringValue().toLowerCase());
 			}
 		}
@@ -349,7 +358,7 @@ public class SecurityService {
 	}
 
 	/**
-	 * Falls die Row-Level-Security für die Prozedur eingeschalten ist (Einträge in der Liste vorhanden), sollten die Rows nach dem Ausführen der Prozedur
+	 * Falls die Row-Level-Security für die Prozedur eingeschaltet ist (Einträge in der Liste vorhanden), sollten die Rows nach dem Ausführen der Prozedur
 	 * gefiltert werden. Überprüft, ob der SecurityToken der rowToBeChecked mit mind. 1 SecurityToken des Users übereinstimmt.
 	 *
 	 * @param userSecurityTokens
@@ -358,7 +367,7 @@ public class SecurityService {
 	 *            Die Row aus dem SqlProcedureResult, welche überprüft werden muss.
 	 * @param securityTokenInColumn
 	 *            Die Spalte als int, in welcher der SecurityToken liegt.
-	 * @return True, falls einer der SecurityTokens übereinstimmt, andernfalls False.
+	 * @return True, falls einer der SecurityTokens übereinstimmt (oder die Liste <code>userSecurityTokens</code> leer ist), andernfalls False.
 	 */
 	public boolean isRowAccessValid(List<String> userSecurityTokens, Row rowToBeChecked, int securityTokenInColumn) {
 		if (!userSecurityTokens.isEmpty()) {
@@ -370,9 +379,10 @@ public class SecurityService {
 	}
 
 	/**
-	 * Updatet die Rollen, welche momentan im SecurityContext für den eingeloggten User hinterlegt sind, anhand folgender Abfrage: select
+	 * Updatet die Rollen, welche momentan im SecurityContext für den eingeloggten User hinterlegt sind, anhand folgender Abfrage:<br>
+	 * <code>select
 	 * KeyText,UserSecurityToken,Memberships from xtcasUser where KeyText = username
-	 *
+	 * </code>
 	 * @param username
 	 *            Der Username dessen Rollen geladen werden sollen.
 	 * @param userSecurityTokens
@@ -381,7 +391,7 @@ public class SecurityService {
 	 * @return Die Liste an bereits vorhandenen GrantedAuthorities vereint mit den neuen Authorities.
 	 */
 	public List<GrantedAuthority> loadUserGroupPrivileges(String username, List<String> userSecurityTokens, List<GrantedAuthority> authorities) {
-		// Füge der Liste der ausgelesenen Authorites aus der Datenbnak die Authorities hinzu, welche bereits vorhanden waren.
+		// Füge der Liste der ausgelesenen Authorities aus der Datenbank die Authorities hinzu, welche bereits vorhanden waren.
 		if (authorities != null) {
 			for (GrantedAuthority ga : authorities) {
 				if (!userSecurityTokens.contains(ga.getAuthority())) {
@@ -393,12 +403,12 @@ public class SecurityService {
 		// Hier werden die Berechtigungen der Gruppen noch herausgesucht anhand der userSecurityToken-Liste.
 		Table groups = new Table();
 		groups.setName("xtcasUserGroup");
-		List<Column> groupcolumns = new ArrayList<>();
-		groupcolumns.add(new Column("KeyText", DataType.STRING));
-		groupcolumns.add(new Column("SecurityToken", DataType.STRING));
-		groups.setColumns(groupcolumns);
+		List<Column> groupColumns = new ArrayList<>();
+		groupColumns.add(new Column("KeyText", DataType.STRING));
+		groupColumns.add(new Column("SecurityToken", DataType.STRING));
+		groups.setColumns(groupColumns);
 		for (String s : userSecurityTokens) {
-			if (!s.trim().equals("")) {
+			if (!s.trim().isEmpty()) {
 				Row tokens = new Row();
 				tokens.setValues(Arrays.asList(new Value(s.trim(), null), new Value("", "!null")));
 				groups.addRow(tokens);
@@ -426,7 +436,7 @@ public class SecurityService {
 
 		List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 		for (String string : userSecurityTokens) {
-			if (!string.equals(""))
+			if (!string.isEmpty())
 				grantedAuthorities.add(new SimpleGrantedAuthority(string));
 		}
 
@@ -499,7 +509,7 @@ public class SecurityService {
 			// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
 			userSecurityTokens = Stream.of(result.split("#"))//
 					.map(String::trim)//
-					.collect(Collectors.toList());
+					.toList();
 
 			// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
 			String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1) != null

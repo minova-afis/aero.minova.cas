@@ -58,12 +58,12 @@ public class ProcedureService {
 	SecurityService securityService;
 
 	/**
-	 * Speichert im SQl-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
+	 * Speichert im SQL-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
 	 *
 	 * @param connection
 	 *            Das ist die Session.
 	 * @throws SQLException
-	 *             Fehler beim setzen des Kontextes für die connection.
+	 *             Fehler beim Setzen des Kontextes für die connection.
 	 */
 	public void setUserContextFor(Connection connection) throws SQLException {
 
@@ -94,7 +94,8 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
+	 * 	          können alle Spalten gesehen werden.
 	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
@@ -110,9 +111,10 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
+	 *            können alle Spalten gesehen werden.
 	 * @param isSetup
-	 *            True falls es sich um einen Aufruf im Rahmend es Setup handelt
+	 *            <code>true</code>, falls es sich um einen Aufruf im Rahmen des Setup handelt
 	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
@@ -129,7 +131,7 @@ public class ProcedureService {
 			}
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
-			customLogger.logSql("Procedure succesfully executed: " + sb);
+			customLogger.logSql("Procedure successfully executed: " + sb);
 			if (isSetup) {
 				connection.createStatement().execute("set ANSI_WARNINGS on");
 			}
@@ -165,7 +167,7 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param isSetup
-	 *            True falls es sich um einen Aufruf im Rahmend es Setup handelt
+	 *            <code>true</code>, falls es sich um einen Aufruf im Rahmen des Setup handelt
 	 * @return SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
@@ -178,7 +180,7 @@ public class ProcedureService {
 		Row requestingAuthority = new Row();
 		/*
 		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
-		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+		 * Value auf false steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
 		 */
 		requestingAuthority.addValue(new Value(false, "1"));
 		requestingAuthority.addValue(new Value(false, "2"));
@@ -198,12 +200,12 @@ public class ProcedureService {
 	 * @param privilegeRequest
 	 *            Eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit).
 	 * @param connection
-	 *            Die Connection zu der Datenbank, welche die Prozedur ausführen soll.
+	 *            Die offene Connection zu der Datenbank, welche die Prozedur ausführen soll.
 	 * @param result
 	 *            Das SQL-Result, welches innerhalb der Methode verändert und dann returned wird.
 	 * @param sb
 	 *            Ein StringBuffer, welcher im Fehlerfall die Fehlermeldung bis zum endgültigen Throw als String aufnimmt.
-	 * @return result Das veränderte SqlProcedureResult.
+	 * @return result das veränderte SqlProcedureResult.
 	 * @throws SQLException
 	 *             Falls ein Fehler beim Ausführen der Prozedur auftritt.
 	 * @throws ProcedureException
@@ -256,20 +258,23 @@ public class ProcedureService {
 
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			{
+			{   // ToDo das sieht etwas dubios aus. ich würde das eher so schreiben:
+				// https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16
 				int i = 0;
 				while (preparedStatement.getResultSet() == null) {
 					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
-						// Es gibt kein nächstes Result gibt.
+						// Es gibt kein nächstes Result
 						break;
 					}
 					if (++i >= maxResultSetCount) {
 						customLogger.logSql(
-								"Warning: too many result sets. Mabye there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");
+								"Warning: too many result sets. Maybe there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");
 						break;
 					}
 				}
 			}
+			// ToDo ich kann mir gar nicht vorstellen, dass hier noch ResultSets vorhanden sind, nachdem weiter oben
+			// mit getMoreResults() alles abgeholt wurde.
 			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
@@ -296,6 +301,7 @@ public class ProcedureService {
 								} else if (type == Types.BIGINT) {
 									return new Column(name, DataType.LONG);
 								} else {
+									customLogger.logFiles( "calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type );
 									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}
 							} catch (Exception e) {
@@ -327,7 +333,7 @@ public class ProcedureService {
 					}
 
 					/*
-					 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
+					 * Falls die SecurityToken-Prüfung nicht eingeschaltet ist, wird einfach true zurückgegeben und die Row hinzugefügt.
 					 */
 					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
 						resultSet.addRow(rowToBeAdded);
@@ -435,6 +441,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
 							} else {
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unbekannter ColumnType für column " + i + ", Typ:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
@@ -456,6 +463,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
 							} else {
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unbekannter ColumnType für column " + i + ", Typ:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -477,6 +485,7 @@ public class ProcedureService {
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 							} else {
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unbekannter ColumnType für column " + i + ", Typ:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -486,12 +495,34 @@ public class ProcedureService {
 				});
 	}
 
+	/**
+	 * Bereitet einen Prozedur-String vor.
+	 * Siehe {@link #prepareProcedureString(Table, Set)}.
+	 *
+	 * @param params
+	 * 			gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
+	 * @return
+	 * 			die SQL-Anweisung
+	 * @throws IllegalArgumentException
+	 *             wenn der Name in der <code>params</code>-Table leer ist.
+	 */
 	public String prepareProcedureString(Table params) {
 		return prepareProcedureString(params, ExecuteStrategy.STANDARD);
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor
+	 * Bereitet einen Prozedur-String vor.
+	 * Als Ergebnis entsteht ein SQL call-Statement in der Form:<br><ol>
+	 *     <li>{ ? = call procName() }</li>
+	 *     <li>{ call procName() }</li>
+	 *     <li>{ call procName( ? ) }</li>
+	 *     <li>{ call procName( ?,?, &#8230; ) }</li>
+	 *     <li>{ ? = call procName( ?,?, &#8230; ) }</li>
+	 * </ol>
+	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table.
+	 * Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl der Spalten der params-Table.
+	 * <br>
+	 * ToDo: prüfen, ob der Name weiter geprüft werden kann oder escaped werden sollte
 	 *
 	 * @param params
 	 *            SQL-Call-Parameter
@@ -502,7 +533,7 @@ public class ProcedureService {
 	 *             Fehler, wenn die Daten in params nicht richtig sind.
 	 */
 	public String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
-		if (params.getName() == null || params.getName().trim().length() == 0) {
+		if (params.getName() == null || params.getName().trim().isEmpty()) {
 			throw new IllegalArgumentException("msg.ProcedureNullName");
 		}
 		final int paramCount = params.getColumns().size();

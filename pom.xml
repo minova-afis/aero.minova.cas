@@ -26,6 +26,7 @@
         <module>app.legacy</module>
         <module>service</module>
         <module>setup</module>
+        <module>installable</module>
     </modules>
 
     <repositories>

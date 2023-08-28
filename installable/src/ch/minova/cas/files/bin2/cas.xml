@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service>
+  <id>aero.minova.cas</id>
+  <name>aero.minova.cas</name>
+  <description></description>
+  <executable>C:/minova/java/jdk.11/bin/java.exe</executable>
+  <arguments>-cp "../lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>
+  <stopexecutable>cas.stop.cmd</stopexecutable>
+  <log mode="roll-by-size">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>30</keepFiles>
+  </log>
+</service>

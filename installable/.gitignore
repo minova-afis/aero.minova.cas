@@ -1,0 +1,19 @@
+### Eclipse
+bin/
+target/
+.classpath
+.project
+.settings
+
+### Intellji
+*.iml
+.idea/
+.DS_Store
+.run/
+
+### Minova - CAS
+Internal/**
+logs/**
+service/src/main/resources/application-local.properties
+service/logs/**
+/.java-version

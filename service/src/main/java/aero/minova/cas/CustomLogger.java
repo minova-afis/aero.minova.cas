@@ -41,6 +41,14 @@ public class CustomLogger {
 	// Log für allgemeine Infos, die nicht zu den obrigen Loggern passen. Z.B: Aufruf einer externen API.
 	private static final Logger INFOLOGGER = LoggerFactory.getLogger("InfoLog");
 
+	private static String CASUSER = "CAS : {}";
+
+	private static String LOGFORMAT = "{} : {}";
+
+	private static String ERRORLOGFORMAT = "{} : {} : \n {}";
+
+	private static String USERREQUESTLOGFORMAT = "{} : {} {}";
+
 	@Autowired
 	private ClientRestAPI crapi;
 
@@ -61,56 +69,41 @@ public class CustomLogger {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			ERRORLOGGER.error(null + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
-		} else {
-			ERRORLOGGER
-					.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		ERRORLOGGER.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
+
 	}
 
 	public void logPrivilege(String logMessage) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			PRIVILEGELOGGER.info(null + ": " + logMessage);
-		} else {
-			PRIVILEGELOGGER.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		PRIVILEGELOGGER.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logSql(String logMessage) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			LOGGER.info(null + ": " + logMessage);
-		} else {
-			LOGGER.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		LOGGER.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logUserRequest(String logMessage) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			USERLOGGER.info(null + ": " + logMessage);
-		} else {
-			USERLOGGER.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		USERLOGGER.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logUserRequest(String logMessage, Object gsonObject) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			USERLOGGER.info(null + ": " + logMessage + " " + gson.toJson(gsonObject));
-		} else {
-			USERLOGGER.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + " " + gson.toJson(gsonObject));
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		USERLOGGER.info(USERREQUESTLOGFORMAT, user, logMessage, gson.toJson(gsonObject));
 	}
 
 	public void logFiles(String logMessage) {
-		FILESLOGGER.info("CAS " + logMessage);
+		FILESLOGGER.info(CASUSER, logMessage);
 	}
 
 	public void logSetup(String logMessage) {
-		SETUPLOGGER.info("CAS " + logMessage);
+		SETUPLOGGER.info(CASUSER, logMessage);
 	}
 
 	public void logQueueService(String logMessage) {
-		QUEUESERVICELOGGER.info("CAS " + logMessage);
+		QUEUESERVICELOGGER.info(CASUSER, logMessage);
 	}
 
 	/**
@@ -135,11 +128,8 @@ public class CustomLogger {
 	}
 
 	public void logInfo(String logMessage) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			INFOLOGGER.info(null + ": " + logMessage);
-		} else {
-			INFOLOGGER.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		INFOLOGGER.info(LOGFORMAT, user, logMessage);
 	}
 
 	public Logger getErrorLogger() {

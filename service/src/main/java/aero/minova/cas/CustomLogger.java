@@ -41,13 +41,13 @@ public class CustomLogger {
 	// Log für allgemeine Infos, die nicht zu den obrigen Loggern passen. Z.B: Aufruf einer externen API.
 	private static final Logger INFOLOGGER = LoggerFactory.getLogger("InfoLog");
 
-	private static String CASUSER = "CAS : {}";
+	private static final String CASUSER = "CAS : {}";
 
-	private static String LOGFORMAT = "{} : {}";
+	private static final String LOGFORMAT = "{} : {}";
 
-	private static String ERRORLOGFORMAT = "{} : {} : \n {}";
+	private static final String ERRORLOGFORMAT = "{} : {} : \n {}";
 
-	private static String USERREQUESTLOGFORMAT = "{} : {} {}";
+	private static final String USERREQUESTLOGFORMAT = "{} : {} {}";
 
 	@Autowired
 	private ClientRestAPI crapi;

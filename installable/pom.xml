@@ -6,7 +6,8 @@
 	<parent>
 		<groupId>ch.minova</groupId>
 		<artifactId>ch.minova.parent.git</artifactId>
-		<version>11.1.1</version>
+		<version>11.1.6</version>
+		<relativePath></relativePath>
 	</parent>
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
@@ -19,11 +20,6 @@
 			<groupId>ch.minova</groupId>
 			<artifactId>ch.minova.install</artifactId>
 			<version>10.34.2</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.minova</groupId>
-			<artifactId>ch.minova.data.schema</artifactId>
-			<version>10.395.0</version>
 		</dependency>
 		<dependency>
 			<groupId>aero.minova</groupId>

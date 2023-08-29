@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<setup name="ch.minova.cas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:noNamespaceSchemaLocation="../../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
+<setup name="ch.minova.cas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
+	<required-modules></required-modules>
+	<required-service>
+		<service name="ch.minova.cas" service-name="cas.service">
+			<wrapper-conf>
+				<!-- Dieser Teil wird für die Ausfühurng des Dienstes nicht verwendet, wird aber für die Installation benötigt. -->
+				<entry key="wrapper.app.parameter.1" value="cas" />
+				<entry key="wrapper.app.parameter.2" value="app=AFIS" />
+				<entry key="wrapper.java.mainclass" value="aero.minova.cas.CoreApplicationSystemApplication" />
+			</wrapper-conf>
+			<log4j2-conf>
+				<entry key="status" value="info" />
+				<entry key="name" value="CAS" />
+				<entry key="property.logFile" value="cas" />
+				<entry key="property.basePath" value="d:/minova/logs/cas//${logFile}" />
+			</log4j2-conf>
+		</service>
+	</required-service>
+	<copy-file>
+		<filecopy filename="this" todir="${service}" />
+		<dircopy fromdir="jar" todir="${service}" />
+		<dircopy fromdir="files" todir="${service}" />
+	</copy-file>
 </setup>

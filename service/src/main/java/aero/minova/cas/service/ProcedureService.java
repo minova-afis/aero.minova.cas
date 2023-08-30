@@ -441,7 +441,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unbekannter ColumnType für column " + i + ", Typ:" + type );
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
@@ -463,7 +463,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unbekannter ColumnType für column " + i + ", Typ:" + type );
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -485,7 +485,7 @@ public class ProcedureService {
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unbekannter ColumnType für column " + i + ", Typ:" + type );
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}

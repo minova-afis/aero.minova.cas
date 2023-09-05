@@ -64,36 +64,18 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(requests -> requests
-				.requestMatchers("/actuator/**").permitAll()
-				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll()
-				.anyRequest().fullyAuthenticated()
-		);
+		// scj: Should only be enabled if basic auth is replaced by a modern method.
+		http.csrf((csrf)-> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
 
-		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
-		http.formLogin()//
-				.loginPage("/login")//
-				.defaultSuccessUrl("/")//
-				.permitAll();
-		http.httpBasic();
-		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
-		http.logout().permitAll();
 
-		Arrays.stream(environment.getActiveProfiles())
-				.filter("dev"::equals)
-				.forEach(profile -> {
-					customLogger.logError("Never use profile '" + profile + "' in production!", new Exception());
+		// Log a warning if the "dev" profile is active
+		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+			customLogger.logError("Never use profile 'dev' in production!", new Exception());
+		}
 
-					try {
-						// Enables CorsConfigurationSource to be used
-						http.cors();
-					} catch (Exception e) {
-						customLogger.logError(e.getMessage(), e);
-						throw new RuntimeException(e);
-					}
-				});
 		return http.build();
 	}
+
 
 	@Bean
 	public UserDetailsManager userDetailsManager() {
@@ -154,12 +136,17 @@ public class SecurityConfig {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
-		corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-		corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
+		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+
+		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+			corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
+		} else if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
+			corsConfiguration.setAllowedOrigins(Arrays.asList("https://saas-app.minova.com"));
+		}
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		// Register mapping(s) to be added to cors whitelist e.g /cas/ping or /**
 		source.registerCorsConfiguration("/**", corsConfiguration);
 
 		return source;

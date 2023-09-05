@@ -140,7 +140,7 @@ public class SecurityConfig {
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-		corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("GET"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
 
 		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {

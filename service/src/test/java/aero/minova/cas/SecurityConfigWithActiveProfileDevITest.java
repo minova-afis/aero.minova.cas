@@ -18,8 +18,6 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -53,7 +51,7 @@ class SecurityConfigWithActiveProfileDevITest {
 	void corsEnabledTest() throws Exception {
 		this.mockMvc
 				.perform(options("/test-cors")
-						.header("Access-Control-Request-Method", Arrays.asList("GET","POST", "PUT", "DELETE"))
+						.header("Access-Control-Request-Method", "GET")
 						.header("Origin", "http://localhost:8100")
 				)
 				.andDo(print())

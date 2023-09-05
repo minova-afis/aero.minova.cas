@@ -52,7 +52,7 @@ class SecurityConfigWithActiveProfileDevITest {
 		this.mockMvc
 				.perform(options("/test-cors")
 						.header("Access-Control-Request-Method", "GET")
-						.header("Origin", "https://localhost:8100/")
+						.header("Origin", "http://localhost:8100/")
 				)
 				.andDo(print())
 				.andExpect(status().isOk())

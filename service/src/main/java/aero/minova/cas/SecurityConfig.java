@@ -66,7 +66,8 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// scj: Should only be enabled if basic auth is replaced by a modern method.
-		http.cors(Customizer.withDefaults())
+		http
+				.cors(Customizer.withDefaults())
 				.csrf((csrf)-> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
 
 

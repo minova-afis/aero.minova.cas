@@ -55,7 +55,6 @@ public class SecurityConfig {
 	private String serverPort;
 
 	private final Environment environment;
-	private final CustomLogger customLogger;
 	private final DataSource dataSource;
 
 	@Bean
@@ -67,16 +66,10 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 		http
-				.cors(Customizer.withDefaults())
+				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
+				.httpBasic(Customizer.withDefaults())
 				// scj: CSRF Should only be enabled if basic auth is replaced by a modern method.
 				.csrf((csrf)-> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
-
-
-		// Log a warning if the "dev" profile is active
-		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
-			customLogger.logError("Never use profile 'dev' in production!", new Exception());
-		}
-
 		return http.build();
 	}
 
@@ -137,13 +130,11 @@ public class SecurityConfig {
 		};
 	}
 
-	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
-
-		corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
+		corsConfiguration.setAllowedMethods(Arrays.asList("*"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
-
+		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
 		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
 			corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
 		} else if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {

@@ -224,6 +224,12 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
+		<!-- Diese Abhängigkeit wird für CAS setup Submodule bereitgestellt -->
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>1.5.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.h2database</groupId>

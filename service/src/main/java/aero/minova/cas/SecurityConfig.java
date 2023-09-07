@@ -1,9 +1,7 @@
 package aero.minova.cas;
 
 import aero.minova.cas.service.SecurityService;
-import aero.minova.cas.sql.SystemDatabase;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -35,14 +33,11 @@ import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
-
 
 	private static final String ADMIN = "admin";
 
@@ -139,7 +134,7 @@ public class SecurityConfig {
 		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
 		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
 
-		for (String profile : Arrays.asList(environment.getActiveProfiles())) {
+		for (String profile : environment.getActiveProfiles()) {
 			if(profile.contains("dev")){
 				corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
 
@@ -147,7 +142,6 @@ public class SecurityConfig {
 				corsConfiguration.setAllowedOrigins(Arrays.asList("https://saas-app.minova.com"));
 			}
 		}
-
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);

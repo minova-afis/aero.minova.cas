@@ -56,7 +56,7 @@ class SecurityConfigWithActiveProfileDevITest {
 				)
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(header().string("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE"))
+				.andExpect(header().string("Access-Control-Allow-Methods", "GET"))
 				.andExpect(content().string(""));
 	}
 

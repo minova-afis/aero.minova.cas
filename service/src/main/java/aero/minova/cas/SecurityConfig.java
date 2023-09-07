@@ -3,6 +3,7 @@ package aero.minova.cas;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -36,10 +37,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
+
+
 	private static final String ADMIN = "admin";
 
 	@Value("${security_ldap_domain:minova.com}")
@@ -64,6 +68,16 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+			System.out.println("profile: dev");
+			//corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
+		} else if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
+			System.out.println("profile: prod");
+			//corsConfiguration.setAllowedOrigins(Arrays.asList("https://saas-app.minova.com"));corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
+		}else{
+			System.out.println("profile: NONE");
+			System.out.println(environment.getActiveProfiles().toString());
+		}
 
 		http
 				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
@@ -135,11 +149,16 @@ public class SecurityConfig {
 		corsConfiguration.setAllowedMethods(Arrays.asList("*"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
 		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
-		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
-			corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
-		} else if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
-			corsConfiguration.setAllowedOrigins(Arrays.asList("https://saas-app.minova.com"));
+
+		for (String profile : Arrays.asList(environment.getActiveProfiles())) {
+			if(profile.contains("dev")){
+				corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
+
+			}else if(profile.contains("prod")){
+				corsConfiguration.setAllowedOrigins(Arrays.asList("https://saas-app.minova.com"));
+			}
 		}
+
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);

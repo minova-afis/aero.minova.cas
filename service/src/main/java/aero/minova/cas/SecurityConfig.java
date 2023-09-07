@@ -68,17 +68,6 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
-			System.out.println("profile: dev");
-			//corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
-		} else if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
-			System.out.println("profile: prod");
-			//corsConfiguration.setAllowedOrigins(Arrays.asList("https://saas-app.minova.com"));corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
-		}else{
-			System.out.println("profile: NONE");
-			System.out.println(environment.getActiveProfiles().toString());
-		}
-
 		http
 				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
 				.httpBasic(Customizer.withDefaults())

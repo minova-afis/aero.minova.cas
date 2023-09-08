@@ -25,21 +25,21 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class CustomLogger {
 	// Log für alle ausgeführten SQL Queries, außer die Privilegien
-	private static final Logger LOGGER = LoggerFactory.getLogger("SqlLogger");
+	public static final Logger LOGGER = LoggerFactory.getLogger("SqlLogger");
 	// Log für alle Privilegien Anfragen
-	private static final Logger PRIVILEGELOGGER = LoggerFactory.getLogger("PrivilegeLogger");
+	public static final Logger PRIVILEGELOGGER = LoggerFactory.getLogger("PrivilegeLogger");
 	// Log für Fehlermeldungen
-	private static final Logger ERRORLOGGER = LoggerFactory.getLogger("ErrorLogger");
+	public static final Logger ERRORLOGGER = LoggerFactory.getLogger("ErrorLogger");
 	// Log für die Anfragen der User ohne SQL
-	private static final Logger USERLOGGER = LoggerFactory.getLogger("UserLogger");
+	public static final Logger USERLOGGER = LoggerFactory.getLogger("UserLogger");
 	// Log für File Hashes und Zipps
-	private static final Logger FILESLOGGER = LoggerFactory.getLogger("FilesLogger");
+	public static final Logger FILESLOGGER = LoggerFactory.getLogger("FilesLogger");
 	// Log für Setup
-	private static final Logger SETUPLOGGER = LoggerFactory.getLogger("SetupLogger");
+	public static final Logger SETUPLOGGER = LoggerFactory.getLogger("SetupLogger");
 	// Log für QueueService
-	private static final Logger QUEUESERVICELOGGER = LoggerFactory.getLogger("QueueServiceLog");
+	public static final Logger QUEUESERVICELOGGER = LoggerFactory.getLogger("QueueServiceLog");
 	// Log für allgemeine Infos, die nicht zu den obrigen Loggern passen. Z.B: Aufruf einer externen API.
-	private static final Logger INFOLOGGER = LoggerFactory.getLogger("InfoLog");
+	public static final Logger INFOLOGGER = LoggerFactory.getLogger("InfoLog");
 
 	private static final String CASUSER = "CAS : {}";
 
@@ -130,13 +130,5 @@ public class CustomLogger {
 	public void logInfo(String logMessage) {
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
 		INFOLOGGER.info(LOGFORMAT, user, logMessage);
-	}
-
-	public Logger getErrorLogger() {
-		return ERRORLOGGER;
-	}
-
-	public Logger getUserLogger() {
-		return USERLOGGER;
 	}
 }

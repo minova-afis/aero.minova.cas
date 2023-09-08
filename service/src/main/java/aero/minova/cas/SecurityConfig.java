@@ -56,6 +56,12 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
+	@Value("${cors.allowed-origins.dev}")
+	private String allowedOriginsDev;
+
+	@Value("${cors.allowed-origins.prod}")
+	private String allowedOriginsProd;
+
 	private final Environment environment;
 	private final DataSource dataSource;
 
@@ -150,10 +156,10 @@ public class SecurityConfig {
 
 		for (String profile : environment.getActiveProfiles()) {
 			if(profile.contains("dev")){
-				corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8100", "https://saas-app-dev.minova.com"));
+				corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOriginsDev.split(",")));
 
 			}else if(profile.contains("prod")){
-				corsConfiguration.setAllowedOrigins(Arrays.asList("https://saas-app.minova.com"));
+				corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOriginsProd.split(",")));
 			}
 		}
 

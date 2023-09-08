@@ -322,13 +322,13 @@ public class ProcedureService {
 						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
 							rowToBeAdded = convertSqlResultToRow(resultSet//
 									, sqlResultSet//
-									, customLogger.getUserLogger()//
+									, customLogger.USERLOGGER//
 									, this);
 						}
 					} else {
 						rowToBeAdded = convertSqlResultToRow(resultSet//
 								, sqlResultSet//
-								, customLogger.getUserLogger()//
+								, customLogger.USERLOGGER//
 								, this);
 					}
 

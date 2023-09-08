@@ -25,21 +25,21 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class CustomLogger {
 	// Log für alle ausgeführten SQL Queries, außer die Privilegien
-	public static final Logger LOGGER = LoggerFactory.getLogger("SqlLogger");
+	public Logger logger = LoggerFactory.getLogger("SqlLogger");
 	// Log für alle Privilegien Anfragen
-	public static final Logger PRIVILEGELOGGER = LoggerFactory.getLogger("PrivilegeLogger");
+	public Logger privilegeLogger = LoggerFactory.getLogger("PrivilegeLogger");
 	// Log für Fehlermeldungen
-	public static final Logger ERRORLOGGER = LoggerFactory.getLogger("ErrorLogger");
+	public Logger errorLogger = LoggerFactory.getLogger("ErrorLogger");
 	// Log für die Anfragen der User ohne SQL
-	public static final Logger USERLOGGER = LoggerFactory.getLogger("UserLogger");
+	public Logger userLogger = LoggerFactory.getLogger("UserLogger");
 	// Log für File Hashes und Zipps
-	public static final Logger FILESLOGGER = LoggerFactory.getLogger("FilesLogger");
+	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 	// Log für Setup
-	public static final Logger SETUPLOGGER = LoggerFactory.getLogger("SetupLogger");
+	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
 	// Log für QueueService
-	public static final Logger QUEUESERVICELOGGER = LoggerFactory.getLogger("QueueServiceLog");
+	public Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
 	// Log für allgemeine Infos, die nicht zu den obrigen Loggern passen. Z.B: Aufruf einer externen API.
-	public static final Logger INFOLOGGER = LoggerFactory.getLogger("InfoLog");
+	public Logger infoLogger = LoggerFactory.getLogger("InfoLog");
 
 	private static final String CASUSER = "CAS : {}";
 
@@ -70,40 +70,40 @@ public class CustomLogger {
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		ERRORLOGGER.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
+		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
 
 	}
 
 	public void logPrivilege(String logMessage) {
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		PRIVILEGELOGGER.info(LOGFORMAT, user, logMessage);
+		privilegeLogger.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logSql(String logMessage) {
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		LOGGER.info(LOGFORMAT, user, logMessage);
+		logger.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logUserRequest(String logMessage) {
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		USERLOGGER.info(LOGFORMAT, user, logMessage);
+		userLogger.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logUserRequest(String logMessage, Object gsonObject) {
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		USERLOGGER.info(USERREQUESTLOGFORMAT, user, logMessage, gson.toJson(gsonObject));
+		userLogger.info(USERREQUESTLOGFORMAT, user, logMessage, gson.toJson(gsonObject));
 	}
 
 	public void logFiles(String logMessage) {
-		FILESLOGGER.info(CASUSER, logMessage);
+		filesLogger.info(CASUSER, logMessage);
 	}
 
 	public void logSetup(String logMessage) {
-		SETUPLOGGER.info(CASUSER, logMessage);
+		setupLogger.info(CASUSER, logMessage);
 	}
 
 	public void logQueueService(String logMessage) {
-		QUEUESERVICELOGGER.info(CASUSER, logMessage);
+		queueServiceLog.info(CASUSER, logMessage);
 	}
 
 	/**
@@ -129,6 +129,6 @@ public class CustomLogger {
 
 	public void logInfo(String logMessage) {
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		INFOLOGGER.info(LOGFORMAT, user, logMessage);
+		infoLogger.info(LOGFORMAT, user, logMessage);
 	}
 }

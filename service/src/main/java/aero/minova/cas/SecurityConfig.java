@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -56,18 +55,28 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
-	@Value("${cors.allowed-origins.dev}")
-	private String allowedOriginsDev;
+	@Value("${cors.allowed.origins:http://localhost:8100}")
+	private String allowedOrigins;
 
-	@Value("${cors.allowed-origins.prod}")
-	private String allowedOriginsProd;
-
-	private final Environment environment;
-	private final DataSource dataSource;
+	private DataSource dataSource;
 
 	@Bean
 	public SpringSecurityDialect springSecurityDialect() {
 		return new SpringSecurityDialect();
+	}
+
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedMethods(Arrays.asList("*"));
+		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
+		System.out.println("CORS: " + allowedOrigins);
+		corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfiguration);
+
+		return source;
 	}
 
 	@Bean
@@ -148,24 +157,5 @@ public class SecurityConfig {
 		};
 	}
 
-	CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.setAllowedMethods(Arrays.asList("*"));
-		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
-		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
 
-		for (String profile : environment.getActiveProfiles()) {
-			if(profile.contains("dev")){
-				corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOriginsDev.split(",")));
-
-			}else if(profile.contains("prod")){
-				corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOriginsProd.split(",")));
-			}
-		}
-
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", corsConfiguration);
-
-		return source;
-	}
 }

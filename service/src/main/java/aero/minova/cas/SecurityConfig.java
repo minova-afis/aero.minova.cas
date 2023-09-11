@@ -55,7 +55,7 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
-	@Value("${cors.allowed.origins:http://localhost:8100}")
+	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
 	private String allowedOrigins;
 
 	private DataSource dataSource;

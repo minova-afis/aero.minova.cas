@@ -5,6 +5,13 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Bestimmung der erlaubten CORS-Origins direkt über URLs statt Profiles
+* InfoLogger zum Loggen allgemeiner Informationen hinzufügen.  
+
+
+## [12.65.19] -- 2023-09-06
+* jgrapht-core Abhängigkeit für das Submodul 'setup' bereitstellen. (Startet man CAS im IntelliJ und möchte DBsetup ausführen, wird kein Fehler wegen fehlender JGraphT Klasse geworfen.)
+
+## [12.65.18] -- 2023-08-29
 * Update auf SpringBoot 3.1.3
 * jackson-datatype-jsr310, hibernate-jpamodelgen, commons-lang3 Abhängigkeiten für Erweiterungen bereitstellen.
 

@@ -96,7 +96,7 @@ public class ViewService {
 				customLogger.logSql("Executing statements: " + sb);
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 
-					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 
 					int totalResults = 0;
 					if (!result.getRows().isEmpty()) {
@@ -140,13 +140,13 @@ public class ViewService {
 	 *            Ein StringBuilder zum Loggen der inputParameter.
 	 */
 	public PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
-		return SqlUtils.fillPreparedViewString(inputTable, preparedStatement, query, sb, customLogger.getErrorLogger());
+		return SqlUtils.fillPreparedViewString(inputTable, preparedStatement, query, sb, customLogger.errorLogger);
 
 	}
 
 	@Deprecated
 	public Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
-		return SqlUtils.convertSqlResultToTable(inputTable, sqlSet, customLogger.getUserLogger(), this);
+		return SqlUtils.convertSqlResultToTable(inputTable, sqlSet, customLogger.userLogger, this);
 	}
 
 	/**

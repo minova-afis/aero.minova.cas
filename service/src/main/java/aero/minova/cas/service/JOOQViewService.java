@@ -81,10 +81,10 @@ public class JOOQViewService implements ViewServiceInterface {
 			final String viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
-					customLogger.getErrorLogger())) {
+					customLogger.errorLogger)) {
 				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
-					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
 			}
 

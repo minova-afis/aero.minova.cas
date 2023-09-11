@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.stream.StreamSupport;
 
-import jakarta.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +20,9 @@ import org.springframework.stereotype.Component;
 import com.google.gson.Gson;
 
 import aero.minova.cas.api.restapi.ClientRestAPI;
-import lombok.Getter;
+import jakarta.annotation.PostConstruct;
 
 @Component
-@Getter
 public class CustomLogger {
 	// Log für alle ausgeführten SQL Queries, außer die Privilegien
 	public Logger logger = LoggerFactory.getLogger("SqlLogger");
@@ -39,8 +36,18 @@ public class CustomLogger {
 	public Logger filesLogger = LoggerFactory.getLogger("FilesLogger");
 	// Log für Setup
 	public Logger setupLogger = LoggerFactory.getLogger("SetupLogger");
-
+	// Log für QueueService
 	public Logger queueServiceLog = LoggerFactory.getLogger("QueueServiceLog");
+	// Log für allgemeine Infos, die nicht zu den obrigen Loggern passen. Z.B: Aufruf einer externen API.
+	public Logger infoLogger = LoggerFactory.getLogger("InfoLog");
+
+	private static final String CASUSER = "CAS : {}";
+
+	private static final String LOGFORMAT = "{} : {}";
+
+	private static final String ERRORLOGFORMAT = "{} : {} : \n {}";
+
+	private static final String USERREQUESTLOGFORMAT = "{} : {} {}";
 
 	@Autowired
 	private ClientRestAPI crapi;
@@ -62,56 +69,41 @@ public class CustomLogger {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			errorLogger.error(null + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
-		} else {
-			errorLogger
-					.error(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + ": " + e.getMessage() + "\n" + sw.toString());
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
+
 	}
 
 	public void logPrivilege(String logMessage) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			privilegeLogger.info(null + ": " + logMessage);
-		} else {
-			privilegeLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		privilegeLogger.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logSql(String logMessage) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			logger.info(null + ": " + logMessage);
-		} else {
-			logger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		logger.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logUserRequest(String logMessage) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			userLogger.info(null + ": " + logMessage);
-		} else {
-			userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage);
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		userLogger.info(LOGFORMAT, user, logMessage);
 	}
 
 	public void logUserRequest(String logMessage, Object gsonObject) {
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			userLogger.info(null + ": " + logMessage + " " + gson.toJson(gsonObject));
-		} else {
-			userLogger.info(SecurityContextHolder.getContext().getAuthentication().getName() + ": " + logMessage + " " + gson.toJson(gsonObject));
-		}
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		userLogger.info(USERREQUESTLOGFORMAT, user, logMessage, gson.toJson(gsonObject));
 	}
 
 	public void logFiles(String logMessage) {
-		filesLogger.info("CAS " + logMessage);
+		filesLogger.info(CASUSER, logMessage);
 	}
 
 	public void logSetup(String logMessage) {
-		setupLogger.info("CAS " + logMessage);
+		setupLogger.info(CASUSER, logMessage);
 	}
 
 	public void logQueueService(String logMessage) {
-		queueServiceLog.info("CAS " + logMessage);
+		queueServiceLog.info(CASUSER, logMessage);
 	}
 
 	/**
@@ -133,5 +125,10 @@ public class CustomLogger {
 				.distinct()//
 				.filter(prop -> !(prop.contains("credentials") || prop.contains("password")))//
 				.forEach(prop -> initLogger.info("Property: {}={}", prop, env.getProperty(prop)));
+	}
+
+	public void logInfo(String logMessage) {
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		infoLogger.info(LOGFORMAT, user, logMessage);
 	}
 }

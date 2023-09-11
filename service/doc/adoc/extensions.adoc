@@ -26,7 +26,7 @@ Diese Abhängigkeiten stehen somit während des Bauens zur Verfügung,
 werden aber beim Deployment durch das CAS bereitgestellt.
 Als Abhängigkeit sind für Erweiterungen nur das CAS und andere CAS-Erweiterungen erlaubt.
 
-Erweiterungen dürfen keine eigene Abhängigkeit mitbringen,
+Erweiterungen dürfen keine eigene Abhängigkeit (Jars) mitbringen,
 da dies zu Versionen-Konflikten führen wird
 (dieselbe Jar ist in den Lib-Ordner des CAS-Dienstes in unterschiedlichen Version mehrmals vorhanden).
 

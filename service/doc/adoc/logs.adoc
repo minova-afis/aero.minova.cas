@@ -11,6 +11,7 @@ Es gibt sieben verschiedene Logs:
 * *filesLog*: Loggt alle File-Anfragen von Usern und alle Hash- und Zip-Operationen des CAS.
 * *setupLog*: Loggt alle Operationen, welche das CAS beim Setup durchführt.
 * *queueServiceLog*: Loggt jede Aktivität des QueueService.
+* *infoLog*: Loggt alle "sonstigen" Informationen, z.B: API Calls oder Extension Hinweise.
 
 Nachdem ein neuer Tag anbricht, verschiebt das CAS die 'alten' Logs automatisch in einen 'archived'-Ordner innerhalb des logs-Ordners.
 Somit gibt es für immer genau *ein Log jeder Art pro Tag*.

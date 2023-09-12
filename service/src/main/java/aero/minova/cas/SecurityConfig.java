@@ -70,7 +70,7 @@ public class SecurityConfig {
 		corsConfiguration.setAllowedMethods(Arrays.asList("*"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
 		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
-		System.out.println("CORS: " + allowedOrigins);
+
 		corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

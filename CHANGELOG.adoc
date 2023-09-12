@@ -9,7 +9,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [12.66.0] -- 2023-09-12
 * Bestimmung der erlaubten CORS-Origins direkt über URLs statt Profiles
 * InfoLogger zum Loggen allgemeiner Informationen hinzufügen. 
-* Das KeyText-Feld der UserPrivileges-Entity hat nun die korrekte Länge von 200. Außer wurde das Descipion Feld ergänzt.  
+* Das KeyText-Feld der Data-Entity hat nun die Länge von 200, da UserPrivilege diese Länge benötigt. Außerdem wurde das Desciption Feld bei der UserPrivilege-Entity ergänzt.  
 
 
 ## [12.65.19] -- 2023-09-06

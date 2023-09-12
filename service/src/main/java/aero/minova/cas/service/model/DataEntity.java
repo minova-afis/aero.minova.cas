@@ -23,8 +23,8 @@ public abstract class DataEntity {
 	private int keyLong;
 
 	@NotNull
-	@Size(max = 50)
-	@Column(name = "KeyText", length = 50)
+	@Size(max = 200)
+	@Column(name = "KeyText", length = 200)
 	public String keyText;
 
 	@Column(name = "LastAction")

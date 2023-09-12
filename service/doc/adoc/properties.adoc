@@ -89,6 +89,12 @@ ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
 
 ** *Wertebereich*: `true/false` Erweitert das Logging beim Setup, wenn auf true.
 
+* cors.allowed.origins
+
+** *Default*: `http://localhost:8100`
+
+** *Wertebereich*: URLs mit Kommata getrennt, zur Festlegung erlaubter Origins für CORS.
+
 == Profiles
 
 * spring.profiles.active

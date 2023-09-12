@@ -1,15 +1,14 @@
 package aero.minova.cas;
 
 import aero.minova.cas.service.SecurityService;
-import aero.minova.cas.sql.SystemDatabase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -25,6 +24,9 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
+import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
+import org.springframework.security.web.server.authentication.logout.WebSessionServerLogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,12 +35,12 @@ import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
+
 	private static final String ADMIN = "admin";
 
 	@Value("${security_ldap_domain:minova.com}")
@@ -53,47 +55,51 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
-	private final Environment environment;
-	private final CustomLogger customLogger;
-	private final DataSource dataSource;
+	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
+	private String allowedOrigins;
+
+	private DataSource dataSource;
 
 	@Bean
 	public SpringSecurityDialect springSecurityDialect() {
 		return new SpringSecurityDialect();
 	}
 
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.setAllowedMethods(Arrays.asList("*"));
+		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
+		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
+
+		corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", corsConfiguration);
+
+		return source;
+	}
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		DelegatingServerLogoutHandler logoutHandler = new DelegatingServerLogoutHandler(new WebSessionServerLogoutHandler(), new SecurityContextServerLogoutHandler());
 		http.authorizeHttpRequests(requests -> requests
 				.requestMatchers("/actuator/**").permitAll()
 				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll()
 				.anyRequest().fullyAuthenticated()
-		);
-
-		http.logout().logoutUrl("/logout").logoutSuccessUrl("/");
-		http.formLogin()//
+		)
+			.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
+			.formLogin(form -> form
 				.loginPage("/login")//
 				.defaultSuccessUrl("/")//
-				.permitAll();
-		http.httpBasic();
-		http.csrf().disable(); // TODO Entferne dies. Vereinfacht zur Zeit die Loginseite.
-		http.logout().permitAll();
+				.permitAll())
+			.httpBasic(Customizer.withDefaults())
+				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
 
-		Arrays.stream(environment.getActiveProfiles())
-				.filter("dev"::equals)
-				.forEach(profile -> {
-					customLogger.logError("Never use profile '" + profile + "' in production!", new Exception());
-
-					try {
-						// Enables CorsConfigurationSource to be used
-						http.cors();
-					} catch (Exception e) {
-						customLogger.logError(e.getMessage(), e);
-						throw new RuntimeException(e);
-					}
-				});
+				// scj: CSRF Should only be enabled if basic auth is replaced by a modern method.
+				.csrf((csrf)-> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
 		return http.build();
 	}
+
 
 	@Bean
 	public UserDetailsManager userDetailsManager() {
@@ -151,17 +157,5 @@ public class SecurityConfig {
 		};
 	}
 
-	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration corsConfiguration = new CorsConfiguration();
-		corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
-		corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-		corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
 
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		// Register mapping(s) to be added to cors whitelist e.g /cas/ping or /**
-		source.registerCorsConfiguration("/**", corsConfiguration);
-
-		return source;
-	}
 }

@@ -5,7 +5,7 @@
 Jede Installation besteht aus 5 Teilen,
 welche für die jeweiligen Umgebungen teilweise unterschiedlich durchgeführt werden:
 
-* [Installation von Kundenprojekten auf Windows-Server](https://github.com/minova-afis/com.minova.sis)
+* link:https://github.com/minova-afis/com.minova.sis[Installation von Kundenprojekten auf Windows-Server]
 * Installation des CAS-Dienstes
 * <<sql-server-und-datenbank-einrichten>>
 * Dateisystem einbinden.

@@ -258,14 +258,30 @@ public class ProcedureService {
 
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			{   // ToDo das sieht etwas dubios aus. ich würde das eher so schreiben:
-				// https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16
+			{   /*
+				 * Man würde hier erwarten, dass der Code wie in folgender Doku aussieht:
+				 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16
+				 *
+				 * Das liegt vor allem daran, dass eine SQL-Prozedur sehr viele
+				 * verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat.
+				 *
+				 * Folgender Artikel umreist, dass ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+				 */
 				int i = 0;
 				while (preparedStatement.getResultSet() == null) {
+					/* Es kann sein, dass am Anfang einige ResultsSets leer sind.
+					 * Diese muss man manuel rausfiltern.
+					 */
+
 					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
 						// Es gibt kein nächstes Result
 						break;
 					}
+					/**
+					 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets.
+					 * Sind mehr vorhanden, ist das Verhalten der Treiber nicht kontrollierbar:
+					 * https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+					 */
 					if (++i >= maxResultSetCount) {
 						customLogger.logSql(
 								"Warning: too many result sets. Maybe there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");

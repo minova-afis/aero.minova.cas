@@ -58,7 +58,7 @@ public class SecurityConfig {
 	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
 	private String allowedOrigins;
 
-	private DataSource dataSource;
+	private final DataSource dataSource;
 
 	@Bean
 	public SpringSecurityDialect springSecurityDialect() {

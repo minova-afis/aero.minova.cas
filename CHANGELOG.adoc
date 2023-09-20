@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* final für dataSource in SecurityConfig von Service wiederhergestellt.
 * Authority-Spaltengröße muss dieselbe Größe haben wie die KeyText-Spalte in xtcasUserGroup.
 
 ## [12.66.0] -- 2023-09-12

@@ -1,25 +1,58 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>cas.app</artifactId>
-	<version>12.66.1-SNAPSHOT</version>
-	<parent>
-		<groupId>aero.minova</groupId>
-		<artifactId>app.parent</artifactId>
-		<version>12.9.2</version>
-		<relativePath />
-	</parent>
-	
-	<dependencies>
-		<dependency>
-			<groupId>aero.minova</groupId>
-			<artifactId>app.i18n</artifactId>
-			<version>12.17.1</version>
-			<classifier>app</classifier>
-		</dependency>
-	</dependencies>
-	
-	<scm>
-		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-		<tag>v12.64.0</tag>
-	</scm>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cas.app</artifactId>
+    <version>12.66.1-SNAPSHOT</version>
+    <parent>
+        <groupId>aero.minova</groupId>
+        <artifactId>app.parent</artifactId>
+        <version>12.9.2</version>
+        <relativePath/>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>aero.minova</groupId>
+            <artifactId>app.i18n</artifactId>
+            <version>12.17.1</version>
+            <classifier>app</classifier>
+        </dependency>
+        <dependency>
+            <groupId>aero.minova</groupId>
+            <artifactId>cas.service</artifactId>
+            <version>12.66.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-extensions</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/</directory>
+                                    <includes>
+                                        <include>${project.groupId}-${project.version}.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <tag>v12.64.0</tag>
+    </scm>
 </project>

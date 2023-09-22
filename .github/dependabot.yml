@@ -31,3 +31,9 @@ updates:
       interval: "daily"
     assignees:
       - "weber-minova"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "weber-minova"

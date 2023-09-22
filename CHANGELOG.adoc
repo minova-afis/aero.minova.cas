@@ -4,13 +4,16 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Dependabot beobachtet nun neben Maven POMs und GitHub Actions auch Container Images
+
+## [12.66.1] -- 2023-09-21
+* final für dataSource in SecurityConfig von Service wiederhergestellt.
 * Authority-Spaltengröße muss dieselbe Größe haben wie die KeyText-Spalte in xtcasUserGroup.
 
 ## [12.66.0] -- 2023-09-12
 * Bestimmung der erlaubten CORS-Origins direkt über URLs statt Profiles
 * InfoLogger zum Loggen allgemeiner Informationen hinzufügen. 
 * Das KeyText-Feld der Data-Entity hat nun die Länge von 200, da UserPrivilege diese Länge benötigt. Außerdem wurde das Desciption Feld bei der UserPrivilege-Entity ergänzt.  
-
 
 ## [12.65.19] -- 2023-09-06
 * jgrapht-core Abhängigkeit für das Submodul 'setup' bereitstellen. (Startet man CAS im IntelliJ und möchte DBsetup ausführen, wird kein Fehler wegen fehlender JGraphT Klasse geworfen.)

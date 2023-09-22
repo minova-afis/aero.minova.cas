@@ -47,7 +47,7 @@ Aus dem oberen Beispiel sollte die folgende MDI Datei erstellt werden.
 
 ```
 
-#Wichtig!
+# Wichtig!
 
 Damit das Filtern nach SecurityToken auch funktioniert, muss in der xtcasLuUserPrivilegesUserGroup für die entsprechende Gruppe das RowLevelSecurity-Bit auf true gesetzt werden.
 

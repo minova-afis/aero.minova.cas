@@ -47,6 +47,10 @@ Aus dem oberen Beispiel sollte die folgende MDI Datei erstellt werden.
 
 ```
 
+Zum Erstellen eines Mdi-Skriptes kann man sich an der [initMdi.sql](./../../api/src/main/app/sql/initMdi.sql) des cas.app-Projektes orientieren.
+
+Zu beachten ist außerdem, dass das Skript in der Setup.xml eingetragen werden muss UND es einen anderen Namen haben muss, als 'initMdi.sql', da dieser Name ja bereits vom CAS verwendet wird. 
+
 # Wichtig!
 
 Damit das Filtern nach SecurityToken auch funktioniert, muss in der xtcasLuUserPrivilegesUserGroup für die entsprechende Gruppe das RowLevelSecurity-Bit auf true gesetzt werden.

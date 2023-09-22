@@ -7,9 +7,9 @@ with encryption as
 	if (@UserPrivilegeKey is not null)
 	begin
 		select	KeyLong,
-				UserPrivilegeKey,
 				UserGroupKey,
-				RowLevelSecurity
+				RowLevelSecurity,
+				KeyText
 		from xtcasLuUserPrivilegeUserGroup
 		where UserPrivilegeKey = @UserPrivilegeKey
 		  and LastAction > 0

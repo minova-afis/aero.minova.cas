@@ -27,12 +27,12 @@ public class Error {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "Username")
+	@Column(name = "Username", length = 50)
 	public String username;
 
 	@NotNull
 	@Size(max = 250)
-	@Column(name = "ErrorMessage")
+	@Column(name = "ErrorMessage", length = 250)
 	public String errormessage;
 
 	@NotNull

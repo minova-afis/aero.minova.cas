@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="ColumnSecurity" title="@ColumnSecurity" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+<form icon="ColumnSecurity" title="@xtcasColumnSecurity.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
 	<index-view id="IndexView" source="xvcasColumnSecurityIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
-			<number/>
+			<number />
+		</column>
+		<column name="KeyText" text="@xtcasColumnSecurity.KeyText">
+			<text length="50" />
 		</column>
 		<column name="TableName" text="@xtcasColumnSecurity.TableName">
-			<text length="50"/>
+			<text length="50" />
 		</column>
 		<column name="ColumnName" text="@xtcasColumnSecurity.ColumnName">
-			<text length="50"/>
+			<text length="50" />
 		</column>
 		<column name="SecurityToken" text="@xtcasColumnSecurity.SecurityToken">
-			<text length="50"/>
+			<text length="50" />
 		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="ColumnSecurity">
 		<head>
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
-				<number/>
+				<number />
+			</field>
+			<field name="KeyText" sql-index="4" text="@xtcasColumnSecurity.KeyText" key-type="user" number-columns-spanned="4" required="true">
+				<text length="50" />
 			</field>
 			<field name="TableName" sql-index="1" text="@xtcasColumnSecurity.TableName" number-columns-spanned="4" required="true" fill="toright">
-				<text length="50"/>
+				<text length="50" />
 			</field>
 			<field name="ColumnName" sql-index="2" text="@xtcasColumnSecurity.ColumnName" number-columns-spanned="4" required="true" fill="toright">
-				<text length="50"/>
+				<text length="50" />
 			</field>
 			<field name="SecurityToken" sql-index="3" text="@xtcasColumnSecurity.SecurityToken" number-columns-spanned="4" required="true" fill="toright">
-				<text length="50"/>
+				<text length="50" />
 			</field>
 		</head>
 	</detail>

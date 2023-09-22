@@ -27,7 +27,7 @@ Datentyp: nvarchar(50) not null +
 
 ==== ServiceURL
 
-Datentyp: nvarchar(50) not null +
+Datentyp: nvarchar(250) not null +
 
 // tag::column.ServiceURL[]
 
@@ -71,3 +71,57 @@ Default: `1` +
 // tag::column.LastAction[]
 
 // end::column.LastAction[]
+
+
+==== ServiceMessageReceiverLoginTypeKey
+
+Datentyp: integer +
+
+// tag::column.ServiceMessageReceiverLoginTypeKey[]
+
+// end::column.ServiceMessageReceiverLoginTypeKey[]
+
+
+==== Username
+
+Datentyp: nvarchar(50) +
+
+// tag::column.Username[]
+
+// end::column.Username[]
+
+
+==== Password
+
+Datentyp: nvarchar(50) +
+
+// tag::column.Password[]
+
+// end::column.Password[]
+
+
+==== ClientID
+
+Datentyp: nvarchar(50) +
+
+// tag::column.ClientID[]
+
+// end::column.ClientID[]
+
+
+==== ClientSecret
+
+Datentyp: nvarchar(50) +
+
+// tag::column.ClientSecret[]
+
+// end::column.ClientSecret[]
+
+
+==== TokenURL
+
+Datentyp: nvarchar(50) +
+
+// tag::column.TokenURL[]
+
+// end::column.TokenURL[]

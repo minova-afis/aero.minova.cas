@@ -28,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(
 		classes = {
 				SecurityConfig.class, CustomLogger.class, ClientRestAPI.class, SystemDatabase.class,
-				SecurityConfigWithActiveProfileDevITest.TestApplication.class },
+				SecurityConfigITest.TestApplication.class },
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("dev")
-class SecurityConfigWithActiveProfileDevITest {
+
+class SecurityConfigITest {
 	@Autowired
 	private WebApplicationContext wac;
 
@@ -48,11 +48,25 @@ class SecurityConfigWithActiveProfileDevITest {
 
 	@Test
 	@WithMockUser(username = "admin", roles = { "ADMIN" })
-	void corsEnabledTest() throws Exception {
+	void corsEnabledForHttpTest() throws Exception {
 		this.mockMvc
 				.perform(options("/test-cors")
 						.header("Access-Control-Request-Method", "GET")
-						.header("Origin", "https://localhost:8100/")
+						.header("Origin", "http://localhost:8100")
+				)
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(header().string("Access-Control-Allow-Methods", "GET"))
+				.andExpect(content().string(""));
+	}
+
+	@Test
+	@WithMockUser(username = "admin", roles = { "ADMIN" })
+	void corsEnabledForHttpsTest() throws Exception {
+		this.mockMvc
+				.perform(options("/test-cors")
+						.header("Access-Control-Request-Method", "GET")
+						.header("Origin", "https://localhost:8100")
 				)
 				.andDo(print())
 				.andExpect(status().isOk())

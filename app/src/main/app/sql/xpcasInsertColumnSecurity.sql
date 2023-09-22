@@ -2,7 +2,8 @@ alter procedure dbo.xpcasInsertColumnSecurity (
 	@KeyLong int output,
 	@TableName nvarchar(50) = null,
 	@ColumnName nvarchar(50) = null,
-	@SecurityToken nvarchar(50) = null
+	@SecurityToken nvarchar(50) = null,
+	@KeyText nvarchar(50) = null
 )
 with encryption as
 	if (exists(select * from xtcasColumnSecurity
@@ -16,12 +17,20 @@ with encryption as
 
 	insert into xtcasColumnSecurity (
 		TableName,
+		KeyText,
 		ColumnName,
-		SecurityToken
+		SecurityToken,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@TableName,
+		@KeyText,
 		@ColumnName,
-		@SecurityToken
+		@SecurityToken,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

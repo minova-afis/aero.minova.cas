@@ -123,22 +123,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			errorMessage = "msg.NoErrorMessageAvailable";
 		}
 
-		boolean hasMsg = false;
-
-		// Alles vor 'msg.' wegschmeißen.
-		if (errorMessage.contains("msg.")) {
-			errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
-			// Neues drittes Format benötigt eine Markierung, ob der Part mit 'ADO | ... |' abgeschnitten wurde.
-			hasMsg = true;
-		}
-
 		/*
-		 * Es gibt drei Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'
-		 * 3.'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.'
+		 * Es gibt vier Fehlermeldungsformate: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' 2. 'msg.PrivilegeError %tBeispiel'
+		 * 3.'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.' 4.'ADO | 25 | msg.sql.51103'
 		 */
 		if (errorMessage.contains("|")) {
-			// Verarbeiten der Fehlermeldungen in Form: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext'
-			outputTable = handleSqlErrorMessage(outputTable, errorMessage, hasMsg);
+			// Verarbeiten der Fehlermeldungen in Form: 1. 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext', 3. oder 4.
+			outputTable = handleSqlErrorMessage(outputTable, errorMessage);
 		} else {
 			// Verarbeiten der Fehlermeldungen in Form: 2. 'msg.PrivilegeError %tBeispiel'
 			outputTable = handleGenericErrorMessage(outputTable, errorMessage);
@@ -170,13 +161,19 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
 	 */
 	private Table handleGenericErrorMessage(Table outputTable, String errorMessage) {
+
+		// Alles vor 'msg.' wegschmeißen.
+		if (errorMessage.contains("msg.")) {
+			errorMessage = errorMessage.substring(errorMessage.indexOf("msg."));
+		}
+
 		Row parameterValues = new Row();
 
 		// Falls in der Message noch Parameter mit '%' vorkommen, z.B.: 'msg.Beispiel %ParameterDerInDieMessageNachDemÜbersetzenEingefügtWird', werden sie hier
 		// raus gefiltert und kommen in ihre eigene Zeile.
 		List<String> errorMessageParts = Stream.of(errorMessage.split("%"))//
 				.map(String::trim)//
-				.collect(Collectors.toList());
+				.toList();
 
 		// Alle Spalten müssen erstellt werden BEVOR sie befüllt werden
 		// Hinzufügen der Spalten für die InputParameter der Internationalierung
@@ -195,38 +192,28 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
-	 * Bringt das Format 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' in Form einer Table noch ohne Stacktrace und returnErrorMessage.
-	 * Es gibt allerdings noch ein Format, welches sehr ähnlich ist, nur dass 'msg.' fehlt: 'ADO | 30 | delaycode.description.comma | Commas are not allowed in
-	 * the description.'
+	 * Bringt das Format <br>
+	 * 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext' <br>
+	 * in Form einer Table noch ohne Stacktrace und returnErrorMessage. <br>
+	 * Es gibt allerdings noch ein Format, welches sehr ähnlich ist, nur dass 'msg.' fehlt: <br>
+	 * 'ADO | 30 | delaycode.description.comma | Commas are not allowed in the description.'<br>
+	 * Außerdem kann vorkommen, dass kein Default-Text gegeben ist: <br>
+	 * 'ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg'
 	 * 
 	 * @param outputTable
-	 *            Die bisher gebaute Table, welche dann auch uzrückgegeben wird.
+	 *            Die bisher gebaute Table, welche dann auch zurückgegeben wird.
 	 * @param errorMessage
 	 *            Die Fehlermeldung, welche auseinander gebaut werden muss.
-	 * @param hasMsg
-	 *            Signalisiert, ob der Part vor msg. abgeschnitten wurde, oder nicht.
 	 * @return Die outputTable befüllt mit dem Inhalt der errorMessage.
 	 */
-	public Table handleSqlErrorMessage(Table outputTable, String errorMessage, boolean hasMsg) {
+	public Table handleSqlErrorMessage(Table outputTable, String errorMessage) {
 
 		List<String> sqlErrorMessage = Stream.of(errorMessage.split("\\|"))//
 				.map(String::trim)//
-				.collect(Collectors.toList());
-
-		// Ab hier benutzen wir den ersten Teil der sqlErrorMessage.
-		int errorMessagePart;
-		int standardErrorMessage;
-
-		if (hasMsg) {
-			errorMessagePart = 0;
-			standardErrorMessage = 1;
-		} else {
-			errorMessagePart = 2;
-			standardErrorMessage = 3;
-		}
+				.toList();
 
 		// Splitte den String überall da, wo ein @ vorkommt.
-		String[] types = sqlErrorMessage.get(errorMessagePart).split("@");
+		String[] types = sqlErrorMessage.get(2).split("@");
 
 		Row internatMsg = new Row();
 
@@ -245,8 +232,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		// Die Column MUSS 'DEFAULT' heißen.
 		outputTable.addColumn(new Column("DEFAULT", DataType.STRING));
 
-		// Die Standard-Fehlermeldung hinzufügen
-		internatMsg.addValue(new Value(sqlErrorMessage.get(standardErrorMessage), null));
+		// Die Standard-Fehlermeldung hinzufügen, ist keine Default-Übersetzung gegeben die "normale" Nachricht verwenden
+		internatMsg.addValue(new Value(sqlErrorMessage.get(sqlErrorMessage.size() == 4 ? 3 : 2), null));
 
 		outputTable.addRow(internatMsg);
 		return outputTable;
@@ -276,8 +263,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	/**
 	 * Verarbeitet die xProcedureException. Die Liste der XSqlProcedureResult, welche zurück gegeben wird, beinhaltet erst die erfolgreich verarbeiteten
 	 * XSqlProcedureResults, dann ein XSqlProcedureResult, welches die typische Fehlermeldung beinhaltet. Dann wird die Liste der XSqlProcedureResults so lange
-	 * mit leeren XSqlProcedureResults gefüllt, bis sie dieselbe Länge hat, wie die anfagns gesendete XTable. Hierbei werden alle IDs der XTables in derselben
-	 * Reihenfolge übernommen. Die Exception wird außerdem zusammen mit dem Username und dem Datum in derDatenbank geloggt.
+	 * mit leeren XSqlProcedureResults gefüllt, bis sie dieselbe Länge hat, wie die anfangs gesendete XTable. Hierbei werden alle IDs der XTables in derselben
+	 * Reihenfolge übernommen. <br>
+	 * <br>
+	 * Tritt der Fehler nicht beim verarbeiten einer Prozedur selbst auf sondern danach, wird ein weiteres XSqlProcedureResult angehängt, dass diesen Fehler
+	 * enthält. Die Liste der zurückgegebenen Werte ist also um eins länger als die Liste der gesendeten XTables. <br>
+	 * <br>
+	 * Die Exception wird außerdem zusammen mit dem Username und dem Datum in derDatenbank geloggt.
 	 * 
 	 * @param ex
 	 *            Eine XProcedureException. Diese beinhaltet neben der Exception, noch eine Liste an XTable, welche bei der Anfrage der Transaktion übergeben
@@ -292,9 +284,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		// Ergebnisse von erfolgreich durchgeführten Prozeduren übernehmen.
 		xsqlProcedureResults.addAll(results);
 
+		// Fall mehr Eingaben (xtables) als Ergebnisse -> Fehler in Prozeudur -> ID der entsprechenden Prozedur übernehmen
+		// Fall Eingaben und Ergebnisse gleiche Anzahl -> Fehler nach Verarbeitung -> Generische Fehlermeldung als ID
+		String errorID = xtables.size() > results.size() ? xtables.get(results.size()).getId() : "Internal Server Error";
+
 		// Error Eintrag an der Stelle, an der der Fehler autritt, machen.
 		SqlProcedureResult errorResult = prepareExceptionReturnSqlProcedureResult(ex);
-		String errorID = xtables.get(results.size()).getId();
 		XSqlProcedureResult error = new XSqlProcedureResult(errorID, errorResult);
 		xsqlProcedureResults.add(error);
 
@@ -326,7 +321,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		String errorStatement = "INSERT INTO xtcasError (Username, ErrorMessage, Date) VALUES (?,?,?)";
 
-		final val connection = systemDatabase.getConnection();
+		val connection = systemDatabase.getConnection();
 		try {
 			Timestamp timeOfError = Timestamp.from(Instant.now());
 			CallableStatement callableErrorStatement = connection.prepareCall(errorStatement);
@@ -339,23 +334,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				e.printStackTrace(pw);
 				customLogger.logSql("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
 				// Der Stacktrace wird nicht in der Datenbank gespeichert, da das Feld einfach viel zu lang ist. Deswegen geben wir ihn im ErrorLog aus.
-				customLogger.logError("CAS: Showing Stacktrace : " + sw.toString(), e);
+				customLogger.logError("CAS: Showing Stacktrace : " + sw, e);
 			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();
-			systemDatabase.freeUpConnection(connection);
 		} catch (SQLException e1) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e1.printStackTrace(pw);
 
-			try {
-				connection.close();
-			} catch (SQLException e2) {
-				customLogger.logError("Connection could not be closed: ", e2);
-			}
-
-			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw.toString(), e1);
+			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw, e1);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 	}
 }

@@ -1,7 +1,8 @@
 alter procedure dbo.xpcasInsertAuthorities (
 	@KeyLong int output,
 	@Username nvarchar(50),
-	@Authority int
+	@Authority int,
+	@KeyText nvarchar(50) = null
 )
 with encryption as
 	-- Der übergebene Authority Key ist eigentlich der UserGroupKey
@@ -26,10 +27,12 @@ with encryption as
 		
 		insert into xtcasAuthorities (
 			Username,
-			Authority
+			Authority,
+			KeyText
 		) values (
 			@Username,
-			@UserGroup
+			@UserGroup,
+			@KeyText
 		)
 
 		select @KeyLong = @@identity

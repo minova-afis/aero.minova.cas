@@ -1,7 +1,9 @@
 alter procedure dbo.xpcasInsertUsers (
 	@KeyLong int output,
 	@Username nvarchar(50),
-	@Password nvarchar(100)
+	@Password nvarchar(100),
+	@Description nvarchar(50),
+	@KeyText nvarchar(50) = null
 )
 with encryption as
 	if (exists(select * from xtcasUsers
@@ -20,10 +22,20 @@ with encryption as
 
 	insert into xtcasUsers (
 		Username,
-		Password
+		Password,
+		Description,
+		KeyText,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@Username,
-		@Password
+		@Password,
+		@Description,
+		@KeyText,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

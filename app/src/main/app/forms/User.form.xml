@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="LDAPUser" title="@xtcasUser" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<form icon="LDAPUser" title="@xtcasUser.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
 	<index-view id="IndexView" source="xvcasUserIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number/>
 		</column>
 		<column name="KeyText" text="@xtcasUser.KeyText">
-			<text length="10"/>
+			<text length="50"/>
 		</column>
 		<column name="UserSecurityToken" text="@xtcasUser.UserSecurityToken">
 			<text length="50"/>

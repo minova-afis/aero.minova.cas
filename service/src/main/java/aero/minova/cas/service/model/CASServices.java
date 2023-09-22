@@ -1,55 +1,50 @@
 package aero.minova.cas.service.model;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
 @Table(name = "xtcasCASServices")
-public class CASServices {
-
-	@Id
-	@NotNull
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "KeyLong")
-	public int keylong;
+public class CASServices extends DataEntity {
 
 	@NotNull
-	@Size(max = 50)
-	@Column(name = "KeyText")
-	public String keytext;
-
-	@NotNull
-	@Size(max = 50)
-	@Column(name = "ServiceURL")
-	public String serviceurl;
+	@Size(max = 250)
+	@Column(name = "ServiceURL", length = 250)
+	public String serviceUrl;
 
 	@NotNull
 	@Column(name = "Port")
 	public int port;
 
-	@NotNull
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "ServiceMessageReceiverLoginTypeKey", nullable = true)
+	public ServiceMessageReceiverLoginType receiverLoginType;
+
 	@Size(max = 50)
-	@Column(name = "LastUser")
-	public String lastuser = "CAS_JPA";
+	@Column(name = "Username", length = 50)
+	public String username;
 
-	@NotNull
-	@Column(name = "LastDate")
-	public Timestamp lastdate = Timestamp.from(Instant.now());
+	@Size(max = 50)
+	@Column(name = "Password", length = 50)
+	public String password;
 
-	@NotNull
-	@Column(name = "LastAction")
-	public int lastaction = 1;
+	@Size(max = 50)
+	@Column(name = "ClientID", length = 50)
+	public String clientId;
 
+	@Size(max = 50)
+	@Column(name = "ClientSecret", length = 50)
+	public String clientSecret;
+
+	@Size(max = 50)
+	@Column(name = "TokenURL", length = 50)
+	public String tokenURL;
 }

@@ -14,6 +14,7 @@ import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.PingResponse;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
 
 @RestController
 public class CommunicationController {
@@ -30,9 +31,12 @@ public class CommunicationController {
 	@Autowired
 	CustomLogger customLogger;
 
+	@Autowired
+	public SystemDatabase database;
+
 	/**
 	 * Hiermit kann geprüft werden, ob die Kommunikation mit und die Anmeldung an den CAS funktioniert.
-	 * 
+	 *
 	 * @return PingResponse Diese Antwort signalisiert, dass es funktioniert hat.
 	 */
 	@GetMapping(value = "ping", produces = "application/json")
@@ -46,14 +50,14 @@ public class CommunicationController {
 		try {
 			securityService.loadAllPrivileges();
 		} catch (Exception e) {
-			customLogger.logError("Erorr while trying to load privileges!", e);
+			customLogger.logError("Error while trying to load privileges!", e);
 			throw new RuntimeException(e);
 		}
 	}
 
 	/**
 	 * Empfängt das Signal von der Web-Oberfläche und übersetzt es in die Setup-Table. Kehrt auf die Hauptseite zurück, wenn das Setup durchgelaufen ist.
-	 * 
+	 *
 	 * @throws Exception
 	 *             Wenn beim Setup ein Fehler auftritt, zum Beispiel, wenn eine Prozedur fehlerhaft war.
 	 */

@@ -124,6 +124,42 @@ Läuft das CAS lokal in einem Docker-Container,
 kann in der Docker-GUI über einen Klick auf den betroffenen Container das Log angeschaut werden.
 Dort ist es auch eine Wortsuche möglich.
 
+
+### SQLServerException: Ungültiger Objektname "xtcasServiceMessageReceiverLoginType"
+
+Ist ab Version 12.65.9 gefixed.
+
+Falls die Version, in der der Fehler auftritt, unbedingt verwendet werden muss, kann folgendes getan werden:
+Das CAS braucht die fehlende Tabelle schon beim Start. 
+
+1. In den application.properties folgendes setzen: spring.jpa.hibernate.ddl-auto=update
+2. CAS starten und warten bis es einmal ganz hoch gefahren ist.
+3. CAS stoppen.
+4. Property setzen: spring.jpa.hibernate.ddl-auto=none
+5. Folgende Query in DB ausführen:
+
+```
+declare @drop NVARCHAR(MAX) = N'';
+
+SELECT @drop += N'
+  ALTER TABLE ' + QUOTENAME(s.name) + N'.'
+  + QUOTENAME(t.name) + N' DROP CONSTRAINT '
+  + QUOTENAME(c.name) + ';'
+FROM sys.objects AS c
+INNER JOIN sys.tables AS t
+ON c.parent_object_id = t.[object_id]
+INNER JOIN sys.schemas AS s 
+ON t.[schema_id] = s.[schema_id]
+WHERE c.[type] IN ('F')
+and t.name like '%xtcas%'
+ORDER BY c.[type];
+
+EXEC sp_executesql @drop;
+```
+
+6. CAS starten und das Setup ganz normal ausführen.
+
+
 ## ClassNotFoundException - Jar von Abhängigkeit fehlt.
 
 ### Es wurde ein App-Projekt mit flaschen Release eingebunden.
@@ -180,6 +216,20 @@ in diesem Fall sollte man alle Abhängigkeiten auf den neuesten Stand bringen.
 `<arguments>-cp "lib/*" aero.minova.core.application.system.CoreApplicationSystemApplication</arguments>`:
 In diesem Fall muss der Pfad aktualisiert werden:
 `<arguments>-cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>`
+
+### com.microsoft.sqlserver.jdbc.SQLServerException: Parameter @ProcedureName was not defined for stored procedure spMinovaCheckProcedure
+
+Aus Gründen wird das cas.app-Projekt nicht zuerst ausgeführt. 
+Dieses Projekt MUSS aber immer als erstes Projekt installiert werden, da in diesem auch die Prozeduren stecken, welche überprüfen, ob es Einträge in der tVersion10 für benötigte Prozeudren/Views gibt.
+
+Um zu Überprüfen, welche Abhängigkeit für diesen Fehler sorgt, kann man nach und nach die Abhängigkeiten aus der POM löschen und damit das Testen etwas schneller geht, kann man, statt immer wieder den setup-Befehl auszuführen, folgenden Maven Befel in der Shell im betroffenen Projekt ausführen: 
+*mvn depgraph:graph -DshowDuplicates -DshowConflicts*
+
+Durch diesen wird in dem Projekt eine dependency-graph.dot erstellt, welche man öffnen kann und im Online-Tool https://dreampuf.github.io/GraphvizOnline/#digraph  den Graph visualisieren kann.
+Hier muss man nur darauf schauen, ob der Knoten data.schema mit einem Pfeil (egal ob rot oder schwarz) auf cas.app zeigt.
+Falls es keinen solchen Pfeil gibt, müssen weitere Abhängigkeiten ausprobiert werden.
+
+Ist die Abhängigkeit gefunden, sollte in dieser die data.schema.app-Abhängigkeit aktualisiert werden und auch darauf geachtet werden, dass keine zirkulären Abhängigkeiten existieren.
 
 ## NoSuchBeanException
 
@@ -281,9 +331,9 @@ sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid
 ```
 
 ==== Lösung
-Bei der Konfiguration von `aero_minova_database_url` den Parameter `encrypt` auf `false` setzen, z.B.:
+Bei der Konfiguration von `spring.datasource.url` den Parameter `encrypt` auf `false` setzen, z.B.:
 ```
-aero_minova_database_url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
+spring.datasource.url=<jdbc:sqlserver://host.docker.internal;encrypt=false;databaseName=test>
 ```
 
 ## Port already in use

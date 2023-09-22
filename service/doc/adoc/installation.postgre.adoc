@@ -14,11 +14,9 @@ Da Postgresql RowCount als Funktion verwendet, wird eine andere Methode zum Zusa
 
 Die application.properties müssen desweiteren mit folgenden Properties geändert werden:
 
-* spring.jooq.sql-dialect=POSTGRESQL
-* aero_minova_database_url=jdbc:postgresql://URLZurDatenbank/DatenbankName
 * spring.datasource.url=jdbc:postgresql://URLZurDatenbank/DatenbankName
-* spring.datasource.username=UsernameVonPostgreDatenbank
-* spring.datasource.password=PasswortDesBenutzersDerPostgreDatenbank
+* spring.datasource.username=UsernameVonPostgresDatenbank
+* spring.datasource.password=PasswortDesBenutzersDerPostgresDatenbank
 
 JOOQ ist selbst in der Lage den richtigen Dialekt zum Interpretieren der Query zu ermitteln.
 

@@ -15,12 +15,12 @@ public class UserGroup extends DataEntity {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "UserCode")
-	public String usercode;
+	@Column(name = "UserCode", length = 50)
+	public String userCode;
 
 	@NotNull
 	@Size(max = 250)
-	@Column(name = "SecurityToken")
-	public String securitytoken;
+	@Column(name = "SecurityToken", length = 250)
+	public String securityToken;
 
 }

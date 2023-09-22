@@ -2,13 +2,14 @@ package aero.minova.cas.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import aero.minova.cas.BaseTest;
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
@@ -24,6 +27,7 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
+import aero.minova.cas.sql.SystemDatabase;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
@@ -34,14 +38,22 @@ class XSqlProcedureControllerTest extends BaseTest {
 	@Autowired
 	Gson gson;
 
+	@Autowired
+	SystemDatabase systemDatabase;
+
+	@Test
+	void checkAutoCommitDisabled() throws SQLException {
+		// Autocommit muss per Default ausgeschaltet sein
+		assertTrue(!systemDatabase.getConnection().getAutoCommit());
+	}
+
 	@Test
 	void testFillInDependencies() {
 
-		Type xSqlProcedureResultType = new TypeToken<ArrayList<XSqlProcedureResult>>() {
-		}.getType();
+		Type xSqlProcedureResultType = new TypeToken<ArrayList<XSqlProcedureResult>>() {}.getType();
 		final List<XSqlProcedureResult> xSqlProcedureResults = gson.fromJson(new Scanner(getClass()//
-						.getClassLoader()//
-						.getResourceAsStream("xprocedureExample.json"), "UTF-8")//
+				.getClassLoader()//
+				.getResourceAsStream("xprocedureExample.json"), "UTF-8")//
 						.useDelimiter("\\A")//
 						.next()//
 				, xSqlProcedureResultType);
@@ -147,8 +159,7 @@ class XSqlProcedureControllerTest extends BaseTest {
 		results.add(xRes);
 		List<XSqlProcedureResult> testres = testSubject.findxSqlResultSetByName("Test Test", results);
 
-		assertThat(testres)
-				.hasSize(2);
+		assertThat(testres).hasSize(2);
 	}
 
 	@Test

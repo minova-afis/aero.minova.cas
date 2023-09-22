@@ -15,28 +15,30 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.service.AuthorizationService;
 
 @SpringBootTest(classes = CoreApplicationSystemApplication.class)
 @ActiveProfiles("test")
 @WithMockUser(username = "admin", password = "rqgzxTf71EAx8chvchMi", authorities = { "admin" }) // Wichtig ist "authorities" statt "roles" zu nutzen, da die
 																								// Authority ansonsten "ROLE_admin" heißt
-@Sql({ "/xvcasUserSecurity.sql" }) // Die View muss erstellt/eingespielt werden. In diesem Fall ohne LastAction-Filter, da die LastAction-Spalte beim Erstellen
-									// über JPA nicht gesetzt wird
+@Sql({ "/xvcasUserSecurityForTest.sql" }) // Die View muss erstellt/eingespielt werden. In diesem Fall ohne LastAction-Filter, da die LastAction-Spalte beim
+											// Erstellen
+// über JPA nicht gesetzt wird
 class SQLViewControllerTest {
 
 	@Autowired
 	SqlViewController testSubject;
 
 	@Autowired
-	AuthorizationController authorizationController;
+	AuthorizationService authorizationService;
 
 	@Test
 	@DisplayName("Methode getIndexView() testen")
 	void getIndexView() throws Exception {
 
 		// Recht und Admin-Nutzer erstellen
-		authorizationController.findOrCreateUserPrivilege("xvcasUserSecurity");
-		authorizationController.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
+		authorizationService.findOrCreateUserPrivilege("xvcasUserSecurity");
+		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
 
 		// Tabelle für Index-Anfrage erstellen
 		Table indexView = new Table();

@@ -12,8 +12,12 @@ import lombok.Data;
 @Table(name = "xtcasUserPrivilege")
 public class UserPrivilege extends DataEntity {
 
+	@Size(max = 50)
+	@Column(name = "Description", length = 50)
+	public String description;
+
 	@Size(max = 100)
-	@Column(name = "TransactionChecker")
+	@Column(name = "TransactionChecker", length = 100)
 	public String transactionchecker;
 
 }

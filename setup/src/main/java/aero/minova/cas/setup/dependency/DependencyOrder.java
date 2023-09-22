@@ -1,8 +1,16 @@
 package aero.minova.cas.setup.dependency;
 
+import aero.minova.cas.setup.dependency.model.Dependency;
+import aero.minova.cas.setup.dependency.model.DependencyGraph;
 import com.google.gson.Gson;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.cycle.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.EdgeReversedGraph;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +19,7 @@ import java.util.Set;
 
 public class DependencyOrder {
 	private DependencyOrder() {
-
+		throw new IllegalStateException(DependencyOrder.class.getSimpleName());
 	}
 
 	/**
@@ -24,89 +32,104 @@ public class DependencyOrder {
 	 *             Dabei müssen Konflikte der Abhängigkeiten in dem Dokument vorhanden sein,
 	 *             da sonst in dem Dokument für ein Modul nicht alle transitiven Abhängigkeiten stehen.
 	 *             Das eigentliche Modul, für das die Installtions-Reihenfolge bestimmt wird,
-	 * 	           wird nicht mit ausgegeben.
+	 *             wird nicht mit ausgegeben.
 	 * @return Liste der Abhängigkeit aufsteigend nach der Installations-Reihenfolge sortiert.
 	 */
 	public static List<String> determineDependencyOrder(String json) {
-		try {
-			final List<Dependency> dependencies = new Gson().fromJson(json, DependencyGraph.class)
-					.getDependencies();
-			final Map<String, Set<String>> dependencyMapping = new HashMap<>();
-			dependencies.forEach(d -> {
-				final String from = standardizeId(d.getFrom());
-				final String to = standardizeId(d.getTo());
-				if (!dependencyMapping.containsKey(from)) {
-					dependencyMapping.put(from, new HashSet<>());
-				}
-				dependencyMapping.get(from).add(to);
-			});
-			final List<String> dependencyOrder = extractReadyDependencies(dependencyMapping);
-			while (!dependencyMapping.isEmpty()) {
-				final String nextDependency = getNextDependency(dependencyMapping);
-				removeDependency(dependencyMapping, nextDependency);
-				if (!"aero.minova.app.build".equals(nextDependency)) {
-					dependencyOrder.add(nextDependency);
-				}
-			}
-			// Das Modul entfernen, für welche die Abhängigkeiten bestimmt werden.
-			dependencyOrder.remove(dependencyOrder.size() - 1);
-			return dependencyOrder;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		Map<String, Set<String>> dependencyRelations = extractDependencyRelationsFromJson(json);
+
+		Graph<String, DefaultEdge> directedGraph = convertRelationsToDirectedGraph(dependencyRelations);
+
+		checkForCycles(directedGraph);
+
+		directedGraph.removeVertex("aero.minova.app.build");
+
+		List<String> dependencyOrder = orderDependencies(directedGraph);
+
+		stripOffThirdPartyDependencies(dependencyOrder);
+
+		// Das Modul entfernen, für welche die Abhängigkeiten bestimmt werden.
+		dependencyOrder.remove(dependencyOrder.size() - 1);
+		return dependencyOrder;
 	}
 
-	/**
-	 * Entfernt Abhängigkeiten aus der Liste,
-	 * welche nur Abhängigkeiten enthalten,
-	 * die ihrerseits keine Abhängigkeiten haben.
-	 *
-	 * @param dependencyMapping Mapping von Modulen zu ihren Abhängigkeiten.
-	 * @return Die entfernten Abhängigkeiten.
-	 */
-	private static List<String> extractReadyDependencies(Map<String, Set<String>> dependencyMapping) {
-		final List<String> readyDependencies = new ArrayList<>();
-		dependencyMapping.values().forEach(e -> {
-			e.forEach(i -> {
-				if (!dependencyMapping.containsKey(i) //
-						&& !readyDependencies.contains(i) //
-						&& !"aero.minova.app.build".equals(i)) {
-					readyDependencies.add(i);
-				}
+	private static List<String> orderDependencies(Graph<String, DefaultEdge> graph) {
+		List<String> orderedDependencies = new ArrayList<>(graph.vertexSet().size());
+
+		while (!graph.vertexSet().isEmpty()) {
+			List<String> dependenciesWithoutFurtherDependencies = findVerticesWithoutIncomingEdges(graph);
+
+			if (dependenciesWithoutFurtherDependencies.isEmpty())
+				throw new RuntimeException("INTERNAL: Cyclic link?");
+			Collections.sort(dependenciesWithoutFurtherDependencies);
+			orderedDependencies.addAll(dependenciesWithoutFurtherDependencies);
+			graph.removeAllVertices(dependenciesWithoutFurtherDependencies);
+		}
+		return orderedDependencies;
+	}
+
+	private static List<String> findVerticesWithoutIncomingEdges(Graph<String, DefaultEdge> graph) {
+		List<String> verticesWithoutIncomingEdges = new ArrayList<>();
+
+		Set<String> vertices = graph.vertexSet();
+		for (String vertex : vertices) {
+			if (graph.incomingEdgesOf(vertex).isEmpty()) {
+				verticesWithoutIncomingEdges.add(vertex);
+			}
+		}
+
+		return verticesWithoutIncomingEdges;
+	}
+
+	private static boolean checkForCycles(Graph<String, DefaultEdge> graph) {
+		CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(graph);
+
+		boolean cyclesDetected = cycleDetector.detectCycles();
+		if (cyclesDetected) {
+			throw new RuntimeException("Cycles within following vertices detected: " + String.join(", ", cycleDetector.findCycles()));
+		}
+		return cyclesDetected;
+	}
+
+	private static Graph<String, DefaultEdge> convertRelationsToDirectedGraph(Map<String, Set<String>> dependencyRelations) {
+		final Graph<String, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+
+		for (Map.Entry<String, Set<String>> entry : dependencyRelations.entrySet()) {
+			graph.addVertex(entry.getKey());
+			entry.getValue().forEach(value -> {
+				graph.addVertex(value);
+				graph.addEdge(entry.getKey(), value);
 			});
+		}
+
+		return new EdgeReversedGraph<>(graph);
+	}
+
+	private static void stripOffThirdPartyDependencies(List<String> dependencyOrder) {
+		List<String> removableKeys = dependencyOrder.stream()
+			.filter(DependencyOrder::isThirdPartyDependency)
+			.toList();
+		
+		dependencyOrder.removeAll(removableKeys);
+	}
+
+	private static boolean isThirdPartyDependency(String dependency) {
+		return !dependency.contains(".minova.");
+	}
+
+	private static Map<String, Set<String>> extractDependencyRelationsFromJson(String json) {
+		final List<Dependency> dependencies = new Gson().fromJson(json, DependencyGraph.class)
+				.getDependencies();
+
+		final Map<String, Set<String>> dependencyMapping = new HashMap<>();
+		dependencies.forEach(d -> {
+			final String from = standardizeId(d.getFrom());
+			final String to = standardizeId(d.getTo());
+
+			dependencyMapping.putIfAbsent(from, new HashSet<>());
+			dependencyMapping.get(from).add(to);
 		});
-		for (String readyDepdenency : readyDependencies) {
-			dependencyMapping.values().forEach(e -> e.remove(readyDepdenency));
-		}
-		dependencyMapping.values().forEach(e -> e.remove("aero.minova.app.build"));
-		return readyDependencies;
-	}
-
-	/**
-	 * Entfernt eine Abhängigkeit aus der Map vollständig.
-	 *
-	 * @param dependencyMapping Mapping von Modulen zu ihren Abhängigkeiten.
-	 * @param dependency Das Modul, welches entfernt werden soll.
-	 */
-	private static void removeDependency(Map<String, Set<String>> dependencyMapping, String dependency) {
-		dependencyMapping.remove(dependency);
-		dependencyMapping.values().forEach(d -> d.remove(dependency));
-	}
-
-	/**
-	 * Bestimmt die nächste Abhängigkeit,
-	 * die ihrerseits keine Abhängigkeit enthält.
-	 *
-	 * @param dependencyMapping Mapping von Modulen zu ihren Abhängigkeiten.
-	 * @return Die nächste freihe Abhängigkeit.
-	 */
-	private static String getNextDependency(Map<String, Set<String>> dependencyMapping) {
-		for (String dependency : dependencyMapping.keySet()) {
-			if (dependencyMapping.get(dependency).isEmpty()) {
-				return dependency;
-			}
-		}
-		throw new IllegalArgumentException("Dependency circle found: " + dependencyMapping);
+		return dependencyMapping;
 	}
 
 	/**

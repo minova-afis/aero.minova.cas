@@ -14,10 +14,16 @@ with encryption as
 
 	insert into xtcasUserPrivilege (
 		KeyText,
-		Description
+		Description,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@KeyText,
-		@Description
+		@Description,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

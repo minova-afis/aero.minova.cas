@@ -25,7 +25,10 @@ with encryption as
 	set KeyText = @KeyText,
 		Description = @Description,
 		UserCode = @UserCode,
-		SecurityToken = @SecurityToken
+		SecurityToken = @SecurityToken,
+		LastAction = 2,
+		LastDate = getDate(),
+		LastUser = dbo.xfCasUser()
 	where KeyLong = @KeyLong
 	
 

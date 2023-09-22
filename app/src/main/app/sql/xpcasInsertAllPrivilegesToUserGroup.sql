@@ -2,27 +2,30 @@ alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
 	@UserGroup nvarchar(50),
 	@SecurityToken nvarchar(10)
 ) with encryption as
+
+    declare @LastUser nvarchar(10) = 'cas.setup',
+    @LastDate datetime = getDate()
+
     if not exists (select * from xtcasUserPrivilege where KeyText = 'setup')
     begin
-        insert into xtcasUserPrivilege (KeyText) values ('setup')
+        insert into xtcasUserPrivilege (KeyText,LastUser, LastDate) values ('setup', @LastUser, @LastDate)
     end
 
-    insert into xtcasUserPrivilege (
-        KeyText, LastAction)
-    select r.SPECIFIC_NAME, 1
+    insert into xtcasUserPrivilege (KeyText, LastAction, LastUser, LastDate)
+    select r.SPECIFIC_NAME, 1, @LastUser, @LastDate
     from INFORMATION_SCHEMA.ROUTINES r
     left join xtcasUserPrivilege p on p.KeyText = r.SPECIFIC_NAME
     where p.KeyLong is null
 
-    insert into xtCasUserPrivilege (KeyText, LastAction)
-    select t.TABLE_NAME, 1
+    insert into xtCasUserPrivilege (KeyText, LastAction, LastUser, LastDate)
+    select t.TABLE_NAME, 1, @LastUser, @LastDate
     from INFORMATION_SCHEMA.TABLES t
     left join xtcasUserPrivilege p on p.KeyText = t.TABLE_NAME
     where p.KeyText is null
 
     if not exists (select * from xtcasUserGroup where KeyText = @UserGroup)
     begin
-        insert into xtcasUserGroup (KeyText,SecurityToken, LastUser) VALUES (@UserGroup, '#' + @SecurityToken, 1)
+        insert into xtcasUserGroup (KeyText,SecurityToken, LastAction, LastUser, LastDate) VALUES (@UserGroup, '#' + @SecurityToken, 1, @LastUser, @LastDate)
     end
 
 
@@ -50,7 +53,7 @@ alter procedure dbo.xpcasInsertAllPrivilegesToUserGroup (
 
         if not exists (select * from xtcasLuUserPrivilegeUserGroup where UserPrivilegeKey = @UserPrivilegeKey and UserGroupKey=@UserGroupKey)
             begin
-            insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey,UserGroupKey, LastAction) values (@UserPrivilegeKey, @UserGroupKey, 1)
+            insert into xtcasLuUserPrivilegeUserGroup (UserPrivilegeKey,UserGroupKey, RowLevelSecurity, LastAction, LastUser, LastDate) values (@UserPrivilegeKey, @UserGroupKey, 0, 1, @LastUser, @LastDate)
             end
 
         fetch NEXT from temp_cursor into @UserPrivilegeKey

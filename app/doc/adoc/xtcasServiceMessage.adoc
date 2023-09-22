@@ -16,6 +16,15 @@ Datentyp: integer (identity) not null +
 // end::column.KeyLong[]
 
 
+==== KeyText
+
+Datentyp: nvarchar(50) +
+
+// tag::column.KeyText[]
+
+// end::column.KeyText[]
+
+
 ==== CASServiceKey
 
 Datentyp: integer not null +
@@ -90,3 +99,13 @@ Default: `1` +
 // tag::column.LastAction[]
 
 // end::column.LastAction[]
+
+
+==== Failed
+
+Datentyp: bit not null +
+Default: `0` +
+
+// tag::column.Failed[]
+
+// end::column.Failed[]

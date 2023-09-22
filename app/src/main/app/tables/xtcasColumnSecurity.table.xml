@@ -3,6 +3,9 @@
 	<column name="KeyLong">
 		<integer nullable="false" identity="true"/>
 	</column>
+	<column name="KeyText">
+		<varchar length="50" nullable="true"/>
+	</column>
 	<column name="TableName">
 		<!-- längster Name bei uns: 47 -->
 		<varchar length="50" nullable="false"/>

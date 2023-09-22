@@ -100,9 +100,23 @@
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
+		<appender name="infoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/infoLog.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${APP_LOG_ROOT}/archived/infoLog%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
 	
 	<logger name="ErrorLogger" level="trace" additivity="false">
 		<appender-ref ref="errorLog"/>
+		<appender-ref ref="console"/>
 	</logger>
 	<logger name="PrivilegeLogger" level="trace" additivity="false">
 		<appender-ref ref="privilegeLog"/>
@@ -123,6 +137,10 @@
 	</logger>
 	<logger name="QueueServiceLog" level="trace" additivity="false">
 		<appender-ref ref="queueServiceLog"/>
+		<appender-ref ref="console"/>
+	</logger>
+	<logger name="InfoLog" level="trace" additivity="false">
+		<appender-ref ref="infoLog"/>
 		<appender-ref ref="console"/>
 	</logger>
 	

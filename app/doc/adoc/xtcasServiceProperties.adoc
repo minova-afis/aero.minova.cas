@@ -25,6 +25,15 @@ Datentyp: nvarchar(128) not null +
 // end::column.Service[]
 
 
+==== KeyText
+
+Datentyp: nvarchar(50) +
+
+// tag::column.KeyText[]
+
+// end::column.KeyText[]
+
+
 ==== Property
 
 Datentyp: nvarchar(256) not null +

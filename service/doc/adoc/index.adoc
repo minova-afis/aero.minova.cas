@@ -11,6 +11,7 @@
 * xref:./servicenotifier.adoc#[ServiceNotifier Service]
 * xref:queueservice.adoc#[Queue Service]
 * xref:sql-integrated-security.adoc#[Integrierte Sicherheit für SQL-Anmeldung]
+* xref:./../md/application_mdi.md#[Erstellen benutzerspezifischer MDIs]
 
 
 == Sicherheitskonzept

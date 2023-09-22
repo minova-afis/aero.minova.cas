@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Dependabot beobachtet nun neben Maven POMs und GitHub Actions auch Container Images
+* Eweitern der Doku zur benutzerspezifischen MDI-Erstellung.
 
 ## [12.66.1] -- 2023-09-21
 * final für dataSource in SecurityConfig von Service wiederhergestellt.

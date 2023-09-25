@@ -18,12 +18,18 @@ with encryption as
 		KeyText,
 		Description,
 		UserCode,
-		SecurityToken
+		SecurityToken,
+		LastAction,
+		LastDate,
+		LastUser
 	) values (
 		@KeyText,
 		@Description,
 		@UserCode,
-		@SecurityToken
+		@SecurityToken,
+		1,
+		getDate(),
+		dbo.xfCasUser()
 	)
 
 	select @KeyLong = @@identity

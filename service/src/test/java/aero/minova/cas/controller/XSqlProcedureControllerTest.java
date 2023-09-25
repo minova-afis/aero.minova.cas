@@ -2,8 +2,10 @@ package aero.minova.cas.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import aero.minova.cas.BaseTest;
 import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
@@ -24,6 +27,7 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
+import aero.minova.cas.sql.SystemDatabase;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
 @SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
@@ -33,6 +37,15 @@ class XSqlProcedureControllerTest extends BaseTest {
 
 	@Autowired
 	Gson gson;
+
+	@Autowired
+	SystemDatabase systemDatabase;
+
+	@Test
+	void checkAutoCommitDisabled() throws SQLException {
+		// Autocommit muss per Default ausgeschaltet sein
+		assertTrue(!systemDatabase.getConnection().getAutoCommit());
+	}
 
 	@Test
 	void testFillInDependencies() {

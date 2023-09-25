@@ -16,13 +16,13 @@ Datentyp: integer (identity) not null +
 // end::column.KeyLong[]
 
 
-==== ID
+==== KeyText
 
-Datentyp: nvarchar(100) +
+Datentyp: nvarchar(50) +
 
-// tag::column.ID[]
+// tag::column.KeyText[]
 
-// end::column.ID[]
+// end::column.KeyText[]
 
 
 ==== Icon

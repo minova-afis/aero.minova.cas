@@ -1,8 +1,7 @@
 = Extensions bzw. Erweiterungen
 
-Es können beim CAS Erweiterungen, sowohl für Prozeduren, als auch für Views registiert werden.
-Wenn eine Prozedur oder View aufgerufen wird,
-wird im CAS geprüft, ob es eine passende Erweiterung dazu gibt.
+Es können beim CAS Erweiterungen, sowohl für Prozeduren, als auch für Views und ganze Transaktionen registiert werden.
+Wenn eine Prozedur oder View aufgerufen wird, wird im CAS geprüft, ob es eine passende Erweiterung dazu gibt.
 Ist dies der Fall wird diese aufgerufen, anstatt den SQL-Server zu befragen.
 
 Es reicht in der Regel nicht, wenn die Erweiterung im Klassenpfad ist,
@@ -27,14 +26,13 @@ Diese Abhängigkeiten stehen somit während des Bauens zur Verfügung,
 werden aber beim Deployment durch das CAS bereitgestellt.
 Als Abhängigkeit sind für Erweiterungen nur das CAS und andere CAS-Erweiterungen erlaubt.
 
-Erweiterungen dürfen keine eigene Abhängigkeit mitbringen,
+Erweiterungen dürfen keine eigene Abhängigkeit (Jars) mitbringen,
 da dies zu Versionen-Konflikten führen wird
 (dieselbe Jar ist in den Lib-Ordner des CAS-Dienstes in unterschiedlichen Version mehrmals vorhanden).
 
 Somit stellt das CAS alle Abhängigkeiten wie JPA und ähnliches zur Verfügung.
 Fehlt eine Abhängigkeit, muss diese in den CAS-Dienst selber mit eingebaut werden.
-Allerdings, ist es eine Einzelfall-Entscheidung,
-ob diese zusätzliche Abhängigkeit übernommen wird oder nicht.
+Allerdings, ist es eine Einzelfall-Entscheidung, ob diese zusätzliche Abhängigkeit übernommen wird oder nicht.
 Damit wird verhindert, dass das CAS unnötig aufgebläht wird.
 
 ```xml
@@ -54,12 +52,6 @@ Damit wird verhindert, dass das CAS unnötig aufgebläht wird.
 		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>aero.minova</groupId>
-			<artifactId>cas.setup</artifactId>
-			<version>12.57.0</version>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>aero.minova</groupId>
 			<artifactId>cas.service</artifactId>
@@ -85,10 +77,6 @@ Alle registierten Erweiterungen werden beim 'Setup' automatisch als Recht mit in
 Denn bevor eine Extension ausgeführt wird, werden die Rollen des Nutzers, der die Anfrage stellt, erst einmal darauf überprüft,
 ob das entsprechende Recht für die Extension vorhanden ist.
 
-== Standard-Prozedur-Erweiterungen
-* xpcasEncodePassword: nimmt eine Tabelle mit den Spalten `password` und `encodedPassword` entgegen.
-Die Passwörter in der Spalte `password` werden kodiert und das Ergebnis in `encodedPassword` abgelegt.
-Die so gehashten Passwörter können in `xtcasUsers.Password` verwendet werden.
 
 
 == Step by step - Anleitung
@@ -123,15 +111,6 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 								<exclude>*sources.jar</exclude>
 							</excludes>
 						</resource>
-						<resource>
-							<directory>${project.build.directory}/../../extension/target/libs</directory>
-							<includes>
-								<include>*.jar</include>
-							</includes>
-							<excludes>
-								<exclude>*sources.jar</exclude>
-							</excludes>
-						</resource>
 					</resources>
 				</configuration>
 			</execution>
@@ -141,8 +120,16 @@ Falls das link:https://github.com/minova-afis/aero.minova.default.template.app[T
 ----
 
 Durch das Hinzufügen dieses Plugins, wird beim Bauen des gesamten Projektes die Jar der Extension bereits in das richtige Verzeichnis geschoben. 
+Weitere Abhängigkeiten sollen **NICHT** mit in den extensions-Ordner kopiert werden. 
+Die einzige Ausnahme ist, wenn eine Abhängigkeit benötigt wird, die nicht vom CAS bereitgestellt wird. 
+Das sollte aber nur selten vorkommen.
+In diesem Fall soll auch nur genau die entsprechende Jar kopiert werden.
 
-3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
+Benötigt eine Extension eine Abhängigkeit auf eine andere Extension, so muss diese dependency sowohl in die extension.pom (damit die Extension gebaut werden kann) als auch in die app.pom (damit die entsprechende jar mitausgeliefert wird) eingetragen werden! 
+Hier muss darauf geachtet werden, dass die gleichen Versionen genutzt werden.
+Ausgeliefert wird, was in der app.pom steht.
+
+3. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController, den XSqlProcedureController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
 
 4. Eine Setup-Methode erstellen, welche mit der @PostConstruct-Annotation gekennziechet ist. Diese muss die *'registerExtension'*-Methode des vorher importierten Controllers aufrufen und damit die Extension mit dem dazugehörigen Keyword registrieren. 
 
@@ -161,6 +148,9 @@ public class ExampleController {
 
 	@Autowired
 	SqlProcedureController sqlProcedureController;
+	
+	@Autowired
+	XSqlProcedureController xsqlProcedureController;
 
 	@Autowired
 	SqlViewController sqlViewController;
@@ -174,11 +164,20 @@ public class ExampleController {
 		sqlProcedureController.registerExtension("xpcasBeispiel", this::doSomething);
 	}
 
-	private void doSomething(Table inputTable) {
+	private ResponseEntity<SqlProcedureResult> doSomething(Table inputTable) {
 		customLogger.logUserRequest("Hier wird etwas gemacht!");
+		return ResponseEntity//
+				.ok()//
+				.contentType(MediaType.APPLICATION_JSON)//
+				.body(new SqlProcedureResult());
 	}
 
 ----
+
+== Besonderheiten
+
+* Die Extensions sind selbst dafür verwantwortlich, im Fehlerfall Rollbacks durchzuführen.
+* Gibt eine Extension null zurück, so wird die Prozedur/Transaktion zusätzlich als SQL ausgeführt
 
 == How to Debug
 

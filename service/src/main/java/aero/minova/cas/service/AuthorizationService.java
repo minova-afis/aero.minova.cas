@@ -1,11 +1,11 @@
-package aero.minova.cas.controller;
+package aero.minova.cas.service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
@@ -18,8 +18,8 @@ import aero.minova.cas.service.repository.UserGroupRepository;
 import aero.minova.cas.service.repository.UserPrivilegeRepository;
 import aero.minova.cas.service.repository.UsersRepository;
 
-@Controller
-public class AuthorizationController {
+@Service
+public class AuthorizationService {
 
 	@Autowired
 	AuthoritiesRepository authoritiesRepository;
@@ -58,7 +58,7 @@ public class AuthorizationController {
 	 * @param privilegeName
 	 */
 	public UserPrivilege findOrCreateUserPrivilege(String privilegeName) {
-		return userPrivilegeRepository.findByKeyText(privilegeName).orElseGet(() -> {
+		return userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).orElseGet(() -> {
 			UserPrivilege privilege = new UserPrivilege();
 			privilege.setKeyText(privilegeName);
 			userPrivilegeRepository.save(privilege);
@@ -82,7 +82,7 @@ public class AuthorizationController {
 
 		findOrCreateAuthority(username, "admin");
 
-		for (UserPrivilege priv : userPrivilegeRepository.findAllWithLastActionGreaterZero()) {
+		for (UserPrivilege priv : userPrivilegeRepository.findByLastActionGreaterThan(0)) {
 			findOrCreateLuUserPrivilegeUserGroup(userGroup, priv);
 		}
 	}
@@ -96,7 +96,7 @@ public class AuthorizationController {
 	 * @return
 	 */
 	public Users findOrCreateUser(String username, String encryptedPassword) {
-		return usersRepository.findByUsername(username).orElseGet(() -> {
+		return usersRepository.findByUsernameAndLastActionGreaterThan(username, 0).orElseGet(() -> {
 			Users newUser = new Users();
 			newUser.setUsername(username);
 			newUser.setPassword(encryptedPassword);
@@ -115,7 +115,7 @@ public class AuthorizationController {
 	 *             wenn der Benutzer nicht existiert
 	 */
 	public Users updateUserPassword(String username, String encryptedPassword) throws NoSuchElementException {
-		Users user = usersRepository.findByUsername(username).get();
+		Users user = usersRepository.findByUsernameAndLastActionGreaterThan(username, 0).get();
 
 		user.setPassword(encryptedPassword);
 		usersRepository.save(user);
@@ -131,19 +131,19 @@ public class AuthorizationController {
 	 * @return
 	 */
 	public UserGroup createOrUpdateUserGroup(String keyText, String securitytoken) {
-		UserGroup usergroup = userGroupRepository.findByKeyText(keyText).orElseGet(() -> {
+		UserGroup usergroup = userGroupRepository.findByKeyTextAndLastActionGreaterThan(keyText, 0).orElseGet(() -> {
 			UserGroup group = new UserGroup();
-			group.setSecuritytoken("");
+			group.setSecurityToken("");
 			group.setKeyText(keyText);
 			return group;
 		});
 
 		// Neue Tokens anhängen, dabei aber keine duplikate erstellen
 		List<String> newTokens = Arrays.asList(securitytoken.split("#"));
-		List<String> oldTokens = Arrays.asList(usergroup.getSecuritytoken().split("#"));
+		List<String> oldTokens = Arrays.asList(usergroup.getSecurityToken().split("#"));
 		for (String newToken : newTokens) {
 			if (!oldTokens.contains(newToken)) {
-				usergroup.setSecuritytoken(usergroup.getSecuritytoken() + "#" + newToken);
+				usergroup.setSecurityToken(usergroup.getSecurityToken() + "#" + newToken);
 			}
 		}
 
@@ -159,7 +159,7 @@ public class AuthorizationController {
 	 * @return
 	 */
 	public Authorities findOrCreateAuthority(String username, String authorityName) {
-		return authoritiesRepository.findByUsernameAndAuthority(username, authorityName).orElseGet(() -> {
+		return authoritiesRepository.findByUsernameAndAuthorityAndLastActionGreaterThan(username, authorityName, 0).orElseGet(() -> {
 			Authorities authority = new Authorities();
 			authority.setUsername(username);
 			authority.setAuthority(authorityName);
@@ -175,12 +175,13 @@ public class AuthorizationController {
 	 * @param priv
 	 */
 	public LuUserPrivilegeUserGroup findOrCreateLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
-		return luUserPrivilegeUserGroupRepository.findByPrivilegeAndGroup(priv.getKeyLong(), userGroup.getKeyLong()).orElseGet(() -> {
-			LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
-			lu.setUsergroup(userGroup);
-			lu.setUserprivilege(priv);
-			luUserPrivilegeUserGroupRepository.save(lu);
-			return lu;
-		});
+		return luUserPrivilegeUserGroupRepository
+				.findByUserPrivilegeKeyLongAndUserGroupKeyLongAndLastActionGreaterThan(priv.getKeyLong(), userGroup.getKeyLong(), 0).orElseGet(() -> {
+					LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
+					lu.setUserGroup(userGroup);
+					lu.setUserPrivilege(priv);
+					luUserPrivilegeUserGroupRepository.save(lu);
+					return lu;
+				});
 	}
 }

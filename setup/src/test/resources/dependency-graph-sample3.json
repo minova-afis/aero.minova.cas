@@ -1,0 +1,4648 @@
+{
+  "graphName" : "min.workingtime",
+  "artifacts" : [ {
+    "id" : "aero.minova:cas.app:jar:app",
+    "numericId" : 1,
+    "groupId" : "aero.minova",
+    "artifactId" : "cas.app",
+    "version" : "12.54.4",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:app.i18n:jar:app",
+    "numericId" : 2,
+    "groupId" : "aero.minova",
+    "artifactId" : "app.i18n",
+    "version" : "12.11.1",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:app.build:jar",
+    "numericId" : 3,
+    "groupId" : "aero.minova",
+    "artifactId" : "app.build",
+    "version" : "12.2.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.minova:min.workingtime:jar",
+    "numericId" : 4,
+    "groupId" : "com.minova",
+    "artifactId" : "min.workingtime",
+    "version" : "12.10.0-SNAPSHOT",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:data.schema.app:jar:app",
+    "numericId" : 5,
+    "groupId" : "aero.minova",
+    "artifactId" : "data.schema.app",
+    "version" : "12.5.8",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:workingtime:jar:app",
+    "numericId" : 6,
+    "groupId" : "aero.minova",
+    "artifactId" : "workingtime",
+    "version" : "12.4.0",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:data.service:jar:app",
+    "numericId" : 7,
+    "groupId" : "aero.minova",
+    "artifactId" : "data.service",
+    "version" : "12.0.7",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:serviceobject:jar:app",
+    "numericId" : 8,
+    "groupId" : "aero.minova",
+    "artifactId" : "serviceobject",
+    "version" : "12.0.4",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:serviceprovider:jar:app",
+    "numericId" : 9,
+    "groupId" : "aero.minova",
+    "artifactId" : "serviceprovider",
+    "version" : "12.0.8",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:contact:jar:app",
+    "numericId" : 10,
+    "groupId" : "aero.minova",
+    "artifactId" : "contact",
+    "version" : "12.0.4",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:servicecontract:jar:app",
+    "numericId" : 11,
+    "groupId" : "aero.minova",
+    "artifactId" : "servicecontract",
+    "version" : "12.0.31",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:journal:jar:app",
+    "numericId" : 12,
+    "groupId" : "aero.minova",
+    "artifactId" : "journal",
+    "version" : "12.0.18",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:orderreceiver:jar:app",
+    "numericId" : 13,
+    "groupId" : "aero.minova",
+    "artifactId" : "orderreceiver",
+    "version" : "12.0.10",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:workingtime.github.app:jar:app",
+    "numericId" : 14,
+    "groupId" : "aero.minova",
+    "artifactId" : "workingtime.github.app",
+    "version" : "12.2.4",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:cas.service:jar",
+    "numericId" : 15,
+    "groupId" : "aero.minova",
+    "artifactId" : "cas.service",
+    "version" : "12.60.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:cas.api:jar",
+    "numericId" : 16,
+    "groupId" : "aero.minova",
+    "artifactId" : "cas.api",
+    "version" : "12.59.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.projectlombok:lombok:jar",
+    "numericId" : 17,
+    "groupId" : "org.projectlombok",
+    "artifactId" : "lombok",
+    "version" : "1.18.26",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-mail:jar",
+    "numericId" : 18,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-mail",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericId" : 19,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-context-support:jar",
+    "numericId" : 20,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-context-support",
+    "version" : "6.0.6",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.eclipse.angus:jakarta.mail:jar",
+    "numericId" : 21,
+    "groupId" : "org.eclipse.angus",
+    "artifactId" : "jakarta.mail",
+    "version" : "1.0.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "jakarta.activation:jakarta.activation-api:jar",
+    "numericId" : 22,
+    "groupId" : "jakarta.activation",
+    "artifactId" : "jakarta.activation-api",
+    "version" : "2.1.0",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.eclipse.angus:angus-activation:jar",
+    "numericId" : 23,
+    "groupId" : "org.eclipse.angus",
+    "artifactId" : "angus-activation",
+    "version" : "1.0.0",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.google.code.gson:gson:jar",
+    "numericId" : 24,
+    "groupId" : "com.google.code.gson",
+    "artifactId" : "gson",
+    "version" : "2.9.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-aop:jar",
+    "numericId" : 25,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-aop",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-aop:jar",
+    "numericId" : 26,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-aop",
+    "version" : "6.0.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.aspectj:aspectjweaver:jar",
+    "numericId" : 27,
+    "groupId" : "org.aspectj",
+    "artifactId" : "aspectjweaver",
+    "version" : "1.9.19",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-data-jpa:jar",
+    "numericId" : 28,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-data-jpa",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-jdbc:jar",
+    "numericId" : 29,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-jdbc",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.zaxxer:HikariCP:jar",
+    "numericId" : 30,
+    "groupId" : "com.zaxxer",
+    "artifactId" : "HikariCP",
+    "version" : "5.0.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.slf4j:slf4j-api:jar",
+    "numericId" : 31,
+    "groupId" : "org.slf4j",
+    "artifactId" : "slf4j-api",
+    "version" : "1.7.25",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-jdbc:jar",
+    "numericId" : 32,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-jdbc",
+    "version" : "6.0.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-beans:jar",
+    "numericId" : 33,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-beans",
+    "version" : "6.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-core:jar",
+    "numericId" : 34,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-core",
+    "version" : "6.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-tx:jar",
+    "numericId" : 35,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-tx",
+    "version" : "6.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.hibernate.orm:hibernate-core:jar",
+    "numericId" : 36,
+    "groupId" : "org.hibernate.orm",
+    "artifactId" : "hibernate-core",
+    "version" : "6.1.7.Final",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "jakarta.persistence:jakarta.persistence-api:jar",
+    "numericId" : 37,
+    "groupId" : "jakarta.persistence",
+    "artifactId" : "jakarta.persistence-api",
+    "version" : "3.1.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "jakarta.transaction:jakarta.transaction-api:jar",
+    "numericId" : 38,
+    "groupId" : "jakarta.transaction",
+    "artifactId" : "jakarta.transaction-api",
+    "version" : "2.0.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.jboss.logging:jboss-logging:jar",
+    "numericId" : 39,
+    "groupId" : "org.jboss.logging",
+    "artifactId" : "jboss-logging",
+    "version" : "3.4.3.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.hibernate.common:hibernate-commons-annotations:jar",
+    "numericId" : 40,
+    "groupId" : "org.hibernate.common",
+    "artifactId" : "hibernate-commons-annotations",
+    "version" : "6.0.6.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.jboss:jandex:jar",
+    "numericId" : 41,
+    "groupId" : "org.jboss",
+    "artifactId" : "jandex",
+    "version" : "2.4.2.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.fasterxml:classmate:jar",
+    "numericId" : 42,
+    "groupId" : "com.fasterxml",
+    "artifactId" : "classmate",
+    "version" : "1.5.1",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "net.bytebuddy:byte-buddy:jar",
+    "numericId" : 43,
+    "groupId" : "net.bytebuddy",
+    "artifactId" : "byte-buddy",
+    "version" : "1.12.21",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "jakarta.xml.bind:jakarta.xml.bind-api:jar",
+    "numericId" : 44,
+    "groupId" : "jakarta.xml.bind",
+    "artifactId" : "jakarta.xml.bind-api",
+    "version" : "4.0.0",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.glassfish.jaxb:jaxb-runtime:jar",
+    "numericId" : 45,
+    "groupId" : "org.glassfish.jaxb",
+    "artifactId" : "jaxb-runtime",
+    "version" : "3.0.0-M5",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "jakarta.inject:jakarta.inject-api:jar",
+    "numericId" : 46,
+    "groupId" : "jakarta.inject",
+    "artifactId" : "jakarta.inject-api",
+    "version" : "2.0.0",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.antlr:antlr4-runtime:jar",
+    "numericId" : 47,
+    "groupId" : "org.antlr",
+    "artifactId" : "antlr4-runtime",
+    "version" : "4.10.1",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.data:spring-data-commons:jar",
+    "numericId" : 48,
+    "groupId" : "org.springframework.data",
+    "artifactId" : "spring-data-commons",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.data:spring-data-jpa:jar",
+    "numericId" : 49,
+    "groupId" : "org.springframework.data",
+    "artifactId" : "spring-data-jpa",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-orm:jar",
+    "numericId" : 50,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-orm",
+    "version" : "6.0.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-context:jar",
+    "numericId" : 51,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-context",
+    "version" : "6.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "jakarta.annotation:jakarta.annotation-api:jar",
+    "numericId" : 52,
+    "groupId" : "jakarta.annotation",
+    "artifactId" : "jakarta.annotation-api",
+    "version" : "2.1.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-aspects:jar",
+    "numericId" : 53,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-aspects",
+    "version" : "6.0.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.postgresql:postgresql:jar",
+    "numericId" : 54,
+    "groupId" : "org.postgresql",
+    "artifactId" : "postgresql",
+    "version" : "42.5.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.checkerframework:checker-qual:jar",
+    "numericId" : 55,
+    "groupId" : "org.checkerframework",
+    "artifactId" : "checker-qual",
+    "version" : "3.5.0",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.microsoft.sqlserver:mssql-jdbc:jar",
+    "numericId" : 56,
+    "groupId" : "com.microsoft.sqlserver",
+    "artifactId" : "mssql-jdbc",
+    "version" : "11.2.3.jre17",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "numericId" : 57,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-web",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "numericId" : 58,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-json",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-web:jar",
+    "numericId" : 59,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-web",
+    "version" : "6.0.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericId" : 60,
+    "groupId" : "com.fasterxml.jackson.core",
+    "artifactId" : "jackson-databind",
+    "version" : "2.13.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar",
+    "numericId" : 61,
+    "groupId" : "com.fasterxml.jackson.datatype",
+    "artifactId" : "jackson-datatype-jdk8",
+    "version" : "2.14.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.fasterxml.jackson.core:jackson-core:jar",
+    "numericId" : 62,
+    "groupId" : "com.fasterxml.jackson.core",
+    "artifactId" : "jackson-core",
+    "version" : "2.13.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar",
+    "numericId" : 63,
+    "groupId" : "com.fasterxml.jackson.datatype",
+    "artifactId" : "jackson-datatype-jsr310",
+    "version" : "2.13.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.fasterxml.jackson.module:jackson-module-parameter-names:jar",
+    "numericId" : 64,
+    "groupId" : "com.fasterxml.jackson.module",
+    "artifactId" : "jackson-module-parameter-names",
+    "version" : "2.14.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-tomcat:jar",
+    "numericId" : 65,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-tomcat",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.tomcat.embed:tomcat-embed-core:jar",
+    "numericId" : 66,
+    "groupId" : "org.apache.tomcat.embed",
+    "artifactId" : "tomcat-embed-core",
+    "version" : "10.1.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.tomcat.embed:tomcat-embed-el:jar",
+    "numericId" : 67,
+    "groupId" : "org.apache.tomcat.embed",
+    "artifactId" : "tomcat-embed-el",
+    "version" : "10.1.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.tomcat.embed:tomcat-embed-websocket:jar",
+    "numericId" : 68,
+    "groupId" : "org.apache.tomcat.embed",
+    "artifactId" : "tomcat-embed-websocket",
+    "version" : "10.1.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.micrometer:micrometer-observation:jar",
+    "numericId" : 69,
+    "groupId" : "io.micrometer",
+    "artifactId" : "micrometer-observation",
+    "version" : "1.10.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-webmvc:jar",
+    "numericId" : 70,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-webmvc",
+    "version" : "6.0.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-expression:jar",
+    "numericId" : 71,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-expression",
+    "version" : "6.0.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-thymeleaf:jar",
+    "numericId" : 72,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-thymeleaf",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.thymeleaf:thymeleaf:jar",
+    "numericId" : 73,
+    "groupId" : "org.thymeleaf",
+    "artifactId" : "thymeleaf",
+    "version" : "3.1.1.RELEASE",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.attoparser:attoparser:jar",
+    "numericId" : 74,
+    "groupId" : "org.attoparser",
+    "artifactId" : "attoparser",
+    "version" : "2.0.6.RELEASE",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.unbescape:unbescape:jar",
+    "numericId" : 75,
+    "groupId" : "org.unbescape",
+    "artifactId" : "unbescape",
+    "version" : "1.1.6.RELEASE",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.thymeleaf:thymeleaf-spring6:jar",
+    "numericId" : 76,
+    "groupId" : "org.thymeleaf",
+    "artifactId" : "thymeleaf-spring6",
+    "version" : "3.1.1.RELEASE",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:jar",
+    "numericId" : 77,
+    "groupId" : "org.thymeleaf.extras",
+    "artifactId" : "thymeleaf-extras-springsecurity6",
+    "version" : "3.1.1.RELEASE",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-security:jar",
+    "numericId" : 78,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-security",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.security:spring-security-config:jar",
+    "numericId" : 79,
+    "groupId" : "org.springframework.security",
+    "artifactId" : "spring-security-config",
+    "version" : "6.0.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.security:spring-security-core:jar",
+    "numericId" : 80,
+    "groupId" : "org.springframework.security",
+    "artifactId" : "spring-security-core",
+    "version" : "6.0.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.security:spring-security-web:jar",
+    "numericId" : 81,
+    "groupId" : "org.springframework.security",
+    "artifactId" : "spring-security-web",
+    "version" : "6.0.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-data-ldap:jar",
+    "numericId" : 82,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-data-ldap",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.data:spring-data-ldap:jar",
+    "numericId" : 83,
+    "groupId" : "org.springframework.data",
+    "artifactId" : "spring-data-ldap",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.ldap:spring-ldap-core:jar",
+    "numericId" : 84,
+    "groupId" : "org.springframework.ldap",
+    "artifactId" : "spring-ldap-core",
+    "version" : "3.0.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework:spring-jcl:jar",
+    "numericId" : 85,
+    "groupId" : "org.springframework",
+    "artifactId" : "spring-jcl",
+    "version" : "6.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.security:spring-security-crypto:jar",
+    "numericId" : 86,
+    "groupId" : "org.springframework.security",
+    "artifactId" : "spring-security-crypto",
+    "version" : "6.0.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.security:spring-security-ldap:jar",
+    "numericId" : 87,
+    "groupId" : "org.springframework.security",
+    "artifactId" : "spring-security-ldap",
+    "version" : "6.0.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.mysql:mysql-connector-j:jar",
+    "numericId" : 88,
+    "groupId" : "com.mysql",
+    "artifactId" : "mysql-connector-j",
+    "version" : "8.0.32",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.ws.commons.util:ws-commons-util:jar",
+    "numericId" : 89,
+    "groupId" : "org.apache.ws.commons.util",
+    "artifactId" : "ws-commons-util",
+    "version" : "1.0.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "junit:junit:jar",
+    "numericId" : 90,
+    "groupId" : "junit",
+    "artifactId" : "junit",
+    "version" : "3.8.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.xmlrpc:xmlrpc-common:jar",
+    "numericId" : 91,
+    "groupId" : "org.apache.xmlrpc",
+    "artifactId" : "xmlrpc-common",
+    "version" : "3.1.3",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.xmlrpc:xmlrpc-client:jar",
+    "numericId" : 92,
+    "groupId" : "org.apache.xmlrpc",
+    "artifactId" : "xmlrpc-client",
+    "version" : "3.1.3",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-cache:jar",
+    "numericId" : 93,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-cache",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-actuator:jar",
+    "numericId" : 94,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-actuator",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-actuator:jar",
+    "numericId" : 95,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-actuator",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot:jar",
+    "numericId" : 96,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-actuator-autoconfigure:jar",
+    "numericId" : 97,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-actuator-autoconfigure",
+    "version" : "3.0.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-autoconfigure:jar",
+    "numericId" : 98,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-autoconfigure",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.micrometer:micrometer-commons:jar",
+    "numericId" : 99,
+    "groupId" : "io.micrometer",
+    "artifactId" : "micrometer-commons",
+    "version" : "1.10.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.micrometer:micrometer-core:jar",
+    "numericId" : 100,
+    "groupId" : "io.micrometer",
+    "artifactId" : "micrometer-core",
+    "version" : "1.10.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.hdrhistogram:HdrHistogram:jar",
+    "numericId" : 101,
+    "groupId" : "org.hdrhistogram",
+    "artifactId" : "HdrHistogram",
+    "version" : "2.1.12",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.latencyutils:LatencyUtils:jar",
+    "numericId" : 102,
+    "groupId" : "org.latencyutils",
+    "artifactId" : "LatencyUtils",
+    "version" : "2.0.3",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.micrometer:micrometer-registry-prometheus:jar",
+    "numericId" : 103,
+    "groupId" : "io.micrometer",
+    "artifactId" : "micrometer-registry-prometheus",
+    "version" : "1.10.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.prometheus:simpleclient_tracer_otel:jar",
+    "numericId" : 104,
+    "groupId" : "io.prometheus",
+    "artifactId" : "simpleclient_tracer_otel",
+    "version" : "0.16.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.prometheus:simpleclient_tracer_common:jar",
+    "numericId" : 105,
+    "groupId" : "io.prometheus",
+    "artifactId" : "simpleclient_tracer_common",
+    "version" : "0.16.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.prometheus:simpleclient:jar",
+    "numericId" : 106,
+    "groupId" : "io.prometheus",
+    "artifactId" : "simpleclient",
+    "version" : "0.16.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.prometheus:simpleclient_tracer_otel_agent:jar",
+    "numericId" : 107,
+    "groupId" : "io.prometheus",
+    "artifactId" : "simpleclient_tracer_otel_agent",
+    "version" : "0.16.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.prometheus:simpleclient_common:jar",
+    "numericId" : 108,
+    "groupId" : "io.prometheus",
+    "artifactId" : "simpleclient_common",
+    "version" : "0.16.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.ehcache:ehcache:jar:jakarta",
+    "numericId" : 109,
+    "groupId" : "org.ehcache",
+    "artifactId" : "ehcache",
+    "version" : "3.10.8",
+    "optional" : false,
+    "classifiers" : [ "jakarta" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "javax.cache:cache-api:jar",
+    "numericId" : 110,
+    "groupId" : "javax.cache",
+    "artifactId" : "cache-api",
+    "version" : "1.1.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.sun.activation:jakarta.activation:jar",
+    "numericId" : 111,
+    "groupId" : "com.sun.activation",
+    "artifactId" : "jakarta.activation",
+    "version" : "2.0.0",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.glassfish.jaxb:jaxb-core:jar",
+    "numericId" : 112,
+    "groupId" : "org.glassfish.jaxb",
+    "artifactId" : "jaxb-core",
+    "version" : "3.0.0-M5",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.glassfish.jaxb:txw2:jar",
+    "numericId" : 113,
+    "groupId" : "org.glassfish.jaxb",
+    "artifactId" : "txw2",
+    "version" : "3.0.0-M5",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.sun.istack:istack-commons-runtime:jar",
+    "numericId" : 114,
+    "groupId" : "com.sun.istack",
+    "artifactId" : "istack-commons-runtime",
+    "version" : "4.0.0",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "commons-io:commons-io:jar",
+    "numericId" : 115,
+    "groupId" : "commons-io",
+    "artifactId" : "commons-io",
+    "version" : "2.11.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "numericId" : 116,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "aws-query-protocol",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:protocol-core:jar",
+    "numericId" : 117,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "protocol-core",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:aws-core:jar",
+    "numericId" : 118,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "aws-core",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:sdk-core:jar",
+    "numericId" : 119,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "sdk-core",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:annotations:jar",
+    "numericId" : 120,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "annotations",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericId" : 121,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "http-client-spi",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:utils:jar",
+    "numericId" : 122,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "utils",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "numericId" : 123,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "aws-xml-protocol",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:s3:jar",
+    "numericId" : 124,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "s3",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:arns:jar",
+    "numericId" : 125,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "arns",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:profiles:jar",
+    "numericId" : 126,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "profiles",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:crt-core:jar",
+    "numericId" : 127,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "crt-core",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:metrics-spi:jar",
+    "numericId" : 128,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "metrics-spi",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:endpoints-spi:jar",
+    "numericId" : 129,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "endpoints-spi",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.reactivestreams:reactive-streams:jar",
+    "numericId" : 130,
+    "groupId" : "org.reactivestreams",
+    "artifactId" : "reactive-streams",
+    "version" : "1.0.3",
+    "optional" : false,
+    "scopes" : [ "compile", "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:auth:jar",
+    "numericId" : 131,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "auth",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:regions:jar",
+    "numericId" : 132,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "regions",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:json-utils:jar",
+    "numericId" : 133,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "json-utils",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.eventstream:eventstream:jar",
+    "numericId" : 134,
+    "groupId" : "software.amazon.eventstream",
+    "artifactId" : "eventstream",
+    "version" : "1.0.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:third-party-jackson-core:jar",
+    "numericId" : 135,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "third-party-jackson-core",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:apache-client:jar",
+    "numericId" : 136,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "apache-client",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.httpcomponents:httpclient:jar",
+    "numericId" : 137,
+    "groupId" : "org.apache.httpcomponents",
+    "artifactId" : "httpclient",
+    "version" : "4.5.13",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.httpcomponents:httpcore:jar",
+    "numericId" : 138,
+    "groupId" : "org.apache.httpcomponents",
+    "artifactId" : "httpcore",
+    "version" : "4.4.13",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "commons-logging:commons-logging:jar",
+    "numericId" : 139,
+    "groupId" : "commons-logging",
+    "artifactId" : "commons-logging",
+    "version" : "1.2",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "commons-codec:commons-codec:jar",
+    "numericId" : 140,
+    "groupId" : "commons-codec",
+    "artifactId" : "commons-codec",
+    "version" : "1.15",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "software.amazon.awssdk:netty-nio-client:jar",
+    "numericId" : 141,
+    "groupId" : "software.amazon.awssdk",
+    "artifactId" : "netty-nio-client",
+    "version" : "2.20.50",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-codec-http:jar",
+    "numericId" : 142,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-codec-http",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-common:jar",
+    "numericId" : 143,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-common",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-buffer:jar",
+    "numericId" : 144,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-buffer",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-transport:jar",
+    "numericId" : 145,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-transport",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-codec:jar",
+    "numericId" : 146,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-codec",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-handler:jar",
+    "numericId" : 147,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-handler",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-codec-http2:jar",
+    "numericId" : 148,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-codec-http2",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-resolver:jar",
+    "numericId" : 149,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-resolver",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-transport-native-unix-common:jar",
+    "numericId" : 150,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-transport-native-unix-common",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.netty:netty-transport-classes-epoll:jar",
+    "numericId" : 151,
+    "groupId" : "io.netty",
+    "artifactId" : "netty-transport-classes-epoll",
+    "version" : "4.1.86.Final",
+    "optional" : false,
+    "scopes" : [ "runtime" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.r2dbc:r2dbc-spi:jar",
+    "numericId" : 152,
+    "groupId" : "io.r2dbc",
+    "artifactId" : "r2dbc-spi",
+    "version" : "0.9.1.RELEASE",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.jooq:jooq:jar",
+    "numericId" : 153,
+    "groupId" : "org.jooq",
+    "artifactId" : "jooq",
+    "version" : "3.17.10",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.jooq:jooq-meta:jar",
+    "numericId" : 154,
+    "groupId" : "org.jooq",
+    "artifactId" : "jooq-meta",
+    "version" : "3.17.10",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.jooq:jooq-codegen:jar",
+    "numericId" : 155,
+    "groupId" : "org.jooq",
+    "artifactId" : "jooq-codegen",
+    "version" : "3.17.10",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "javax.validation:validation-api:jar",
+    "numericId" : 156,
+    "groupId" : "javax.validation",
+    "artifactId" : "validation-api",
+    "version" : "2.0.1.Final",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.assertj:assertj-core:jar",
+    "numericId" : 157,
+    "groupId" : "org.assertj",
+    "artifactId" : "assertj-core",
+    "version" : "3.24.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:workingtime.github.extension:jar",
+    "numericId" : 158,
+    "groupId" : "aero.minova",
+    "artifactId" : "workingtime.github.extension",
+    "version" : "12.2.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:github:jar",
+    "numericId" : 159,
+    "groupId" : "aero.minova",
+    "artifactId" : "github",
+    "version" : "12.1.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "io.swagger:swagger-annotations:jar",
+    "numericId" : 160,
+    "groupId" : "io.swagger",
+    "artifactId" : "swagger-annotations",
+    "version" : "1.5.22",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.fasterxml.jackson.core:jackson-annotations:jar",
+    "numericId" : 161,
+    "groupId" : "com.fasterxml.jackson.core",
+    "artifactId" : "jackson-annotations",
+    "version" : "2.13.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.openapitools:jackson-databind-nullable:jar",
+    "numericId" : 162,
+    "groupId" : "org.openapitools",
+    "artifactId" : "jackson-databind-nullable",
+    "version" : "0.2.3",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "com.google.code.findbugs:jsr305:jar",
+    "numericId" : 163,
+    "groupId" : "com.google.code.findbugs",
+    "artifactId" : "jsr305",
+    "version" : "3.0.2",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:cas.app:jar",
+    "numericId" : 164,
+    "groupId" : "aero.minova",
+    "artifactId" : "cas.app",
+    "version" : "12.59.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:trac.app:jar:app",
+    "numericId" : 165,
+    "groupId" : "aero.minova",
+    "artifactId" : "trac.app",
+    "version" : "12.0.1",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:trac.extension:jar",
+    "numericId" : 166,
+    "groupId" : "aero.minova",
+    "artifactId" : "trac.extension",
+    "version" : "12.0.1",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "ch.qos.logback:logback-classic:jar",
+    "numericId" : 167,
+    "groupId" : "ch.qos.logback",
+    "artifactId" : "logback-classic",
+    "version" : "1.4.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "ch.qos.logback:logback-core:jar",
+    "numericId" : 168,
+    "groupId" : "ch.qos.logback",
+    "artifactId" : "logback-core",
+    "version" : "1.4.5",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.springframework.boot:spring-boot-starter-logging:jar",
+    "numericId" : 169,
+    "groupId" : "org.springframework.boot",
+    "artifactId" : "spring-boot-starter-logging",
+    "version" : "3.0.4",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.logging.log4j:log4j-to-slf4j:jar",
+    "numericId" : 170,
+    "groupId" : "org.apache.logging.log4j",
+    "artifactId" : "log4j-to-slf4j",
+    "version" : "2.19.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apache.logging.log4j:log4j-api:jar",
+    "numericId" : 171,
+    "groupId" : "org.apache.logging.log4j",
+    "artifactId" : "log4j-api",
+    "version" : "2.19.0",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.slf4j:jul-to-slf4j:jar",
+    "numericId" : 172,
+    "groupId" : "org.slf4j",
+    "artifactId" : "jul-to-slf4j",
+    "version" : "2.0.6",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.yaml:snakeyaml:jar",
+    "numericId" : 173,
+    "groupId" : "org.yaml",
+    "artifactId" : "snakeyaml",
+    "version" : "1.33",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.ehcache:ehcache:jar",
+    "numericId" : 174,
+    "groupId" : "org.ehcache",
+    "artifactId" : "ehcache",
+    "version" : "3.9.7",
+    "optional" : false,
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "aero.minova:sis.spellingcontrol.app:jar:app",
+    "numericId" : 175,
+    "groupId" : "aero.minova",
+    "artifactId" : "sis.spellingcontrol.app",
+    "version" : "12.0.0",
+    "optional" : false,
+    "classifiers" : [ "app" ],
+    "scopes" : [ "compile" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.junit.jupiter:junit-jupiter-api:jar",
+    "numericId" : 176,
+    "groupId" : "org.junit.jupiter",
+    "artifactId" : "junit-jupiter-api",
+    "version" : "5.9.3",
+    "optional" : false,
+    "scopes" : [ "test" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.opentest4j:opentest4j:jar",
+    "numericId" : 177,
+    "groupId" : "org.opentest4j",
+    "artifactId" : "opentest4j",
+    "version" : "1.2.0",
+    "optional" : false,
+    "scopes" : [ "test" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.junit.platform:junit-platform-commons:jar",
+    "numericId" : 178,
+    "groupId" : "org.junit.platform",
+    "artifactId" : "junit-platform-commons",
+    "version" : "1.9.3",
+    "optional" : false,
+    "scopes" : [ "test" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.apiguardian:apiguardian-api:jar",
+    "numericId" : 179,
+    "groupId" : "org.apiguardian",
+    "artifactId" : "apiguardian-api",
+    "version" : "1.1.2",
+    "optional" : false,
+    "scopes" : [ "test" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.junit.jupiter:junit-jupiter-params:jar",
+    "numericId" : 180,
+    "groupId" : "org.junit.jupiter",
+    "artifactId" : "junit-jupiter-params",
+    "version" : "5.9.3",
+    "optional" : false,
+    "scopes" : [ "test" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.junit.platform:junit-platform-engine:jar",
+    "numericId" : 181,
+    "groupId" : "org.junit.platform",
+    "artifactId" : "junit-platform-engine",
+    "version" : "1.9.3",
+    "optional" : false,
+    "scopes" : [ "test" ],
+    "types" : [ "jar" ]
+  }, {
+    "id" : "org.junit.jupiter:junit-jupiter-engine:jar",
+    "numericId" : 182,
+    "groupId" : "org.junit.jupiter",
+    "artifactId" : "junit-jupiter-engine",
+    "version" : "5.9.3",
+    "optional" : false,
+    "scopes" : [ "test" ],
+    "types" : [ "jar" ]
+  } ],
+  "dependencies" : [ {
+    "from" : "aero.minova:cas.app:jar:app",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 0,
+    "numericTo" : 1,
+    "version" : "12.11.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:cas.app:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 0,
+    "numericTo" : 2,
+    "version" : "0.2.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:cas.app:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 0,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:data.schema.app:jar:app",
+    "to" : "aero.minova:cas.app:jar:app",
+    "numericFrom" : 4,
+    "numericTo" : 0,
+    "version" : "12.44.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:data.schema.app:jar:app",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 4,
+    "numericTo" : 1,
+    "version" : "12.7.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:data.schema.app:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 4,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 4,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:app.i18n:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 1,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 1,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 4,
+    "version" : "12.8.11",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:data.service:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 6,
+    "numericTo" : 4,
+    "version" : "0.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:data.service:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 6,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:data.service:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 6,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:serviceobject:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 7,
+    "numericTo" : 4,
+    "version" : "0.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:serviceobject:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 7,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:serviceobject:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 7,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:serviceprovider:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 8,
+    "numericTo" : 4,
+    "version" : "0.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:contact:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 9,
+    "numericTo" : 4,
+    "version" : "0.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:contact:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 9,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:serviceprovider:jar:app",
+    "to" : "aero.minova:contact:jar:app",
+    "numericFrom" : 8,
+    "numericTo" : 9,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:serviceprovider:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 8,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:serviceprovider:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 8,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:servicecontract:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 10,
+    "numericTo" : 4,
+    "version" : "0.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:servicecontract:jar:app",
+    "to" : "aero.minova:contact:jar:app",
+    "numericFrom" : 10,
+    "numericTo" : 9,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:servicecontract:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 10,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:servicecontract:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 10,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:journal:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 11,
+    "numericTo" : 4,
+    "version" : "0.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:journal:jar:app",
+    "to" : "aero.minova:contact:jar:app",
+    "numericFrom" : 11,
+    "numericTo" : 9,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:journal:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 11,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:journal:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 11,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:orderreceiver:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 12,
+    "numericTo" : 4,
+    "version" : "0.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:orderreceiver:jar:app",
+    "to" : "aero.minova:contact:jar:app",
+    "numericFrom" : 12,
+    "numericTo" : 9,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:orderreceiver:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 12,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:orderreceiver:jar:app",
+    "numericFrom" : 5,
+    "numericTo" : 12,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:workingtime:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 5,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:workingtime:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 5,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:workingtime.github.app:jar:app",
+    "to" : "aero.minova:workingtime:jar:app",
+    "numericFrom" : 13,
+    "numericTo" : 5,
+    "version" : "12.3.4",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime.github.app:jar:app",
+    "to" : "aero.minova:cas.app:jar:app",
+    "numericFrom" : 13,
+    "numericTo" : 0,
+    "version" : "12.60.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime.github.app:jar:app",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 13,
+    "numericTo" : 1,
+    "version" : "12.14.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:workingtime.github.app:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 13,
+    "numericTo" : 2,
+    "version" : "12.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:workingtime.github.app:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 13,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "aero.minova:cas.api:jar",
+    "numericFrom" : 14,
+    "numericTo" : 15,
+    "version" : "12.60.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.projectlombok:lombok:jar",
+    "numericFrom" : 14,
+    "numericTo" : 16,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-mail:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 17,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-mail:jar",
+    "to" : "org.springframework:spring-context-support:jar",
+    "numericFrom" : 17,
+    "numericTo" : 19,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.eclipse.angus:jakarta.mail:jar",
+    "to" : "jakarta.activation:jakarta.activation-api:jar",
+    "numericFrom" : 20,
+    "numericTo" : 21,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.eclipse.angus:angus-activation:jar",
+    "to" : "jakarta.activation:jakarta.activation-api:jar",
+    "numericFrom" : 22,
+    "numericTo" : 21,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.eclipse.angus:jakarta.mail:jar",
+    "to" : "org.eclipse.angus:angus-activation:jar",
+    "numericFrom" : 20,
+    "numericTo" : 22,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-mail:jar",
+    "to" : "org.eclipse.angus:jakarta.mail:jar",
+    "numericFrom" : 17,
+    "numericTo" : 20,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-mail:jar",
+    "numericFrom" : 14,
+    "numericTo" : 17,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "com.google.code.gson:gson:jar",
+    "numericFrom" : 14,
+    "numericTo" : 23,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-aop:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 24,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-aop:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 24,
+    "numericTo" : 25,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-aop:jar",
+    "to" : "org.aspectj:aspectjweaver:jar",
+    "numericFrom" : 24,
+    "numericTo" : 26,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-data-jpa:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-aop:jar",
+    "numericFrom" : 27,
+    "numericTo" : 24,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-jdbc:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 28,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.zaxxer:HikariCP:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 29,
+    "numericTo" : 30,
+    "version" : "2.0.0-alpha1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-jdbc:jar",
+    "to" : "com.zaxxer:HikariCP:jar",
+    "numericFrom" : 28,
+    "numericTo" : 29,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-jdbc:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 31,
+    "numericTo" : 32,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-jdbc:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 31,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-jdbc:jar",
+    "to" : "org.springframework:spring-tx:jar",
+    "numericFrom" : 31,
+    "numericTo" : 34,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-jdbc:jar",
+    "to" : "org.springframework:spring-jdbc:jar",
+    "numericFrom" : 28,
+    "numericTo" : 31,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-data-jpa:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-jdbc:jar",
+    "numericFrom" : 27,
+    "numericTo" : 28,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "jakarta.persistence:jakarta.persistence-api:jar",
+    "numericFrom" : 35,
+    "numericTo" : 36,
+    "version" : "3.0.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "jakarta.transaction:jakarta.transaction-api:jar",
+    "numericFrom" : 35,
+    "numericTo" : 37,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "org.jboss.logging:jboss-logging:jar",
+    "numericFrom" : 35,
+    "numericTo" : 38,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "org.hibernate.common:hibernate-commons-annotations:jar",
+    "numericFrom" : 35,
+    "numericTo" : 39,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "org.jboss:jandex:jar",
+    "numericFrom" : 35,
+    "numericTo" : 40,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "com.fasterxml:classmate:jar",
+    "numericFrom" : 35,
+    "numericTo" : 41,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "net.bytebuddy:byte-buddy:jar",
+    "numericFrom" : 35,
+    "numericTo" : 42,
+    "version" : "1.12.18",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "jakarta.xml.bind:jakarta.xml.bind-api:jar",
+    "numericFrom" : 35,
+    "numericTo" : 43,
+    "version" : "3.0.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "org.glassfish.jaxb:jaxb-runtime:jar",
+    "numericFrom" : 35,
+    "numericTo" : 44,
+    "version" : "3.0.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "jakarta.inject:jakarta.inject-api:jar",
+    "numericFrom" : 35,
+    "numericTo" : 45,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.hibernate.orm:hibernate-core:jar",
+    "to" : "org.antlr:antlr4-runtime:jar",
+    "numericFrom" : 35,
+    "numericTo" : 46,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-data-jpa:jar",
+    "to" : "org.hibernate.orm:hibernate-core:jar",
+    "numericFrom" : 27,
+    "numericTo" : 35,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.data:spring-data-commons:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 47,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-commons:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 47,
+    "numericTo" : 32,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-commons:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 47,
+    "numericTo" : 30,
+    "version" : "2.0.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.springframework.data:spring-data-commons:jar",
+    "numericFrom" : 48,
+    "numericTo" : 47,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-orm:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 49,
+    "numericTo" : 32,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-orm:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 49,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-orm:jar",
+    "to" : "org.springframework:spring-jdbc:jar",
+    "numericFrom" : 49,
+    "numericTo" : 31,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework:spring-orm:jar",
+    "to" : "org.springframework:spring-tx:jar",
+    "numericFrom" : 49,
+    "numericTo" : 34,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.springframework:spring-orm:jar",
+    "numericFrom" : 48,
+    "numericTo" : 49,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 48,
+    "numericTo" : 50,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 48,
+    "numericTo" : 25,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.springframework:spring-tx:jar",
+    "numericFrom" : 48,
+    "numericTo" : 34,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 48,
+    "numericTo" : 32,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 48,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "jakarta.annotation:jakarta.annotation-api:jar",
+    "numericFrom" : 48,
+    "numericTo" : 51,
+    "version" : "2.0.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-jpa:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 48,
+    "numericTo" : 30,
+    "version" : "2.0.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-data-jpa:jar",
+    "to" : "org.springframework.data:spring-data-jpa:jar",
+    "numericFrom" : 27,
+    "numericTo" : 48,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-aspects:jar",
+    "to" : "org.aspectj:aspectjweaver:jar",
+    "numericFrom" : 52,
+    "numericTo" : 26,
+    "version" : "1.9.9.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-data-jpa:jar",
+    "to" : "org.springframework:spring-aspects:jar",
+    "numericFrom" : 27,
+    "numericTo" : 52,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-data-jpa:jar",
+    "numericFrom" : 14,
+    "numericTo" : 27,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.postgresql:postgresql:jar",
+    "to" : "org.checkerframework:checker-qual:jar",
+    "numericFrom" : 53,
+    "numericTo" : 54,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.postgresql:postgresql:jar",
+    "numericFrom" : 14,
+    "numericTo" : 53,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "com.microsoft.sqlserver:mssql-jdbc:jar",
+    "numericFrom" : 14,
+    "numericTo" : 55,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 56,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 57,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "to" : "org.springframework:spring-web:jar",
+    "numericFrom" : 57,
+    "numericTo" : 58,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericFrom" : 57,
+    "numericTo" : 59,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-core:jar",
+    "numericFrom" : 60,
+    "numericTo" : 61,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericFrom" : 60,
+    "numericTo" : 59,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "to" : "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar",
+    "numericFrom" : 57,
+    "numericTo" : 60,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "to" : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar",
+    "numericFrom" : 57,
+    "numericTo" : 62,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.fasterxml.jackson.module:jackson-module-parameter-names:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-core:jar",
+    "numericFrom" : 63,
+    "numericTo" : 61,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.fasterxml.jackson.module:jackson-module-parameter-names:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericFrom" : 63,
+    "numericTo" : 59,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "to" : "com.fasterxml.jackson.module:jackson-module-parameter-names:jar",
+    "numericFrom" : 57,
+    "numericTo" : 63,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-json:jar",
+    "numericFrom" : 56,
+    "numericTo" : 57,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-tomcat:jar",
+    "to" : "jakarta.annotation:jakarta.annotation-api:jar",
+    "numericFrom" : 64,
+    "numericTo" : 51,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-tomcat:jar",
+    "to" : "org.apache.tomcat.embed:tomcat-embed-core:jar",
+    "numericFrom" : 64,
+    "numericTo" : 65,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-tomcat:jar",
+    "to" : "org.apache.tomcat.embed:tomcat-embed-el:jar",
+    "numericFrom" : 64,
+    "numericTo" : 66,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.apache.tomcat.embed:tomcat-embed-websocket:jar",
+    "to" : "org.apache.tomcat.embed:tomcat-embed-core:jar",
+    "numericFrom" : 67,
+    "numericTo" : 65,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-tomcat:jar",
+    "to" : "org.apache.tomcat.embed:tomcat-embed-websocket:jar",
+    "numericFrom" : 64,
+    "numericTo" : 67,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-tomcat:jar",
+    "numericFrom" : 56,
+    "numericTo" : 64,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-web:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 58,
+    "numericTo" : 32,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-web:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 58,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-web:jar",
+    "to" : "io.micrometer:micrometer-observation:jar",
+    "numericFrom" : 58,
+    "numericTo" : 68,
+    "version" : "1.10.4",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "to" : "org.springframework:spring-web:jar",
+    "numericFrom" : 56,
+    "numericTo" : 58,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-webmvc:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 69,
+    "numericTo" : 25,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework:spring-webmvc:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 69,
+    "numericTo" : 32,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-webmvc:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 69,
+    "numericTo" : 50,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-webmvc:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 69,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-expression:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 70,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-webmvc:jar",
+    "to" : "org.springframework:spring-expression:jar",
+    "numericFrom" : 69,
+    "numericTo" : 70,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-webmvc:jar",
+    "to" : "org.springframework:spring-web:jar",
+    "numericFrom" : 69,
+    "numericTo" : 58,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "to" : "org.springframework:spring-webmvc:jar",
+    "numericFrom" : 56,
+    "numericTo" : 69,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "numericFrom" : 14,
+    "numericTo" : 56,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-thymeleaf:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 71,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.thymeleaf:thymeleaf:jar",
+    "to" : "org.attoparser:attoparser:jar",
+    "numericFrom" : 72,
+    "numericTo" : 73,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.thymeleaf:thymeleaf:jar",
+    "to" : "org.unbescape:unbescape:jar",
+    "numericFrom" : 72,
+    "numericTo" : 74,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.thymeleaf:thymeleaf:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 72,
+    "numericTo" : 30,
+    "version" : "2.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.thymeleaf:thymeleaf-spring6:jar",
+    "to" : "org.thymeleaf:thymeleaf:jar",
+    "numericFrom" : 75,
+    "numericTo" : 72,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.thymeleaf:thymeleaf-spring6:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 75,
+    "numericTo" : 30,
+    "version" : "2.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-thymeleaf:jar",
+    "to" : "org.thymeleaf:thymeleaf-spring6:jar",
+    "numericFrom" : 71,
+    "numericTo" : 75,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-thymeleaf:jar",
+    "numericFrom" : 14,
+    "numericTo" : 71,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:jar",
+    "to" : "org.thymeleaf:thymeleaf-spring6:jar",
+    "numericFrom" : 76,
+    "numericTo" : 75,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 76,
+    "numericTo" : 30,
+    "version" : "2.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.thymeleaf.extras:thymeleaf-extras-springsecurity6:jar",
+    "numericFrom" : 14,
+    "numericTo" : 76,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-security:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 77,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-aop:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 25,
+    "numericTo" : 32,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-aop:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 25,
+    "numericTo" : 33,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-security:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 77,
+    "numericTo" : 25,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.security:spring-security-config:jar",
+    "to" : "org.springframework.security:spring-security-core:jar",
+    "numericFrom" : 78,
+    "numericTo" : 79,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.security:spring-security-config:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 78,
+    "numericTo" : 25,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-config:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 78,
+    "numericTo" : 32,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-config:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 78,
+    "numericTo" : 50,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.security:spring-security-config:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 78,
+    "numericTo" : 33,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-security:jar",
+    "to" : "org.springframework.security:spring-security-config:jar",
+    "numericFrom" : 77,
+    "numericTo" : 78,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.security:spring-security-web:jar",
+    "to" : "org.springframework.security:spring-security-core:jar",
+    "numericFrom" : 80,
+    "numericTo" : 79,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.security:spring-security-web:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 80,
+    "numericTo" : 33,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-web:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 80,
+    "numericTo" : 25,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-web:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 80,
+    "numericTo" : 32,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-web:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 80,
+    "numericTo" : 50,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.security:spring-security-web:jar",
+    "to" : "org.springframework:spring-expression:jar",
+    "numericFrom" : 80,
+    "numericTo" : 70,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-web:jar",
+    "to" : "org.springframework:spring-web:jar",
+    "numericFrom" : 80,
+    "numericTo" : 58,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-security:jar",
+    "to" : "org.springframework.security:spring-security-web:jar",
+    "numericFrom" : 77,
+    "numericTo" : 80,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-security:jar",
+    "numericFrom" : 14,
+    "numericTo" : 77,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-data-ldap:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 81,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-ldap:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 82,
+    "numericTo" : 50,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-ldap:jar",
+    "to" : "org.springframework:spring-tx:jar",
+    "numericFrom" : 82,
+    "numericTo" : 34,
+    "version" : "6.0.7",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.data:spring-data-ldap:jar",
+    "to" : "org.springframework.ldap:spring-ldap-core:jar",
+    "numericFrom" : 82,
+    "numericTo" : 83,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.data:spring-data-ldap:jar",
+    "to" : "org.springframework.data:spring-data-commons:jar",
+    "numericFrom" : 82,
+    "numericTo" : 47,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.data:spring-data-ldap:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 82,
+    "numericTo" : 30,
+    "version" : "2.0.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-data-ldap:jar",
+    "to" : "org.springframework.data:spring-data-ldap:jar",
+    "numericFrom" : 81,
+    "numericTo" : 82,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-data-ldap:jar",
+    "numericFrom" : 14,
+    "numericTo" : 81,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-core:jar",
+    "to" : "org.springframework:spring-jcl:jar",
+    "numericFrom" : 33,
+    "numericTo" : 84,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.ldap:spring-ldap-core:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 83,
+    "numericTo" : 33,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-beans:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 32,
+    "numericTo" : 33,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.ldap:spring-ldap-core:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 83,
+    "numericTo" : 32,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-tx:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 34,
+    "numericTo" : 32,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework:spring-tx:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 34,
+    "numericTo" : 33,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.ldap:spring-ldap-core:jar",
+    "to" : "org.springframework:spring-tx:jar",
+    "numericFrom" : 83,
+    "numericTo" : 34,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.ldap:spring-ldap-core:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 83,
+    "numericTo" : 30,
+    "version" : "1.7.36",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.ldap:spring-ldap-core:jar",
+    "numericFrom" : 14,
+    "numericTo" : 83,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.security:spring-security-core:jar",
+    "to" : "org.springframework.security:spring-security-crypto:jar",
+    "numericFrom" : 79,
+    "numericTo" : 85,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.security:spring-security-core:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 79,
+    "numericTo" : 25,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-core:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 79,
+    "numericTo" : 32,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-core:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 79,
+    "numericTo" : 50,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.security:spring-security-core:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 79,
+    "numericTo" : 33,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-core:jar",
+    "to" : "org.springframework:spring-expression:jar",
+    "numericFrom" : 79,
+    "numericTo" : 70,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-core:jar",
+    "to" : "io.micrometer:micrometer-observation:jar",
+    "numericFrom" : 79,
+    "numericTo" : 68,
+    "version" : "1.10.4",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-ldap:jar",
+    "to" : "org.springframework.security:spring-security-core:jar",
+    "numericFrom" : 86,
+    "numericTo" : 79,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.security:spring-security-ldap:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 86,
+    "numericTo" : 32,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-context:jar",
+    "to" : "org.springframework:spring-aop:jar",
+    "numericFrom" : 50,
+    "numericTo" : 25,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-context:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 50,
+    "numericTo" : 32,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-context:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 50,
+    "numericTo" : 33,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-context:jar",
+    "to" : "org.springframework:spring-expression:jar",
+    "numericFrom" : 50,
+    "numericTo" : 70,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-ldap:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 86,
+    "numericTo" : 50,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.security:spring-security-ldap:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 86,
+    "numericTo" : 33,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-ldap:jar",
+    "to" : "org.springframework:spring-tx:jar",
+    "numericFrom" : 86,
+    "numericTo" : 34,
+    "version" : "6.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.security:spring-security-ldap:jar",
+    "to" : "org.springframework.ldap:spring-ldap-core:jar",
+    "numericFrom" : 86,
+    "numericTo" : 83,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.security:spring-security-ldap:jar",
+    "numericFrom" : 14,
+    "numericTo" : 86,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "com.mysql:mysql-connector-j:jar",
+    "numericFrom" : 14,
+    "numericTo" : 87,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.apache.ws.commons.util:ws-commons-util:jar",
+    "to" : "junit:junit:jar",
+    "numericFrom" : 88,
+    "numericTo" : 89,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.apache.ws.commons.util:ws-commons-util:jar",
+    "numericFrom" : 14,
+    "numericTo" : 88,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.apache.xmlrpc:xmlrpc-common:jar",
+    "to" : "org.apache.ws.commons.util:ws-commons-util:jar",
+    "numericFrom" : 90,
+    "numericTo" : 88,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.apache.xmlrpc:xmlrpc-client:jar",
+    "to" : "org.apache.xmlrpc:xmlrpc-common:jar",
+    "numericFrom" : 91,
+    "numericTo" : 90,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.apache.xmlrpc:xmlrpc-client:jar",
+    "numericFrom" : 14,
+    "numericTo" : 91,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-cache:jar",
+    "numericFrom" : 14,
+    "numericTo" : 92,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-actuator:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 93,
+    "numericTo" : 18,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-actuator:jar",
+    "to" : "org.springframework.boot:spring-boot:jar",
+    "numericFrom" : 94,
+    "numericTo" : 95,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-actuator-autoconfigure:jar",
+    "to" : "org.springframework.boot:spring-boot-actuator:jar",
+    "numericFrom" : 96,
+    "numericTo" : 94,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-actuator-autoconfigure:jar",
+    "to" : "org.springframework.boot:spring-boot:jar",
+    "numericFrom" : 96,
+    "numericTo" : 95,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-actuator-autoconfigure:jar",
+    "to" : "org.springframework.boot:spring-boot-autoconfigure:jar",
+    "numericFrom" : 96,
+    "numericTo" : 97,
+    "version" : "3.0.5",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-actuator-autoconfigure:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericFrom" : 96,
+    "numericTo" : 59,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-actuator-autoconfigure:jar",
+    "to" : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar",
+    "numericFrom" : 96,
+    "numericTo" : 62,
+    "version" : "2.14.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-actuator:jar",
+    "to" : "org.springframework.boot:spring-boot-actuator-autoconfigure:jar",
+    "numericFrom" : 93,
+    "numericTo" : 96,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.micrometer:micrometer-observation:jar",
+    "to" : "io.micrometer:micrometer-commons:jar",
+    "numericFrom" : 68,
+    "numericTo" : 98,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-actuator:jar",
+    "to" : "io.micrometer:micrometer-observation:jar",
+    "numericFrom" : 93,
+    "numericTo" : 68,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.micrometer:micrometer-core:jar",
+    "to" : "io.micrometer:micrometer-commons:jar",
+    "numericFrom" : 99,
+    "numericTo" : 98,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.micrometer:micrometer-core:jar",
+    "to" : "io.micrometer:micrometer-observation:jar",
+    "numericFrom" : 99,
+    "numericTo" : 68,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.micrometer:micrometer-core:jar",
+    "to" : "org.hdrhistogram:HdrHistogram:jar",
+    "numericFrom" : 99,
+    "numericTo" : 100,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.micrometer:micrometer-core:jar",
+    "to" : "org.latencyutils:LatencyUtils:jar",
+    "numericFrom" : 99,
+    "numericTo" : 101,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-actuator:jar",
+    "to" : "io.micrometer:micrometer-core:jar",
+    "numericFrom" : 93,
+    "numericTo" : 99,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-actuator:jar",
+    "numericFrom" : 14,
+    "numericTo" : 93,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.micrometer:micrometer-registry-prometheus:jar",
+    "to" : "io.micrometer:micrometer-core:jar",
+    "numericFrom" : 102,
+    "numericTo" : 99,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.prometheus:simpleclient_tracer_otel:jar",
+    "to" : "io.prometheus:simpleclient_tracer_common:jar",
+    "numericFrom" : 103,
+    "numericTo" : 104,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.prometheus:simpleclient:jar",
+    "to" : "io.prometheus:simpleclient_tracer_otel:jar",
+    "numericFrom" : 105,
+    "numericTo" : 103,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.prometheus:simpleclient_tracer_otel_agent:jar",
+    "to" : "io.prometheus:simpleclient_tracer_common:jar",
+    "numericFrom" : 106,
+    "numericTo" : 104,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.prometheus:simpleclient:jar",
+    "to" : "io.prometheus:simpleclient_tracer_otel_agent:jar",
+    "numericFrom" : 105,
+    "numericTo" : 106,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.prometheus:simpleclient_common:jar",
+    "to" : "io.prometheus:simpleclient:jar",
+    "numericFrom" : 107,
+    "numericTo" : 105,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.micrometer:micrometer-registry-prometheus:jar",
+    "to" : "io.prometheus:simpleclient_common:jar",
+    "numericFrom" : 102,
+    "numericTo" : 107,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "io.micrometer:micrometer-registry-prometheus:jar",
+    "numericFrom" : 14,
+    "numericTo" : 102,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "jakarta.annotation:jakarta.annotation-api:jar",
+    "numericFrom" : 14,
+    "numericTo" : 51,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "jakarta.xml.bind:jakarta.xml.bind-api:jar",
+    "to" : "jakarta.activation:jakarta.activation-api:jar",
+    "numericFrom" : 43,
+    "numericTo" : 21,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "jakarta.xml.bind:jakarta.xml.bind-api:jar",
+    "numericFrom" : 14,
+    "numericTo" : 43,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "jakarta.persistence:jakarta.persistence-api:jar",
+    "numericFrom" : 14,
+    "numericTo" : 36,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.ehcache:ehcache:jar:jakarta",
+    "to" : "javax.cache:cache-api:jar",
+    "numericFrom" : 108,
+    "numericTo" : 109,
+    "version" : "1.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.ehcache:ehcache:jar:jakarta",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 108,
+    "numericTo" : 30,
+    "version" : "1.7.36",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.glassfish.jaxb:jaxb-runtime:jar",
+    "to" : "com.sun.activation:jakarta.activation:jar",
+    "numericFrom" : 44,
+    "numericTo" : 110,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.glassfish.jaxb:jaxb-core:jar",
+    "to" : "jakarta.xml.bind:jakarta.xml.bind-api:jar",
+    "numericFrom" : 111,
+    "numericTo" : 43,
+    "version" : "3.0.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.glassfish.jaxb:jaxb-core:jar",
+    "to" : "com.sun.activation:jakarta.activation:jar",
+    "numericFrom" : 111,
+    "numericTo" : 110,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.glassfish.jaxb:jaxb-core:jar",
+    "to" : "org.glassfish.jaxb:txw2:jar",
+    "numericFrom" : 111,
+    "numericTo" : 112,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.glassfish.jaxb:jaxb-core:jar",
+    "to" : "com.sun.istack:istack-commons-runtime:jar",
+    "numericFrom" : 111,
+    "numericTo" : 113,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.glassfish.jaxb:jaxb-runtime:jar",
+    "to" : "org.glassfish.jaxb:jaxb-core:jar",
+    "numericFrom" : 44,
+    "numericTo" : 111,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.ehcache:ehcache:jar:jakarta",
+    "to" : "org.glassfish.jaxb:jaxb-runtime:jar",
+    "numericFrom" : 108,
+    "numericTo" : 44,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.ehcache:ehcache:jar:jakarta",
+    "numericFrom" : 14,
+    "numericTo" : 108,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "commons-io:commons-io:jar",
+    "numericFrom" : 14,
+    "numericTo" : 114,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "to" : "software.amazon.awssdk:protocol-core:jar",
+    "numericFrom" : 115,
+    "numericTo" : 116,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "to" : "software.amazon.awssdk:aws-core:jar",
+    "numericFrom" : 115,
+    "numericTo" : 117,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "to" : "software.amazon.awssdk:sdk-core:jar",
+    "numericFrom" : 115,
+    "numericTo" : 118,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 115,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 115,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 115,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "to" : "software.amazon.awssdk:aws-query-protocol:jar",
+    "numericFrom" : 122,
+    "numericTo" : 115,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "to" : "software.amazon.awssdk:protocol-core:jar",
+    "numericFrom" : 122,
+    "numericTo" : 116,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "to" : "software.amazon.awssdk:aws-core:jar",
+    "numericFrom" : 122,
+    "numericTo" : 117,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "to" : "software.amazon.awssdk:sdk-core:jar",
+    "numericFrom" : 122,
+    "numericTo" : 118,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 122,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 122,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 122,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:aws-xml-protocol:jar",
+    "numericFrom" : 123,
+    "numericTo" : 122,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:protocol-core:jar",
+    "to" : "software.amazon.awssdk:sdk-core:jar",
+    "numericFrom" : 116,
+    "numericTo" : 118,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:protocol-core:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 116,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:protocol-core:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 116,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:protocol-core:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 116,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:protocol-core:jar",
+    "numericFrom" : 123,
+    "numericTo" : 116,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:arns:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 124,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:arns:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 124,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:arns:jar",
+    "numericFrom" : 123,
+    "numericTo" : 124,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:profiles:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 125,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:profiles:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 125,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:profiles:jar",
+    "numericFrom" : 123,
+    "numericTo" : 125,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:crt-core:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 126,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:crt-core:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 126,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:crt-core:jar",
+    "numericFrom" : 123,
+    "numericTo" : 126,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 118,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 118,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "software.amazon.awssdk:metrics-spi:jar",
+    "numericFrom" : 118,
+    "numericTo" : 127,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "software.amazon.awssdk:endpoints-spi:jar",
+    "numericFrom" : 118,
+    "numericTo" : 128,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 118,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "software.amazon.awssdk:profiles:jar",
+    "numericFrom" : 118,
+    "numericTo" : 125,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 118,
+    "numericTo" : 30,
+    "version" : "1.7.30",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "software.amazon.awssdk:sdk-core:jar",
+    "to" : "org.reactivestreams:reactive-streams:jar",
+    "numericFrom" : 118,
+    "numericTo" : 129,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:sdk-core:jar",
+    "numericFrom" : 123,
+    "numericTo" : 118,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 130,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 130,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.awssdk:sdk-core:jar",
+    "numericFrom" : 130,
+    "numericTo" : 118,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.awssdk:regions:jar",
+    "numericFrom" : 130,
+    "numericTo" : 131,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.awssdk:profiles:jar",
+    "numericFrom" : 130,
+    "numericTo" : 125,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 130,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.awssdk:json-utils:jar",
+    "numericFrom" : 130,
+    "numericTo" : 132,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:auth:jar",
+    "to" : "software.amazon.eventstream:eventstream:jar",
+    "numericFrom" : 130,
+    "numericTo" : 133,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:auth:jar",
+    "numericFrom" : 123,
+    "numericTo" : 130,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:http-client-spi:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 120,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:http-client-spi:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 120,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:http-client-spi:jar",
+    "to" : "software.amazon.awssdk:metrics-spi:jar",
+    "numericFrom" : 120,
+    "numericTo" : 127,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:http-client-spi:jar",
+    "to" : "org.reactivestreams:reactive-streams:jar",
+    "numericFrom" : 120,
+    "numericTo" : 129,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 123,
+    "numericTo" : 120,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:regions:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 131,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:regions:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 131,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:regions:jar",
+    "to" : "software.amazon.awssdk:sdk-core:jar",
+    "numericFrom" : 131,
+    "numericTo" : 118,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:regions:jar",
+    "to" : "software.amazon.awssdk:profiles:jar",
+    "numericFrom" : 131,
+    "numericTo" : 125,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:regions:jar",
+    "to" : "software.amazon.awssdk:json-utils:jar",
+    "numericFrom" : 131,
+    "numericTo" : 132,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:regions:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 131,
+    "numericTo" : 30,
+    "version" : "1.7.30",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:regions:jar",
+    "numericFrom" : 123,
+    "numericTo" : 131,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 123,
+    "numericTo" : 119,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:utils:jar",
+    "to" : "org.reactivestreams:reactive-streams:jar",
+    "numericFrom" : 121,
+    "numericTo" : 129,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:utils:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 121,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:utils:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 121,
+    "numericTo" : 30,
+    "version" : "1.7.30",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 123,
+    "numericTo" : 121,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 117,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:regions:jar",
+    "numericFrom" : 117,
+    "numericTo" : 131,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:auth:jar",
+    "numericFrom" : 117,
+    "numericTo" : 130,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:profiles:jar",
+    "numericFrom" : 117,
+    "numericTo" : 125,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:sdk-core:jar",
+    "numericFrom" : 117,
+    "numericTo" : 118,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 117,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:metrics-spi:jar",
+    "numericFrom" : 117,
+    "numericTo" : 127,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:endpoints-spi:jar",
+    "numericFrom" : 117,
+    "numericTo" : 128,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 117,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:aws-core:jar",
+    "to" : "software.amazon.eventstream:eventstream:jar",
+    "numericFrom" : 117,
+    "numericTo" : 133,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:aws-core:jar",
+    "numericFrom" : 123,
+    "numericTo" : 117,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:metrics-spi:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 127,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:metrics-spi:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 127,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:metrics-spi:jar",
+    "numericFrom" : 123,
+    "numericTo" : 127,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:json-utils:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 132,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:json-utils:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 132,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:json-utils:jar",
+    "to" : "software.amazon.awssdk:third-party-jackson-core:jar",
+    "numericFrom" : 132,
+    "numericTo" : 134,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:json-utils:jar",
+    "numericFrom" : 123,
+    "numericTo" : 132,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:endpoints-spi:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 128,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:endpoints-spi:jar",
+    "numericFrom" : 123,
+    "numericTo" : 128,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:apache-client:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 135,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:apache-client:jar",
+    "to" : "software.amazon.awssdk:metrics-spi:jar",
+    "numericFrom" : 135,
+    "numericTo" : 127,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:apache-client:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 135,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:apache-client:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 135,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.apache.httpcomponents:httpclient:jar",
+    "to" : "org.apache.httpcomponents:httpcore:jar",
+    "numericFrom" : 136,
+    "numericTo" : 137,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.apache.httpcomponents:httpclient:jar",
+    "to" : "commons-logging:commons-logging:jar",
+    "numericFrom" : 136,
+    "numericTo" : 138,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.apache.httpcomponents:httpclient:jar",
+    "to" : "commons-codec:commons-codec:jar",
+    "numericFrom" : 136,
+    "numericTo" : 139,
+    "version" : "1.11",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "software.amazon.awssdk:apache-client:jar",
+    "to" : "org.apache.httpcomponents:httpclient:jar",
+    "numericFrom" : 135,
+    "numericTo" : 136,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:apache-client:jar",
+    "to" : "org.apache.httpcomponents:httpcore:jar",
+    "numericFrom" : 135,
+    "numericTo" : 137,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:apache-client:jar",
+    "to" : "commons-codec:commons-codec:jar",
+    "numericFrom" : 135,
+    "numericTo" : 139,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:apache-client:jar",
+    "numericFrom" : 123,
+    "numericTo" : 135,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "software.amazon.awssdk:annotations:jar",
+    "numericFrom" : 140,
+    "numericTo" : 119,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "software.amazon.awssdk:http-client-spi:jar",
+    "numericFrom" : 140,
+    "numericTo" : 120,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "software.amazon.awssdk:utils:jar",
+    "numericFrom" : 140,
+    "numericTo" : 121,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "software.amazon.awssdk:metrics-spi:jar",
+    "numericFrom" : 140,
+    "numericTo" : 127,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 141,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 141,
+    "numericTo" : 143,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http:jar",
+    "to" : "io.netty:netty-transport:jar",
+    "numericFrom" : 141,
+    "numericTo" : 144,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http:jar",
+    "to" : "io.netty:netty-codec:jar",
+    "numericFrom" : 141,
+    "numericTo" : 145,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http:jar",
+    "to" : "io.netty:netty-handler:jar",
+    "numericFrom" : 141,
+    "numericTo" : 146,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-codec-http:jar",
+    "numericFrom" : 140,
+    "numericTo" : 141,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.netty:netty-codec-http2:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 147,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http2:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 147,
+    "numericTo" : 143,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http2:jar",
+    "to" : "io.netty:netty-transport:jar",
+    "numericFrom" : 147,
+    "numericTo" : 144,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http2:jar",
+    "to" : "io.netty:netty-codec:jar",
+    "numericFrom" : 147,
+    "numericTo" : 145,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http2:jar",
+    "to" : "io.netty:netty-handler:jar",
+    "numericFrom" : 147,
+    "numericTo" : 146,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec-http2:jar",
+    "to" : "io.netty:netty-codec-http:jar",
+    "numericFrom" : 147,
+    "numericTo" : 141,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-codec-http2:jar",
+    "numericFrom" : 140,
+    "numericTo" : 147,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.netty:netty-codec:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 145,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 145,
+    "numericTo" : 143,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-codec:jar",
+    "to" : "io.netty:netty-transport:jar",
+    "numericFrom" : 145,
+    "numericTo" : 144,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-codec:jar",
+    "numericFrom" : 140,
+    "numericTo" : 145,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.netty:netty-transport:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 144,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 144,
+    "numericTo" : 143,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-resolver:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 148,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport:jar",
+    "to" : "io.netty:netty-resolver:jar",
+    "numericFrom" : 144,
+    "numericTo" : 148,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-transport:jar",
+    "numericFrom" : 140,
+    "numericTo" : 144,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 140,
+    "numericTo" : 142,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.netty:netty-buffer:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 143,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 140,
+    "numericTo" : 143,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.netty:netty-handler:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 146,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-handler:jar",
+    "to" : "io.netty:netty-resolver:jar",
+    "numericFrom" : 146,
+    "numericTo" : 148,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-handler:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 146,
+    "numericTo" : 143,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-handler:jar",
+    "to" : "io.netty:netty-transport:jar",
+    "numericFrom" : 146,
+    "numericTo" : 144,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport-native-unix-common:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 149,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport-native-unix-common:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 149,
+    "numericTo" : 143,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport-native-unix-common:jar",
+    "to" : "io.netty:netty-transport:jar",
+    "numericFrom" : 149,
+    "numericTo" : 144,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-handler:jar",
+    "to" : "io.netty:netty-transport-native-unix-common:jar",
+    "numericFrom" : 146,
+    "numericTo" : 149,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.netty:netty-handler:jar",
+    "to" : "io.netty:netty-codec:jar",
+    "numericFrom" : 146,
+    "numericTo" : 145,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-handler:jar",
+    "numericFrom" : 140,
+    "numericTo" : 146,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.netty:netty-transport-classes-epoll:jar",
+    "to" : "io.netty:netty-common:jar",
+    "numericFrom" : 150,
+    "numericTo" : 142,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport-classes-epoll:jar",
+    "to" : "io.netty:netty-buffer:jar",
+    "numericFrom" : 150,
+    "numericTo" : 143,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport-classes-epoll:jar",
+    "to" : "io.netty:netty-transport:jar",
+    "numericFrom" : 150,
+    "numericTo" : 144,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "io.netty:netty-transport-classes-epoll:jar",
+    "to" : "io.netty:netty-transport-native-unix-common:jar",
+    "numericFrom" : 150,
+    "numericTo" : 149,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "io.netty:netty-transport-classes-epoll:jar",
+    "numericFrom" : 140,
+    "numericTo" : 150,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "org.reactivestreams:reactive-streams:jar",
+    "numericFrom" : 140,
+    "numericTo" : 129,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "software.amazon.awssdk:netty-nio-client:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 140,
+    "numericTo" : 30,
+    "version" : "1.7.30",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "software.amazon.awssdk:s3:jar",
+    "to" : "software.amazon.awssdk:netty-nio-client:jar",
+    "numericFrom" : 123,
+    "numericTo" : 140,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "software.amazon.awssdk:s3:jar",
+    "numericFrom" : 14,
+    "numericTo" : 123,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "io.r2dbc:r2dbc-spi:jar",
+    "to" : "org.reactivestreams:reactive-streams:jar",
+    "numericFrom" : 151,
+    "numericTo" : 129,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.jooq:jooq:jar",
+    "to" : "io.r2dbc:r2dbc-spi:jar",
+    "numericFrom" : 152,
+    "numericTo" : 151,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.jooq:jooq:jar",
+    "to" : "jakarta.xml.bind:jakarta.xml.bind-api:jar",
+    "numericFrom" : 152,
+    "numericTo" : 43,
+    "version" : "3.0.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.jooq:jooq:jar",
+    "numericFrom" : 14,
+    "numericTo" : 152,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.jooq:jooq-meta:jar",
+    "to" : "org.jooq:jooq:jar",
+    "numericFrom" : 153,
+    "numericTo" : 152,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.jooq:jooq-meta:jar",
+    "numericFrom" : 14,
+    "numericTo" : 153,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.jooq:jooq-codegen:jar",
+    "to" : "org.jooq:jooq:jar",
+    "numericFrom" : 154,
+    "numericTo" : 152,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.jooq:jooq-codegen:jar",
+    "to" : "org.jooq:jooq-meta:jar",
+    "numericFrom" : 154,
+    "numericTo" : 153,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.jooq:jooq-codegen:jar",
+    "numericFrom" : 14,
+    "numericTo" : 154,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "javax.validation:validation-api:jar",
+    "numericFrom" : 14,
+    "numericTo" : 155,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.service:jar",
+    "to" : "org.assertj:assertj-core:jar",
+    "numericFrom" : 14,
+    "numericTo" : 156,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:workingtime.github.extension:jar",
+    "to" : "aero.minova:cas.service:jar",
+    "numericFrom" : 157,
+    "numericTo" : 14,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "io.swagger:swagger-annotations:jar",
+    "numericFrom" : 158,
+    "numericTo" : 159,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-core:jar",
+    "numericFrom" : 158,
+    "numericTo" : 61,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-annotations:jar",
+    "numericFrom" : 158,
+    "numericTo" : 160,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-annotations:jar",
+    "numericFrom" : 59,
+    "numericTo" : 160,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-core:jar",
+    "numericFrom" : 59,
+    "numericTo" : 61,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericFrom" : 158,
+    "numericTo" : 59,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-annotations:jar",
+    "numericFrom" : 62,
+    "numericTo" : 160,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-core:jar",
+    "numericFrom" : 62,
+    "numericTo" : 61,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericFrom" : 62,
+    "numericTo" : 59,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar",
+    "numericFrom" : 158,
+    "numericTo" : 62,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.openapitools:jackson-databind-nullable:jar",
+    "to" : "com.fasterxml.jackson.core:jackson-databind:jar",
+    "numericFrom" : 161,
+    "numericTo" : 59,
+    "version" : "2.13.3",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "org.openapitools:jackson-databind-nullable:jar",
+    "numericFrom" : 158,
+    "numericTo" : 161,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "com.google.code.findbugs:jsr305:jar",
+    "numericFrom" : 158,
+    "numericTo" : 162,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "jakarta.xml.bind:jakarta.xml.bind-api:jar",
+    "numericFrom" : 158,
+    "numericTo" : 43,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:github:jar",
+    "to" : "org.assertj:assertj-core:jar",
+    "numericFrom" : 158,
+    "numericTo" : 156,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:workingtime.github.extension:jar",
+    "to" : "aero.minova:github:jar",
+    "numericFrom" : 157,
+    "numericTo" : 158,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:workingtime.github.extension:jar",
+    "to" : "org.assertj:assertj-core:jar",
+    "numericFrom" : 157,
+    "numericTo" : 156,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:workingtime.github.extension:jar",
+    "numericFrom" : 3,
+    "numericTo" : 157,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.app:jar",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 163,
+    "numericTo" : 1,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:cas.app:jar",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 163,
+    "numericTo" : 2,
+    "version" : "12.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:trac.app:jar:app",
+    "to" : "aero.minova:cas.app:jar",
+    "numericFrom" : 164,
+    "numericTo" : 163,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:trac.app:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 164,
+    "numericTo" : 2,
+    "version" : "12.1.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:trac.app:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 164,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:cas.api:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-web:jar",
+    "numericFrom" : 15,
+    "numericTo" : 56,
+    "version" : "3.0.2",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:cas.api:jar",
+    "to" : "com.google.code.gson:gson:jar",
+    "numericFrom" : 15,
+    "numericTo" : 23,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:cas.api:jar",
+    "to" : "org.projectlombok:lombok:jar",
+    "numericFrom" : 15,
+    "numericTo" : 16,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:cas.api:jar",
+    "to" : "org.assertj:assertj-core:jar",
+    "numericFrom" : 15,
+    "numericTo" : 156,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "aero.minova:trac.extension:jar",
+    "to" : "aero.minova:cas.api:jar",
+    "numericFrom" : 165,
+    "numericTo" : 15,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:trac.extension:jar",
+    "to" : "aero.minova:cas.service:jar",
+    "numericFrom" : 165,
+    "numericTo" : 14,
+    "version" : "12.59.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 95,
+    "numericTo" : 33,
+    "version" : "6.0.6",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 95,
+    "numericTo" : 50,
+    "version" : "6.0.6",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter:jar",
+    "to" : "org.springframework.boot:spring-boot:jar",
+    "numericFrom" : 18,
+    "numericTo" : 95,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-autoconfigure:jar",
+    "to" : "org.springframework.boot:spring-boot:jar",
+    "numericFrom" : 97,
+    "numericTo" : 95,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter:jar",
+    "to" : "org.springframework.boot:spring-boot-autoconfigure:jar",
+    "numericFrom" : 18,
+    "numericTo" : 97,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "ch.qos.logback:logback-classic:jar",
+    "to" : "ch.qos.logback:logback-core:jar",
+    "numericFrom" : 166,
+    "numericTo" : 167,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "ch.qos.logback:logback-classic:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 166,
+    "numericTo" : 30,
+    "version" : "2.0.4",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-logging:jar",
+    "to" : "ch.qos.logback:logback-classic:jar",
+    "numericFrom" : 168,
+    "numericTo" : 166,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.apache.logging.log4j:log4j-to-slf4j:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 169,
+    "numericTo" : 30,
+    "version" : "1.7.36",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.apache.logging.log4j:log4j-to-slf4j:jar",
+    "to" : "org.apache.logging.log4j:log4j-api:jar",
+    "numericFrom" : 169,
+    "numericTo" : 170,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-logging:jar",
+    "to" : "org.apache.logging.log4j:log4j-to-slf4j:jar",
+    "numericFrom" : 168,
+    "numericTo" : 169,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.slf4j:jul-to-slf4j:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 171,
+    "numericTo" : 30,
+    "version" : "2.0.6",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-logging:jar",
+    "to" : "org.slf4j:jul-to-slf4j:jar",
+    "numericFrom" : 168,
+    "numericTo" : 171,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-logging:jar",
+    "numericFrom" : 18,
+    "numericTo" : 168,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter:jar",
+    "to" : "jakarta.annotation:jakarta.annotation-api:jar",
+    "numericFrom" : 18,
+    "numericTo" : 51,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 18,
+    "numericTo" : 33,
+    "version" : "6.0.6",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter:jar",
+    "to" : "org.yaml:snakeyaml:jar",
+    "numericFrom" : 18,
+    "numericTo" : 172,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-cache:jar",
+    "to" : "org.springframework.boot:spring-boot-starter:jar",
+    "numericFrom" : 92,
+    "numericTo" : 18,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.springframework:spring-context-support:jar",
+    "to" : "org.springframework:spring-beans:jar",
+    "numericFrom" : 19,
+    "numericTo" : 32,
+    "version" : "6.0.6",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-context-support:jar",
+    "to" : "org.springframework:spring-context:jar",
+    "numericFrom" : 19,
+    "numericTo" : 50,
+    "version" : "6.0.6",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework:spring-context-support:jar",
+    "to" : "org.springframework:spring-core:jar",
+    "numericFrom" : 19,
+    "numericTo" : 33,
+    "version" : "6.0.6",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "org.springframework.boot:spring-boot-starter-cache:jar",
+    "to" : "org.springframework:spring-context-support:jar",
+    "numericFrom" : 92,
+    "numericTo" : 19,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:trac.extension:jar",
+    "to" : "org.springframework.boot:spring-boot-starter-cache:jar",
+    "numericFrom" : 165,
+    "numericTo" : 92,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:trac.extension:jar",
+    "to" : "javax.cache:cache-api:jar",
+    "numericFrom" : 165,
+    "numericTo" : 109,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.ehcache:ehcache:jar",
+    "to" : "org.slf4j:slf4j-api:jar",
+    "numericFrom" : 173,
+    "numericTo" : 30,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:trac.extension:jar",
+    "to" : "org.ehcache:ehcache:jar",
+    "numericFrom" : 165,
+    "numericTo" : 173,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:trac.extension:jar",
+    "to" : "org.assertj:assertj-core:jar",
+    "numericFrom" : 165,
+    "numericTo" : 156,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:trac.extension:jar",
+    "numericFrom" : 3,
+    "numericTo" : 165,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:sis.spellingcontrol.app:jar:app",
+    "to" : "aero.minova:workingtime:jar:app",
+    "numericFrom" : 174,
+    "numericTo" : 5,
+    "version" : "12.3.4",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:sis.spellingcontrol.app:jar:app",
+    "to" : "aero.minova:data.schema.app:jar:app",
+    "numericFrom" : 174,
+    "numericTo" : 4,
+    "version" : "12.8.11",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:sis.spellingcontrol.app:jar:app",
+    "to" : "aero.minova:cas.app:jar:app",
+    "numericFrom" : 174,
+    "numericTo" : 0,
+    "version" : "12.60.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:sis.spellingcontrol.app:jar:app",
+    "to" : "aero.minova:app.i18n:jar:app",
+    "numericFrom" : 174,
+    "numericTo" : 1,
+    "version" : "12.14.0",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "aero.minova:sis.spellingcontrol.app:jar:app",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 174,
+    "numericTo" : 2,
+    "version" : "0.2.1",
+    "resolution" : "OMITTED_FOR_CONFLICT"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:sis.spellingcontrol.app:jar:app",
+    "numericFrom" : 3,
+    "numericTo" : 174,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "aero.minova:app.build:jar",
+    "to" : "org.assertj:assertj-core:jar",
+    "numericFrom" : 2,
+    "numericTo" : 156,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "aero.minova:app.build:jar",
+    "numericFrom" : 3,
+    "numericTo" : 2,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-api:jar",
+    "to" : "org.opentest4j:opentest4j:jar",
+    "numericFrom" : 175,
+    "numericTo" : 176,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.junit.platform:junit-platform-commons:jar",
+    "to" : "org.apiguardian:apiguardian-api:jar",
+    "numericFrom" : 177,
+    "numericTo" : 178,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-api:jar",
+    "to" : "org.junit.platform:junit-platform-commons:jar",
+    "numericFrom" : 175,
+    "numericTo" : 177,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-api:jar",
+    "to" : "org.apiguardian:apiguardian-api:jar",
+    "numericFrom" : 175,
+    "numericTo" : 178,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "org.junit.jupiter:junit-jupiter-api:jar",
+    "numericFrom" : 3,
+    "numericTo" : 175,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-params:jar",
+    "to" : "org.junit.jupiter:junit-jupiter-api:jar",
+    "numericFrom" : 179,
+    "numericTo" : 175,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-params:jar",
+    "to" : "org.apiguardian:apiguardian-api:jar",
+    "numericFrom" : 179,
+    "numericTo" : 178,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "org.junit.jupiter:junit-jupiter-params:jar",
+    "numericFrom" : 3,
+    "numericTo" : 179,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.junit.platform:junit-platform-engine:jar",
+    "to" : "org.opentest4j:opentest4j:jar",
+    "numericFrom" : 180,
+    "numericTo" : 176,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.junit.platform:junit-platform-engine:jar",
+    "to" : "org.junit.platform:junit-platform-commons:jar",
+    "numericFrom" : 180,
+    "numericTo" : 177,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.junit.platform:junit-platform-engine:jar",
+    "to" : "org.apiguardian:apiguardian-api:jar",
+    "numericFrom" : 180,
+    "numericTo" : 178,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-engine:jar",
+    "to" : "org.junit.platform:junit-platform-engine:jar",
+    "numericFrom" : 181,
+    "numericTo" : 180,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-engine:jar",
+    "to" : "org.junit.jupiter:junit-jupiter-api:jar",
+    "numericFrom" : 181,
+    "numericTo" : 175,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "org.junit.jupiter:junit-jupiter-engine:jar",
+    "to" : "org.apiguardian:apiguardian-api:jar",
+    "numericFrom" : 181,
+    "numericTo" : 178,
+    "resolution" : "OMITTED_FOR_DUPLICATE"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "org.junit.jupiter:junit-jupiter-engine:jar",
+    "numericFrom" : 3,
+    "numericTo" : 181,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "org.assertj:assertj-core:jar",
+    "to" : "net.bytebuddy:byte-buddy:jar",
+    "numericFrom" : 156,
+    "numericTo" : 42,
+    "resolution" : "INCLUDED"
+  }, {
+    "from" : "com.minova:min.workingtime:jar",
+    "to" : "org.assertj:assertj-core:jar",
+    "numericFrom" : 3,
+    "numericTo" : 156,
+    "resolution" : "INCLUDED"
+  } ]
+}

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="Menu" title="@xtcasMdi" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+<?xml version="1.0" encoding="UTF-8"?><form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="Menu" title="@xtcasMdi.Administration" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
 	<index-view id="IndexView" source="xvcasMdiIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number/>
 		</column>
-		<column name="ID" text="@xtcasMdi.ID">
-			<text length="100"/>
+		<column name="KeyText" text="@xtcasMdi.KeyText">
+			<text length="50" />
 		</column>
 		<column name="Icon" text="@xtcasMdi.Icon">
 			<text length="100"/>
@@ -16,7 +16,7 @@
 			<text length="100"/>
 		</column>
 		<column name="Position" text="@xtcasMdi.Position">
-			<number decimals="5"/>
+			<number decimals="3"/>
 		</column>
 		<column name="SecurityToken" text="@xtcasMdi.SecurityToken">
 			<text length="50"/>
@@ -39,20 +39,20 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
 			</field>
-			<field name="ID" sql-index="1" text="@xtcasMdi.ID" number-columns-spanned="4" fill="toright">
-				<text length="100"/>
+			<field name="KeyText" sql-index="1" text="@xtcasMdi.KeyText" number-columns-spanned="4"  key-type="user">
+				<text length="50" />
 			</field>
 			<field name="Icon" sql-index="2" text="@xtcasMdi.Icon" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
-			<field name="Label" sql-index="3" text="@xtcasMdi.Label" number-columns-spanned="4" fill="toright">
+			<field name="Label" sql-index="3" text="@xtcasMdi.Label" required="true" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
 			<field name="Menu" sql-index="4" text="@xtcasMdi.Menu" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
 			<field name="Position" sql-index="5" text="@xtcasMdi.Position" number-columns-spanned="4">
-				<number decimals="5"/>
+				<number decimals="3"/>
 			</field>
 			<field name="SecurityToken" sql-index="6" text="@xtcasMdi.SecurityToken" number-columns-spanned="4" fill="toright">
 				<text length="100"/>

@@ -74,6 +74,11 @@
     
     
         
+* link:xtcasServiceMessageReceiverLoginType.adoc[]
+
+    
+    
+        
 * link:xtcasError.adoc[]
 
     

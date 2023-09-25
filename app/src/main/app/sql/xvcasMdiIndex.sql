@@ -1,7 +1,7 @@
 alter view dbo.xvcasMdiIndex
 with encryption as
 	select	m.KeyLong,
-			m.ID,
+			m.KeyText,
 			m.Icon,
 			m.Label,
 			m.Menu,

@@ -17,13 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import aero.minova.cas.BaseTest;
 import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.controller.BaseTest;
 import aero.minova.cas.controller.SqlViewController;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
@@ -45,7 +45,7 @@ class FilesServiceTest extends BaseTest {
 	void testMdi() throws Exception {
 
 		Table mockResult = new Table();
-		mockResult.addColumn(new Column("ID", DataType.STRING));
+		mockResult.addColumn(new Column("KeyText", DataType.STRING));
 		mockResult.addColumn(new Column("Icon", DataType.STRING));
 		mockResult.addColumn(new Column("Label", DataType.STRING));
 		mockResult.addColumn(new Column("Menu", DataType.STRING));
@@ -109,8 +109,7 @@ class FilesServiceTest extends BaseTest {
 		fl.read(awatingResult);
 		fl.close();
 
-		assertThat(testSubject.readMDI())//
-				.isEqualTo(awatingResult);
+		assertThat(new String(testSubject.readMDI())).isEqualToNormalizingNewlines(new String(awatingResult));
 	}
 
 	@DisplayName("MDI Test ohne Menu Eintrag in Action")
@@ -119,7 +118,7 @@ class FilesServiceTest extends BaseTest {
 	void testMdiWithoutMenuEntryInAction() throws Exception {
 
 		Table mockResult = new Table();
-		mockResult.addColumn(new Column("ID", DataType.STRING));
+		mockResult.addColumn(new Column("KeyText", DataType.STRING));
 		mockResult.addColumn(new Column("Icon", DataType.STRING));
 		mockResult.addColumn(new Column("Label", DataType.STRING));
 		mockResult.addColumn(new Column("Menu", DataType.STRING));
@@ -183,8 +182,7 @@ class FilesServiceTest extends BaseTest {
 		fl.read(awatingResult);
 		fl.close();
 
-		assertThat(testSubject.readMDI())//
-				.isEqualTo(awatingResult);
+		assertThat(new String(testSubject.readMDI())).isEqualToNormalizingNewlines(new String(awatingResult));
 	}
 
 	@DisplayName("MDI Test ohne Hauptmenu")
@@ -193,7 +191,7 @@ class FilesServiceTest extends BaseTest {
 	void testMdiWithoutMainMenu() throws Exception {
 
 		Table mockResult = new Table();
-		mockResult.addColumn(new Column("ID", DataType.STRING));
+		mockResult.addColumn(new Column("KeyText", DataType.STRING));
 		mockResult.addColumn(new Column("Icon", DataType.STRING));
 		mockResult.addColumn(new Column("Label", DataType.STRING));
 		mockResult.addColumn(new Column("Menu", DataType.STRING));

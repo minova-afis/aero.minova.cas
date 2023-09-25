@@ -3,10 +3,11 @@ package aero.minova.cas.service;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,8 @@ import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.val;
 
 @Service
@@ -34,14 +37,19 @@ public class ViewService {
 	@Autowired
 	private SecurityService securityService;
 
-	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:MSSQL}")
-	String context;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-	private static String MSSQL = "MSSQL";
+	private static final String MSSQLDIALECT = "SQLServer";
 
 	@PostConstruct
 	private void init() {
-		if (context.equalsIgnoreCase(MSSQL)) {
+
+		final Session session = (Session) entityManager.getDelegate();
+		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
+		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
+
+		if (dialect.toString().contains(MSSQLDIALECT)) {
 			viewService = new MssqlViewService(systemDatabase, customLogger, securityService);
 		} else {
 			viewService = new JOOQViewService(systemDatabase, customLogger, securityService);
@@ -85,10 +93,10 @@ public class ViewService {
 			String viewQuery = viewService.prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			val preparedStatement = connection.prepareCall(viewQuery);
 			try (PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
-				customLogger.logSql("Executing statements: " + sb.toString());
+				customLogger.logSql("Executing statements: " + sb);
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 
-					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.getUserLogger(), this);
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 
 					int totalResults = 0;
 					if (!result.getRows().isEmpty()) {
@@ -111,17 +119,10 @@ public class ViewService {
 				}
 			}
 		} catch (Throwable e) {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException e1) {
-					customLogger.logError("Connection could not be closed: ", e1);
-				}
-			}
-			customLogger.logError("Statement could not be executed: " + sb.toString(), e);
+			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new TableException(e);
 		} finally {
-			systemDatabase.freeUpConnection(connection);
+			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
@@ -137,17 +138,15 @@ public class ViewService {
 	 *            Das bereits fertig aufgebaute Sql Statement, welches statt der Werte '?' enthält. Diese werden hier 'ersetzt'.
 	 * @param sb
 	 *            Ein StringBuilder zum Loggen der inputParameter.
-	 * @param Logger
-	 *            Ein Logger, welcher bei Fehlern die Exception loggen kann.
 	 */
 	public PreparedStatement fillPreparedViewString(Table inputTable, CallableStatement preparedStatement, String query, StringBuilder sb) {
-		return SqlUtils.fillPreparedViewString(inputTable, preparedStatement, query, sb, customLogger.getErrorLogger());
+		return SqlUtils.fillPreparedViewString(inputTable, preparedStatement, query, sb, customLogger.errorLogger);
 
 	}
 
 	@Deprecated
 	public Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet) {
-		return SqlUtils.convertSqlResultToTable(inputTable, sqlSet, customLogger.getUserLogger(), this);
+		return SqlUtils.convertSqlResultToTable(inputTable, sqlSet, customLogger.userLogger, this);
 	}
 
 	/**

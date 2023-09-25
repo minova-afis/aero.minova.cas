@@ -12,29 +12,25 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
-import aero.minova.cas.CoreApplicationSystemApplication;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
-import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.controller.BaseTest;
 import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
-@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
-class ViewServiceTest extends BaseTest {
-
-	@Autowired
-	ViewService testSubject;
+//IGNORECASE=true, damit sich H2-Datenbank wie SQL verhält
+@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = {	"application.runner.enabled=false",
+																					"spring.datasource.url=jdbc:h2:mem:testdb;IGNORECASE=true" })
+class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 
 	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")
 	@Test

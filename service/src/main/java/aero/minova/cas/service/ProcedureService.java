@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Session;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,12 +33,14 @@ import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.val;
 
 @Service
 public class ProcedureService {
 
-	private static String POSTGRESQL = "postgresql";
+	private static final String POSTGRESQLDIALECT = "PostgreSQLDialect";
 
 	@Autowired
 	CustomLogger customLogger;
@@ -44,8 +48,8 @@ public class ProcedureService {
 	@Autowired
 	SystemDatabase systemDatabase;
 
-	@org.springframework.beans.factory.annotation.Value("${spring.jooq.sql-dialect:mssql}")
-	String databaseKind;
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@org.springframework.beans.factory.annotation.Value("${aero.minova.database.maxresultsetcount:512}")
 	Integer maxResultSetCount;
@@ -54,16 +58,21 @@ public class ProcedureService {
 	SecurityService securityService;
 
 	/**
-	 * Speichert im SQl-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
+	 * Speichert im SQL-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
 	 *
 	 * @param connection
 	 *            Das ist die Session.
 	 * @throws SQLException
-	 *             Fehler beim setzen des Kontextes für die connection.
+	 *             Fehler beim Setzen des Kontextes für die connection.
 	 */
 	public void setUserContextFor(Connection connection) throws SQLException {
+
+		final Session session = (Session) entityManager.getDelegate();
+		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
+		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
+
 		CallableStatement userContextSetter;
-		if (databaseKind.equalsIgnoreCase(POSTGRESQL)) {
+		if (dialect.contains(POSTGRESQLDIALECT)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
@@ -85,34 +94,52 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit)
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
+	 * 	          können alle Spalten gesehen werden.
 	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
 	 */
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest) throws Exception {
+		return processSqlProcedureRequest(inputTable, privilegeRequest, false);
+	}
+
+	/**
+	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
+	 * zurückgegeben.
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @param privilegeRequest
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
+	 *            können alle Spalten gesehen werden.
+	 * @param isSetup
+	 *            <code>true</code>, falls es sich um einen Aufruf im Rahmen des Setup handelt
+	 * @return Resultat SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler bei der Ausführung
+	 */
+	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest, boolean isSetup) throws Exception {
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
 		Connection connection = null;
 
 		try {
 			connection = systemDatabase.getConnection();
+			if (isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS off");
+			}
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();
-			customLogger.logSql("Procedure succesfully executed: " + sb.toString());
-
-			systemDatabase.freeUpConnection(connection);
-		} catch (Exception e) {
-			customLogger.logError("Procedure could not be executed: " + sb.toString(), e);
-			if (connection != null) {
-				try {
-					connection.rollback();
-				} catch (Exception e1) {
-					customLogger.logError("Couldn't roll back procedure execution", e);
-				}
-				connection.close();
+			customLogger.logSql("Procedure successfully executed: " + sb);
+			if (isSetup) {
+				connection.createStatement().execute("set ANSI_WARNINGS on");
 			}
+		} catch (Exception e) {
+			customLogger.logError("Procedure could not be executed: " + sb, e);
 			throw new ProcedureException(e);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
@@ -126,15 +153,34 @@ public class ProcedureService {
 	 * @return SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler beim Ausführen der Prozedur.
+	 * @deprecated TODO @Kerstin: was sollte anstelle dieser Methode verwendet werden?
 	 */
 	@Deprecated
 	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable) throws Exception {
+		return unsecurelyProcessProcedure(inputTable, false);
+	}
+
+	/**
+	 * Diese Methode ist NICHT geschützt. Aufrufer sind für die Sicherheit verantwortlich. Führt eine Prozedur mit den übergebenen Parametern aus. Falls die
+	 * Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult zurückgegeben. CHECKT KEINE EXTENSIONS!!!
+	 *
+	 * @param inputTable
+	 *            Ausführungs-Parameter im Form einer Table
+	 * @param isSetup
+	 *            <code>true</code>, falls es sich um einen Aufruf im Rahmen des Setup handelt
+	 * @return SqlProcedureResult der Ausführung
+	 * @throws Exception
+	 *             Fehler beim Ausführen der Prozedur.
+	 * @deprecated TODO @Kerstin: was sollte anstelle dieser Methode verwendet werden?
+	 */
+	@Deprecated
+	public SqlProcedureResult unsecurelyProcessProcedure(Table inputTable, boolean isSetup) throws Exception {
 
 		// Hiermit wird der unsichere Zugriff ermöglicht.
 		Row requestingAuthority = new Row();
 		/*
 		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
-		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+		 * Value auf false steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
 		 */
 		requestingAuthority.addValue(new Value(false, "1"));
 		requestingAuthority.addValue(new Value(false, "2"));
@@ -142,7 +188,7 @@ public class ProcedureService {
 
 		List<Row> authority = new ArrayList<>();
 		authority.add(requestingAuthority);
-		return processSqlProcedureRequest(inputTable, authority);
+		return processSqlProcedureRequest(inputTable, authority, isSetup);
 	}
 
 	/**
@@ -154,12 +200,12 @@ public class ProcedureService {
 	 * @param privilegeRequest
 	 *            Eine Liste an Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit).
 	 * @param connection
-	 *            Die Connection zu der Datenbank, welche die Prozedur ausführen soll.
+	 *            Die offene Connection zu der Datenbank, welche die Prozedur ausführen soll.
 	 * @param result
 	 *            Das SQL-Result, welches innerhalb der Methode verändert und dann returned wird.
 	 * @param sb
 	 *            Ein StringBuffer, welcher im Fehlerfall die Fehlermeldung bis zum endgültigen Throw als String aufnimmt.
-	 * @return result Das veränderte SqlProcedureResult.
+	 * @return result das veränderte SqlProcedureResult.
 	 * @throws SQLException
 	 *             Falls ein Fehler beim Ausführen der Prozedur auftritt.
 	 * @throws ProcedureException
@@ -169,7 +215,7 @@ public class ProcedureService {
 			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
 
-		result.setReturnCodes(new ArrayList<Integer>());
+		result.setReturnCodes(new ArrayList<>());
 		result.setReturnCode(0);
 		val parameterOffset = 2;
 		val resultSetOffset = 1;
@@ -212,20 +258,39 @@ public class ProcedureService {
 
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			{
+			{   /*
+				 * Man würde hier erwarten, dass der Code wie in folgender Doku aussieht:
+				 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16
+				 *
+				 * Das liegt vor allem daran, dass eine SQL-Prozedur sehr viele
+				 * verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat.
+				 *
+				 * Folgender Artikel umreist, dass ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+				 */
 				int i = 0;
 				while (preparedStatement.getResultSet() == null) {
-					if ((preparedStatement.getMoreResults() == false) && (preparedStatement.getUpdateCount() == -1)) {
-						// Es gibt kein nächstes Result gibt.
+					/* Es kann sein, dass am Anfang einige ResultsSets leer sind.
+					 * Diese muss man manuel rausfiltern.
+					 */
+
+					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
+						// Es gibt kein nächstes Result
 						break;
 					}
+					/**
+					 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets.
+					 * Sind mehr vorhanden, ist das Verhalten der Treiber nicht kontrollierbar:
+					 * https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+					 */
 					if (++i >= maxResultSetCount) {
 						customLogger.logSql(
-								"Warning: too many result sets. Mabye there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");
+								"Warning: too many result sets. Maybe there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");
 						break;
 					}
 				}
 			}
+			// ToDo ich kann mir gar nicht vorstellen, dass hier noch ResultSets vorhanden sind, nachdem weiter oben
+			// mit getMoreResults() alles abgeholt wurde.
 			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
 				val sqlResultSet = preparedStatement.getResultSet();
 				val resultSet = new Table();
@@ -252,6 +317,7 @@ public class ProcedureService {
 								} else if (type == Types.BIGINT) {
 									return new Column(name, DataType.LONG);
 								} else {
+									customLogger.logFiles( "calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type );
 									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}
 							} catch (Exception e) {
@@ -272,18 +338,18 @@ public class ProcedureService {
 						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
 							rowToBeAdded = convertSqlResultToRow(resultSet//
 									, sqlResultSet//
-									, customLogger.getUserLogger()//
+									, customLogger.userLogger//
 									, this);
 						}
 					} else {
 						rowToBeAdded = convertSqlResultToRow(resultSet//
 								, sqlResultSet//
-								, customLogger.getUserLogger()//
+								, customLogger.userLogger//
 								, this);
 					}
 
 					/*
-					 * Falls die SecurityToken-Prüfung nicht eingeschalten ist, wird einfach true zurückgegeben und die Row hinzugefügt.
+					 * Falls die SecurityToken-Prüfung nicht eingeschaltet ist, wird einfach true zurückgegeben und die Row hinzugefügt.
 					 */
 					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
 						resultSet.addRow(rowToBeAdded);
@@ -305,7 +371,7 @@ public class ProcedureService {
 						.getColumns()//
 						.stream()//
 						.map(c -> c.getOutputType() == OutputType.OUTPUT)//
-						.collect(toList());
+						.toList();
 
 				val outputValues = new Row();
 				outputParameters.setColumns(inputTable.getColumns());
@@ -325,7 +391,7 @@ public class ProcedureService {
 				if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 					resultRow = outputValues;
 				} else {
-					for (Value element : outputValues.getValues()) {
+					for (Value ignored : outputValues.getValues()) {
 						resultRow.addValue(null);
 					}
 				}
@@ -391,6 +457,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
 							} else {
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
@@ -412,6 +479,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
 							} else {
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -433,6 +501,7 @@ public class ProcedureService {
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 							} else {
+								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -442,12 +511,34 @@ public class ProcedureService {
 				});
 	}
 
+	/**
+	 * Bereitet einen Prozedur-String vor.
+	 * Siehe {@link #prepareProcedureString(Table, Set)}.
+	 *
+	 * @param params
+	 * 			gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
+	 * @return
+	 * 			die SQL-Anweisung
+	 * @throws IllegalArgumentException
+	 *             wenn der Name in der <code>params</code>-Table leer ist.
+	 */
 	public String prepareProcedureString(Table params) {
 		return prepareProcedureString(params, ExecuteStrategy.STANDARD);
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor
+	 * Bereitet einen Prozedur-String vor.
+	 * Als Ergebnis entsteht ein SQL call-Statement in der Form:<br><ol>
+	 *     <li>{ ? = call procName() }</li>
+	 *     <li>{ call procName() }</li>
+	 *     <li>{ call procName( ? ) }</li>
+	 *     <li>{ call procName( ?,?, &#8230; ) }</li>
+	 *     <li>{ ? = call procName( ?,?, &#8230; ) }</li>
+	 * </ol>
+	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table.
+	 * Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl der Spalten der params-Table.
+	 * <br>
+	 * ToDo: prüfen, ob der Name weiter geprüft werden kann oder escaped werden sollte
 	 *
 	 * @param params
 	 *            SQL-Call-Parameter
@@ -458,7 +549,7 @@ public class ProcedureService {
 	 *             Fehler, wenn die Daten in params nicht richtig sind.
 	 */
 	public String prepareProcedureString(Table params, Set<ExecuteStrategy> strategy) throws IllegalArgumentException {
-		if (params.getName() == null || params.getName().trim().length() == 0) {
+		if (params.getName() == null || params.getName().trim().isEmpty()) {
 			throw new IllegalArgumentException("msg.ProcedureNullName");
 		}
 		final int paramCount = params.getColumns().size();
@@ -466,7 +557,6 @@ public class ProcedureService {
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append('{')//
-				.append("")//
 				.append(returnRequired ? "? = call " : "call ")//
 				.append(params.getName())//
 				.append("(");

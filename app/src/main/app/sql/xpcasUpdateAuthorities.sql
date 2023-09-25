@@ -1,7 +1,8 @@
 alter procedure dbo.xpcasUpdateAuthorities (
 	@KeyLong int,
 	@Username nvarchar(50),
-	@Authority nvarchar(50)
+	@Authority nvarchar(50),
+	@KeyText nvarchar(50) = null
 )
 with encryption as
 	if (exists(select * from xtcasAuthorities
@@ -15,6 +16,10 @@ with encryption as
 	end
 
 	update xtcasAuthorities
-	set	Authority = @Authority
+	set	Authority = @Authority,
+		KeyText = @KeyText,
+		LastUser = dbo.xfCasUser(),
+		LastDate = getDate(),
+		LastAction = 2
 	where KeyLong = @KeyLong
 	return @@error

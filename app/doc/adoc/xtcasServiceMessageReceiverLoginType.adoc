@@ -1,0 +1,55 @@
+
+
+== Tabelle xtcasServiceMessageReceiverLoginType ()
+
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Datentyp: integer (identity) not null +
+
+// tag::column.KeyLong[]
+
+// end::column.KeyLong[]
+
+
+==== KeyText
+
+Datentyp: nvarchar(50) not null +
+
+// tag::column.KeyText[]
+
+// end::column.KeyText[]
+
+
+==== LastUser
+
+Datentyp: nvarchar(50) not null +
+Default: `system_user` +
+
+// tag::column.LastUser[]
+
+// end::column.LastUser[]
+
+
+==== LastDate
+
+Datentyp: datetime not null +
+Default: `getdate()` +
+
+// tag::column.LastDate[]
+
+// end::column.LastDate[]
+
+
+==== LastAction
+
+Datentyp: integer not null +
+Default: `1` +
+
+// tag::column.LastAction[]
+
+// end::column.LastAction[]

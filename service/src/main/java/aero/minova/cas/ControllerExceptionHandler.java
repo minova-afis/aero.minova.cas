@@ -263,8 +263,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	/**
 	 * Verarbeitet die xProcedureException. Die Liste der XSqlProcedureResult, welche zurück gegeben wird, beinhaltet erst die erfolgreich verarbeiteten
 	 * XSqlProcedureResults, dann ein XSqlProcedureResult, welches die typische Fehlermeldung beinhaltet. Dann wird die Liste der XSqlProcedureResults so lange
-	 * mit leeren XSqlProcedureResults gefüllt, bis sie dieselbe Länge hat, wie die anfagns gesendete XTable. Hierbei werden alle IDs der XTables in derselben
-	 * Reihenfolge übernommen. Die Exception wird außerdem zusammen mit dem Username und dem Datum in derDatenbank geloggt.
+	 * mit leeren XSqlProcedureResults gefüllt, bis sie dieselbe Länge hat, wie die anfangs gesendete XTable. Hierbei werden alle IDs der XTables in derselben
+	 * Reihenfolge übernommen. <br>
+	 * <br>
+	 * Tritt der Fehler nicht beim verarbeiten einer Prozedur selbst auf sondern danach, wird ein weiteres XSqlProcedureResult angehängt, dass diesen Fehler
+	 * enthält. Die Liste der zurückgegebenen Werte ist also um eins länger als die Liste der gesendeten XTables. <br>
+	 * <br>
+	 * Die Exception wird außerdem zusammen mit dem Username und dem Datum in derDatenbank geloggt.
 	 * 
 	 * @param ex
 	 *            Eine XProcedureException. Diese beinhaltet neben der Exception, noch eine Liste an XTable, welche bei der Anfrage der Transaktion übergeben
@@ -279,9 +284,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		// Ergebnisse von erfolgreich durchgeführten Prozeduren übernehmen.
 		xsqlProcedureResults.addAll(results);
 
+		// Fall mehr Eingaben (xtables) als Ergebnisse -> Fehler in Prozeudur -> ID der entsprechenden Prozedur übernehmen
+		// Fall Eingaben und Ergebnisse gleiche Anzahl -> Fehler nach Verarbeitung -> Generische Fehlermeldung als ID
+		String errorID = xtables.size() > results.size() ? xtables.get(results.size()).getId() : "Internal Server Error";
+
 		// Error Eintrag an der Stelle, an der der Fehler autritt, machen.
 		SqlProcedureResult errorResult = prepareExceptionReturnSqlProcedureResult(ex);
-		String errorID = xtables.get(results.size()).getId();
 		XSqlProcedureResult error = new XSqlProcedureResult(errorID, errorResult);
 		xsqlProcedureResults.add(error);
 
@@ -313,7 +321,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		String errorStatement = "INSERT INTO xtcasError (Username, ErrorMessage, Date) VALUES (?,?,?)";
 
-		final val connection = systemDatabase.getConnection();
+		val connection = systemDatabase.getConnection();
 		try {
 			Timestamp timeOfError = Timestamp.from(Instant.now());
 			CallableStatement callableErrorStatement = connection.prepareCall(errorStatement);
@@ -326,23 +334,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				e.printStackTrace(pw);
 				customLogger.logSql("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage() + ", " + timeOfError);
 				// Der Stacktrace wird nicht in der Datenbank gespeichert, da das Feld einfach viel zu lang ist. Deswegen geben wir ihn im ErrorLog aus.
-				customLogger.logError("CAS: Showing Stacktrace : " + sw.toString(), e);
+				customLogger.logError("CAS: Showing Stacktrace : " + sw, e);
 			}
 			callableErrorStatement.executeUpdate();
 			connection.commit();
-			systemDatabase.freeUpConnection(connection);
 		} catch (SQLException e1) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e1.printStackTrace(pw);
 
-			try {
-				connection.close();
-			} catch (SQLException e2) {
-				customLogger.logError("Connection could not be closed: ", e2);
-			}
-
-			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw.toString(), e1);
+			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw, e1);
+		} finally {
+			systemDatabase.closeConnection(connection);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package aero.minova.cas.setup.dependency;
+package aero.minova.cas.setup.dependency.model;
 
 import java.io.Serializable;
 

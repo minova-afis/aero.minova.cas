@@ -1,6 +1,6 @@
 alter procedure dbo.xpcasUpdateUser (
 	@KeyLong int,
-	@KeyText nvarchar(10) = null,
+	@KeyText nvarchar(50) = null,
 	@UserSecurityToken nvarchar(50) = null,
 	@Memberships nvarchar(250) = null
 )
@@ -17,6 +17,9 @@ with encryption as
 	update xtcasUser
 	set KeyText = @KeyText,
 		UserSecurityToken = @UserSecurityToken,
-		Memberships = @Memberships
+		Memberships = @Memberships,
+		LastAction = 2,
+		LastDate = getDate(),
+		LastUser = dbo.xfCasUser()
 	where KeyLong = @KeyLong
 return @@error

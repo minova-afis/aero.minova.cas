@@ -16,6 +16,15 @@ Datentyp: integer (identity) not null +
 // end::column.KeyLong[]
 
 
+==== KeyText
+
+Datentyp: nvarchar(50) +
+
+// tag::column.KeyText[]
+
+// end::column.KeyText[]
+
+
 ==== Username
 
 Datentyp: nvarchar(50) not null +
@@ -23,6 +32,15 @@ Datentyp: nvarchar(50) not null +
 // tag::column.Username[]
 
 // end::column.Username[]
+
+
+==== Description
+
+Datentyp: nvarchar(50) +
+
+// tag::column.Description[]
+
+// end::column.Description[]
 
 
 ==== Password

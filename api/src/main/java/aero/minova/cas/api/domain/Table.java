@@ -85,7 +85,7 @@ public class Table implements Serializable {
 				return i;
 			}
 		}
-		throw new IllegalArgumentException("Column name " + columnName + " could not be found for table " + name + "!");
+		return -1;
 	}
 
 	public void addColumn(Column c) {

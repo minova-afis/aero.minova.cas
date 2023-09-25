@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form icon="DBUser" title="@xtcasUsers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-helper-class="aero.minova.cas.app.helper.CASUsersHelper"
-	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+<form icon="DBUser" title="@xtcasUsers.Administration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" helper-class="aero.minova.cas.app.helper.CASUsersHelper" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
 	<index-view id="IndexView" source="xvcasUsersIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
-			<number/>
+			<number />
 		</column>
 		<column name="Username" text="@xtcasUsers.Username">
-			<text length="50"/>
+			<text length="50" />
+		</column>
+		<column name="Description" text="@xtcasUsers.Description">
+			<text length="50" />
 		</column>
 		<column name="Password" text="@xtcasUsers.Password" visible="false">
-			<text length="100"/>
+			<text length="100" />
 		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="Users">
 		<head>
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
-				<number/>
+				<number />
 			</field>
-			<field name="Username" sql-index="1" text="@xtcasUsers.Username" required="true" key-type="user">
-				<text length="50"/>
+			<field name="Username" sql-index="1" text="@xtcasUsers.Username" required="true" key-type="user" number-columns-spanned="4" >
+				<text length="50" />
+			</field>
+			<field name="Description" sql-index="3" text="@xtcasUsers.Description" required="false" number-columns-spanned="4" fill="toright">
+				<text length="50" />
 			</field>
 			<field name="Password" sql-index="2" text="@xtcasUsers.Password" number-columns-spanned="4" required="true" fill="toright">
-				<text length="100"/>
+				<text length="100" />
 			</field>
 		</head>
 	</detail>

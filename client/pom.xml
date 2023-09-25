@@ -2,11 +2,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>aero.minova</groupId>
 	<artifactId>cas.app.root</artifactId>
-	<version>12.58.0-SNAPSHOT</version>
+	<version>12.64.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho.version>2.4.0</tycho.version>
+		<tycho.version>2.7.4</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 	</properties>
@@ -32,6 +32,35 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+					<execution>
+						<id>copy-libraries</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems> 
+								<item> 
+									<overWrite>true</overWrite>
+									<groupId>org.springframework.security</groupId>
+									<artifactId>spring-security-crypto</artifactId>
+									<version>6.1.0</version>
+									<destFileName>spring-security-crypto.jar</destFileName>
+								</item>
+							</artifactItems>
+							<outputDirectory>${basedir}/aero.minova.cas.app.helper/lib</outputDirectory> <!-- Name des Output-Ordners -->
+							<stripVersion>true</stripVersion>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>

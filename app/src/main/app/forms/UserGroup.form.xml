@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="UserGroup" title="@UserGroup" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/minova-afis/aero.minova.xsd/main/form.xsd">
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="UserGroup" title="@xtcasUserGroup.Administration" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/minova-afis/aero.minova.xsd/main/form.xsd">
 	<index-view id="IndexView" source="xvcasUserGroupIndex" index-report="auto">
 		<column name="KeyLong" key="true" visible="false">
 			<number />
@@ -39,7 +39,7 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>
-			<field name="UserKey" sql-index="1" text="@UserKey" required="false" key-type="primary">
+			<field name="UserKey" sql-index="1" text="@UserKey" required="true" key-type="primary">
 				<lookup table="xvcasUserIndex2" />
 			</field>
 		</grid>
@@ -47,7 +47,7 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number />
 			</field>
-			<field name="UsersKey" sql-index="1" text="@UsersKey" required="false" key-type="primary">
+			<field name="UsersKey" sql-index="1" text="@UsersKey" required="true" key-type="primary">
 				<lookup table="xvcasUsersIndex2" />
 			</field>
 		</grid>

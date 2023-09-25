@@ -1,3 +1,6 @@
+
+DROP VIEW IF EXISTS xvcasUserSecurity
+
 create view xvcasUserSecurity as--
 	select	up.KeyLong,--
 			up.KeyText as PrivilegeKeyText,--

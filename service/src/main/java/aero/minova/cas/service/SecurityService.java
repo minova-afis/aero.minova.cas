@@ -180,16 +180,14 @@ public class SecurityService {
 	/**
 	 * Entfernt alle Spalten der Eingabe-Tabelle, auf die der Nutzer keinen Zugriff hat.
 	 * <p>
-	 * TODO Idee: Man sollte eine neue Tabelle erstellen, statt die Eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht
-	 * geändert wird.<br>
-	 * Die Sql-Abfrage hat folgendes Format:<br><code>
+	 * TODO Idee: Man sollte eine neue Tabelle erstellen, statt die Eingabe abzuändern, da die Methoden-Signature impliziert, dass die InputTable nicht geändert
+	 * wird.<br>
+	 * Die Sql-Abfrage hat folgendes Format:<br>
+	 * <code>
 	 * select TableName, ColumnName, SecurityToken from xtcasColumnSecurity where (TableName =
 	 * inputTableName and SecurityToken = UserSecurityToken1) or (TableName = inputTableName and SecurityToken = UserSecurityToken2) or ...
 	 * </code> <br>
-	 * ToDo: kann man nicht schreiben: Select ... from
-	 * where tableName = inputTableName and SecurityToken in ( token1, token2, ... )
-	 *
-	 * <br>
+	 * ToDo: kann man nicht schreiben: Select ... from where tableName = inputTableName and SecurityToken in ( token1, token2, ... ) <br>
 	 * Die Rows der zurückgelieferten Table haben folgendes Format:<br>
 	 * Row r = [Tabellenname,ColumnName,SecurityToken],<br>
 	 * Beispiel: Row r = ["tTestTabelle","Spalte1","User1"]<br>
@@ -383,6 +381,7 @@ public class SecurityService {
 	 * <code>select
 	 * KeyText,UserSecurityToken,Memberships from xtcasUser where KeyText = username
 	 * </code>
+	 * 
 	 * @param username
 	 *            Der Username dessen Rollen geladen werden sollen.
 	 * @param userSecurityTokens
@@ -509,7 +508,7 @@ public class SecurityService {
 			// alle SecurityTokens werden in der Datenbank mit Leerzeile und Raute voneinander getrennt
 			userSecurityTokens = Stream.of(result.split("#"))//
 					.map(String::trim)//
-					.toList();
+					.collect(Collectors.toList());
 
 			// überprüfen, ob der einzigartige userSecurityToken bereits in der Liste der Memberships vorhanden war, wenn nicht, dann hinzufügen
 			String uniqueUserToken = membershipsFromUser.getRows().get(0).getValues().get(1) != null

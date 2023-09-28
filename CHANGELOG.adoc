@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Tabellen um eine Hilfsmethode erweitert, mit der man eine Spalte über den Namen finden kann
 
 ## [12.66.2] -- 2023-09-26
 * Dependabot beobachtet nun neben Maven POMs und GitHub Actions auch Container Images

@@ -70,11 +70,8 @@ public class Table implements Serializable {
 	}
 
 	/**
-	 * Sucht anhand des Spaltennamens an welcher Position sich diese befindet und gibt die Stelle zurück. Falls der Name nicht vorkommt, wird eine
-	 * IllegalArgumentException geworfen.
+	 * Sucht anhand des Spaltennamens an welcher Position sich diese befindet und gibt die Stelle zurück. Falls der Name nicht vorkommt, wird -1 zurückgegeben
 	 * 
-	 * @param t
-	 *            Tabelle, in welcher gesucht werden soll.
 	 * @param columnName
 	 *            Spaltenname, nach welchem gesucht werden soll.
 	 * @return Die Position als int.
@@ -86,6 +83,22 @@ public class Table implements Serializable {
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * Gibt die Spalte mit dem gegebenen Namen zurück (Case egal). Wird keine passende Spalte gefunden wird null zurückgegeben
+	 * 
+	 * @param columnName
+	 *            Spaltenname, nach welchem gesucht werden soll.
+	 * @return
+	 */
+	public Column getColumn(String columnName) {
+		for (Column c : columns) {
+			if (c.getName().equalsIgnoreCase(columnName)) {
+				return c;
+			}
+		}
+		return null;
 	}
 
 	public void addColumn(Column c) {

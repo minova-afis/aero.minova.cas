@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>cas.parent</artifactId>
-		<version>12.66.3</version>
+		<version>12.66.4-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -33,7 +33,7 @@
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
 		<developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git
 		</developerConnection>
-		<tag>v12.66.3</tag>
+		<tag>v12.64.0</tag>
 	</scm>
 
 	<dependencies>

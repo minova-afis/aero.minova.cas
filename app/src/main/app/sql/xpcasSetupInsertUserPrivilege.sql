@@ -11,7 +11,7 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
         update xtCasUserPrivilege
         set LastAction = 1,
 		LastDate = getDate(),
-		LastUser = dbo.xfcasUser
+		LastUser = dbo.xfcasUser()
         where KeyText = @KeyText
     end
 	else

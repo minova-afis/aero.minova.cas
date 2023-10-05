@@ -52,6 +52,16 @@ spring.datasource.password=<Passwort aus der Connection.xbs>
 login_dataSource=<database|admin|ldap>
 --------
 
+=== Bei erstmaliger Installation
+
+Bei der ersten Installation müssen die JPA-Tabellen initialisiert werden, bevor das Setup durchgeführt wird.
+.JPA-Einstellungen
+----
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.defer-datasource-initialization=true
+spring.sql.init.mode=always
+----
+
 === Optional Keystore für HTTPS einrichten.
 
 [source]

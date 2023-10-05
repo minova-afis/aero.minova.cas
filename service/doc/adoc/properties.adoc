@@ -18,8 +18,8 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 
 == Standard Properties
-* server.port
 
+* server.port
 ** *Default*: `8084`
 
 * management.server.port
@@ -29,6 +29,24 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 * management.endpoints.web.exposure.include
 ** *Default*: `*`
 ** *Beschreibung*: Siehe https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
+
+== JPA Properties
+
+* spring.jpa.hibernate.ddl-auto
+** *Default*: `none`
+** *Wertebereich*: none , validate , update , create-drop
+** *Beschreibung*: link:https://docs.spring.io/spring-boot/docs/1.1.0.M1/reference/html/howto-database-initialization.html[Spring-Doku]
+
+* spring.jpa.defer-datasource-initialization
+** *Default*: `false`
+** *Wertebereich*: true, false
+** *Beschreibung*: Wenn true, werden erst die JPA Tabellen aufgespielt, bevor Queries aus data.sql ausgeführt werden. Wenn die JPA Tabellen installiert werden, muss diese Property auf jeden Fall auf 'true' gesetzt werden.
+
+* spring.sql.init.mode
+** *Default*: Bei H2: `always` , ansonsten: `never`
+** *Wertebereich*: always, never
+** *Beschreibung*: Aktiviert skript-basierte Initialisierung. Siehe https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.using-basic-sql-scripts[Spring-Doku].
+
 
 == Minova Properties
 

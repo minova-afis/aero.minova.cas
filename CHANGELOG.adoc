@@ -4,6 +4,11 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+## [12.66.4] -- 2023-10-06
+* Doppeltes setzen vom UserPrivelege "setup" behoben
+
+## [12.66.3] -- 2023-10-05
 * Tabellen um eine Hilfsmethode erweitert, mit der man eine Spalte über den Namen finden kann
 * JPA Tabelle für Users um Description erweitert
 

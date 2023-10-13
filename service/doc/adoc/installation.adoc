@@ -110,6 +110,13 @@ oder `cas-test.exe` und `cas-test.xml`
 </service>
 --------
 
+Möchte man vermeiden, dass der CAS Dienst zu viel Speicher zieht kann man eine Beschränkung in der `<arguments>` Zeile angeben, sodass sie z.B. so aussieht:
+
+[source,xml]
+--------
+	<arguments>-Xmx256m -Xms128m -cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>
+--------
+
 Wenn alles bereit steht,
 kann der Windows-Dienst über die CMD (mit unter Umständen Admin-Rechten) installiert werden: `<exe> install`.
 Für das vorherige Beispiel würde es `com.minova.vgeibelstadt.cas.exe install` lauten.

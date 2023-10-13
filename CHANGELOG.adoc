@@ -4,7 +4,11 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Rücknahme des PR von: Benutzeranmeldung über Datenbank fixen. Es wurde keine DataSource initialisiert. 
+
+## [12.67.0] -- 2023-10-13
 * Beim Einfügen von Authorities über die Maske (xpcasInsertAuthorities) wurden LastAction, LastUser und LastDate nicht gesetzt.
+* Benutzeranmeldung über Datenbank fixen. Es wurde keine DataSource initialisiert. 
 
 ## [12.66.4] -- 2023-10-06
 * Doppeltes setzen vom UserPrivelege "setup" behoben

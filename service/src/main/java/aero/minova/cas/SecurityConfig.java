@@ -1,7 +1,10 @@
 package aero.minova.cas;
 
-import aero.minova.cas.service.SecurityService;
-import lombok.RequiredArgsConstructor;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +35,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
-import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
@@ -58,8 +60,6 @@ public class SecurityConfig {
 	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
 	private String allowedOrigins;
 
-	private final DataSource dataSource;
-
 	@Bean
 	public SpringSecurityDialect springSecurityDialect() {
 		return new SpringSecurityDialect();
@@ -81,46 +81,37 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		DelegatingServerLogoutHandler logoutHandler = new DelegatingServerLogoutHandler(new WebSessionServerLogoutHandler(), new SecurityContextServerLogoutHandler());
+		DelegatingServerLogoutHandler logoutHandler = new DelegatingServerLogoutHandler(new WebSessionServerLogoutHandler(),
+				new SecurityContextServerLogoutHandler());
 		http.authorizeHttpRequests(requests -> requests
-				.requestMatchers("/actuator/**").permitAll()
-				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout").permitAll()
-				.anyRequest().fullyAuthenticated()
-		)
-			.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
-			.formLogin(form -> form
-				.loginPage("/login")//
-				.defaultSuccessUrl("/")//
-				.permitAll())
-			.httpBasic(Customizer.withDefaults())
+				.requestMatchers("/actuator/**").permitAll().requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
+				.permitAll().anyRequest().fullyAuthenticated()).logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
+				.formLogin(form -> form.loginPage("/login")//
+						.defaultSuccessUrl("/")//
+						.permitAll())
+				.httpBasic(Customizer.withDefaults())
 				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
 
 				// scj: CSRF Should only be enabled if basic auth is replaced by a modern method.
-				.csrf((csrf)-> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
+				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
 		return http.build();
 	}
 
-
 	@Bean
-	public UserDetailsManager userDetailsManager() {
+	public UserDetailsManager userDetailsManager(SystemDatabase systemDatabase) throws SQLException {
 		if ("ldap".equals(loginDataSource)) {
 			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(ldapServerAddress);
 			contextSource.afterPropertiesSet();
 
 			return new LdapUserDetailsManager(contextSource);
 		} else if ("database".equals(loginDataSource)) {
-			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(systemDatabase.getDataSource());
 			jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction from xtcasUsers where Username = ?");
 			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
 
 			return jdbcUserDetailsManager;
 		} else if (ADMIN.equals(loginDataSource)) {
-			UserDetails user = User
-					.withUsername(ADMIN)
-					.password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi"))
-					.roles(ADMIN)
-					.authorities(ADMIN)
-					.build();
+			UserDetails user = User.withUsername(ADMIN).password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")).roles(ADMIN).authorities(ADMIN).build();
 			return new InMemoryUserDetailsManager(user);
 		}
 		throw new IllegalArgumentException("dataSource contains unknown parameter '" + loginDataSource + "'");
@@ -156,6 +147,5 @@ public class SecurityConfig {
 			}
 		};
 	}
-
 
 }

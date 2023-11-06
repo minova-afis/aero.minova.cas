@@ -262,7 +262,7 @@
 		<dependency>
 			<groupId>com.microsoft.azure</groupId>
 			<artifactId>msal4j</artifactId>
-			<version>1.13.10</version>
+			<version>1.14.0</version>
 		</dependency>
 		<dependency>
 			<!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.github) bereitgestellt: service/doc/adoc/extensions.adoc -->

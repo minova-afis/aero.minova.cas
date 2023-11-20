@@ -11,9 +11,9 @@ LABEL maintainer=service@minova.com
 
 COPY service/target/libs /opt/aero.minova.cas/lib/
 COPY service/target/*.jar /opt/aero.minova.cas/lib/
-COPY app/target/classes /opt/aero.minova.cas/system-files/
-COPY app/target/classes/files /opt/aero.minova.cas/system-files/
-COPY app/target/classes/forms /opt/aero.minova.cas/system-files/
+COPY app/target/docker-layer /opt/aero.minova.cas/system-files/
+COPY app/target/docker-extension-layer /opt/aero.minova.cas/lib/
+COPY app/target/extensions /opt/aero.minova.cas/lib/
 
 COPY app/target/cas.app-12.66.1-SNAPSHOT.jar /opt/aero.minova.cas/lib/
 

@@ -30,6 +30,30 @@
                 <version>3.3.0</version>
                 <executions>
                     <execution>
+                        <id>copy-cas-as-app-extension</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../service/target/libs</directory>
+                                    <includes>
+                                        <include>*</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/../service/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-extensions</id>
                         <phase>package</phase>
                         <goals>
@@ -51,6 +75,15 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <!-- Sorgt dafür, dass die Jar mit dem Java-Extension-Code in der App-Jar/Projekt vorhanden ist. -->
+                    <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>

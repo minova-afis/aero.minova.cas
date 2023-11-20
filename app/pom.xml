@@ -6,7 +6,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>app.parent</artifactId>
-        <version>12.9.2</version>
+        <version>12.9.5</version>
         <relativePath/>
     </parent>
     <dependencies>
@@ -31,7 +31,7 @@
                 <executions>
                     <execution>
                         <id>copy-extensions</id>
-                        <phase>generate-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -39,10 +39,13 @@
                             <outputDirectory>${project.build.directory}/extensions</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/</directory>
+                                    <directory>${project.build.directory}</directory>
                                     <includes>
-                                        <include>${project.groupId}-${project.version}.jar</include>
+                                        <include>*.jar</include>
                                     </includes>
+                                    <excludes>
+                                        <exclude>*-app.jar</exclude>
+                                    </excludes>
                                 </resource>
                             </resources>
                         </configuration>

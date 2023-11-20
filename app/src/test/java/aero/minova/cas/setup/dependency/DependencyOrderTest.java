@@ -116,8 +116,6 @@ class DependencyOrderTest {
 				"aero.minova.workingtime", //
 				"aero.minova.sis.spellingcontrol.app", //
 				"aero.minova.workingtime.github.app", //
-				"aero.minova.cas.api", //
-				"aero.minova.cas.service", //
 				"aero.minova.trac.extension", //
 				"aero.minova.workingtime.github.extension" //
 		);

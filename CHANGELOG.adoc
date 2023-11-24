@@ -4,7 +4,23 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* Rücknahme des PR von: Benutzeranmeldung über Datenbank fixen. Es wurde keine DataSource initialisiert. 
+
+## [12.67.0] -- 2023-10-13
+* Beim Einfügen von Authorities über die Maske (xpcasInsertAuthorities) wurden LastAction, LastUser und LastDate nicht gesetzt.
+* Benutzeranmeldung über Datenbank fixen. Es wurde keine DataSource initialisiert. 
+
+## [12.66.4] -- 2023-10-06
+* Doppeltes setzen vom UserPrivelege "setup" behoben
+
+## [12.66.3] -- 2023-10-05
+* Tabellen um eine Hilfsmethode erweitert, mit der man eine Spalte über den Namen finden kann
+* JPA Tabelle für Users um Description erweitert
+
+## [12.66.2] -- 2023-09-26
 * Dependabot beobachtet nun neben Maven POMs und GitHub Actions auch Container Images
+* Eweitern der Doku zur benutzerspezifischen MDI-Erstellung.
+* Auslesen der LDAP User Tokens korrigieren. Zuvor entstand ein Fehler, da es sich um eine ImmutableList handelte.
 
 ## [12.66.1] -- 2023-09-21
 * final für dataSource in SecurityConfig von Service wiederhergestellt.

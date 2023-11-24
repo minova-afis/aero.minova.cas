@@ -52,6 +52,16 @@ spring.datasource.password=<Passwort aus der Connection.xbs>
 login_dataSource=<database|admin|ldap>
 --------
 
+=== Bei erstmaliger Installation
+
+Bei der ersten Installation müssen die JPA-Tabellen initialisiert werden, bevor das Setup durchgeführt wird.
+.JPA-Einstellungen
+----
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.defer-datasource-initialization=true
+spring.sql.init.mode=always
+----
+
 === Optional Keystore für HTTPS einrichten.
 
 [source]
@@ -98,6 +108,13 @@ oder `cas-test.exe` und `cas-test.xml`
 	<arguments>-cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>
 	<logmode>rotate</logmode>
 </service>
+--------
+
+Möchte man vermeiden, dass der CAS Dienst zu viel Speicher zieht kann man eine Beschränkung in der `<arguments>` Zeile angeben, sodass sie z.B. so aussieht:
+
+[source,xml]
+--------
+	<arguments>-Xmx256m -Xms128m -cp "lib/*" aero.minova.cas.CoreApplicationSystemApplication</arguments>
 --------
 
 Wenn alles bereit steht,

@@ -21,18 +21,21 @@ with encryption as
 			raiserror('ADO | 25 | msg.sql.DuplicateMatchcodeNotAllowed', 16, 1) with seterror
 			return -1
 		end
-
-
-
 		
 		insert into xtcasAuthorities (
 			Username,
 			Authority,
-			KeyText
+			KeyText,
+			LastAction,
+			LastUser,
+			LastDate
 		) values (
 			@Username,
 			@UserGroup,
-			@KeyText
+			@KeyText,
+			1,
+			dbo.xfCasUser(),
+			getDate()
 		)
 
 		select @KeyLong = @@identity

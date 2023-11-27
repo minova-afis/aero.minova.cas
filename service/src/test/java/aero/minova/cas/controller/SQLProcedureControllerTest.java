@@ -1,7 +1,7 @@
 package aero.minova.cas.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Connection;
@@ -90,7 +90,7 @@ public class SQLProcedureControllerTest extends BaseTest {
 		ResponseEntity procedureResult = spc.executeProcedure(procedure);
 
 		// Es muss mindestens das eine eben erstellte Recht geben
-		assertFalse(procedureResult.getBody() == null);
+		assertNotNull(procedureResult.getBody());
 	}
 
 	public void loadData() {

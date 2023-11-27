@@ -424,6 +424,8 @@ public class ProcedureService {
 			try {
 				returnCode = preparedStatement.getObject(1);
 			} catch (Exception e) {
+				// Wenn preparedStatement.getObject(1) ausgeführt wird, können in Spezialfällen "No Data available" geworfen werden, obwohl die Prozeudr
+				// ausgeführt wurde.
 				Logger.logException(e);
 			}
 

@@ -36,11 +36,14 @@ import aero.minova.cas.sql.SystemDatabase;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.val;
+import net.sourceforge.jtds.util.Logger;
 
 @Service
 public class ProcedureService {
 
 	private static final String POSTGRESQLDIALECT = "PostgreSQLDialect";
+
+	private static final String H2DIALECT = "H2";
 
 	@Autowired
 	CustomLogger customLogger;
@@ -74,6 +77,9 @@ public class ProcedureService {
 		CallableStatement userContextSetter;
 		if (dialect.contains(POSTGRESQLDIALECT)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
+		} else if (dialect.contains(H2DIALECT)) {
+			// H2 wird bei uns für Tests verwendet. Hier gibt es so etaws wie Session Context nicht, da es sich um eine In-Memory Datenbank handelt.
+			return;
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
 		}
@@ -94,8 +100,8 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
-	 * 	          können alle Spalten gesehen werden.
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist, können alle Spalten gesehen
+	 *            werden.
 	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
@@ -111,8 +117,8 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
-	 *            können alle Spalten gesehen werden.
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist, können alle Spalten gesehen
+	 *            werden.
 	 * @param isSetup
 	 *            <code>true</code>, falls es sich um einen Aufruf im Rahmen des Setup handelt
 	 * @return Resultat SqlProcedureResult der Ausführung
@@ -258,19 +264,16 @@ public class ProcedureService {
 
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			{   /*
+			{ /*
 				 * Man würde hier erwarten, dass der Code wie in folgender Doku aussieht:
-				 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16
-				 *
-				 * Das liegt vor allem daran, dass eine SQL-Prozedur sehr viele
-				 * verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat.
-				 *
-				 * Folgender Artikel umreist, dass ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+				 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16 Das liegt vor allem daran, dass eine
+				 * SQL-Prozedur sehr viele verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat. Folgender Artikel umreist, dass
+				 * ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
 				 */
 				int i = 0;
 				while (preparedStatement.getResultSet() == null) {
-					/* Es kann sein, dass am Anfang einige ResultsSets leer sind.
-					 * Diese muss man manuel rausfiltern.
+					/*
+					 * Es kann sein, dass am Anfang einige ResultsSets leer sind. Diese muss man manuel rausfiltern.
 					 */
 
 					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
@@ -278,9 +281,8 @@ public class ProcedureService {
 						break;
 					}
 					/**
-					 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets.
-					 * Sind mehr vorhanden, ist das Verhalten der Treiber nicht kontrollierbar:
-					 * https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+					 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets. Sind mehr vorhanden, ist das Verhalten der Treiber nicht
+					 * kontrollierbar: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
 					 */
 					if (++i >= maxResultSetCount) {
 						customLogger.logSql(
@@ -317,7 +319,7 @@ public class ProcedureService {
 								} else if (type == Types.BIGINT) {
 									return new Column(name, DataType.LONG);
 								} else {
-									customLogger.logFiles( "calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type );
+									customLogger.logFiles("calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type);
 									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}
 							} catch (Exception e) {
@@ -418,7 +420,13 @@ public class ProcedureService {
 				}
 			}
 			// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
-			val returnCode = preparedStatement.getObject(1);
+			Object returnCode = null;
+			try {
+				returnCode = preparedStatement.getObject(1);
+			} catch (Exception e) {
+				Logger.logException(e);
+			}
+
 			if (returnCode != null) {
 				int reCode = preparedStatement.getInt(1);
 				resultForThisRow.setReturnCode(reCode);
@@ -457,7 +465,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
@@ -479,7 +487,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -501,7 +509,7 @@ public class ProcedureService {
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -512,13 +520,11 @@ public class ProcedureService {
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor.
-	 * Siehe {@link #prepareProcedureString(Table, Set)}.
+	 * Bereitet einen Prozedur-String vor. Siehe {@link #prepareProcedureString(Table, Set)}.
 	 *
 	 * @param params
-	 * 			gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
-	 * @return
-	 * 			die SQL-Anweisung
+	 *            gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
+	 * @return die SQL-Anweisung
 	 * @throws IllegalArgumentException
 	 *             wenn der Name in der <code>params</code>-Table leer ist.
 	 */
@@ -527,17 +533,16 @@ public class ProcedureService {
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor.
-	 * Als Ergebnis entsteht ein SQL call-Statement in der Form:<br><ol>
-	 *     <li>{ ? = call procName() }</li>
-	 *     <li>{ call procName() }</li>
-	 *     <li>{ call procName( ? ) }</li>
-	 *     <li>{ call procName( ?,?, &#8230; ) }</li>
-	 *     <li>{ ? = call procName( ?,?, &#8230; ) }</li>
+	 * Bereitet einen Prozedur-String vor. Als Ergebnis entsteht ein SQL call-Statement in der Form:<br>
+	 * <ol>
+	 * <li>{ ? = call procName() }</li>
+	 * <li>{ call procName() }</li>
+	 * <li>{ call procName( ? ) }</li>
+	 * <li>{ call procName( ?,?, &#8230; ) }</li>
+	 * <li>{ ? = call procName( ?,?, &#8230; ) }</li>
 	 * </ol>
-	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table.
-	 * Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl der Spalten der params-Table.
-	 * <br>
+	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table. Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl
+	 * der Spalten der params-Table. <br>
 	 * ToDo: prüfen, ob der Name weiter geprüft werden kann oder escaped werden sollte
 	 *
 	 * @param params

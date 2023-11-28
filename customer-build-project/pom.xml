@@ -12,6 +12,7 @@
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.parent</artifactId>
         <version>12.67.1-SNAPSHOT</version>
+        <relativePath>../cas.extension.parent</relativePath>
     </parent>
     <dependencies>
         <dependency>

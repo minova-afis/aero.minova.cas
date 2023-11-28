@@ -1,6 +1,5 @@
 package aero.minova.cas.resource.maven.plugin;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -77,7 +76,7 @@ public class ResourceListGenerator extends AbstractMojo {
                                     final var jarEntry = jarContent.nextElement();
                                     if (!jarEntry.getName().equals("aero.minova.app.resources/")
                                             && jarEntry.getName().startsWith("aero.minova.app.resources/")) {
-                                        deployList.append(jarEntry.getName());
+                                        deployList.append("/" + jarEntry.getName());
                                         deployList.append('\n');
                                     }
                                 }
@@ -87,7 +86,7 @@ public class ResourceListGenerator extends AbstractMojo {
                         }
                     });
                 }
-                deployList.append(resourceFolderName + "/" + resourceFileName);
+                deployList.append("/" + resourceFolderName + "/" + resourceFileName);
                 deployList.append('\n');
                 Files.writeString(deployFile, deployList.toString());
             } else if (createDeployList) {

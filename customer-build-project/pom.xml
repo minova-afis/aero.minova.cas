@@ -29,7 +29,7 @@
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>
-                        <phase>package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>generate-resource-file</goal>
                         </goals>
@@ -45,7 +45,7 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>

@@ -10,14 +10,14 @@
     </description>
     <parent>
         <groupId>aero.minova</groupId>
-        <artifactId>cas.parent</artifactId>
+        <artifactId>cas.extension.parent</artifactId>
         <version>12.67.1-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>cas.app</artifactId>
-            <version>${project.version}</version>
+            <version>12.67.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
@@ -35,22 +35,6 @@
                         </goals>
                         <configuration>
                             <createDeployList>true</createDeployList>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/jar-dependencies</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

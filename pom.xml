@@ -21,6 +21,7 @@
 
     <modules>
         <module>resource-plugin</module>
+        <module>cas.extension.parent</module>
         <module>dev</module>
         <module>api</module>
         <module>app</module>

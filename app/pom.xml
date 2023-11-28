@@ -5,71 +5,60 @@
     <version>12.67.1-SNAPSHOT</version>
     <parent>
         <groupId>aero.minova</groupId>
-        <artifactId>app.parent</artifactId>
-        <version>12.9.5</version>
-        <relativePath/>
+        <artifactId>cas.parent</artifactId>
+        <version>12.67.1-SNAPSHOT</version>
     </parent>
     <dependencies>
-        <dependency>
+        <!-- TODO <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>app.i18n</artifactId>
             <version>12.17.1</version>
             <classifier>app</classifier>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>cas.service</artifactId>
-            <version>12.66.1</version>
-            <scope>provided</scope>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>aero.minova</groupId>
+            <artifactId>cas.setup</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.0</version>
         </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>2.6</version>
                 <executions>
                     <execution>
-                        <id>copy-cas-as-app-extension</id>
+                        <id>copy-i18n</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                            <outputDirectory>${basedir}/target/classes/i18n</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/../service/target/libs</directory>
+                                    <directory>${basedir}/src/main/app/i18n</directory>
                                     <includes>
-                                        <include>*</include>
+                                        <include>**/*</include>
                                     </includes>
-                                </resource>
-                                <resource>
-                                    <directory>${project.basedir}/../service/target</directory>
-                                    <includes>
-                                        <include>*.jar</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-extensions</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>*.jar</include>
-                                    </includes>
-                                    <excludes>
-                                        <exclude>*-app.jar</exclude>
-                                    </excludes>
                                 </resource>
                             </resources>
                         </configuration>
@@ -83,12 +72,10 @@
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>generate-resource-file</goal>
                         </goals>
-                        <configuration>
-                            <createDeployList>true</createDeployList>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -98,7 +85,7 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
@@ -107,14 +94,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <configuration>
-                    <!-- Sorgt dafür, dass die Jar mit dem Java-Extension-Code in der App-Jar/Projekt vorhanden ist. -->
-                    <outputDirectory>${project.build.directory}/extensions</outputDirectory>
-                </configuration>
             </plugin>
         </plugins>
     </build>

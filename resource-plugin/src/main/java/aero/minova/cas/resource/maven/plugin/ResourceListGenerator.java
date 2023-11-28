@@ -25,10 +25,12 @@ public class ResourceListGenerator extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         final var targetFolder = Path.of(project.getBuild().getDirectory());
-        final var libsFolder = targetFolder.resolve("libs");
+        final var libsFolder = targetFolder.resolve("jar-dependencies");
         final var classesFolder = targetFolder.resolve("classes");
-        final var resourceFolder = classesFolder.resolve("aero.minova.app.resources");
-        final var resourceFile = resourceFolder.resolve(project.getGroupId() + "." + project.getArtifactId() + ".resources.txt");
+        final var resourceFolderName = "aero.minova.app.resources";
+        final var resourceFolder = classesFolder.resolve(resourceFolderName);
+        final var resourceFileName = project.getGroupId() + "." + project.getArtifactId() + ".resources.txt";
+        final var resourceFile = resourceFolder.resolve(resourceFileName);
         final var deployFile = resourceFolder.resolve("deployed.resource.txt");
         try {
             Files.createDirectories(resourceFolder);
@@ -56,28 +58,35 @@ public class ResourceListGenerator extends AbstractMojo {
                 final var deployList = new StringBuilder();
                 try (final var jarFiles = Files.walk(libsFolder)) {
                     jarFiles.forEach(jarPath -> {
-                        try {
-                            final var jar = new JarFile(jarPath.toFile());
-                            final var jarContent = jar.entries();
-                            while (jarContent.hasMoreElements()) {
-                                final var jarEntry = jarContent.nextElement();
-                                if (jarEntry.getName().startsWith("/aero.minova.app.resources/")) {
-                                    deployList.append(jarEntry.getName());
-                                    deployList.append('\n');
+                        if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar")) {
+                            try {
+                                final var jar = new JarFile(jarPath.toFile());
+                                final var jarContent = jar.entries();
+                                while (jarContent.hasMoreElements()) {
+                                    final var jarEntry = jarContent.nextElement();
+                                    if (!jarEntry.getName().equals("aero.minova.app.resources/")
+                                            && jarEntry.getName().startsWith("aero.minova.app.resources/")) {
+                                        deployList.append(jarEntry.getName());
+                                        deployList.append('\n');
+                                    }
                                 }
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
                             }
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
                         }
                     });
                 }
+                deployList.append(resourceFolderName + "/" + resourceFileName);
+                deployList.append('\n');
                 Files.writeString(deployFile, deployList.toString());
-            } else {
+            } else if (createDeployList) {
                 throw new FileNotFoundException("libs folder is missing for `createDeployList` goal: " + libsFolder);
             }
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             throw new MojoExecutionException("Could not generate resource file: " + resourceFile, e);
         }
+
     }
 
     private static String normalize(Path classesFolder, Path arg) {

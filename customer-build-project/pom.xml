@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cas-customer-build-project</artifactId>
-    <version>12.66.1-SNAPSHOT</version>
+    <version>12.67.1-SNAPSHOT</version>
     <description>Stellt sicher, dass im CAS image nur das verfügbar ist,
         was im CAS-App auch veröffentlicht wurde und nicht Dinge,
         welche durch dessen POM reinkopiert wurde.
@@ -10,18 +10,68 @@
     </description>
     <parent>
         <groupId>aero.minova</groupId>
-        <artifactId>app.parent</artifactId>
-        <version>12.9.5</version>
-        <relativePath/>
+        <artifactId>cas.parent</artifactId>
+        <version>12.67.1-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>cas.app</artifactId>
             <version>${project.version}</version>
-            <classifier>app</classifier>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>aero.minova</groupId>
+                <artifactId>cas.resource.maven.plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-resource-file</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>generate-resource-file</goal>
+                        </goals>
+                        <configuration>
+                            <createDeployList>true</createDeployList>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/jar-dependencies</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
+                    <layout>ZIP</layout>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
         <tag>v12.64.0</tag>

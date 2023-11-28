@@ -1,6 +1,11 @@
-# Setup-Plugin für das CAS
+# Standard App-Projekt
 
-## Beschreibung
+Dieses Projekt enthält die minimalen Masken und Daten, um das CAS zu verwenden,
+sowie das Setup-Plugin, um die Datenbank aufzusetzen.
+
+## Setup-Plugin für das CAS
+
+### Beschreibung
 
 Hiermit werden die Komponenten des link:https://github.com/minova-afis/aero.minova.app.parent[APP-Servers] installiert.
 Dazu wird die `setup/Setup.xml` des APP-Servers mithilfe des Install-Tools ausgewertet:
@@ -9,12 +14,12 @@ Dazu wird die `setup/Setup.xml` des APP-Servers mithilfe des Install-Tools ausge
 * Die Schema-Definitionen werden zuerst aufgespielt.
 * Anschließend wird SQL-Code ausgeführt, welche Initialisierungs-Skripte durchführen und Prozeduren und Views erstellen.
 
-## Installation
+### Installation
 
 Die Jar des target-Ordners und des libs-Ordners
 in den lib-Ordner vom CAS kopieren.
 
-## API
+### API
 
 Das Plugin ist eine Erweiterung des `data/procedure`-Pfades.
 

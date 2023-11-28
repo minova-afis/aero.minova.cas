@@ -6,10 +6,9 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>app.parent</artifactId>
-        <version>12.9.2</version>
+        <version>12.9.5</version>
         <relativePath/>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>aero.minova</groupId>
@@ -17,9 +16,66 @@
             <version>12.17.1</version>
             <classifier>app</classifier>
         </dependency>
+        <dependency>
+            <groupId>aero.minova</groupId>
+            <artifactId>cas.service</artifactId>
+            <version>12.66.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-cas-as-app-extension</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../service/target/libs</directory>
+                                    <includes>
+                                        <include>*</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/../service/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-extensions</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>*-app.jar</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
@@ -47,15 +103,21 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/libs
-                            </outputDirectory>
+                            <outputDirectory>${project.build.directory}/jar-dependencies</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <!-- Sorgt dafür, dass die Jar mit dem Java-Extension-Code in der App-Jar/Projekt vorhanden ist. -->
+                    <outputDirectory>${project.build.directory}/extensions</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
         <tag>v12.64.0</tag>

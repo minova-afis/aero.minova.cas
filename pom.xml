@@ -28,6 +28,7 @@
         <module>service</module>
         <module>setup</module>
         <module>fat.jar</module>
+        <module>customer-build-project</module>
     </modules>
 
     <repositories>

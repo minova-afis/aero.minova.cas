@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup name="example.app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
+	<sql-code>
+	</sql-code>
+	<schema>
+	</schema>
+</setup>

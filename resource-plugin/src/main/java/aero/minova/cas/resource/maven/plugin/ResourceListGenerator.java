@@ -35,7 +35,7 @@ public class ResourceListGenerator extends AbstractMojo {
         try {
             Files.createDirectories(resourceFolder);
             final var resourceList = new StringBuilder();
-            for (String resourceSubFolderName : new String[]{"forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables"}) {
+            for (String resourceSubFolderName : new String[]{"files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables"}) {
                 final var resourceSubFolder = classesFolder.resolve(resourceSubFolderName);
                 if (Files.isDirectory(resourceSubFolder)) {
                     try (final var resources = Files.walk(resourceSubFolder)) {
@@ -51,6 +51,17 @@ public class ResourceListGenerator extends AbstractMojo {
                             }
                         });
                     }
+                }
+            }
+            final var resourceSubFolder = classesFolder;
+            if (Files.isDirectory(resourceSubFolder)) {
+                try (final var resources = Files.walk(resourceSubFolder, 1)) {
+                    resources.forEach(r -> {
+                        if (Files.isRegularFile(r)) {
+                            resourceList.append(normalize(classesFolder, r));
+                            resourceList.append('\n');
+                        }
+                    });
                 }
             }
             Files.writeString(resourceFile, resourceList.toString());

@@ -46,6 +46,12 @@
                 <configuration>
                     <mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
                     <layout>ZIP</layout>
+										<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
                 </configuration>
                 <executions>
                     <execution>

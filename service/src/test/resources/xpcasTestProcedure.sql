@@ -1,1 +1,0 @@
-CREATE ALIAS xpcasTestProcedure FOR "aero.minova.cas.controller.SQLProcedureControllerTest.test";

@@ -15,9 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -69,10 +67,8 @@ public class SQLProcedureControllerTest extends BaseTest {
 
 	@Test
 	@DisplayName("Prozedurenaufruf testen")
-	@Sql({ "/xpcasTestProcedure.sql" })
+	@Sql({ "/xvcasUserSecurityForTest.sql", "/xpcasTestProcedure.sql" })
 	void testProcedure() throws Exception {
-
-		loadData();
 
 		// Recht und Admin-Nutzer erstellen
 		authorizationService.findOrCreateUserPrivilege("xvcasUserSecurity");
@@ -91,13 +87,6 @@ public class SQLProcedureControllerTest extends BaseTest {
 
 		// Es muss mindestens das eine eben erstellte Recht geben
 		assertNotNull(procedureResult.getBody());
-	}
-
-	public void loadData() {
-		String filename = "xvcasUserSecurityForTest.sql";
-
-		ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator(false, false, "UTF-8", new ClassPathResource(filename));
-		resourceDatabasePopulator.execute(dataSource);
 	}
 
 }

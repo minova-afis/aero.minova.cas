@@ -38,6 +38,12 @@
             <artifactId>commons-io</artifactId>
             <version>2.15.0</version>
         </dependency>
+        <dependency>
+            <groupId>aero.minova</groupId>
+            <artifactId>app.build</artifactId>
+            <version>12.2.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -82,13 +88,31 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-files-root</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/app/files</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-forms</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/forms</outputDirectory>
+                            <outputDirectory>${basedir}/target/generated-resources/forms</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/app/forms</directory>
@@ -242,6 +266,73 @@
                                     </includes>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <id>transform-forms</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <transformationSets>
+                                <transformationSet>
+                                    <dir>${project.build.directory}/generated-resources/forms</dir>
+                                    <outputDir>${project.build.directory}/classes/forms</outputDir>
+                                    <stylesheet>${project.build.directory}/build/form2xml.xsl</stylesheet>
+                                    <includes>
+                                        <include>**/*.form.xml</include>
+                                    </includes>
+                                    <fileMappers>
+                                        <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                                            <pattern>\.form\.xml$</pattern>
+                                            <replacement>.xml</replacement>
+                                        </fileMapper>
+                                        <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+                                    </fileMappers>
+                                </transformationSet>
+                                <transformationSet>
+                                    <dir>${project.build.directory}/generated-resources/forms</dir>
+                                    <outputDir>${project.build.directory}/classes</outputDir>
+                                    <stylesheet>${project.build.directory}/build/form2xml.xsl</stylesheet>
+                                    <includes>
+                                        <include>**/*.form.xml</include>
+                                    </includes>
+                                    <fileMappers>
+                                        <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                                            <pattern>\.form\.xml$</pattern>
+                                            <replacement>.xml</replacement>
+                                        </fileMapper>
+                                        <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+                                    </fileMappers>
+                                </transformationSet>
+                            </transformationSets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-build-files</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>aero.minova</includeGroupIds>
+                            <includeArtifactIds>app.build</includeArtifactIds>
+                            <includes>build/**/*</includes>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

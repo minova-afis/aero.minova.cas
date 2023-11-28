@@ -2,12 +2,14 @@ package aero.minova.cas.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -73,7 +75,7 @@ public class SQLProcedureControllerTest extends BaseTest {
 	public static Integer testString(Connection connection, String keyText) throws SQLException {
 		// Translate your T-SQL statements to jOOQ statements
 		return DSL.using(connection, SQLDialect.H2).select(DSL.field("KeyLong")).from(SECURITYVIEW).where(DSL.field("PrivilegeKeyText").eq(keyText)).fetchOne(0,
-				int.class);
+				Integer.class);
 	}
 
 	public static Integer testBoolean(Connection connection, Boolean rowLevelSecurity, String keyText) throws SQLException {
@@ -86,6 +88,18 @@ public class SQLProcedureControllerTest extends BaseTest {
 		// Translate your T-SQL statements to jOOQ statements
 		return DSL.using(connection, SQLDialect.H2).select(DSL.field("RowLevelSecurity")).from(SECURITYVIEW).where(DSL.field("PrivilegeKeyText").eq(keyText))
 				.fetchOne(0, Boolean.class);
+	}
+
+	public static java.sql.Timestamp testInstant(Connection connection, String keyText) throws SQLException {
+		// Translate your T-SQL statements to jOOQ statements
+		return DSL.using(connection, SQLDialect.H2).select(DSL.field("LastDate")).from(SECURITYVIEW).where(DSL.field("PrivilegeKeyText").eq(keyText))
+				.fetchOne(0, java.sql.Timestamp.class);
+	}
+
+	public static Integer testInstant2(Connection connection, Instant lastDate) throws SQLException {
+		// Translate your T-SQL statements to jOOQ statements
+		return DSL.using(connection, SQLDialect.H2).selectCount().from(SECURITYVIEW).where(DSL.field("LastDate").lessOrEqual(lastDate)).fetchOne(0,
+				Integer.class);
 	}
 
 	@Test
@@ -188,6 +202,56 @@ public class SQLProcedureControllerTest extends BaseTest {
 		assertNotNull(procedureResult.getBody());
 		SqlProcedureResult result = (SqlProcedureResult) procedureResult.getBody();
 		assertFalse(result.getResultSet().getRows().get(0).getValues().get(0).getBooleanValue());
+	}
+
+	@Test
+	@DisplayName("Prozedurenaufruf für Instant testen")
+	void testProcedureInstant() throws Exception {
+
+		// Recht und Admin-Nutzer erstellen
+		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
+		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureInstant2");
+		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
+
+		// Tabelle für Index-Anfrage erstellen
+		Table procedure = new Table();
+		procedure.setName("xpcasTestProcedureInstant2");
+		procedure.addColumn(new Column("LastDate", DataType.INSTANT));
+		Row r = new Row();
+		r.addValue(new Value(Instant.now(), null));
+		procedure.addRow(r);
+
+		ResponseEntity procedureResult = spc.executeProcedure(procedure);
+
+		// Es muss mindestens das eine eben erstellte Recht geben
+		assertNotNull(procedureResult.getBody());
+		SqlProcedureResult result = (SqlProcedureResult) procedureResult.getBody();
+		assertEquals(2, result.getResultSet().getRows().get(0).getValues().get(0).getIntegerValue());
+	}
+
+	@Test
+	@DisplayName("Prozedurenaufruf für Instant als Rückgabewert testen")
+	void testProcedureInstant2() throws Exception {
+
+		// Recht und Admin-Nutzer erstellen
+		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
+		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureInstant");
+		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
+
+		// Tabelle für Index-Anfrage erstellen
+		Table procedure = new Table();
+		procedure.setName("xpcasTestProcedureInstant");
+		procedure.addColumn(new Column("KeyText", DataType.STRING));
+		Row r = new Row();
+		r.addValue(new Value(SECURITYVIEW, null));
+		procedure.addRow(r);
+
+		ResponseEntity procedureResult = spc.executeProcedure(procedure);
+
+		// Es muss mindestens das eine eben erstellte Recht geben
+		assertNotNull(procedureResult.getBody());
+		SqlProcedureResult result = (SqlProcedureResult) procedureResult.getBody();
+		assertTrue(Instant.now().isAfter(result.getResultSet().getRows().get(0).getValues().get(0).getInstantValue()));
 	}
 
 }

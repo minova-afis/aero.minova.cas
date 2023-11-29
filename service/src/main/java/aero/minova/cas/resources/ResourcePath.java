@@ -14,7 +14,7 @@ public class ResourcePath implements Path {
     public ResourcePath(List<String> pathArg, FileSystem fileSystemArg) {
         path = new ArrayList<>(pathArg.size());
         for (final String element : pathArg) {
-            if (!element.equals("/") && !element.isEmpty()) {
+            if (!element.equals("/") && !element.isEmpty() && !element.equals(".")) {
                 path.add(element);
             }
         }

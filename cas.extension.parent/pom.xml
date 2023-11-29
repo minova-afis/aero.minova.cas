@@ -16,11 +16,6 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>aero.minova</groupId>
-            <artifactId>cas.setup</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
@@ -378,6 +373,22 @@
                                     <includeArtifactIds>app.build</includeArtifactIds>
                                     <includes>build/**/*</includes>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack-dependencies-setup</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>unpack-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+                                    <includeScope>compile</includeScope>
+                                    <includeTypes>jar</includeTypes>
+                                    <includes>setup/**/*.xml</includes>
+                                    <outputDirectory>${project.build.directory}/classes/setup</outputDirectory>
+                                    <overWriteReleases>true</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
                                 </configuration>
                             </execution>
                         </executions>

@@ -69,6 +69,8 @@ public class CustomLogger {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
+		// TODO Der Stacktrace wird nicht geloggt, daher habe ich als Übergangslösung ein printStackTrace eingebaut.
+		e.printStackTrace();
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
 		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
 

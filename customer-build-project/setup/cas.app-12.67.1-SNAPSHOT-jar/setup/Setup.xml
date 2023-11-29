@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup name="aero.minova.cas.app" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
+    <sql-code>
+        <script name="xtcasAuthoritiesConstraints" type="script"/>
+        <script name="initDebug" type="script"/>
+        <script name="initVersionTable" type="script"/>
+        <script name="initVersionTable1" type="script"/>
+        <!-- Die Prozeduren spMinovaUpdateVersion und spMinovaCheckProcedure müssen als type="script" aufgespielt werden,
+        weil type="procedure" diese beiden Prozeduren benötigt. Siehe initVersionTable1, sorgt dafür, dass alter procedure funktioniert. -->
+        <script name="spMinovaUpdateVersion" type="script"/>
+        <script name="spMinovaCheckProcedure" type="script"/>
+        <script name="spMinovaCheckView" type="procedure"/>
+        <script name="spMinovaCheckFunction" type="procedure"/>
+        <script name="spMinovaCheckTable" type="procedure"/>
+        <script name="spMinovaCheckData" type="procedure"/>
+        <script name="xfCasUser" type="function"/>
+        <script name="xvcasUserPrivileges" type="view"/>
+        <script name="xvcasUserSecurity" type="view"/>
+        <script name="xpcasReadUser" type="procedure"/>
+        <script name="xpcasInsertUser" type="procedure"/>
+        <script name="xpcasUpdateUser" type="procedure"/>
+        <script name="xpcasDeleteUser" type="procedure"/>
+        <script name="xvcasUserIndex" type="view"/>
+        <script name="xpcasReadUserGroup" type="procedure"/>
+        <script name="xpcasInsertUserGroup" type="procedure"/>
+        <script name="xpcasUpdateUserGroup" type="procedure"/>
+        <script name="xpcasDeleteUserGroup" type="procedure"/>
+        <script name="xvcasUserGroupIndex" type="view"/>
+        <script name="xpcasReadColumnSecurity" type="procedure"/>
+        <script name="xpcasInsertColumnSecurity" type="procedure"/>
+        <script name="xpcasUpdateColumnSecurity" type="procedure"/>
+        <script name="xpcasDeleteColumnSecurity" type="procedure"/>
+        <script name="xvcasColumnSecurityIndex" type="view"/>
+        <script name="xpcasReadLuUserPrivilegeUserGroup" type="procedure"/>
+        <script name="xpcasInsertLuUserPrivilegeUserGroup" type="procedure"/>
+        <script name="xpcasUpdateLuUserPrivilegeUserGroup" type="procedure"/>
+        <script name="xpcasDeleteLuUserPrivilegeUserGroup" type="procedure"/>
+        <script name="xpcasReadUserPrivilege" type="procedure"/>
+        <script name="xpcasInsertUserPrivilege" type="procedure"/>
+        <script name="xpcasUpdateUserPrivilege" type="procedure"/>
+        <script name="xpcasDeleteUserPrivilege" type="procedure"/>
+        <script name="xvcasUserPrivilegeIndex" type="view"/>
+        <script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
+        <script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
+        <script name="xvcasCASServiceMessage" type="view"/>
+        <script name="xvcasCASServices" type="view"/>
+        <script name="xpcasInsertCASService" type="procedure"/>
+        <script name="xpcasDeleteCASService" type="procedure"/>
+        <script name="xpcasInsertProcedureNewsfeed" type="procedure"/>
+        <script name="xpcasDeleteProcedureNewsfeed" type="procedure"/>
+        <script name="xpcasInsertNewsfeedListener" type="procedure"/>
+        <script name="xpcasDeleteNewsfeedListener" type="procedure"/>
+        <script name="xpcasDeleteServiceMessage" type="procedure"/>
+        <script name="xpcasInsertServiceMessage" type="procedure"/>
+        <script name="xpcasReadServiceMessage" type="procedure"/>
+        <script name="xpcasUpdateServiceMessage" type="procedure"/>
+        <script name="xpcasDeleteAuthorities" type="procedure"/>
+        <script name="xpcasDeleteUsers" type="procedure"/>
+        <script name="xpcasInsertAuthorities" type="procedure"/>
+        <script name="xpcasInsertUsers" type="procedure"/>
+        <script name="xpcasReadAuthorities" type="procedure"/>
+        <script name="xpcasReadUsers" type="procedure"/>
+        <script name="xpcasUpdateAuthorities" type="procedure"/>
+        <script name="xpcasUpdateUsers" type="procedure"/>
+        <script name="xvcasUsersIndex" type="view"/>
+        <script name="xvcasUsersIndex2" type="view"/>
+        <script name="xvcasUserIndex2" type="view"/>
+        <script name="xpcasDeleteUserGroupUser" type="procedure"/>
+        <script name="xpcasDeleteUserGroupUsers" type="procedure"/>
+        <script name="xpcasInsertUserGroupUser" type="procedure"/>
+        <script name="xpcasInsertUserGroupUsers" type="procedure"/>
+        <script name="xpcasReadUserGroupUser" type="procedure"/>
+        <script name="xpcasReadUserGroupUsers" type="procedure"/>
+        <script name="xpcasUpdateUserGroupUser" type="procedure"/>
+        <script name="xpcasUpdateUserGroupUsers" type="procedure"/>
+        <script name="xvcasServicePropertiesIndex" type="view"/>
+        <script name="xpcasDeleteServiceProperties" type="procedure"/>
+        <script name="xpcasInsertServiceProperties" type="procedure"/>
+        <script name="xpcasReadServiceProperties" type="procedure"/>
+        <script name="xpcasUpdateServiceProperties" type="procedure"/>
+        <script name="xpcasDeleteMdi" type="procedure" />
+		<script name="xpcasInsertMdi" type="procedure" />
+		<script name="xpcasReadMdi" type="procedure" />
+		<script name="xpcasUpdateMdi" type="procedure" />
+		<script name="xvcasMdiIndex" type="view" />
+		<script name="xpcasInitMdi" type="procedure" />
+		<script name="initMdi" type="script" />
+        <script name="xvcasMdi" type="view"/>
+    </sql-code>
+    <schema>
+        <tableschema name="xtcasError" type="table"/>
+        <tableschema name="xtcasUser" type="table"/>
+        <tableschema name="xtcasUsers" type="table"/>
+        <tableschema name="xtcasUserGroup" type="table"/>
+        <tableschema name="xtcasUserPrivilege" type="table"/>
+        <tableschema name="xtcasAuthorities" type="table"/>
+        <tableschema name="xtcasColumnSecurity" type="table"/>
+        <tableschema name="xtcasLuUserPrivilegeUserGroup" type="table"/>
+        <tableschema name="xtcasServiceMessageReceiverLoginType" type="table"/>
+        <tableschema name="xtcasCASServices" type="table"/>
+        <tableschema name="xtcasProcedureNewsfeed" type="table"/>
+        <tableschema name="xtcasNewsfeedListener" type="table"/>
+        <tableschema name="xtcasServiceMessage" type="table"/>
+        <tableschema name="xtcasServiceProperties" type="table"/>
+        <tableschema name="xtcasMdi" type="table"/>
+        <tableschema name="xtcasMdiType" type="table"/>
+    </schema>
+</setup>

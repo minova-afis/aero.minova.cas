@@ -70,7 +70,7 @@
                         <goals>
                             <goal>graph</goal>
                         </goals>
-                        <phase>compile</phase>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <graphFormat>json</graphFormat>
                             <showDuplicates>true</showDuplicates>
@@ -85,7 +85,7 @@
                 <executions>
                     <execution>
                         <id>copy-depgraph-to-setup</id>
-                        <phase>package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>

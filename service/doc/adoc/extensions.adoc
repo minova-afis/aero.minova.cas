@@ -47,6 +47,36 @@ Kundenprojekte mit `this-is-deployed-project.txt` dürfen nicht als Abhängigkei
 </project>
 ```
 
+== Extensions mit Spring Application
+
+Wenn man das CAS nicht über `aero.minova.cas.CoreApplicationSystemApplication` startet,
+sondern eine eigene Klasse mit Spring-Boot verwendet,
+sollten folgende Annotationen verwendet werden:
+
+```
+package aero.minova.example;
+
+import java.util.TimeZone;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@ComponentScan({ "aero.minova", "com.minova" })
+@EntityScan({ "aero.minova", "com.minova" })
+@Configuration
+public class ExampleApplication {
+	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		SpringApplication.run(ExampleApplication.class, args);
+	}
+}
+```
+
 == Erweiterungs-Registierung
 
 Hierzu muss bei dem jeweiligen Controller nur die Methode *'registerExtension'* aufgerufen werden.

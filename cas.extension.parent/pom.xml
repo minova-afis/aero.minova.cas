@@ -38,6 +38,18 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
                 <version>12.67.1-SNAPSHOT</version>
@@ -276,6 +288,53 @@
     </build>
     <profiles>
         <profile>
+            <id>setup-transformation</id>
+            <activation>
+                <file>
+                    <exists>${basedir}/src/main/app/setup</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-build-files</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>unpack-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <includeGroupIds>aero.minova</includeGroupIds>
+                                    <includeArtifactIds>app.build</includeArtifactIds>
+                                    <includes>build/**/*</includes>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack-dependencies-setup</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>unpack-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+                                    <includeScope>compile</includeScope>
+                                    <includeTypes>jar</includeTypes>
+                                    <includes>setup/**/*.xml</includes>
+                                    <outputDirectory>${project.build.directory}/classes/setup</outputDirectory>
+                                    <overWriteReleases>true</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>form-transformation</id>
             <activation>
                 <file>
@@ -373,22 +432,6 @@
                                     <includeArtifactIds>app.build</includeArtifactIds>
                                     <includes>build/**/*</includes>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>unpack-dependencies-setup</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>unpack-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
-                                    <includeScope>compile</includeScope>
-                                    <includeTypes>jar</includeTypes>
-                                    <includes>setup/**/*.xml</includes>
-                                    <outputDirectory>${project.build.directory}/classes/setup</outputDirectory>
-                                    <overWriteReleases>true</overWriteReleases>
-                                    <overWriteSnapshots>true</overWriteSnapshots>
                                 </configuration>
                             </execution>
                         </executions>

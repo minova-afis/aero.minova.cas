@@ -46,3 +46,62 @@ Kundenprojekte mit `this-is-deployed-project.txt` dürfen nicht als Abhängigkei
     </scm>
 </project>
 ```
+
+== Erweiterungs-Registierung
+
+Hierzu muss bei dem jeweiligen Controller nur die Methode *'registerExtension'* aufgerufen werden.
+Hierbei muss darauf geachtet werden, dass keine zwei Extensions mit demselben Namen exisiteren.
+In diesem Fall wird eine entsprechenede Exception geworfen.
+
+Alle registierten Erweiterungen werden beim 'Setup' automatisch als Recht mit installiert und können so einfacher an die Rollen vergeben werden.
+Denn bevor eine Extension ausgeführt wird, werden die Rollen des Nutzers, der die Anfrage stellt, erst einmal darauf überprüft,
+ob das entsprechende Recht für die Extension vorhanden ist.
+
+1. Controller-Klasse im src/main/java des extension-Projektes erstellen und dort je nach Bedarf den SQLViewController, den XSqlProcedureController und/oder den SqlProcedureController eintragen. Hier das @Autowired nicht vergessen.
+
+2. Eine Setup-Methode erstellen, welche mit der @PostConstruct-Annotation gekennziechet ist. Diese muss die *'registerExtension'*-Methode des vorher importierten Controllers aufrufen und damit die Extension mit dem dazugehörigen Keyword registrieren.
+
+3. Wenn in einer Extension etwas geloggt werden muss, wird dies über den CustomLogger gemacht. Welche Methode des Loggers für welchen Fall verwendet werden müssen, wird xref:./logs.adoc#[hier] erklärt.
+
+Die Klasse sollte am Ende ungefähr so aussehen:
+----
+import org.springframework.web.bind.annotation.RestController;
+
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.controller.SqlViewController;
+
+@RestController
+public class ExampleController {
+
+	@Autowired
+	SqlProcedureController sqlProcedureController;
+
+	@Autowired
+	XSqlProcedureController xsqlProcedureController;
+
+	@Autowired
+	SqlViewController sqlViewController;
+
+	@Autowired
+	CustomLogger customLogger;
+
+	@PostConstruct
+	public void setup() {
+		// fügt Extension hinzu
+		sqlProcedureController.registerExtension("xpcasBeispiel", this::doSomething);
+	}
+
+	private ResponseEntity<SqlProcedureResult> doSomething(Table inputTable) {
+		customLogger.logUserRequest("Hier wird etwas gemacht!");
+		return ResponseEntity//
+				.ok()//
+				.contentType(MediaType.APPLICATION_JSON)//
+				.body(new SqlProcedureResult());
+	}
+----
+
+== Besonderheiten
+
+* Die Extensions sind selbst dafür verwantwortlich, im Fehlerfall Rollbacks durchzuführen.
+* Gibt eine Extension null zurück, so wird die Prozedur/Transaktion zusätzlich als SQL ausgeführt

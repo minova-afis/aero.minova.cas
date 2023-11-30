@@ -91,8 +91,15 @@ public class FilesService {
     public void setUp() {
         if (isFatJarMode) {
             systemFolder = FILE_SYSTEM_PROVIDER.getFileSystem(null).getPath(rootPath);
-        } else if (rootPath == null || rootPath.isEmpty()) {
-            rootPath = Paths.get(".").toAbsolutePath().normalize().toString();
+            final var notExistingFolder = systemFolder.resolve("not-existing-folder");
+            internalFolder = systemFolder.resolve("Internal");
+            logsFolder = internalFolder.resolve("UserLogs");
+            md5Folder = internalFolder.resolve("MD5");
+            zipsFolder = internalFolder.resolve("Zips");
+        } else {
+            if (rootPath == null || rootPath.isEmpty()) {
+                rootPath = Paths.get(".").toAbsolutePath().normalize().toString();
+            }
             systemFolder = Paths.get(rootPath).toAbsolutePath().normalize();
             internalFolder = systemFolder.resolve("Internal").toAbsolutePath().normalize();
             logsFolder = internalFolder.resolve("UserLogs").toAbsolutePath().normalize();

@@ -27,7 +27,6 @@
         <module>app</module>
         <module>app.legacy</module>
         <module>service</module>
-        <module>setup</module>
         <module>cas.extension.parent</module>
         <module>cas.extension.deployment</module>
         <module>customer-build-project</module>

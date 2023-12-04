@@ -5,9 +5,9 @@
     <version>12.67.1-SNAPSHOT</version>
     <parent>
         <groupId>aero.minova</groupId>
-        <artifactId>cas.extension.parent</artifactId>
+        <artifactId>cas.extension.parent.internal</artifactId>
         <version>12.67.1-SNAPSHOT</version>
-        <relativePath>../cas.extension.parent</relativePath>
+        <relativePath>../cas.extension.parent.internal</relativePath>
     </parent>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>

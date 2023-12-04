@@ -1,36 +1,23 @@
 package ch.minova.install.setup;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
-import aero.minova.cas.setup.xml.setup.SetupType;
 import aero.minova.cas.setup.xml.setup.ScriptType;
+import aero.minova.cas.setup.xml.setup.SetupType;
 import aero.minova.cas.setup.xml.setup.TableschemaType;
-
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
 import ch.minova.install.setup.schema.XmlDatabaseColumn;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
 import ch.minova.install.sql.TVersion;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.*;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import static aero.minova.cas.resources.ResourceFileSystemProvider.FILE_SYSTEM_PROVIDER;
 import static aero.minova.cas.setup.xml.setup.ScriptType.*;
@@ -57,6 +44,8 @@ public class BaseSetup {
     protected VersionInfo versionInfo;
 
     public static Properties parameter = null;
+
+    private boolean isFatJarMode = false;
 
     public static final String FAILTOWRITENODETODOCUMENT = "Error: Der Knoten {0} konnte nicht in die Datei eingetragen werden!";
 
@@ -1290,5 +1279,9 @@ public class BaseSetup {
 
     public void setSetupDocument(SetupType setupDocument) {
         this.setupDocument = setupDocument;
+    }
+
+    public void setIsFatJarMode(boolean arg) {
+        isFatJarMode = arg;
     }
 }

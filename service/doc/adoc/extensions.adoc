@@ -3,24 +3,28 @@
 Es gibt keine Unterscheidung von Extensions und App-Projekten.
 Diese werden jetzt über einen Projekt-Typ umgesetzt.
 
-Es muss nur eine spezielles Parent in der POM verwendet werden.
+Es muss nur ein spezielles Parent in der POM verwendet werden.
 Als Parent hat man die Wahl zwischen 2 verschiedenen POMs:
 
 * `cas.extension.parent` wird verwendet, wenn die Erweiterung nur als Abhängigkeit verwendet wird.
     Also beispielsweise für eine Erweiterung, welche eine Lieferscheinmaske bereitstellt.
 * `cas.extension.deployment` wird verwendet, wenn die Erweiterung ausgeliefert wird und nicht als Abhängigkeit verwendet wird.
-    Also beispielsweise für Kundenprojekte die ausgeliefert werden.
+    Also beispielsweise für Kundenprojekte die installiert werden.
 
 Der Hintergrund für die 2 verschiedenen Parents ist,
 dass zur Zeit, Erweiterungen nicht gleichzeit als Hauptprojekt ausgeliefert und
 selber wiederum als Abhängigkeit verwendet werden können.
-Der Grund dafür ist das `cas.extension.deployment` die Datei `aero.minova.app.resources/deployed.resources.txt` in die Jar einfügt,
+Der Grund dafür wiederum ist, dass `cas.extension.deployment` die Datei `aero.minova.app.resources/deployed.resources.txt` in die Jar einfügt,
 welche nur einmalig vorhanden sein sollte.
+Mit der `cas.extension.parent` wird verhindert,
+dass es die `aero.minova.app.resources/deployed.resources.txt` mehrmals gibt.
 
 TODO: Vielleicht könnten wird die Aufteilung in `cas.extension.parent` und `cas.extension.deployment` in Zukunft irgendwie abschaffen.
 
 
 Alle internen und externen Abhängigkeiten können frei hinzugefügt werden.
+
+Minimale POM:
 
 ```
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

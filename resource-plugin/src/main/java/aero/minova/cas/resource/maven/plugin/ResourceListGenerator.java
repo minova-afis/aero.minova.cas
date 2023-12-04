@@ -30,7 +30,7 @@ public class ResourceListGenerator extends AbstractMojo {
         final var resourceFolder = classesFolder.resolve(resourceFolderName);
         final var resourceFileName = project.getGroupId() + "." + project.getArtifactId() + ".resources.txt";
         final var resourceFile = resourceFolder.resolve(resourceFileName);
-        final var deployFile = resourceFolder.resolve("deployed.resource.txt");
+        final var deployFile = resourceFolder.resolve("deployed.resources.txt");
         try {
             Files.createDirectories(resourceFolder);
             final var resourceList = new StringBuilder();

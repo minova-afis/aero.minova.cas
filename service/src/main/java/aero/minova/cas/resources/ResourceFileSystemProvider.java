@@ -5,7 +5,6 @@ import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.channels.Channels;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -26,7 +25,7 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
     public ResourceFileSystemProvider(ClassLoader classLoaderArg) {
         classLoader = classLoaderArg;
         try {
-            final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resource.txt").readAllBytes());
+            final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resources.txt").readAllBytes());
             for (final var resourceListPath : deployedResources.split("\n")) {
                 if (resourceListPath.isBlank()) {
                     continue;

@@ -2,7 +2,6 @@ package aero.minova.cas.controller;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
-import jakarta.annotation.PostConstruct;
 import lombok.val;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +18,10 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
-import java.nio.file.spi.FileSystemProvider;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -236,7 +233,7 @@ public class FilesController {
                 path = "/" + path;
             }
             final List<String> matchingResources = new ArrayList<>();
-            final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resource.txt").readAllBytes());
+            final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resources.txt").readAllBytes());
             for (final var resourceListPath : deployedResources.split("\n")) {
                 if (resourceListPath.isBlank()) {
                     System.out.println("Ignoring: " + resourceListPath);

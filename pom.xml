@@ -22,14 +22,13 @@
     <modules>
         <module>resource-plugin</module>
         <module>cas.extension.parent</module>
-        <module>cas.extension.deployment</module>
         <module>dev</module>
         <module>api</module>
         <module>app</module>
         <module>app.legacy</module>
         <module>service</module>
         <module>setup</module>
-        <module>fat.jar</module>
+        <module>cas.extension.deployment</module>
         <module>customer-build-project</module>
     </modules>
 

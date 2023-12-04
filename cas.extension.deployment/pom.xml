@@ -10,6 +10,13 @@
         <version>12.67.1-SNAPSHOT</version>
         <relativePath>../cas.extension.parent</relativePath>
     </parent>
+    <dependencies>
+        <dependency>
+            <groupId>aero.minova</groupId>
+            <artifactId>cas.app</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

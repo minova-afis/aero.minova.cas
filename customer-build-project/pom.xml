@@ -14,13 +14,6 @@
         <version>12.67.1-SNAPSHOT</version>
         <relativePath>../cas.extension.deployment</relativePath>
     </parent>
-    <dependencies>
-        <dependency>
-            <groupId>aero.minova</groupId>
-            <artifactId>cas.app</artifactId>
-            <version>12.67.1-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
         <tag>v12.64.0</tag>

@@ -4,17 +4,23 @@ Es gibt keine Unterscheidung von Extensions und App-Projekten.
 Diese werden jetzt über einen Projekt-Typ umgesetzt.
 
 Es muss nur eine spezielles Parent in der POM verwendet werden.
-Abhängigkeiten können frei hinzugefügt werden,
-wobei mindestens `aero.minova.cas.app` als Abhängigkeit angeben werden muss.
-Es dürfen keine weiteren Plugins etc. verwendet werden.
+Als Parent hat man die Wahl zwischen 2 verschiedenen POMs:
 
-Für Kundenprojekt die ausgeliefert werden,
-muss in dem Projekt-Verzeichnis die Datei `this-is-deployed-project.txt` vorhanden sein.
-Ist dies nicht der Fall, wird das so gebaute CAS nicht vollständig funktionieren.
-Der Inhalt ist egal, da dies nur als Trigger für Maven verwendet wird.
-Kundenprojekte mit `this-is-deployed-project.txt` dürfen nicht als Abhängigkeit verwendet werden.
+* `cas.extension.parent` wird verwendet, wenn die Erweiterung nur als Abhängigkeit verwendet wird.
+    Also beispielsweise für eine Erweiterung, welche eine Lieferscheinmaske bereitstellt.
+* `cas.extension.deployment` wird verwendet, wenn die Erweiterung ausgeliefert wird und nicht als Abhängigkeit verwendet wird.
+    Also beispielsweise für Kundenprojekte die ausgeliefert werden.
 
- TODO: Vielleicht eine zusätzliche Parent statt `this-is-deployed-project.txt` verwenden?
+Der Hintergrund für die 2 verschiedenen Parents ist,
+dass zur Zeit, Erweiterungen nicht gleichzeit als Hauptprojekt ausgeliefert und
+selber wiederum als Abhängigkeit verwendet werden können.
+Der Grund dafür ist das `cas.extension.deployment` die Datei `aero.minova.app.resources/deployed.resources.txt` in die Jar einfügt,
+welche nur einmalig vorhanden sein sollte.
+
+TODO: Vielleicht könnten wird die Aufteilung in `cas.extension.parent` und `cas.extension.deployment` in Zukunft irgendwie abschaffen.
+
+
+Alle internen und externen Abhängigkeiten können frei hinzugefügt werden.
 
 ```
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -29,17 +35,10 @@ Kundenprojekte mit `this-is-deployed-project.txt` dürfen nicht als Abhängigkei
     </description>
     <parent>
         <groupId>aero.minova</groupId>
-        <artifactId>cas.extension.parent</artifactId>
+        <artifactId>cas.extension.deployment</artifactId>
         <version>12.67.1-SNAPSHOT</version>
-        <relativePath>../cas.extension.parent</relativePath>
+        <relativePath></relativePath>
     </parent>
-    <dependencies>
-        <dependency>
-            <groupId>aero.minova</groupId>
-            <artifactId>cas.app</artifactId>
-            <version>12.67.1-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
         <tag>v12.64.0</tag>

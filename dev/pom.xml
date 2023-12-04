@@ -17,7 +17,7 @@
         </dependency>
         <dependency>
             <groupId>aero.minova</groupId>
-            <artifactId>cas.setup</artifactId>
+            <artifactId>cas.app</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

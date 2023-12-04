@@ -20,12 +20,16 @@
     </scm>
 
     <modules>
+        <module>resource-plugin</module>
+        <module>cas.extension.parent.internal</module>
         <module>dev</module>
         <module>api</module>
         <module>app</module>
         <module>app.legacy</module>
         <module>service</module>
-        <module>setup</module>
+        <module>cas.extension.parent</module>
+        <module>cas.extension.deployment</module>
+        <module>customer-build-project</module>
     </modules>
 
     <repositories>
@@ -45,6 +49,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

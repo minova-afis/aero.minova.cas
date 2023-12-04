@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cas.extension.deployment</artifactId>
     <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
@@ -7,7 +6,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.parent</artifactId>
-        <version>12.67.1-SNAPSHOT</version>
+        <version>13.0.0</version>
         <relativePath>../cas.extension.parent</relativePath>
     </parent>
     <build>
@@ -15,7 +14,7 @@
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
-                <version>12.67.1-SNAPSHOT</version>
+                <version>13.0.0</version>
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>
@@ -96,5 +95,6 @@
     </build>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-    </scm>
+      <tag>v13.0.0</tag>
+  </scm>
 </project>

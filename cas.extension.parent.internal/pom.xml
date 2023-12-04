@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cas.extension.parent.internal</artifactId>
     <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
@@ -7,7 +6,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.parent</artifactId>
-        <version>12.67.1-SNAPSHOT</version>
+        <version>13.0.0</version>
     </parent>
     <dependencies>
         <dependency>
@@ -52,7 +51,7 @@
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
-                <version>12.67.1-SNAPSHOT</version>
+                <version>13.0.0</version>
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>
@@ -388,12 +387,11 @@
                                                 <include>**/*.form.xml</include>
                                             </includes>
                                             <fileMappers>
-                                                <fileMapper
-                                                        implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
                                                     <pattern>\.form\.xml$</pattern>
                                                     <replacement>.xml</replacement>
                                                 </fileMapper>
-                                                <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper/>
+                                                <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
                                             </fileMappers>
                                         </transformationSet>
                                         <transformationSet>
@@ -404,12 +402,11 @@
                                                 <include>**/*.form.xml</include>
                                             </includes>
                                             <fileMappers>
-                                                <fileMapper
-                                                        implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                                                <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
                                                     <pattern>\.form\.xml$</pattern>
                                                     <replacement>.xml</replacement>
                                                 </fileMapper>
-                                                <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper/>
+                                                <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
                                             </fileMappers>
                                         </transformationSet>
                                     </transformationSets>
@@ -442,5 +439,6 @@
     </profiles>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-    </scm>
+      <tag>v13.0.0</tag>
+  </scm>
 </project>

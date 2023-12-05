@@ -39,8 +39,7 @@ Minimale POM:
         <relativePath></relativePath>
     </parent>
     <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <tag>v12.64.0</tag>
+        <connection>scm:git:https://github.com/minova-afis/[TODO].git</connection>
     </scm>
 </project>
 ```

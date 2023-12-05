@@ -9,13 +9,11 @@ FROM eclipse-temurin:17-jre-alpine
 LABEL org.opencontainers.image.source=https://github.com/minova-afis/aero.minova.cas
 LABEL maintainer=service@minova.com
 
-COPY customer-build-project/target/docker-layer /opt/aero.minova.cas/system-files/
-COPY customer-build-project/target/docker-extension-layer /opt/aero.minova.cas/lib/
-COPY customer-build-project/target/extensions /opt/aero.minova.cas/lib/
+COPY customer-build-project/target/aero.minova.cas.jar /opt/aero.minova.cas/lib/
 
-ENV aero_minova_core_application_root_path='/opt/aero.minova.cas/system-files/'
+ENV aero_minova_core_application_root_path='/'
 ENTRYPOINT ["/opt/java/openjdk/bin/java"]
-CMD ["-cp", "/opt/aero.minova.cas/lib/*", "aero.minova.cas.CoreApplicationSystemApplication"]
+CMD ["-jar", "/opt/aero.minova.cas/lib/aero.minova.cas.jar"]
 
 VOLUME /var/lib/aero.minova.cas
 

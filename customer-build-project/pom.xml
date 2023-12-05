@@ -17,4 +17,7 @@
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
         <tag>v12.64.0</tag>
     </scm>
+    <build>
+        <finalName>aero.minova.cas</finalName>
+    </build>
 </project>

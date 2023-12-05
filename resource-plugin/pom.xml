@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>aero.minova</groupId>
@@ -83,6 +84,13 @@
             <url>http://central</url>
         </repository>
     </repositories>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Minova Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+        </repository>
+    </distributionManagement>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
     </scm>

@@ -51,4 +51,41 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>github</id>
+            <name>GitHub Minova AFIS Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>github-snaptshots</id>
+            <name>GitHub Minova AFIS Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>central</id>
+            <url>http://central</url>
+        </repository>
+    </repositories>
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+    </scm>
 </project>

@@ -31,16 +31,11 @@ Minimale POM:
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cas-customer-build-project</artifactId>
-    <version>12.67.1-SNAPSHOT</version>
-    <description>Stellt sicher, dass im CAS image nur das verfügbar ist,
-        was im CAS-App auch veröffentlicht wurde und nicht Dinge,
-        welche durch dessen POM reinkopiert wurde.
-        Folglich darf diese POM keine Plugins enthalten.
-    </description>
+    <version>13.0.0-SNAPSHOT</version>
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.deployment</artifactId>
-        <version>12.67.1-SNAPSHOT</version>
+        <version>13.0.6</version>
         <relativePath></relativePath>
     </parent>
     <scm>

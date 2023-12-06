@@ -3,8 +3,11 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## [UNRELEASED] -- XXXX-XX-XX
-* Rücknahme des PR von: Benutzeranmeldung über Datenbank fixen. Es wurde keine DataSource initialisiert. 
+## [13.0.7] -- 2023-12-06
+* CAS als fat jar ohne weitere Dateien auslieferbar machen. Dazu wurde die Kompatibilität mit alten App-Projekten gebrochen.
+* Tabellen für das Sicherheits-System werden jetzt über JPA standardmäßig beim starten aufgesetzt, ohne das Setup zu verwenden.
+Dadurch ist die Verwendung von Postgre einfacher, da die Standarteinstellungen dazu weniger geändert  werden müssen.
+Dies ist für Postgre, da für dieses der Setup-Befehl bisher nie funktioniert hat.
 
 ## [12.67.0] -- 2023-10-13
 * Beim Einfügen von Authorities über die Maske (xpcasInsertAuthorities) wurden LastAction, LastUser und LastDate nicht gesetzt.

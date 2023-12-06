@@ -19,6 +19,8 @@ welche nur einmalig vorhanden sein sollte.
 Mit der `cas.extension.parent` wird verhindert,
 dass es die `aero.minova.app.resources/deployed.resources.txt` mehrmals gibt.
 
+Zudem sollte die Property `fat.jar.mode` auf `true` gesetzt werden.
+
 TODO: Vielleicht könnten wird die Aufteilung in `cas.extension.parent` und `cas.extension.deployment` in Zukunft irgendwie abschaffen.
 
 

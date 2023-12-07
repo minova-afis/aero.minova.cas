@@ -58,6 +58,8 @@ public class MssqlViewService implements ViewServiceInterface {
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
+			} finally {
+				preparedStatement.close();
 			}
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);

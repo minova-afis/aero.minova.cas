@@ -86,6 +86,8 @@ public class JOOQViewService implements ViewServiceInterface {
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
+			} finally {
+				preparedStatement.close();
 			}
 
 		} catch (Exception e) {

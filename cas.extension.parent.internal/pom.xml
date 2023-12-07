@@ -6,7 +6,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.parent</artifactId>
-        <version>13.0.8</version>
+        <version>13.0.9-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
@@ -51,7 +51,7 @@
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
-                <version>13.0.8</version>
+                <version>13.0.9-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>
@@ -439,6 +439,6 @@
     </profiles>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-      <tag>v13.0.8</tag>
+      <tag>HEAD</tag>
   </scm>
 </project>

@@ -3,6 +3,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
+## Unreleased
+* PreparedStatements und ResultSets nach der Ausführung schließen.
+
 ## [13.0.7] -- 2023-12-06
 * CAS als fat jar ohne weitere Dateien auslieferbar machen. Dazu wurde die Kompatibilität mit alten App-Projekten gebrochen.
 * Tabellen für das Sicherheits-System werden jetzt über JPA standardmäßig beim starten aufgesetzt, ohne das Setup zu verwenden.

@@ -6,7 +6,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.parent</artifactId>
-        <version>13.0.7-SNAPSHOT</version>
+        <version>13.0.8-SNAPSHOT</version>
     </parent>
 
     <dependencies>

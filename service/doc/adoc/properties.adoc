@@ -122,6 +122,12 @@ ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
 ** *Beschreibung*: Setzt das Profil. Es gibt aktuell nur das Profil `dev`. Erlaubt alle CORS-Policies 
 aus Entwicklungszwecken. Niemals im Produktivbetrieb benutzen!
 
+* aero.minova.cas.setup.logging
+
+** *Default*: `false`
+
+** *Wertebereich*: `true/false`: Bei `false` funktioniert das CAS einigermaßen wie bisher. Dateien Werden aus dem Dateisystem geladen. Bei `true` werden die Datei aus der Datei vom ausgelieferten CAS selber geladen.
+
 
 == POSTGRE
 

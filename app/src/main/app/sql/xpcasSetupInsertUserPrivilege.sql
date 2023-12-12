@@ -7,13 +7,16 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 		where KeyText = @KeyText
 			and LastAction > 0 or LastAction is null)
     
+	begin
 		update xtCasUserPrivilege set
 			LastAction = 2,
 			LastDate = getDate(),
 			LastUser = dbo.xfcasUser()
 		where KeyText = @KeyText
-    
+    end
+
 	else
+	begin
 		insert into xtcasUserPrivilege (
 			KeyText,
 			Description,
@@ -27,19 +30,22 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 			dbo.xfcasUser(),
 			getDate()
 		)
-    
+    end
 
 	if exists (select * from tVersion10
 		where KeyText = @KeyText
 			and LastAction > 0 or LastAction is null)
-    
+
+    begin
 		update tVersion10 set
 			LastAction = 2,
 			LastDate = getDate(),
 			LastUser = dbo.xfcasUser()
 		where KeyText = @KeyText
-    
+    end
+
 	else
+	begin
 		insert into tVersion10 (
 			KeyText,
 			ModuleName
@@ -47,6 +53,7 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 			@KeyText,
 			'ch.minova.install'
 		)
+	end
     
 	select @KeyLong = @@identity
 return @@error

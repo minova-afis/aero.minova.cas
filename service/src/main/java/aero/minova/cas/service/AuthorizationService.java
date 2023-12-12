@@ -97,7 +97,7 @@ public class AuthorizationService {
 			Users newUser = new Users();
 			newUser.setUsername(username);
 			newUser.setPassword(encryptedPassword);
-			usersRepository.save(newUser);
+			newUser = usersRepository.save(newUser);
 			return newUser;
 		});
 	}
@@ -114,7 +114,7 @@ public class AuthorizationService {
 		Users user = usersRepository.findByUsernameAndLastActionGreaterThan(username, 0).get();
 
 		user.setPassword(encryptedPassword);
-		usersRepository.save(user);
+		user = usersRepository.save(user);
 
 		return user;
 	}
@@ -143,7 +143,7 @@ public class AuthorizationService {
 			}
 		}
 
-		userGroupRepository.save(usergroup);
+		usergroup = userGroupRepository.save(usergroup);
 		return usergroup;
 	}
 
@@ -160,7 +160,7 @@ public class AuthorizationService {
 					Authorities authority = new Authorities();
 					authority.setUsername(username);
 					authority.setAuthority(authorityName);
-					authoritiesRepository.save(authority);
+					authority = authoritiesRepository.save(authority);
 					return authority;
 				});
 	}
@@ -177,7 +177,7 @@ public class AuthorizationService {
 					LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
 					lu.setUserGroup(userGroup);
 					lu.setUserPrivilege(priv);
-					luUserPrivilegeUserGroupRepository.save(lu);
+					lu = luUserPrivilegeUserGroupRepository.save(lu);
 					return lu;
 				});
 	}

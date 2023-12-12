@@ -8,7 +8,7 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 			and LastAction > 0 or LastAction is null)
     
         update xtCasUserPrivilege set
-        	LastAction = 2,
+			LastAction = 2,
 			LastDate = getDate(),
 			LastUser = dbo.xfcasUser()
         where KeyText = @KeyText
@@ -34,7 +34,7 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 			and LastAction > 0 or LastAction is null)
     
         update tVersion10 set
-        	LastAction = 2,
+			LastAction = 2,
 			LastDate = getDate(),
 			LastUser = dbo.xfcasUser()
         where KeyText = @KeyText

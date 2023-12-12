@@ -28,7 +28,7 @@ public class AuthorizationService {
 	LuUserPrivilegeUserGroupRepository luUserPrivilegeUserGroupRepository;
 
 	@Autowired
-	UserGroupRepository userGroupRepository;
+	UserGroupRepository userGroupRepository; 
 
 	@Autowired
 	UserPrivilegeRepository userPrivilegeRepository;
@@ -37,8 +37,7 @@ public class AuthorizationService {
 	UsersRepository usersRepository;
 
 	/**
-	 * Erstellt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die
-	 * Index-View
+	 * Erstellt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View
 	 * 
 	 * @param maskname
 	 * @param procedurePrefix
@@ -54,8 +53,7 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch
-	 * nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
+	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
 	 * 
 	 * @param privilegeName
 	 */
@@ -69,12 +67,7 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die
-	 * Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle
-	 * xtCasUserPrivilege eingetragen sein (Methode
-	 * {@link #findOrCreateUserPrivilege(String privilegeName)}). Existiert der
-	 * Benutzer bereits, werden alle fehlenden Berechtigungen erteilt, das Passwort
-	 * wird NICHT aktualisiert
+	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle xtCasUserPrivilege eingetragen sein (Methode {@link #findOrCreateUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen erteilt, das Passwort wird NICHT aktualisiert
 	 * 
 	 * @param username
 	 * @param encryptedPassword
@@ -93,9 +86,7 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein
-	 * Nutzer mit dem Namen existiert. Ansonsten wird das Passwort auch NICHT
-	 * aktualisiert.
+	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein Nutzer mit dem Namen existiert. Ansonsten wird das Passwort auch NICHT aktualisiert.
 	 * 
 	 * @param username
 	 * @param encryptedPassword
@@ -129,8 +120,7 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt eine neue UserGroup, wenn noch keine mit diesem KeyText existiert.
-	 * Die securitytokens (getrennt mit #) werden an evtl. bestehende angehängt
+	 * Erstellt eine neue UserGroup, wenn noch keine mit diesem KeyText existiert. Die securitytokens (getrennt mit #) werden an evtl. bestehende angehängt
 	 * 
 	 * @param keyText
 	 * @param securitytoken
@@ -158,8 +148,7 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt eine Authority (Zuorndung zwischen Benutzer und BenutzerGruppe),
-	 * wenn diese noch nicht existiert
+	 * Erstellt eine Authority (Zuorndung zwischen Benutzer und BenutzerGruppe), wenn diese noch nicht existiert
 	 * 
 	 * @param username
 	 * @param authority
@@ -177,8 +166,7 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt einen Eintrag in xtcasLuUserPrivilegeUser, damit die Gruppe Rechte
-	 * auf das Privileg (Prozedur, View, ...) hat, wenn noch nicht vorhanden
+	 * Erstellt einen Eintrag in xtcasLuUserPrivilegeUser, damit die Gruppe Rechte auf das Privileg (Prozedur, View, ...) hat, wenn noch nicht vorhanden
 	 * 
 	 * @param userGroup
 	 * @param priv

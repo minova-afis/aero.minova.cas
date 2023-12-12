@@ -37,7 +37,8 @@ public class AuthorizationService {
 	UsersRepository usersRepository;
 
 	/**
-	 * Erstellt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View
+	 * Erstellt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die
+	 * Index-View
 	 * 
 	 * @param maskname
 	 * @param procedurePrefix
@@ -53,7 +54,8 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
+	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch
+	 * nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
 	 * 
 	 * @param privilegeName
 	 */
@@ -61,15 +63,18 @@ public class AuthorizationService {
 		return userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).orElseGet(() -> {
 			UserPrivilege privilege = new UserPrivilege();
 			privilege.setKeyText(privilegeName);
-			userPrivilegeRepository.save(privilege);
+			privilege = userPrivilegeRepository.save(privilege);
 			return privilege;
 		});
 	}
 
 	/**
-	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle xtCasUserPrivilege
-	 * eingetragen sein (Methode {@link #findOrCreateUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen
-	 * erteilt, das Passwort wird NICHT aktualisiert
+	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die
+	 * Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle
+	 * xtCasUserPrivilege eingetragen sein (Methode
+	 * {@link #findOrCreateUserPrivilege(String privilegeName)}). Existiert der
+	 * Benutzer bereits, werden alle fehlenden Berechtigungen erteilt, das Passwort
+	 * wird NICHT aktualisiert
 	 * 
 	 * @param username
 	 * @param encryptedPassword
@@ -88,7 +93,8 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein Nutzer mit dem Namen existiert. Ansonsten wird das Passwort auch NICHT
+	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein
+	 * Nutzer mit dem Namen existiert. Ansonsten wird das Passwort auch NICHT
 	 * aktualisiert.
 	 * 
 	 * @param username
@@ -111,8 +117,7 @@ public class AuthorizationService {
 	 * @param username
 	 * @param encryptedPassword
 	 * @return
-	 * @throws NoSuchElementException
-	 *             wenn der Benutzer nicht existiert
+	 * @throws NoSuchElementException wenn der Benutzer nicht existiert
 	 */
 	public Users updateUserPassword(String username, String encryptedPassword) throws NoSuchElementException {
 		Users user = usersRepository.findByUsernameAndLastActionGreaterThan(username, 0).get();
@@ -124,7 +129,8 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt eine neue UserGroup, wenn noch keine mit diesem KeyText existiert. Die securitytokens (getrennt mit #) werden an evtl. bestehende angehängt
+	 * Erstellt eine neue UserGroup, wenn noch keine mit diesem KeyText existiert.
+	 * Die securitytokens (getrennt mit #) werden an evtl. bestehende angehängt
 	 * 
 	 * @param keyText
 	 * @param securitytoken
@@ -152,31 +158,34 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt eine Authority (Zuorndung zwischen Benutzer und BenutzerGruppe), wenn diese noch nicht existiert
+	 * Erstellt eine Authority (Zuorndung zwischen Benutzer und BenutzerGruppe),
+	 * wenn diese noch nicht existiert
 	 * 
 	 * @param username
 	 * @param authority
 	 * @return
 	 */
 	public Authorities findOrCreateAuthority(String username, String authorityName) {
-		return authoritiesRepository.findByUsernameAndAuthorityAndLastActionGreaterThan(username, authorityName, 0).orElseGet(() -> {
-			Authorities authority = new Authorities();
-			authority.setUsername(username);
-			authority.setAuthority(authorityName);
-			authoritiesRepository.save(authority);
-			return authority;
-		});
+		return authoritiesRepository.findByUsernameAndAuthorityAndLastActionGreaterThan(username, authorityName, 0)
+				.orElseGet(() -> {
+					Authorities authority = new Authorities();
+					authority.setUsername(username);
+					authority.setAuthority(authorityName);
+					authoritiesRepository.save(authority);
+					return authority;
+				});
 	}
 
 	/**
-	 * Erstellt einen Eintrag in xtcasLuUserPrivilegeUser, damit die Gruppe Rechte auf das Privileg (Prozedur, View, ...) hat, wenn noch nicht vorhanden
+	 * Erstellt einen Eintrag in xtcasLuUserPrivilegeUser, damit die Gruppe Rechte
+	 * auf das Privileg (Prozedur, View, ...) hat, wenn noch nicht vorhanden
 	 * 
 	 * @param userGroup
 	 * @param priv
 	 */
 	public LuUserPrivilegeUserGroup findOrCreateLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
-		return luUserPrivilegeUserGroupRepository
-				.findByUserPrivilegeKeyLongAndUserGroupKeyLongAndLastActionGreaterThan(priv.getKeyLong(), userGroup.getKeyLong(), 0).orElseGet(() -> {
+		return luUserPrivilegeUserGroupRepository.findByUserPrivilegeKeyLongAndUserGroupKeyLongAndLastActionGreaterThan(
+				priv.getKeyLong(), userGroup.getKeyLong(), 0).orElseGet(() -> {
 					LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
 					lu.setUserGroup(userGroup);
 					lu.setUserPrivilege(priv);

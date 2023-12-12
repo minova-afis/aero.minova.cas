@@ -5,53 +5,48 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 ) as
 	if exists (select * from xtcasUserPrivilege
 		where KeyText = @KeyText
-		  and LastAction < 0
-		  or LastAction is null)
-    begin
-        update xtCasUserPrivilege
-        set LastAction = 1,
-		LastDate = getDate(),
-		LastUser = dbo.xfcasUser()
+			and LastAction > 0 or LastAction is null)
+    
+        update xtCasUserPrivilege set
+        	LastAction = 2,
+			LastDate = getDate(),
+			LastUser = dbo.xfcasUser()
         where KeyText = @KeyText
-    end
+    
 	else
-	begin
 		insert into xtcasUserPrivilege (
-		KeyText,
-		Description,
-		LastAction,
-		LastUser,
-		LastDate
+			KeyText,
+			Description,
+			LastAction,
+			LastUser,
+			LastDate
 		) values (
-		@KeyText,
-		@Description,
-		1,
-		dbo.xfcasUser(),
-		getDate()
-	)
-    end
+			@KeyText,
+			@Description,
+			1,
+			dbo.xfcasUser(),
+			getDate()
+		)
+    
 
 	if exists (select * from tVersion10
 		where KeyText = @KeyText
-		  and LastAction < 0 or LastAction is null)
-    begin
-        update tVersion10
-        set LastAction = 1,
-		LastDate = getDate(),
-		LastUser = dbo.xfcasUser()
+			and LastAction > 0 or LastAction is null)
+    
+        update tVersion10 set
+        	LastAction = 2,
+			LastDate = getDate(),
+			LastUser = dbo.xfcasUser()
         where KeyText = @KeyText
-    end
+    
 	else
-	begin
 		insert into tVersion10 (
-		KeyText,
-		ModuleName
-	) values (
-		@KeyText,
-		'ch.minova.install'
-	)
-    end
-
-
+			KeyText,
+			ModuleName
+		) values (
+			@KeyText,
+			'ch.minova.install'
+		)
+    
 	select @KeyLong = @@identity
 return @@error

@@ -6,7 +6,10 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 
+## [13.0.10] -- 2023-12-07
+
 * Bei Setup Extensionnamen nur einmal in Tabellen xtcasUserPrivilege und tVersion10 eintragen.
+* Debugging-Code entfernen.
 
 ## [13.0.8] -- 2023-12-07
 * Standard Übersetzungen aus dem `aero.minova.app.i18n`-Projekt in das CAS übernehmen,

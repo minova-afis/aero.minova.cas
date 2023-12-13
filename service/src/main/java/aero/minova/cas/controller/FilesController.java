@@ -236,23 +236,18 @@ public class FilesController {
             final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resources.txt").readAllBytes());
             for (final var resourceListPath : deployedResources.split("\n")) {
                 if (resourceListPath.isBlank()) {
-                    System.out.println("Ignoring: " + resourceListPath);
                     continue;
                 }
-                System.out.println("Processing: " + resourceListPath);
                 final var resourceList = new String(getClass().getResourceAsStream(resourceListPath).readAllBytes());
                 for (final var resource : resourceList.split("\n")) {
                     if (resource.isBlank()) {
-                        System.out.println("Ignoring: " + resource);
                         continue;
                     }
-                    System.out.println("Processing: " + resource);
                     if (resource.startsWith(pathStr)) {
                         matchingResources.add(resource);
                     }
                 }
             }
-            System.out.println("matchingResources: " + matchingResources);
             String resourcePathLog = null;
             ZipEntry ze = null;
             ByteArrayOutputStream fos = new ByteArrayOutputStream();

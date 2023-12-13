@@ -38,7 +38,7 @@ login_dataSource=admin
 # Datenbankverbindung
 spring.datasource.url=jdbc:postgresql://localhost:5432/saraco #Beispiel Postgres
 # spring.datasource.url=jdbc:sqlserver://localhost;databaseName=sam;encrypt=false #Beispiel SQL
-spring.datasource.user=XXX
+spring.datasource.username=XXX
 spring.datasource.password=XXX
 ```
 

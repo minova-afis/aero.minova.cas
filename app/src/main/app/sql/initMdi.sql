@@ -1,4 +1,4 @@
--- Änderungen hier sollten auch in der Klasse MdiService durchgeführt werden!
+-- Änderungen hier sollten auch in der Methode MdiService#setupCASMdi durchgeführt werden!
 
 -- General Application Info
 exec xpcasInitMdi null, 'CAS', '@CAS', null, null, null, 3, 'aero.minova.cas'

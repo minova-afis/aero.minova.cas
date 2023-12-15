@@ -184,6 +184,7 @@ public class MdiService {
 		// Ansonsten nur speichern, wenn es diesen KeyText nicht schon gibt
 		if (mdiRepository.findByKeyTextAndLastActionGreaterThan(mdi.getKeyText(), 0).isEmpty()) {
 			if (mdi.getMdiType().getKeyLong() != 1) {
+				// Nur die Masken selbst sollen SecurityTokens haben, vgl xpcasInitMdi
 				mdi.setSecurityToken(null);
 			}
 

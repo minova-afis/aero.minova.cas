@@ -19,10 +19,16 @@ public class MdiService {
 	@Autowired
 	MdiRepository mdiRepository;
 
+	@Autowired
+	AuthorizationService authorizationService;
+
 	/**
 	 * Äquivalent zum Einspielen von xtcasMdiType.form.xml über setup, dort werden die 3 Typen auch angelegt
 	 */
 	public void setupMdiTypes() {
+
+		// Zugriff auf xtcasMdi muss erlaubt sein
+		authorizationService.findOrCreateUserPrivilege("xtcasMdi");
 
 		if (!mdiTypeRepository.findByLastActionGreaterThan(0).isEmpty()) {
 			// Wenn es schon MdiTypes gibt muss nichts getan werden

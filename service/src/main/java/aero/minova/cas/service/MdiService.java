@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,7 @@ public class MdiService {
 		mdi.setKeyText("config");
 		saveMdi(mdi);
 
-		mdi = new Mdi("xtcasServiceProperties", //
+		mdi = new Mdi("ServiceProperties", //
 				"@xtcasServiceProperties", //
 				"config", //
 				10, //
@@ -187,16 +188,17 @@ public class MdiService {
 			return null;
 		}
 
-		// Ansonsten nur speichern, wenn es diesen KeyText nicht schon gibt
-		if (mdiRepository.findByKeyTextAndLastActionGreaterThan(mdi.getKeyText(), 0).isEmpty()) {
-			if (mdi.getMdiType().getKeyLong() != 1) {
-				// Nur die Masken selbst sollen SecurityTokens haben, vgl xpcasInitMdi
-				mdi.setSecurityToken(null);
-			}
-
-			return mdiRepository.save(mdi);
+		// Ansonsten nur speichern, wenn es diesen KeyText nicht schon gibt (Updates aber erlauben)
+		Optional<Mdi> findByKeyText = mdiRepository.findByKeyText(mdi.getKeyText());
+		if (findByKeyText.isPresent() && !Objects.equals(findByKeyText.get().getKeyLong(), mdi.getKeyLong())) {
+			return null;
 		}
-		return null;
+		if (mdi.getMdiType().getKeyLong() != 1) {
+			// Nur die Masken selbst sollen SecurityTokens haben, vgl xpcasInitMdi
+			mdi.setSecurityToken(null);
+		}
+
+		return mdiRepository.save(mdi);
 	}
 
 }

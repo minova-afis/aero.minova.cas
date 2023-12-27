@@ -62,7 +62,7 @@ class AuthorizationTest {
 		assertNotNull(user);
 
 		// Wurde Admin Gruppe erstellt?
-		UserGroup group = userGroupRepository.findByKeyText("admin").get();
+		UserGroup group = userGroupRepository.findByKeyText("admin").get(0);
 		assertNotNull(group);
 
 		// Wurde Nutzer der admin-Gruppe zugeordnet?
@@ -115,25 +115,25 @@ class AuthorizationTest {
 
 		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
 
-		UserGroup group = userGroupRepository.findByKeyText(groupName).get();
+		UserGroup group = userGroupRepository.findByKeyText(groupName).get(0);
 		assertNotNull(group);
 		assertEquals("#FirstToken", group.getSecurityToken());
 
 		// Sicherstellen, dass keine Duplikat-Token angehängt werden
 		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
-		group = userGroupRepository.findByKeyText(groupName).get();
+		group = userGroupRepository.findByKeyText(groupName).get(0);
 		assertNotNull(group);
 		assertEquals("#FirstToken", group.getSecurityToken());
 
 		// Sicherstellen, dass neuer Token angehängt wird
 		controller.createOrUpdateUserGroup(groupName, "#SecondToken");
-		group = userGroupRepository.findByKeyText(groupName).get();
+		group = userGroupRepository.findByKeyText(groupName).get(0);
 		assertNotNull(group);
 		assertEquals("#FirstToken#SecondToken", group.getSecurityToken());
 
 		// Nochmal keine Duplikate testen
 		controller.createOrUpdateUserGroup(groupName, "#FirstToken");
-		group = userGroupRepository.findByKeyText(groupName).get();
+		group = userGroupRepository.findByKeyText(groupName).get(0);
 		assertNotNull(group);
 		assertEquals("#FirstToken#SecondToken", group.getSecurityToken());
 	}

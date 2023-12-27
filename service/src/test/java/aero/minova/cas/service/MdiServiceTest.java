@@ -32,9 +32,9 @@ class MdiServiceTest {
 		// Erster Aufruf legt 3 Typen an
 		mdiService.setupMdiTypes();
 		assertEquals(3, mdiTypeRepository.findByLastActionGreaterThan(0).size());
-		assertEquals(mdiTypeRepository.findByKeyText("form").get(), mdiService.getMdiTypeByKeyLong(1));
-		assertEquals(mdiTypeRepository.findByKeyText("menu").get(), mdiService.getMdiTypeByKeyLong(2));
-		assertEquals(mdiTypeRepository.findByKeyText("application").get(), mdiService.getMdiTypeByKeyLong(3));
+		assertEquals(mdiTypeRepository.findByKeyText("form").get(0), mdiService.getMdiTypeByKeyLong(1));
+		assertEquals(mdiTypeRepository.findByKeyText("menu").get(0), mdiService.getMdiTypeByKeyLong(2));
+		assertEquals(mdiTypeRepository.findByKeyText("application").get(0), mdiService.getMdiTypeByKeyLong(3));
 
 		// Zweiter Aufruf legt nicht doppelt an
 		mdiService.setupMdiTypes();

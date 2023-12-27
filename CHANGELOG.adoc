@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 
 ## Unreleased
+
+## [13.0.11] -- 2023-12-15
 * MdiService zum Erstellen des Default-Menüs
 * Mdis auch mit CAS 13 aus Datenbank ziehen
 * ZipFehler beheben

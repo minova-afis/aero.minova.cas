@@ -6,6 +6,8 @@ import java.time.Instant;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,7 +22,7 @@ public abstract class DataEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "KeyLong")
-	private int keyLong;
+	private Integer keyLong;
 
 	@NotNull
 	@Size(max = 200)
@@ -32,7 +34,8 @@ public abstract class DataEntity {
 
 	@Size(max = 50)
 	@Column(name = "LastUser", length = 50)
-	String lastUser = "CAS_JPA";
+	String lastUser = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName()
+			: "CAS_JPA";
 
 	@Column(name = "LastDate")
 	public Timestamp lastDate = Timestamp.from(Instant.now());

@@ -55,7 +55,7 @@ class AuthorizationTest {
 		controller.findOrCreateUserPrivilege("xvcorTEST");
 		controller.findOrCreateUserPrivilege("xpcorAnotherone");
 
-		controller.createOrUpdateAdminUser(username, "asfiusdhvn");
+		controller.createOrUpdateAdminUser(username, "$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK");
 
 		// Wurde Nutzer erstellt?
 		Users user = usersRepository.findByUsername(username).get();
@@ -79,7 +79,7 @@ class AuthorizationTest {
 		}
 
 		controller.findOrCreateUserPrivilege("xpcorLastOne");
-		controller.createOrUpdateAdminUser(username, "asfiusdhvn"); // Recht auf neues Privileg
+		controller.createOrUpdateAdminUser(username, "$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK"); // Recht auf neues Privileg
 
 		// Hat Admin-Nutzer auch Rechte auf das neue Privileg?
 		findAllWithLastActionGreaterZero = luUserPrivilegeUserGroupRepository.findByLastActionGreaterThan(0);
@@ -95,16 +95,16 @@ class AuthorizationTest {
 		String username = "PasswortTest";
 
 		// User mit erstem Passwort erstellen
-		controller.findOrCreateUser(username, "firstPW");
+		controller.findOrCreateUser(username, "$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK");
 		Users user = usersRepository.findByUsername(username).get();
 		assertNotNull(user);
-		assertEquals("firstPW", user.getPassword());
+		assertEquals("$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK", user.getPassword());
 
 		// Passwort NICHT geändern
-		controller.findOrCreateUser(username, "secondPW");
+		controller.findOrCreateUser(username, "$2a$10$KWp4qk82HkMzv84bTK89C.zPWtlp3UauzuUaco4Jmzq7ww2bWYjKS");
 		user = usersRepository.findByUsername(username).get();
 		assertNotNull(user);
-		assertEquals("firstPW", user.getPassword());
+		assertEquals("$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK", user.getPassword());
 
 	}
 

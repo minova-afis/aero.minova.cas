@@ -106,7 +106,7 @@ public class BaseService<E extends DataEntity> {
 		return repository.findAllWithLastActionGreaterZero();
 	}
 
-	public String getCurrentUser() {
-		return SecurityContextHolder.getContext().getAuthentication().getName();
+	public static String getCurrentUser() {
+		return SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : "CAS_JPA";
 	}
 }

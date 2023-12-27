@@ -1,14 +1,8 @@
 package aero.minova.cas.app.extension;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -16,9 +10,6 @@ import com.google.gson.JsonElement;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.api.domain.ValueDeserializer;
-import aero.minova.cas.api.domain.ValueSerializer;
 import aero.minova.cas.api.domain.XTable;
 import aero.minova.cas.app.util.GsonUtil;
 import aero.minova.cas.app.util.ResponseEntityUtil;
@@ -26,16 +17,12 @@ import aero.minova.cas.app.util.TableDeserializer;
 import aero.minova.cas.app.util.TableSerializer;
 import aero.minova.cas.app.util.TableUtil;
 import aero.minova.cas.controller.SqlProcedureController;
-import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.AuthorizationService;
+import aero.minova.cas.service.BaseService;
 import aero.minova.cas.service.model.DataEntity;
-import aero.minova.cas.service.repository.DataEntityRepository;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.annotation.PostConstruct;
 
 public class BaseExtension<E extends DataEntity> {
-
-	@Autowired
-	protected SqlViewController sqlViewController;
 
 	@Autowired
 	protected SqlProcedureController sqlProcedureController;
@@ -55,29 +42,27 @@ public class BaseExtension<E extends DataEntity> {
 			.setPrettyPrinting() //
 			.create();
 
-	public static final Gson GSON = GsonUtil.getGsonBuilder() //
-			.registerTypeAdapter(Value.class, new ValueDeserializer()) //
-			.registerTypeAdapter(Value.class, new ValueSerializer()) //
-			.setDateFormat("yyyyMMddHHmmss")//
-			.create();
+	protected Class<E> entityClass;
 
 	@Autowired
-	protected RestTemplate restTemplate;
+	protected BaseService<E> service;
 
-	private Class<E> entityClass;
-
-	@Autowired
-	protected DataEntityRepository<E> repository;
-
-	protected boolean allowDuplicateMatchcodes = false;
-
-	public void setup(Class<E> entityClass) {
-		setup(entityClass, entityClass.getSimpleName());
+	@SuppressWarnings("unchecked")
+	public BaseExtension() {
+		Class<?>[] resolveTypeArguments = GenericTypeResolver.resolveTypeArguments(getClass(), BaseExtension.class);
+		if (resolveTypeArguments != null) {
+			this.entityClass = (Class<E>) resolveTypeArguments[0];
+		} else {
+			throw new RuntimeException("No TypeArguments found");
+		}
 	}
 
-	public void setup(Class<E> entityClass, String formName) {
-		this.entityClass = entityClass;
+	@PostConstruct
+	public void basicSetup() {
+		setup(entityClass.getSimpleName());
+	}
 
+	public void setup(String formName) {
 		sqlProcedureController.registerExtension("xpcasInsert" + formName, this::insert);
 		sqlProcedureController.registerExtension("xpcasUpdate" + formName, this::update);
 		sqlProcedureController.registerExtension("xpcasDelete" + formName, this::delete);
@@ -94,7 +79,7 @@ public class BaseExtension<E extends DataEntity> {
 		try {
 			E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
 
-			E response = save(entity);
+			E response = service.save(entity);
 
 			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(response);
 			Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
@@ -108,44 +93,17 @@ public class BaseExtension<E extends DataEntity> {
 	public ResponseEntity<SqlProcedureResult> update(Table inputTable) {
 		try {
 			E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
-			entity.setLastAction(2);
-			save(entity);
+			service.save(entity);
 			return ResponseEntityUtil.createResponseEntity(null, false);
 		} catch (Exception e) {
 			throw handleError(e);
 		}
 	}
 
-	public E save(E entity) {
-
-		if (!allowDuplicateMatchcodes) {// Gibt es diesen KeyText schon (nicht gelöscht)?
-			Optional<E> findByKeyText = repository.findByKeyText(entity.getKeyText());
-			if (findByKeyText.isPresent() && !Objects.equals(findByKeyText.get().getKeyLong(), entity.getKeyLong())) {
-				throw new RuntimeException("@msg.DuplicateMatchcodeNotAllowed");
-			}
-		}
-
-		entity.setLastDate(Timestamp.from(Instant.now()));
-		entity.setLastUser(getCurrentUser());
-		entity = repository.save(entity);
-
-		return entity;
-	}
-
 	public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
 		try {
 
-			Optional<E> optional = repository.findById(inputTable.getValue("KeyLong", 0).getIntegerValue());
-			if (optional.isEmpty()) {
-				throw new EntityNotFoundException("@msg.EntityNotFound");
-			}
-
-			E entity = optional.get();
-
-			entity.setLastAction(-1);
-			entity.setLastDate(Timestamp.from(Instant.now()));
-			entity.setLastUser(getCurrentUser());
-			repository.save(entity);
+			service.deleteById(inputTable.getValue("KeyLong", 0).getIntegerValue());
 
 			return ResponseEntityUtil.createResponseEntity(null, false);
 		} catch (Exception e) {
@@ -156,12 +114,9 @@ public class BaseExtension<E extends DataEntity> {
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
 		try {
 
-			Optional<E> optional = repository.findById(inputTable.getValue("KeyLong", 0).getIntegerValue());
-			if (optional.isEmpty()) {
-				throw new EntityNotFoundException("@msg.EntityNotFound");
-			}
+			E findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
 
-			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(optional.get());
+			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
 			Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
 			Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
 			logger.logger.info("Result: {}", resultTable);
@@ -172,13 +127,9 @@ public class BaseExtension<E extends DataEntity> {
 	}
 
 	// TODO: Do anything fancy or remove
-	public RuntimeException handleError(Exception e) {
+	public static RuntimeException handleError(Exception e) {
 
 		return new RuntimeException(e);
-	}
-
-	public String getCurrentUser() {
-		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 
 }

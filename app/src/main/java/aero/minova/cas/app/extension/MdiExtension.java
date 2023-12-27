@@ -16,12 +16,6 @@ public class MdiExtension extends BaseExtension<Mdi> {
 	@PostConstruct
 	public void setup() {
 		authorizationService.findOrCreateUserPrivilege("xtcasMdiType"); // Berechtigung für Lookup
-		super.setup(Mdi.class);
 	}
 
-	@Override
-	public Mdi save(Mdi mdi) {
-		// TODO: Fehlermeldung :(
-		return mdiService.saveMdi(mdi);
-	}
 }

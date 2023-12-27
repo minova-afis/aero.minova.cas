@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ import aero.minova.cas.service.repository.MdiRepository;
 import aero.minova.cas.service.repository.MdiTypeRepository;
 
 @Service
-public class MdiService {
+public class MdiService extends BaseService<Mdi> {
 
 	@Autowired
 	MdiTypeRepository mdiTypeRepository;
@@ -189,8 +190,8 @@ public class MdiService {
 		}
 
 		// Ansonsten nur speichern, wenn es diesen KeyText nicht schon gibt (Updates aber erlauben)
-		Optional<Mdi> findByKeyText = mdiRepository.findByKeyText(mdi.getKeyText());
-		if (findByKeyText.isPresent() && !Objects.equals(findByKeyText.get().getKeyLong(), mdi.getKeyLong())) {
+		List<Mdi> findByKeyText = mdiRepository.findByKeyText(mdi.getKeyText());
+		if (!findByKeyText.isEmpty() && !Objects.equals(findByKeyText.get(0).getKeyLong(), mdi.getKeyLong())) {
 			return null;
 		}
 		if (mdi.getMdiType().getKeyLong() != 1) {
@@ -199,6 +200,12 @@ public class MdiService {
 		}
 
 		return mdiRepository.save(mdi);
+	}
+
+	@Override
+	public Mdi save(Mdi mdi) {
+		// TODO: Fehlermeldung :(
+		return saveMdi(mdi);
 	}
 
 }

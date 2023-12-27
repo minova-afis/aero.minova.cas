@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="LuUserPrivilegeForUserGroup" icon="UserPrivilegeForUserGroup" title="@xtcasLuUserPrivilegeForUserGroup.Administration" procedure-prefix="xpcas" procedure-suffix="LuUserPrivilegeUserGroup" read-requires-all-params="true" delete-requires-all-params="true" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">
-	<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
+<grid xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	id="LuUserPrivilegeForUserGroup" icon="UserPrivilegeForUserGroup"
+	title="@xtcasLuUserPrivilegeForUserGroup.Administration"
+	procedure-prefix="xpcas" procedure-suffix="LuUserPrivilegeUserGroup"
+	read-requires-all-params="true" delete-requires-all-params="true"
+	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd">
+	<field name="KeyLong" key-type="primary" sql-index="0"
+		visible="false">
 		<number />
 	</field>
-	<field name="UserPrivilegeKey" sql-index="1" text="@xtcasLuUserGroupForUserPrivilege.UserPrivilegeKey" key-type="primary" required="true">
+	<field name="UserPrivilege.KeyLong" sql-index="1"
+		text="@xtcasLuUserGroupForUserPrivilege.UserPrivilegeKey"
+		key-type="primary" required="true">
 		<lookup table="xtcasUserPrivilege" />
 	</field>
-	<field name="UserGroupKey" sql-index="2" text="@xtcasLuUserGroupForUserPrivilege.UserGroupKey" key-type="primary" visible="false">
+	<field name="UserGroup.KeyLong" sql-index="2"
+		text="@xtcasLuUserGroupForUserPrivilege.UserGroupKey"
+		key-type="primary" visible="false">
 		<number />
 	</field>
-	<field name="RowLevelSecurity" sql-index="3" text="@xtcasLuUserGroupForUserPrivilege.RowLevelSecurity" required="true" default="0">
+	<field name="RowLevelSecurity" sql-index="3"
+		text="@xtcasLuUserGroupForUserPrivilege.RowLevelSecurity"
+		required="true" default="0">
 		<boolean />
 	</field>
 </grid>

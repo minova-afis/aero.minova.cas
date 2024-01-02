@@ -249,14 +249,12 @@ public class ProcedureService {
 		sb.append(procedureCall);
 		setUserContextFor(connection);
 
-		final val preparedStatement = connection.prepareCall(procedureCall);
-
 		// Jede Row ist eine Abfrage.
 		for (int j = 0; j < inputTable.getRows().size(); j++) {
 			SqlProcedureResult resultForThisRow = new SqlProcedureResult();
 
-			fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
-			try {
+			try (final var preparedStatement = connection.prepareCall(procedureCall)) {
+				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
 				preparedStatement.registerOutParameter(1, Types.INTEGER);
 				preparedStatement.execute();
 				{ /*
@@ -429,8 +427,6 @@ public class ProcedureService {
 					}
 					result.getReturnCodes().add(resultForThisRow.getReturnCode());
 				}
-			} finally {
-				preparedStatement.close();
 			}
 		}
 		return result;

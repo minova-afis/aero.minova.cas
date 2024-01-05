@@ -9,7 +9,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import aero.minova.cas.service.model.DataEntity;
 
 @NoRepositoryBean
-public interface DataEntityRepository<E extends DataEntity> extends JpaRepository<E, Long> {
+public interface DataEntityRepository<E extends DataEntity> extends JpaRepository<E, Integer> {
 
 	public List<E> findByLastActionGreaterThan(int lastAction);
 

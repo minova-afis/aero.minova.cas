@@ -10,6 +10,7 @@ alter procedure dbo.xpcasInitMdi (
 )
 with encryption
 as
+	-- Änderungen hier sollten auch in der Methode MdiService#saveMdi durchgeführt werden!
 	declare @Execute bit = 1
 	
 	if(@MdiTypeKey = 3)

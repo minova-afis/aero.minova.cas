@@ -7,6 +7,7 @@ import static java.util.stream.IntStream.range;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -94,8 +95,8 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
-	 * 	          können alle Spalten gesehen werden.
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist, können alle Spalten gesehen
+	 *            werden.
 	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
@@ -111,8 +112,8 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
-	 *            können alle Spalten gesehen werden.
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist, können alle Spalten gesehen
+	 *            werden.
 	 * @param isSetup
 	 *            <code>true</code>, falls es sich um einen Aufruf im Rahmen des Setup handelt
 	 * @return Resultat SqlProcedureResult der Ausführung
@@ -248,185 +249,184 @@ public class ProcedureService {
 		sb.append(procedureCall);
 		setUserContextFor(connection);
 
-		final val preparedStatement = connection.prepareCall(procedureCall);
-
 		// Jede Row ist eine Abfrage.
 		for (int j = 0; j < inputTable.getRows().size(); j++) {
 			SqlProcedureResult resultForThisRow = new SqlProcedureResult();
 
-			fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
-
-			preparedStatement.registerOutParameter(1, Types.INTEGER);
-			preparedStatement.execute();
-			{   /*
-				 * Man würde hier erwarten, dass der Code wie in folgender Doku aussieht:
-				 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16
-				 *
-				 * Das liegt vor allem daran, dass eine SQL-Prozedur sehr viele
-				 * verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat.
-				 *
-				 * Folgender Artikel umreist, dass ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
-				 */
-				int i = 0;
-				while (preparedStatement.getResultSet() == null) {
-					/* Es kann sein, dass am Anfang einige ResultsSets leer sind.
-					 * Diese muss man manuel rausfiltern.
+			try (final var preparedStatement = connection.prepareCall(procedureCall)) {
+				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
+				preparedStatement.registerOutParameter(1, Types.INTEGER);
+				preparedStatement.execute();
+				{ /*
+					 * Man würde hier erwarten, dass der Code wie in folgender Doku aussieht:
+					 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16 Das liegt vor allem daran, dass eine
+					 * SQL-Prozedur sehr viele verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat. Folgender Artikel umreist,
+					 * dass ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
 					 */
+					int i = 0;
+					while (preparedStatement.getResultSet() == null) {
+						/*
+						 * Es kann sein, dass am Anfang einige ResultsSets leer sind. Diese muss man manuel rausfiltern.
+						 */
 
-					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
-						// Es gibt kein nächstes Result
-						break;
-					}
-					/**
-					 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets.
-					 * Sind mehr vorhanden, ist das Verhalten der Treiber nicht kontrollierbar:
-					 * https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
-					 */
-					if (++i >= maxResultSetCount) {
-						customLogger.logSql(
-								"Warning: too many result sets. Maybe there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");
-						break;
-					}
-				}
-			}
-			// ToDo ich kann mir gar nicht vorstellen, dass hier noch ResultSets vorhanden sind, nachdem weiter oben
-			// mit getMoreResults() alles abgeholt wurde.
-			if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
-				val sqlResultSet = preparedStatement.getResultSet();
-				val resultSet = new Table();
-				resultSet.setName(inputTable.getName());
-				resultForThisRow.setResultSet(resultSet);
-				val metaData = sqlResultSet.getMetaData();
-				resultSet.setColumns(//
-						range(0, metaData.getColumnCount()).mapToObj(i -> {
-							try {
-								val type = metaData.getColumnType(i + resultSetOffset);
-								val name = metaData.getColumnName(i + resultSetOffset);
-								if (type == Types.BOOLEAN || Types.BIT == type) {
-									return new Column(name, DataType.BOOLEAN);
-								} else if (type == Types.DOUBLE) {
-									return new Column(name, DataType.DOUBLE);
-								} else if (type == Types.TIMESTAMP) {
-									return new Column(name, DataType.INSTANT);
-								} else if (type == Types.INTEGER) {
-									return new Column(name, DataType.INTEGER);
-								} else if ((type == Types.VARCHAR) || (type == Types.NVARCHAR)) {
-									return new Column(name, DataType.STRING);
-								} else if (type == Types.DECIMAL) {
-									return new Column(name, DataType.BIGDECIMAL);
-								} else if (type == Types.BIGINT) {
-									return new Column(name, DataType.LONG);
-								} else {
-									customLogger.logFiles( "calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type );
-									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
-								}
-							} catch (Exception e) {
-								throw new RuntimeException("msg.ParseResultSetError");
-							}
-						}).collect(toList()));
-				int totalResults = 0;
-
-				int securityTokenInColumn = -1;
-				if (!userSecurityTokensToBeChecked.isEmpty()) {
-					securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
-				}
-				resultSet.setMetaData(new TableMetaData());
-				while (sqlResultSet.next()) {
-					Row rowToBeAdded = null;
-					if (limit > 0) {
-						// nur die Menge an Rows, welche auf der gewünschten Page liegen
-						if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
-							rowToBeAdded = convertSqlResultToRow(resultSet//
-									, sqlResultSet//
-									, customLogger.userLogger//
-									, this);
+						if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
+							// Es gibt kein nächstes Result
+							break;
 						}
-					} else {
-						rowToBeAdded = convertSqlResultToRow(resultSet//
-								, sqlResultSet//
-								, customLogger.userLogger//
-								, this);
+						/**
+						 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets. Sind mehr vorhanden, ist das Verhalten der Treiber nicht
+						 * kontrollierbar: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+						 */
+						if (++i >= maxResultSetCount) {
+							customLogger.logSql(
+									"Warning: too many result sets. Maybe there is a big report, which writes a lot of resultsets? Please increase the default value in application.properties (aero.minova.database.maxresultsetcount)");
+							break;
+						}
 					}
-
-					/*
-					 * Falls die SecurityToken-Prüfung nicht eingeschaltet ist, wird einfach true zurückgegeben und die Row hinzugefügt.
-					 */
-					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
-						resultSet.addRow(rowToBeAdded);
-						totalResults++;
-					}
-					resultSet.fillMetaData(resultSet, limit, totalResults, page);
 				}
-			}
+				// ToDo ich kann mir gar nicht vorstellen, dass hier noch ResultSets vorhanden sind, nachdem weiter oben
+				// mit getMoreResults() alles abgeholt wurde.
+				if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
+					try (ResultSet sqlResultSet = preparedStatement.getResultSet()) {
+						val resultSet = new Table();
+						resultSet.setName(inputTable.getName());
+						resultForThisRow.setResultSet(resultSet);
+						val metaData = sqlResultSet.getMetaData();
+						resultSet.setColumns(//
+								range(0, metaData.getColumnCount()).mapToObj(i -> {
+									try {
+										val type = metaData.getColumnType(i + resultSetOffset);
+										val name = metaData.getColumnName(i + resultSetOffset);
+										if (type == Types.BOOLEAN || Types.BIT == type) {
+											return new Column(name, DataType.BOOLEAN);
+										} else if (type == Types.DOUBLE) {
+											return new Column(name, DataType.DOUBLE);
+										} else if (type == Types.TIMESTAMP) {
+											return new Column(name, DataType.INSTANT);
+										} else if (type == Types.INTEGER) {
+											return new Column(name, DataType.INTEGER);
+										} else if ((type == Types.VARCHAR) || (type == Types.NVARCHAR)) {
+											return new Column(name, DataType.STRING);
+										} else if (type == Types.DECIMAL) {
+											return new Column(name, DataType.BIGDECIMAL);
+										} else if (type == Types.BIGINT) {
+											return new Column(name, DataType.LONG);
+										} else {
+											customLogger.logFiles("calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type);
+											throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
+										}
+									} catch (Exception e) {
+										throw new RuntimeException("msg.ParseResultSetError");
+									}
+								}).collect(toList()));
+						int totalResults = 0;
 
-			val hasOutputParameters = inputTable//
-					.getColumns()//
-					.stream()//
-					.anyMatch(c -> c.getOutputType() == OutputType.OUTPUT);
-			if (hasOutputParameters) {
-				val outputParameters = new Table();
-				outputParameters.setName(inputTable.getName());
-				resultForThisRow.setOutputParameters(outputParameters);
-				val outputColumnsMapping = inputTable//
+						int securityTokenInColumn = -1;
+						if (!userSecurityTokensToBeChecked.isEmpty()) {
+							securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
+						}
+						resultSet.setMetaData(new TableMetaData());
+						while (sqlResultSet.next()) {
+							Row rowToBeAdded = null;
+							if (limit > 0) {
+								// nur die Menge an Rows, welche auf der gewünschten Page liegen
+								if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
+									rowToBeAdded = convertSqlResultToRow(resultSet//
+											, sqlResultSet//
+											, customLogger.userLogger//
+											, this);
+								}
+							} else {
+								rowToBeAdded = convertSqlResultToRow(resultSet//
+										, sqlResultSet//
+										, customLogger.userLogger//
+										, this);
+							}
+
+							/*
+							 * Falls die SecurityToken-Prüfung nicht eingeschaltet ist, wird einfach true zurückgegeben und die Row hinzugefügt.
+							 */
+							if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, rowToBeAdded, securityTokenInColumn)) {
+								resultSet.addRow(rowToBeAdded);
+								totalResults++;
+							}
+							resultSet.fillMetaData(resultSet, limit, totalResults, page);
+						}
+					} catch (Exception e) {
+						throw new RuntimeException("Error while trying to extract ResultSet for procedure " + inputTable.getName() + ".", e);
+					}
+				}
+
+				boolean hasOutputParameters = inputTable//
 						.getColumns()//
 						.stream()//
-						.map(c -> c.getOutputType() == OutputType.OUTPUT)//
-						.toList();
+						.anyMatch(c -> c.getOutputType() == OutputType.OUTPUT);
+				if (hasOutputParameters) {
+					val outputParameters = new Table();
+					outputParameters.setName(inputTable.getName());
+					resultForThisRow.setOutputParameters(outputParameters);
+					val outputColumnsMapping = inputTable//
+							.getColumns()//
+							.stream()//
+							.map(c -> c.getOutputType() == OutputType.OUTPUT)//
+							.toList();
 
-				val outputValues = new Row();
-				outputParameters.setColumns(inputTable.getColumns());
-				range(0, inputTable.getColumns().size())//
-						.forEach(i -> {
-							if (outputColumnsMapping.get(i)) {
-								outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
-							} else {
-								outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
-							}
-						});
-				int securityTokenInColumn = -1;
-				if (!userSecurityTokensToBeChecked.isEmpty()) {
-					securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
+					val outputValues = new Row();
+					outputParameters.setColumns(inputTable.getColumns());
+					range(0, inputTable.getColumns().size())//
+							.forEach(i -> {
+								if (outputColumnsMapping.get(i)) {
+									outputValues.addValue(parseSqlParameter(preparedStatement, i + parameterOffset, inputTable.getColumns().get(i)));
+								} else {
+									outputValues.addValue(inputTable.getRows().get(0).getValues().get(i));
+								}
+							});
+					int securityTokenInColumn = -1;
+					if (!userSecurityTokensToBeChecked.isEmpty()) {
+						securityTokenInColumn = securityService.findSecurityTokenColumn(inputTable);
+					}
+					Row resultRow = new Row();
+					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
+						resultRow = outputValues;
+					} else {
+						for (Value ignored : outputValues.getValues()) {
+							resultRow.addValue(null);
+						}
+					}
+					outputParameters.addRow(resultRow);
 				}
-				Row resultRow = new Row();
-				if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
-					resultRow = outputValues;
-				} else {
-					for (Value ignored : outputValues.getValues()) {
-						resultRow.addValue(null);
+
+				// Endresult-OutputParameter erweitern um RowResult-OutputParameter.
+				if (resultForThisRow.getOutputParameters() != null && resultForThisRow.getOutputParameters().getRows() != null) {
+					if (result.getOutputParameters() == null) {
+						result.setOutputParameters(resultForThisRow.getOutputParameters());
+					} else {
+						result.getOutputParameters().getRows().addAll(resultForThisRow.getOutputParameters().getRows());
 					}
 				}
-				outputParameters.addRow(resultRow);
-			}
 
-			// Endresult-OutputParameter erweitern um RowResult-OutputParameter.
-			if (resultForThisRow.getOutputParameters() != null && resultForThisRow.getOutputParameters().getRows() != null) {
-				if (result.getOutputParameters() == null) {
-					result.setOutputParameters(resultForThisRow.getOutputParameters());
-				} else {
-					result.getOutputParameters().getRows().addAll(resultForThisRow.getOutputParameters().getRows());
+				// Endresult-ResultSet erweitern um RowResult-ResultSet.
+				if (resultForThisRow.getResultSet() != null && resultForThisRow.getResultSet().getRows() != null) {
+					if (result.getResultSet() == null) {
+						result.setResultSet(resultForThisRow.getResultSet());
+					} else {
+						TableMetaData metaData = result.getResultSet().getMetaData();
+						result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
+						result.getResultSet().fillMetaData(inputTable, limit, metaData.getTotalResults() + resultForThisRow.getResultSet().getRows().size(),
+								page);
+					}
 				}
-			}
-
-			// Endresult-ResultSet erweitern um RowResult-ResultSet.
-			if (resultForThisRow.getResultSet() != null && resultForThisRow.getResultSet().getRows() != null) {
-				if (result.getResultSet() == null) {
-					result.setResultSet(resultForThisRow.getResultSet());
-				} else {
-					TableMetaData metaData = result.getResultSet().getMetaData();
-					result.getResultSet().getRows().addAll(resultForThisRow.getResultSet().getRows());
-					result.getResultSet().fillMetaData(inputTable, limit, metaData.getTotalResults() + resultForThisRow.getResultSet().getRows().size(), page);
+				// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
+				val returnCode = preparedStatement.getObject(1);
+				if (returnCode != null) {
+					int reCode = preparedStatement.getInt(1);
+					resultForThisRow.setReturnCode(reCode);
+					// Falls nicht alle ReturnCodes gleich sind, wird 1 als endgültiger ReturnCode rein geschrieben.
+					if (!result.getReturnCodes().isEmpty() && !result.getReturnCodes().contains(reCode) && result.getReturnCode() != 1) {
+						result.setReturnCode(1);
+					}
+					result.getReturnCodes().add(resultForThisRow.getReturnCode());
 				}
-			}
-			// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
-			val returnCode = preparedStatement.getObject(1);
-			if (returnCode != null) {
-				int reCode = preparedStatement.getInt(1);
-				resultForThisRow.setReturnCode(reCode);
-				// Falls nicht alle ReturnCodes gleich sind, wird 1 als endgültiger ReturnCode rein geschrieben.
-				if (!result.getReturnCodes().isEmpty() && !result.getReturnCodes().contains(reCode) && result.getReturnCode() != 1) {
-					result.setReturnCode(1);
-				}
-				result.getReturnCodes().add(resultForThisRow.getReturnCode());
 			}
 		}
 		return result;
@@ -457,7 +457,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
@@ -479,7 +479,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -501,7 +501,7 @@ public class ProcedureService {
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -512,13 +512,11 @@ public class ProcedureService {
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor.
-	 * Siehe {@link #prepareProcedureString(Table, Set)}.
+	 * Bereitet einen Prozedur-String vor. Siehe {@link #prepareProcedureString(Table, Set)}.
 	 *
 	 * @param params
-	 * 			gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
-	 * @return
-	 * 			die SQL-Anweisung
+	 *            gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
+	 * @return die SQL-Anweisung
 	 * @throws IllegalArgumentException
 	 *             wenn der Name in der <code>params</code>-Table leer ist.
 	 */
@@ -527,17 +525,16 @@ public class ProcedureService {
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor.
-	 * Als Ergebnis entsteht ein SQL call-Statement in der Form:<br><ol>
-	 *     <li>{ ? = call procName() }</li>
-	 *     <li>{ call procName() }</li>
-	 *     <li>{ call procName( ? ) }</li>
-	 *     <li>{ call procName( ?,?, &#8230; ) }</li>
-	 *     <li>{ ? = call procName( ?,?, &#8230; ) }</li>
+	 * Bereitet einen Prozedur-String vor. Als Ergebnis entsteht ein SQL call-Statement in der Form:<br>
+	 * <ol>
+	 * <li>{ ? = call procName() }</li>
+	 * <li>{ call procName() }</li>
+	 * <li>{ call procName( ? ) }</li>
+	 * <li>{ call procName( ?,?, &#8230; ) }</li>
+	 * <li>{ ? = call procName( ?,?, &#8230; ) }</li>
 	 * </ol>
-	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table.
-	 * Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl der Spalten der params-Table.
-	 * <br>
+	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table. Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl
+	 * der Spalten der params-Table. <br>
 	 * ToDo: prüfen, ob der Name weiter geprüft werden kann oder escaped werden sollte
 	 *
 	 * @param params

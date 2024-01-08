@@ -14,9 +14,10 @@ name: "CodeQL"
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+# Der Worflow ist erstmal deaktiviert, weil dieser nicht funktioniert. Siehe #847.
+#  pull_request:
+#    # The branches below must be a subset of the branches above
+#    branches: [ "main" ]
   schedule:
     - cron: '16 12 * * 2'
 

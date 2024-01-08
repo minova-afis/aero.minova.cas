@@ -423,7 +423,15 @@ public class ProcedureService {
 				}
 
 				// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
-				val returnCode = preparedStatement.getObject(1);
+				Object returnCode = null;
+				try {
+					returnCode = preparedStatement.getObject(1);
+				} catch (Exception e) {
+					// Wenn preparedStatement.getObject(1) ausgeführt wird, können in Spezialfällen "No Data available" geworfen werden, obwohl die Prozedur
+					// ausgeführt wurde.
+					Logger.logException(e);
+				}
+
 				if (returnCode != null) {
 					int reCode = preparedStatement.getInt(1);
 					resultForThisRow.setReturnCode(reCode);

@@ -1,0 +1,115 @@
+
+
+== Tabelle DefaultDescriptions (Standardwerte für Tabellenfelder)
+
+Diese Tabelle gibt es nicht in der Datenbank.
+Sie enthält lediglich Beschreibungen für Standardfelder in Tabellen.
+So wird erreicht, dass dieser Code nicht in jeder Datei erscheint. 
+    
+
+=== Spalten
+
+In der Tabelle sind folgende Spalten definiert.
+
+==== KeyLong
+
+Bezeichnung: Interne ID +
+Datentyp: integer (identity) +
+
+// tag::column.KeyLong[]
+
+Dieses Feld enthält den internen Schlüssel in der Datenbank.
+Er wird für alle Verweise in anderen Tabellen auf einen Datensatz in dieser Tabelle verwendet.
+
+Dieser Schlüsselwert ist für den Anwender ''unsichtbar''.
+        
+// end::column.KeyLong[]
+
+
+==== KeyText
+
+Bezeichnung: Matchcode +
+Datentyp: nvarchar(20) not null +
+
+// tag::column.KeyText[]
+
+Dieses Feld enthält den benutzerdefinierten Schlüssel in der Datenbank.
+Er wird in allen Lookup-Feldern auf den Masken angezeigt.
+Er wird in der Regel auch im Index von Tabellen / Masken angezeigt, die auf einen Datensatz in dieser Tabelle verweisen.
+
+Dieser Schlüsselwert kann vom Anwender nicht geändert werden. 
+Dazu muss ein neuer Datensatz angelegt werden.
+        
+// end::column.KeyText[]
+
+
+==== Description
+
+Bezeichnung: Beschreibung +
+Datentyp: nvarchar(100) +
+
+// tag::column.Description[]
+
+In diesem Feld kann eine nähere Beschreibung für den Datensatz hinterlegt werden.
+        
+// end::column.Description[]
+
+
+==== LastAction
+
+Bezeichnung: Art der letzten Änderung +
+Datentyp: integer not null +
+
+// tag::column.LastAction[]
+
+In diesem Feld wird bei jeder relevanten Änderung durch einen Benutzer die Art der Änderung gespeichert.
+Folgende Arten sind bekannt
+
+[options="header",cols=">,"]
+|======
+| Wert | Bedeutung
+| 1 | Datensatz wurde neu hinzugefügt
+| 2 | Datensatz wurde geändert
+| -1 | Datensatz wurde gelöscht
+|======
+        
+// end::column.LastAction[]
+
+
+==== LastDate
+
+Bezeichnung: Zeitpunkt der letzten Änderung +
+Datentyp: datetime not null +
+
+// tag::column.LastDate[]
+
+In diesem Feld wird bei jeder relevanten Änderung der jeweilige Zeitpunkt gespeichert.
+        
+// end::column.LastDate[]
+
+
+==== LastUser
+
+Bezeichnung: Benutzer der letzten Änderung +
+Datentyp: nvarchar(50) not null +
+
+// tag::column.LastUser[]
+
+In diesem Feld wird bei jeder relevanten Änderung durch einen Benutzer dessen Anmeldename gespeichert.
+        
+// end::column.LastUser[]
+
+
+==== SecurityToken
+
+Bezeichnung: Tag für die RowLevelSecurity +
+Datentyp: nvarchar(10) +
+
+// tag::column.SecurityToken[]
+
+In dieser Spalte werden den verschiedenen Einträgen SecurityToken zugesprochen, mithilfe derer man die Einträge nur für bestimmte Nutzer und Nutzergruppen zugänglich machen kann. 
+Ist die Spalte leer, darf jeder sie sehen. 
+Damit auf die RowLevelSecurity geachtet wird muss das RowLevelSecurity-Flag in der xtcasLuUserPrivilegeUserGroup auf 1 gesetzt werden.
+Ansonsten wird die Spalte ignoriert.
+       
+// end::column.SecurityToken[]

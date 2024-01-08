@@ -117,6 +117,8 @@ public class ViewService {
 
 					result.fillMetaData(result, limit, totalResults, page);
 				}
+			} finally {
+				preparedStatement.close();
 			}
 		} catch (Throwable e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);

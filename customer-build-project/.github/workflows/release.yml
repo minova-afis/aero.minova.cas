@@ -1,0 +1,14 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Release Version'
+        required: true
+jobs:
+  Release:
+    uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/release-java.yml@main
+    secrets: inherit
+    with:
+      release-version: ${{ github.event.inputs.release-version }}
+

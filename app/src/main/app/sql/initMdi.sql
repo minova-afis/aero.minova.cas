@@ -1,3 +1,5 @@
+-- Änderungen hier sollten auch in der Methode MdiService#setupCASMdi durchgeführt werden!
+
 -- General Application Info
 exec xpcasInitMdi null, 'CAS', '@CAS', null, null, null, 3, 'aero.minova.cas'
 
@@ -11,5 +13,5 @@ exec xpcasInitMdi 'ColumnSecurity', 'ColumnSecurity', '@xtcasColumnSecurity', 'C
 exec xpcasInitMdi 'UserGroup', 'UserGroup', '@xtcasUserGroup', 'CAS', 12.0, 'admin', 1, 'aero.minova.cas'
 exec xpcasInitMdi 'UserPrivilege', 'UserPrivilege', '@xtcasUserPrivilege', 'CAS', 13.0, 'admin', 1, 'aero.minova.cas'
 exec xpcasInitMdi 'Mdi', 'Menu', '@xtcasMdi', 'CAS', 14.0, 'admin', 1, 'aero.minova.cas'
-exec xpcasInitMdi 'User', 'LDAPUser', '@xtcasUser', 'CAS', 10.0, 'admin', 1, 'aero.minova.cas'
-exec xpcasInitMdi 'Users', 'DBUser', '@xtcasUsers', 'CAS', 10.0, 'admin', 1, 'aero.minova.cas'
+exec xpcasInitMdi 'User', 'LDAPUser', '@xtcasUser', 'CAS', 15.0, 'admin', 1, 'aero.minova.cas'
+exec xpcasInitMdi 'Users', 'DBUser', '@xtcasUsers', 'CAS', 16.0, 'admin', 1, 'aero.minova.cas'

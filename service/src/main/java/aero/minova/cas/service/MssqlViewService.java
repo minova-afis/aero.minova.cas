@@ -49,9 +49,8 @@ public class MssqlViewService implements ViewServiceInterface {
 		userGroups.add(inputRow);
 		Table result = new Table();
 		val connection = systemDatabase.getConnection();
-		try {
-			val viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
-			val preparedStatement = connection.prepareCall(viewQuery);
+		val viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
+		try (val preparedStatement = connection.prepareCall(viewQuery)) {
 			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
 					customLogger.errorLogger)) {
 				customLogger.logPrivilege("Executing SQL-statement for view:  " + sb);

@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cas.parent</artifactId>
-    <version>12.67.1-SNAPSHOT</version>
+    <version>13.0.12-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>aero.minova.cas</name>
 
@@ -13,6 +13,11 @@
         <relativePath />
     </parent>
 
+    <properties>
+        <sonar.dependencyCheck.jsonReportPath>target/dependency-check-report.json</sonar.dependencyCheck.jsonReportPath>
+        <sonar.dependencyCheck.htmlReportPath>target/dependency-check-report.html</sonar.dependencyCheck.htmlReportPath>
+    </properties>
+
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
         <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</developerConnection>
@@ -20,12 +25,16 @@
     </scm>
 
     <modules>
+        <module>resource-plugin</module>
+        <module>cas.extension.parent.internal</module>
         <module>dev</module>
         <module>api</module>
         <module>app</module>
         <module>app.legacy</module>
         <module>service</module>
-        <module>setup</module>
+        <module>cas.extension.parent</module>
+        <module>cas.extension.deployment</module>
+        <module>customer-build-project</module>
     </modules>
 
     <repositories>
@@ -45,6 +54,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>9.0.8</version>
             </plugin>
         </plugins>
     </build>

@@ -8,4 +8,6 @@ on:
 jobs:
   Build:
     uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/java-continuous-integration.yml@main
+    with:
+      dependency-check-goal: 'help'
     secrets: inherit

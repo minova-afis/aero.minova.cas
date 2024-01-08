@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cas.extension.parent</artifactId>
+    <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
+    <packaging>pom</packaging>
+    <parent>
+        <groupId>aero.minova</groupId>
+        <artifactId>cas.extension.parent.internal</artifactId>
+        <version>13.0.12-SNAPSHOT</version>
+        <relativePath>../cas.extension.parent.internal</relativePath>
+    </parent>
+    <dependencies>
+        <dependency>
+            <groupId>aero.minova</groupId>
+            <artifactId>cas.app</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <tag>HEAD</tag>
+    </scm>
+</project>

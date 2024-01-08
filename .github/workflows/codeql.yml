@@ -82,7 +82,7 @@ jobs:
           
     - name: Maven build
       run: |
-        mvn --batch-mode compile \
+        mvn --batch-mode clean install \
           -P repo-github \
           -Dusername=$GITHUB_ACCESS_TOKEN \
           --file pom.xml \

@@ -427,8 +427,8 @@ public class ProcedureService {
 				try {
 					returnCode = preparedStatement.getObject(1);
 				} catch (Exception e) {
-					// Wenn preparedStatement.getObject(1) ausgeführt wird, können in Spezialfällen "No Data available" geworfen werden, obwohl die Prozedur
-					// ausgeführt wurde.
+					// Wenn preparedStatement.getObject(1) ausgeführt wird, wird in den Tests "Connection already closed" geworfen, obwohl die Prozedur
+					// ausgeführt wurde. Es ist also eigentlich gar kein echter Fehler aufgetreten.
 					Logger.logException(e);
 				}
 

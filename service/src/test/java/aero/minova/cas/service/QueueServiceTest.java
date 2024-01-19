@@ -49,8 +49,19 @@ public class QueueServiceTest {
 		serviceNotifierRegistration.registerProcedureNewsfeed("test", "tFlightSchedule");
 
 		assertEquals(1, serviceRepo.findAll().size());
+		assertEquals("Service", serviceRepo.findByKeyLong(1).get().getKeyText());
+		assertEquals("test", serviceRepo.findByKeyLong(1).get().getUsername());
+		assertEquals("abc1234", serviceRepo.findByKeyLong(1).get().getPassword());
+		assertEquals(0, serviceRepo.findByKeyLong(1).get().getPort());
+		assertEquals("localhost", serviceRepo.findByKeyLong(1).get().getServiceUrl());
 		assertEquals(2, newsfeedListenerRepo.findAll().size());
+		assertEquals("tShipment", newsfeedListenerRepo.findByKeyLong(1).get().getTopic());
+		assertEquals("tFlightSchedule", newsfeedListenerRepo.findByKeyLong(2).get().getTopic());
 		assertEquals(2, procedureNewsfeedRepo.findAll().size());
+		assertEquals("test", procedureNewsfeedRepo.findByKeyLong(1).get().getKeyText());
+		assertEquals("tShipment", procedureNewsfeedRepo.findByKeyLong(1).get().getTopic());
+		assertEquals("test", procedureNewsfeedRepo.findByKeyLong(2).get().getKeyText());
+		assertEquals("tFlightSchedule", procedureNewsfeedRepo.findByKeyLong(2).get().getTopic());
 	}
 
 }

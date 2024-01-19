@@ -13,6 +13,7 @@ import java.time.Instant;
 
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,15 +103,23 @@ public class SQLProcedureControllerTest extends BaseTest {
 				Integer.class);
 	}
 
-	@Test
-	@DisplayName("Prozedurenaufruf für Integer testen")
-	void testProcedure() throws Exception {
-
+	@BeforeEach
+	public void init() {
 		// Recht und Admin-Nutzer erstellen
 		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
 		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureInt");
-		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
+		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureString");
+		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureBoolean");
+		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureBoolean2");
 
+		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureInstant");
+		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureInstant2");
+		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
+	}
+
+	@Test
+	@DisplayName("Prozedurenaufruf für Integer testen")
+	void testProcedure() throws Exception {
 		// Tabelle für Index-Anfrage erstellen
 		Table procedure = new Table();
 		procedure.setName("xpcasTestProcedureInt");
@@ -131,11 +140,6 @@ public class SQLProcedureControllerTest extends BaseTest {
 	@Test
 	@DisplayName("Prozedurenaufruf für Boolean testen")
 	void testProcedureBoolean() throws Exception {
-		// Recht und Admin-Nutzer erstellen
-		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
-		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureBoolean");
-		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
-
 		// Tabelle für Index-Anfrage erstellen
 		Table procedure = new Table();
 		procedure.setName("xpcasTestProcedureBoolean");
@@ -158,11 +162,6 @@ public class SQLProcedureControllerTest extends BaseTest {
 	@DisplayName("Prozedurenaufruf für Strings testen")
 	void testProcedureString() throws Exception {
 
-		// Recht und Admin-Nutzer erstellen
-		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
-		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureString");
-		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
-
 		// Tabelle für Index-Anfrage erstellen
 		Table procedure = new Table();
 		procedure.setName("xpcasTestProcedureString");
@@ -182,12 +181,6 @@ public class SQLProcedureControllerTest extends BaseTest {
 	@Test
 	@DisplayName("Prozedurenaufruf für Boolean als Rückgabewert testen")
 	void testProcedureBoolean2() throws Exception {
-
-		// Recht und Admin-Nutzer erstellen
-		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
-		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureBoolean2");
-		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
-
 		// Tabelle für Index-Anfrage erstellen
 		Table procedure = new Table();
 		procedure.setName("xpcasTestProcedureBoolean2");
@@ -208,11 +201,6 @@ public class SQLProcedureControllerTest extends BaseTest {
 	@DisplayName("Prozedurenaufruf für Instant testen")
 	void testProcedureInstant() throws Exception {
 
-		// Recht und Admin-Nutzer erstellen
-		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
-		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureInstant2");
-		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
-
 		// Tabelle für Index-Anfrage erstellen
 		Table procedure = new Table();
 		procedure.setName("xpcasTestProcedureInstant2");
@@ -226,17 +214,12 @@ public class SQLProcedureControllerTest extends BaseTest {
 		// Es muss mindestens das eine eben erstellte Recht geben
 		assertNotNull(procedureResult.getBody());
 		SqlProcedureResult result = (SqlProcedureResult) procedureResult.getBody();
-		assertEquals(2, result.getResultSet().getRows().get(0).getValues().get(0).getIntegerValue());
+		assertEquals(7, result.getResultSet().getRows().get(0).getValues().get(0).getIntegerValue());
 	}
 
 	@Test
 	@DisplayName("Prozedurenaufruf für Instant als Rückgabewert testen")
 	void testProcedureInstant2() throws Exception {
-
-		// Recht und Admin-Nutzer erstellen
-		authorizationService.findOrCreateUserPrivilege(SECURITYVIEW);
-		authorizationService.findOrCreateUserPrivilege("xpcasTestProcedureInstant");
-		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
 
 		// Tabelle für Index-Anfrage erstellen
 		Table procedure = new Table();

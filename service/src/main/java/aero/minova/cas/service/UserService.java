@@ -1,6 +1,7 @@
 package aero.minova.cas.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,19 @@ public class UserService extends BaseService<User> {
 		}
 	}
 
+//TODO:Testen	
 	public void removeUserFromUserGroup(int userKey, int userGroupKey) {
 		User user = findEntityById(userKey);
-		String userGroupToken = "#" + userGroupService.findEntityById(userGroupKey).getKeyText();
+		String userGroupToken = userGroupService.findEntityById(userGroupKey).getKeyText();
 
-		user.setMemberships(user.getMemberships().toLowerCase().replace(userGroupToken.toLowerCase(), ""));
+		List<String> memberships = Arrays.asList(user.getMemberships().split("#"));
+		memberships.remove(userGroupToken);
+
+		user.setMemberships("");
+		for (String s : memberships) {
+			user.setMemberships(user.getMemberships() + "#" + s);
+		}
+
 		save(user);
 	}
 

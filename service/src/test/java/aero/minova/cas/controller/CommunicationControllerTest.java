@@ -27,7 +27,7 @@ public class CommunicationControllerTest extends BaseTest {
 	CommunicationController communicationController;
 
 	@Test
-	public void testSetupSuccess() throws Exception {
+	void testSetupSuccess() throws Exception {
 		sqlController = spy(sqlController);
 		communicationController.spc = sqlController;
 		ResponseEntity res = new ResponseEntity(HttpStatus.ACCEPTED);
@@ -40,7 +40,7 @@ public class CommunicationControllerTest extends BaseTest {
 	}
 
 	@Test
-	public void testSetupError() throws Exception {
+	void testSetupError() throws Exception {
 		HttpServletResponse httpServlet = new MockHttpServletResponse();
 		// Da in den Tests die Hibernate Datenbank verwendet wird, wird im sqlController ein Fehler geworfen. Das soll hier aber genauso sein, damit wir den
 		// Fehlerfall testen können.

@@ -73,6 +73,7 @@ public class AuthoritiesExtension extends BaseGridExtension<Authorities> {
 
 	private Authorities fillAuthority(Authorities entity) {
 
+		// In der Maske ist Authorities.op.xml ist das Feld `Authority` als Lookup definiert -> entity.getAuthority ist der KeyLong der Authority
 		UserGroup userGroup = userGroupService.findEntityById(Integer.valueOf(entity.getAuthority()));
 		entity.setAuthority(userGroup.getKeyText());
 

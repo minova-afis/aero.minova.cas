@@ -16,6 +16,10 @@
 </p>
 ++++
 
+== Architektur-Übersicht
+
+image::doc/cas-overview.svg[]
+
 == Beschreibung
 Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank, Erweiterungen basierend auf Java, sowie einem Read-Only-Dateisystem bereit.
 Der Fokus liegt hierbei darauf, das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.

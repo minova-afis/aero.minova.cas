@@ -72,7 +72,7 @@ public class CustomLogger {
 		// TODO Der Stacktrace wird nicht geloggt, daher habe ich als Übergangslösung ein printStackTrace eingebaut.
 		e.printStackTrace();
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
+		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw);
 
 	}
 
@@ -120,7 +120,7 @@ public class CustomLogger {
 		initLogger.info("Active profiles: {}", Arrays.toString(env.getActiveProfiles()));
 		final MutablePropertySources sources = ((AbstractEnvironment) env).getPropertySources();
 		StreamSupport.stream(sources.spliterator(), false)//
-				.filter(ps -> ps instanceof EnumerablePropertySource)//
+				.filter(EnumerablePropertySource.class::isInstance)//
 				.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())//
 				.flatMap(Arrays::stream)//
 				.distinct()//
@@ -129,7 +129,7 @@ public class CustomLogger {
 					try {
 						initLogger.info("Property: {}={}", prop, env.getProperty(prop));
 					} catch (IllegalArgumentException e) {
-						initLogger.info("Property: " + prop + " not resolvable: " + e.getMessage(), e);
+						initLogger.warn("Property: " + prop + " not resolvable: " + e.getMessage(), e);
 					}
 				});
 	}

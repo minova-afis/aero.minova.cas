@@ -1,7 +1,8 @@
 name: CodeQL
 on:
-  branches:
-    - '**'
+  push:
+    branches:
+      - '**'
   workflow_dispatch:
   schedule:
     - cron: '16 12 * * 2'

@@ -9,8 +9,8 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL"
-
+name: CodeQL
+on:
 # Der Worflow ist erstmal deaktiviert, weil dieser nicht funktioniert. Siehe #847.
 #on:
 #  push:
@@ -18,6 +18,7 @@ name: "CodeQL"
 #  pull_request:
 #    # The branches below must be a subset of the branches above
 #    branches: [ "main" ]
+  workflow_dispatch:
   schedule:
     - cron: '16 12 * * 2'
 

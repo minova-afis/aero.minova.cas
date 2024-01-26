@@ -111,8 +111,7 @@ public class CustomLogger {
 	/**
 	 * TODO Das loggen funktioniert zur Zeit nicht.
 	 *
-	 * @param event
-	 *            Das Event, bei dem die Methode ausgeführt werden soll.
+	 * @param event Das Event, bei dem die Methode ausgeführt werden soll.
 	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -126,7 +125,13 @@ public class CustomLogger {
 				.flatMap(Arrays::stream)//
 				.distinct()//
 				.filter(prop -> !(prop.contains("credentials") || prop.contains("password")))//
-				.forEach(prop -> initLogger.info("Property: {}={}", prop, env.getProperty(prop)));
+				.forEach(prop -> {
+					try {
+						initLogger.info("Property: {}={}", prop, env.getProperty(prop));
+					} catch (IllegalArgumentException e) {
+						initLogger.info("Property: " + prop + " not resolvable: " + e.getMessage(), e);
+					}
+				});
 	}
 
 	public void logInfo(String logMessage) {

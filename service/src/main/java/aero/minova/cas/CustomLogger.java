@@ -72,7 +72,7 @@ public class CustomLogger {
 		// TODO Der Stacktrace wird nicht geloggt, daher habe ich als Übergangslösung ein printStackTrace eingebaut.
 		e.printStackTrace();
 		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
+		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw);
 
 	}
 
@@ -111,8 +111,7 @@ public class CustomLogger {
 	/**
 	 * TODO Das loggen funktioniert zur Zeit nicht.
 	 *
-	 * @param event
-	 *            Das Event, bei dem die Methode ausgeführt werden soll.
+	 * @param event Das Event, bei dem die Methode ausgeführt werden soll.
 	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -121,12 +120,18 @@ public class CustomLogger {
 		initLogger.info("Active profiles: {}", Arrays.toString(env.getActiveProfiles()));
 		final MutablePropertySources sources = ((AbstractEnvironment) env).getPropertySources();
 		StreamSupport.stream(sources.spliterator(), false)//
-				.filter(ps -> ps instanceof EnumerablePropertySource)//
+				.filter(EnumerablePropertySource.class::isInstance)//
 				.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())//
 				.flatMap(Arrays::stream)//
 				.distinct()//
 				.filter(prop -> !(prop.contains("credentials") || prop.contains("password")))//
-				.forEach(prop -> initLogger.info("Property: {}={}", prop, env.getProperty(prop)));
+				.forEach(prop -> {
+					try {
+						initLogger.info("Property: {}={}", prop, env.getProperty(prop));
+					} catch (IllegalArgumentException e) {
+						initLogger.warn("Property: " + prop + " not resolvable: " + e.getMessage(), e);
+					}
+				});
 	}
 
 	public void logInfo(String logMessage) {

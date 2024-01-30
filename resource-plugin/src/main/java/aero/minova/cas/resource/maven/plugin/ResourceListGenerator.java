@@ -86,7 +86,7 @@ public class ResourceListGenerator extends AbstractMojo {
 									}
 									if (!jarEntry.isDirectory() && jarEntry.getName().startsWith("i18n/") && jarEntry.getName().endsWith(".properties")) {
 										System.out.println(jarEntry.getName());
-										Path i18nFilePath = i18nFolderFile.resolve(jar.getName()).resolve(jarEntry.getName());
+										Path i18nFilePath = i18nFolderFile.resolve(jarPath.getFileName()).resolve(jarEntry.getName());
 										copyResourcesToDirectory(jar, jarEntry, i18nFilePath.toFile());
 									}
 								}

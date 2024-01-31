@@ -35,7 +35,7 @@ public class ResourceListGenerator extends AbstractMojo {
 		final var resourceFileName = project.getGroupId() + "." + project.getArtifactId() + ".resources.txt";
 		final var resourceFile = resourceFolder.resolve(resourceFileName);
 		final var deployFile = resourceFolder.resolve("deployed.resources.txt");
-		final var i18nFolderFile = resourceFolder.resolve(project.getGroupId() + "." + project.getArtifactId() + ".resources");
+		final var customerProjectResourcesI18n = resourceFolder.resolve(project.getGroupId() + "." + project.getArtifactId() + ".resources").resolve("i18n");
 		try {
 			Files.createDirectories(resourceFolder);
 			final var resourceList = new StringBuilder();
@@ -47,6 +47,21 @@ public class ResourceListGenerator extends AbstractMojo {
 							if (Files.isRegularFile(r)) {
 								resourceList.append(normalize(classesFolder, r));
 								resourceList.append('\n');
+
+								// Die vorhandenen i18ns sind nur die aus dem Kundenprojekt. Wir kopieren sie erst einmal weg, damit wir sie später mergen
+								// können.
+								if (resourceSubFolder.endsWith("i18n") && !resourceSubFolder.getFileName().toString().contains(resourceFolder.toString())) {
+									try {
+										if (!customerProjectResourcesI18n.toFile().exists()) {
+											customerProjectResourcesI18n.toFile().mkdirs();
+										}
+										Files.copy(resourceSubFolder.resolve(r), customerProjectResourcesI18n.resolve(r.getFileName()));
+									} catch (IOException e) {
+										throw new RuntimeException(
+												"ResourceListGenerator was not able to copy " + r.getFileName() + " to " + customerProjectResourcesI18n, e);
+									}
+								}
+
 							} else if (Files.isDirectory(r)) {
 								resourceList.append(normalize(classesFolder, r) + "/");
 								resourceList.append('\n');
@@ -56,6 +71,7 @@ public class ResourceListGenerator extends AbstractMojo {
 						});
 					}
 				}
+
 			}
 			final var resourceSubFolder = classesFolder;
 			if (Files.isDirectory(resourceSubFolder)) {
@@ -85,9 +101,8 @@ public class ResourceListGenerator extends AbstractMojo {
 										deployList.append('\n');
 									}
 									if (!jarEntry.isDirectory() && jarEntry.getName().startsWith("i18n/") && jarEntry.getName().endsWith(".properties")) {
-										System.out.println(jarEntry.getName());
-										Path i18nFilePath = i18nFolderFile.resolve(jarPath.getFileName()).resolve(jarEntry.getName());
-										copyResourcesToDirectory(jar, jarEntry, i18nFilePath.toFile());
+										Path i18nFilePath = resourceFolder.resolve(jarPath.getFileName()).resolve(jarEntry.getName() + ".resources");
+										copyJarContentToDirectory(jar, jarEntry, i18nFilePath.toFile());
 									}
 								}
 							} catch (IOException e) {
@@ -115,10 +130,9 @@ public class ResourceListGenerator extends AbstractMojo {
 	/**
 	 * Copies a directory from a jar file to an external directory.
 	 */
-	public static void copyResourcesToDirectory(JarFile fromJar, JarEntry jarDir, File destDir) throws IOException {
+	public static void copyJarContentToDirectory(JarFile fromJar, JarEntry jarDir, File destDir) throws IOException {
 		File parent = destDir.getParentFile();
 		if (parent != null) {
-			System.out.println("Creating directoriy: " + parent);
 			parent.mkdirs();
 		}
 		InputStream in = fromJar.getInputStream(jarDir);

@@ -17,12 +17,20 @@ import aero.minova.cas.service.AuthoritiesService;
 import aero.minova.cas.service.UserGroupService;
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.model.UserGroup;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class AuthoritiesExtension extends BaseGridExtension<Authorities> {
 
 	@Autowired
 	UserGroupService userGroupService;
+
+	@PostConstruct
+	void setPrefix() {
+		viewPrefix = "xvcas";
+		procedurePrefix = "xpcas";
+		super.basicSetup();
+	}
 
 	@Override
 	protected ResponseEntity<SqlProcedureResult> insertOrUpdate(Table inputTable) {

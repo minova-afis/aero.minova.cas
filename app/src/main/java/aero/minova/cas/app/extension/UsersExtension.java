@@ -10,9 +10,17 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.app.util.ResponseEntityUtil;
 import aero.minova.cas.app.util.TableUtil;
 import aero.minova.cas.service.model.Users;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class UsersExtension extends BaseExtension<Users> {
+
+	@PostConstruct
+	void setPrefix() {
+		viewPrefix = "xvcas";
+		procedurePrefix = "xpcas";
+		super.basicSetup();
+	}
 
 	@Override
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
@@ -32,5 +40,4 @@ public class UsersExtension extends BaseExtension<Users> {
 			throw handleError(e);
 		}
 	}
-
 }

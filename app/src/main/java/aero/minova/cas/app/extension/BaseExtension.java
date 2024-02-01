@@ -33,6 +33,9 @@ public abstract class BaseExtension<E extends DataEntity> {
 	@Autowired
 	protected AuthorizationService authorizationService;
 
+	protected String procedurePrefix = "xpcor";
+	protected String viewPrefix = "xvcor";
+
 	public static final Gson TABLE_CONVERSION_GSON = GsonUtil.getGsonBuilder() //
 			.registerTypeAdapter(Table.class, new TableDeserializer()) //
 			.registerTypeAdapter(Table.class, new TableSerializer()) //
@@ -63,14 +66,15 @@ public abstract class BaseExtension<E extends DataEntity> {
 	}
 
 	public void setup(String formName) {
-		sqlProcedureController.registerExtension("xpcasInsert" + formName, this::insert);
-		sqlProcedureController.registerExtension("xpcasUpdate" + formName, this::update);
-		sqlProcedureController.registerExtension("xpcasDelete" + formName, this::delete);
-		sqlProcedureController.registerExtension("xpcasRead" + formName, this::read);
-		authorizationService.createDefaultPrivilegesForMask(formName, "xpcas", "xvcas");
+		sqlProcedureController.registerExtension(procedurePrefix + "Insert" + formName, this::insert);
+		sqlProcedureController.registerExtension(procedurePrefix + "Update" + formName, this::update);
+		sqlProcedureController.registerExtension(procedurePrefix + "Delete" + formName, this::delete);
+		sqlProcedureController.registerExtension(procedurePrefix + "Read" + formName, this::read);
 
+		authorizationService.createDefaultPrivilegesForMask(formName, procedurePrefix, viewPrefix);
 		authorizationService.findOrCreateUserPrivilege("v" + formName.toLowerCase() + "Index");
 		authorizationService.findOrCreateUserPrivilege("v" + formName.toLowerCase());
+		authorizationService.findOrCreateUserPrivilege("t" + formName.toLowerCase());
 		authorizationService.findOrCreateUserPrivilege("xtcas" + formName.toLowerCase());
 		authorizationService.findOrCreateUserPrivilege(formName.toLowerCase());
 	}

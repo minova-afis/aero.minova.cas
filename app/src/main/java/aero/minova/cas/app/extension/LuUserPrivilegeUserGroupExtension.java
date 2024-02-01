@@ -14,9 +14,17 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.app.util.ResponseEntityUtil;
 import aero.minova.cas.service.LuUserPrivilegeUserGroupService;
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class LuUserPrivilegeUserGroupExtension extends BaseGridExtension<LuUserPrivilegeUserGroup> {
+	
+	@PostConstruct
+	void setPrefix() {
+		viewPrefix = "xvcas";
+		procedurePrefix = "xpcas";
+		super.basicSetup();
+	}
 
 	@Override
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {

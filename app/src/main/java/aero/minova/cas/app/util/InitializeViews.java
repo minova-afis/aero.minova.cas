@@ -34,6 +34,7 @@ public class InitializeViews {
 
 	private static final String MSSQLDIALECT = "SQLServer".toLowerCase();
 	private static final String POSTGRES = "postgres".toLowerCase();
+	private static final String H2 = "h2".toLowerCase();
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -44,11 +45,11 @@ public class InitializeViews {
 		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
 
-		// Aktuell nur views einspielen wenn Postgres Datenbank genutzt wird
+		// Aktuell nur views einspielen wenn Postgres oder H2 Datenbank genutzt wird
 		if (dialect.toLowerCase().contains(MSSQLDIALECT)) {
 			logger.warn("SQL Views aren't created automatically, execute setup!");
 			return;
-		} else if (!dialect.toLowerCase().contains(POSTGRES)) {
+		} else if (!dialect.toLowerCase().contains(POSTGRES) && !dialect.toLowerCase().contains(H2)) {
 			logger.warn("Unkown JDBC Dialect {}, can't create views", dialect);
 			return;
 		}

@@ -3,8 +3,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-
 ## Unreleased
+* PreparedStatements und ResultSets nach der Ausführung schließen.
+* Verhindern eines Absturzes, wenn der Wert einer Umgebungsvariable eine andere, unbekannte Umgebungsvariable enthält
 
 * CAS-Masken über JPA und Extensions bedienen, Prozeduren entfernen
 
@@ -23,6 +24,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [13.0.8] -- 2023-12-07
 * Standard Übersetzungen aus dem `aero.minova.app.i18n`-Projekt in das CAS übernehmen,
 da diese immer benötigt werden.
+
 
 ## [13.0.7] -- 2023-12-06
 * CAS als fat jar ohne weitere Dateien auslieferbar machen. Dazu wurde die Kompatibilität mit alten App-Projekten gebrochen.

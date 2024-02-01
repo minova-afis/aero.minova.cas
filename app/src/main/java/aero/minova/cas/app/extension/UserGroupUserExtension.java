@@ -49,9 +49,11 @@ public class UserGroupUserExtension {
 
 	public ResponseEntity<SqlProcedureResult> insert(Table inputTable) {
 		try {
-			userService.addUserToUserGroup(//
-					inputTable.getValue("UserKey", 0).getIntegerValue(), //
-					inputTable.getValue("KeyLong", 0).getIntegerValue());
+			for (Row r : inputTable.getRows()) {
+				userService.addUserToUserGroup(//
+						inputTable.getValue("UserKey", r).getIntegerValue(), //
+						inputTable.getValue("KeyLong", r).getIntegerValue());
+			}
 
 			return ResponseEntityUtil.createResponseEntity(null, true);
 		} catch (Exception e) {
@@ -70,12 +72,12 @@ public class UserGroupUserExtension {
 
 	public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
 		try {
-			userService.removeUserFromUserGroup(//
-					inputTable.getValue("UserKey", 0).getIntegerValue(), //
-					inputTable.getValue("KeyLong", 0).getIntegerValue());
-
+			for (Row r : inputTable.getRows()) {
+				userService.removeUserFromUserGroup(//
+						inputTable.getValue("UserKey", r).getIntegerValue(), //
+						inputTable.getValue("KeyLong", r).getIntegerValue());
+			}
 			return ResponseEntityUtil.createResponseEntity(null, true);
-
 		} catch (Exception e) {
 			throw BaseExtension.handleError(e);
 		}

@@ -1,7 +1,5 @@
 package aero.minova.cas.service;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -183,29 +181,28 @@ public class MdiService extends BaseService<Mdi> {
 	 * @return
 	 */
 	public Mdi saveMdi(Mdi mdi) {
+		try {
+			return save(mdi);
+		} catch (RuntimeException e) {
+			// Wenn nicht gespeichert werden konnte null zurückgeben
+		}
+		return null;
+	}
+
+	@Override
+	public Mdi save(Mdi mdi) {
 
 		// Es darf nur genau einen Mdi Eintrag mit Typ 3 (Generelle Information) geben
 		if (mdi.getMdiType().getKeyLong() == 3 && !mdiRepository.findByMdiTypeKeyLongAndLastActionGreaterThan(3, 0).isEmpty()) {
-			return null;
+			throw new RuntimeException("@msg.OnlyOneGeneralInformationInMDI");
 		}
 
-		// Ansonsten nur speichern, wenn es diesen KeyText nicht schon gibt (Updates aber erlauben)
-		List<Mdi> findByKeyText = mdiRepository.findByKeyText(mdi.getKeyText());
-		if (!findByKeyText.isEmpty() && !Objects.equals(findByKeyText.get(0).getKeyLong(), mdi.getKeyLong())) {
-			return null;
-		}
 		if (mdi.getMdiType().getKeyLong() != 1) {
 			// Nur die Masken selbst sollen SecurityTokens haben, vgl xpcasInitMdi
 			mdi.setSecurityToken(null);
 		}
 
-		return mdiRepository.save(mdi);
-	}
-
-	@Override
-	public Mdi save(Mdi mdi) {
-		// TODO: Fehlermeldung :(
-		return saveMdi(mdi);
+		return super.save(mdi);
 	}
 
 }

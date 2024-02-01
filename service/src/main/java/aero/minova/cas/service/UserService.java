@@ -3,6 +3,7 @@ package aero.minova.cas.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,27 +35,45 @@ public class UserService extends BaseService<User> {
 
 		User user = findEntityById(userKey);
 
-		String userGroupToken = "#" + userGroupService.findEntityById(userGroupKey).getKeyText();
-		if (user.getMemberships() == null || !user.getMemberships().toLowerCase().contains(userGroupToken.toLowerCase())) {
-			user.setMemberships(user.getMemberships() != null ? user.getMemberships() : "" + userGroupToken);
+		String newToken = userGroupService.findEntityById(userGroupKey).getKeyText();
+
+		List<String> memberships = getMemberships(user);
+
+		if (!memberships.contains(newToken)) {
+			memberships.add(newToken);
+			user.setMemberships(getMembershipString(memberships));
 			save(user);
 		}
 	}
 
-//TODO:Testen	
 	public void removeUserFromUserGroup(int userKey, int userGroupKey) {
 		User user = findEntityById(userKey);
-		String userGroupToken = userGroupService.findEntityById(userGroupKey).getKeyText();
+		String tokenToRemove = userGroupService.findEntityById(userGroupKey).getKeyText();
 
-		List<String> memberships = Arrays.asList(user.getMemberships().split("#"));
-		memberships.remove(userGroupToken);
+		List<String> memberships = Arrays.asList(user.getMemberships().split("#")).stream().filter(token -> !token.equalsIgnoreCase(tokenToRemove)).toList();
+		user.setMemberships(getMembershipString(memberships));
+		save(user);
+	}
 
-		user.setMemberships("");
-		for (String s : memberships) {
-			user.setMemberships(user.getMemberships() + "#" + s);
+	private List<String> getMemberships(User user) {
+		if (user.getMemberships() == null || user.getMemberships().isBlank()) {
+			return new ArrayList<>();
 		}
 
-		save(user);
+		return Arrays.asList(user.getMemberships().split("#")).stream().map(String::strip).filter(s -> !s.isBlank())
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	private String getMembershipString(List<String> memberships) {
+		StringBuilder res = new StringBuilder();
+
+		for (String s : memberships) {
+			if (s != null && !s.strip().isBlank()) {
+				res.append("#" + s.strip());
+			}
+		}
+
+		return res.toString();
 	}
 
 }

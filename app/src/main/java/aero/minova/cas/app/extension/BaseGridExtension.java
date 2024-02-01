@@ -11,7 +11,7 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.app.util.ResponseEntityUtil;
 import aero.minova.cas.service.model.DataEntity;
 
-public class BaseGridExtension<E extends DataEntity> extends BaseExtension<E> {
+public abstract class BaseGridExtension<E extends DataEntity> extends BaseExtension<E> {
 
 	@Override
 	public ResponseEntity<SqlProcedureResult> insert(Table inputTable) {
@@ -64,5 +64,8 @@ public class BaseGridExtension<E extends DataEntity> extends BaseExtension<E> {
 		}
 		return l;
 	}
+
+	@Override
+	public abstract ResponseEntity<SqlProcedureResult> read(Table inputTable);
 
 }

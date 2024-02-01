@@ -20,7 +20,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 
-public class BaseService<E extends DataEntity> {
+public abstract class BaseService<E extends DataEntity> {
 
 	@Autowired
 	protected DataEntityRepository<E> repository;

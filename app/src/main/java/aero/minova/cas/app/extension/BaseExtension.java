@@ -22,7 +22,7 @@ import aero.minova.cas.service.BaseService;
 import aero.minova.cas.service.model.DataEntity;
 import jakarta.annotation.PostConstruct;
 
-public class BaseExtension<E extends DataEntity> {
+public abstract class BaseExtension<E extends DataEntity> {
 
 	@Autowired
 	protected SqlProcedureController sqlProcedureController;

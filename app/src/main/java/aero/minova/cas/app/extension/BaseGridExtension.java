@@ -24,32 +24,26 @@ public abstract class BaseGridExtension<E extends DataEntity> extends BaseExtens
 	}
 
 	protected ResponseEntity<SqlProcedureResult> insertOrUpdate(Table inputTable) {
-		try {
 
-			List<E> l = getEntitiesList(inputTable);
+		List<E> l = getEntitiesList(inputTable);
 
-			for (E entity : l) {
-				service.save(entity);
-			}
-
-			return ResponseEntityUtil.createResponseEntity(null, true);
-		} catch (Exception e) {
-			throw handleError(e);
+		for (E entity : l) {
+			service.save(entity);
 		}
+
+		return ResponseEntityUtil.createResponseEntity(null, true);
+
 	}
 
 	@Override
 	public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
-		try {
 
-			for (Row r : inputTable.getRows()) {
-				service.deleteById(inputTable.getValue("KeyLong", r).getIntegerValue());
-			}
-
-			return ResponseEntityUtil.createResponseEntity(null, false);
-		} catch (Exception e) {
-			throw handleError(e);
+		for (Row r : inputTable.getRows()) {
+			service.deleteById(inputTable.getValue("KeyLong", r).getIntegerValue());
 		}
+
+		return ResponseEntityUtil.createResponseEntity(null, false);
+
 	}
 
 	protected List<E> getEntitiesList(Table inputTable) {

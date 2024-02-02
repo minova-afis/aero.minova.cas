@@ -34,30 +34,25 @@ public class AuthoritiesExtension extends BaseGridExtension<Authorities> {
 
 	@Override
 	protected ResponseEntity<SqlProcedureResult> insertOrUpdate(Table inputTable) {
-		try {
 
-			List<Authorities> l = getEntitiesList(inputTable);
+		List<Authorities> l = getEntitiesList(inputTable);
 
-			for (Authorities entity : l) {
-				entity = fillAuthority(entity);
+		for (Authorities entity : l) {
+			entity = fillAuthority(entity);
 
-				service.save(entity);
-			}
-
-			return ResponseEntityUtil.createResponseEntity(null, true);
-		} catch (Exception e) {
-			throw handleError(e);
+			service.save(entity);
 		}
+
+		return ResponseEntityUtil.createResponseEntity(null, true);
+
 	}
 
 	@Override
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
-		try {
-			List<Authorities> findEntityById = ((AuthoritiesService) service).findByUsername(inputTable.getValue("Username", 0).getStringValue());
-			return ResponseEntityUtil.createResponseEntity(getResponseTable(findEntityById, inputTable.getName()), true);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+
+		List<Authorities> findEntityById = ((AuthoritiesService) service).findByUsername(inputTable.getValue("Username", 0).getStringValue());
+		return ResponseEntityUtil.createResponseEntity(getResponseTable(findEntityById, inputTable.getName()), true);
+
 	}
 
 	private Table getResponseTable(List<Authorities> authorities, String tableName) {

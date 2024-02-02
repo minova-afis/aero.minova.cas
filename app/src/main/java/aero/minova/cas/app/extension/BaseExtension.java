@@ -80,60 +80,44 @@ public abstract class BaseExtension<E extends DataEntity> {
 	}
 
 	public ResponseEntity<SqlProcedureResult> insert(Table inputTable) {
-		try {
-			E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
 
-			E response = service.save(entity);
+		E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
 
-			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(response);
-			Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
-			Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
-			return ResponseEntityUtil.createResponseEntity(resultTable, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+		E response = service.save(entity);
+
+		JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(response);
+		Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
+		Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
+		return ResponseEntityUtil.createResponseEntity(resultTable, false);
+
 	}
 
 	public ResponseEntity<SqlProcedureResult> update(Table inputTable) {
-		try {
-			E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
-			service.save(entity);
-			return ResponseEntityUtil.createResponseEntity(null, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+
+		E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
+		service.save(entity);
+		return ResponseEntityUtil.createResponseEntity(null, false);
+
 	}
 
 	public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
-		try {
 
-			service.deleteById(inputTable.getValue("KeyLong", 0).getIntegerValue());
+		service.deleteById(inputTable.getValue("KeyLong", 0).getIntegerValue());
 
-			return ResponseEntityUtil.createResponseEntity(null, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+		return ResponseEntityUtil.createResponseEntity(null, false);
+
 	}
 
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
-		try {
 
-			E findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
+		E findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
 
-			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
-			Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
-			Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
-			logger.logger.info("Result: {}", resultTable);
-			return ResponseEntityUtil.createResponseEntity(resultTable, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
-	}
+		JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
+		Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
+		Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
+		logger.logger.info("Result: {}", resultTable);
+		return ResponseEntityUtil.createResponseEntity(resultTable, false);
 
-	// TODO: Do anything fancy or remove
-	public static RuntimeException handleError(Exception e) {
-
-		return new RuntimeException(e);
 	}
 
 }

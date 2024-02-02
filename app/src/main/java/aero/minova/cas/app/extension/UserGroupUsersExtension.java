@@ -56,61 +56,51 @@ public class UserGroupUsersExtension {
 	}
 
 	public ResponseEntity<SqlProcedureResult> insert(Table inputTable) {
-		try {
-			for (Row r : inputTable.getRows()) {
-				usersService.addUserToUserGroup(//
-						inputTable.getValue("UsersKey", r).getIntegerValue(), //
-						inputTable.getValue("KeyLong", r).getIntegerValue());
-			}
-			return ResponseEntityUtil.createResponseEntity(null, true);
-		} catch (Exception e) {
-			throw BaseExtension.handleError(e);
+
+		for (Row r : inputTable.getRows()) {
+			usersService.addUserToUserGroup(//
+					inputTable.getValue("UsersKey", r).getIntegerValue(), //
+					inputTable.getValue("KeyLong", r).getIntegerValue());
 		}
+		return ResponseEntityUtil.createResponseEntity(null, true);
+
 	}
 
 	public ResponseEntity<SqlProcedureResult> update(Table inputTable) {
-		try {
-			// Do Nothing, throw Exception??
-			return ResponseEntityUtil.createResponseEntity(null, true);
-		} catch (Exception e) {
-			throw BaseExtension.handleError(e);
-		}
+
+		// Can't update because we dont know the old value, so just do nothing
+		return ResponseEntityUtil.createResponseEntity(null, true);
+
 	}
 
 	public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
-		try {
-			for (Row r : inputTable.getRows()) {
-				usersService.removeUserFromUserGroup(//
-						inputTable.getValue("UsersKey", r).getIntegerValue(), //
-						inputTable.getValue("KeyLong", r).getIntegerValue());
-			}
-			return ResponseEntityUtil.createResponseEntity(null, true);
-		} catch (Exception e) {
-			throw BaseExtension.handleError(e);
+
+		for (Row r : inputTable.getRows()) {
+			usersService.removeUserFromUserGroup(//
+					inputTable.getValue("UsersKey", r).getIntegerValue(), //
+					inputTable.getValue("KeyLong", r).getIntegerValue());
 		}
+		return ResponseEntityUtil.createResponseEntity(null, true);
+
 	}
 
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
-		try {
 
-			int userGroupKey = inputTable.getValue("KeyLong", 0).getIntegerValue();
-			List<Users> users = usersService.findUsersInUserGroup(userGroupKey);
+		int userGroupKey = inputTable.getValue("KeyLong", 0).getIntegerValue();
+		List<Users> users = usersService.findUsersInUserGroup(userGroupKey);
 
-			Table res = new Table();
-			res.setName(inputTable.getName());
-			res.addColumn(new Column("KeyLong", DataType.INTEGER));
-			res.addColumn(new Column("UsersKey", DataType.INTEGER));
+		Table res = new Table();
+		res.setName(inputTable.getName());
+		res.addColumn(new Column("KeyLong", DataType.INTEGER));
+		res.addColumn(new Column("UsersKey", DataType.INTEGER));
 
-			for (Users u : users) {
-				Row r = new Row();
-				r.addValue(new Value(userGroupKey));
-				r.addValue(new Value(u.getKeyLong()));
-				res.addRow(r);
-			}
-
-			return ResponseEntityUtil.createResponseEntity(res, true);
-		} catch (Exception e) {
-			throw BaseExtension.handleError(e);
+		for (Users u : users) {
+			Row r = new Row();
+			r.addValue(new Value(userGroupKey));
+			r.addValue(new Value(u.getKeyLong()));
+			res.addRow(r);
 		}
+
+		return ResponseEntityUtil.createResponseEntity(res, true);
 	}
 }

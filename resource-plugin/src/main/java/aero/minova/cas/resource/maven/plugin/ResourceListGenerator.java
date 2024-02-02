@@ -229,11 +229,13 @@ public class ResourceListGenerator extends AbstractMojo {
 					}
 					bf.flush();
 				} catch (IOException e) {
+					System.out.println("Error writing to file: " + file + ". Error was: " + e);
 					throw new RuntimeException(e);
 				}
 			}
 
 		} catch (Exception e) {
+			System.out.println("Error merging files. Error was: " + e);
 			throw new RuntimeException(e);
 		}
 

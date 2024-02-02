@@ -212,6 +212,7 @@ public class ResourceListGenerator extends AbstractMojo {
 			// Nachdem wir alle Dateien eingelesen haben, können wir die zusammen gemergten Übersetzungsdateien anlegen.
 			for (String fileName : mergedI18nMapping.keySet()) {
 				File file = classesFolder.resolve("i18n").resolve(fileName).toFile();
+				file.mkdirs();
 
 				try (BufferedWriter bf = new BufferedWriter(new FileWriter(file))) {
 					for (Map.Entry<String, String> entry : mergedI18nMapping.get(fileName).entrySet()) {

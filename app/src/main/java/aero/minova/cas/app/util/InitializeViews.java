@@ -1,7 +1,7 @@
 package aero.minova.cas.app.util;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -54,19 +54,21 @@ public class InitializeViews {
 			return;
 		}
 
-		try {
-			File[] files = new ClassPathResource("postgres").getFile().listFiles();
-			for (int i = 0; i < files.length; i++) {
-				if (files[i].getName().endsWith(".sql")) {
+		List<String> viewnames = new ArrayList<>();
+		viewnames.add("xvcasColumnSecurityIndex.sql");
+		viewnames.add("xvcasMdiIndex.sql");
+		viewnames.add("xvcasServicePropertiesIndex.sql");
+		viewnames.add("xvcasUserGroupIndex.sql");
+		viewnames.add("xvcasUserIndex.sql");
+		viewnames.add("xvcasUserIndex2.sql");
+		viewnames.add("xvcasUserPrivilegeIndex.sql");
+		viewnames.add("xvcasUserSecurity.sql");
+		viewnames.add("xvcasUsersIndex.sql");
+		viewnames.add("xvcasUsersIndex2.sql");
 
-					ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator(false, false, "UTF-8",
-							new ClassPathResource("postgres/" + files[i].getName()));
-					resourceDatabasePopulator.execute(dataSource);
-				}
-			}
-		} catch (IOException e) {
-			customLogger.logError("Error initializing views", e);
+		for (String s : viewnames) {
+			ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator(false, false, "UTF-8", new ClassPathResource("postgres/" + s));
+			resourceDatabasePopulator.execute(dataSource);
 		}
-
 	}
 }

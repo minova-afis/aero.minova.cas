@@ -189,13 +189,13 @@ public class ResourceListGenerator extends AbstractMojo {
 									// Für diese Sprache haben wir schon einen Eintrag. Weitere Prüfung nötig.
 								} else if (mergedI18nMapping.containsKey(messagePropertiesName)) {
 									if (!mergedI18nMapping.get(messagePropertiesName).containsKey(key)) {
-										Map<String, String> propertyContent = new HashMap<>();
+										Map<String, String> propertyContent = mergedI18nMapping.get(messagePropertiesName);
 										propertyContent.put(key, value);
 										mergedI18nMapping.put(messagePropertiesName, propertyContent);
 
 									} else if (!mergedI18nMapping.get(messagePropertiesName).get(key).equals(value)) {
-										throw new RuntimeException("Could not merge i18n because translation is different! " + mergedI18nMapping.get(key)
-												+ " does not equal " + value);
+										throw new RuntimeException("Could not merge i18n because translation is different! "
+												+ mergedI18nMapping.get(messagePropertiesName).get(key) + " does not equal " + value + " for Key " + key);
 
 									}
 								}

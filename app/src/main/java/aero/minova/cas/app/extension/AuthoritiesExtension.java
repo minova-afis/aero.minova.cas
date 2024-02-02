@@ -29,6 +29,7 @@ public class AuthoritiesExtension extends BaseGridExtension<Authorities> {
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 

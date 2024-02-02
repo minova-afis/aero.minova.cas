@@ -14,6 +14,7 @@ public class MdiExtension extends BaseExtension<Mdi> {
 
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 }

@@ -12,6 +12,7 @@ public class ColumnSecurityExtension extends BaseExtension<ColumnSecurity> {
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 }

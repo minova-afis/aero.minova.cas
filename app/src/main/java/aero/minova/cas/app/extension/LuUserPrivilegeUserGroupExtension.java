@@ -23,6 +23,7 @@ public class LuUserPrivilegeUserGroupExtension extends BaseGridExtension<LuUserP
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 

@@ -12,6 +12,7 @@ public class UserPrivilegeExtension extends BaseExtension<UserPrivilege> {
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 }

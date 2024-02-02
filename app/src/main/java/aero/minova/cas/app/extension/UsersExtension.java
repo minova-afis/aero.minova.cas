@@ -19,6 +19,7 @@ public class UsersExtension extends BaseExtension<Users> {
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 

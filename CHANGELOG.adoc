@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+
+## [13.1.0] -- 2024-02-02
 * PreparedStatements und ResultSets nach der Ausführung schließen.
 * Verhindern eines Absturzes, wenn der Wert einer Umgebungsvariable eine andere, unbekannte Umgebungsvariable enthält
 * CAS-Masken über JPA und Extensions bedienen, Prozeduren entfernen

@@ -215,6 +215,7 @@ public class ResourceListGenerator extends AbstractMojo {
 				if (file.exists()) {
 					file.delete();
 				}
+				file.createNewFile();
 
 				try (BufferedWriter bf = new BufferedWriter(new FileWriter(file))) {
 					for (Map.Entry<String, String> entry : mergedI18nMapping.get(fileName).entrySet()) {

@@ -28,13 +28,16 @@ public class AuthorizationService {
 	LuUserPrivilegeUserGroupRepository luUserPrivilegeUserGroupRepository;
 
 	@Autowired
-	UserGroupRepository userGroupRepository; 
+	UserGroupRepository userGroupRepository;
 
 	@Autowired
 	UserPrivilegeRepository userPrivilegeRepository;
 
 	@Autowired
 	UsersRepository usersRepository;
+
+	@Autowired
+	UsersService usersService;
 
 	/**
 	 * Erstellt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View
@@ -58,16 +61,21 @@ public class AuthorizationService {
 	 * @param privilegeName
 	 */
 	public UserPrivilege findOrCreateUserPrivilege(String privilegeName) {
-		return userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).orElseGet(() -> {
-			UserPrivilege privilege = new UserPrivilege();
-			privilege.setKeyText(privilegeName);
-			privilege = userPrivilegeRepository.save(privilege);
-			return privilege;
-		});
+		return !userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).isEmpty()
+				? userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).get(0)
+				: createUserPrivilege(privilegeName);
+	}
+
+	private UserPrivilege createUserPrivilege(String privilegeName) {
+		UserPrivilege privilege = new UserPrivilege();
+		privilege.setKeyText(privilegeName);
+		return userPrivilegeRepository.save(privilege);
 	}
 
 	/**
-	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle xtCasUserPrivilege eingetragen sein (Methode {@link #findOrCreateUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen erteilt, das Passwort wird NICHT aktualisiert
+	 * Erstellt einen Nutzer, der alle Berechtigungen hat (oder updated die Berechtigungen). Die Berechtigungen müssen bereits in der Tabelle xtCasUserPrivilege
+	 * eingetragen sein (Methode {@link #findOrCreateUserPrivilege(String privilegeName)}). Existiert der Benutzer bereits, werden alle fehlenden Berechtigungen
+	 * erteilt, das Passwort wird NICHT aktualisiert
 	 * 
 	 * @param username
 	 * @param encryptedPassword
@@ -86,7 +94,8 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein Nutzer mit dem Namen existiert. Ansonsten wird das Passwort auch NICHT aktualisiert.
+	 * Erstellt einen neuen Benutzer (für datasource="database") wenn noch kein Nutzer mit dem Namen existiert. Ansonsten wird das Passwort auch NICHT
+	 * aktualisiert.
 	 * 
 	 * @param username
 	 * @param encryptedPassword
@@ -97,7 +106,7 @@ public class AuthorizationService {
 			Users newUser = new Users();
 			newUser.setUsername(username);
 			newUser.setPassword(encryptedPassword);
-			newUser = usersRepository.save(newUser);
+			newUser = usersService.save(newUser);
 			return newUser;
 		});
 	}
@@ -108,7 +117,8 @@ public class AuthorizationService {
 	 * @param username
 	 * @param encryptedPassword
 	 * @return
-	 * @throws NoSuchElementException wenn der Benutzer nicht existiert
+	 * @throws NoSuchElementException
+	 *             wenn der Benutzer nicht existiert
 	 */
 	public Users updateUserPassword(String username, String encryptedPassword) throws NoSuchElementException {
 		Users user = usersRepository.findByUsernameAndLastActionGreaterThan(username, 0).get();
@@ -127,12 +137,9 @@ public class AuthorizationService {
 	 * @return
 	 */
 	public UserGroup createOrUpdateUserGroup(String keyText, String securitytoken) {
-		UserGroup usergroup = userGroupRepository.findByKeyTextAndLastActionGreaterThan(keyText, 0).orElseGet(() -> {
-			UserGroup group = new UserGroup();
-			group.setSecurityToken("");
-			group.setKeyText(keyText);
-			return group;
-		});
+		UserGroup usergroup = !userGroupRepository.findByKeyTextAndLastActionGreaterThan(keyText, 0).isEmpty()
+				? userGroupRepository.findByKeyTextAndLastActionGreaterThan(keyText, 0).get(0)
+				: createUserGroup(keyText);
 
 		// Neue Tokens anhängen, dabei aber keine duplikate erstellen
 		List<String> newTokens = Arrays.asList(securitytoken.split("#"));
@@ -143,8 +150,14 @@ public class AuthorizationService {
 			}
 		}
 
-		usergroup = userGroupRepository.save(usergroup);
-		return usergroup;
+		return userGroupRepository.save(usergroup);
+	}
+
+	private UserGroup createUserGroup(String keyText) {
+		UserGroup group = new UserGroup();
+		group.setSecurityToken("");
+		group.setKeyText(keyText);
+		return group;
 	}
 
 	/**
@@ -155,14 +168,13 @@ public class AuthorizationService {
 	 * @return
 	 */
 	public Authorities findOrCreateAuthority(String username, String authorityName) {
-		return authoritiesRepository.findByUsernameAndAuthorityAndLastActionGreaterThan(username, authorityName, 0)
-				.orElseGet(() -> {
-					Authorities authority = new Authorities();
-					authority.setUsername(username);
-					authority.setAuthority(authorityName);
-					authority = authoritiesRepository.save(authority);
-					return authority;
-				});
+		return authoritiesRepository.findByUsernameAndAuthorityAndLastActionGreaterThan(username, authorityName, 0).orElseGet(() -> {
+			Authorities authority = new Authorities();
+			authority.setUsername(username);
+			authority.setAuthority(authorityName);
+			authority = authoritiesRepository.save(authority);
+			return authority;
+		});
 	}
 
 	/**
@@ -172,8 +184,8 @@ public class AuthorizationService {
 	 * @param priv
 	 */
 	public LuUserPrivilegeUserGroup findOrCreateLuUserPrivilegeUserGroup(UserGroup userGroup, UserPrivilege priv) {
-		return luUserPrivilegeUserGroupRepository.findByUserPrivilegeKeyLongAndUserGroupKeyLongAndLastActionGreaterThan(
-				priv.getKeyLong(), userGroup.getKeyLong(), 0).orElseGet(() -> {
+		return luUserPrivilegeUserGroupRepository
+				.findByUserPrivilegeKeyLongAndUserGroupKeyLongAndLastActionGreaterThan(priv.getKeyLong(), userGroup.getKeyLong(), 0).orElseGet(() -> {
 					LuUserPrivilegeUserGroup lu = new LuUserPrivilegeUserGroup();
 					lu.setUserGroup(userGroup);
 					lu.setUserPrivilege(priv);

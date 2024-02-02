@@ -13,11 +13,16 @@ public interface DataEntityRepository<E extends DataEntity> extends JpaRepositor
 
 	public List<E> findByLastActionGreaterThan(int lastAction);
 
+	public default List<E> findAllWithLastActionGreaterZero() {
+		return findByLastActionGreaterThan(0);
+	}
+
 	public Optional<E> findByKeyLong(int keyLong);
 
-	public Optional<E> findByKeyTextAndLastActionGreaterThan(String keyText, int lastAction);
+	// Es gibt Tabellen in denen KeyText mehrmals vorkommen darf -> Rückgabetyp muss Liste sein, nicht Optional
+	public List<E> findByKeyTextAndLastActionGreaterThan(String keyText, int lastAction);
 
-	public default Optional<E> findByKeyText(String keyText) {
+	public default List<E> findByKeyText(String keyText) {
 		return findByKeyTextAndLastActionGreaterThan(keyText, 0);
 	}
 }

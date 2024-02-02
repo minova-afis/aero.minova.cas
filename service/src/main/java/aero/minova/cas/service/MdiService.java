@@ -11,7 +11,7 @@ import aero.minova.cas.service.repository.MdiRepository;
 import aero.minova.cas.service.repository.MdiTypeRepository;
 
 @Service
-public class MdiService {
+public class MdiService extends BaseService<Mdi> {
 
 	@Autowired
 	MdiTypeRepository mdiTypeRepository;
@@ -84,7 +84,7 @@ public class MdiService {
 		mdi.setKeyText("config");
 		saveMdi(mdi);
 
-		mdi = new Mdi("xtcasServiceProperties", //
+		mdi = new Mdi("ServiceProperties", //
 				"@xtcasServiceProperties", //
 				"config", //
 				10, //
@@ -181,22 +181,28 @@ public class MdiService {
 	 * @return
 	 */
 	public Mdi saveMdi(Mdi mdi) {
+		try {
+			return save(mdi);
+		} catch (RuntimeException e) {
+			// Wenn nicht gespeichert werden konnte null zurückgeben
+		}
+		return null;
+	}
+
+	@Override
+	public Mdi save(Mdi mdi) {
 
 		// Es darf nur genau einen Mdi Eintrag mit Typ 3 (Generelle Information) geben
 		if (mdi.getMdiType().getKeyLong() == 3 && !mdiRepository.findByMdiTypeKeyLongAndLastActionGreaterThan(3, 0).isEmpty()) {
-			return null;
+			throw new RuntimeException("@msg.OnlyOneGeneralInformationInMDI");
 		}
 
-		// Ansonsten nur speichern, wenn es diesen KeyText nicht schon gibt
-		if (mdiRepository.findByKeyTextAndLastActionGreaterThan(mdi.getKeyText(), 0).isEmpty()) {
-			if (mdi.getMdiType().getKeyLong() != 1) {
-				// Nur die Masken selbst sollen SecurityTokens haben, vgl xpcasInitMdi
-				mdi.setSecurityToken(null);
-			}
-
-			return mdiRepository.save(mdi);
+		if (mdi.getMdiType().getKeyLong() != 1) {
+			// Nur die Masken selbst sollen SecurityTokens haben, vgl xpcasInitMdi
+			mdi.setSecurityToken(null);
 		}
-		return null;
+
+		return super.save(mdi);
 	}
 
 }

@@ -13,6 +13,10 @@ import lombok.Data;
 @Table(name = "xtcasUserGroup")
 public class UserGroup extends DataEntity {
 
+	@Size(max = 50)
+	@Column(name = "Description", length = 50)
+	public String description;
+
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "UserCode", length = 50)

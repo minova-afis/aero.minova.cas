@@ -6,8 +6,11 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## Unreleased
 * PreparedStatements und ResultSets nach der Ausführung schließen.
 * Verhindern eines Absturzes, wenn der Wert einer Umgebungsvariable eine andere, unbekannte Umgebungsvariable enthält
-
 * CAS-Masken über JPA und Extensions bedienen, Prozeduren entfernen
+* Services und Repositories für die CAS DataEntites
+* postgresql Ordner entfernen, da er nicht mehr benötigt wird
+* Bei Login über Datenbank wird LastAction Spalte von xtcasUsers korrekt ausgewertet (vorher nur LastAction = 1 erlaubt)
+* CAS mit H2-Datenbank starten lassen
 
 ## [13.0.11] -- 2023-12-15
 * MdiService zum Erstellen des Default-Menüs

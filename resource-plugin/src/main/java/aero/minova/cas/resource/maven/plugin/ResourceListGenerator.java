@@ -1,15 +1,21 @@
 package aero.minova.cas.resource.maven.plugin;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -101,7 +107,7 @@ public class ResourceListGenerator extends AbstractMojo {
 										deployList.append('\n');
 									}
 									if (!jarEntry.isDirectory() && jarEntry.getName().startsWith("i18n/") && jarEntry.getName().endsWith(".properties")) {
-										Path i18nFilePath = resourceFolder.resolve(jarPath.getFileName()).resolve(jarEntry.getName() + ".resources");
+										Path i18nFilePath = resourceFolder.resolve(jarPath.getFileName() + ".resources").resolve(jarEntry.getName());
 										copyJarContentToDirectory(jar, jarEntry, i18nFilePath.toFile());
 									}
 								}
@@ -117,6 +123,7 @@ public class ResourceListGenerator extends AbstractMojo {
 			} else if (createDeployList) {
 				throw new FileNotFoundException("libs folder is missing for `createDeployList` goal: " + libsFolder);
 			}
+			mergeI18n(resourceFolder, classesFolder);
 		} catch (IOException e) {
 			throw new MojoExecutionException("Could not generate resource file: " + resourceFile, e);
 		}
@@ -145,9 +152,84 @@ public class ResourceListGenerator extends AbstractMojo {
 				out.write(buffer, 0, s);
 			}
 		} catch (IOException e) {
-			throw new IOException("Could not copy asset from jar file", e);
+			throw new IOException("Could not copy asset from jar file.", e);
 		} finally {
 			in.close();
 		}
+	}
+
+	private void mergeI18n(Path resourceFolder, Path classesFolder) {
+		/*
+		 * Der Key der äußeren Map ist der Name der message.properties-Datei, da dieser für jede Sprache leicht anders ist, z.B. message_de.properties. Der Key
+		 * der inneren Map ist der zu übersetzende Part, z.B. xtcasUserGroup. Der Value der inneren Map ist dann die Übersetzung, z.B. Benutzergruppen.
+		 */
+		Map<String, Map<String, String>> mergedI18nMapping = new HashMap<>();
+
+		try (final var resources = Files.walk(resourceFolder)) {
+			resources.forEach(r -> {
+				if (Files.isRegularFile(r) && r.getParent().endsWith("i18n")) {
+
+					try (Stream<String> stream = Files.lines(r, StandardCharsets.ISO_8859_1)) {
+
+						stream.forEach(l -> {
+							l = l.strip();
+							// Kommentare überspringen
+							if (!l.startsWith("#") && !l.isBlank()) {
+								String messagePropertiesName = r.getFileName().toString();
+								int divider = l.indexOf("=");
+								String key = l.substring(0, divider);
+								String value = l.substring(divider + 1, l.length());
+
+								// Diese Sprache wurde noch nicht bearbeitet, also in die Map einfügen.
+								if (!mergedI18nMapping.containsKey(messagePropertiesName)) {
+									Map<String, String> propertyContent = new HashMap<>();
+									propertyContent.put(key, value);
+									mergedI18nMapping.put(messagePropertiesName, propertyContent);
+
+									// Für diese Sprache haben wir schon einen Eintrag. Weitere Prüfung nötig.
+								} else if (mergedI18nMapping.containsKey(messagePropertiesName)) {
+									if (!mergedI18nMapping.get(messagePropertiesName).containsKey(key)) {
+										Map<String, String> propertyContent = new HashMap<>();
+										propertyContent.put(key, value);
+										mergedI18nMapping.put(messagePropertiesName, propertyContent);
+
+									} else if (!mergedI18nMapping.get(messagePropertiesName).get(key).equals(value)) {
+										throw new RuntimeException("Could not merge i18n because translation is different! " + mergedI18nMapping.get(key)
+												+ " does not equal " + value);
+
+									}
+								}
+							}
+						});
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
+
+			// Nachdem wir alle Dateien eingelesen haben, können wir die zusammen gemergten Übersetzungsdateien anlegen.
+			for (String fileName : mergedI18nMapping.keySet()) {
+				File file = classesFolder.resolve("i18n").resolve(fileName).toFile();
+
+				// Die Datei, die davor noch existiert hat, ist die alte aus dem Kundenprojekt, die wir vorhin schon weggesichert haben.
+				if (file.exists()) {
+					file.delete();
+				}
+
+				try (BufferedWriter bf = new BufferedWriter(new FileWriter(file))) {
+					for (Map.Entry<String, String> entry : mergedI18nMapping.get(fileName).entrySet()) {
+						bf.write(entry.getKey() + "=" + entry.getValue());
+						bf.newLine();
+					}
+					bf.flush();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 }

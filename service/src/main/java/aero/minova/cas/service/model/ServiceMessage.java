@@ -1,6 +1,6 @@
 package aero.minova.cas.service.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 
@@ -36,8 +36,8 @@ public class ServiceMessage extends DataEntity {
 	public int numberOfAttempts = 0;
 
 	@NotNull
-	@Column(name = "MessageCreationDate")
-	public Timestamp messageCreationDate;
+	@Column(name = "MessageCreationDate", columnDefinition = "TIMESTAMP")
+	public LocalDateTime messageCreationDate;
 
 	@NotNull
 	@Column(name = "Failed")

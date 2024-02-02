@@ -65,11 +65,11 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
 
 		// Ein paar Daten erstellen
-		authoritiesRepository.save(new Authorities(1, "User1", "test", "user", Timestamp.valueOf("2023-06-18 00:00:00.0"), 1));
-		authoritiesRepository.save(new Authorities(2, "User2", "TEST", "user", Timestamp.valueOf("2023-06-19 00:00:00.0"), 2));
-		authoritiesRepository.save(new Authorities(3, "User3", "not test", "user", Timestamp.valueOf("2023-06-19 08:00:00.0"), 1));
-		authoritiesRepository.save(new Authorities(4, "User4", "testtest", "user", Timestamp.valueOf("2023-06-19 16:00:00.0"), 1));
-		authoritiesRepository.save(new Authorities(5, "User5", "te", null, Timestamp.valueOf("2023-06-20 08:00:00.0"), -1));
+		authoritiesRepository.save(new Authorities(1, "User1", "test", "user", Timestamp.valueOf("2023-06-18 00:00:00.0").toLocalDateTime(), 1));
+		authoritiesRepository.save(new Authorities(2, "User2", "TEST", "user", Timestamp.valueOf("2023-06-19 00:00:00.0").toLocalDateTime(), 2));
+		authoritiesRepository.save(new Authorities(3, "User3", "not test", "user", Timestamp.valueOf("2023-06-19 08:00:00.0").toLocalDateTime(), 1));
+		authoritiesRepository.save(new Authorities(4, "User4", "testtest", "user", Timestamp.valueOf("2023-06-19 16:00:00.0").toLocalDateTime(), 1));
+		authoritiesRepository.save(new Authorities(5, "User5", "te", null, Timestamp.valueOf("2023-06-20 08:00:00.0").toLocalDateTime(), -1));
 	}
 
 	@Test

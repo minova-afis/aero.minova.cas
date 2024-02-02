@@ -139,11 +139,9 @@ public class ResourceListGenerator extends AbstractMojo {
 	 */
 	public static void copyJarContentToDirectory(JarFile fromJar, JarEntry jarDir, File destDir) throws IOException {
 		File parent = destDir.getParentFile();
-
 		if (parent != null) {
 			parent.mkdirs();
 		}
-		destDir.createNewFile();
 		InputStream in = fromJar.getInputStream(jarDir);
 		try (FileOutputStream out = new FileOutputStream(destDir)) {
 
@@ -212,7 +210,16 @@ public class ResourceListGenerator extends AbstractMojo {
 			// Nachdem wir alle Dateien eingelesen haben, können wir die zusammen gemergten Übersetzungsdateien anlegen.
 			for (String fileName : mergedI18nMapping.keySet()) {
 				File file = classesFolder.resolve("i18n").resolve(fileName).toFile();
-				file.mkdirs();
+				File parent = new File(file.getParent());
+
+				if (!parent.exists()) {
+					parent.mkdirs();
+				} else {
+					// Die Datei, die davor noch existiert hat, ist die alte aus dem Kundenprojekt, die wir vorhin schon weggesichert haben.
+					if (file.exists()) {
+						file.delete();
+					}
+				}
 
 				try (BufferedWriter bf = new BufferedWriter(new FileWriter(file))) {
 					for (Map.Entry<String, String> entry : mergedI18nMapping.get(fileName).entrySet()) {
@@ -226,7 +233,6 @@ public class ResourceListGenerator extends AbstractMojo {
 			}
 
 		} catch (Exception e) {
-			System.out.println("Error merging files. Error was: " + e);
 			throw new RuntimeException(e);
 		}
 

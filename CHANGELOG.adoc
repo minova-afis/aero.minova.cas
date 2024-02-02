@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+
+[13.1.1] — 2024-02-02
 * Automatisches Einspielen von Postgres/H2 Views ausbessern
 
 ## [13.1.0] -- 2024-02-02

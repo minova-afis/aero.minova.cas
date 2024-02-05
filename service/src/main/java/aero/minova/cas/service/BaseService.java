@@ -1,7 +1,6 @@
 package aero.minova.cas.service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,7 +61,7 @@ public abstract class BaseService<E extends DataEntity> {
 			entity.setLastAction(2);
 		}
 
-		entity.setLastDate(Timestamp.from(Instant.now()));
+		entity.setLastDate(LocalDateTime.now());
 		entity.setLastUser(getCurrentUser());
 		entity = repository.save(entity);
 
@@ -80,7 +79,7 @@ public abstract class BaseService<E extends DataEntity> {
 
 		entity.setLastAction(-1);
 		entity.setLastUser(getCurrentUser());
-		entity.setLastDate(Timestamp.from(Instant.now()));
+		entity.setLastDate(LocalDateTime.now());
 		repository.save(entity);
 	}
 

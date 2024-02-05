@@ -8,8 +8,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XTable;
 import aero.minova.cas.app.util.GsonUtil;
 import aero.minova.cas.app.util.ResponseEntityUtil;
@@ -17,6 +21,7 @@ import aero.minova.cas.app.util.TableDeserializer;
 import aero.minova.cas.app.util.TableSerializer;
 import aero.minova.cas.app.util.TableUtil;
 import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.AuthorizationService;
 import aero.minova.cas.service.BaseService;
 import aero.minova.cas.service.model.DataEntity;
@@ -28,6 +33,9 @@ public abstract class BaseExtension<E extends DataEntity> {
 	protected SqlProcedureController sqlProcedureController;
 
 	@Autowired
+	protected SqlViewController sqlViewController;
+
+	@Autowired
 	protected CustomLogger logger;
 
 	@Autowired
@@ -35,6 +43,8 @@ public abstract class BaseExtension<E extends DataEntity> {
 
 	protected String procedurePrefix = "xpcor";
 	protected String viewPrefix = "xvcor";
+	protected String tablePrefix = "";
+	protected boolean filterLastAction = true;
 
 	public static final Gson TABLE_CONVERSION_GSON = GsonUtil.getGsonBuilder() //
 			.registerTypeAdapter(Table.class, new TableDeserializer()) //
@@ -71,69 +81,82 @@ public abstract class BaseExtension<E extends DataEntity> {
 		sqlProcedureController.registerExtension(procedurePrefix + "Delete" + formName, this::delete);
 		sqlProcedureController.registerExtension(procedurePrefix + "Read" + formName, this::read);
 
+		sqlViewController.registerExtension(viewPrefix + formName.toLowerCase() + "Index", this::readIndex);
+		sqlViewController.registerExtension(viewPrefix + formName.toLowerCase(), this::readIndex);
+		sqlViewController.registerExtension(tablePrefix + formName.toLowerCase(), this::readIndex);
+
+		authorizationService.findOrCreateUserPrivilege(viewPrefix + formName.toLowerCase() + "Index");
+		authorizationService.findOrCreateUserPrivilege(viewPrefix + formName.toLowerCase());
+		authorizationService.findOrCreateUserPrivilege(tablePrefix + formName.toLowerCase());
+
 		authorizationService.createDefaultPrivilegesForMask(formName, procedurePrefix, viewPrefix);
-		authorizationService.findOrCreateUserPrivilege("v" + formName.toLowerCase() + "Index");
-		authorizationService.findOrCreateUserPrivilege("v" + formName.toLowerCase());
-		authorizationService.findOrCreateUserPrivilege("t" + formName.toLowerCase());
-		authorizationService.findOrCreateUserPrivilege("xtcas" + formName.toLowerCase());
-		authorizationService.findOrCreateUserPrivilege(formName.toLowerCase());
+	}
+
+	public Table readIndex(Table inputTable) {
+		try {
+
+			if (filterLastAction) {
+				// Immer LastAction >0 anhängen, um gelöschte Werte zu filtern
+
+				Table withFilter = new Table();
+				withFilter.setName(inputTable.getName());
+
+				for (Column c : inputTable.getColumns()) {
+					withFilter.addColumn(c);
+				}
+				withFilter.addColumn(new Column("LastAction", DataType.INTEGER));
+
+				for (Row r : inputTable.getRows()) {
+					Row newRow = new Row();
+					for (Value v : r.getValues()) {
+						newRow.addValue(v);
+					}
+					newRow.addValue(new Value(0, ">"));
+					withFilter.addRow(newRow);
+				}
+
+				return sqlViewController.getIndexView(withFilter, false);
+			} else {
+				return sqlViewController.getIndexView(inputTable, false);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public ResponseEntity<SqlProcedureResult> insert(Table inputTable) {
-		try {
-			E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
 
-			E response = service.save(entity);
+		E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
 
-			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(response);
-			Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
-			Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
-			return ResponseEntityUtil.createResponseEntity(resultTable, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+		E response = service.save(entity);
+
+		JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(response);
+		Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
+		Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
+		return ResponseEntityUtil.createResponseEntity(resultTable, false);
 	}
 
 	public ResponseEntity<SqlProcedureResult> update(Table inputTable) {
-		try {
-			E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
-			service.save(entity);
-			return ResponseEntityUtil.createResponseEntity(null, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+
+		E entity = TABLE_CONVERSION_GSON.fromJson(TABLE_CONVERSION_GSON.toJsonTree(inputTable), entityClass);
+		service.save(entity);
+
+		return ResponseEntityUtil.createResponseEntity(null, false);
 	}
 
 	public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
-		try {
-
-			service.deleteById(inputTable.getValue("KeyLong", 0).getIntegerValue());
-
-			return ResponseEntityUtil.createResponseEntity(null, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+		service.deleteById(inputTable.getValue("KeyLong", 0).getIntegerValue());
+		return ResponseEntityUtil.createResponseEntity(null, false);
 	}
 
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
-		try {
 
-			E findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
+		E findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
 
-			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
-			Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
-			Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
-			logger.logger.info("Result: {}", resultTable);
-			return ResponseEntityUtil.createResponseEntity(resultTable, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
+		JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
+		Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
+		Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
+		logger.logger.info("Result: {}", resultTable);
+		return ResponseEntityUtil.createResponseEntity(resultTable, false);
 	}
-
-	// TODO: Do anything fancy or remove
-	public static RuntimeException handleError(Exception e) {
-
-		return new RuntimeException(e);
-	}
-
 }

@@ -4,6 +4,7 @@ as
            KeyText,
            Service,
            Property,
-           Val
+           Val,
+           LastAction
     from xtcasServiceProperties
     where LastAction > 0;

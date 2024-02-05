@@ -18,29 +18,28 @@ import jakarta.annotation.PostConstruct;
 
 @Component
 public class LuUserPrivilegeUserGroupExtension extends BaseGridExtension<LuUserPrivilegeUserGroup> {
-	
+
 	@PostConstruct
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 
 	@Override
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
-		try {
-			List<LuUserPrivilegeUserGroup> lus;
 
-			if (inputTable.getValue("UserPrivilege.KeyLong", 0) != null) {
-				lus = ((LuUserPrivilegeUserGroupService) service).findByUserPrivilegeKey(inputTable.getValue("UserPrivilege.KeyLong", 0).getIntegerValue());
-			} else {
-				lus = ((LuUserPrivilegeUserGroupService) service).findByUserGroupKey(inputTable.getValue("UserGroup.KeyLong", 0).getIntegerValue());
-			}
+		List<LuUserPrivilegeUserGroup> lus;
 
-			return ResponseEntityUtil.createResponseEntity(getResponseTable(lus, inputTable.getName()), true);
-		} catch (Exception e) {
-			throw handleError(e);
+		if (inputTable.getValue("UserPrivilege.KeyLong", 0) != null) {
+			lus = ((LuUserPrivilegeUserGroupService) service).findByUserPrivilegeKey(inputTable.getValue("UserPrivilege.KeyLong", 0).getIntegerValue());
+		} else {
+			lus = ((LuUserPrivilegeUserGroupService) service).findByUserGroupKey(inputTable.getValue("UserGroup.KeyLong", 0).getIntegerValue());
 		}
+
+		return ResponseEntityUtil.createResponseEntity(getResponseTable(lus, inputTable.getName()), true);
+
 	}
 
 	private Table getResponseTable(List<LuUserPrivilegeUserGroup> lus, String tableName) {

@@ -5,7 +5,8 @@ as
 			up.KeyText,
 			up.Description,
 			ug.KeyLong as UserGroupKey,
-			lu.RowLevelSecurity
+			lu.RowLevelSecurity,
+			lu.LastAction
 	from xtcasUserPrivilege up
 	left outer join xtcasLuUserPrivilegeUserGroup lu on lu.UserPrivilegeKey = up.KeyLong
 	left outer join xtcasUserGroup ug on ug.KeyLong=lu.UserGroupKey

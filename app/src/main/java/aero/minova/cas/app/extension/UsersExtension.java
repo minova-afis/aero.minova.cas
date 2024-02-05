@@ -19,25 +19,22 @@ public class UsersExtension extends BaseExtension<Users> {
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 
 	@Override
 	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
-		try {
+		Users findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
 
-			Users findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
+		// Passwort soll nicht ausgelesen werden
+		findEntityById.setPassword(null);
 
-			// Passwort soll nicht ausgelesen werden
-			findEntityById.setPassword(null);
+		JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
+		Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
+		Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
+		logger.logger.info("Result: {}", resultTable);
+		return ResponseEntityUtil.createResponseEntity(resultTable, false);
 
-			JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
-			Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
-			Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
-			logger.logger.info("Result: {}", resultTable);
-			return ResponseEntityUtil.createResponseEntity(resultTable, false);
-		} catch (Exception e) {
-			throw handleError(e);
-		}
 	}
 }

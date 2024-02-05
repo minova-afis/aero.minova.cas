@@ -12,6 +12,7 @@ public class ServicePropertiesExtension extends BaseExtension<ServiceProperties>
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 }

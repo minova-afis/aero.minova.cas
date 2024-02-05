@@ -6,6 +6,7 @@ with encryption as
 			ug.Description,
 			ug.UserCode,
 			ug.SecurityToken,
-			ug.KeyLong as UserPrivilegeKey
+			ug.KeyLong as UserPrivilegeKey,
+			ug.LastAction
 	from xtcasUserGroup ug
 	where ug.LastAction > 0

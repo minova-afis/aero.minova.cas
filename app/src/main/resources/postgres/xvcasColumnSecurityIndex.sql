@@ -4,7 +4,8 @@ as
 			cs.KeyText,
 			cs.TableName,
 			cs.ColumnName,
-			cs.SecurityToken
+			cs.SecurityToken,
+			cs.LastAction
 	from xtcasColumnSecurity cs
 	where cs.LastAction > 0
 	;

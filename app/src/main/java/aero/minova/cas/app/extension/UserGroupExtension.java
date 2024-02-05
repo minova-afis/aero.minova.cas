@@ -12,6 +12,7 @@ public class UserGroupExtension extends BaseExtension<UserGroup> {
 	void setPrefix() {
 		viewPrefix = "xvcas";
 		procedurePrefix = "xpcas";
+		tablePrefix = "xtcas";
 		super.basicSetup();
 	}
 }

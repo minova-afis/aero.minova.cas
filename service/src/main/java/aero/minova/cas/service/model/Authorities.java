@@ -1,6 +1,6 @@
 package aero.minova.cas.service.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Authorities extends DataEntity {
 
-	public Authorities(int keyLong, String username, String authority, String lastUser, Timestamp lastDate, int lastAction) {
+	public Authorities(int keyLong, String username, String authority, String lastUser, LocalDateTime lastDate, int lastAction) {
 
 		this.username = username;
 		this.authority = authority;

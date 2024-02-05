@@ -44,6 +44,7 @@ public abstract class BaseExtension<E extends DataEntity> {
 	protected String procedurePrefix = "xpcor";
 	protected String viewPrefix = "xvcor";
 	protected String tablePrefix = "";
+	protected boolean filterLastAction = true;
 
 	public static final Gson TABLE_CONVERSION_GSON = GsonUtil.getGsonBuilder() //
 			.registerTypeAdapter(Table.class, new TableDeserializer()) //
@@ -93,22 +94,31 @@ public abstract class BaseExtension<E extends DataEntity> {
 
 	public Table readIndex(Table inputTable) {
 		try {
-			// Immer LastAction >0 anhängen, um gelöschte Werte zu filtern
 
-			Table withFilter = new Table();
-			withFilter.setName(inputTable.getName());
+			if (filterLastAction) {
+				// Immer LastAction >0 anhängen, um gelöschte Werte zu filtern
 
-			for (Column c : inputTable.getColumns()) {
-				withFilter.addColumn(c);
+				Table withFilter = new Table();
+				withFilter.setName(inputTable.getName());
+
+				for (Column c : inputTable.getColumns()) {
+					withFilter.addColumn(c);
+				}
+				withFilter.addColumn(new Column("LastAction", DataType.INTEGER));
+
+				for (Row r : inputTable.getRows()) {
+					Row newRow = new Row();
+					for (Value v : r.getValues()) {
+						newRow.addValue(v);
+					}
+					newRow.addValue(new Value(0, ">"));
+					withFilter.addRow(newRow);
+				}
+
+				return sqlViewController.getIndexView(withFilter, false);
+			} else {
+				return sqlViewController.getIndexView(inputTable, false);
 			}
-			withFilter.addColumn(new Column("LastAction", DataType.INTEGER));
-
-			for (Row r : inputTable.getRows()) {
-				r.addValue(new Value(0, ">"));
-				withFilter.addRow(r);
-			}
-
-			return sqlViewController.getIndexView(withFilter, false);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

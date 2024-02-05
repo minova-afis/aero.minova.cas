@@ -10,7 +10,8 @@ CREATE OR REPLACE VIEW public.xvcasMdiIndex
 			mt.KeyText as MdiTypeKeyText,
 			m.ModulName,
 			m.LastUser,
-			m.LastDate
+			m.LastDate,
+			m.LastAction
 	from xtcasMdi m
 	left join xtcasMdiType mt on m.MdiTypeKey = mt.KeyLong
 	where m.LastAction > 0;

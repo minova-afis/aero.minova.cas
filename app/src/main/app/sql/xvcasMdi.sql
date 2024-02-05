@@ -6,6 +6,7 @@ with encryption as
 			menu,
 			position,
 			securitytoken,
-			mdiTypeKey
+			mdiTypeKey,
+			LastAction
 	from xtcasMdi 
 	where LastAction > 0

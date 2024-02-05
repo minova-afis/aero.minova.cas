@@ -17,7 +17,8 @@ Es gibt allerdings *keine weiteren* User, nur den Admin.
 
 === ldap
 Ist die Property auf 'ldap' gesetzt, werden die Anmeldeinformationen des AD-Benutzers genommen, um sich einzuloggen.
-Damit die AD-Gruppen des Users genutzt werden können, müssen diese in der Datenbank in der *xtcasUserGroup* Tabelle abgebildet werden. 
+Damit die AD-Gruppen des Users genutzt werden können, müssen diese in der Datenbank in der *xtcasUserGroup* Tabelle abgebildet werden.
+Dabei entsprechen die SecurityToken den AD-Gruppen.
 Hat man die Gruppen erstellt müssen diese dann mit den Privilegien aus der *xtcasUserPrivilege* Tabelle über die *xtcasLuUserPrivilegeUserGroup* Tabelle verknüpft werden.
 
 Folgende properties müssen gesetzt werden:

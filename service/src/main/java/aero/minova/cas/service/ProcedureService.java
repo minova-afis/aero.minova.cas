@@ -42,6 +42,7 @@ import lombok.val;
 public class ProcedureService {
 
 	private static final String POSTGRESQLDIALECT = "PostgreSQLDialect";
+	private static final String H2DIALECT = "H2";
 
 	@Autowired
 	CustomLogger customLogger;
@@ -75,6 +76,9 @@ public class ProcedureService {
 		CallableStatement userContextSetter;
 		if (dialect.contains(POSTGRESQLDIALECT)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
+		} else if (dialect.contains(H2DIALECT)) {
+			// Bei H2 Datenbank brauchen wir keinen Nutzer setzten, weil LastUser eh über die Java-Klassen gesetzt wird
+			return;
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
 		}

@@ -140,12 +140,14 @@ public class ServiceNotifierService {
 	 * @return ein ServiceMessageReceiverLoginType-Objekt.
 	 */
 	public ServiceMessageReceiverLoginType findOrCreateServiceMessageReceiverLoginType(String loginType) {
-		return serviceMessageReceiverLoginTypeRepo.findByKeyTextAndLastActionGreaterThan(loginType, 0).orElseGet(() -> {
-			ServiceMessageReceiverLoginType serviceMessageLoginType = new ServiceMessageReceiverLoginType();
-			serviceMessageLoginType.setKeyText(loginType);
-			serviceMessageReceiverLoginTypeRepo.save(serviceMessageLoginType);
-			return serviceMessageLoginType;
-		});
+		return !serviceMessageReceiverLoginTypeRepo.findByKeyText(loginType).isEmpty() ? serviceMessageReceiverLoginTypeRepo.findByKeyText(loginType).get(0)
+				: createNewServiceMessageReceiverLoginType(loginType);
+	}
+
+	private ServiceMessageReceiverLoginType createNewServiceMessageReceiverLoginType(String loginType) {
+		ServiceMessageReceiverLoginType serviceMessageLoginType = new ServiceMessageReceiverLoginType();
+		serviceMessageLoginType.setKeyText(loginType);
+		return serviceMessageReceiverLoginTypeRepo.save(serviceMessageLoginType);
 	}
 
 	/**
@@ -406,7 +408,7 @@ public class ServiceNotifierService {
 	private CASServices findServiceEntry(String casServiceName) {
 		try {
 			// Die ServiceNamen müssen eindeutig sein, deswegen nehmen wir hier einfach den Ersten, den wir finden.
-			return casServiceRepo.findByKeyText(casServiceName).get();
+			return casServiceRepo.findByKeyText(casServiceName).get(0);
 		} catch (Exception e) {
 			logger.logError("Error while trying to find service " + casServiceName + " in xtcasCASServices!", e);
 			throw new RuntimeException(e);
@@ -437,14 +439,14 @@ public class ServiceNotifierService {
 				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByLastActionGreaterThan(0);
 				} else {
-					CASServices findMe = casServiceRepo.findByKeyText(casServiceName).get();
+					CASServices findMe = casServiceRepo.findByKeyText(casServiceName).get(0);
 					return newsfeedListenerRepo.findAllByCasService(findMe);
 				}
 			} else {
 				if (casServiceName == null || casServiceName.isBlank()) {
 					return newsfeedListenerRepo.findAllByTopicAndLastActionGreaterThan(topic, 0);
 				} else {
-					CASServices findMe = casServiceRepo.findByKeyText(casServiceName).get();
+					CASServices findMe = casServiceRepo.findByKeyText(casServiceName).get(0);
 					return newsfeedListenerRepo.findAllByCasServiceAndTopicAndLastActionGreaterThan(findMe, topic, 0);
 				}
 			}

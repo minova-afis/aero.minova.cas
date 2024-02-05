@@ -1,6 +1,6 @@
 package aero.minova.cas.service;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -32,9 +32,9 @@ class MdiServiceTest {
 		// Erster Aufruf legt 3 Typen an
 		mdiService.setupMdiTypes();
 		assertEquals(3, mdiTypeRepository.findByLastActionGreaterThan(0).size());
-		assertEquals(mdiTypeRepository.findByKeyText("form").get(), mdiService.getMdiTypeByKeyLong(1));
-		assertEquals(mdiTypeRepository.findByKeyText("menu").get(), mdiService.getMdiTypeByKeyLong(2));
-		assertEquals(mdiTypeRepository.findByKeyText("application").get(), mdiService.getMdiTypeByKeyLong(3));
+		assertEquals(mdiTypeRepository.findByKeyText("form").get(0), mdiService.getMdiTypeByKeyLong(1));
+		assertEquals(mdiTypeRepository.findByKeyText("menu").get(0), mdiService.getMdiTypeByKeyLong(2));
+		assertEquals(mdiTypeRepository.findByKeyText("application").get(0), mdiService.getMdiTypeByKeyLong(3));
 
 		// Zweiter Aufruf legt nicht doppelt an
 		mdiService.setupMdiTypes();
@@ -57,12 +57,12 @@ class MdiServiceTest {
 		mdiService.setupCASMdi(); // Zum Testdaten anlegen
 
 		// Es darf kein zweites General Info angelegt werden
-		Mdi mdi = new Mdi("XX", "@XXX", null, 0, mdiService.getMdiTypeByKeyLong(3), "aero.minova.cas", null);
-		assertNull(mdiService.saveMdi(mdi));
+		Mdi mdi1 = new Mdi("XX", "@XXX", null, 0, mdiService.getMdiTypeByKeyLong(3), "aero.minova.cas", null);
+		assertThrows(RuntimeException.class, () -> mdiService.save(mdi1));
 
 		// Doppelter KeyText darf nicht angelegt werden
-		mdi = new Mdi("DBUser", "@xtcasUsers", "CAS", 16, mdiService.getMdiTypeByKeyLong(1), "aero.minova.cas", "admin");
-		assertNull(mdiService.saveMdi(mdi));
+		Mdi mdi2 = new Mdi("DBUser", "@xtcasUsers", "CAS", 16, mdiService.getMdiTypeByKeyLong(1), "aero.minova.cas", "admin");
+		assertThrows(RuntimeException.class, () -> mdiService.save(mdi2));
 
 	}
 }

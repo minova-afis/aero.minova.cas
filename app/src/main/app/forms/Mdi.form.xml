@@ -57,7 +57,7 @@
 			<field name="SecurityToken" sql-index="6" text="@xtcasMdi.SecurityToken" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
-			<field name="MdiTypeKey" sql-index="7" text="@xtcasMdi.MdiTypeKeyText" required="true" number-columns-spanned="4">
+			<field name="MdiType.KeyLong" sql-index="7" text="@xtcasMdi.MdiTypeKeyText" required="true" number-columns-spanned="4">
 				<lookup table="xtcasMdiType"/>
 			</field>
 			<field name="ModulName" sql-index="8" text="@xtcasMdi.ModulName" number-columns-spanned="4" required="true" fill="toright">

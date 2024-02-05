@@ -15,7 +15,7 @@
 				<map/>
 				<node name="LuUserGroupForUserPrivilege.op.xml">
 					<map>
-						<entry key="UserPrivilegeKey" value="KeyLong"/>
+						<entry key="UserPrivilege.KeyLong" value="KeyLong"/>
 					</map>
 				</node>
 			</node>
@@ -26,7 +26,7 @@
 				<map/>
 				<node name="LuUserPrivilegeForUserGroup.op.xml">
 					<map>
-						<entry key="UserGroupKey" value="KeyLong"/>
+						<entry key="UserGroup.KeyLong" value="KeyLong"/>
 					</map>
 				</node>
 			</node>

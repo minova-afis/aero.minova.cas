@@ -6,7 +6,6 @@ CREATE OR REPLACE VIEW public.xvcasUserIndex2
 			u.Memberships,
 			u.LastAction,
 			u.LastDate,
-			u.LastUser,
-			u.LastAction
+			u.LastUser
 	from xtcasUser u
 	where u.LastAction > 0;

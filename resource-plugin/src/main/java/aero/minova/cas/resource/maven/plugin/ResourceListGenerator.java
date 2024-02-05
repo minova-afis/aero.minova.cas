@@ -158,7 +158,7 @@ public class ResourceListGenerator extends AbstractMojo {
 		}
 	}
 
-	private void mergeI18n(Path resourceFolder, Path classesFolder) {
+	public void mergeI18n(Path resourceFolder, Path classesFolder) {
 		/*
 		 * Der Key der äußeren Map ist der Name der message.properties-Datei, da dieser für jede Sprache leicht anders ist, z.B. message_de.properties. Der Key
 		 * der inneren Map ist der zu übersetzende Part, z.B. xtcasUserGroup. Der Value der inneren Map ist dann die Übersetzung, z.B. Benutzergruppen.

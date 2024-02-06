@@ -43,6 +43,16 @@ public class Value implements Serializable {
 	}
 
 	/**
+	 * Der Standard-Konstruktor für Integer-Values, ohne rule
+	 *
+	 * @param integerValue
+	 *            Der Wert als Integer.
+	 */
+	public Value(Integer integerValue) {
+		this(integerValue, null);
+	}
+
+	/**
 	 * Der Standard-Konstruktor für Long-Values.
 	 *
 	 * @param longValue
@@ -57,6 +67,16 @@ public class Value implements Serializable {
 	}
 
 	/**
+	 * Der Standard-Konstruktor für Long-Values, ohne rule
+	 *
+	 * @param longValue
+	 *            Der Wert als Long.
+	 */
+	public Value(Long longValue) {
+		this(longValue, null);
+	}
+
+	/**
 	 * @param booleanValue
 	 * @param rule
 	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
@@ -65,6 +85,13 @@ public class Value implements Serializable {
 		type = DataType.BOOLEAN;
 		this.rule = rule;
 		setValue(booleanValue);
+	}
+
+	/**
+	 * @param booleanValue
+	 */
+	public Value(Boolean booleanValue) {
+		this(booleanValue, null);
 	}
 
 	/**
@@ -81,6 +108,10 @@ public class Value implements Serializable {
 		setValue(doubleValue);
 	}
 
+	public Value(Double doubleValue) {
+		this(doubleValue, null);
+	}
+
 	/**
 	 * Der Standard-Konstruktor für String-Values.
 	 *
@@ -93,6 +124,10 @@ public class Value implements Serializable {
 		type = DataType.STRING;
 		this.rule = rule;
 		setValue(stringValue);
+	}
+
+	public Value(String stringValue) {
+		this(stringValue, null);
 	}
 
 	/**
@@ -109,6 +144,10 @@ public class Value implements Serializable {
 		setValue(instantValue);
 	}
 
+	public Value(Instant instantValue) {
+		this(instantValue, null);
+	}
+
 	/**
 	 * Der Standard-Konstruktor für ZonedDateTime-Values.
 	 *
@@ -123,6 +162,10 @@ public class Value implements Serializable {
 		setValue(zonedDateTimeValue);
 	}
 
+	public Value(ZonedDateTime zonedDateTimeValue) {
+		this(zonedDateTimeValue, null);
+	}
+
 	/**
 	 * Der Standard-Konstruktor für BigDecimal-Values. Wird für Money verwendet.
 	 *
@@ -135,6 +178,10 @@ public class Value implements Serializable {
 		type = DataType.BIGDECIMAL;
 		this.rule = rule;
 		setValue(decimalValue);
+	}
+
+	public Value(BigDecimal decimalValue) {
+		this(decimalValue, null);
 	}
 
 	@SuppressWarnings("unchecked")

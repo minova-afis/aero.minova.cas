@@ -1,9 +1,9 @@
 package aero.minova.cas.service;
 
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
@@ -178,7 +178,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				}
 
 				// Falls die Nachricht älter ist als das allowedMessageAge muss die Nachricht gelöscht werden.
-				if (pendingMessage.getMessageCreationDate().toInstant().isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))) {
+				if (pendingMessage.getMessageCreationDate().toInstant(ZoneOffset.UTC).isBefore(Instant.now().minus(allowedMessageAge, ChronoUnit.DAYS))) {
 					deleteMessage(pendingMessage);
 					continue;
 				}
@@ -240,7 +240,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				serviceMessage.setCasService(service);
 				serviceMessage.setMessage(message);
 
-				serviceMessage.setMessageCreationDate(Timestamp.valueOf(LocalDateTime.now()));
+				serviceMessage.setMessageCreationDate(LocalDateTime.now());
 
 				serviceMessageRepo.saveAndFlush(serviceMessage);
 

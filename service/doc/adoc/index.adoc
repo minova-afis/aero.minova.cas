@@ -15,7 +15,7 @@
 
 
 == Sicherheitskonzept
-* xref:security.adoc#[Sicherheitsmechanismen]
+* xref:security.adoc#[Sicherheitsmechanismen und Rechteverwaltung]
 * xref:nutzerverwaltung.adoc#[Nutzerverwaltung]
 * xref:rowlevelexample.adoc#[Beispiel zum Aktivieren der RowLevelSecurity]
 * xref:adGroupsToUserGroups.adoc#[Vergeben von Berechtigungen für AD-Gruppen]

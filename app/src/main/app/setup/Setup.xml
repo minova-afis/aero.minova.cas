@@ -17,29 +17,9 @@
         <script name="xfCasUser" type="function"/>
         <script name="xvcasUserPrivileges" type="view"/>
         <script name="xvcasUserSecurity" type="view"/>
-        <script name="xpcasReadUser" type="procedure"/>
-        <script name="xpcasInsertUser" type="procedure"/>
-        <script name="xpcasUpdateUser" type="procedure"/>
-        <script name="xpcasDeleteUser" type="procedure"/>
         <script name="xvcasUserIndex" type="view"/>
-        <script name="xpcasReadUserGroup" type="procedure"/>
-        <script name="xpcasInsertUserGroup" type="procedure"/>
-        <script name="xpcasUpdateUserGroup" type="procedure"/>
-        <script name="xpcasDeleteUserGroup" type="procedure"/>
         <script name="xvcasUserGroupIndex" type="view"/>
-        <script name="xpcasReadColumnSecurity" type="procedure"/>
-        <script name="xpcasInsertColumnSecurity" type="procedure"/>
-        <script name="xpcasUpdateColumnSecurity" type="procedure"/>
-        <script name="xpcasDeleteColumnSecurity" type="procedure"/>
         <script name="xvcasColumnSecurityIndex" type="view"/>
-        <script name="xpcasReadLuUserPrivilegeUserGroup" type="procedure"/>
-        <script name="xpcasInsertLuUserPrivilegeUserGroup" type="procedure"/>
-        <script name="xpcasUpdateLuUserPrivilegeUserGroup" type="procedure"/>
-        <script name="xpcasDeleteLuUserPrivilegeUserGroup" type="procedure"/>
-        <script name="xpcasReadUserPrivilege" type="procedure"/>
-        <script name="xpcasInsertUserPrivilege" type="procedure"/>
-        <script name="xpcasUpdateUserPrivilege" type="procedure"/>
-        <script name="xpcasDeleteUserPrivilege" type="procedure"/>
         <script name="xvcasUserPrivilegeIndex" type="view"/>
         <script name="xpcasInsertAllPrivilegesToUserGroup" type="procedure"/>
         <script name="xpcasSetupInsertUserPrivilege" type="procedure"/>
@@ -55,34 +35,10 @@
         <script name="xpcasInsertServiceMessage" type="procedure"/>
         <script name="xpcasReadServiceMessage" type="procedure"/>
         <script name="xpcasUpdateServiceMessage" type="procedure"/>
-        <script name="xpcasDeleteAuthorities" type="procedure"/>
-        <script name="xpcasDeleteUsers" type="procedure"/>
-        <script name="xpcasInsertAuthorities" type="procedure"/>
-        <script name="xpcasInsertUsers" type="procedure"/>
-        <script name="xpcasReadAuthorities" type="procedure"/>
-        <script name="xpcasReadUsers" type="procedure"/>
-        <script name="xpcasUpdateAuthorities" type="procedure"/>
-        <script name="xpcasUpdateUsers" type="procedure"/>
         <script name="xvcasUsersIndex" type="view"/>
         <script name="xvcasUsersIndex2" type="view"/>
         <script name="xvcasUserIndex2" type="view"/>
-        <script name="xpcasDeleteUserGroupUser" type="procedure"/>
-        <script name="xpcasDeleteUserGroupUsers" type="procedure"/>
-        <script name="xpcasInsertUserGroupUser" type="procedure"/>
-        <script name="xpcasInsertUserGroupUsers" type="procedure"/>
-        <script name="xpcasReadUserGroupUser" type="procedure"/>
-        <script name="xpcasReadUserGroupUsers" type="procedure"/>
-        <script name="xpcasUpdateUserGroupUser" type="procedure"/>
-        <script name="xpcasUpdateUserGroupUsers" type="procedure"/>
         <script name="xvcasServicePropertiesIndex" type="view"/>
-        <script name="xpcasDeleteServiceProperties" type="procedure"/>
-        <script name="xpcasInsertServiceProperties" type="procedure"/>
-        <script name="xpcasReadServiceProperties" type="procedure"/>
-        <script name="xpcasUpdateServiceProperties" type="procedure"/>
-        <script name="xpcasDeleteMdi" type="procedure" />
-		<script name="xpcasInsertMdi" type="procedure" />
-		<script name="xpcasReadMdi" type="procedure" />
-		<script name="xpcasUpdateMdi" type="procedure" />
 		<script name="xvcasMdiIndex" type="view" />
 		<script name="xpcasInitMdi" type="procedure" />
 		<script name="initMdi" type="script" />

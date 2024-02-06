@@ -22,4 +22,9 @@ public interface AuthoritiesRepository extends DataEntityRepository<Authorities>
 		return findByUsernameAndLastActionGreaterThan(username, 0);
 	}
 
+	public List<Authorities> findByAuthorityAndLastActionGreaterThan(String authority, int lastAction);
+
+	public default List<Authorities> findByAuthority(String authority) {
+		return findByAuthorityAndLastActionGreaterThan(authority, 0);
+	}
 }

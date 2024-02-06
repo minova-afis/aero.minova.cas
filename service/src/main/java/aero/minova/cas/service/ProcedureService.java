@@ -43,7 +43,6 @@ import net.sourceforge.jtds.util.Logger;
 public class ProcedureService {
 
 	private static final String POSTGRESQLDIALECT = "PostgreSQLDialect";
-
 	private static final String H2DIALECT = "H2";
 
 	@Autowired
@@ -79,7 +78,7 @@ public class ProcedureService {
 		if (dialect.contains(POSTGRESQLDIALECT)) {
 			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
 		} else if (dialect.contains(H2DIALECT)) {
-			// H2 wird bei uns für Tests verwendet. Hier gibt es so etaws wie Session Context nicht, da es sich um eine In-Memory Datenbank handelt.
+			// Bei H2 Datenbank brauchen wir keinen Nutzer setzten, weil LastUser eh über die Java-Klassen gesetzt wird
 			return;
 		} else {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");

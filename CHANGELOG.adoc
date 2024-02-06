@@ -4,7 +4,22 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+
+[13.1.2] — 2024-02-05
+* LocalDateTime statt Timestamp in Entities verwenden
+* Bei Index-Anfragen auch LastAction >0 filtern
+
+[13.1.1] — 2024-02-02
+* Automatisches Einspielen von Postgres/H2 Views ausbessern
+
+## [13.1.0] -- 2024-02-02
 * PreparedStatements und ResultSets nach der Ausführung schließen.
+* Verhindern eines Absturzes, wenn der Wert einer Umgebungsvariable eine andere, unbekannte Umgebungsvariable enthält
+* CAS-Masken über JPA und Extensions bedienen, Prozeduren entfernen
+* Services und Repositories für die CAS DataEntites
+* postgresql Ordner entfernen, da er nicht mehr benötigt wird
+* Bei Login über Datenbank wird LastAction Spalte von xtcasUsers korrekt ausgewertet (vorher nur LastAction = 1 erlaubt)
+* CAS mit H2-Datenbank starten lassen
 
 ## [13.0.11] -- 2023-12-15
 * MdiService zum Erstellen des Default-Menüs

@@ -182,58 +182,6 @@ Sowohl beim Aufruf von data/procedure, als auch beim Aufruf von data/index werde
 Des Weiteren wird beim Befüllen der statements überprüft, ob der Typ des values mit dem Typ der angefragten Spalte übereinstimmt. 
 
 
-== In der WFC Anwendung
-
-
-Bild 1
-
-Zuerst in der Maske Benutzergruppe die gewünschte Gruppe erstellen und einen Token mit '#' am anfang eintraagen. 
-
-Bild 3
-
-Die Gewünschten Tabellen und Prozeduren eintragen
-
-
-Bild 2
-
-In der maske Verwaltung db User, Benutzer Anlegen und einer Gruppe Zuteilen.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 == Beispiel in einer Datenbank
 
 Um in der Datenbank direkt die Rechte zuverwalten ist es erstaml Notwendig sich mit der richtigen Datenbank zu Verbinden.

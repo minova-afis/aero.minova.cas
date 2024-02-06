@@ -6,13 +6,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch External Terminal",
-            "request": "launch",
-            "console": "externalTerminal",
-            "mainClass": "/c/Users/weberr/Documents/Entwicklung/CAS/Progam Files.som"
-        },
-        {
-            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

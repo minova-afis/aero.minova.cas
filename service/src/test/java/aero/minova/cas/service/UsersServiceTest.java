@@ -113,4 +113,20 @@ class UsersServiceTest {
 		assertEquals("$2a$10$XHHIEJR8h3K2E/teoo6xTOvopt79hbBU4xsEVLEQ0Pu/8MPbO6W/e", userFromService4.getPassword());
 	}
 
+	@Test
+	void testBaseService() {
+		assertEquals(5, usersService.getAllEntities().size());
+
+		Users u = usersService.findByUsername("user1");
+		usersService.deleteById(u.getKeyLong());
+		assertEquals(4, usersService.getAllEntities().size());
+		Users deleted = usersService.findEntityById(u.getKeyLong());
+		assertEquals(-1, deleted.getLastAction());
+
+		assertThrows(RuntimeException.class, () -> usersService.deleteById(50000));
+		assertThrows(RuntimeException.class, () -> usersService.findEntityById(50000));
+		assertThrows(RuntimeException.class, () -> usersService.findEntitiesByKeyText("Does Not Exist"));
+
+	}
+
 }

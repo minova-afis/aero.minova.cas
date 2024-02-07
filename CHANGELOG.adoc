@@ -4,7 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
-* Zusammenfügen von Übersetzungen beim Bauen von Kundenprojekten.
+* Zusammenfügen von Übersetzungen beim Bauen von Kundenprojekten, da seit der 13er CAS Einführung, Abhängigkeiten nicht mehr richtig bereitgestellt wurden.
 
 [13.1.2] — 2024-02-05
 * LocalDateTime statt Timestamp in Entities verwenden

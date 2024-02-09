@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+* Tests für Extensions und Services
 
 [13.1.2] — 2024-02-05
 * LocalDateTime statt Timestamp in Entities verwenden

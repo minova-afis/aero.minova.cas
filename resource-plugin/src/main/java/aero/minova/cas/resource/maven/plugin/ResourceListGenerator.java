@@ -3,7 +3,6 @@ package aero.minova.cas.resource.maven.plugin;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,19 +141,10 @@ public class ResourceListGenerator extends AbstractMojo {
 		if (parent != null) {
 			parent.mkdirs();
 		}
-		InputStream in = fromJar.getInputStream(jarDir);
-		try (FileOutputStream out = new FileOutputStream(destDir)) {
-
-			byte[] buffer = new byte[8 * 1024];
-
-			int s = 0;
-			while ((s = in.read(buffer)) > 0) {
-				out.write(buffer, 0, s);
-			}
+		try (InputStream in = fromJar.getInputStream(jarDir)) {
+			Files.write(destDir.toPath(), in.readAllBytes());
 		} catch (IOException e) {
 			throw new IOException("Could not copy asset from jar file.", e);
-		} finally {
-			in.close();
 		}
 	}
 

@@ -51,7 +51,7 @@ public class ServiceNotifierRegistrationAPI {
 			notifierService.registerService(casServiceTable);
 
 		} catch (Exception e) {
-			logger.logError("The Service could not be registered with the name " + keyText, e);
+			throw new RuntimeException(e);
 		}
 	}
 

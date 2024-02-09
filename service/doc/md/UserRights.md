@@ -7,7 +7,7 @@ Jede Benutzergruppen Verfügt über bestimmte Rechte, der benutzer erhält die R
 
 Wenn man einem Benutzer mit Bestimmten Rechten erstellen will muss man die Maske Verwaltung DB User im CAS Menü öffnen.
 
-![Alt text](minova-afis/aero.minova.cas/service/doc/md/images/UserRights/image0.png)
+![Alt text](./images/UserRights/image0.png)
 
 Hier muss man eine ID und ein Passwort festlegen.
 

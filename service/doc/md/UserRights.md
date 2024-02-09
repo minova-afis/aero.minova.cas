@@ -1,16 +1,31 @@
-# In der WFC Anwendung
-# <img src="Screenshot 2024-02-06 145718.png" alt="alt text" width="50%">
+# Cas User Rechtsvergabe über WFC
 
-Zuerst in der Maske Benutzergruppe die gewünschte Gruppe erstellen und einen Token mit '#' am Anfang eintragen. 
+Im Cas gibt es die Möglichkeit jeden Benutzer einer oder mehere Benutzergruppen zuzuteilen.
+Jede Benutzergruppen Verfügt über bestimmte Rechte, der benutzer erhält die Rechte jeder Benutzergruppen von der er ein Teil ist.
 
-<img src="Screenshot 2024-02-06 144546.png" alt="alt text" width="50%">
+## Benutzer Anlegen
 
-Die Gewünschten Tabellen und Prozeduren eintragen. Bei der MDI kann hier die Reihensicherheit 
+Wenn man einem Benutzer mit Bestimmten Rechten erstellen will muss man die Maske Verwaltung DB User im CAS Menü öffnen.
+![Alt text](minova-afis/aero.minova.cas/service/doc/md/images/UserRights/image0.png)
+Hier muss man eine ID und ein Passwort festlegen.
+![Alt text](minova-afis/aero.minova.cas/service/doc/md/images/UserRights/image1.png)
+Danach sollte man überprüfen ob es Bereits eine Benutzergruppe mit den gewünschten Rechten gibt und wenn nicht diese Erstellen und zum Schluss dem Benutzer Zuweisen.
+![Alt text](minova-afis/aero.minova.cas/service/doc/md/images/UserRights/image3.png)
+## Benutzergruppe Anlegen
 
-# <img src="image-1.png" alt="alt text" width="50%">
+Zum erstellen einer Benutzergruppe muss man im Menü CAS die Maske Benutzergruppe öffnen.
+![Alt text](minova-afis/aero.minova.cas/service/doc/md/images/UserRights/image4.png)
+Danach muss einen Matchcode eingegeben werden und ein Token der mit # beginnt. 
 
-In der Maske Menü Verwaltung die zugeteilte Maske mit dem Security Token ohne '#' eintragen
+Als Nächstes muss man die Rechte zuweisen.
 
-<img src="Screenshot 2024-02-06 143045.png" alt="alt text" width="50%">
+## Rechte zuweisen
 
-In der Maske Verwaltung DB User, Benutzer Anlegen und den Gewünschten Gruppen Zuteilen.
+Um Rechte einer Benutzergruppe zuzuweisen muss man in der Maske Benutzergruppe mi Grid Verwaltung Gruppenrechte die Views, Prozeduren und Tabellen Eintragen auf die Benutzergruppe Zugriff haben soll. Hier Kann auch die 
+[Reihensicherung](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#tabellenzugriffserlaubnis:~:text=Methoden%20weiter%20gereicht.-,Row%2DLevel%2DSecurity,-Da%20jeder%20User) einschalten.
+![Alt text](minova-afis/aero.minova.cas/service/doc/md/images/UserRights/image5.png)
+## Menü Verwaltung
+In der Menüdefinitions Maske können die Zugriffen auf Menüs und Masken Über [Security Tokens](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#securitytoken:~:text=vom%20CAS%20haben.-,SecurityToken,-Jeder%20User%20erh%C3%A4lt) verwaltet werden. Indem man die Security Token's der Benutzergruppe einträgt.
+![Alt text](minova-afis/aero.minova.cas/service/doc/md/images/UserRights/image7
+.png)
+

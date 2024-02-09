@@ -7,7 +7,7 @@ Jede Benutzergruppen Verfügt über bestimmte Rechte, der benutzer erhält die R
 
 Wenn man einem Benutzer mit Bestimmten Rechten erstellen will muss man die Maske Verwaltung DB User im CAS Menü öffnen.
 
-![Alt text](./images/UserRights/image0.png)
+![Alt text](./images/UserRights/image0.png =250x)
 
 Hier muss man eine ID und ein Passwort festlegen.
 

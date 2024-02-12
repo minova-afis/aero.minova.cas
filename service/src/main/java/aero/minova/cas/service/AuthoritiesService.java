@@ -56,6 +56,8 @@ public class AuthoritiesService extends BaseService<Authorities> {
 		Optional<Authorities> findByUsernameAndAuthority = ((AuthoritiesRepository) repository).findByUsernameAndAuthority(username, authority);
 		if (findByUsernameAndAuthority.isPresent()) {
 			deleteById(findByUsernameAndAuthority.get().getKeyLong());
+		} else {
+			throw new EntityNotFoundException("@msg.EntityNotFound");
 		}
 	}
 

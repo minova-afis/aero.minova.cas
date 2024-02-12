@@ -1,0 +1,36 @@
+{
+	"name": "xpcasUpdateUserGroup",
+	"columns": [
+		{
+			"name": "KeyLong",
+			"type": "INTEGER"
+		},
+		{
+			"name": "KeyText",
+			"type": "STRING"
+		},
+		{
+			"name": "Description",
+			"type": "STRING"
+		},
+		{
+			"name": "UserCode",
+			"type": "STRING"
+		},
+		{
+			"name": "SecurityToken",
+			"type": "STRING"
+		}
+	],
+	"rows": [
+		{
+			"values": [
+				"n-2",
+				"s-Group",
+				"s-Des",
+				null,
+				"s-Token"
+			]
+		}
+	]
+}

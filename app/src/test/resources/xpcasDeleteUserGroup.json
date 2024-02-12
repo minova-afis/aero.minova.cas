@@ -1,0 +1,16 @@
+{
+	"name": "xpcasDeleteUserGroup",
+	"columns": [
+		{
+			"name": "KeyLong",
+			"type": "INTEGER"
+		}
+	],
+	"rows": [
+		{
+			"values": [
+				"n-2"
+			]
+		}
+	]
+}

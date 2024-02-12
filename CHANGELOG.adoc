@@ -4,15 +4,16 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+
+## [13.2.0] — 2024-02-12
 * Zusammenfügen von Übersetzungen beim Bauen von Kundenprojekten, da seit der 13er CAS Einführung, Abhängigkeiten nicht mehr richtig bereitgestellt wurden.
 * Tests für Extensions und Services
 
-
-[13.1.2] — 2024-02-05
+## [13.1.2] — 2024-02-05
 * LocalDateTime statt Timestamp in Entities verwenden
 * Bei Index-Anfragen auch LastAction >0 filtern
 
-[13.1.1] — 2024-02-02
+## [13.1.1] — 2024-02-02
 * Automatisches Einspielen von Postgres/H2 Views ausbessern
 
 ## [13.1.0] -- 2024-02-02

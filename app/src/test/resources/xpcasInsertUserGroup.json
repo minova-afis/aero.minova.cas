@@ -1,0 +1,37 @@
+{
+	"name": "xpcasInsertUserGroup",
+	"columns": [
+		{
+			"name": "KeyLong",
+			"type": "INTEGER",
+			"outputType": "OUTPUT"
+		},
+		{
+			"name": "KeyText",
+			"type": "STRING"
+		},
+		{
+			"name": "Description",
+			"type": "STRING"
+		},
+		{
+			"name": "UserCode",
+			"type": "STRING"
+		},
+		{
+			"name": "SecurityToken",
+			"type": "STRING"
+		}
+	],
+	"rows": [
+		{
+			"values": [
+				null,
+				"s-Group",
+				null,
+				null,
+				"s-Token"
+			]
+		}
+	]
+}

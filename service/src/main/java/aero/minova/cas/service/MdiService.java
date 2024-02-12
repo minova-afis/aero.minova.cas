@@ -9,6 +9,7 @@ import aero.minova.cas.service.model.Mdi;
 import aero.minova.cas.service.model.MdiType;
 import aero.minova.cas.service.repository.MdiRepository;
 import aero.minova.cas.service.repository.MdiTypeRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class MdiService extends BaseService<Mdi> {
@@ -171,7 +172,7 @@ public class MdiService extends BaseService<Mdi> {
 		if (findById.isPresent()) {
 			return findById.get();
 		}
-		return null;
+		throw new EntityNotFoundException("@msg.EntityNotFound");
 	}
 
 	/**

@@ -12,6 +12,7 @@ import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.service.model.Mdi;
 import aero.minova.cas.service.repository.MdiRepository;
 import aero.minova.cas.service.repository.MdiTypeRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @SpringBootTest(classes = CoreApplicationSystemApplication.class)
 @ActiveProfiles("test")
@@ -39,6 +40,9 @@ class MdiServiceTest {
 		// Zweiter Aufruf legt nicht doppelt an
 		mdiService.setupMdiTypes();
 		assertEquals(3, mdiTypeRepository.findByLastActionGreaterThan(0).size());
+
+		// Gibt keinen MdiTyp mit KeyLong 4
+		assertThrows(EntityNotFoundException.class, () -> mdiService.getMdiTypeByKeyLong(4));
 	}
 
 	@Test
@@ -63,6 +67,5 @@ class MdiServiceTest {
 		// Doppelter KeyText darf nicht angelegt werden
 		Mdi mdi2 = new Mdi("DBUser", "@xtcasUsers", "CAS", 16, mdiService.getMdiTypeByKeyLong(1), "aero.minova.cas", "admin");
 		assertThrows(RuntimeException.class, () -> mdiService.save(mdi2));
-
 	}
 }

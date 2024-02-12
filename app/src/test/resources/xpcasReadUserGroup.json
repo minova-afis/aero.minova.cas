@@ -1,0 +1,41 @@
+{
+	"name": "xpcasReadUserGroup",
+	"columns": [
+		{
+			"name": "KeyLong",
+			"type": "INTEGER",
+			"outputType": "OUTPUT"
+		},
+		{
+			"name": "KeyText",
+			"type": "STRING",
+			"outputType": "OUTPUT"
+		},
+		{
+			"name": "Description",
+			"type": "STRING",
+			"outputType": "OUTPUT"
+		},
+		{
+			"name": "UserCode",
+			"type": "STRING",
+			"outputType": "OUTPUT"
+		},
+		{
+			"name": "SecurityToken",
+			"type": "STRING",
+			"outputType": "OUTPUT"
+		}
+	],
+	"rows": [
+		{
+			"values": [
+				"n-2",
+				null,
+				null,
+				null,
+				null
+			]
+		}
+	]
+}

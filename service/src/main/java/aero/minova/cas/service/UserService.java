@@ -21,9 +21,8 @@ public class UserService extends BaseService<User> {
 		String userGroupToken = userGroupService.findEntityById(userGroupKey).getKeyText();
 
 		List<User> res = new ArrayList<>();
-
 		for (User u : repository.findAllWithLastActionGreaterZero()) {
-			if (u.getMemberships() != null && u.getMemberships().toLowerCase().contains(userGroupToken.toLowerCase())) {
+			if (getMemberships(u).contains(userGroupToken)) {
 				res.add(u);
 			}
 		}

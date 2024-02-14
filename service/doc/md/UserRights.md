@@ -54,7 +54,9 @@ In der Benutzergruppe können den Gruppen Rechte auf Tabellen, Prozeduren oder V
 
 *Table* Eine Tabelle enthält Daten auf der Datenbank. Das Recht auf eine Tabelle zuzugreifen braucht man, wenn die Werte aus einer Lookup (Komponente mit DropDown-Liste) geladen werden müssen.
 
-<img src="./images/UserRights/image51.png" alt="Alt text" width="40%">
+<img src="./images/UserRights/image55.png" alt="Alt text" width="40%">
+
+In diesem Beispiel braucht der Benutzer das Recht für die Tabelle "tCompany" damit beim Lesen, Erfassen oder Andern eines Datensatzes auf die verschiedenen Einträge aus der Tabelle zugegriffen werden kann. 
 
 ## Einschränkung auf das generelle Menu
 

@@ -1,44 +1,84 @@
-# Cas User Rechtsvergabe über WFC
+# CAS User Rechtsvergabe über WFC
 
-Im Cas gibt es die Möglichkeit jeden Benutzer einer oder mehere Benutzergruppen zuzuteilen.
-Jede Benutzergruppen Verfügt über bestimmte Rechte, der benutzer erhält die Rechte jeder Benutzergruppen von der er ein Teil ist.
+Diese Dokumentation beschreibt den Vorgang und die Anpassungen die für die Einrichtung der Benutzerrechte notwenidg sind. 
+
+Es ist mölich die Benutzer in unterschiedliche Benutzergruppen aufzuteilen. Dabei können den Gruppen jeweils andere Rechte zugewiesen werden.
+Die Rechte beziehen sich dabei auf die das durchführen eines bestimmten Prozesses: "Ändern eines Datensatze" oder auf das Anzeigen von unterschieldichen Menus. Ein Benutzgruppe darf nur Masken aus ihrem Bereich sehen, z.B. Stammdaten. 
 
 ## Benutzer Anlegen
-
-Wenn man einem Benutzer mit Bestimmten Rechten erstellen will muss man die Maske Verwaltung DB User im CAS Menü öffnen.
+Über den Menupunkt: CAS, kann mit dem Eintrag: "Benutzer über DB Tabelle" ein neuer Benutzer angelegt oder ein existierender Benutzer geändert werden. 
+Ein Benutzer wird über die Maske: DB User angelegt. 
 
 <img src="./images/UserRights/image0.png" alt="Alt text" width="25%">
 
-Hier muss man eine ID und ein Passwort festlegen.
+_ID_ - eindeutiger Benuztzername, dies kann auch eine Kennung sein oder eine Nummer. 
+
+_Beschreibung_ - Beschreibung des Benutzers, in der Regel der volle Name des Benutzer oder eine kurze Beschreibung der Tätitkeit. 
+
+_Passwort_ - Das Passwort des Benutzers. Nach der Eingabe des Passwortes wird das Passwort beim speichern verschlüsselt und ist nicht mehr lesbar. 
 
 <img src="./images/UserRights/image1.png" alt="Alt text" width="40%">
 
-Danach sollte man überprüfen ob es Bereits eine Benutzergruppe mit den gewünschten Rechten gibt und wenn nicht diese Erstellen und zum Schluss dem Benutzer Zuweisen.
+Das Zurücksetzen des Passwortes erfolgt auschließlich durch eine Neueingabe des Passwortes! Dies sollte durch einen Administrator durchgeführt werden. 
 
-<img src="./images/UserRights/image3.png" alt="Alt text" width="25%">
+Danach sollte man überprüfen ob es bereits eine Benutzergruppe mit den gewünschten Rechten gibt. 
+
 
 ## Benutzergruppe Anlegen
 
-Zum erstellen einer Benutzergruppe muss man im Menü CAS die Maske Benutzergruppe öffnen.
+Zum Erstellen einer Benutzergruppe muss man im Menü CAS die Maske Benutzergruppe öffnen.
 
-<img src="./images/UserRights/image4.png" alt="Alt text" width="25%">
+<img src="./images/UserRights/image3.png" alt="Alt text" width="25%">
 
-Danach muss einen Matchcode eingegeben werden und ein Token der mit # beginnt. 
+Die entsprechenden Felder sollten sinnvoll gefüllt werden.
 
-Als Nächstes muss man die Rechte zuweisen.
+_MatchCode_ - Name der Gruppe, dieser muss eindeutig sein. 
 
-## Rechte zuweisen
+_Beschreibung_ - Beschreibung der Benutzergruppe, in der Regel eine kurze Beschreibung der Tätitkeit oder des Aufgabenbereis.
 
-Um Rechte einer Benutzergruppe zuzuweisen muss man in der Maske Benutzergruppe mi Grid Verwaltung Gruppenrechte die Views, Prozeduren und Tabellen Eintragen auf die Benutzergruppe Zugriff haben soll. Hier Kann auch die 
-[Reihensicherung](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#tabellenzugriffserlaubnis:~:text=Methoden%20weiter%20gereicht.-,Row%2DLevel%2DSecurity,-Da%20jeder%20User) einschalten.
+_Benutzercode_ - Erstmal noch keine Verwenddung. Belibet bis auf Weiteres leer. 
 
-<img src="./images/UserRights/image5.png" alt="Alt text" width="25%">
+_Token_ - Der eindeutige Benutzertoken, mit dem die Rechte für unterschiedlich Prozesse eingerichtet werden. Es können auch mehrere Token angegeben werden, diese trennt man mit dem '#'-Symbol.
 
-## Menü Verwaltung
+<img src="./images/UserRights/image4.png" alt="Alt text" width="40%">
+
+
+### Rechte zuweisen
+
+Um Rechte einer Benutzergruppe zuzuweisen, muss man in der Maske Benutzergruppe mit Grid Verwaltung Gruppenrechte die Views, Prozeduren und Tabellen Eintragen auf die Benutzergruppe Zugriff haben soll. Hier kann auch die 
+[Reihensicherung](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#tabellenzugriffserlaubnis:~:text=Methoden%20weiter%20gereicht.-,Row%2DLevel%2DSecurity,-Da%20jeder%20User) einschaltet werden.
+
+<img src="./images/UserRights/image5.png" alt="Alt text" width="40%">
+
+*Prozeduren* Sie beschreiben eine bestimmte Funktion wie zum Beispiel das erstmalige Hinzufügen eines Datensatze, das Aktualisieren, Lesen oder Löschen eines Datensatzes. Zusäztzlich können auch Prozesse wie "Buchen" abgebildet sein. 
+
+*Views* Eine View ist eine "Sicht" auf einen bestimmten Bereich. Damit ist gemeint, dass zum Beipsiel alle nicht gelöschten Produkte, Fahrzeuge oder Events angezeigt werden. 
+
+*Table* Eine Tabelle enthält Daten auf der Datenbank. Das Recht auf eine Tabelle zuzugreifen braucht man, wenn die Werte aus einer Lookup (Komponente mit DropDown-Liste) gelesen werden müssen.
+
+## Einschränkung auf das generelle Menu
+
+Im Menü CAS kann die Menudefinition geöffnet werdern. In dieser Maske wird definiert, wie das Menu aussieht, und welche Masken zu den Menupunkten gehören. 
 
 <img src="./images/UserRights/image6.png" alt="Alt text" width="25%">
 
-In der Menüdefinitions Maske können die Zugriffen auf Menüs und Masken Über [Security Tokens](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#securitytoken:~:text=vom%20CAS%20haben.-,SecurityToken,-Jeder%20User%20erh%C3%A4lt) verwaltet werden. Indem man die Security Token's der Benutzergruppe einträgt.
+_Matchcode_ - eindeutiger Name des Menueintrags
 
-<img src="./images/UserRights/image7.png" alt="Alt text" width="60%">
+_Icon_ - Name des Icons für das entsprechende Menu. Achtung für den MDI Typ: "menu" wird kein Icon benötigt.
+
+_Text_ - Text, der angezeigt werden soll. Dieser entspricht dem Menu oder der Maske. Achtung, bei zu übersetzenden Properties muss die entsprechende Propertie mit einem angeführten "@" erfasst werden. 
+
+_Menu_ - Verweis aus ein existierendes Menu, damit diese Maske sich in dem Menu einfügt
+
+_Position_ - Gibt an an welcher Stelle innerhalb des Unter- oder Hauptmenus dieser Eintrag eingetragen wird. Es können Fließkommawerte eingetragen werden. 
+
+_Security Token_ - Über die defionierten [Security Tokens](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#securitytoken:~:text=vom%20CAS%20haben.-,SecurityToken,-Jeder%20User%20erh%C3%A4lt) aus der Benutzergruppe können hier entsprechende Rechte eingetragen werden. Dafür ist es wichtg, dass die Gruppen denen nur bestimmte Menus angezeigt werden sollen immer ein gülteiger Token zugewiesen wurde.
+
+_MDI Type_ - Es gibt 3 unterschiedliche Typen: application (Oberstes Menupunkt, der Pro Anwendung einmal existiert), menu (Menupunkt, wie "CAS", "Stammdaten", .. um die Masken zu sortieren, from (Maske mit Funktion).
+
+_Modulname_ - Name des Moduls aus dem die entsprechende Maske stammt oder das Menu stammt.
+
+<img src="./images/UserRights/image7.png" alt="Alt text" width="90%">
+
+Menupunkt ohne Security Token werden nur dann für den Benutzer sichtbar, wenn dieser das Recht hat mindestens eine Maske aus dem entsprechende Menu zu sehen. Andernsfalls ist der Menupunkt nicht sichtbar. 
 

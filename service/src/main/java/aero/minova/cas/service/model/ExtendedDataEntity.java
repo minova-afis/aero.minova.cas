@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public abstract class ExtendedDataEntity extends DataEntity {
 
-	@Column(length = 200)
+	@Column(length = 50)
 	private String description;
 
 }

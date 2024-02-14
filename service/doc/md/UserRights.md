@@ -72,7 +72,7 @@ _Menu_ - Verweis aus ein existierendes Menu, damit diese Maske sich in dem Menu 
 
 _Position_ - Gibt an an welcher Stelle innerhalb des Unter- oder Hauptmenus dieser Eintrag eingetragen wird. Es können Fließkommawerte eingetragen werden. 
 
-_Security Token_ - Über die defionierten [Security Tokens](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#securitytoken:~:text=vom%20CAS%20haben.-,SecurityToken,-Jeder%20User%20erh%C3%A4lt) aus der Benutzergruppe können hier entsprechende Rechte eingetragen werden. Dafür ist es wichtg, dass die Gruppen denen nur bestimmte Menus angezeigt werden sollen immer ein gülteiger Token zugewiesen wurde.
+_Security Token_ - Über die definierten [Security Tokens](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#securitytoken:~:text=vom%20CAS%20haben.-,SecurityToken,-Jeder%20User%20erh%C3%A4lt) aus der Benutzergruppe können Rechte eingetragen werden. Dafür ist es wichtg, dass die Gruppen denen nur bestimmte Menus angezeigt werden sollen immer ein gülteiger Token zugewiesen ist.
 
 _MDI Type_ - Es gibt 3 unterschiedliche Typen: application (Oberstes Menupunkt, der Pro Anwendung einmal existiert), menu (Menupunkt, wie "CAS", "Stammdaten", .. um die Masken zu sortieren, from (Maske mit Funktion).
 

@@ -4,7 +4,6 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
-* ExtendedDataEntity Klasse für Entities, die auch eine Beschreibung haben sollen
 
 ## [13.2.0] — 2024-02-12
 * Zusammenfügen von Übersetzungen beim Bauen von Kundenprojekten, da seit der 13er CAS Einführung, Abhängigkeiten nicht mehr richtig bereitgestellt wurden.

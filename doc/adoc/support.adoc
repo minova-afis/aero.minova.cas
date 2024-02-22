@@ -402,3 +402,10 @@ Folgendes Vorgehen ist am besten:
 * Im Stack-Trace die Methode für die Verbindung und Anmeldung finden und
   Break-Point an dieser stelle setzen.
 * Im Debug-Modus die Anmelde-Daten etc. in den Variablen prüfen.
+
+### Einige Benutzer funktionieren bei der Anmeldung und andere nicht.
+Man sollte darauf achten, dass die Nutzer immer die richtige Domäne haben,
+da das CAS zur Zeit nur eine Domäne gleichzeitig unterstützt.
+Nutzer von mehreren Domänene gleichzeitig werden nicht unterstützt.
+
+Die Domäne ist im Benutzerprinzipalname (=UPN=User Principal Name) der Teil nach dem `@` Symbol.

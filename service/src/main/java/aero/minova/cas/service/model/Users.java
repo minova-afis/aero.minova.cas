@@ -7,16 +7,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Table(name = "xtcasUsers")
-public class Users extends DataEntity {
+public class Users extends ExtendedDataEntity {
 
-	@Size(max = 50)
-	@Column(name = "Description", length = 50)
-	public String description;
-	
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "Username", length = 50)

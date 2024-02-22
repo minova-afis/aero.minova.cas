@@ -10,13 +10,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @Table(name = "xtcasAuthorities")
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class Authorities extends DataEntity {
 
 	public Authorities(int keyLong, String username, String authority, String lastUser, LocalDateTime lastDate, int lastAction) {

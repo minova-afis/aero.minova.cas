@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+
+## [13.2.1] — 2024-02-22
 * ExtendedDataEntity Klasse für Entities, die auch eine Beschreibung haben sollen
 
 ## [13.2.0] — 2024-02-12

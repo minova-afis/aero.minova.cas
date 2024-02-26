@@ -187,10 +187,11 @@ public class SqlProcedureController {
         ResponseEntity extResult = null;
         synchronized (extensionSynchronizer) {
             if (extensions.containsKey(inputTable.getName())) {
-                extResult = extensions.get(inputTable.getName()).apply(inputTable);
+                final var extension = extensions.get(inputTable.getName());
+                extResult = extension.apply(inputTable);
                 queueService.accept(inputTable, extResult);
                 if (extResult == null) {
-                    customLogger.logError("Extension " + extensions.get(inputTable.getName())
+                    customLogger.logError("Extension " + extension
                             + " returned null. This is not allowed to happen, as otherwise the SQL method is executed after the extension as well.", new NullPointerException());
                 }
                 return Optional.of(extResult);

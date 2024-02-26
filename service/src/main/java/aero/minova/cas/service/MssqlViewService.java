@@ -1,5 +1,13 @@
 package aero.minova.cas.service;
 
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.*;
+import aero.minova.cas.sql.SqlUtils;
+import aero.minova.cas.sql.SystemDatabase;
+import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -7,19 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Column;
-import aero.minova.cas.api.domain.DataType;
-import aero.minova.cas.api.domain.Row;
-import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.sql.SqlUtils;
-import aero.minova.cas.sql.SystemDatabase;
-import lombok.val;
 
 @Service
 public class MssqlViewService implements ViewServiceInterface {
@@ -147,6 +142,11 @@ public class MssqlViewService implements ViewServiceInterface {
 				}
 
 				final Object valObj = r.getValues().get(colI).getValue();
+				if (valObj == null) {
+					final var exception = new IllegalArgumentException("msg.ConvertTableError");
+					customLogger.logError(Value.class.getName() + "#value is not allowed to be null. Use null in " + Row.class + " instead.", exception);
+					throw exception;
+				}
 				String strValue = valObj.toString().trim();
 				String ruleValue = r.getValues().get(colI).getRule();
 				if (Objects.equals(ruleValue, "~")) {

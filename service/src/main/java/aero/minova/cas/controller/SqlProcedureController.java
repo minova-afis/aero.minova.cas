@@ -39,31 +39,31 @@ import lombok.val;
 @RestController
 public class SqlProcedureController {
 
-	@Autowired
-	CustomLogger customLogger;
+    @Autowired
+    CustomLogger customLogger;
 
-	@Autowired
-	ProcedureService procedureService;
+    @Autowired
+    ProcedureService procedureService;
 
-	@Autowired
-	SecurityService securityService;
+    @Autowired
+    SecurityService securityService;
 
-	@Autowired
-	public SystemDatabase database;
+    @Autowired
+    public SystemDatabase database;
 
-	@Setter
-	QueueService queueService;
+    @Setter
+    QueueService queueService;
 
-	final Object extensionSynchronizer = new Object();
+    final Object extensionSynchronizer = new Object();
 
-	/**
-	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
-	 */
-	private final Map<String, Function<Table, ResponseEntity>> extensions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-	/**
-	 * Wird nur verwendet, falls die Tabelle "xvcasUserSecurity" nicht vorhanden ist. In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt ist.
-	 */
-	private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
+    /**
+     * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur mit den Namen der Registrierung ausgeführt werden soll.
+     */
+    private final Map<String, Function<Table, ResponseEntity>> extensions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    /**
+     * Wird nur verwendet, falls die Tabelle "xvcasUserSecurity" nicht vorhanden ist. In diesem Fall kann man annehmen, das die Datenbank nicht aufgesetzt ist.
+     */
+    private final Map<String, Function<Table, Boolean>> extensionBootstrapChecks = new HashMap<>();
 
 	/**
 	 * Hiermit lassen sich Erweiterungen registrieren, die ausgeführt werden, wenn eine Prozedur mit der Namen der Registrierung ausgeführt werden soll.
@@ -96,121 +96,123 @@ public class SqlProcedureController {
 		extensionBootstrapChecks.put(name, extCheck);
 	}
 
-	/**
-	 * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
-	 * werden die Extensions in die tVersion10-Tabelle eingetragen.
-	 */
-	public void setupExtensions() {
-		Table extensionSetupTable = new Table();
-		extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
-		extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
-		extensionSetupTable.addColumn(new Column("KeyText", DataType.STRING));
-		extensionSetupTable.addColumn(new Column("Description", DataType.STRING));
+    /**
+     * Hinterlegt bei der Installation der Extensions die Rechte in der xtcasUserPrivileges-Tabelle, ordnet diese allerdings noch keinem Nutzer zu. Außerdem
+     * werden die Extensions in die tVersion10-Tabelle eingetragen.
+     */
+    public void setupExtensions() {
+        Table extensionSetupTable = new Table();
+        extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
+        extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));
+        extensionSetupTable.addColumn(new Column("KeyText", DataType.STRING));
+        extensionSetupTable.addColumn(new Column("Description", DataType.STRING));
 
-		for (String extensionName : extensions.keySet()) {
-			Row extensionSetupRows = new Row();
-			extensionSetupRows.addValue(null);
-			extensionSetupRows.addValue(new Value(extensionName, null));
-			extensionSetupRows.addValue(null);
+        for (String extensionName : extensions.keySet()) {
+            Row extensionSetupRows = new Row();
+            extensionSetupRows.addValue(null);
+            extensionSetupRows.addValue(new Value(extensionName, null));
+            extensionSetupRows.addValue(null);
 
-			extensionSetupTable.addRow(extensionSetupRows);
-		}
-		try {
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
-			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
-		} catch (Exception e) {
-			customLogger.logError("Error while trying to setup extension privileges!", e);
-			throw new RuntimeException(e);
-		}
-	}
+            extensionSetupTable.addRow(extensionSetupRows);
+        }
+        try {
+            database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+            procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
+            database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
+        } catch (Exception e) {
+            customLogger.logError("Error while trying to setup extension privileges!", e);
+            throw new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Erstellt eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden. Wird nach dem erfolgreichen Setup ausgeführt.
-	 */
-	public void setupPrivileges() {
-		try {
-			Table adminPrivilegeTable = new Table();
-			adminPrivilegeTable.setName("xpcasInsertAllPrivilegesToUserGroup");
-			adminPrivilegeTable.addColumn(new Column("UserGroup", DataType.STRING));
-			adminPrivilegeTable.addColumn(new Column("SecurityToken", DataType.STRING));
+    /**
+     * Erstellt eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden. Wird nach dem erfolgreichen Setup ausgeführt.
+     */
+    public void setupPrivileges() {
+        try {
+            Table adminPrivilegeTable = new Table();
+            adminPrivilegeTable.setName("xpcasInsertAllPrivilegesToUserGroup");
+            adminPrivilegeTable.addColumn(new Column("UserGroup", DataType.STRING));
+            adminPrivilegeTable.addColumn(new Column("SecurityToken", DataType.STRING));
 
-			// Eine Gruppe mit dem Namen 'admin' und dem SecurityToken 'admin' anlegen.
-			Row adminSetupRow = new Row();
-			adminSetupRow.addValue(new Value("admin", null));
-			adminSetupRow.addValue(new Value("admin", null));
+            // Eine Gruppe mit dem Namen 'admin' und dem SecurityToken 'admin' anlegen.
+            Row adminSetupRow = new Row();
+            adminSetupRow.addValue(new Value("admin", null));
+            adminSetupRow.addValue(new Value("admin", null));
 
-			adminPrivilegeTable.addRow(adminSetupRow);
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
-			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
-		} catch (Exception e) {
-			customLogger.logError("Error while trying to setup privileges for admin!", e);
-			throw new RuntimeException(e);
-		}
+            adminPrivilegeTable.addRow(adminSetupRow);
+            database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+            procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
+            database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
+        } catch (Exception e) {
+            customLogger.logError("Error while trying to setup privileges for admin!", e);
+            throw new RuntimeException(e);
+        }
 
-	}
+    }
 
-	/**
-	 * Führt eine CAS-Erweiterung falls vorhanden oder eine SQL-Prozedur im anderen Fall aus. Falls {@link #arePrivilegeStoresSetup} nicht gilt und es für die
-	 * Eingabe eine passende Prozedur gibt, wird geprüft, ob es für die Erweiterung eine passende alternative-Rechteprüfung gibt. Dieser Mechanismus wird
-	 * verwendet, um das Initialisieren der Datenbank über das CAS zu triggern.
-	 *
-	 * @param inputTable
-	 *            Name der Prozedur und Aufruf Parameter
-	 * @return Ergebnis des Prozeduren-Aufrufs
-	 * @throws Exception
-	 *             Fehler bei der Ausführung
-	 */
-	@SuppressWarnings("unchecked")
-	@PostMapping(value = "data/procedure")
-	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		if (inputTable.getName().equals("setup")) {
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
-		}
-		customLogger.logUserRequest("data/procedure: ", inputTable);
-		try {
-			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
+    /**
+     * Führt eine CAS-Erweiterung falls vorhanden oder eine SQL-Prozedur im anderen Fall aus. Falls {@link #arePrivilegeStoresSetup} nicht gilt und es für die
+     * Eingabe eine passende Prozedur gibt, wird geprüft, ob es für die Erweiterung eine passende alternative-Rechteprüfung gibt. Dieser Mechanismus wird
+     * verwendet, um das Initialisieren der Datenbank über das CAS zu triggern.
+     *
+     * @param inputTable Name der Prozedur und Aufruf Parameter
+     * @return Ergebnis des Prozeduren-Aufrufs
+     * @throws Exception Fehler bei der Ausführung
+     */
+    @SuppressWarnings("unchecked")
+    @PostMapping(value = "data/procedure")
+    public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
+        if (inputTable.getName().equals("setup")) {
+            database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+        }
+        customLogger.logUserRequest("data/procedure: ", inputTable);
+        try {
+            final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
 
-			Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
+            Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
 
-			if (extensionResult.isPresent()) {
-				return extensionResult.get();
-			}
+            if (extensionResult.isPresent()) {
+                return extensionResult.get();
+            }
 
-			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
-			queueService.accept(inputTable, result);
-			if (inputTable.getName().equals("setup")) {
-				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
-			}
-			return result;
-		} catch (Throwable e) {
-			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
+            val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
+            queueService.accept(inputTable, result);
+            if (inputTable.getName().equals("setup")) {
+                database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
+            }
+            return result;
+        } catch (Throwable e) {
+            customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);
 
-			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
-			throw new ProcedureException(e);
-		}
-	}
+            // Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
+            throw new ProcedureException(e);
+        }
+    }
 
-	/**
-	 * Überprüft, ob es für den Namen der übergebenen Table einen passenden Eintrag in den Extensions gibt und gibt das Ergebnis der ausgeführten Extension als
-	 * Optional<ResponseEntity> zurück.
-	 * 
-	 * @param inputTable
-	 *            Eine Table. Muss einen Namen haben.
-	 * @return Das Ergebnis der Extension als Optional mit der übergebenen Table als Input.
-	 */
-	Optional<ResponseEntity> checkForExtension(Table inputTable) {
-		ResponseEntity extResult = null;
-
-		synchronized (extensionSynchronizer) {
-			if (extensions.containsKey(inputTable.getName())) {
-				extResult = extensions.get(inputTable.getName()).apply(inputTable);
-				queueService.accept(inputTable, extResult);
-			}
-		}
-		return Optional.ofNullable(extResult);
-	}
+    /**
+     * Überprüft, ob es für den Namen der übergebenen Table einen passenden Eintrag in den Extensions gibt und gibt das Ergebnis der ausgeführten Extension als
+     * Optional<ResponseEntity> zurück.
+     *
+     * @param inputTable Eine Table. Muss einen Namen haben.
+     * @return Das Ergebnis der Extension als Optional mit der übergebenen Table als Input.
+     */
+    Optional<ResponseEntity> checkForExtension(Table inputTable) {
+        ResponseEntity extResult = null;
+        synchronized (extensionSynchronizer) {
+            if (extensions.containsKey(inputTable.getName())) {
+                extResult = extensions.get(inputTable.getName()).apply(inputTable);
+                queueService.accept(inputTable, extResult);
+                if (extResult == null) {
+                    customLogger.logError("Extension " + extensions.get(inputTable.getName())
+                            + " returned null. This is not allowed to happen, as otherwise the SQL method is executed after the extension as well.", new NullPointerException());
+                }
+                return Optional.of(extResult);
+            } else {
+                return Optional.empty();
+            }
+        }
+    }
 
 	/**
 	 * Überprüft, ob es für den derzeitigen Nutzer und die übergebene Table Privilegien gibt und falls nicht, ob eine Extension vorhanden ist, welche keine
@@ -272,23 +274,23 @@ public class SqlProcedureController {
 	public ResponseEntity<?> unsecurelyExecuteProcedure(Table inputTable) throws Exception {
 		Optional<ResponseEntity> extensionResult = checkForExtension(inputTable);
 
-		if (extensionResult.isPresent()) {
-			return extensionResult.orElse(null);
-		}
-		// Hiermit wird der unsichere Zugriff ermöglicht.
-		Row requestingAuthority = new Row();
-		/*
-		 * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
-		 * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
-		 */
-		requestingAuthority.addValue(new Value(false, "1"));
-		requestingAuthority.addValue(new Value(false, "2"));
-		requestingAuthority.addValue(new Value(false, "3"));
+        if (extensionResult.isPresent()) {
+            return extensionResult.orElse(null);
+        }
+        // Hiermit wird der unsichere Zugriff ermöglicht.
+        Row requestingAuthority = new Row();
+        /*
+         * Diese drei Values werden benötigt, um unsicher die Sicherheitsabfrage ohne User durchführen zu können. Das wichtigste hierbei ist, dass der dritte
+         * Value auf Valse steht. Das Format der Row ist normalerweise (PrivilegName, UserSecurityToke, RowLevelSecurity-Bit)
+         */
+        requestingAuthority.addValue(new Value(false, "1"));
+        requestingAuthority.addValue(new Value(false, "2"));
+        requestingAuthority.addValue(new Value(false, "3"));
 
-		List<Row> authority = new ArrayList<>();
-		authority.add(requestingAuthority);
-		return new ResponseEntity(procedureService.processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
-	}
+        List<Row> authority = new ArrayList<>();
+        authority.add(requestingAuthority);
+        return new ResponseEntity(procedureService.processSqlProcedureRequest(inputTable, authority), HttpStatus.ACCEPTED);
+    }
 
 	/**
 	 * Speichert im SQl-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
@@ -346,15 +348,15 @@ public class SqlProcedureController {
 		return procedureService.calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 	}
 
-	@Deprecated
-	private void fillCallableSqlProcedureStatement(CallableStatement preparedStatement, Table inputTable, int parameterOffset, StringBuffer sb, int row) {
-		procedureService.fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, row);
-	}
+    @Deprecated
+    private void fillCallableSqlProcedureStatement(CallableStatement preparedStatement, Table inputTable, int parameterOffset, StringBuffer sb, int row) {
+        procedureService.fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, row);
+    }
 
-	@Deprecated
-	String prepareProcedureString(Table params) {
-		return prepareProcedureString(params, ExecuteStrategy.STANDARD);
-	}
+    @Deprecated
+    String prepareProcedureString(Table params) {
+        return prepareProcedureString(params, ExecuteStrategy.STANDARD);
+    }
 
 	/**
 	 * Bereitet einen Prozedur-String vor

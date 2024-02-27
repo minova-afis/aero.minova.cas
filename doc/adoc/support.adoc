@@ -409,3 +409,7 @@ da das CAS zur Zeit nur eine Domäne gleichzeitig unterstützt.
 Nutzer von mehreren Domänene gleichzeitig werden nicht unterstützt.
 
 Die Domäne ist im Benutzerprinzipalname (=UPN=User Principal Name) der Teil nach dem `@` Symbol.
+
+## Zip oder MD5-Dateien aus `Internal/` können vom WFC nicht ausgelesen werden.
+Die Zip und MD5-Dateien werden beim Start des CAS erstellt.
+Allerdings dauert dies etwas und es gibt kein Logging dazu.

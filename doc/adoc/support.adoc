@@ -411,5 +411,17 @@ Nutzer von mehreren Domänene gleichzeitig werden nicht unterstützt.
 Die Domäne ist im Benutzerprinzipalname (=UPN=User Principal Name) der Teil nach dem `@` Symbol.
 
 ## Zip oder MD5-Dateien aus `Internal/` können vom WFC nicht ausgelesen werden.
+````
+ msg.FileError %C:\ClusterStorage\Volume1\DUS\Shared Data\Program Files\SIS12\SIS\Internal\Zips\plugins.zip
+2024-02-27T14:31:42.682 minova : files/zip: reports.zip
+2024-02-27T14:31:42.705 minova : CAS : Execute : INSERT INTO xtcasError (Username, ErrorMessage, Date) VALUES (?,?,?) with values: minova, msg.FileError %C:\ClusterStorage\Volume1\DUS\Shared Data\Program Files\SIS12\SIS\Internal\Zips\reports.zip, 2024-02-27 14:31:42.7052953
+2024-02-27T14:31:42.706 minova : CAS: Showing Stacktrace : java.nio.file.NoSuchFileException: msg.FileError %C:\ClusterStorage\Volume1\DUS\Shared Data\Program Files\SIS12\SIS\Internal\Zips\reports.zip
+	at aero.minova.cas.service.FilesService.checkLegalPath(FilesService.java:193)
+	at aero.minova.cas.controller.FilesController.getZip(FilesController.java:212)
+	at aero.minova.cas.controller.FilesController.getFile(FilesController.java:162)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+````
+
 Die Zip und MD5-Dateien werden beim Start des CAS erstellt.
 Allerdings dauert dies etwas und es gibt kein Logging dazu.

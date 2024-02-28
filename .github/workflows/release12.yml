@@ -1,9 +1,9 @@
-name: Release
+name: Release Version 12
 on:
   workflow_dispatch:
     inputs:
       releaseVersion:
-        description: 'Release Version'
+        description: 'Release Version < 13'
         required: true
         default: ''
 

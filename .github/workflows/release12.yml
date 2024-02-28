@@ -22,7 +22,9 @@ jobs:
           git config --global user.email "service@minova.com"
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE
-          git checkout version-12
+          git remote -v
+          git switch version-12
+          git
           mvn --batch-mode release:prepare release:perform -P repo-github \
                       -Dusername=$GITHUB_ACCESS_TOKEN \
                       -Dpassword=$GITHUB_ACCESS_TOKEN \

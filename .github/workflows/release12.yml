@@ -23,6 +23,7 @@ jobs:
           git config --global user.name "minova-worker"
           cd $GITHUB_WORKSPACE
           git remote -v
+          git fetch
           git switch version-12
           git
           mvn --batch-mode release:prepare release:perform -P repo-github \

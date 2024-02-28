@@ -31,6 +31,7 @@ jobs:
                       -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
                       -Darguments="-Dmaven.javadoc.skip=true" \
                       --settings .github/settings.xml
+          git branch --set-upstream-to=origin/version-12 version-12
           git pull
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}

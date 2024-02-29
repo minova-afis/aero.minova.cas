@@ -54,9 +54,9 @@ link:https://github.com/minova-afis/aero.minova.spring.maven.root[hier] dokument
 
 ## Fehler ohne erkennbaren Fehler-Eintrag im Log
 
-CAS in der Konsole starten.
+CAS in der Konsole starten, um den Fehler zumindestens in der Konsole zu sehen.
 Es kann sein, dass eine Exception wie die MethodNotFoundException nicht im Log angezeigt wird,
-weill amn eine solche Exception in der Regel nicht fangen kann.
+weil amn eine solche Exception in der Regel nicht fangen kann.
 
 ## Log-Files durchsuchen.
 

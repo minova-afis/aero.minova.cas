@@ -56,7 +56,11 @@ link:https://github.com/minova-afis/aero.minova.spring.maven.root[hier] dokument
 
 CAS in der Konsole starten, um den Fehler zumindestens in der Konsole zu sehen.
 Es kann sein, dass eine Exception wie die MethodNotFoundException nicht im Log angezeigt wird,
-weil amn eine solche Exception in der Regel nicht fangen kann.
+weil man eine solche Exception in der Regel nicht fangen kann.
+
+Man kann hier auch die dazugehörige `wrapper.log` des Dienstes einsehen.
+Allerdings gab es schon fälle, wo ein Fehler in der Konsole sichtbar ist,
+aber nicht in der `wrapper.log`.
 
 ## Log-Files durchsuchen.
 

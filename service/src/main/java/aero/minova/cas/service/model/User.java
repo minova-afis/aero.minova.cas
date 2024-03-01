@@ -21,7 +21,6 @@ public class User extends DataEntity {
 	@Column(name = "UserSecurityToken", length = 50)
 	public String userSecurityToken;
 
-	@NotNull
 	@Size(max = 250)
 	@Column(name = "Memberships", length = 250)
 	public String memberships;

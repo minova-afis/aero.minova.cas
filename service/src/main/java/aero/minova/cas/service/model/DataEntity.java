@@ -24,14 +24,14 @@ public abstract class DataEntity {
 	@NotNull
 	@Size(max = 200)
 	@Column(length = 200)
-	public String keyText;
+	private String keyText;
 
 	private Integer lastAction = 1;
 
 	@Size(max = 50)
 	@Column(length = 50)
-	String lastUser = BaseService.getCurrentUser();
+	private String lastUser = BaseService.getCurrentUser();
 
 	@Column(columnDefinition = "TIMESTAMP")
-	public LocalDateTime lastDate = LocalDateTime.now();
+	private LocalDateTime lastDate = LocalDateTime.now();
 }

@@ -28,9 +28,9 @@ public class Authorities extends DataEntity {
 		this.username = username;
 		this.authority = authority;
 
-		super.setKeyLong(keyLong);
-		super.lastUser = lastUser;
-		super.lastDate = lastDate;
+		this.setKeyLong(keyLong);
+		this.setLastUser(lastUser);
+		this.setLastDate(lastDate);
 		this.setLastAction(lastAction);
 	}
 

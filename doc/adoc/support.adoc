@@ -172,6 +172,69 @@ EXEC sp_executesql @drop;
 
 6. CAS starten und das Setup ganz normal ausführen.
 
+### 
+
+Fehler tritt bei Version 12.67.2 auf
+
+Fehlermeldung:
+
+```
+Caused by: java.lang.RuntimeException: java.lang.RuntimeException: java.lang.RuntimeException: com.microsoft.sqlserver.jdbc.SQLServerException: The ALTER TABLE statement conflicted with the FOREIGN KEY constraint "FK_xtcasLuUserPrivilegeUserGroup_UserPrivilegeKey". The conflict occurred in database "SISMINOVADEMODEV", table "dbo.xtcasUserPrivilege", column 'KeyLong'.
+	at aero.minova.cas.setup.SetupService.lambda$setup$0(SetupService.java:81)
+	at aero.minova.cas.controller.SqlProcedureController.checkForExtension(SqlProcedureController.java:208)
+	at aero.minova.cas.controller.SqlProcedureController.executeProcedure(SqlProcedureController.java:175)
+	... 129 more
+Caused by: java.lang.RuntimeException: java.lang.RuntimeException: com.microsoft.sqlserver.jdbc.SQLServerException: The ALTER TABLE statement conflicted with the FOREIGN KEY constraint "FK_xtcasLuUserPrivilegeUserGroup_UserPrivilegeKey". The conflict occurred in database "SISMINOVADEMODEV", table "dbo.xtcasUserPrivilege", column 'KeyLong'.
+	at aero.minova.cas.setup.InstallToolIntegration.installSetup(InstallToolIntegration.java:86)
+	at aero.minova.cas.setup.SetupService.readSetups(SetupService.java:102)
+	at aero.minova.cas.setup.SetupService.lambda$setup$0(SetupService.java:69)
+	... 131 more
+Caused by: java.lang.RuntimeException: com.microsoft.sqlserver.jdbc.SQLServerException: The ALTER TABLE statement conflicted with the FOREIGN KEY constraint "FK_xtcasLuUserPrivilegeUserGroup_UserPrivilegeKey". The conflict occurred in database "SISMINOVADEMODEV", table "dbo.xtcasUserPrivilege", column 'KeyLong'.
+	at ch.minova.install.setup.BaseSetup.readoutSchemaCreate(BaseSetup.java:233)
+	at aero.minova.cas.setup.InstallToolIntegration.installSetup(InstallToolIntegration.java:73)
+	... 133 more
+Caused by: com.microsoft.sqlserver.jdbc.SQLServerException: The ALTER TABLE statement conflicted with the FOREIGN KEY constraint "FK_xtcasLuUserPrivilegeUserGroup_UserPrivilegeKey". The conflict occurred in database "SISMINOVADEMODEV", table "dbo.xtcasUserPrivilege", column 'KeyLong'.
+	at com.microsoft.sqlserver.jdbc.SQLServerException.makeFromDatabaseError(SQLServerException.java:265)
+	at com.microsoft.sqlserver.jdbc.SQLServerStatement.getNextResult(SQLServerStatement.java:1676)
+	at com.microsoft.sqlserver.jdbc.SQLServerStatement.doExecuteStatement(SQLServerStatement.java:907)
+	at com.microsoft.sqlserver.jdbc.SQLServerStatement$StmtExecCmd.doExecute(SQLServerStatement.java:802)
+	at com.microsoft.sqlserver.jdbc.TDSCommand.execute(IOBuffer.java:7620)
+	at com.microsoft.sqlserver.jdbc.SQLServerConnection.executeCommand(SQLServerConnection.java:3916)
+	at com.microsoft.sqlserver.jdbc.SQLServerStatement.executeCommand(SQLServerStatement.java:268)
+	at com.microsoft.sqlserver.jdbc.SQLServerStatement.executeStatement(SQLServerStatement.java:242)
+	at com.microsoft.sqlserver.jdbc.SQLServerStatement.execute(SQLServerStatement.java:775)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at ch.minova.install.setup.BaseSetup.readoutSchemaCreate(BaseSetup.java:225)
+	... 134 more
+```
+Dieser Fehler tritt auf, wenn mit der Version 12.67.2 ein setup ausgeführt wurde und dann auf eine vorherige Version 12.67.0 wechselt. Die CAS Tabellen in der Datenbank können nun unsichtbare Keys enthalten. Sie sind nicht über ein SQL-Tool wie z.B. AZURE Data Studio sichtbar. Folgende Lösungsansätze sind möglich:
+
+**1. Versuchen alle Keys zu löschen**
+```
+declare @drop NVARCHAR(MAX) = N'';
+
+SELECT @drop += N'
+  ALTER TABLE ' + QUOTENAME(s.name) + N'.'
+  + QUOTENAME(t.name) + N' DROP CONSTRAINT '
+  + QUOTENAME(c.name) + ';'
+FROM sys.objects AS c
+INNER JOIN sys.tables AS t
+ON c.parent_object_id = t.[object_id]
+INNER JOIN sys.schemas AS s 
+ON t.[schema_id] = s.[schema_id]
+WHERE t.name like '%xtcas%'
+ORDER BY c.[type];
+
+EXEC sp_executesql @drop;
+```
+
+**2. Betroffene Tabellen löschen**
+
+Die Fehlermeldung teilt einem mit welche Tabelle den Fehler wirft und dieser muss gelöscht werden. Welche Tabelle betroffen ist ist im Key ersichtlich. Im oberen Beispiel ist der Key `FK_xtcasLuUserPrivilegeUserGroup_UserPrivilegeKey` und die dazugehörige Tabelle ist die `xtcasLuUserPrivilegeUserGroup`
+
+Wieder setup ausführen und schauen, ob nun die Keys korrekt sind. Wird der Fehler weiterhin geworfen aber mit einer anderen Tabelle Schritt 2 wiederholen.
+
 
 ## ClassNotFoundException - Jar von Abhängigkeit fehlt.
 

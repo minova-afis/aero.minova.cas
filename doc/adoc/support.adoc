@@ -172,7 +172,7 @@ EXEC sp_executesql @drop;
 
 6. CAS starten und das Setup ganz normal ausführen.
 
-### 
+### ALTER TABLE statement conflicted with the FOREIGN KEY constraint
 
 Fehler tritt bei Version 12.67.2 auf
 

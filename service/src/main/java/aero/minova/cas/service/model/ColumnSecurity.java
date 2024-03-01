@@ -19,15 +19,15 @@ public class ColumnSecurity extends DataEntity {
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "TableName", length = 50)
-	public String tableName;
+	private String tableName;
 
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "ColumnName", length = 50)
-	public String columnName;
+	private String columnName;
 
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "SecurityToken", length = 50)
-	public String securityToken;
+	private String securityToken;
 }

@@ -21,33 +21,33 @@ public class CASServices extends DataEntity {
 	@NotNull
 	@Size(max = 250)
 	@Column(name = "ServiceURL", length = 250)
-	public String serviceUrl;
+	private String serviceUrl;
 
 	@NotNull
 	@Column(name = "Port")
-	public int port;
+	private int port;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "ServiceMessageReceiverLoginTypeKey", nullable = true)
-	public ServiceMessageReceiverLoginType receiverLoginType;
+	private ServiceMessageReceiverLoginType receiverLoginType;
 
 	@Size(max = 50)
 	@Column(name = "Username", length = 50)
-	public String username;
+	private String username;
 
 	@Size(max = 50)
 	@Column(name = "Password", length = 50)
-	public String password;
+	private String password;
 
 	@Size(max = 50)
 	@Column(name = "ClientID", length = 50)
-	public String clientId;
+	private String clientId;
 
 	@Size(max = 50)
 	@Column(name = "ClientSecret", length = 50)
-	public String clientSecret;
+	private String clientSecret;
 
 	@Size(max = 50)
 	@Column(name = "TokenURL", length = 50)
-	public String tokenURL;
+	private String tokenURL;
 }

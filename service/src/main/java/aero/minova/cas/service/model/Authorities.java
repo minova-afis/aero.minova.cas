@@ -36,10 +36,10 @@ public class Authorities extends DataEntity {
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "Username", length = 50)
-	public String username;
+	private String username;
 
 	@NotNull
 	@Size(max = 200)
 	@Column(name = "Authority", length = 200)
-	public String authority;
+	private String authority;
 }

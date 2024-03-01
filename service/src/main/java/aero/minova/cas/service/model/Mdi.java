@@ -24,31 +24,31 @@ public class Mdi extends DataEntity {
 
 	@Size(max = 100)
 	@Column(name = "Icon", length = 100)
-	public String icon;
+	private String icon;
 
 	@Size(max = 100)
 	@Column(name = "Label", length = 100)
-	public String label;
+	private String label;
 
 	@Size(max = 100)
 	@Column(name = "Menu", length = 100)
-	public String menu;
+	private String menu;
 
 	@Column(name = "Position")
-	public double position;
+	private double position;
 
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "MdiTypeKey", nullable = false)
-	public MdiType mdiType;
+	private MdiType mdiType;
 
 	@NotNull
 	@Size(max = 500)
 	@Column(name = "ModulName", length = 500)
-	public String modulName;
+	private String modulName;
 
 	@Size(max = 50)
 	@Column(name = "SecurityToken", length = 50)
-	public String securityToken;
+	private String securityToken;
 
 }

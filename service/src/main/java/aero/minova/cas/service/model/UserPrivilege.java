@@ -17,6 +17,6 @@ public class UserPrivilege extends ExtendedDataEntity {
 
 	@Size(max = 100)
 	@Column(name = "TransactionChecker", length = 100)
-	public String transactionchecker;
+	private String transactionchecker;
 
 }

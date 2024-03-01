@@ -21,10 +21,10 @@ public class NewsfeedListener extends DataEntity {
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "CASServiceKey", nullable = false)
-	public CASServices casService;
+	private CASServices casService;
 
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "Topic", length = 50)
-	public String topic;
+	private String topic;
 }

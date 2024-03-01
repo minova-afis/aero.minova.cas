@@ -19,11 +19,11 @@ public class Users extends ExtendedDataEntity {
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "Username", length = 50)
-	public String username;
+	private String username;
 
 	@NotNull
 	@Size(max = 100)
 	@Column(name = "Password", length = 100)
-	public String password;
+	private String password;
 
 }

@@ -19,9 +19,9 @@ public class User extends DataEntity {
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "UserSecurityToken", length = 50)
-	public String userSecurityToken;
+	private String userSecurityToken;
 
 	@Size(max = 250)
 	@Column(name = "Memberships", length = 250)
-	public String memberships;
+	private String memberships;
 }

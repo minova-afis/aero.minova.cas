@@ -21,20 +21,20 @@ public class Error {
 	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "KeyLong")
-	public int keylong;
+	private int keylong;
 
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "Username", length = 50)
-	public String username;
+	private String username;
 
 	@NotNull
 	@Size(max = 250)
 	@Column(name = "ErrorMessage", length = 250)
-	public String errormessage;
+	private String errormessage;
 
 	@NotNull
 	@Column(name = "Date", columnDefinition = "TIMESTAMP")
-	public LocalDateTime lastdate = LocalDateTime.now();
+	private LocalDateTime lastdate = LocalDateTime.now();
 
 }

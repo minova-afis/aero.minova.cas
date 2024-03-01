@@ -20,15 +20,15 @@ public class LuUserPrivilegeUserGroup extends DataEntity {
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "UserPrivilegeKey", nullable = false)
-	public UserPrivilege userPrivilege;
+	private UserPrivilege userPrivilege;
 
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "UserGroupKey", nullable = false)
-	public UserGroup userGroup;
+	private UserGroup userGroup;
 
 	@NotNull
 	@Column(name = "RowLevelSecurity")
-	public boolean rowLevelSecurity = false;
+	private boolean rowLevelSecurity = false;
 
 }

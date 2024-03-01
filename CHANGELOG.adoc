@@ -4,7 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
-* DataEntity-Attribute einheitlich auf private
+* Modelklassen-Attribute einheitlich auf private
 * javax.validation mit jakarta.validation austauschen -> die @NotNull und @Size Restriktionen werden jetzt tatsächlich überprüft!
 
 ## [13.2.1] — 2024-02-22

@@ -19,5 +19,5 @@ public class ProcedureNewsfeed extends DataEntity {
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "Topic", length = 50)
-	public String topic;
+	private String topic;
 }

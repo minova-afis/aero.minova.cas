@@ -16,7 +16,6 @@ import lombok.ToString;
 @Table(name = "xtcasUserGroup")
 public class UserGroup extends ExtendedDataEntity {
 
-	@NotNull
 	@Size(max = 50)
 	@Column(name = "UserCode", length = 50)
 	public String userCode;

@@ -42,6 +42,6 @@ insert into xtcasLuUserPrivilegesUserGroup (UserGroupKey,UserPrivilegeKey) value
 
 select @UserPrivilegeKey = KeyLong from xtcasUserPrivilege where KeyText = 'pBeispiel'
 
-insert into xtcasLuUserPrivilegesUserGroup (UserGroupKey,UserPrivilegeKey) values ( @UserGroupKey, @UserPrivilegeKey)
+insert into xtcasLuUserPrivilegeUserGroup (UserGroupKey,UserPrivilegeKey) values ( @UserGroupKey, @UserPrivilegeKey)
 
 ----

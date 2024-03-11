@@ -10,8 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
@@ -22,6 +25,8 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 @Mojo(name = "generate-resource-file", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class ResourceListGenerator extends AbstractMojo {
@@ -34,6 +39,7 @@ public class ResourceListGenerator extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		final var targetFolder = Path.of(project.getBuild().getDirectory());
 		final var libsFolder = targetFolder.resolve("jar-dependencies");
+		final var app12Folder = targetFolder.resolve("app12-dependencies");
 		final var classesFolder = targetFolder.resolve("classes");
 		final var resourceFolderName = "aero.minova.app.resources";
 		final var resourceFolder = classesFolder.resolve(resourceFolderName);
@@ -123,6 +129,13 @@ public class ResourceListGenerator extends AbstractMojo {
 				throw new FileNotFoundException("libs folder is missing for `createDeployList` goal: " + libsFolder);
 			}
 			mergeI18n(resourceFolder, classesFolder);
+
+			if (app12Folder.toFile().exists()) {
+
+				mergeI18n(app12Folder, classesFolder);
+				moveApp12Contents(app12Folder, classesFolder);
+			}
+
 		} catch (IOException e) {
 			throw new MojoExecutionException("Could not generate resource file: " + resourceFile, e);
 		}
@@ -133,6 +146,41 @@ public class ResourceListGenerator extends AbstractMojo {
 		return arg.toString().substring(classesFolder.toString().length()).replace(FileSystems.getDefault().getSeparator(), "/");
 	}
 
+	@SuppressWarnings("unchecked")
+	public static void moveApp12Contents(Path app12SubFolder, Path classes) {
+		List<String> resourceSubFolderName = Arrays.asList(new String[] { "files", "forms", "images", "pdf", "plugins", "reports", "sql", "tables" });
+		try (final var jarFiles = Files.walk(app12SubFolder)) {
+			jarFiles.forEach(jarPath -> {
+				if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar")) {
+					try {
+						final var jar = new JarFile(jarPath.toFile());
+						final var jarContent = jar.entries();
+						while (jarContent.hasMoreElements()) {
+							final var jarEntry = jarContent.nextElement();
+							String fileName = jarEntry.getName();
+							Optional<String> found = resourceSubFolderName.stream().filter(fileName::contains).findAny();
+
+							if (!jarEntry.isDirectory() && !found.isEmpty()) {
+								fileName = fileName.substring(fileName.lastIndexOf(FileSystems.getDefault().getSeparator()) + 1);
+								try {
+									copyJarContentToDirectory(jar, jarEntry, classes.resolve(Paths.get(found.get()).resolve(fileName)).toFile());
+								} catch (Exception e) {
+									throw new RuntimeException("Could not move app12-Resource folder to classes: " + fileName.toString(), e);
+								}
+							}
+						}
+					} catch (Exception e) {
+						throw new RuntimeException("Could not move app12-Resource folder to classes: " + app12SubFolder.toString(), e);
+
+					}
+				}
+			});
+		} catch (Exception e) {
+			throw new RuntimeException("Could not move app12-dependency resources.", e);
+		}
+
+	}
+
 	/**
 	 * Copies a directory from a jar file to an external directory.
 	 */
@@ -141,6 +189,11 @@ public class ResourceListGenerator extends AbstractMojo {
 		if (parent != null) {
 			parent.mkdirs();
 		}
+		if (destDir.exists()) {
+			System.out.println("File " + destDir + " already exists and will not be copied again.");
+			return;
+		}
+
 		try (InputStream in = fromJar.getInputStream(jarDir)) {
 			Files.write(destDir.toPath(), in.readAllBytes());
 		} catch (IOException e) {

@@ -76,6 +76,17 @@
                             <outputDirectory>${project.build.directory}/jar-dependencies</outputDirectory>
                         </configuration>
                     </execution>
+                     <execution>
+                        <id>copy-app-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+							<includeClassifiers>app</includeClassifiers>
+                            <outputDirectory>${project.build.directory}/app12-dependencies</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

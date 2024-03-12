@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+* Auflösen von 12er App-Dependencies beim Bauen des CAS.
 * Technische Logs für fehlerhaftes View-Parameter verbessern.
 * Erweiterungen dürfen nicht mehr Null zurückgeben,
   da sonst versucht wird die gleichnamige SQL-Prozedur aufzurufen.

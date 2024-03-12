@@ -145,7 +145,6 @@ public class ResourceListGenerator extends AbstractMojo {
 		return arg.toString().substring(classesFolder.toString().length()).replace(FileSystems.getDefault().getSeparator(), "/");
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void moveApp12Contents(Path app12SubFolder, Path resourceFolder) {
 		List<String> resourceSubFolderName = Arrays.asList(appResourcesFolder);
 		try (final var jarFiles = Files.walk(app12SubFolder)) {
@@ -212,7 +211,7 @@ public class ResourceListGenerator extends AbstractMojo {
 							// Kommentare überspringen
 							if (!l.startsWith("#") && !l.isBlank()) {
 								String messagePropertiesName = r.getFileName().toString();
-								
+
 								int divider = l.indexOf("=");
 								if (divider == -1) {
 									throw new RuntimeException(

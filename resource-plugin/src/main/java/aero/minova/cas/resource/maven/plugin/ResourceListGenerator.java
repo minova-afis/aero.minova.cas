@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,8 @@ public class ResourceListGenerator extends AbstractMojo {
 	@Parameter(property = "createDeployList", required = false, defaultValue = "false")
 	boolean createDeployList;
 
+	static String[] appResourcesFolder = new String[] { "files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables" };
+
 	public void execute() throws MojoExecutionException {
 		final var targetFolder = Path.of(project.getBuild().getDirectory());
 		final var libsFolder = targetFolder.resolve("jar-dependencies");
@@ -48,9 +49,13 @@ public class ResourceListGenerator extends AbstractMojo {
 		final var deployFile = resourceFolder.resolve("deployed.resources.txt");
 		final var customerProjectResourcesI18n = resourceFolder.resolve(project.getGroupId() + "." + project.getArtifactId() + ".resources").resolve("i18n");
 		try {
+			if (app12Folder.toFile().exists()) {
+				moveApp12Contents(app12Folder, resourceFolder);
+			}
+
 			Files.createDirectories(resourceFolder);
 			final var resourceList = new StringBuilder();
-			for (String resourceSubFolderName : new String[] { "files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables" }) {
+			for (String resourceSubFolderName : appResourcesFolder) {
 				final var resourceSubFolder = classesFolder.resolve(resourceSubFolderName);
 				if (Files.isDirectory(resourceSubFolder)) {
 					try (final var resources = Files.walk(resourceSubFolder)) {
@@ -130,12 +135,6 @@ public class ResourceListGenerator extends AbstractMojo {
 			}
 			mergeI18n(resourceFolder, classesFolder);
 
-			if (app12Folder.toFile().exists()) {
-
-				mergeI18n(app12Folder, classesFolder);
-				moveApp12Contents(app12Folder, classesFolder);
-			}
-
 		} catch (IOException e) {
 			throw new MojoExecutionException("Could not generate resource file: " + resourceFile, e);
 		}
@@ -147,8 +146,8 @@ public class ResourceListGenerator extends AbstractMojo {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void moveApp12Contents(Path app12SubFolder, Path classes) {
-		List<String> resourceSubFolderName = Arrays.asList(new String[] { "files", "forms", "images", "pdf", "plugins", "reports", "sql", "tables" });
+	public static void moveApp12Contents(Path app12SubFolder, Path resourceFolder) {
+		List<String> resourceSubFolderName = Arrays.asList(appResourcesFolder);
 		try (final var jarFiles = Files.walk(app12SubFolder)) {
 			jarFiles.forEach(jarPath -> {
 				if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar")) {
@@ -157,20 +156,18 @@ public class ResourceListGenerator extends AbstractMojo {
 						final var jarContent = jar.entries();
 						while (jarContent.hasMoreElements()) {
 							final var jarEntry = jarContent.nextElement();
-							String fileName = jarEntry.getName();
-							Optional<String> found = resourceSubFolderName.stream().filter(fileName::contains).findAny();
+							Optional<String> found = resourceSubFolderName.stream().filter(jarEntry.getName()::contains).findAny();
 
-							if (!jarEntry.isDirectory() && !found.isEmpty()) {
-								fileName = fileName.substring(fileName.lastIndexOf(FileSystems.getDefault().getSeparator()) + 1);
-								try {
-									copyJarContentToDirectory(jar, jarEntry, classes.resolve(Paths.get(found.get()).resolve(fileName)).toFile());
-								} catch (Exception e) {
-									throw new RuntimeException("Could not move app12-Resource folder to classes: " + fileName.toString(), e);
-								}
+							if (!jarEntry.isDirectory() && found.isPresent()) {
+								String fileName = jarEntry.getName().substring(jarEntry.getName().lastIndexOf(FileSystems.getDefault().getSeparator()) + 1);
+								Path copyTo = resourceFolder.resolve(jarPath.getFileName() + ".resources").resolve(found.get()).resolve(fileName);
+								System.out.println("Starting to copy to: " + copyTo);
+								copyJarContentToDirectory(jar, jarEntry, copyTo.toFile());
+
 							}
 						}
 					} catch (Exception e) {
-						throw new RuntimeException("Could not move app12-Resource folder to classes: " + app12SubFolder.toString(), e);
+						throw new RuntimeException("Could not move app12-Resource folder to ressourceFolder: " + app12SubFolder.toString(), e);
 
 					}
 				}
@@ -188,10 +185,6 @@ public class ResourceListGenerator extends AbstractMojo {
 		File parent = destDir.getParentFile();
 		if (parent != null) {
 			parent.mkdirs();
-		}
-		if (destDir.exists()) {
-			System.out.println("File " + destDir + " already exists and will not be copied again.");
-			return;
 		}
 
 		try (InputStream in = fromJar.getInputStream(jarDir)) {

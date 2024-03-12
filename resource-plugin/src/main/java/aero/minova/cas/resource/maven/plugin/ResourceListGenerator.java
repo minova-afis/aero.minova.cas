@@ -37,6 +37,7 @@ public class ResourceListGenerator extends AbstractMojo {
 
 	static String[] appResourcesFolder = new String[] { "files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables" };
 
+	@Override
 	public void execute() throws MojoExecutionException {
 		final var targetFolder = Path.of(project.getBuild().getDirectory());
 		final var libsFolder = targetFolder.resolve("jar-dependencies");
@@ -212,7 +213,13 @@ public class ResourceListGenerator extends AbstractMojo {
 							// Kommentare überspringen
 							if (!l.startsWith("#") && !l.isBlank()) {
 								String messagePropertiesName = r.getFileName().toString();
+								
 								int divider = l.indexOf("=");
+								if (divider == -1) {
+									throw new RuntimeException(
+											"Line \"" + l + "\" in file " + r.toAbsolutePath().toString() + " does not contain divider character \"=\"");
+								}
+
 								String key = l.substring(0, divider);
 								String value = l.substring(divider + 1, l.length());
 

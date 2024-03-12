@@ -38,10 +38,10 @@ select @UserGroupKey = KeyLong from xtcasUserGroup where KeyText = 'BeiSPielGrup
 
 select @UserPrivilegeKey = KeyLong from xtcasUserPrivilege where KeyText = 'vBeispiel'
 
-insert into xtcasLuUserPrivilegesUserGroup (UserGroupKey,UserPrivilegeKey) values ( @UserGroupKey, @UserPrivilegeKey)
+insert into xtcasLuUserPrivilegeUserGroup (UserGroupKey,UserPrivilegeKey) values ( @UserGroupKey, @UserPrivilegeKey)
 
 select @UserPrivilegeKey = KeyLong from xtcasUserPrivilege where KeyText = 'pBeispiel'
 
-insert into xtcasLuUserPrivilegesUserGroup (UserGroupKey,UserPrivilegeKey) values ( @UserGroupKey, @UserPrivilegeKey)
+insert into xtcasLuUserPrivilegeUserGroup (UserGroupKey,UserPrivilegeKey) values ( @UserGroupKey, @UserPrivilegeKey)
 
 ----

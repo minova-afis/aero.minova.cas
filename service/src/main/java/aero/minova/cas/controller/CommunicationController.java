@@ -1,7 +1,5 @@
 package aero.minova.cas.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +13,7 @@ import aero.minova.cas.api.domain.PingResponse;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 public class CommunicationController {
@@ -41,6 +40,7 @@ public class CommunicationController {
 	 */
 	@GetMapping(value = "ping", produces = "application/json")
 	public PingResponse executePing() {
+		customLogger.logInfo("Received new ping from Client!");
 		return new PingResponse();
 	}
 

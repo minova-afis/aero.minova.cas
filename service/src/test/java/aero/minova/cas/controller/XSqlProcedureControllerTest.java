@@ -53,7 +53,7 @@ class XSqlProcedureControllerTest extends BaseTest {
 		Type xSqlProcedureResultType = new TypeToken<ArrayList<XSqlProcedureResult>>() {}.getType();
 		final List<XSqlProcedureResult> xSqlProcedureResults = gson.fromJson(new Scanner(getClass()//
 				.getClassLoader()//
-				.getResourceAsStream("xprocedureExample.json"), "UTF-8")//
+				.getResourceAsStream("jsons/xprocedureExample.json"), "UTF-8")//
 						.useDelimiter("\\A")//
 						.next()//
 				, xSqlProcedureResultType);

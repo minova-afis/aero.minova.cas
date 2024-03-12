@@ -101,7 +101,7 @@ class FilesServiceTest extends BaseTest {
 
 		testSubject.setViewController(mockController);
 
-		File testFile = new File(getClass().getClassLoader().getResource("MdiTest.xml").getFile());
+		File testFile = new File(getClass().getClassLoader().getResource("xmls/MdiTest.xml").getFile());
 
 		FileInputStream fl = new FileInputStream(testFile);
 		byte[] awatingResult = new byte[(int) testFile.length()];
@@ -174,7 +174,7 @@ class FilesServiceTest extends BaseTest {
 
 		testSubject.setViewController(mockController);
 
-		File testFile = new File(getClass().getClassLoader().getResource("MdiTestActionWithoutMenu.xml").getFile());
+		File testFile = new File(getClass().getClassLoader().getResource("xmls/MdiTestActionWithoutMenu.xml").getFile());
 
 		FileInputStream fl = new FileInputStream(testFile);
 		byte[] awatingResult = new byte[(int) testFile.length()];

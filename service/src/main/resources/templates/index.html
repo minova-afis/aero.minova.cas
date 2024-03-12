@@ -21,10 +21,10 @@
 
 		</div>
 		<div class="container" sec:authorize="isAnonymous()">
-			<div th:replace="login.body :: login-body" />
+			<div th:replace="~{login.body :: login-body}" />
 		</div>
 	</main>
-	<footer th:replace="layout :: footer"></footer>
+	<footer th:replace="~{layout :: footer}"></footer>
 </body>
 
 </html>

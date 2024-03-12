@@ -1,6 +1,8 @@
 package aero.minova.cas.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,9 +23,9 @@ import aero.minova.cas.service.AuthorizationService;
 @ActiveProfiles("test")
 @WithMockUser(username = "admin", password = "rqgzxTf71EAx8chvchMi", authorities = { "admin" }) // Wichtig ist "authorities" statt "roles" zu nutzen, da die
 																								// Authority ansonsten "ROLE_admin" heißt
+
 @Sql({ "/xvcasUserSecurityForTest.sql" }) // Die View muss erstellt/eingespielt werden. In diesem Fall ohne LastAction-Filter, da die LastAction-Spalte beim
-											// Erstellen
-// über JPA nicht gesetzt wird
+											// Erstellen über JPA nicht gesetzt wird
 class SQLViewControllerTest {
 
 	@Autowired
@@ -31,6 +33,17 @@ class SQLViewControllerTest {
 
 	@Autowired
 	AuthorizationService authorizationService;
+
+	@DisplayName("Keine doppelten Extensionnamen erlauben.")
+	@Test
+	void testDoubleExtensionWithSameName() throws Exception {
+
+		testSubject.registerExtension("test", null);
+
+		Throwable exception = assertThrows(IllegalArgumentException.class, () -> testSubject.registerExtension("test", null));
+		assertThat(exception).hasMessage("Cannot register two extensions with the same name: test");
+
+	}
 
 	@Test
 	@DisplayName("Methode getIndexView() testen")

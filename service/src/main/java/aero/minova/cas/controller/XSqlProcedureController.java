@@ -74,7 +74,7 @@ public class XSqlProcedureController {
 	 *            den QueueService verschickt werden sollen. Ist dies nicht der Fall, kann die Map ignoriert werden. <br>
 	 *            Die Extension muss eine Liste von XSqlProcedureResults zurückgeben, ein Result pro Input-Tabelle.
 	 * @throws IllegalArgumentException
-	 *            beim Versuch, einen bereits verwendeten Namen für eine andere Extension zu registrieren
+	 *             beim Versuch, einen bereits verwendeten Namen für eine andere Extension zu registrieren
 	 */
 	public void registerExtension(String name, BiFunction<List<XTable>, Map<Table, List<SqlProcedureResult>>, List<XSqlProcedureResult>> ext) {
 		if (extensions.containsKey(name)) {
@@ -253,8 +253,10 @@ public class XSqlProcedureController {
 			// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunden wurde, normal ausführen.
 			if (extensionResult != null) {
 				result = (SqlProcedureResult) extensionResult.getBody();
+				customLogger.logSql("Extension succesfully executed with name: " + filledTable.getName());
 			} else {
 				result = procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+				customLogger.logSql("Procedure succesfully executed: " + sb.toString());
 			}
 			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompatibilität da, damit hier keine NullPointerException geworfen wird.
 			if (inputTablesWithResults != null) {
@@ -284,9 +286,9 @@ public class XSqlProcedureController {
 	 *            Die Liste an bereits ausgeführten xSqlProcedureResults. Diese beinhalten die Referenz-Values.
 	 * @return Eine Table, in welcher der Value bereits ersetzt wurde.
 	 * @throws RuntimeException
-	 *         wenn das ResultSet einer Dependency keinen Output-Parameter enthält
+	 *             wenn das ResultSet einer Dependency keinen Output-Parameter enthält
 	 * @throws RuntimeException
-	 *         wenn im ResultSet einer Dependency kein Reference-Value gefunden wird
+	 *             wenn im ResultSet einer Dependency kein Reference-Value gefunden wird
 	 */
 	Table fillInDependencies(XTable dependant, List<XSqlProcedureResult> dependencies) {
 
@@ -302,14 +304,14 @@ public class XSqlProcedureController {
 
 					String stringValue = v.getStringValue();
 					/*
-					 * Bei mehreren Rows in einer Referenztabelle, wird mit - die Position angegeben, in der geschickten Table z.B. r-parent_call-0-KeyLong.
-					 * Der Value dazu würde hier folgendermaßen aussehen: Value("0-KeyLong","parent_call")
+					 * Bei mehreren Rows in einer Referenztabelle, wird mit - die Position angegeben, in der geschickten Table z.B. r-parent_call-0-KeyLong. Der
+					 * Value dazu würde hier folgendermaßen aussehen: Value("0-KeyLong","parent_call")
 					 */
 					if (stringValue.contains("-")) {
 						// Spaltennamen könnten auch '-' enthalten, deshalb kein Split.
 						String positionString = stringValue.substring(0, stringValue.indexOf("-"));
 						position = Integer.parseInt(positionString);
-						stringValue = stringValue.substring(positionString.length() + 1 );
+						stringValue = stringValue.substring(positionString.length() + 1);
 					}
 
 					// Ohne OutputParameter kann man nichts referenzieren.
@@ -358,7 +360,7 @@ public class XSqlProcedureController {
 	 *            Die Liste an xSqlProcedureResults, welche zur Verfügung stehen.
 	 * @return Das xSqlProcedureResult, welches die gewünschte Id hat.
 	 * @throws RuntimeException
-	 *            wenn der gesuchte idToFind nicht vorhanden ist
+	 *             wenn der gesuchte idToFind nicht vorhanden ist
 	 */
 	XSqlProcedureResult findxSqlResultSet(String idToFind, List<XSqlProcedureResult> resultSets) {
 		for (XSqlProcedureResult xSqlResult : resultSets) {
@@ -424,7 +426,7 @@ public class XSqlProcedureController {
 	 *            Eine Map, in welcher die InputTables und deren SqlProcedureResults gespeichert werden. Wird zum Versenden von Nachrichten über den
 	 *            QueueService später benötigt.
 	 * @throws RuntimeException
-	 *            "msg.PrivilegeError"
+	 *             "msg.PrivilegeError"
 	 */
 	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlResults, StringBuffer sb, Connection connection,
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) {
@@ -434,7 +436,7 @@ public class XSqlProcedureController {
 		privilegeRequest.addColumn(new Column("KeyText", DataType.STRING));
 		privilegeRequest.addColumn(new Column("TransactionChecker", DataType.STRING));
 
-		List<Row> inputRows = new ArrayList<>();		// ToDo - was passiert mit inputRows?
+		List<Row> inputRows = new ArrayList<>(); // ToDo - was passiert mit inputRows?
 		for (XTable xTable : inputTables) {
 			Row requestParam = new Row();
 			privilegeRequest.getRows().add(requestParam);
@@ -444,6 +446,7 @@ public class XSqlProcedureController {
 			inputRows.add(requestParam);
 		}
 		try {
+			customLogger.logInfo("Checking for follow.up procedures...");
 			Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
 			// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.

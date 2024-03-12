@@ -3,21 +3,22 @@
 	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 
 <head>
-<div th:replace="layout :: head" />
-<title th:value="${@environment.getProperty('spring.application.name')}"></title>
+	<div th:replace="~{layout :: head}" />
+	<title th:value="${@environment.getProperty('spring.application.name')}"></title>
 </head>
 
 <body class="d-flex flex-column h-100 bg-light">
-	<header th:replace="layout :: header"></header>
+	<div th:replace="~{layout :: header}" />
 	<main role="main" class="flex-shrink-0">
 		<div class="container">
 			<div class="my-3 p-3 bg-white rounded shadow-sm">
-				<span>An error occured while trying to setup the SQL database. Please check the logs for further informations.</span>
+				<span>An error occured while trying to setup the SQL database. Please check the logs for further
+					informations.</span>
 			</div>
 
 		</div>
 	</main>
-	<footer th:replace="layout :: footer"></footer>
+	<footer th:replace="~{layout :: footer}"></footer>
 </body>
 
 </html>

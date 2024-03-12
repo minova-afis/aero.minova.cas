@@ -58,8 +58,9 @@ public class SqlViewController {
 	 */
 	public void registerExtension(String name, Function<Table, Table> ext) {
 		if (extensions.containsKey(name)) {
-			customLogger.logSetup("Cannot register two extensions with the same name: " + name);
-			throw new IllegalArgumentException(name);
+			String errorMessage = "Cannot register two extensions with the same name: " + name;
+			customLogger.logSetup(errorMessage);
+			throw new IllegalArgumentException(errorMessage);
 		}
 		extensions.put(name, ext);
 	}

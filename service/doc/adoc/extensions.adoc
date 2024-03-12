@@ -115,13 +115,13 @@ ob das entsprechende Recht für die Extension vorhanden ist.
 
 Die Klasse sollte am Ende ungefähr so aussehen:
 ----
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.controller.SqlViewController;
 
-@RestController
+@Component
 public class ExampleController {
 
 	@Autowired

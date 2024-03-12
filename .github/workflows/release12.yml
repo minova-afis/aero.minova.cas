@@ -1,0 +1,49 @@
+name: Release Version 12
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version < 13'
+        required: true
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          java-package: 'jdk'
+      - name: Build
+        run: |
+          git config --global user.email "service@minova.com"
+          git config --global user.name "minova-worker"
+          cd $GITHUB_WORKSPACE
+          git remote -v
+          git fetch origin version-12:version-12
+          git switch version-12
+          mvn --batch-mode release:prepare release:perform -P repo-github \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      -DreleaseVersion=${{ github.event.inputs.releaseVersion }} \
+                      -Darguments="-Dmaven.javadoc.skip=true" \
+                      --settings .github/settings.xml
+          git branch --set-upstream-to=origin/version-12 version-12
+          git pull
+        env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+
+      - name: build & push container image '${{ github.event.inputs.releaseVersion }}'
+        uses: mr-smithers-excellent/docker-build-push@v6
+        with:
+          image: minova/aero.minova.cas.app
+          tags: ${{ github.event.inputs.releaseVersion }}
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          buildArgs: 'casVersion=${{ github.event.inputs.releaseVersion }}'

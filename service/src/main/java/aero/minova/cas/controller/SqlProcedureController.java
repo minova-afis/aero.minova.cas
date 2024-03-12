@@ -34,7 +34,6 @@ import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.Setter;
-import lombok.val;
 
 @RestController
 public class SqlProcedureController {
@@ -179,7 +178,7 @@ public class SqlProcedureController {
 				return extensionResult.get();
 			}
 
-			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
+			ResponseEntity result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
 			if (inputTable.getName().equals("setup")) {
 				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
@@ -196,21 +195,29 @@ public class SqlProcedureController {
 	/**
 	 * Überprüft, ob es für den Namen der übergebenen Table einen passenden Eintrag in den Extensions gibt und gibt das Ergebnis der ausgeführten Extension als
 	 * Optional<ResponseEntity> zurück.
-	 * 
+	 *
 	 * @param inputTable
 	 *            Eine Table. Muss einen Namen haben.
 	 * @return Das Ergebnis der Extension als Optional mit der übergebenen Table als Input.
 	 */
 	Optional<ResponseEntity> checkForExtension(Table inputTable) {
 		ResponseEntity extResult = null;
-
 		synchronized (extensionSynchronizer) {
 			if (extensions.containsKey(inputTable.getName())) {
-				extResult = extensions.get(inputTable.getName()).apply(inputTable);
+				final var extension = extensions.get(inputTable.getName());
+				extResult = extension.apply(inputTable);
 				queueService.accept(inputTable, extResult);
+				if (extResult == null) {
+					customLogger.logError(
+							"Extension " + extension
+									+ " returned null. This is not allowed to happen, as otherwise the SQL method is executed after the extension as well.",
+							new NullPointerException());
+				}
+				return Optional.of(extResult);
+			} else {
+				return Optional.empty();
 			}
 		}
-		return Optional.ofNullable(extResult);
 	}
 
 	/**

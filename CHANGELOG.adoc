@@ -4,6 +4,11 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+* Technische Logs für fehlerhaftes View-Parameter verbessern.
+* Erweiterungen dürfen nicht mehr Null zurückgeben,
+  da sonst versucht wird die gleichnamige SQL-Prozedur aufzurufen.
+  Der Zweck von Erweiterung ist es, SQL-Prozeduren zu ersetzen und nicht zu vervollständigen.
+ * Aussagekräftige Fehlermeldung werfen, wenn in einer i18n-Datei das "=" Trennzeichen für die Properties fehlt
 
 ## [13.2.1] — 2024-02-22
 * ExtendedDataEntity Klasse für Entities, die auch eine Beschreibung haben sollen

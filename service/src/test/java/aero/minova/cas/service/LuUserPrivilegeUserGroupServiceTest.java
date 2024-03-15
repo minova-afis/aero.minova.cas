@@ -33,6 +33,7 @@ class LuUserPrivilegeUserGroupServiceTest {
 	void testSave() {
 		UserGroup group = new UserGroup();
 		group.setKeyText("Minova");
+		group.setSecurityToken("Minova");
 		group = userGroupService.save(group);
 
 		UserPrivilege up1 = new UserPrivilege();

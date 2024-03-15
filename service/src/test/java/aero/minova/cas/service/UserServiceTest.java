@@ -29,37 +29,45 @@ class UserServiceTest {
 	void setup() {
 		UserGroup group = new UserGroup();
 		group.setKeyText("Minova");
+		group.setSecurityToken("token");
 		userGroupService.save(group);
 
 		UserGroup group2 = new UserGroup();
 		group2.setKeyText("MinovaAdmin");
+		group2.setSecurityToken("token");
 		userGroupService.save(group2);
 
 		UserGroup group3 = new UserGroup();
 		group3.setKeyText("MinovaTTA");
+		group3.setSecurityToken("token");
 		userGroupService.save(group3);
 
 		User user1 = new User();
 		user1.setKeyText("user1");
+		user1.setUserSecurityToken("quatsch");
 		user1.setMemberships("Minova#MinovaAdmin");
 		userService.save(user1);
 
 		User user2 = new User();
 		user2.setKeyText("user2");
+		user2.setUserSecurityToken("quatsch");
 		user2.setMemberships("MinovaTTA");
 		userService.save(user2);
 
 		User user3 = new User();
 		user3.setKeyText("user3");
+		user3.setUserSecurityToken("quatsch");
 		user3.setMemberships("Minova");
 		userService.save(user3);
 
 		User user4 = new User();
 		user4.setKeyText("user4");
+		user4.setUserSecurityToken("quatsch");
 		userService.save(user4);
 
 		User user5 = new User();
 		user5.setKeyText("user5");
+		user5.setUserSecurityToken("quatsch");
 		user5.setMemberships("");
 		userService.save(user5);
 	}

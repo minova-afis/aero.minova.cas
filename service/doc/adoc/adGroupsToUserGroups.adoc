@@ -38,6 +38,6 @@ select @UserGroupKey = KeyLong from xtcasUserGroup where KeyText = 'BeiSPielGrup
 
 select @UserPrivilegeKey = KeyLong from xtcasUserPrivilege where KeyText = 'BeispielProzedurOderView'
 
-insert into xtcasLuUserPrivilegeUserGroup (UserGroupKey, UserPrivilegeKey, LastDate, LastUser, RowLevelSecurity) values ( @UserGroupKey, @UserPrivilegeKey, getDate(), 1, 'support', 1)
+insert into xtcasLuUserPrivilegeUserGroup (UserGroupKey, UserPrivilegeKey, LastDate, LastUser, RowLevelSecurity) values ( @UserGroupKey, @UserPrivilegeKey, getDate(), 'support', 1)
 
 ----

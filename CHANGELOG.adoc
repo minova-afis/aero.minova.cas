@@ -11,7 +11,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Erweiterungen dürfen nicht mehr Null zurückgeben,
   da sonst versucht wird die gleichnamige SQL-Prozedur aufzurufen.
   Der Zweck von Erweiterung ist es, SQL-Prozeduren zu ersetzen und nicht zu vervollständigen.
-* Aussagekräftige Fehlermeldung werfen, wenn in einer i18n-Datei das "=" Trennzeichen für die Properties fehlt
+* Aussagekräftige Fehlermeldung werfen, wenn in einer i18n-Datei das "=" Trennzeichen für die Properties fehlt.
+* CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.
 
 
 ## [13.2.1] — 2024-02-22

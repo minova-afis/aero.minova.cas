@@ -111,7 +111,8 @@ public class CustomLogger {
 	/**
 	 * TODO Das loggen funktioniert zur Zeit nicht.
 	 *
-	 * @param event Das Event, bei dem die Methode ausgeführt werden soll.
+	 * @param event
+	 *            Das Event, bei dem die Methode ausgeführt werden soll.
 	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -135,7 +136,7 @@ public class CustomLogger {
 	}
 
 	public void logInfo(String logMessage) {
-		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : "CAS";
 		infoLogger.info(LOGFORMAT, user, logMessage);
 	}
 }

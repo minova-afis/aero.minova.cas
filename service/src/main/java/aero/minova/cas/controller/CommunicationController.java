@@ -1,6 +1,6 @@
 package aero.minova.cas.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.PingResponse;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 public class CommunicationController {
@@ -78,5 +80,10 @@ public class CommunicationController {
 			httpServletResponse.setHeader("Location", homePath + "/setupError");
 			httpServletResponse.setStatus(302);
 		}
+	}
+
+	@RequestMapping(value = "/version", produces = "application/json", method = RequestMethod.GET)
+	public String getVersion() throws IOException {
+		return CoreApplicationSystemApplication.getVersion();
 	}
 }

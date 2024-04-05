@@ -155,3 +155,14 @@ public class ExampleController {
 
 * Die Extensions sind selbst dafür verwantwortlich, im Fehlerfall Rollbacks durchzuführen.
 * Gibt eine Extension null zurück, so wird die Prozedur/Transaktion zusätzlich als SQL ausgeführt
+
+== Extraktion des Dateisystems eines Kundensystems
+
+Kompletter Befehl: `docker build --tag=minova/app . && docker run --name=app -d minova/app && mkdir -p target && docker cp app:/opt/aero.minova.cas/ ./target/container-filesystem && docker rm -f app`
+
+* Kundenprojekt bauen: `mvn clean verify`
+* Docker Image bauen: `docker build --tag=minova/app .`
+* Docker Image ausführen: `docker run --name=app -d minova/app` (sonst kann der Inhalt des Docker Images nicht extrahiert werden)
+* Daten aus Container extrahieren: `docker cp app:/opt/aero.minova.cas/ ./target/container-filesystem`
+* Docker Container wieder löschen: `docker rm -f app`
+

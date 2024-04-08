@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 
+## [13.2.2] — 2024-04-08
 * Modelklassen-Attribute einheitlich auf private
 * javax.validation mit jakarta.validation austauschen -> die @NotNull und @Size Restriktionen werden jetzt tatsächlich überprüft!
 * Technische Logs für fehlerhaftes View-Parameter verbessern.

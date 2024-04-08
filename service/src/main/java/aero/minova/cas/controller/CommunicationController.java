@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +39,7 @@ public class CommunicationController {
 	public SystemDatabase database;
 
 	/**
-	 * Hiermit kann geprüft werden, ob die Kommunikation mit und die Anmeldung an den CAS funktioniert.
+	 * Hiermit kann geprüft werden, ob die Kommunikation und die Anmeldung an den CAS funktioniert.
 	 *
 	 * @return PingResponse Diese Antwort signalisiert, dass es funktioniert hat.
 	 */
@@ -83,7 +85,8 @@ public class CommunicationController {
 	}
 
 	@RequestMapping(value = "/version", produces = "application/json", method = RequestMethod.GET)
-	public String getVersion() throws IOException {
-		return CoreApplicationSystemApplication.getVersion();
+	public ResponseEntity<String> getVersion() throws IOException {
+		ResponseEntity<String> response = new ResponseEntity<String>(CoreApplicationSystemApplication.getVersion(), HttpStatusCode.valueOf(200));
+		return response;
 	}
 }

@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import aero.minova.cas.CoreApplicationSystemApplication;
+import aero.minova.cas.service.model.CASServices;
 import aero.minova.cas.service.repository.CASServicesRepository;
 import aero.minova.cas.service.repository.NewsfeedListenerRepository;
 import aero.minova.cas.service.repository.ProcedureNewsfeedRepository;
@@ -48,12 +49,14 @@ public class QueueServiceTest {
 		serviceNotifierRegistration.registerProcedureNewsfeed("test", "tShipment");
 		serviceNotifierRegistration.registerProcedureNewsfeed("test", "tFlightSchedule");
 
+		final CASServices testService = serviceRepo.findByKeyLong(1).get();
+
 		assertEquals(1, serviceRepo.findAll().size());
-		assertEquals("Service", serviceRepo.findByKeyLong(1).get().getKeyText());
-		assertEquals("test", serviceRepo.findByKeyLong(1).get().getUsername());
-		assertEquals("abc1234", serviceRepo.findByKeyLong(1).get().getPassword());
-		assertEquals(0, serviceRepo.findByKeyLong(1).get().getPort());
-		assertEquals("localhost", serviceRepo.findByKeyLong(1).get().getServiceUrl());
+		assertEquals("Service", testService.getKeyText());
+		assertEquals("test", testService.getUsername());
+		assertEquals("abc1234", testService.getPassword());
+		assertEquals(0, testService.getPort());
+		assertEquals("localhost", testService.getServiceUrl());
 		assertEquals(2, newsfeedListenerRepo.findAll().size());
 		assertEquals("tShipment", newsfeedListenerRepo.findByKeyLong(1).get().getTopic());
 		assertEquals("tFlightSchedule", newsfeedListenerRepo.findByKeyLong(2).get().getTopic());

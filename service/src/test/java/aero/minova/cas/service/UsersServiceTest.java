@@ -31,34 +31,42 @@ class UsersServiceTest {
 	void setup() {
 		UserGroup group = new UserGroup();
 		group.setKeyText("Minova");
+		group.setSecurityToken("token");
 		userGroupService.save(group);
 
 		UserGroup group2 = new UserGroup();
 		group2.setKeyText("MinovaAdmin");
+		group2.setSecurityToken("token");
 		userGroupService.save(group2);
 
 		UserGroup group3 = new UserGroup();
 		group3.setKeyText("MinovaTTA");
+		group3.setSecurityToken("token");
 		userGroupService.save(group3);
 
 		Users user1 = new Users();
 		user1.setUsername("user1");
+		user1.setPassword("$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK");
 		usersService.save(user1);
 
 		Users user2 = new Users();
 		user2.setUsername("user2");
+		user2.setPassword("$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK");
 		usersService.save(user2);
 
 		Users user3 = new Users();
 		user3.setUsername("user3");
+		user3.setPassword("$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK");
 		usersService.save(user3);
 
 		Users user4 = new Users();
 		user4.setUsername("user4");
+		user4.setPassword("$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK");
 		usersService.save(user4);
 
 		Users user5 = new Users();
 		user5.setUsername("user5");
+		user5.setPassword("$2a$10$.PKTRwGwfIDHy0Nw5nj.CezXtt7I4KrV4WpRYQxHdI/6ex85M0KMK");
 		usersService.save(user5);
 	}
 

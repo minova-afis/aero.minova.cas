@@ -6,8 +6,6 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import java.util.Scanner;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -26,7 +24,7 @@ import aero.minova.cas.api.restapi.ClientRestAPI;
 
 @SpringBootTest(classes = CoreApplicationSystemApplication.class)
 @ActiveProfiles("test")
-class ErrorMessageTest {
+class ErrorMessageTest extends BaseTest {
 
 	Gson gson;
 
@@ -55,24 +53,13 @@ class ErrorMessageTest {
 		doCallRealMethod().when(mockSubject).handleSqlErrorMessage(any(Table.class), any(String.class));
 	}
 
-	@SuppressWarnings("resource")
-	public Table readTableFromExampleJson(String fileName) {
-
-		return gson.fromJson(new Scanner(getClass()//
-				.getClassLoader()//
-				.getResourceAsStream(fileName + ".json"), "UTF-8")//
-						.useDelimiter("\\A")//
-						.next(),
-				Table.class);
-	}
-
 	@Test
 	void testSqlErrorMessage1() {
 		Exception e = new Exception("ADO | 25 | msg.sql.51103 @p tUnit.Description.16 @s kg | Beipieltext");
 
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
 
-		Table sqlError1 = readTableFromExampleJson("SqlError1");
+		Table sqlError1 = readTableFromExampleJson("jsons/SqlError1");
 
 		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
 		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
@@ -92,7 +79,7 @@ class ErrorMessageTest {
 
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
 
-		Table sqlError1 = readTableFromExampleJson("SqlError2");
+		Table sqlError1 = readTableFromExampleJson("jsons/SqlError2");
 
 		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
 		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
@@ -108,7 +95,7 @@ class ErrorMessageTest {
 
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
 
-		Table sqlError1 = readTableFromExampleJson("SqlError3");
+		Table sqlError1 = readTableFromExampleJson("jsons/SqlError3");
 
 		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
 		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
@@ -124,7 +111,7 @@ class ErrorMessageTest {
 
 		Table exceptionTable = mockSubject.prepareExceptionReturnTable(e);
 
-		Table sqlError1 = readTableFromExampleJson("ProgramError");
+		Table sqlError1 = readTableFromExampleJson("jsons/ProgramError");
 
 		assertThat(sqlError1.getColumns()).hasSameSizeAs(exceptionTable.getColumns());
 		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());

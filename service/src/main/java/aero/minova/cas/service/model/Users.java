@@ -1,11 +1,10 @@
 package aero.minova.cas.service.model;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,11 +19,11 @@ public class Users extends ExtendedDataEntity {
 	@NotNull
 	@Size(max = 50)
 	@Column(name = "Username", length = 50)
-	public String username;
+	private String username;
 
 	@NotNull
 	@Size(max = 100)
 	@Column(name = "Password", length = 100)
-	public String password;
+	private String password;
 
 }

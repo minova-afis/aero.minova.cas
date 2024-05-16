@@ -1,7 +1,6 @@
 package aero.minova.cas.controller;
 
 import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -45,6 +44,7 @@ public class CommunicationController {
 	 */
 	@GetMapping(value = "ping", produces = "application/json")
 	public PingResponse executePing() {
+		customLogger.logInfo("Received new ping from Client!");
 		return new PingResponse();
 	}
 

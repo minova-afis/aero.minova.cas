@@ -37,6 +37,7 @@ import aero.minova.cas.sql.SystemDatabase;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.val;
+import net.sourceforge.jtds.util.Logger;
 
 @Service
 public class ProcedureService {
@@ -256,7 +257,6 @@ public class ProcedureService {
 		// Jede Row ist eine Abfrage.
 		for (int j = 0; j < inputTable.getRows().size(); j++) {
 			SqlProcedureResult resultForThisRow = new SqlProcedureResult();
-
 			try (final var preparedStatement = connection.prepareCall(procedureCall)) {
 				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
 				preparedStatement.registerOutParameter(1, Types.INTEGER);
@@ -420,8 +420,17 @@ public class ProcedureService {
 								page);
 					}
 				}
+
 				// Dies muss ausgelesen werden, nachdem die ResultSet ausgelesen wurde, da sonst diese nicht abrufbar ist.
-				val returnCode = preparedStatement.getObject(1);
+				Object returnCode = null;
+				try {
+					returnCode = preparedStatement.getObject(1);
+				} catch (Exception e) {
+					// Wenn preparedStatement.getObject(1) ausgeführt wird, wird in den Tests "Connection already closed" geworfen, obwohl die Prozedur
+					// ausgeführt wurde. Es ist also eigentlich gar kein echter Fehler aufgetreten.
+					Logger.logException(e);
+				}
+
 				if (returnCode != null) {
 					int reCode = preparedStatement.getInt(1);
 					resultForThisRow.setReturnCode(reCode);

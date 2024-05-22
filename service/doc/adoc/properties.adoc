@@ -64,11 +64,11 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 * security_ldap_domain
 
-** *Default* `minova.comminova.com`
+** *Default* `minova.com`
 
 * security_ldap_address
 
-** *Default* `ldap:Minova Ldap Adresse`
+** *Default* `ldap://...` (Ldap Adresse der Minova)
 
 * login_dataSource
 

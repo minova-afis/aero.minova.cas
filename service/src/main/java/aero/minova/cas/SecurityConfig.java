@@ -19,9 +19,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -44,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private static final String ADMIN = "admin";
+
+	public static final String MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR = ";";
 
 	@Value("${security_ldap_domain:minova.com}")
 	private String domain;
@@ -102,10 +101,7 @@ public class SecurityConfig {
 	@Bean
 	public UserDetailsManager userDetailsManager() {
 		if ("ldap".equals(loginDataSource)) {
-			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(ldapServerAddress);
-			contextSource.afterPropertiesSet();
-
-			return new LdapUserDetailsManager(contextSource);
+			return new MultipleLdapServerAddressesUserDetailsManager(ldapServerAddress);
 		} else if ("database".equals(loginDataSource)) {
 			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 			jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
@@ -132,11 +128,7 @@ public class SecurityConfig {
 	@Bean
 	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
 	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(UserDetailsContextMapper userDetailsContextMapper) {
-		ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
-		provider.setConvertSubErrorCodesToExceptions(true);
-		provider.setUserDetailsContextMapper(userDetailsContextMapper);
-
-		return provider;
+		return new MultipleLdapDomainsAuthenticationProvider(domain, ldapServerAddress, userDetailsContextMapper);
 	}
 
 	@Bean("ldapUser")

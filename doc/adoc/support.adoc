@@ -477,11 +477,11 @@ Folgendes Vorgehen ist am besten:
 * Im Debug-Modus die Anmelde-Daten etc. in den Variablen prüfen.
 
 ### Einige Benutzer funktionieren bei der Anmeldung und andere nicht.
-Man sollte darauf achten, dass die Nutzer immer die richtige Domäne haben,
-da das CAS zur Zeit nur eine Domäne gleichzeitig unterstützt.
-Nutzer von mehreren Domänene gleichzeitig werden nicht unterstützt.
 
+Man sollte darauf achten, dass die Domänen der Nutzer alle eingetragen sind (getrennt mit `;`).
 Die Domäne ist im Benutzerprinzipalname (=UPN=User Principal Name) der Teil nach dem `@` Symbol.
+
+Außerdem muss der Benutzername genau mit dem entsprechenden Eintrag in die Tabelle `xtcasUser` übereinstimmen.
 
 ## Zip oder MD5-Dateien aus `Internal/` können vom WFC nicht ausgelesen werden.
 

@@ -26,6 +26,11 @@ Folgende properties müssen gesetzt werden:
 * `security_ldap_domain`: Domain der Nutzer
 * `security_ldap_address`: URL des LDAP bzw. Active Directory (AD) Server
 
+Dabei ist es möglich, mehrere Domänen oder Adressen anzugeben. 
+Diese müssen jeweils mit einem `;` getrennt werden.
+Ist nur genau eine `security_ldap_address` gegeben wird diese für alle Domänen genutzt.
+Ansonsten wird die erste Domäne mit der ersten Adresse, die zweite mit der zweiten, ... verwendet.
+
 === database
 Ist die Property auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
 Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt.

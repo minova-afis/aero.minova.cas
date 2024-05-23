@@ -68,7 +68,7 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 * security_ldap_address
 
-** *Default* `ldap://...` (Ldap Adresse der Minova)
+** *Default* `ldap://mindcsrv.minova.com:3268/` (Ldap Adresse der Minova)
 
 * login_dataSource
 

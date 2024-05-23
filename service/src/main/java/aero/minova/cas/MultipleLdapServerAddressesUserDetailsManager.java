@@ -1,7 +1,6 @@
 package aero.minova.cas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,10 +13,8 @@ public class MultipleLdapServerAddressesUserDetailsManager implements UserDetail
 
 	List<LdapUserDetailsManager> managers = new ArrayList<>();
 
-	public MultipleLdapServerAddressesUserDetailsManager(String ldapServerAddresses) {
-		List<String> addressList = Arrays.asList(ldapServerAddresses.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR));
-
-		for (String address : addressList) {
+	public MultipleLdapServerAddressesUserDetailsManager(List<String> ldapServerAddresses) {
+		for (String address : ldapServerAddresses) {
 			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(address);
 			contextSource.afterPropertiesSet();
 			managers.add(new LdapUserDetailsManager(contextSource));

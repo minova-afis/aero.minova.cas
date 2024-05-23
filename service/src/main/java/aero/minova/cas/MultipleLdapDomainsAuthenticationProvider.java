@@ -1,7 +1,6 @@
 package aero.minova.cas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,16 +13,16 @@ public class MultipleLdapDomainsAuthenticationProvider implements Authentication
 
 	List<ActiveDirectoryLdapAuthenticationProvider> providers = new ArrayList<>();
 
-	public MultipleLdapDomainsAuthenticationProvider(String domains, String ldapServerAddresses, UserDetailsContextMapper userDetailsContextMapper) {
+	public MultipleLdapDomainsAuthenticationProvider(List<String> domains, List<String> ldapServerAddresses,
+			UserDetailsContextMapper userDetailsContextMapper) {
 
-		List<String> domainList = Arrays.asList(domains.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR));
-		List<String> addressList = Arrays.asList(ldapServerAddresses.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR));
+		for (int i = 0; i < domains.size(); i++) {
 
-		for (int i = 0; i < domainList.size(); i++) {
+			// Wenn nur genau eine Adresse gegeben ist diese für alle Domänen nutzen
+			// Ansonsten erste Adresse mit erster Domäne, zweite mit zweiter, ...
+			String address = ldapServerAddresses.size() == 1 ? ldapServerAddresses.get(0) : ldapServerAddresses.get(i);
 
-			String address = addressList.size() == 1 ? addressList.get(0) : addressList.get(i);
-
-			ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domainList.get(i), address);
+			ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domains.get(i), address);
 			provider.setConvertSubErrorCodesToExceptions(true);
 			provider.setUserDetailsContextMapper(userDetailsContextMapper);
 

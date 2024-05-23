@@ -42,7 +42,7 @@ public class SecurityConfig {
 
 	private static final String ADMIN = "admin";
 
-	public static final String MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR = ";";
+	private static final String MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR = ";";
 
 	@Value("${security_ldap_domain:minova.com}")
 	private String domain;
@@ -101,7 +101,8 @@ public class SecurityConfig {
 	@Bean
 	public UserDetailsManager userDetailsManager() {
 		if ("ldap".equals(loginDataSource)) {
-			return new MultipleLdapServerAddressesUserDetailsManager(ldapServerAddress);
+			return new MultipleLdapServerAddressesUserDetailsManager(
+					Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)));
 		} else if ("database".equals(loginDataSource)) {
 			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 			jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
@@ -128,7 +129,10 @@ public class SecurityConfig {
 	@Bean
 	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
 	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(UserDetailsContextMapper userDetailsContextMapper) {
-		return new MultipleLdapDomainsAuthenticationProvider(domain, ldapServerAddress, userDetailsContextMapper);
+		return new MultipleLdapDomainsAuthenticationProvider(//
+				Arrays.asList(domain.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
+				Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
+				userDetailsContextMapper);
 	}
 
 	@Bean("ldapUser")

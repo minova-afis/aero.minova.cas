@@ -28,6 +28,8 @@ Folgende properties müssen gesetzt werden:
 
 Dabei ist es möglich, mehrere Domänen oder Adressen anzugeben. 
 Diese müssen jeweils mit einem `;` getrennt werden.
+Nutzer von unterschiedlichen Domänen aber gleichen Namen werden vom CAS als der selbe Nutzer betrachtet.
+
 Ist nur genau eine `security_ldap_address` gegeben wird diese für alle Domänen genutzt.
 Ansonsten wird die erste Domäne mit der ersten Adresse, die zweite mit der zweiten, ... verwendet.
 

@@ -261,7 +261,7 @@
             <!-- Wird für die SeekableInMemoryByteChannel benötigt, mit welcher eine eigene FileSystem Implementierung gemacht wird. -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.26.1</version>
+            <version>1.26.2</version>
         </dependency>
         <dependency>
             <!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.github) bereitgestellt: service/doc/adoc/extensions.adoc -->

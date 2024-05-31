@@ -3,6 +3,7 @@ package aero.minova.cas;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
@@ -10,6 +11,9 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 
 public class MultipleLdapServerAddressesUserDetailsManager implements UserDetailsManager {
+
+	@Autowired
+	CustomLogger customLogger;
 
 	List<LdapUserDetailsManager> managers = new ArrayList<>();
 
@@ -23,6 +27,7 @@ public class MultipleLdapServerAddressesUserDetailsManager implements UserDetail
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		List<Exception> exceptions = new ArrayList<>();
 		for (LdapUserDetailsManager manager : managers) {
 
 			try {
@@ -31,8 +36,13 @@ public class MultipleLdapServerAddressesUserDetailsManager implements UserDetail
 					return userByUsername;
 				}
 			} catch (Exception e) {
-				// Nächsten probieren
+				exceptions.add(e);
 			}
+		}
+
+		customLogger.logError("LoadUserByUsername failed for all LdapUserDetailsManagers");
+		for (Exception e : exceptions) {
+			customLogger.logError(e);
 		}
 
 		return null;
@@ -76,14 +86,20 @@ public class MultipleLdapServerAddressesUserDetailsManager implements UserDetail
 
 	@Override
 	public boolean userExists(String username) {
+		List<Exception> exceptions = new ArrayList<>();
 		for (LdapUserDetailsManager manager : managers) {
 			try {
 				if (manager.userExists(username)) {
 					return true;
 				}
 			} catch (Exception e) {
-				// Nächsten probieren
+				exceptions.add(e);
 			}
+		}
+
+		customLogger.logError("Checking if user with name '" + username + "' exists failed for all LdapUserDetailsManagers");
+		for (Exception e : exceptions) {
+			customLogger.logError(e);
 		}
 
 		return false;

@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 
+* Logging im Fehlerfall ausbessern, Stacktraces werden jetzt mit geloggt
 * Mehrere Ldap Domänen und Adressen unterstützen
 
 ## [13.2.2] — 2024-04-08

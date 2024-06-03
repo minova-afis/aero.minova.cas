@@ -92,7 +92,7 @@ server.ssl.key-store-password=<Passwort des Keystores>
 Der Prefix der Konfigurations-Datei muss mit der Wrapper-Exe übereinstimmen.
 Beispiel: `com.minova.vgeibelstadt.cas.exe` und `com.minova.vgeibelstadt.cas.xml`
 oder `cas-test.exe` und `cas-test.xml`
-** Ggf. eine passende Java-Version herunterladen: https://adoptium.net/de/temurin/releases/
+** Ggf. eine passende Java-Version herunterladen (JDK): https://adoptium.net/de/temurin/releases/
 
 [source,xml]
 --------

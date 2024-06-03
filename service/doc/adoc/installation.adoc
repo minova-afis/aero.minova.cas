@@ -73,7 +73,7 @@ server.ssl.key-alias=<Alias im Keystore>
 server.ssl.key-store-password=<Passwort des Keystores>
 ----
 
-=== lib-Ordner erstellen
+=== lib-Ordner erstellen (Nur nötig bei CAS Versionen < 13.0.0)
 
 * Release verwenden: Die Release Jars aus einem Docker-Image kopieren.
 * Entwickler-Version verwenden:

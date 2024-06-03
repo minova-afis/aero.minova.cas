@@ -450,7 +450,7 @@ In den application.properties:
 * security_ldap_domain
 * security_ldap_address 
 
-Man solle auf jeden Fall überprüfen, ob die beiden Properties richtig sind. Dabei ist zu beachten, dass die security_ldap_address immer mit 'ldap://' beginnt.
+Man solle auf jeden Fall überprüfen, ob die beiden Properties richtig sind. Dabei ist zu beachten, dass die security_ldap_address immer mit 'ldap://' oder 'ldaps://' beginnt.
 
 Die security_ldap_domain kann über den Command Line Befehl 'net user USERNAME /domain' herausgefunden werden. Hierbei wird USERNAME durch einen bekannten AD-Benutzernamen ersetzt.
 

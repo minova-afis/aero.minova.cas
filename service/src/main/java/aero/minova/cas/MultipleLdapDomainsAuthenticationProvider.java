@@ -20,6 +20,11 @@ public class MultipleLdapDomainsAuthenticationProvider implements Authentication
 	public MultipleLdapDomainsAuthenticationProvider(List<String> domains, List<String> ldapServerAddresses,
 			UserDetailsContextMapper userDetailsContextMapper) {
 
+		if (ldapServerAddresses.size() > 1 && ldapServerAddresses.size() != domains.size()) {
+			throw new RuntimeException(
+					"Number of LDAP domains and addresses don't match. Either configure one address to use with all domains, or have the same number of domains and addresses.");
+		}
+
 		for (int i = 0; i < domains.size(); i++) {
 
 			// Wenn nur genau eine Adresse gegeben ist diese für alle Domänen nutzen

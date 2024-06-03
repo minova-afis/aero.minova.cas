@@ -32,6 +32,7 @@ Nutzer von unterschiedlichen Domänen aber gleichen Namen werden vom CAS als der
 
 Ist nur genau eine `security_ldap_address` gegeben wird diese für alle Domänen genutzt.
 Ansonsten wird die erste Domäne mit der ersten Adresse, die zweite mit der zweiten, ... verwendet.
+Es muss also entweder genau eine Adresse gegeben sein, oder genausoviele Adressen wie Domänen.
 
 === database
 Ist die Property auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.

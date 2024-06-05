@@ -1,13 +1,17 @@
 package aero.minova.cas.controller;
 
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.PingResponse;
 import aero.minova.cas.api.domain.Table;
@@ -34,7 +38,7 @@ public class CommunicationController {
 	public SystemDatabase database;
 
 	/**
-	 * Hiermit kann geprüft werden, ob die Kommunikation mit und die Anmeldung an den CAS funktioniert.
+	 * Hiermit kann geprüft werden, ob die Kommunikation und die Anmeldung an den CAS funktioniert.
 	 *
 	 * @return PingResponse Diese Antwort signalisiert, dass es funktioniert hat.
 	 */
@@ -78,5 +82,11 @@ public class CommunicationController {
 			httpServletResponse.setHeader("Location", homePath + "/setupError");
 			httpServletResponse.setStatus(302);
 		}
+	}
+
+	@RequestMapping(value = "/version", produces = "application/json", method = RequestMethod.GET)
+	public ResponseEntity<String> getVersion() throws IOException {
+		ResponseEntity<String> response = new ResponseEntity<String>(CoreApplicationSystemApplication.getVersion(), HttpStatusCode.valueOf(200));
+		return response;
 	}
 }

@@ -21,6 +21,9 @@ public class CommunicationController {
 	@Value("${server.servlet.context-path:}")
 	String homePath;
 
+	@Value("${aero.minova.cas.label:}")
+	String label;
+
 	@Autowired
 	SqlProcedureController spc;
 
@@ -78,5 +81,14 @@ public class CommunicationController {
 			httpServletResponse.setHeader("Location", homePath + "/setupError");
 			httpServletResponse.setStatus(302);
 		}
+	}
+
+	/**
+	 * Hiermit kann die konfigurierte Bezeichnung des CAS abgerufen werden
+	 */
+	@GetMapping(value = "label", produces = "application/json")
+	public String getLabel() {
+		customLogger.logInfo("Received request for CAS Label");
+		return label;
 	}
 }

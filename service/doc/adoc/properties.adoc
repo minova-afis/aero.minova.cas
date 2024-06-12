@@ -113,6 +113,14 @@ ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
 
 ** *Wertebereich*: URLs mit Kommata getrennt, zur Festlegung erlaubter Origins für CORS.
 
+
+* aero.minova.cas.label
+
+** *Default*: nicht gesetzt
+
+** *Beschreibung*: Bezeichnung für das CAS. Wird vom WFC angefragt und im Hauptfenster angezeigt
+
+
 == Profiles
 
 * spring.profiles.active

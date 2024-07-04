@@ -151,7 +151,7 @@ public class ResourceListGenerator extends AbstractMojo {
 		try (final var jarFiles = Files.walk(app12SubFolder)) {
 			jarFiles.forEach(jarPath -> {
 				if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar") && //
-						!jarPath.toString().contains("cas.app-12") // CAS App in Version 12 ignorieren
+						!jarPath.toString().contains("cas.app-12") // CAS App in Version 12 ignorieren, sonst i18n merge Konflikte
 				) {
 					try {
 						final var jar = new JarFile(jarPath.toFile());

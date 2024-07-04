@@ -6,12 +6,14 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## Unreleased
 * Auflösen von 12er App-Dependencies beim Bauen des CAS.
 * i18n Übersetzungen aus dem CAS entfernen.
+* Konfigurierte Bezeichnung des CAS über GET /label abrufbar machen
+* Logging im Fehlerfall ausbessern, Stacktraces werden jetzt mit geloggt
+* Mehrere Ldap Domänen und Adressen unterstützen
 
 
 ## [13.2.2] — 2024-04-08
 * Modelklassen-Attribute einheitlich auf private
 * javax.validation mit jakarta.validation austauschen -> die @NotNull und @Size Restriktionen werden jetzt tatsächlich überprüft!
-
 * Technische Logs für fehlerhaftes View-Parameter verbessern.
 * Erweiterungen dürfen nicht mehr Null zurückgeben,
   da sonst versucht wird die gleichnamige SQL-Prozedur aufzurufen.

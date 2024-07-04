@@ -34,7 +34,8 @@ public class ResourceListGenerator extends AbstractMojo {
 	@Parameter(property = "createDeployList", required = false, defaultValue = "false")
 	boolean createDeployList;
 
-	static String[] appResourcesFolder = new String[] { "files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables" };
+	static String[] appResourcesFolder = new String[] { "app/files", "app/forms", "app/i18n", "app/images", "app/pdf", "app/plugins", "app/reports",
+														"app/setup", "app/sql", "app/tables" };
 
 	@Override
 	public void execute() throws MojoExecutionException {
@@ -145,11 +146,13 @@ public class ResourceListGenerator extends AbstractMojo {
 		return arg.toString().substring(classesFolder.toString().length()).replace(FileSystems.getDefault().getSeparator(), "/");
 	}
 
-	public static void moveApp12Contents(Path app12SubFolder, Path resourceFolder) {
+	public void moveApp12Contents(Path app12SubFolder, Path resourceFolder) {
 		List<String> resourceSubFolderName = Arrays.asList(appResourcesFolder);
 		try (final var jarFiles = Files.walk(app12SubFolder)) {
 			jarFiles.forEach(jarPath -> {
-				if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar")) {
+				if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar") && //
+						!jarPath.toString().contains("cas.app-12") // CAS App in Version 12 ignorieren
+				) {
 					try {
 						final var jar = new JarFile(jarPath.toFile());
 						final var jarContent = jar.entries();
@@ -160,9 +163,8 @@ public class ResourceListGenerator extends AbstractMojo {
 							if (!jarEntry.isDirectory() && found.isPresent()) {
 								String fileName = jarEntry.getName().substring(jarEntry.getName().lastIndexOf(FileSystems.getDefault().getSeparator()) + 1);
 								Path copyTo = resourceFolder.resolve(jarPath.getFileName() + ".resources").resolve(found.get()).resolve(fileName);
-								System.out.println("Starting to copy to: " + copyTo);
+								getLog().info("Starting to copy to: " + copyTo);
 								copyJarContentToDirectory(jar, jarEntry, copyTo.toFile());
-
 							}
 						}
 					} catch (Exception e) {
@@ -236,8 +238,8 @@ public class ResourceListGenerator extends AbstractMojo {
 
 									} else if (!mergedI18nMapping.get(messagePropertiesName).get(key).equals(value)) {
 										throw new RuntimeException("Could not merge i18n because translation is different! "
-												+ mergedI18nMapping.get(messagePropertiesName).get(key) + " does not equal " + value + " for Key " + key);
-
+												+ mergedI18nMapping.get(messagePropertiesName).get(key) + " does not equal " + value + " for Key " + key
+												+ " (while merging " + r.toAbsolutePath().toString() + ")");
 									}
 								}
 							}

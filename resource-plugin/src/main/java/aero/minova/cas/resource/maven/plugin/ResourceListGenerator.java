@@ -34,8 +34,7 @@ public class ResourceListGenerator extends AbstractMojo {
 	@Parameter(property = "createDeployList", required = false, defaultValue = "false")
 	boolean createDeployList;
 
-	static String[] appResourcesFolder = new String[] { "app/files", "app/forms", "app/i18n", "app/images", "app/pdf", "app/plugins", "app/reports",
-														"app/setup", "app/sql", "app/tables" };
+	static String[] appResourcesFolder = new String[] { "files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables" };
 
 	@Override
 	public void execute() throws MojoExecutionException {
@@ -50,11 +49,12 @@ public class ResourceListGenerator extends AbstractMojo {
 		final var deployFile = resourceFolder.resolve("deployed.resources.txt");
 		final var customerProjectResourcesI18n = resourceFolder.resolve(project.getGroupId() + "." + project.getArtifactId() + ".resources").resolve("i18n");
 		try {
+			Files.createDirectories(resourceFolder);
+
 			if (app12Folder.toFile().exists()) {
 				moveApp12Contents(app12Folder, resourceFolder);
 			}
 
-			Files.createDirectories(resourceFolder);
 			final var resourceList = new StringBuilder();
 			for (String resourceSubFolderName : appResourcesFolder) {
 				final var resourceSubFolder = classesFolder.resolve(resourceSubFolderName);
@@ -146,8 +146,15 @@ public class ResourceListGenerator extends AbstractMojo {
 		return arg.toString().substring(classesFolder.toString().length()).replace(FileSystems.getDefault().getSeparator(), "/");
 	}
 
+	/**
+	 * Geht die jars der Abhängigkeiten in Version 12 durch und kopiert die relevanten Inhalte (files, forms, i18n, sql, ...) in den resourceFolder.
+	 * Funktioniert auch für Verschachtelungen (benötigt für images)
+	 * 
+	 * @param app12SubFolder
+	 * @param resourceFolder
+	 */
 	public void moveApp12Contents(Path app12SubFolder, Path resourceFolder) {
-		List<String> resourceSubFolderName = Arrays.asList(appResourcesFolder);
+		List<String> resourceSubFolderName = Arrays.asList(appResourcesFolder).stream().map(s -> s + File.separator).toList();
 		try (final var jarFiles = Files.walk(app12SubFolder)) {
 			jarFiles.forEach(jarPath -> {
 				if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar") && //
@@ -158,25 +165,22 @@ public class ResourceListGenerator extends AbstractMojo {
 						final var jarContent = jar.entries();
 						while (jarContent.hasMoreElements()) {
 							final var jarEntry = jarContent.nextElement();
-							Optional<String> found = resourceSubFolderName.stream().filter(jarEntry.getName()::contains).findAny();
-
-							if (!jarEntry.isDirectory() && found.isPresent()) {
+							Optional<String> found = resourceSubFolderName.stream().filter(jarEntry.getName()::endsWith).findAny();
+							if (found.isPresent()) {
 								String fileName = jarEntry.getName().substring(jarEntry.getName().lastIndexOf(FileSystems.getDefault().getSeparator()) + 1);
-								Path copyTo = resourceFolder.resolve(jarPath.getFileName() + ".resources").resolve(found.get()).resolve(fileName);
+								File copyTo = resourceFolder.resolve(jarPath.getFileName() + ".resources").resolve(found.get()).resolve(fileName).toFile();
 								getLog().info("Starting to copy to: " + copyTo);
-								copyJarContentToDirectory(jar, jarEntry, copyTo.toFile());
+								FileUtils.copyJarResourcesRecursively(copyTo, jar, jarEntry);
 							}
 						}
 					} catch (Exception e) {
-						throw new RuntimeException("Could not move app12-Resource folder to ressourceFolder: " + app12SubFolder.toString(), e);
-
+						throw new RuntimeException("Could not move app12-Resource folder to resourceFolder: " + app12SubFolder.toString(), e);
 					}
 				}
 			});
 		} catch (Exception e) {
 			throw new RuntimeException("Could not move app12-dependency resources.", e);
 		}
-
 	}
 
 	/**

@@ -36,16 +36,15 @@ public class FileUtils {
 				throw new RuntimeException("Zip Slip, unallowed entry in Zip: " + filename);
 			}
 
-			final File f = new File(destDir, filename);
 			if (!entry.isDirectory()) {
 				final InputStream entryInputStream = jarFile.getInputStream(entry);
-				if (!FileUtils.copyStream(entryInputStream, f)) {
+				if (!FileUtils.copyStream(entryInputStream, file)) {
 					return false;
 				}
 				entryInputStream.close();
 			} else {
-				if (!FileUtils.ensureDirectoryExists(f)) {
-					throw new IOException("Could not create directory: " + f.getAbsolutePath());
+				if (!FileUtils.ensureDirectoryExists(file)) {
+					throw new IOException("Could not create directory: " + file.getAbsolutePath());
 				}
 			}
 		}

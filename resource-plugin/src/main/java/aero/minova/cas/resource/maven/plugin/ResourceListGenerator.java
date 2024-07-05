@@ -10,8 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
@@ -31,10 +34,13 @@ public class ResourceListGenerator extends AbstractMojo {
 	@Parameter(property = "createDeployList", required = false, defaultValue = "false")
 	boolean createDeployList;
 
+	static String[] appResourcesFolder = new String[] { "files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables" };
+
 	@Override
 	public void execute() throws MojoExecutionException {
 		final var targetFolder = Path.of(project.getBuild().getDirectory());
 		final var libsFolder = targetFolder.resolve("jar-dependencies");
+		final var app12Folder = targetFolder.resolve("app12-dependencies");
 		final var classesFolder = targetFolder.resolve("classes");
 		final var resourceFolderName = "aero.minova.app.resources";
 		final var resourceFolder = classesFolder.resolve(resourceFolderName);
@@ -44,8 +50,13 @@ public class ResourceListGenerator extends AbstractMojo {
 		final var customerProjectResourcesI18n = resourceFolder.resolve(project.getGroupId() + "." + project.getArtifactId() + ".resources").resolve("i18n");
 		try {
 			Files.createDirectories(resourceFolder);
+
+			if (app12Folder.toFile().exists()) {
+				moveApp12Contents(app12Folder, resourceFolder);
+			}
+
 			final var resourceList = new StringBuilder();
-			for (String resourceSubFolderName : new String[] { "files", "forms", "i18n", "images", "pdf", "plugins", "reports", "setup", "sql", "tables" }) {
+			for (String resourceSubFolderName : appResourcesFolder) {
 				final var resourceSubFolder = classesFolder.resolve(resourceSubFolderName);
 				if (Files.isDirectory(resourceSubFolder)) {
 					try (final var resources = Files.walk(resourceSubFolder)) {
@@ -124,6 +135,7 @@ public class ResourceListGenerator extends AbstractMojo {
 				throw new FileNotFoundException("libs folder is missing for `createDeployList` goal: " + libsFolder);
 			}
 			mergeI18n(resourceFolder, classesFolder);
+
 		} catch (IOException e) {
 			throw new MojoExecutionException("Could not generate resource file: " + resourceFile, e);
 		}
@@ -135,6 +147,43 @@ public class ResourceListGenerator extends AbstractMojo {
 	}
 
 	/**
+	 * Geht die jars der Abhängigkeiten in Version 12 durch und kopiert die relevanten Inhalte (files, forms, i18n, sql, ...) in den resourceFolder.
+	 * Funktioniert auch für Verschachtelungen (benötigt für images)
+	 * 
+	 * @param app12SubFolder
+	 * @param resourceFolder
+	 */
+	public void moveApp12Contents(Path app12SubFolder, Path resourceFolder) {
+		List<String> resourceSubFolderName = Arrays.asList(appResourcesFolder).stream().map(s -> s + File.separator).toList();
+		try (final var jarFiles = Files.walk(app12SubFolder)) {
+			jarFiles.forEach(jarPath -> {
+				if (Files.isRegularFile(jarPath) && jarPath.toString().endsWith(".jar") && //
+						!jarPath.toString().contains("cas.app-12") // CAS App in Version 12 ignorieren, sonst i18n merge Konflikte
+				) {
+					try {
+						final var jar = new JarFile(jarPath.toFile());
+						final var jarContent = jar.entries();
+						while (jarContent.hasMoreElements()) {
+							final var jarEntry = jarContent.nextElement();
+							Optional<String> found = resourceSubFolderName.stream().filter(jarEntry.getName()::endsWith).findAny();
+							if (found.isPresent()) {
+								String fileName = jarEntry.getName().substring(jarEntry.getName().lastIndexOf(FileSystems.getDefault().getSeparator()) + 1);
+								File copyTo = resourceFolder.resolve(jarPath.getFileName() + ".resources").resolve(found.get()).resolve(fileName).toFile();
+								getLog().info("Starting to copy to: " + copyTo);
+								FileUtils.copyJarResourcesRecursively(copyTo, jar, jarEntry);
+							}
+						}
+					} catch (Exception e) {
+						throw new RuntimeException("Could not move app12-Resource folder to resourceFolder: " + app12SubFolder.toString(), e);
+					}
+				}
+			});
+		} catch (Exception e) {
+			throw new RuntimeException("Could not move app12-dependency resources.", e);
+		}
+	}
+
+	/**
 	 * Copies a directory from a jar file to an external directory.
 	 */
 	public static void copyJarContentToDirectory(JarFile fromJar, JarEntry jarDir, File destDir) throws IOException {
@@ -142,6 +191,7 @@ public class ResourceListGenerator extends AbstractMojo {
 		if (parent != null) {
 			parent.mkdirs();
 		}
+
 		try (InputStream in = fromJar.getInputStream(jarDir)) {
 			Files.write(destDir.toPath(), in.readAllBytes());
 		} catch (IOException e) {
@@ -167,7 +217,7 @@ public class ResourceListGenerator extends AbstractMojo {
 							// Kommentare überspringen
 							if (!l.startsWith("#") && !l.isBlank()) {
 								String messagePropertiesName = r.getFileName().toString();
-								
+
 								int divider = l.indexOf("=");
 								if (divider == -1) {
 									throw new RuntimeException(
@@ -192,8 +242,8 @@ public class ResourceListGenerator extends AbstractMojo {
 
 									} else if (!mergedI18nMapping.get(messagePropertiesName).get(key).equals(value)) {
 										throw new RuntimeException("Could not merge i18n because translation is different! "
-												+ mergedI18nMapping.get(messagePropertiesName).get(key) + " does not equal " + value + " for Key " + key);
-
+												+ mergedI18nMapping.get(messagePropertiesName).get(key) + " does not equal " + value + " for Key " + key
+												+ " (while merging " + r.toAbsolutePath().toString() + ")");
 									}
 								}
 							}

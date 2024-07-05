@@ -4,10 +4,12 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+* Auflösen von 12er App-Dependencies beim Bauen des CAS.
+* i18n Übersetzungen aus dem CAS entfernen.
 * Konfigurierte Bezeichnung des CAS über GET /label abrufbar machen
-
 * Logging im Fehlerfall ausbessern, Stacktraces werden jetzt mit geloggt
 * Mehrere Ldap Domänen und Adressen unterstützen
+
 
 ## [13.2.2] — 2024-04-08
 * Modelklassen-Attribute einheitlich auf private

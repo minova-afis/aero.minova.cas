@@ -33,7 +33,7 @@ public class FileUtils {
 			// "Zip Slip" verhindern, https://github.com/minova-afis/aero.minova.cas/security/code-scanning/53
 			File file = new File(destDir, filename);
 			if (!file.toPath().normalize().startsWith(destDir.toPath())) {
-				throw new RuntimeException("Zip Slip, unallowed entry in Zip");
+				throw new RuntimeException("Zip Slip, unallowed entry in Zip: " + filename);
 			}
 
 			final File f = new File(destDir, filename);

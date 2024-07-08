@@ -3,7 +3,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
-## Unreleased
+## Unreleased 
+* Absturz bei Fehler während dem Erstellen von Privilegien über JPA verhindern. Damit ist es wieder möglich, das CAS mit einer leeren Datenbank zu starten.
 * Konfigurierte Bezeichnung des CAS über GET /label abrufbar machen
 
 * Logging im Fehlerfall ausbessern, Stacktraces werden jetzt mit geloggt

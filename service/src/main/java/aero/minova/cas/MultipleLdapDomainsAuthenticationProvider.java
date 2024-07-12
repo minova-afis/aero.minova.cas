@@ -20,23 +20,29 @@ public class MultipleLdapDomainsAuthenticationProvider implements Authentication
 	public MultipleLdapDomainsAuthenticationProvider(List<String> domains, List<String> ldapServerAddresses,
 			UserDetailsContextMapper userDetailsContextMapper) {
 
-		if (ldapServerAddresses.size() > 1 && ldapServerAddresses.size() != domains.size()) {
+		if (domains.size() == ldapServerAddresses.size()) {
+			for (int i = 0; i < domains.size(); i++) {
+				addProvider(domains.get(i), ldapServerAddresses.get(i), userDetailsContextMapper);
+			}
+		} else if (ldapServerAddresses.size() == 1) {
+			for (int i = 0; i < domains.size(); i++) {
+				addProvider(domains.get(i), ldapServerAddresses.get(0), userDetailsContextMapper);
+			}
+		} else if (domains.size() == 1) {
+			for (int i = 0; i < ldapServerAddresses.size(); i++) {
+				addProvider(domains.get(0), ldapServerAddresses.get(i), userDetailsContextMapper);
+			}
+		} else {
 			throw new RuntimeException(
-					"Number of LDAP domains and addresses don't match. Either configure one address to use with all domains, or have the same number of domains and addresses.");
+					"Number of LDAP domains and addresses don't match. Either configure one address to use with all domains, one domain to use with all addresses, or have the same number of domains and addresses.");
 		}
+	}
 
-		for (int i = 0; i < domains.size(); i++) {
-
-			// Wenn nur genau eine Adresse gegeben ist diese für alle Domänen nutzen
-			// Ansonsten erste Adresse mit erster Domäne, zweite mit zweiter, ...
-			String address = ldapServerAddresses.size() == 1 ? ldapServerAddresses.get(0) : ldapServerAddresses.get(i);
-
-			ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domains.get(i), address);
-			provider.setConvertSubErrorCodesToExceptions(true);
-			provider.setUserDetailsContextMapper(userDetailsContextMapper);
-
-			providers.add(provider);
-		}
+	private void addProvider(String domain, String url, UserDetailsContextMapper userDetailsContextMapper) {
+		ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domain, url);
+		provider.setConvertSubErrorCodesToExceptions(true);
+		provider.setUserDetailsContextMapper(userDetailsContextMapper);
+		providers.add(provider);
 	}
 
 	@Override

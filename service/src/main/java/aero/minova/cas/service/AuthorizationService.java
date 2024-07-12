@@ -61,6 +61,22 @@ public class AuthorizationService {
 	}
 
 	/**
+	 * Gibt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View zu der gegebenen Gruppe
+	 * 
+	 * @param maskname
+	 * @param procedurePrefix
+	 * @param viewPrefix
+	 */
+	public void giveDefaultPrivilegesForMask(UserGroup group, String maskname, String procedurePrefix, String viewPrefix) {
+		findOrCreateLuUserPrivilegeUserGroup(group, findOrCreateUserPrivilege(procedurePrefix + "Insert" + maskname));
+		findOrCreateLuUserPrivilegeUserGroup(group, findOrCreateUserPrivilege(procedurePrefix + "Update" + maskname));
+		findOrCreateLuUserPrivilegeUserGroup(group, findOrCreateUserPrivilege(procedurePrefix + "Read" + maskname));
+		findOrCreateLuUserPrivilegeUserGroup(group, findOrCreateUserPrivilege(procedurePrefix + "Delete" + maskname));
+
+		findOrCreateLuUserPrivilegeUserGroup(group, findOrCreateUserPrivilege(viewPrefix + maskname + "Index"));
+	}
+
+	/**
 	 * Trägt die Berechtigung in die Tabelle xtCasUserPrivilege ein, wenn sie noch nicht existiert. Z.B. "xpcorInsertMovement", "xvcorMovementIndex"
 	 * 
 	 * @param privilegeName

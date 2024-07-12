@@ -77,13 +77,21 @@ public class UsersService extends BaseService<Users> {
 	}
 
 	public void addUserToUserGroup(int usersKey, int userGroupKey) {
-		String username = findEntityById(usersKey).getUsername();
-		String authority = userGroupService.findEntityById(userGroupKey).getKeyText();
+		addUserToUserGroup(findEntityById(usersKey), userGroupService.findEntityById(userGroupKey));
+	}
 
-		Authorities a = new Authorities();
-		a.setAuthority(authority);
-		a.setUsername(username);
-		authoritiesService.save(a);
+	public void addUserToUserGroup(Users user, UserGroup userGroup) {
+		String username = user.getUsername();
+		String authority = userGroup.getKeyText();
+
+		// Nur anlegen, wenn User nicht eh schon in der Gruppe ist
+		if (!authoritiesService.findByUsernameAndAuthority(username, authority).isPresent()) {
+			Authorities a = new Authorities();
+			a.setAuthority(authority);
+			a.setUsername(username);
+			authoritiesService.save(a);
+		}
+
 	}
 
 	public void removeUserFromUserGroup(int usersKey, int userGroupKey) {

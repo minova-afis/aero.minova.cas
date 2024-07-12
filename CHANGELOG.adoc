@@ -5,7 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 * RowLevelSecurity mit JOOQ ermöglichen/ausbessern
-
+* Bequemlichkeits-Methoden für Nutzerverwaltung in Services
 
 ## [13.3.0] — 2024-07-08
 * Absturz bei Fehler während dem Erstellen von Privilegien über JPA verhindern. Damit ist es wieder möglich, das CAS mit einer leeren Datenbank zu starten.

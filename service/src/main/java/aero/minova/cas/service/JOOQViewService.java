@@ -28,22 +28,15 @@ import lombok.val;
 public class JOOQViewService implements ViewServiceInterface {
 	private final SystemDatabase systemDatabase;
 	private final CustomLogger customLogger;
-	private final SecurityService securityService;
 
+	@Override
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean isCounting, List<Row> authorities) throws IllegalArgumentException {
 
 		if (params.getName() == null || params.getName().trim().length() == 0) {
 			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 
-		// Hier wird auch schon die RowLevelSecurity mit rein gepackt.
 		Condition condition = prepareWhereClauseGetCondition(params, autoLike);
-
-		// Hier passiert die RowLevelSecurity.
-		Condition userCondition = rowLevelSecurity(authorities);
-		if (userCondition != null) {
-			condition = condition.and(userCondition);
-		}
 
 		List<SelectField<Object>> fields = new ArrayList<>();
 
@@ -64,9 +57,15 @@ public class JOOQViewService implements ViewServiceInterface {
 			query = DSL.select(fields).from(params.getName()).where(condition);
 		}
 
-		return query.getSQL();
+		String sqlString = query.getSQL();
+
+		// Die RowLevelSecurity muss schon als "ausgefüllter" String angehängt werden (keine "?"), da die Werte nicht in der Tabelle stehen
+		sqlString += SecurityService.rowLevelSecurity(condition.equals(DSL.noCondition()), authorities);
+
+		return sqlString;
 	}
 
+	@Override
 	public Table unsecurelyGetIndexView(Table inputTable) {
 		StringBuilder sb = new StringBuilder();
 		List<Row> userGroups = new ArrayList<>();
@@ -93,28 +92,6 @@ public class JOOQViewService implements ViewServiceInterface {
 			systemDatabase.closeConnection(connection);
 		}
 		return result;
-	}
-
-	public Condition rowLevelSecurity(List<Row> requestingAuthorities) {
-		if (requestingAuthorities.isEmpty()) {
-			return null;
-		}
-
-		List<String> requestingRoles = securityService.extractUserTokens(requestingAuthorities);
-		// Falls die Liste leer ist, darf der User alle Spalten sehen.
-		if (requestingRoles.isEmpty()) {
-			return null;
-		}
-
-		Condition userCondition = DSL.noCondition();
-
-		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen.
-		userCondition = userCondition.and(DSL.field("SecurityToken").isNull());
-
-		// Nach allen relevanten SecurityTokens suchen.
-		userCondition = userCondition.or(DSL.field("SecurityToken").in(requestingRoles));
-
-		return userCondition;
 	}
 
 	@Override

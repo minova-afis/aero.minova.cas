@@ -50,9 +50,9 @@ public class ViewService {
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
 
 		if (dialect.toString().contains(MSSQLDIALECT)) {
-			viewService = new MssqlViewService(systemDatabase, customLogger, securityService);
+			viewService = new MssqlViewService(systemDatabase, customLogger);
 		} else {
-			viewService = new JOOQViewService(systemDatabase, customLogger, securityService);
+			viewService = new JOOQViewService(systemDatabase, customLogger);
 		}
 		securityService.setViewService(viewService);
 	}

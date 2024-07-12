@@ -245,16 +245,16 @@ public class MssqlViewService implements ViewServiceInterface {
 		}
 
 		sb.append("( select Row_Number() over (order by KeyLong) as RowNum, * from ").append(params.getName());
-		boolean whereClauseExists = false;
+		boolean isFirstWhereClause = true;
 		if (!params.getColumns().isEmpty() && !params.getRows().isEmpty()) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 			if (!where.trim().equals("")) {
-				whereClauseExists = true;
+				isFirstWhereClause = false;
 				sb.append(")");
 			}
 		}
-		final String onlyAuthorizedRows = SecurityService.rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = SecurityService.rowLevelSecurity(isFirstWhereClause, authorities);
 		sb.append(onlyAuthorizedRows);
 		sb.append(" ) as RowConstraintResult");
 

@@ -32,7 +32,7 @@ import lombok.val;
 @Setter
 public class SecurityService {
 
-	ViewServiceInterface viewService;
+	ViewService viewService;
 
 	@Autowired
 	SystemDatabase systemDatabase;

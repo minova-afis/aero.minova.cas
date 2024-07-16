@@ -61,7 +61,8 @@ public class AuthorizationService {
 	}
 
 	/**
-	 * Gibt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View zu der gegebenen Gruppe
+	 * Gibt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View zu der gegebenen Gruppe. Existieren die Berechtigungen noch nicht werden
+	 * sie angelegt.
 	 * 
 	 * @param maskname
 	 * @param procedurePrefix

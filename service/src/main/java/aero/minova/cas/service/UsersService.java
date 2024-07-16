@@ -62,8 +62,10 @@ public class UsersService extends BaseService<Users> {
 	}
 
 	public List<Users> findUsersInUserGroup(int userGroupKey) {
+		return findUsersInUserGroup(userGroupService.findEntityById(userGroupKey));
+	}
 
-		UserGroup userGroup = userGroupService.findEntityById(userGroupKey);
+	public List<Users> findUsersInUserGroup(UserGroup userGroup) {
 
 		List<Authorities> authorities = authoritiesService.findByAuthority(userGroup.getKeyText());
 
@@ -71,6 +73,23 @@ public class UsersService extends BaseService<Users> {
 
 		for (Authorities a : authorities) {
 			res.add(findByUsername(a.getUsername()));
+		}
+
+		return res;
+	}
+
+	public List<UserGroup> findUserGroupsOfUser(int usersKey) {
+		return findUserGroupsOfUser(findEntityById(usersKey));
+	}
+
+	public List<UserGroup> findUserGroupsOfUser(Users user) {
+
+		List<Authorities> authorities = authoritiesService.findByUsername(user.getUsername());
+
+		List<UserGroup> res = new ArrayList<>();
+
+		for (Authorities a : authorities) {
+			res.addAll(userGroupService.findEntitiesByKeyText(a.getAuthority()));
 		}
 
 		return res;

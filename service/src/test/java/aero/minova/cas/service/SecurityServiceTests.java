@@ -52,10 +52,10 @@ class SecurityServiceTests {
 	void test_rowLevelSecurityWithNoRoles() {
 		List<Row> userGroups = new ArrayList<>();
 
-		assertThat(securityService.rowLevelSecurity(false, userGroups))//
-				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL ) )");
-		assertThat(securityService.rowLevelSecurity(true, userGroups))//
+		assertThat(SecurityService.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nand ( ( SecurityToken IS NULL ) )");
+		assertThat(SecurityService.rowLevelSecurity(true, userGroups))//
+				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL ) )");
 	}
 
 	@DisplayName("Row-Level-Security mit mehreren Rollen")
@@ -80,10 +80,10 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
-		assertThat(securityService.rowLevelSecurity(false, userGroups))//
-				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('user','dispatcher','codemonkey') ) )");
-		assertThat(securityService.rowLevelSecurity(true, userGroups))//
+		assertThat(SecurityService.rowLevelSecurity(false, userGroups))//
 				.isEqualTo("\r\nand ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('user','dispatcher','codemonkey') ) )");
+		assertThat(SecurityService.rowLevelSecurity(true, userGroups))//
+				.isEqualTo("\r\nwhere ( ( SecurityToken IS NULL )" + "\r\nor ( SecurityToken IN ('user','dispatcher','codemonkey') ) )");
 	}
 
 	@DisplayName("Row-Level-Security mit mehreren Rollen, aber eine darf alle Spalten sehen")
@@ -108,7 +108,7 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
-		assertThat(securityService.rowLevelSecurity(false, userGroups))//
+		assertThat(SecurityService.rowLevelSecurity(false, userGroups))//
 				.isEmpty();
 	}
 
@@ -382,7 +382,7 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
-		List<String> resultList = securityService.extractUserTokens(userGroups);
+		List<String> resultList = SecurityService.extractUserTokens(userGroups);
 		assertThat(resultList).hasSize(3).containsExactly("user", "dispatcher", "codemonkey");
 	}
 
@@ -408,7 +408,7 @@ class SecurityServiceTests {
 		inputRow.addValue(new Value("codemonkey", null));
 		inputRow.addValue(new Value(true, null));
 		userGroups.add(inputRow);
-		List<String> resultList = securityService.extractUserTokens(userGroups);
+		List<String> resultList = SecurityService.extractUserTokens(userGroups);
 
 		assertThat(resultList).isEmpty();
 	}

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.service.model.User;
+import aero.minova.cas.service.model.UserGroup;
 
 @Service
 public class UserService extends BaseService<User> {
@@ -31,10 +32,11 @@ public class UserService extends BaseService<User> {
 	}
 
 	public void addUserToUserGroup(int userKey, int userGroupKey) {
+		addUserToUserGroup(findEntityById(userKey), userGroupService.findEntityById(userGroupKey));
+	}
 
-		User user = findEntityById(userKey);
-
-		String newToken = userGroupService.findEntityById(userGroupKey).getKeyText();
+	public void addUserToUserGroup(User user, UserGroup userGroup) {
+		String newToken = userGroup.getKeyText();
 
 		List<String> memberships = getMemberships(user);
 

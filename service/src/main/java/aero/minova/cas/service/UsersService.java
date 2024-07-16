@@ -62,8 +62,10 @@ public class UsersService extends BaseService<Users> {
 	}
 
 	public List<Users> findUsersInUserGroup(int userGroupKey) {
+		return findUsersInUserGroup(userGroupService.findEntityById(userGroupKey));
+	}
 
-		UserGroup userGroup = userGroupService.findEntityById(userGroupKey);
+	public List<Users> findUsersInUserGroup(UserGroup userGroup) {
 
 		List<Authorities> authorities = authoritiesService.findByAuthority(userGroup.getKeyText());
 
@@ -76,14 +78,39 @@ public class UsersService extends BaseService<Users> {
 		return res;
 	}
 
-	public void addUserToUserGroup(int usersKey, int userGroupKey) {
-		String username = findEntityById(usersKey).getUsername();
-		String authority = userGroupService.findEntityById(userGroupKey).getKeyText();
+	public List<UserGroup> findUserGroupsOfUser(int usersKey) {
+		return findUserGroupsOfUser(findEntityById(usersKey));
+	}
 
-		Authorities a = new Authorities();
-		a.setAuthority(authority);
-		a.setUsername(username);
-		authoritiesService.save(a);
+	public List<UserGroup> findUserGroupsOfUser(Users user) {
+
+		List<Authorities> authorities = authoritiesService.findByUsername(user.getUsername());
+
+		List<UserGroup> res = new ArrayList<>();
+
+		for (Authorities a : authorities) {
+			res.addAll(userGroupService.findEntitiesByKeyText(a.getAuthority()));
+		}
+
+		return res;
+	}
+
+	public void addUserToUserGroup(int usersKey, int userGroupKey) {
+		addUserToUserGroup(findEntityById(usersKey), userGroupService.findEntityById(userGroupKey));
+	}
+
+	public void addUserToUserGroup(Users user, UserGroup userGroup) {
+		String username = user.getUsername();
+		String authority = userGroup.getKeyText();
+
+		// Nur anlegen, wenn User nicht eh schon in der Gruppe ist
+		if (!authoritiesService.findByUsernameAndAuthority(username, authority).isPresent()) {
+			Authorities a = new Authorities();
+			a.setAuthority(authority);
+			a.setUsername(username);
+			authoritiesService.save(a);
+		}
+
 	}
 
 	public void removeUserFromUserGroup(int usersKey, int userGroupKey) {

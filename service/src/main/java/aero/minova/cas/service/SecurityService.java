@@ -32,7 +32,7 @@ import lombok.val;
 @Setter
 public class SecurityService {
 
-	ViewServiceInterface viewService;
+	ViewService viewService;
 
 	@Autowired
 	SystemDatabase systemDatabase;
@@ -273,7 +273,7 @@ public class SecurityService {
 	 *            Die Rollen des Nutzers, welche ein Recht auf einen Zugriff haben.
 	 * @return einen String, der entweder an das Ende der vorhandenen Where-Klausel angefügt wird oder die Where-Klausel selbst ist
 	 */
-	public String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAuthorities) {
+	public static String rowLevelSecurity(boolean isFirstWhereClause, List<Row> requestingAuthorities) {
 		List<String> requestingRoles = new ArrayList<>();
 		if (!requestingAuthorities.isEmpty()) {
 			requestingRoles = extractUserTokens(requestingAuthorities);
@@ -284,11 +284,11 @@ public class SecurityService {
 		}
 
 		final StringBuffer rowSec = new StringBuffer();
-		// Falls where-Klausel bereits vorhanden 'and' anfügen, wenn nicht, dann 'where'
+		// Falls where-Klausel bereits vorhanden 'where' anfügen, wenn nicht, dann 'and'
 		if (isFirstWhereClause) {
-			rowSec.append("\r\nand (");
-		} else {
 			rowSec.append("\r\nwhere (");
+		} else {
+			rowSec.append("\r\nand (");
 		}
 		// Wenn SecurityToken null, dann darf jeder User die Spalte sehen
 		rowSec.append(" ( SecurityToken IS NULL )");
@@ -312,7 +312,7 @@ public class SecurityService {
 	 *         alle Rows zu sehen.
 	 * @author weber
 	 */
-	public List<String> extractUserTokens(List<Row> requestingAuthorities) {
+	public static List<String> extractUserTokens(List<Row> requestingAuthorities) {
 		List<String> requestingRoles = new ArrayList<>();
 
 		for (Row authority : requestingAuthorities) {

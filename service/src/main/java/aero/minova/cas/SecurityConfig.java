@@ -30,6 +30,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
+import aero.minova.cas.ldap.MultipleLdapDomainsAuthenticationProvider;
+import aero.minova.cas.ldap.MultipleLdapServerAddressesUserDetailsManager;
 import aero.minova.cas.service.SecurityService;
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package aero.minova.cas;
+package aero.minova.cas.ldap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,15 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+
+import aero.minova.cas.CustomLogger;
 
 public class MultipleLdapDomainsAuthenticationProvider implements AuthenticationProvider {
 
 	@Autowired
 	CustomLogger customLogger;
 
-	List<ActiveDirectoryLdapAuthenticationProvider> providers = new ArrayList<>();
+	List<MinovaActiveDirectoryLdapAuthenticationProvider> providers = new ArrayList<>();
 
 	public MultipleLdapDomainsAuthenticationProvider(List<String> domains, List<String> ldapServerAddresses,
 			UserDetailsContextMapper userDetailsContextMapper) {
@@ -39,7 +40,7 @@ public class MultipleLdapDomainsAuthenticationProvider implements Authentication
 	}
 
 	private void addProvider(String domain, String url, UserDetailsContextMapper userDetailsContextMapper) {
-		ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domain, url);
+		MinovaActiveDirectoryLdapAuthenticationProvider provider = new MinovaActiveDirectoryLdapAuthenticationProvider(domain, url);
 		provider.setConvertSubErrorCodesToExceptions(true);
 		provider.setUserDetailsContextMapper(userDetailsContextMapper);
 		providers.add(provider);
@@ -48,7 +49,7 @@ public class MultipleLdapDomainsAuthenticationProvider implements Authentication
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		List<Exception> exceptions = new ArrayList<>();
-		for (ActiveDirectoryLdapAuthenticationProvider provider : providers) {
+		for (MinovaActiveDirectoryLdapAuthenticationProvider provider : providers) {
 			try {
 				Authentication authenticate = provider.authenticate(authentication);
 				if (authenticate != null) {
@@ -69,7 +70,7 @@ public class MultipleLdapDomainsAuthenticationProvider implements Authentication
 	@Override
 	public boolean supports(Class<?> authentication) {
 		List<Exception> exceptions = new ArrayList<>();
-		for (ActiveDirectoryLdapAuthenticationProvider provider : providers) {
+		for (MinovaActiveDirectoryLdapAuthenticationProvider provider : providers) {
 			try {
 				if (provider.supports(authentication)) {
 					return true;

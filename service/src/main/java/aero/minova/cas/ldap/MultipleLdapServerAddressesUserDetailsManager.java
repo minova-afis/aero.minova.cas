@@ -1,4 +1,4 @@
-package aero.minova.cas;
+package aero.minova.cas.ldap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+
+import aero.minova.cas.CustomLogger;
 
 public class MultipleLdapServerAddressesUserDetailsManager implements UserDetailsManager {
 

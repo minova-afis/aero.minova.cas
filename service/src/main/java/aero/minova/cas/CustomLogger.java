@@ -41,13 +41,13 @@ public class CustomLogger {
 	// Log für allgemeine Infos, die nicht zu den obrigen Loggern passen. Z.B: Aufruf einer externen API.
 	public Logger infoLogger = LoggerFactory.getLogger("InfoLog");
 
-	private static final String CASUSER = "CAS : {}";
+	private static final String CASUSER = "CAS: {}";
 
-	private static final String LOGFORMAT = "{} : {}";
+	private static final String LOGFORMAT = "{}: {}";
 
-	private static final String ERRORLOGFORMAT = "{} : {} : \n {}";
+	private static final String ERRORLOGFORMAT = "{}: {}: \n{}";
 
-	private static final String USERREQUESTLOGFORMAT = "{} : {} {}";
+	private static final String USERREQUESTLOGFORMAT = "{}: {} {}";
 
 	@Autowired
 	private ClientRestAPI crapi;
@@ -69,29 +69,31 @@ public class CustomLogger {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
-		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		errorLogger.error(ERRORLOGFORMAT, user, logMessage, e.getMessage(), sw.toString());
+		errorLogger.error(ERRORLOGFORMAT, getUser(), logMessage, sw);
+	}
 
+	public void logError(Exception e) {
+		logError(e.getMessage(), (Throwable) e);
+	}
+
+	public void logError(String logMessage) {
+		errorLogger.error(LOGFORMAT, getUser(), logMessage);
 	}
 
 	public void logPrivilege(String logMessage) {
-		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		privilegeLogger.info(LOGFORMAT, user, logMessage);
+		privilegeLogger.info(LOGFORMAT, getUser(), logMessage);
 	}
 
 	public void logSql(String logMessage) {
-		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		logger.info(LOGFORMAT, user, logMessage);
+		logger.info(LOGFORMAT, getUser(), logMessage);
 	}
 
 	public void logUserRequest(String logMessage) {
-		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		userLogger.info(LOGFORMAT, user, logMessage);
+		userLogger.info(LOGFORMAT, getUser(), logMessage);
 	}
 
 	public void logUserRequest(String logMessage, Object gsonObject) {
-		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		userLogger.info(USERREQUESTLOGFORMAT, user, logMessage, gson.toJson(gsonObject));
+		userLogger.info(USERREQUESTLOGFORMAT, getUser(), logMessage, gson.toJson(gsonObject));
 	}
 
 	public void logFiles(String logMessage) {
@@ -119,16 +121,25 @@ public class CustomLogger {
 		initLogger.info("Active profiles: {}", Arrays.toString(env.getActiveProfiles()));
 		final MutablePropertySources sources = ((AbstractEnvironment) env).getPropertySources();
 		StreamSupport.stream(sources.spliterator(), false)//
-				.filter(ps -> ps instanceof EnumerablePropertySource)//
+				.filter(EnumerablePropertySource.class::isInstance)//
 				.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())//
 				.flatMap(Arrays::stream)//
 				.distinct()//
 				.filter(prop -> !(prop.contains("credentials") || prop.contains("password")))//
-				.forEach(prop -> initLogger.info("Property: {}={}", prop, env.getProperty(prop)));
+				.forEach(prop -> {
+					try {
+						initLogger.info("Property: {}={}", prop, env.getProperty(prop));
+					} catch (IllegalArgumentException e) {
+						initLogger.warn("Property: " + prop + " not resolvable: " + e.getMessage(), e);
+					}
+				});
 	}
 
 	public void logInfo(String logMessage) {
-		String user = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
-		infoLogger.info(LOGFORMAT, user, logMessage);
+		infoLogger.info(LOGFORMAT, getUser(), logMessage);
+	}
+
+	private String getUser() {
+		return SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : "CAS";
 	}
 }

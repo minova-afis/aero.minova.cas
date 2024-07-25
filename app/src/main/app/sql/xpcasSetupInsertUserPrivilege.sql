@@ -4,9 +4,7 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 	@Description nvarchar(50) = null
 ) as
 	if exists (select * from xtcasUserPrivilege
-		where KeyText = @KeyText
-		  and LastAction < 0
-		  or LastAction is null)
+		where KeyText = @KeyText)
     begin
         update xtCasUserPrivilege
         set LastAction = 1,
@@ -32,8 +30,7 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
     end
 
 	if exists (select * from tVersion10
-		where KeyText = @KeyText
-		  and LastAction < 0 or LastAction is null)
+		where KeyText = @KeyText)
     begin
         update tVersion10
         set LastAction = 1,
@@ -44,14 +41,13 @@ alter procedure dbo.xpcasSetupInsertUserPrivilege (
 	else
 	begin
 		insert into tVersion10 (
-		KeyText,
-		ModuleName
-	) values (
-		@KeyText,
-		'ch.minova.install'
-	)
-    end
-
-
+			KeyText,
+			ModuleName
+		) values (
+			@KeyText,
+			'ch.minova.install'
+		)
+	end
+    
 	select @KeyLong = @@identity
 return @@error

@@ -4,8 +4,17 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-* Login über LDAP: Mehrere Domänen, Adressen und alternative UPN Suffixe unterstützen
+
+## [12.67.5] -- 2024-07-23
+* Bei Setup Extension Namen nur einmal in UserPrivilege eintragen
+
+## [12.67.4] -- 2023-07-19
 * Konfigurierte Bezeichnung des CAS über GET /label abrufbar machen
+
+## [12.67.3] -- 2023-07-19
+* Login über LDAP: Mehrere Domänen, Adressen und alternative UPN Suffixe unterstützen
+
+## [12.67.??] -- ???
 * Beim Einfügen von Authorities über die Maske (xpcasInsertAuthorities) wurden LastAction, LastUser und LastDate nicht gesetzt.
 * Benutzeranmeldung über Datenbank fixen. Es wurde keine DataSource initialisiert. 
 

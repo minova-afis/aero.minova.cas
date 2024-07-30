@@ -70,7 +70,8 @@ public class Table implements Serializable {
 	}
 
 	/**
-	 * Sucht anhand des Spaltennamens an welcher Position sich diese befindet und gibt die Stelle zurück. Falls der Name nicht vorkommt, wird -1 zurückgegeben
+	 * Sucht anhand des Spaltennamens (Case egal) an welcher Position sich diese befindet und gibt die Stelle zurück. Falls der Name nicht vorkommt, wird -1
+	 * zurückgegeben
 	 * 
 	 * @param columnName
 	 *            Spaltenname, nach welchem gesucht werden soll.

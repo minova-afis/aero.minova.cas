@@ -95,9 +95,9 @@ public abstract class BaseExtension<E extends DataEntity> {
 	public Table readIndex(Table inputTable) {
 		try {
 
-			if (filterLastAction) {
-				// Immer LastAction >0 anhängen, um gelöschte Werte zu filtern
+			if (filterLastAction && inputTable.findColumnPosition("LastAction") == -1) {
 
+				// LastAction > 0 an die erste Zeile und jede Zeile mit "echtem" Filter anhängen, damit gelöschte Einträge nicht angezeigt werden
 				Table withFilter = new Table();
 				withFilter.setName(inputTable.getName());
 
@@ -106,13 +106,26 @@ public abstract class BaseExtension<E extends DataEntity> {
 				}
 				withFilter.addColumn(new Column("LastAction", DataType.INTEGER));
 
+				boolean firstRow = true;
 				for (Row r : inputTable.getRows()) {
+					boolean allNull = true;
 					Row newRow = new Row();
-					for (Value v : r.getValues()) {
+					for (int i = 0; i < r.getValues().size(); i++) {
+						Value v = r.getValues().get(i);
 						newRow.addValue(v);
+						if (v != null && !inputTable.getColumns().get(i).getName().equals(Column.AND_FIELD_NAME)) {
+							allNull = false;
+						}
 					}
-					newRow.addValue(new Value(0, ">"));
+
+					if (firstRow || !allNull) {
+						newRow.addValue(new Value(0, ">"));
+					} else {
+						newRow.addValue(null);
+					}
+
 					withFilter.addRow(newRow);
+					firstRow = false;
 				}
 
 				return sqlViewController.getIndexView(withFilter, false);

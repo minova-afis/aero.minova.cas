@@ -7,6 +7,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Umlaute in i18n Datei ausbessern
 * Bei Login über LDAP alternative UPN Suffixe unterstützen
 * Bei Setup Extension Namen nur einmal in UserPrivilege eintragen
+* Suche über BaseExtension ausbessern, Filter werden jetzt korrekt angewendet
 
 ## [13.3.0] — 2024-07-08
 * Absturz bei Fehler während dem Erstellen von Privilegien über JPA verhindern. Damit ist es wieder möglich, das CAS mit einer leeren Datenbank zu starten.

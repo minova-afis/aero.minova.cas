@@ -4,7 +4,7 @@
 	<groupId>aero.minova</groupId>
 	<artifactId>cas.resource.maven.plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>13.4.0</version>
+	<version>13.4.1-SNAPSHOT</version>
 	<properties>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
@@ -106,6 +106,6 @@
 	</distributionManagement>
 	<scm>
 		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-		<tag>v13.4.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 </project>

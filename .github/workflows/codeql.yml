@@ -75,9 +75,9 @@ jobs:
             --file pom.xml \
             --settings .github/settings.xml
         env:
-          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
-          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.TEST_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.TEST_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.TEST_TOKEN }}
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

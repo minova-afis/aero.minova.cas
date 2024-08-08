@@ -2,6 +2,7 @@ package aero.minova.cas;
 
 import java.util.TimeZone;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -17,9 +18,21 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class CoreApplicationSystemApplication {
+
+	@Autowired
+	static CustomLogger logger;
+
 	public static void main(String[] args) {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
 		SpringApplication.run(CoreApplicationSystemApplication.class, args);
+
+		try {
+			logger = new CustomLogger();
+			logger.logInfo(VersionUtil.getVersionString());
+		} catch (Exception e) {
+			logger.logError("Could not read CAS Version.", e);
+		}
 	}
+
 }

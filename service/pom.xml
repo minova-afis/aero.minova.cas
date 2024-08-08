@@ -1,21 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>cas.service</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>cas.service</artifactId>
 
-    <parent>
-        <groupId>aero.minova</groupId>
-        <artifactId>cas.parent</artifactId>
-        <version>13.4.1-SNAPSHOT</version>
-        <relativePath>../</relativePath>
-    </parent>
-
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git
-        </developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-    <dependencyManagement>
+	<parent>
+		<groupId>aero.minova</groupId>
+		<artifactId>cas.parent</artifactId>
+		<version>13.4.1-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+  
+ <dependencyManagement>
         <dependencies>
             <dependency>
                 <!-- Diese BOM wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
@@ -250,7 +246,6 @@
         <dependency>
     		<groupId>org.hibernate.validator</groupId>
     		<artifactId>hibernate-validator</artifactId>
-    		<version>8.0.1.Final</version>
 		</dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
@@ -279,45 +274,54 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <finalName>aero.minova.cas.service</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <parameters>true</parameters>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/libs
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<finalName>aero.minova.cas.service</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<parameters>true</parameters>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/libs
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/pom.properties</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Minova Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</repositories>
 </project>

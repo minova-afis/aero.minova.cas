@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.VersionUtil;
 import aero.minova.cas.api.domain.PingResponse;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.VersionResponse;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.servlet.http.HttpServletResponse;
@@ -98,8 +99,7 @@ public class CommunicationController {
 	}
 
 	@RequestMapping(value = "/version", produces = "application/json", method = RequestMethod.GET)
-	public ResponseEntity<String> getVersion() throws IOException {
-		ResponseEntity<String> response = new ResponseEntity<String>(CoreApplicationSystemApplication.getVersion(), HttpStatusCode.valueOf(200));
-		return response;
+	public ResponseEntity<VersionResponse> getVersion() throws IOException {
+		return new ResponseEntity<>(VersionUtil.getVersionResponse(), HttpStatusCode.valueOf(200));
 	}
 }

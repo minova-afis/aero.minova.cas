@@ -1,7 +1,5 @@
 package aero.minova.cas;
 
-import java.io.IOException;
-import java.util.Properties;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import aero.minova.cas.service.mdi.Main;
 
 @SpringBootApplication
 @ComponentScan({ "aero.minova", "com.minova" })
@@ -33,15 +29,10 @@ public class CoreApplicationSystemApplication {
 
 		try {
 			logger = new CustomLogger();
-			logger.logInfo(getVersion());
+			logger.logInfo(VersionUtil.getVersionString());
 		} catch (Exception e) {
 			logger.logError("Could not read CAS Version.", e);
 		}
 	}
 
-	public static String getVersion() throws IOException {
-		Properties properties = new Properties();
-		properties.load(Main.class.getResourceAsStream("/pom.properties"));
-		return properties.getProperty("groupId") + "." + properties.getProperty("artifactId") + "-" + properties.getProperty("version");
-	}
 }

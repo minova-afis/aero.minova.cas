@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.PingResponse;
+import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.servlet.http.HttpServletResponse;

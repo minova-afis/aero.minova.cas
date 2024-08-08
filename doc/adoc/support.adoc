@@ -450,7 +450,7 @@ In den application.properties:
 * security_ldap_domain
 * security_ldap_address 
 
-Man solle auf jeden Fall überprüfen, ob die beiden Properties richtig sind. Dabei ist zu beachten, dass die security_ldap_address immer mit 'ldap://' beginnt.
+Man solle auf jeden Fall überprüfen, ob die beiden Properties richtig sind. Dabei ist zu beachten, dass die security_ldap_address immer mit 'ldap://' oder 'ldaps://' beginnt.
 
 Die security_ldap_domain kann über den Command Line Befehl 'net user USERNAME /domain' herausgefunden werden. Hierbei wird USERNAME durch einen bekannten AD-Benutzernamen ersetzt.
 
@@ -477,11 +477,11 @@ Folgendes Vorgehen ist am besten:
 * Im Debug-Modus die Anmelde-Daten etc. in den Variablen prüfen.
 
 ### Einige Benutzer funktionieren bei der Anmeldung und andere nicht.
-Man sollte darauf achten, dass die Nutzer immer die richtige Domäne haben,
-da das CAS zur Zeit nur eine Domäne gleichzeitig unterstützt.
-Nutzer von mehreren Domänene gleichzeitig werden nicht unterstützt.
 
+Man sollte darauf achten, dass die Domänen der Nutzer alle eingetragen sind (getrennt mit `;`).
 Die Domäne ist im Benutzerprinzipalname (=UPN=User Principal Name) der Teil nach dem `@` Symbol.
+
+Außerdem muss der Benutzername genau mit dem entsprechenden Eintrag in die Tabelle `xtcasUser` übereinstimmen.
 
 ## Zip oder MD5-Dateien aus `Internal/` können vom WFC nicht ausgelesen werden.
 

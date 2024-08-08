@@ -1,6 +1,7 @@
 package aero.minova.cas.controller;
 
 import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.PingResponse;
-import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +24,9 @@ public class CommunicationController {
 
 	@Value("${server.servlet.context-path:}")
 	String homePath;
+
+	@Value("${aero.minova.cas.label:}")
+	String label;
 
 	@Autowired
 	SqlProcedureController spc;
@@ -82,6 +85,15 @@ public class CommunicationController {
 			httpServletResponse.setHeader("Location", homePath + "/setupError");
 			httpServletResponse.setStatus(302);
 		}
+	}
+
+	/**
+	 * Hiermit kann die konfigurierte Bezeichnung des CAS abgerufen werden
+	 */
+	@GetMapping(value = "label", produces = "application/json")
+	public String getLabel() {
+		customLogger.logInfo("Received request for CAS Label");
+		return label;
 	}
 
 	@RequestMapping(value = "/version", produces = "application/json", method = RequestMethod.GET)

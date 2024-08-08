@@ -64,11 +64,11 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 * security_ldap_domain
 
-** *Default* `minova.comminova.com`
+** *Default* `minova.com`
 
 * security_ldap_address
 
-** *Default* `ldap:Minova Ldap Adresse`
+** *Default* `ldap://mindcsrv.minova.com:3268/` (Ldap Adresse der Minova)
 
 * login_dataSource
 
@@ -112,6 +112,14 @@ ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
 ** *Default*: `http://localhost:8100`
 
 ** *Wertebereich*: URLs mit Kommata getrennt, zur Festlegung erlaubter Origins für CORS.
+
+
+* aero.minova.cas.label
+
+** *Default*: nicht gesetzt
+
+** *Beschreibung*: Bezeichnung für das CAS. Wird vom WFC angefragt und im Hauptfenster angezeigt
+
 
 == Profiles
 

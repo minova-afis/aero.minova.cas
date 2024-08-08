@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
 import aero.minova.cas.service.model.UserGroup;
@@ -39,6 +41,9 @@ public class AuthorizationService {
 	@Autowired
 	UsersService usersService;
 
+	@Autowired
+	protected CustomLogger logger;
+
 	/**
 	 * Erstellt die Insert/Update/Read/Delete Prozedur-Berechtigungen und die Index-View
 	 * 
@@ -61,9 +66,15 @@ public class AuthorizationService {
 	 * @param privilegeName
 	 */
 	public UserPrivilege findOrCreateUserPrivilege(String privilegeName) {
-		return !userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).isEmpty()
-				? userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).get(0)
-				: createUserPrivilege(privilegeName);
+		try {
+			return !userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).isEmpty()
+					? userPrivilegeRepository.findByKeyTextAndLastActionGreaterThan(privilegeName, 0).get(0)
+					: createUserPrivilege(privilegeName);
+		} catch (InvalidDataAccessResourceUsageException e) {
+			logger.logError("Error while trying to set up privilege " + privilegeName
+					+ ". Consider executing setup or enabling spring.jpa.hibernate.ddl-auto=update in the properties", e);
+		}
+		return null;
 	}
 
 	private UserPrivilege createUserPrivilege(String privilegeName) {

@@ -26,6 +26,15 @@ Folgende properties müssen gesetzt werden:
 * `security_ldap_domain`: Domain der Nutzer
 * `security_ldap_address`: URL des LDAP bzw. Active Directory (AD) Server
 
+Dabei ist es möglich, mehrere Domänen oder Adressen anzugeben. 
+Diese müssen jeweils mit einem `;` getrennt werden.
+Nutzer von unterschiedlichen Domänen aber gleichen Namen werden vom CAS als der selbe Nutzer betrachtet.
+
+Ist nur genau eine `security_ldap_address` gegeben wird diese für alle Domänen genutzt.
+Ist genau eine `security_ldap_domain` gegeben wird diese für alle Adressen genutzt.
+Ansonsten wird die erste Domäne mit der ersten Adresse, die zweite mit der zweiten, ... verwendet.
+Gibt es mehr als eine Adresse und mehr als eine Domäne müssen es die gleiche Anzahl sein, ansonsten startet das CAS mit einer entsprechenden Fehlermeldung nicht.
+
 === database
 Ist die Property auf 'database' gesetzt, müssen die User erst in der *xtcasUsers* Tabelle erstellt werden.
 Hierfür wird deren Username und ein mit Base64 verschlüsseltes Passwort benötigt.

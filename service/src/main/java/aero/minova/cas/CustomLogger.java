@@ -140,6 +140,6 @@ public class CustomLogger {
 	}
 
 	private String getUser() {
-		return SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : "anonymous";
+		return SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : "CAS";
 	}
 }

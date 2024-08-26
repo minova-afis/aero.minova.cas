@@ -7,6 +7,9 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.
 * Es wird nun Java 21 verwendet.
 
+* RowLevelSecurity mit JOOQ ermöglichen/ausbessern
+* Bequemlichkeits-Methoden für Nutzerverwaltung in Services
+
 ## [13.4.0] — 2024-07-31
 * Umlaute in i18n Datei ausbessern
 * Bei Login über LDAP alternative UPN Suffixe unterstützen

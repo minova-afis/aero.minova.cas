@@ -16,6 +16,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.TableMetaData;
+import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.annotation.PostConstruct;
@@ -50,11 +51,11 @@ public class ViewService {
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
 
 		if (dialect.toString().contains(MSSQLDIALECT)) {
-			viewService = new MssqlViewService(systemDatabase, customLogger, securityService);
+			viewService = new MssqlViewService(systemDatabase, customLogger);
 		} else {
-			viewService = new JOOQViewService(systemDatabase, customLogger, securityService);
+			viewService = new JOOQViewService(systemDatabase, customLogger);
 		}
-		securityService.setViewService(viewService);
+		securityService.setViewService(this);
 	}
 
 	public Table executeView(Table inputTable, List<Row> authoritiesForThisTable) throws TableException {
@@ -187,8 +188,40 @@ public class ViewService {
 		return viewService.prepareViewString(params, autoLike, maxRows, count, authorities);
 	}
 
+	/**
+	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage und ohne die maximale Anzahl der ausgegebenen Zeilen zu beschränken. Ist nur für
+	 * die Sicherheitsabfragen gedacht, um nicht zu viele unnötige SQL-Abfrage zu machen.
+	 *
+	 * @param inputTable
+	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
+	 * @return Das Ergebnis der Abfrage.
+	 */
 	public Table unsecurelyGetIndexView(Table inputTable) {
-		return viewService.unsecurelyGetIndexView(inputTable);
+		StringBuilder sb = new StringBuilder();
+		List<Row> userGroups = new ArrayList<>();
+		Row inputRow = new Row();
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value("", null));
+		inputRow.addValue(new Value(false, null));
+		userGroups.add(inputRow);
+		Table result = new Table();
+		final val connection = systemDatabase.getConnection();
+		final String viewQuery = prepareViewString(inputTable, false, ViewServiceInterface.IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
+		try (final var preparedStatement = connection.prepareCall(viewQuery)) {
+			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
+					customLogger.errorLogger)) {
+				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
+				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
+					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
+				}
+			}
+		} catch (Exception e) {
+			customLogger.logError("Statement could not be executed: " + sb, e);
+			throw new RuntimeException(e);
+		} finally {
+			systemDatabase.closeConnection(connection);
+		}
+		return result;
 	}
 
 	/**

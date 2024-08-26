@@ -11,16 +11,6 @@ public interface ViewServiceInterface {
 	static final int IF_LESS_THAN_ZERO_THEN_MAX_ROWS = -1;
 
 	/**
-	 * Wie {@link #getIndexView(Table)}, nur ohne die erste Sicherheits-Abfrage und ohne die maximale Anzahl der ausgegebenen Zeilen zu beschränken. Ist nur für
-	 * die Sicherheitsabfragen gedacht, um nicht zu viele unnötige SQL-Abfrage zu machen.
-	 *
-	 * @param inputTable
-	 *            Die Parameter, der SQL-Anfrage die ohne Sicherheitsprüfung durchgeführt werden soll.
-	 * @return Das Ergebnis der Abfrage.
-	 */
-	public Table unsecurelyGetIndexView(Table inputTable);
-
-	/**
 	 * @param params
 	 *            Suchzeilen (z.B. Suchparameter), wobei auch ein Spezialfeld mit dem Namen 'AND' genutzt werden kann, um die Kriterien zu verknüpfen
 	 * @param autoLike

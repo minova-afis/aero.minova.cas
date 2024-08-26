@@ -4,9 +4,17 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
-* Umlaute in i18n Datei ausbessern
+* CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.
+* Es wird nun Java 21 verwendet.
+
 * RowLevelSecurity mit JOOQ ermöglichen/ausbessern
 * Bequemlichkeits-Methoden für Nutzerverwaltung in Services
+
+## [13.4.0] — 2024-07-31
+* Umlaute in i18n Datei ausbessern
+* Bei Login über LDAP alternative UPN Suffixe unterstützen
+* Bei Setup Extension Namen nur einmal in UserPrivilege eintragen
+* Suche über BaseExtension ausbessern, Filter werden jetzt korrekt angewendet
 
 ## [13.3.0] — 2024-07-08
 * Absturz bei Fehler während dem Erstellen von Privilegien über JPA verhindern. Damit ist es wieder möglich, das CAS mit einer leeren Datenbank zu starten.
@@ -22,7 +30,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Erweiterungen dürfen nicht mehr Null zurückgeben,
   da sonst versucht wird die gleichnamige SQL-Prozedur aufzurufen.
   Der Zweck von Erweiterung ist es, SQL-Prozeduren zu ersetzen und nicht zu vervollständigen.
-* Aussagekräftige Fehlermeldung werfen, wenn in einer i18n-Datei das "=" Trennzeichen für die Properties fehlt
+* Aussagekräftige Fehlermeldung werfen, wenn in einer i18n-Datei das "=" Trennzeichen für die Properties fehlt.
 
 
 ## [13.2.1] — 2024-02-22

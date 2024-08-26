@@ -8,8 +8,8 @@ registries:
   maven-github:
     type: maven-repository
     url: https://maven.pkg.github.com/minova-afis
-    username: ${{secrets.MAIN_GITHUB_RELEASE_USERNAME}}
-    password: ${{secrets.MAIN_GITHUB_RELEASE_TOKEN}}
+    username: ${{secrets.TEST_USERNAME}}
+    password: ${{secrets.TEST_TOKEN}}
 updates:
   - package-ecosystem: "maven"
     directory: "/"

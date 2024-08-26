@@ -25,14 +25,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.WebSessionServerLogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
+import aero.minova.cas.ldap.MultipleLdapDomainsAuthenticationProvider;
+import aero.minova.cas.ldap.MultipleLdapServerAddressesUserDetailsManager;
 import aero.minova.cas.service.SecurityService;
 import lombok.RequiredArgsConstructor;
 
@@ -82,8 +81,7 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		DelegatingServerLogoutHandler logoutHandler = new DelegatingServerLogoutHandler(new WebSessionServerLogoutHandler(),
-				new SecurityContextServerLogoutHandler());
+
 		http.authorizeHttpRequests(requests -> requests
 				.requestMatchers("/actuator/**").permitAll().requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
 				.permitAll().anyRequest().fullyAuthenticated()).logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))

@@ -212,6 +212,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				.map(String::trim)//
 				.toList();
 
+		// War wohl doch kein SQL Fehler
+		if (sqlErrorMessage.size() < 3) {
+			return handleGenericErrorMessage(outputTable, errorMessage);
+		}
+
 		// Splitte den String überall da, wo ein @ vorkommt.
 		String[] types = sqlErrorMessage.get(2).split("@");
 

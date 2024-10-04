@@ -230,6 +230,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		for (int i = 1; i < types.length; i++) {
 			types[i] = types[i].trim();
 			int blank = types[i].indexOf(' ');
+			if (blank == -1) {
+				// Komisches Format kann nicht verarbeitet werden
+				continue;
+			}
 			outputTable.addColumn(new Column(types[i].substring(0, blank), DataType.STRING));
 			internatMsg.addValue(new Value((types[i].subSequence(blank + 1, types[i].length())).toString(), null));
 		}

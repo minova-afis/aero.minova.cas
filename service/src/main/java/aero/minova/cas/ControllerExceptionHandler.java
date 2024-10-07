@@ -212,6 +212,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				.map(String::trim)//
 				.toList();
 
+		// War wohl doch kein SQL Fehler
+		if (sqlErrorMessage.size() < 3) {
+			return handleGenericErrorMessage(outputTable, errorMessage);
+		}
+
 		// Splitte den String überall da, wo ein @ vorkommt.
 		String[] types = sqlErrorMessage.get(2).split("@");
 
@@ -225,6 +230,10 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		for (int i = 1; i < types.length; i++) {
 			types[i] = types[i].trim();
 			int blank = types[i].indexOf(' ');
+			if (blank == -1) {
+				// Komisches Format kann nicht verarbeitet werden
+				continue;
+			}
 			outputTable.addColumn(new Column(types[i].substring(0, blank), DataType.STRING));
 			internatMsg.addValue(new Value((types[i].subSequence(blank + 1, types[i].length())).toString(), null));
 		}

@@ -12,6 +12,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 * Fehlerhandling robuster gestalten
 
+* LastDate im Java-Code keinen Default-Wert geben, da es sich um eine TIMESTAMP Spalte handelt, in die in SQL kein explizierter Wert eingetragen werden darf
+
 ## [13.4.0] — 2024-07-31
 * Umlaute in i18n Datei ausbessern
 * Bei Login über LDAP alternative UPN Suffixe unterstützen

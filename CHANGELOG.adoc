@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+
+## [13.5.0] — 2024-10-09
 * CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.
 * Es wird nun Java 21 verwendet.
 

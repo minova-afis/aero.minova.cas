@@ -5,6 +5,9 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 
+* LastDate nicht als TIMESTAMP Spalte erstellen
+* Database-Login ausbessern
+
 ## [13.5.0] — 2024-10-09
 * CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.
 * Es wird nun Java 21 verwendet.

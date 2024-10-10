@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,16 +39,9 @@ public class ViewService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	private static final String MSSQLDIALECT = "SQLServer";
-
 	@PostConstruct
 	private void init() {
-
-		final Session session = (Session) entityManager.getDelegate();
-		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
-		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
-
-		if (dialect.toString().contains(MSSQLDIALECT)) {
+		if (systemDatabase.isSQLDatabase()) {
 			viewService = new MssqlViewService(systemDatabase, customLogger);
 		} else {
 			viewService = new JOOQViewService(systemDatabase, customLogger);

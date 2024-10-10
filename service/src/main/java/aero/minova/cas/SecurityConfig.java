@@ -33,6 +33,7 @@ import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import aero.minova.cas.ldap.MultipleLdapDomainsAuthenticationProvider;
 import aero.minova.cas.ldap.MultipleLdapServerAddressesUserDetailsManager;
 import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -59,6 +60,8 @@ public class SecurityConfig {
 	private String allowedOrigins;
 
 	private final DataSource dataSource;
+
+	private final SystemDatabase systemDatabase;
 
 	@Bean
 	public SpringSecurityDialect springSecurityDialect() {
@@ -103,7 +106,11 @@ public class SecurityConfig {
 					Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)));
 		} else if ("database".equals(loginDataSource)) {
 			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-			jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
+			if (systemDatabase.isSQLDatabase()) {
+				jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction as enabled  from xtcasUsers where Username = ?");
+			} else {
+				jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
+			}
 			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
 
 			return jdbcUserDetailsManager;

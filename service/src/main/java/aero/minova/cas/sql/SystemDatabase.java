@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.hibernate.Session;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,8 @@ public class SystemDatabase {
 	private final EntityManager entityManager;
 	private final CustomLogger customLogger;
 
+	private static final String MSSQLDIALECT = "SQLServer";
+
 	public Connection getConnection() {
 		try {
 			Map<String, Object> properties = entityManager.getEntityManagerFactory().getProperties();
@@ -45,8 +49,9 @@ public class SystemDatabase {
 
 	public void closeConnection(Connection connection) {
 		try {
-			if (connection != null)
+			if (connection != null) {
 				connection.close();
+			}
 		} catch (SQLException e) {
 			customLogger.logError("Connection '" + connection + "' could not be closed: ", e);
 		}
@@ -59,5 +64,13 @@ public class SystemDatabase {
 		dataSource.setUsername(userName);
 		dataSource.setPassword(userPassword);
 		return dataSource;
+	}
+
+	public boolean isSQLDatabase() {
+		final Session session = (Session) entityManager.getDelegate();
+		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
+		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
+
+		return dialect.contains(MSSQLDIALECT);
 	}
 }

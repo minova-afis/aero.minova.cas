@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Fehlerhandling robuster gestalten
+* Login für Database-User mit SQL Datenbank ausbessern
 
 ## [12.67.6] -- 2024-07-25
 * Neuste i18n Version

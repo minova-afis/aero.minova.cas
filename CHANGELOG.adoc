@@ -7,6 +7,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 * LastDate nicht als TIMESTAMP Spalte erstellen
 * Login für Database-User mit SQL Datenbank ausbessern
+* HTML-Dateien beim Bauen wieder mit ausliefern
 
 ## [13.5.0] — 2024-10-09
 * CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.

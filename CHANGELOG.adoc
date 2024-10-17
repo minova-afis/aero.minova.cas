@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 
+## [13.5.1] — 2024-10-17
 * LastDate nicht als TIMESTAMP Spalte erstellen
 * Login für Database-User mit SQL Datenbank ausbessern
 * HTML-Dateien beim Bauen wieder mit ausliefern

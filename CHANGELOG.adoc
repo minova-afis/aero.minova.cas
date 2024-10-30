@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+* Bei Fehler in LDAP Login username Loggen
 
 ## [13.5.1] — 2024-10-17
 * LastDate nicht als TIMESTAMP Spalte erstellen

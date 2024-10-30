@@ -60,7 +60,7 @@ public class MultipleLdapDomainsAuthenticationProvider implements Authentication
 			}
 		}
 
-		customLogger.logError("Authentication failed for all ActiveDirectoryLdapAuthenticationProviders");
+		customLogger.logError("Authentication of user '" + authentication.getName() + "' failed for all ActiveDirectoryLdapAuthenticationProviders");
 		for (Exception e : exceptions) {
 			customLogger.logError(e);
 		}

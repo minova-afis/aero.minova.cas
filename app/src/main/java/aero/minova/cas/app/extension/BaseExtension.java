@@ -99,6 +99,7 @@ public abstract class BaseExtension<E extends DataEntity> {
 
 				// LastAction > 0 an die erste Zeile und jede Zeile mit "echtem" Filter anhängen, damit gelöschte Einträge nicht angezeigt werden
 				Table withFilter = new Table();
+				withFilter.setMetaData(inputTable.getMetaData());
 				withFilter.setName(inputTable.getName());
 
 				for (Column c : inputTable.getColumns()) {

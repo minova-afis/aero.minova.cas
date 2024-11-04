@@ -28,6 +28,7 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.model.Authorities;
@@ -412,6 +413,32 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		}
 	}
 
+	@Test
+	@DisplayName("Limit testen")
+	void testLimit() throws Exception {
+		// Erste Page mit 2 Ergebnissen -> KeyLongs 1 und 2
+		Table indexView = getTableForRequestWithLimitedRows(1);
+		Table indexViewResult = viewController.getIndexView(indexView);
+		assertEquals(2, indexViewResult.getRows().size());
+		assertEquals(1, indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue());
+		assertEquals(2, indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue());
+		assertEquals(2, indexViewResult.getMetaData().getLimited());
+		assertEquals(1, indexViewResult.getMetaData().getPage());
+		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
+		assertTrue(indexViewResult.getMetaData().getResultsLeft() >= 2);
+
+		// Zweite Page mit 2 Ergebnissen -> KeyLongs 3 und 4
+		indexView = getTableForRequestWithLimitedRows(2);
+		indexViewResult = viewController.getIndexView(indexView);
+		assertEquals(2, indexViewResult.getRows().size());
+		assertEquals(3, indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue());
+		assertEquals(4, indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue());
+		assertEquals(2, indexViewResult.getMetaData().getLimited());
+		assertEquals(2, indexViewResult.getMetaData().getPage());
+		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
+		assertTrue(indexViewResult.getMetaData().getResultsLeft() >= 0);
+	}
+
 	private Table getTableForRequest() {
 		Table indexView = new Table();
 		indexView.setName("xtcasAuthorities");
@@ -448,6 +475,26 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		indexView.addColumn(new Column("lastaction", DataType.INTEGER));
 
 		indexView.addRow(getEmptyRow(6));
+		return indexView;
+	}
+
+	private Table getTableForRequestWithLimitedRows(int page) {
+		Table indexView = new Table();
+		indexView.setName("xtcasAuthorities");
+		indexView.addColumn(new Column("KeyLong", DataType.INTEGER));
+		indexView.addColumn(new Column("Username", DataType.STRING));
+		indexView.addColumn(new Column("Authority", DataType.STRING));
+		indexView.addColumn(new Column("Lastuser", DataType.STRING));
+		indexView.addColumn(new Column("Lastdate", DataType.INSTANT));
+		indexView.addColumn(new Column("lastaction", DataType.INTEGER));
+
+		indexView.addRow(getEmptyRow(6));
+
+		TableMetaData tableMetaData = new TableMetaData();
+		tableMetaData.setLimited(2);
+		tableMetaData.setPage(page);
+		indexView.setMetaData(tableMetaData);
+
 		return indexView;
 	}
 

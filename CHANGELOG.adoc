@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+* ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern
 
 ## [13.5.2] — 2024-11-04
 * Bei Fehler in LDAP Login username Loggen

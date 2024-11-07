@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern
 
 ## [12.67.7] -- 2024-10-22
 * Fehlerhandling robuster gestalten

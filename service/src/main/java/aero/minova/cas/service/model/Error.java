@@ -31,8 +31,8 @@ public class Error {
 	public String username;
 
 	@NotNull
-	@Size(max = 250)
-	@Column(name = "ErrorMessage", length = 250)
+	@Size(max = 2000)
+	@Column(name = "ErrorMessage", length = 2000)
 	public String errormessage;
 
 	@NotNull

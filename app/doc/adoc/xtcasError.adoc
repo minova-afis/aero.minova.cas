@@ -27,7 +27,7 @@ Datentyp: nvarchar(50) not null +
 
 ==== ErrorMessage
 
-Datentyp: nvarchar(250) not null +
+Datentyp: nvarchar(2000) not null +
 
 // tag::column.ErrorMessage[]
 

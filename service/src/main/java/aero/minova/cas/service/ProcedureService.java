@@ -19,7 +19,6 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
@@ -84,7 +83,7 @@ public class ProcedureService {
 			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
 		}
 		try {
-			userContextSetter.setNString(1, SecurityContextHolder.getContext().getAuthentication().getName());
+			userContextSetter.setNString(1, BaseService.getCurrentUser());
 			userContextSetter.execute();
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to set user for procedures: ", e);

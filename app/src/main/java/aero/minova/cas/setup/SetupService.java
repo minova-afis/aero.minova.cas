@@ -101,7 +101,7 @@ public class SetupService {
 			logger.logSetup("Searching for setup.xml for dependency " + dependency);
 			final Optional<Path> setupXml = findSetupXml(dependency, dependencySetupsDir);
 			if (setupXml.isEmpty()) {
-				logger.logError("No setup file found  for dependency " + dependency + ". Continuing with setup.");
+				logger.logError("No setup file found for dependency " + dependency + ". Continuing with setup.");
 				continue;
 			}
 			logger.logSetup("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);

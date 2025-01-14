@@ -86,12 +86,11 @@ public class SetupService {
 	}
 
 	/**
-	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
+	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück. Wird eine Setup.xml nicht gefunden läuft
+	 * das Setup trotzdem weiter
 	 *
 	 * @param arg
 	 *            Ein String, in welchem die benötigten Dependencies stehen.
-	 * @throws IOException
-	 *             Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
 	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = DependencyOrder.determineDependencyOrder(Files.readString(dependencyList));

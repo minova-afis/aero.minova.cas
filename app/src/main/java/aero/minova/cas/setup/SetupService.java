@@ -141,39 +141,15 @@ public class SetupService {
 		 * wäre, würde es hiermit enden. else { throw new NoSuchFileException("No setup file found with the name " + setupFile); }
 		 */
 		final String adjustedDependency = dependency.substring(dependency.indexOf(".", dependency.indexOf(".") + 1) + 1);
-		try {
-			if (true) {
-				final Optional<Path> result = FILE_SYSTEM_PROVIDER.walk(dependencySetupsDir).stream().map(dir -> {
-					if (dir.toString().startsWith("setup/" + adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency)) {
-						if (dir.getFileName().toString().equalsIgnoreCase("Setup.xml")) {
-							return Optional.of(dir);
-						}
-					}
-					return Optional.<Path> empty();
-				}).filter(Optional::isPresent).map(Optional::get).findFirst();
 
-				return result;
-			} else {
-				final Optional<Path> result = Files.walk(dependencySetupsDir, 1).map(dir -> {
-					if (dir.getFileName().toString().startsWith(adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency)) {
-						try {
-							return Files.walk(dir)//
-									.filter(f -> f.getFileName().toString().equalsIgnoreCase("setup.xml"))//
-									.findFirst();
-						} catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-					}
-					return Optional.<Path> empty();
-				}).filter(Optional::isPresent).map(Optional::get).findFirst();
-				if (result.isEmpty()) {
-					throw new NoSuchFileException("No setup file found with the name " + niceSetupFile);
-				}
-				return result;
+		return FILE_SYSTEM_PROVIDER.walk(dependencySetupsDir).stream().map(dir -> {
+			if ((dir.toString().startsWith("setup/" + adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency))
+					&& dir.getFileName().toString().equalsIgnoreCase("Setup.xml")) {
+				return Optional.of(dir);
 			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+			return Optional.<Path> empty();
+		}).filter(Optional::isPresent).map(Optional::get).findFirst();
+
 	}
 
 	/**

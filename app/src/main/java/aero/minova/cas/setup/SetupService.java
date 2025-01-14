@@ -59,6 +59,7 @@ public class SetupService {
 	@Autowired
 	CustomLogger logger;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@PostConstruct
 	private void setup() {
 		spc.registerExtension(PROCEDURE_NAME, inputTable -> {

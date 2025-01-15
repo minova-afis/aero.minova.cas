@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+
+## [13.5.3/4] — 2025-01-14
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern
 * Setup nicht abbrechen, wenn das setup.xml File einer Abhängigkeit nicht gefunden wurde
 * Wenn Prozeduren vom CAS selbst aufgerufen werden User "CAS_JPA" für LastUser in der Datenbank setzten

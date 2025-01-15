@@ -39,8 +39,8 @@ public class ServiceMessage extends DataEntity {
 	private int numberOfAttempts = 0;
 
 	@NotNull
-	@Column(name = "MessageCreationDate", columnDefinition = "TIMESTAMP")
-	private LocalDateTime messageCreationDate;
+	@Column(name = "MessageCreationDate")
+	private LocalDateTime messageCreationDate = LocalDateTime.now();
 
 	@NotNull
 	@Column(name = "Failed")

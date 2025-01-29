@@ -7,7 +7,7 @@ version: 2
 registries:
   maven-github:
     type: maven-repository
-    url: https://maven.pkg.github.com/minova-afis/aero.minova.maven.root
+    url: https://gibt.es.nicht
     username: ${{secrets.TEST_USERNAME}}
     password: ${{secrets.TEST_TOKEN}}
 updates:

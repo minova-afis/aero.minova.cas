@@ -20,11 +20,11 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
 			</field>
-			<field name="KeyText" sql-index="1" text="@xtcasUser.KeyText" required="true" key-type="user">
-				<text length="10"/>
+			<field name="KeyText" sql-index="1" text="@xtcasUser.KeyText" required="true" key-type="user" fill="toright">
+				<text length="100"/>
 			</field>
 			<field name="UserSecurityToken" sql-index="2" text="@xtcasUser.UserSecurityToken" number-columns-spanned="4" required="true" fill="toright">
-				<text length="50"/>
+				<text length="100"/>
 			</field>
 			<field name="Memberships" sql-index="3" text="@xtcasUser.Memberships" number-columns-spanned="4" fill="toright">
 				<text length="250"/>

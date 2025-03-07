@@ -6,6 +6,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## Unreleased
 
 * Maske LDAP User: Mehr Zeichen für KeyText erlauben
+* CORS Erweitern: `https://saas-app.minova.com,https://saas-app-dev.minova.com` Zugriff gewähren, damit SAM PWA DEMO nicht mehr mit 403er Fehler abgewiesen wird. Mr. Katzenberger würde die PWA gerne vorstellen.
+
 
 ## [13.5.3/4] — 2025-01-14
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern

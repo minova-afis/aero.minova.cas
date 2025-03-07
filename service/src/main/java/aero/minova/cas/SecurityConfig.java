@@ -57,7 +57,7 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
-	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
+	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100,https://saas-app.minova.com,https://saas-app-dev.minova.com}")
 	private String allowedOrigins;
 
 	@Autowired
@@ -88,16 +88,21 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 		http.authorizeHttpRequests(requests -> requests
-				.requestMatchers("/actuator/**").permitAll().requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
-				.permitAll().anyRequest().fullyAuthenticated()).logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
+				.requestMatchers("/actuator/**").permitAll()
+				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
+				.permitAll().anyRequest().fullyAuthenticated())
+				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
 				.formLogin(form -> form.loginPage("/login")//
 						.defaultSuccessUrl("/")//
 						.permitAll())
 				.httpBasic(Customizer.withDefaults())
-				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
+				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
+						.configurationSource(corsConfigurationSource()))
 
-				// scj: CSRF Should only be enabled if basic auth is replaced by a modern method.
-				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
+				// scj: CSRF Should only be enabled if basic auth is replaced by a modern
+				// method.
+				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security
+													// vulnerabilities.
 		return http.build();
 	}
 
@@ -110,12 +115,15 @@ public class SecurityConfig {
 			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 
 			if (systemDatabase.isSQLDatabase()) {
-				jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction as enabled  from xtcasUsers where Username = ?");
+				jdbcUserDetailsManager.setUsersByUsernameQuery(
+						"select Username,Password,LastAction as enabled  from xtcasUsers where Username = ?");
 			} else {
-				jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
+				jdbcUserDetailsManager.setUsersByUsernameQuery(
+						"select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
 			}
 
-			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
+			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+					"select Username,Authority from xtcasAuthorities where Username = ?");
 
 			return jdbcUserDetailsManager;
 		} else if (ADMIN.equals(loginDataSource)) {
@@ -137,7 +145,8 @@ public class SecurityConfig {
 
 	@Bean
 	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
-	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(UserDetailsContextMapper userDetailsContextMapper) {
+	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(
+			UserDetailsContextMapper userDetailsContextMapper) {
 		return new MultipleLdapDomainsAuthenticationProvider(//
 				Arrays.asList(domain.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
 				Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
@@ -150,10 +159,12 @@ public class SecurityConfig {
 		return new LdapUserDetailsMapper() {
 			@SuppressWarnings("unchecked")
 			@Override
-			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
+			public UserDetails mapUserFromContext(DirContextOperations ctx, String username,
+					Collection<? extends GrantedAuthority> authorities)
 					throws RuntimeException {
 				List<String> userSecurityTokens = securityService.loadLDAPUserTokens(username);
-				List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username, userSecurityTokens,
+				List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username,
+						userSecurityTokens,
 						(List<GrantedAuthority>) authorities);
 				return super.mapUserFromContext(ctx, username, grantedAuthorities);
 			}

@@ -57,7 +57,7 @@ public class SecurityConfig {
 	@Value("${server.port:8084}")
 	private String serverPort;
 
-	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100,https://saas-app.minova.com,https://saas-app-dev.minova.com}")
+	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
 	private String allowedOrigins;
 
 	@Autowired

@@ -27,6 +27,17 @@
             <artifactId>cas.api</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <!-- HUB FUnktionalität -->
+        <dependency>
+            <groupId>ch.minova</groupId>
+            <artifactId>appmodel</artifactId>
+            <version>0.9.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.minova</groupId>
+            <artifactId>assist.core</artifactId>
+            <version>0.9.6</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

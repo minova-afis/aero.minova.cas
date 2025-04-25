@@ -7,7 +7,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern
 * Bei Fehler in LDAP Login username Loggen
-
+* HUB Funktionalität, siehe link:https://github.com/minova-afis/aero.minova.cas/issues/1272[#1272]
 
 ## [12.67.7] -- 2024-10-22
 * Fehlerhandling robuster gestalten

@@ -6,6 +6,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## Unreleased
 
 * Maske LDAP User: Mehr Zeichen für KeyText erlauben
+* HUB Funktionalität, siehe link:https://github.com/minova-afis/aero.minova.cas/issues/1272[#1272]
 
 ## [13.5.3/4] — 2025-01-14
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern

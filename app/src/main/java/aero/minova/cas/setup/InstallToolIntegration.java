@@ -1,19 +1,20 @@
 package aero.minova.cas.setup;
 
-import aero.minova.cas.CustomLogger;
-import aero.minova.cas.service.FilesService;
-import aero.minova.cas.setup.xml.setup.SetupType;
-import aero.minova.cas.sql.SystemDatabase;
-import ch.minova.install.setup.BaseSetup;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.service.FilesService;
+import aero.minova.cas.setup.xml.setup.SetupType;
+import aero.minova.cas.sql.SystemDatabase;
+import ch.minova.install.setup.BaseSetup;
 
 /**
  * Diese Klasse installiert SQL-Code, Procedure und Schemas aus den "Setup.xml"s mithilfe des Install-Tools. Dabei wurde gesorgt, dass der Code des
@@ -60,8 +61,7 @@ public class InstallToolIntegration {
 			BaseSetup.hashModules = new Hashtable<>();
 			BaseSetup.hashtables = new Hashtable<>();
 			BaseSetup.tablevector = new Vector<>();
-			final BaseSetup setup = new BaseSetup();
-			setup.setIsFatJarMode(isFatJarMode);
+			final BaseSetup setup = new BaseSetup(logger);
 			setup.setSetupDocument(setupDocument);
 			setup.readSchema();
 			// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.

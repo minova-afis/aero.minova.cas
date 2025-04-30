@@ -1,5 +1,12 @@
 package ch.minova.install.setup;
 
+import static aero.minova.cas.setup.xml.setup.ScriptType.TYPE_FUNCTION;
+import static aero.minova.cas.setup.xml.setup.ScriptType.TYPE_PROCEDURE;
+import static aero.minova.cas.setup.xml.setup.ScriptType.TYPE_SCRIPT;
+import static aero.minova.cas.setup.xml.setup.ScriptType.TYPE_TABLE;
+import static aero.minova.cas.setup.xml.setup.ScriptType.TYPE_VIEW;
+import static java.nio.file.Files.readAllBytes;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,22 +25,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import aero.minova.cas.setup.xml.setup.SetupType;
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.setup.xml.setup.ScriptType;
+import aero.minova.cas.setup.xml.setup.SetupType;
 import aero.minova.cas.setup.xml.setup.TableschemaType;
-
 import ch.minova.install.setup.schema.SqlDatabase;
 import ch.minova.install.setup.schema.SqlDatabaseTable;
 import ch.minova.install.setup.schema.XmlDatabaseColumn;
 import ch.minova.install.setup.schema.XmlDatabaseTable;
 import ch.minova.install.sql.TVersion;
-
-import static aero.minova.cas.setup.xml.setup.ScriptType.*;
-import static java.nio.file.Files.readAllBytes;
 
 /**
  * Basisklasse für die Installer der Module
@@ -58,6 +67,13 @@ public class BaseSetup {
 	public static Properties parameter = null;
 
 	public static final String FAILTOWRITENODETODOCUMENT = "Error: Der Knoten {0} konnte nicht in die Datei eingetragen werden!";
+
+	CustomLogger logger;
+
+	public BaseSetup(CustomLogger logger) {
+		this.logger = logger;
+	}
+
 	public boolean readoutSchemaCreate(final Connection con) throws IOException, BaseSetupException {
 		return readoutSchemaCreate(con, Optional.empty(), Optional.empty());
 	}
@@ -93,8 +109,7 @@ public class BaseSetup {
 		}
 	}
 
-	public boolean readoutSchemaCreate(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary)
-			throws IOException, BaseSetupException {
+	public boolean readoutSchemaCreate(final Connection con, Optional<Path> tableLibrary, Optional<Path> sqlLibrary) throws IOException, BaseSetupException {
 		checktVersion10(con, sqlLibrary);
 		SqlDatabase sqldatabase = new SqlDatabase();
 		XmlDatabaseTable xmlTable = null;
@@ -147,15 +162,19 @@ public class BaseSetup {
 		} catch (final SQLException e1) {
 			System.out.println("help me SQLException");
 			e1.printStackTrace();
+			logger.logSetup(e1.getMessage());
 		} catch (final InstantiationException e1) {
 			System.out.println("help me InstantiationException");
 			e1.printStackTrace();
+			logger.logSetup(e1.getMessage());
 		} catch (final IllegalAccessException e1) {
 			System.out.println("help me IllegalAccessException");
 			e1.printStackTrace();
+			logger.logSetup(e1.getMessage());
 		} catch (final ClassNotFoundException e1) {
 			System.out.println("help me ClassNotFoundException");
 			e1.printStackTrace();
+			logger.logSetup(e1.getMessage());
 		}
 		// Table constraints für UN und PK
 		log(MessageFormat.format("Tableconstrains erstellen (UK/PK):", ""), true);
@@ -402,9 +421,9 @@ public class BaseSetup {
 	 * @param message
 	 * @param forceOutput
 	 */
-	protected static void log(final String message, final boolean forceOutput) {
+	protected void log(final String message, final boolean forceOutput) {
 		if (forceOutput || (parameter.containsKey("verbose") || parameter.containsKey("v"))) {
-			System.out.println(message);
+			logger.logSetup(message);
 		}
 	}
 
@@ -427,23 +446,21 @@ public class BaseSetup {
 			throw new SQLException(e);
 		}
 	}
+
 	private InputStream readTableXml(String tableName, Optional<Path> tableLibrary) {
 		if (tableLibrary.isEmpty()) {
 			return readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tableName + ".table.xml");
 		} else {
 			try {
-				final Optional<Path> tableXml = Files.walk(tableLibrary.get())
-						.map(path -> {
-							// TODO Einheitliche XML-Namen verwenden.
-							if (Files.isRegularFile(path) && path.getFileName().toString().equals(tableName + ".table.xml") || path.getFileName().toString()
-									.equals(tableName + ".xml")) {
-								return Optional.of(path);
-							}
-							return Optional.<Path>empty();
-						})//
-						.filter(path -> !path.isEmpty())
-						.map(path -> path.get())
-						.findFirst();
+				final Optional<Path> tableXml = Files.walk(tableLibrary.get()).map(path -> {
+					// TODO Einheitliche XML-Namen verwenden.
+					if (Files.isRegularFile(path) && path.getFileName().toString().equals(tableName + ".table.xml")
+							|| path.getFileName().toString().equals(tableName + ".xml")) {
+						return Optional.of(path);
+					}
+					return Optional.<Path> empty();
+				})//
+						.filter(path -> !path.isEmpty()).map(path -> path.get()).findFirst();
 				if (tableXml.isEmpty()) {
 					throw new RuntimeException("Table xml " + tableName + "not found.");
 				}
@@ -877,8 +894,7 @@ public class BaseSetup {
 		handleSqlScripts(con, Optional.empty());
 	}
 
-	public void handleSqlScripts(final Connection con, final Optional<Path> sqlLibrary)
-			throws IOException, BaseSetupException, SQLException, SQLExeption {
+	public void handleSqlScripts(final Connection con, final Optional<Path> sqlLibrary) throws IOException, BaseSetupException, SQLException, SQLExeption {
 		SetupType doc;
 		final String table = "tVersion10";
 		final boolean forceSql = parameter.containsKey("fs");
@@ -948,7 +964,8 @@ public class BaseSetup {
 	/**
 	 * @param sqlScript
 	 * @param name
-	 * @param versionInfo2 (wird derzeit nicht verwendet)
+	 * @param versionInfo2
+	 *            (wird derzeit nicht verwendet)
 	 * @param type
 	 * @param con
 	 * @throws SQLException
@@ -985,7 +1002,6 @@ public class BaseSetup {
 		}
 		return true;
 	}
-
 
 	private void executeSqlFunction(final String sqlScript, final String name, final boolean force, final Connection con) throws SQLException {
 		executeSqlMethod(sqlScript, name, "@FunctionName", "spMinovaCheckFunction", force, con);
@@ -1040,7 +1056,7 @@ public class BaseSetup {
 	}
 
 	private void executeSqlMethod(final String sqlScript, final String name, final String firstParameterName, final String checkProcedureName,
-								  final boolean force, final Connection con) throws SQLException {
+			final boolean force, final Connection con) throws SQLException {
 		log(sqlScript);
 		try {
 			this.connection = con;
@@ -1144,7 +1160,8 @@ public class BaseSetup {
 	/**
 	 * Auslesen des Modulenamen inlusive der zugehoerigen Versionsnummer
 	 *
-	 * @param clazz BaseSetup
+	 * @param clazz
+	 *            BaseSetup
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
@@ -1173,13 +1190,10 @@ public class BaseSetup {
 		if (pathToFile == null) {
 			this.connection = checkConnection();
 		} else {
-/*			try {
-				readEveryXbsFile(pathToFile, "connection.xbs");
-				connect();
-			} catch (final BaseSetupException e) {
-				System.err.println(e.getMessage());
-				throw new RuntimeErrorException(new Error(e));
-			}*/
+			/*
+			 * try { readEveryXbsFile(pathToFile, "connection.xbs"); connect(); } catch (final BaseSetupException e) { System.err.println(e.getMessage()); throw
+			 * new RuntimeErrorException(new Error(e)); }
+			 */
 		}
 		return this.connection;
 	}

@@ -5,7 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Setup komplett loggen
-* Alle Outputs auch in ein File Loggen
+* ConsoleLog definieren und alle System.outs und Stacktraces auch in ein File loggen
 
 ## [12.68.0] -- 2025-04-25
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern

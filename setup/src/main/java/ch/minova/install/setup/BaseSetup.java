@@ -101,10 +101,10 @@ public class BaseSetup {
 				}
 			} catch (final IOException e) {
 				log(MessageFormat.format("Error IOException: {0}", e.getMessage()));
-				e.printStackTrace();
+				logger.logError(e);
 			} catch (final SQLException e) {
 				log(MessageFormat.format("Error SQLException: {0}", e.getMessage()));
-				e.printStackTrace();
+				logger.logError(e);
 			}
 		}
 	}
@@ -160,21 +160,13 @@ public class BaseSetup {
 		try {
 			sqldatabase.readDataBase(this.connection);
 		} catch (final SQLException e1) {
-			System.out.println("help me SQLException");
-			e1.printStackTrace();
-			logger.logSetup(e1.getMessage());
+			logger.logError(e1);
 		} catch (final InstantiationException e1) {
-			System.out.println("help me InstantiationException");
-			e1.printStackTrace();
-			logger.logSetup(e1.getMessage());
+			logger.logError(e1);
 		} catch (final IllegalAccessException e1) {
-			System.out.println("help me IllegalAccessException");
-			e1.printStackTrace();
-			logger.logSetup(e1.getMessage());
+			logger.logError(e1);
 		} catch (final ClassNotFoundException e1) {
-			System.out.println("help me ClassNotFoundException");
-			e1.printStackTrace();
-			logger.logSetup(e1.getMessage());
+			logger.logError(e1);
 		}
 		// Table constraints für UN und PK
 		log(MessageFormat.format("Tableconstrains erstellen (UK/PK):", ""), true);
@@ -309,10 +301,10 @@ public class BaseSetup {
 			}
 		} catch (final NullPointerException npe) {
 			log(MessageFormat.format("NullPointerException beim Lesen der Datei '{0}'!", completeName), true);
-			// npe.printStackTrace();
+			logger.logError(npe);
 		} catch (final IOException e) {
 			log(MessageFormat.format("Error IOException: {0}", e.getMessage()));
-			// e.printStackTrace();
+			logger.logError(e);
 		}
 		return null;
 	}
@@ -378,14 +370,14 @@ public class BaseSetup {
 			sqlIn = copyStream(inputStream);
 		} catch (final Exception e) {
 			sqlIn = null;
-			// e.printStackTrace();
+			logger.logError(e);
 		} finally {
 			if (jFile != null) {
 				try {
 					// schließt auch alle selbst geöffneten InputStreams
 					jFile.close();
 				} catch (final IOException e) {
-					// e.printStackTrace();
+					logger.logError(e);
 				}
 			}
 		}
@@ -396,7 +388,7 @@ public class BaseSetup {
 				sqlIn = getClass().getResourceAsStream("../" + folderPath + "/" + fileName);
 			} catch (final NullPointerException npe) {
 				sqlIn = null;
-				// e.printStackTrace();
+				logger.logError(npe);
 			}
 		}
 
@@ -442,7 +434,7 @@ public class BaseSetup {
 		} catch (final SQLException e) {
 			log(MessageFormat.format("ERROR", ""), true);
 			log(sqlScript, true);
-			e.printStackTrace();
+			logger.logError(e);
 			throw new SQLException(e);
 		}
 	}
@@ -481,8 +473,7 @@ public class BaseSetup {
 			rs.next();
 			return rs.getString("collation");
 		} catch (final SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.logError(e);
 		}
 		return "null";
 	}
@@ -584,7 +575,7 @@ public class BaseSetup {
 			}
 			log(sb.toString(), false);
 		} catch (final IOException e) {
-			// e.printStackTrace();
+			logger.logError(e);
 		}
 
 		return new ByteArrayInputStream(sb.toString().getBytes());
@@ -955,7 +946,7 @@ public class BaseSetup {
 				log(MessageFormat.format("Aus der Setup.xml Datei wird der sql-Code ausgelesen Modul:{0}_{1}", bs.getVersionInfo().getModulName(),
 						bs.getVersionInfo().toString()));
 			} catch (final BaseSetupException e) {
-				e.printStackTrace();
+				logger.logError(e);
 				throw new BaseSetupException(e.getMessage() + setup.getClass().getName());
 			}
 		}

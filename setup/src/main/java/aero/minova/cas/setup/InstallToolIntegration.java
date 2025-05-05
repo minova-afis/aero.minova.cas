@@ -58,7 +58,7 @@ public class InstallToolIntegration {
 			BaseSetup.hashModules = new Hashtable<>();
 			BaseSetup.hashtables = new Hashtable<>();
 			BaseSetup.tablevector = new Vector<>();
-			final BaseSetup setup = new BaseSetup();
+			final BaseSetup setup = new BaseSetup(logger);
 			setup.setSetupDocument(setupDocument);
 			setup.readSchema();
 			// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.

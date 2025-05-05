@@ -9,6 +9,19 @@
 		</encoder>
 	</appender>
 
+	<appender name="consoleToFileLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${APP_LOG_ROOT}/console.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${APP_LOG_ROOT}/archived/console_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
 	<appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${APP_LOG_ROOT}/error.log</file>
 		<append>true</append>
@@ -117,6 +130,7 @@
 	<logger name="ErrorLogger" level="trace" additivity="false">
 		<appender-ref ref="errorLog"/>
 		<appender-ref ref="console"/>
+		<appender-ref ref="consoleToFileLog"/>
 	</logger>
 	<logger name="PrivilegeLogger" level="trace" additivity="false">
 		<appender-ref ref="privilegeLog"/>
@@ -124,10 +138,12 @@
 	<logger name="SqlLogger" level="trace" additivity="false">
 		<appender-ref ref="springLog"/>
 		<appender-ref ref="console"/>
+		<appender-ref ref="consoleToFileLog"/>
 	</logger>
 	<logger name="UserLogger" level="trace" additivity="false">
 		<appender-ref ref="userLog"/>
 		<appender-ref ref="console"/>
+		<appender-ref ref="consoleToFileLog"/>
 	</logger>
 		<logger name="FilesLogger" level="trace" additivity="false">
 		<appender-ref ref="filesLog"/>
@@ -138,13 +154,22 @@
 	<logger name="QueueServiceLog" level="trace" additivity="false">
 		<appender-ref ref="queueServiceLog"/>
 		<appender-ref ref="console"/>
+		<appender-ref ref="consoleToFileLog"/>
 	</logger>
 	<logger name="InfoLog" level="trace" additivity="false">
 		<appender-ref ref="infoLog"/>
 		<appender-ref ref="console"/>
+		<appender-ref ref="consoleToFileLog"/>
+	</logger>
+	
+	<logger name="ConsoleLog" level="trace" additivity="false">
+		<appender-ref ref="infoLog"/>
+		<appender-ref ref="console"/>
+		<appender-ref ref="consoleToFileLog"/>
 	</logger>
 	
 	<root level="info">
 		<appender-ref ref="console"/>
+		<appender-ref ref="consoleToFileLog"/>
 	</root>
 </configuration>

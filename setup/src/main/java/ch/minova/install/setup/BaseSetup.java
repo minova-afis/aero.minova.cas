@@ -160,12 +160,16 @@ public class BaseSetup {
 		try {
 			sqldatabase.readDataBase(this.connection);
 		} catch (final SQLException e1) {
+			log(MessageFormat.format("Error SQLException: {0}", e1.getMessage()));
 			logger.logError(e1);
 		} catch (final InstantiationException e1) {
+			log(MessageFormat.format("Error InstantiationException: {0}", e1.getMessage()));
 			logger.logError(e1);
 		} catch (final IllegalAccessException e1) {
+			log(MessageFormat.format("Error IllegalAccessException: {0}", e1.getMessage()));
 			logger.logError(e1);
 		} catch (final ClassNotFoundException e1) {
+			log(MessageFormat.format("Error ClassNotFoundException: {0}", e1.getMessage()));
 			logger.logError(e1);
 		}
 		// Table constraints für UN und PK

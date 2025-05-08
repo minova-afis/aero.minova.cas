@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.service.DBFileService;
 import aero.minova.cas.service.FilesService;
 import lombok.val;
 
@@ -43,6 +44,9 @@ import lombok.val;
 // benötigt, damit JUnit-Tests nicht abbrechen
 @ConditionalOnProperty(prefix = "application.runner", value = "enabled", havingValue = "true", matchIfMissing = true)
 public class FilesController {
+	
+	@Autowired
+	DBFileService dbFileService;
 
 	@Autowired
 	FilesService fileService;
@@ -58,6 +62,9 @@ public class FilesController {
 
 	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
 	boolean isFatJarMode;
+	
+	@org.springframework.beans.factory.annotation.Value("${dbfiles.active:true}")
+	boolean isDBFilesActive;
 
 	// TODO Extension vorerst entfernt, aber für später aufheben
 	// TODO Bytes in JSON durch BASE64 darstellen
@@ -164,7 +171,13 @@ public class FilesController {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
 		}
-
+		
+		if(isDBFilesActive) {
+			byte[] toRet = dbFileService.getFile(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
 		// Bei fatJarMode Dateien aus Resourcen
 		if (isFatJarMode) {
 			if (!path.startsWith("/")) {
@@ -201,6 +214,13 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+		// Try tFiles first
+		if(isDBFilesActive) {
+			byte[] toRet = dbFileService.getMD5(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
 		if (isFatJarMode) {
 			if (!path.startsWith("/")) {
 				path = "/" + path;
@@ -242,6 +262,13 @@ public class FilesController {
 
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
+		// Try tFiles first
+		if(isDBFilesActive) {
+			byte[] toRet = dbFileService.getFile(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
 		if (isFatJarMode) {
 			final var pathStr = path.toString();
 			if (!path.startsWith("/")) {

@@ -1,2 +1,2 @@
-ALTER TABLE xtcasAuthorities ADD FOREIGN KEY (Authority) REFERENCES xtcasUserGroup(KeyText)
-ALTER TABLE xtcasAuthorities ADD FOREIGN KEY (Username) REFERENCES xtcasUsers(Username)
+ALTER TABLE xtcasAuthorities ADD CONSTRAINT FK_xtcasAuthorities_Authority FOREIGN KEY (Authority) REFERENCES xtcasUserGroup(KeyText)
+ALTER TABLE xtcasAuthorities ADD CONSTRAINT FK_xtcasAuthorities_Username FOREIGN KEY (Username) REFERENCES xtcasUsers(KeyText)

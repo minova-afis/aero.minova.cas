@@ -70,6 +70,7 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
+			<version>12.10.0.jre11</version>
 		</dependency>
 		<!-- Eine Datenbank-Abhängigkeit wird für SpringBoot 3.x benötigt, auch wenn diese nicht verwendet wird. Dies führt vor
         allem dazu, dass eine entityManagerFactory bereitgestellt wird, welche von der JdbcUserDetailsManager benötigt wird -->

@@ -4,6 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* neue Versionen von software.amazon.awssdk.bom, net.logstash.logback.logstash-logback-encoder, com.microsoft.azure.msal4j, com.azure.spring.spring-cloud-azure-dependencies
 
 ## [12.68.2] -- 2025-06-12
 * mssql-jdbc wieder als managed Version

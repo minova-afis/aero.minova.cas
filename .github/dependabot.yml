@@ -16,24 +16,7 @@ updates:
     registries: "*"
     schedule:
       interval: "daily"
-    assignees:
-      - "weber-minova"
-  - package-ecosystem: "maven"
-    directory: "/client"
-    registries: "*"
-    schedule:
-      interval: "daily"
-    assignees:
-      - "weber-minova"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
-    assignees:
-      - "weber-minova"
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    assignees:
-      - "weber-minova"

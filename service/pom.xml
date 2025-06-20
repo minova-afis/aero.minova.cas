@@ -36,7 +36,7 @@
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>assist.core</artifactId>
-            <version>0.9.6</version>
+            <version>0.9.18</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

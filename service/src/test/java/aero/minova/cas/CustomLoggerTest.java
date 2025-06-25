@@ -15,6 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = { CustomLogger.class, ClientRestAPI.class, Gson.class }, properties = { "PROPERY_SAMPLE1=/opt/hostedtoolcache/CodeQL/2.16.0/x64/codeql/tools/linux64/${LIB}_${PLATFORM}_trace.so"})
 @ExtendWith(OutputCaptureExtension.class)
 class CustomLoggerTest {
+	/**
+	 * Hier wird getestet, dass eine Property mit Variablen nicht dazu führt, dass CAS abstürzt,
+	 * was in der Vergangenheit bspw. bei Code-QL-Workflows zu Problemen geführt hat.
+	 *
+	 * @param output
+	 */
 	@Test
 	void handleContextRefreshWithUnresolvableVariablesTest(CapturedOutput output) {
 		assertThat(output)

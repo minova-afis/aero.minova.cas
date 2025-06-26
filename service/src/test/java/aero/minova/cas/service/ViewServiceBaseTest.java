@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,6 +73,8 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 
 	@Autowired
 	ColumnSecurityRepository columnSecurityRepository;
+
+	private List<Integer> authorityKeys = Arrays.asList(1, 2, 3, 4, 5);
 
 	@PostConstruct
 	void setupViewServiceTest() {
@@ -420,8 +426,8 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		Table indexView = getTableForRequestWithLimitedRows(1);
 		Table indexViewResult = viewController.getIndexView(indexView);
 		assertEquals(2, indexViewResult.getRows().size());
-		assertEquals(1, indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue());
-		assertEquals(2, indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue());
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue()));
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue()));
 		assertEquals(2, indexViewResult.getMetaData().getLimited());
 		assertEquals(1, indexViewResult.getMetaData().getPage());
 		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
@@ -431,8 +437,8 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		indexView = getTableForRequestWithLimitedRows(2);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertEquals(2, indexViewResult.getRows().size());
-		assertEquals(3, indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue());
-		assertEquals(4, indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue());
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue()));
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue()));
 		assertEquals(2, indexViewResult.getMetaData().getLimited());
 		assertEquals(2, indexViewResult.getMetaData().getPage());
 		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);

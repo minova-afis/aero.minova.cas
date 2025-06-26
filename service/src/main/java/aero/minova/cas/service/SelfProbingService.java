@@ -59,7 +59,8 @@ public class SelfProbingService {
 				Log.debug(this, "Database connection is not probed.");
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			Log.debug(this, "The connection to the database failed.", e);
+			systemExit();
 		}
 	}
 }

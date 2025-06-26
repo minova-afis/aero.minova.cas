@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import aero.minova.cas.api.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,11 +29,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import aero.minova.cas.BaseTest;
 import aero.minova.cas.CoreApplicationSystemApplication;
-import aero.minova.cas.api.domain.Column;
-import aero.minova.cas.api.domain.DataType;
-import aero.minova.cas.api.domain.Row;
-import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.model.Authorities;
 import aero.minova.cas.service.repository.AuthoritiesRepository;
@@ -56,6 +56,8 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 
 	@Autowired
 	AuthoritiesRepository authoritiesRepository;
+
+	private List<Integer> authorityKeys = Arrays.asList(1, 2, 3, 4, 5);
 
 	@PostConstruct
 	void setupViewServiceTest() {
@@ -371,6 +373,32 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		}
 	}
 
+	@Test
+	@DisplayName("Limit testen")
+	void testLimit() throws Exception {
+		// Erste Page mit 2 Ergebnissen -> KeyLongs 1 und 2
+		Table indexView = getTableForRequestWithLimitedRows(1);
+		Table indexViewResult = viewController.getIndexView(indexView);
+		assertEquals(2, indexViewResult.getRows().size());
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue()));
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue()));
+		assertEquals(2, indexViewResult.getMetaData().getLimited());
+		assertEquals(1, indexViewResult.getMetaData().getPage());
+		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
+		assertTrue(indexViewResult.getMetaData().getResultsLeft() >= 2);
+
+		// Zweite Page mit 2 Ergebnissen -> KeyLongs 3 und 4
+		indexView = getTableForRequestWithLimitedRows(2);
+		indexViewResult = viewController.getIndexView(indexView);
+		assertEquals(2, indexViewResult.getRows().size());
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue()));
+		assertTrue(authorityKeys.contains(indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue()));
+		assertEquals(2, indexViewResult.getMetaData().getLimited());
+		assertEquals(2, indexViewResult.getMetaData().getPage());
+		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
+		assertTrue(indexViewResult.getMetaData().getResultsLeft() >= 0);
+	}
+
 	private Table getTableForRequest() {
 		Table indexView = new Table();
 		indexView.setName("xtcasAuthorities");
@@ -399,6 +427,27 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		indexView.addRow(getEmptyRow(6));
 		return indexView;
 	}
+
+	private Table getTableForRequestWithLimitedRows(int page) {
+		Table indexView = new Table();
+		indexView.setName("xtcasAuthorities");
+		indexView.addColumn(new Column("KeyLong", DataType.INTEGER));
+		indexView.addColumn(new Column("Username", DataType.STRING));
+		indexView.addColumn(new Column("Authority", DataType.STRING));
+		indexView.addColumn(new Column("Lastuser", DataType.STRING));
+		indexView.addColumn(new Column("Lastdate", DataType.INSTANT));
+		indexView.addColumn(new Column("lastaction", DataType.INTEGER));
+
+		indexView.addRow(getEmptyRow(6));
+
+		TableMetaData tableMetaData = new TableMetaData();
+		tableMetaData.setLimited(2);
+		tableMetaData.setPage(page);
+		indexView.setMetaData(tableMetaData);
+
+		return indexView;
+	}
+
 
 	private Row getEmptyRow(int numberOfValues) {
 		Row r = new Row();

@@ -53,6 +53,7 @@ public class SelfProbingService {
 					Log.debug(this, "The connection to the database is working.");
 				} else {
 					Log.debug(this, "The connection to the database failed.");
+					systemExit();
 				}
 			} else {
 				Log.debug(this, "Database connection is not probed.");

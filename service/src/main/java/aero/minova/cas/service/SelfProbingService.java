@@ -20,6 +20,9 @@ public class SelfProbingService {
 	@Autowired
 	SystemDatabase database;
 
+	@Value("#{new Integer('${probing.max.time:100000}')}")
+	private int probingMaxTime = 100_000;
+
 	private void systemExit() {
 		try {
 			// Wir schlafen etwas in der Hoffnung, dass die Log-Nachricht auch wirklich ausgegeben oder in eine Datei etc. ausgeschrieben wurde.
@@ -47,6 +50,7 @@ public class SelfProbingService {
 
 	@Scheduled(cron = "${self.probing.cron:0 * * * * *}")
 	private void run() {
+		final var probe = new Thread(() -> {
 		try {
 			if (database.isSQLDatabase()) {
 				if (database.getConnection().prepareCall("select 1").execute()) {
@@ -60,6 +64,18 @@ public class SelfProbingService {
 			}
 		} catch (SQLException e) {
 			Log.debug(this, "The connection to the database failed.", e);
+			systemExit();
+		}
+		});
+		try {
+			probe.join(probingMaxTime);
+		} catch (InterruptedException e) {
+			Log.debug(this, "Interrupt during probe.", e);
+		}
+		if (probe.isAlive()) {
+			Log.debug(this, "Database connection probing should not take longer than " //
+					+ (probingMaxTime / 1000) //
+					+ " seconds.");
 			systemExit();
 		}
 	}

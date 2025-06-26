@@ -14,6 +14,20 @@ import java.util.Map;
 @Service
 public class SelfProbingService {
 
+	@Autowired
+	SystemDatabase database;
+
+	private void systemExit() {
+		try {
+			// Wir schlafen etwas in der Hoffnung, dass die Log-Nachricht auch wirklich ausgegeben oder in eine Datei etc. ausgeschrieben wurde.
+			Thread.sleep(10000);
+		} catch (InterruptedException ex) {
+			throw new RuntimeException(ex);
+		} finally {
+			System.exit(1);
+		}
+	}
+
 	/**
 	 * <p>Setzt eine Behandlung von nicht behandelten Exceptions auf.
 	 * Das sind Exceptions, die nicht einmal durch Springs default Catchern gefangen wurden.</p>
@@ -23,14 +37,7 @@ public class SelfProbingService {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
 			if (e instanceof OutOfMemoryError) {
 				Log.err(this, "Not enough RAM is available.", e);
-				try {
-					// Wir schlafen etwas in der Hoffnung, dass die Log-Nachricht auch wirklich ausgegeben oder in eine Datei etc. ausgeschrieben wurde.
-					Thread.sleep(10000);
-				} catch (InterruptedException ex) {
-					throw new RuntimeException(ex);
-				} finally {
-					System.exit(1);
-				}
+				systemExit();
 			}
 		});
 	}

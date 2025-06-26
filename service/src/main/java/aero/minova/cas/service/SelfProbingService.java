@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import ch.minova.appmodel.log.Log;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.annotation.PostConstruct;
 import org.hibernate.Session;
@@ -13,11 +14,23 @@ import java.util.Map;
 @Service
 public class SelfProbingService {
 
+	/**
+	 * <p>Setzt eine Behandlung von nicht behandelten Exceptions auf.
+	 * Das sind Exceptions, die nicht einmal durch Springs default Catchern gefangen wurden.</p>
+	 */
 	@PostConstruct
 	public void setup() {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
 			if (e instanceof OutOfMemoryError) {
-				System.exit(1);
+				Log.err(this, "Not enough RAM is available.", e);
+				try {
+					// Wir schlafen etwas in der Hoffnung, dass die Log-Nachricht auch wirklich ausgegeben oder in eine Datei etc. ausgeschrieben wurde.
+					Thread.sleep(10000);
+				} catch (InterruptedException ex) {
+					throw new RuntimeException(ex);
+				} finally {
+					System.exit(1);
+				}
 			}
 		});
 	}

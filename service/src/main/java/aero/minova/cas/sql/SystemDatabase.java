@@ -66,11 +66,15 @@ public class SystemDatabase {
 		return dataSource;
 	}
 
+	/**
+	 *
+	 * @return Gibt wahr zurück, wenn der JDBC-Dialekt-ID den String "SQLServer" beinhalten und somit der SQL-Code MSSQL-Server kompatibel ist.
+	 * Zu beachten ist, dass die Methode bei H2-Datenbanken falsch zurückgibt.
+	 */
 	public boolean isSQLDatabase() {
 		final Session session = (Session) entityManager.getDelegate();
 		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
-
 		return dialect.contains(MSSQLDIALECT);
 	}
 }

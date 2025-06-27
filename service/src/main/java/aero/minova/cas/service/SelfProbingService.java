@@ -52,15 +52,11 @@ public class SelfProbingService {
 	private void run() {
 		final var probe = new Thread(() -> {
 		try {
-			if (database.isSQLDatabase()) {
-				if (database.getConnection().prepareCall("select 1").execute()) {
-					Log.debug(this, "The connection to the database is working.");
-				} else {
-					Log.debug(this, "The connection to the database failed.");
-					systemExit();
-				}
+			if (database.getConnection().prepareCall("select 1").execute()) {
+				Log.debug(this, "The connection to the database is working.");
 			} else {
-				Log.debug(this, "Database connection is not probed.");
+				Log.debug(this, "The connection to the database failed.");
+				systemExit();
 			}
 		} catch (SQLException e) {
 			Log.debug(this, "The connection to the database failed.", e);

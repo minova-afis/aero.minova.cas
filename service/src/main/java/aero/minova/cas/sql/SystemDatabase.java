@@ -34,12 +34,14 @@ public class SystemDatabase {
 
 	private static final String MSSQLDIALECT = "SQLServer";
 
+	private HikariDataSource dataSource() {
+		Map<String, Object> properties = entityManager.getEntityManagerFactory().getProperties();
+		return (HikariDataSource) properties.get("javax.persistence.nonJtaDataSource");
+	}
+
 	public Connection getConnection() {
 		try {
-			Map<String, Object> properties = entityManager.getEntityManagerFactory().getProperties();
-			HikariDataSource dataSource = (HikariDataSource) properties.get("javax.persistence.nonJtaDataSource");
-
-			Connection connection = dataSource.getConnection();
+			Connection connection = dataSource().getConnection();
 			connection.setAutoCommit(false);
 			return connection;
 		} catch (Exception e) {
@@ -64,6 +66,10 @@ public class SystemDatabase {
 		dataSource.setUsername(userName);
 		dataSource.setPassword(userPassword);
 		return dataSource;
+	}
+
+	public void softEvictConnections() {
+		dataSource().getHikariPoolMXBean().softEvictConnections();
 	}
 
 	/**

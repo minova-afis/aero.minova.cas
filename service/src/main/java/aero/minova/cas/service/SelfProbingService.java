@@ -15,6 +15,12 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 import java.util.Map;
 
+/**
+ * Prüft, ob die Verbindung zur Datenbank noch steht und beendet den Dienst,
+ * wenn Probleme gefunden wurden.
+ * Zudem werden alle SQL-Verbindungen geschlossen, um den Connection-Pool nicht zu überfüllen.
+ *
+ */
 @Service
 public class SelfProbingService {
 
@@ -23,7 +29,7 @@ public class SelfProbingService {
 	@Autowired
 	SystemDatabase database;
 
-	@Value("#{new Integer('${probing.max.time:100000}')}")
+	@Value("#{new Integer('${self.probing.cron:100000}')}")
 	private int probingMaxTime = 100_000;
 
 	private void systemExit() {

@@ -29,8 +29,8 @@ public class SelfProbingService {
 	@Autowired
 	SystemDatabase database;
 
-	@Value("#{new Integer('${self.probing.cron:100000}')}")
-	private int probingMaxTime = 100_000;
+	@Value("#{new Integer('${self.probing.max.time:60000}')}")
+	private int probingMaxTime = 60_000;
 
 	private void systemExit() {
 		try {

@@ -66,6 +66,7 @@ public class SelfProbingService {
 			systemExit();
 		}
 		});
+		probe.start();
 		try {
 			probe.join(probingMaxTime);
 		} catch (InterruptedException e) {

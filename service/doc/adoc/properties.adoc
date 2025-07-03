@@ -53,11 +53,16 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 * self.probing.cron:
 ** *Default*: `-` (= die Funktion wird nie ausgeführt)
 ** *Wertebereich*: Spring Boot Cron Expression wie bspw. `0 * * * * *`, um die Funktion minütlich auszuführen.
-** *Beschreibung*: Gibt an, wann geprüft werden soll, dass keine Datenbankverbindung vorhanden ist.
+** *Beschreibung*: Gibt an, wann geprüft werden soll (=to probe), dass keine Datenbankverbindung vorhanden ist.
    Wird ein Verbindungsfehler erkannt wird das CAS beendet, damit die Kubernetes-Umgebung diesen automatisch neu starten kann.
 
-* app.log.root
+* self.probing.max.time:
+** *Default*: `60000` (= Ein Probing soll maximal eine Minute lange dauern.)
+** *Wertebereich*: Die Anzahl der Millisekunden
+** *Beschreibung*: Gibt in Millisekunden an, wie lange eine Probing maximal dauern soll.
+  Dauert das Probing länger wird der Dienst bzw. der Java-Prozess beendet, damit die Kubernetes-Umgebung diesen automatisch neu starten kann.
 
+* app.log.root
 ** *Default*: `./logs`
 ** *Wertebereich*: Pfad zum Ordner
 ** *Beschreibung*: Setzt den Log-Ordner für den Dienst.

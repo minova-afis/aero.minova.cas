@@ -51,8 +51,8 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 == Minova Properties
 
 * self.probing.cron:
-** *Default*: `0 * * * * *`
-** *Wertebereich*: Spring Boot Cron Expression
+** *Default*: `-` (= die Funktion wird nie ausgeführt)
+** *Wertebereich*: Spring Boot Cron Expression wie bspw. `0 * * * * *`, um die Funktion minütlich auszuführen.
 ** *Beschreibung*: Gibt an, wann geprüft werden soll, dass keine Datenbankverbindung vorhanden ist.
    Wird ein Verbindungsfehler erkannt wird das CAS beendet, damit die Kubernetes-Umgebung diesen automatisch neu starten kann.
 

@@ -55,6 +55,15 @@ public class SelfProbingService {
 	private void run() {
 		final var probe = new Thread(() -> {
 		try {
+			/*
+			 * Hiermit werden alle Verbindungen die zum Pool zurückgegeben geschlossen,
+			 * statt diese in den Pool zu tun,
+			 * um zu vermeiden, dass der Pool voll mit Verbindungen läuft,
+			 * welche nicht funktionieren oder einen Fehler hatten,
+			 * während dies Hikari nicht mitbekommt.
+			 * Somit ist es unwahrscheinlicher, dass diese kaputte Verbindungen an den nächsten Nutzer weitergegeben werden.
+			 */
+			database.softEvictConnections();
 			if (database.getConnection().prepareCall("select 1").execute()) {
 				logger.logInfo("The connection to the database is working.");
 			} else {

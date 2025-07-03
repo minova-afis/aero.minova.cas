@@ -9,6 +9,9 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * HUB Funktionalität, siehe link:https://github.com/minova-afis/aero.minova.cas/issues/1272[#1272]
 * Setup komplett loggen
 * ConsoleLog definieren und alle System.outs und Stacktraces auch in ein File loggen
+* SelfProbingService mit der Einstellung bereitstellen, womit Verbindungsprobleme zum SQL-Server erkannt werden.
+  Gibt es ein SQL-Verbindungsproblem wird der Dienst beendet, damit dieser von Kubernetes automatisch neu gestartet wird.
+  Zudem wurden die Hikari-Einstellung so angepasst, dass Verbindungsprobleme besser erkannt/vermieden werden.
 
 ## [13.5.3/4] — 2025-01-14
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern

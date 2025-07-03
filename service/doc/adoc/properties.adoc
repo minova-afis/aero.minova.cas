@@ -19,30 +19,30 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 == Standard Properties
 
-* server.port
+* *server.port*:
 ** *Default*: `8084`
 
-* management.server.port
+* *management.server.port*:
 ** *Default*: `8081`
 ** *Beschreibung*: Setzt den Port unter dem die Endpunkte des SpringBoot Actuators zu finden sind.
 
-* management.endpoints.web.exposure.include
+* *management.endpoints.web.exposure.include*:
 ** *Default*: `*`
 ** *Beschreibung*: Siehe https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
 
 == JPA Properties
 
-* spring.jpa.hibernate.ddl-auto
+* *spring.jpa.hibernate.ddl-auto*:
 ** *Default*: `none`
 ** *Wertebereich*: none , validate , update , create-drop
 ** *Beschreibung*: link:https://docs.spring.io/spring-boot/docs/1.1.0.M1/reference/html/howto-database-initialization.html[Spring-Doku]
 
-* spring.jpa.defer-datasource-initialization
+* *spring.jpa.defer-datasource-initialization*:
 ** *Default*: `false`
 ** *Wertebereich*: true, false
 ** *Beschreibung*: Wenn true, werden erst die JPA Tabellen aufgespielt, bevor Queries aus data.sql ausgeführt werden. Wenn die JPA Tabellen installiert werden, muss diese Property auf jeden Fall auf 'true' gesetzt werden.
 
-* spring.sql.init.mode
+* *spring.sql.init.mode*:
 ** *Default*: Bei H2: `always` , ansonsten: `never`
 ** *Wertebereich*: always, never
 ** *Beschreibung*: Aktiviert skript-basierte Initialisierung. Siehe https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.using-basic-sql-scripts[Spring-Doku].
@@ -50,101 +50,79 @@ Heißt das Projekt der Extension zum Beispiel 'aero.minova.example', sollte die 
 
 == Minova Properties
 
-* self.probing.cron:
+* *self.probing.cron*:
 ** *Default*: `-` (= die Funktion wird nie ausgeführt)
 ** *Wertebereich*: Spring Boot Cron Expression wie bspw. `0 * * * * *`, um die Funktion minütlich auszuführen.
 ** *Beschreibung*: Gibt an, wann geprüft werden soll (=to probe), dass keine Datenbankverbindung vorhanden ist.
    Wird ein Verbindungsfehler erkannt wird das CAS beendet, damit die Kubernetes-Umgebung diesen automatisch neu starten kann.
 
-* self.probing.max.time:
+* *self.probing.max.time*:
 ** *Default*: `60000` (= Ein Probing soll maximal eine Minute lange dauern.)
 ** *Wertebereich*: Die Anzahl der Millisekunden
 ** *Beschreibung*: Gibt in Millisekunden an, wie lange eine Probing maximal dauern soll.
   Dauert das Probing länger wird der Dienst bzw. der Java-Prozess beendet, damit die Kubernetes-Umgebung diesen automatisch neu starten kann.
 
-* app.log.root
+* *app.log.root*:
 ** *Default*: `./logs`
 ** *Wertebereich*: Pfad zum Ordner
 ** *Beschreibung*: Setzt den Log-Ordner für den Dienst.
 
-* aero_minova_core_application_root_path
-
+* *aero_minova_core_application_root_path*:
 ** *Default*: `.`
-
 ** *Wertebereich*: Absolute Pfade und relative Pfade zum Ausführungsort
 
-* security_ldap_domain
-
+* *security_ldap_domain*:
 ** *Default* `minova.com`
 
-* security_ldap_address
-
+* *security_ldap_address*:
 ** *Default* `ldap://mindcsrv.minova.com:3268/` (Ldap Adresse der Minova)
 
-* login_dataSource
-
+* *login_dataSource*:
 ** *Wertebereich*: `admin/database/ldap` Jeweils einen dieser drei Werte für einen anderen Login-Modus
 
-* spring.datasource.url
-
+* *spring.datasource.url*:
 ** *Default*: `jdbc:sqlserver://localhost;encrypt=false;databaseName=AFIS_HAM`
 
-* spring.datasource.username
-
+* *spring.datasource.username*:
 ** *Default*: `sa`
 
-* spring.datasource.password
-
+* *spring.datasource.password*:
 ** *Default*: `password`
 
-* files.permission.check
-
+* *files.permission.check*:
 ** *Default*: `false`
-
 ** *Wertebereich*: `true/false` Schalter für die files/read- und files/hash-Anfragen, welcher bestimmt, 
 ob eingehende Anfragen auf Dateien auf Berechtigung überprüft werden sollen.
 
 
-* generate.mdi.per.user
-
+* *generate.mdi.per.user*:
 ** *Default*: `true`
-
 ** *Wertebereich*: `true/false` Entscheided, ob die Mdi aus der Datenbank oder aus dem Filesystem gelesen wird.
 
 
-* aero.minova.cas.setup.logging
-
+* *aero.minova.cas.setup.logging*:
 ** *Default*: `false`
-
 ** *Wertebereich*: `true/false` Erweitert das Logging beim Setup, wenn auf true.
 
-* cors.allowed.origins
-
+* *cors.allowed.origins*:
 ** *Default*: `http://localhost:8100`
-
 ** *Wertebereich*: URLs mit Kommata getrennt, zur Festlegung erlaubter Origins für CORS.
 
-
-* aero.minova.cas.label
-
+* *aero.minova.cas.label*:
 ** *Default*: nicht gesetzt
-
 ** *Beschreibung*: Bezeichnung für das CAS. Wird vom WFC angefragt und im Hauptfenster angezeigt
 
 
 == Profiles
 
-* spring.profiles.active
+* *spring.profiles.active*:
 
 ** *Default*: `""`
-
 ** *Beschreibung*: Setzt das Profil. Es gibt aktuell nur das Profil `dev`. Erlaubt alle CORS-Policies 
 aus Entwicklungszwecken. Niemals im Produktivbetrieb benutzen!
 
-* aero.minova.cas.setup.logging
-
+* *aero.minova.cas.setup.logging*:
 ** *Default*: `false`
-
 ** *Wertebereich*: `true/false`: Bei `false` funktioniert das CAS einigermaßen wie bisher. Dateien Werden aus dem Dateisystem geladen. Bei `true` werden die Datei aus der Datei vom ausgelieferten CAS selber geladen.
 
 

@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.sql.SystemDatabase;
 import ch.minova.appmodel.log.Log;
 import com.zaxxer.hikari.HikariDataSource;

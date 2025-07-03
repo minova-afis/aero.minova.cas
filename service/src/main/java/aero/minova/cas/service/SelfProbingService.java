@@ -18,6 +18,8 @@ import java.util.Map;
 public class SelfProbingService {
 
 	@Autowired
+	protected CustomLogger logger;
+	@Autowired
 	SystemDatabase database;
 
 	@Value("#{new Integer('${probing.max.time:100000}')}")
@@ -42,7 +44,7 @@ public class SelfProbingService {
 	public void setup() {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
 			if (e instanceof OutOfMemoryError) {
-				Log.err(this, "Not enough RAM is available.", e);
+				logger.logError("Not enough RAM is available.", e);
 				systemExit();
 			}
 		});
@@ -53,23 +55,23 @@ public class SelfProbingService {
 		final var probe = new Thread(() -> {
 		try {
 			if (database.getConnection().prepareCall("select 1").execute()) {
-				Log.debug(this, "The connection to the database is working.");
+				logger.logInfo("The connection to the database is working.");
 			} else {
-				Log.debug(this, "The connection to the database failed.");
+				logger.logInfo("The connection to the database failed.");
 				systemExit();
 			}
 		} catch (SQLException e) {
-			Log.debug(this, "The connection to the database failed.", e);
+			logger.logError("The connection to the database failed.", e);
 			systemExit();
 		}
 		});
 		try {
 			probe.join(probingMaxTime);
 		} catch (InterruptedException e) {
-			Log.debug(this, "Interrupt during probe.", e);
+			logger.logError("Interrupt during probe.", e);
 		}
 		if (probe.isAlive()) {
-			Log.debug(this, "Database connection probing should not take longer than " //
+			logger.logInfo("Database connection probing should not take longer than " //
 					+ (probingMaxTime / 1000) //
 					+ " seconds.");
 			systemExit();

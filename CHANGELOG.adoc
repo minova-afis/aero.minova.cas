@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## Unreleased
 
+## [13.6.0] — 2025-07-02
 * Maske LDAP User: Mehr Zeichen für KeyText erlauben
 * HUB Funktionalität, siehe link:https://github.com/minova-afis/aero.minova.cas/issues/1272[#1272]
 * Setup komplett loggen

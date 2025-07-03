@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>aero.minova</groupId>
 		<artifactId>cas.parent</artifactId>
-		<version>13.5.5-SNAPSHOT</version>
+		<version>13.6.1-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
   
@@ -15,7 +15,7 @@
                 <!-- Diese BOM wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.31.70</version>
+                <version>2.31.76</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>assist.core</artifactId>
-            <version>0.9.18</version>
+            <version>0.9.19</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

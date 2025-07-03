@@ -57,7 +57,7 @@ public class SelfProbingService {
 		});
 	}
 
-	@Scheduled(cron = "${self.probing.cron:0 * * * * *}")
+	@Scheduled(cron = "${self.probing.cron:-}")
 	private void run() {
 		final var probe = new Thread(() -> {
 		try {

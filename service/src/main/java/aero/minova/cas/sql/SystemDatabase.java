@@ -22,12 +22,14 @@ public class SystemDatabase {
 	private final CustomLogger customLogger;
 	private static final String MSSQLDIALECT = "SQLServer";
 
+	private HikariDataSource dataSource() {
+		Map<String, Object> properties = entityManager.getEntityManagerFactory().getProperties();
+		return (HikariDataSource) properties.get("javax.persistence.nonJtaDataSource");
+	}
+
 	public Connection getConnection() {
 		try {
-			Map<String, Object> properties = entityManager.getEntityManagerFactory().getProperties();
-			HikariDataSource dataSource = (HikariDataSource) properties.get("javax.persistence.nonJtaDataSource");
-
-			Connection connection = dataSource.getConnection();
+			Connection connection = dataSource().getConnection();
 			connection.setAutoCommit(false);
 			return connection;
 		} catch (Exception e) {
@@ -45,11 +47,19 @@ public class SystemDatabase {
 		}
 	}
 
+	public void softEvictConnections() {
+		dataSource().getHikariPoolMXBean().softEvictConnections();
+	}
+
+	/**
+	 *
+	 * @return Gibt wahr zurück, wenn der JDBC-Dialekt-ID den String "SQLServer" beinhalten und somit der SQL-Code MSSQL-Server kompatibel ist.
+	 * Zu beachten ist, dass die Methode bei H2-Datenbanken falsch zurückgibt.
+	 */
 	public boolean isSQLDatabase() {
 		final Session session = (Session) entityManager.getDelegate();
 		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
-
 		return dialect.contains(MSSQLDIALECT);
 	}
 }

@@ -378,7 +378,6 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	@Test
 	@DisplayName("Limit testen")
 	void testLimit() throws Exception {
-		// Erste Page mit 2 Ergebnissen -> KeyLongs 1 und 2
 		Table indexView = getTableForRequestWithLimitedRows(1);
 		Table indexViewResult = viewController.getIndexView(indexView);
 		assertEquals(2, indexViewResult.getRows().size());
@@ -390,7 +389,6 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
 		assertTrue(indexViewResult.getMetaData().getResultsLeft() >= 2);
 
-		// Zweite Page mit 2 Ergebnissen -> KeyLongs 3 und 4
 		indexView = getTableForRequestWithLimitedRows(2);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertEquals(2, indexViewResult.getRows().size());

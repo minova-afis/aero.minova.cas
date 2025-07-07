@@ -4,6 +4,9 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+* SelfProbingService mit der Einstellung bereitstellen, womit Verbindungsprobleme zum SQL-Server erkannt werden.
+  Gibt es ein SQL-Verbindungsproblem wird der Dienst beendet, damit dieser von Kubernetes automatisch neu gestartet wird.
+  Zudem wurden die Hikari-Einstellung so angepasst, dass Verbindungsprobleme besser erkannt/vermieden werden.
 
 ## [12.68.4] -- 2025-06-13
 * Keine Neuerungen, in 12.68.3 ist etwas mit dem Docker-Release schief gegangen
@@ -18,9 +21,6 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 * Setup komplett loggen
 * ConsoleLog definieren und alle System.outs und Stacktraces auch in ein File loggen
 * mssql-jdbc auf 12.10.0.jre11
-* SelfProbingService mit der Einstellung bereitstellen, womit Verbindungsprobleme zum SQL-Server erkannt werden.
-  Gibt es ein SQL-Verbindungsproblem wird der Dienst beendet, damit dieser von Kubernetes automatisch neu gestartet wird.
-  Zudem wurden die Hikari-Einstellung so angepasst, dass Verbindungsprobleme besser erkannt/vermieden werden.
 
 ## [12.68.0] -- 2025-04-25
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern

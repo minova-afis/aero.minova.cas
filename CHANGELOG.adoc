@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+## [12.69.0] -- 2025-07-08
 * SelfProbingService mit der Einstellung bereitstellen, womit Verbindungsprobleme zum SQL-Server erkannt werden.
   Gibt es ein SQL-Verbindungsproblem wird der Dienst beendet, damit dieser von Kubernetes automatisch neu gestartet wird.
   Zudem wurden die Hikari-Einstellung so angepasst, dass Verbindungsprobleme besser erkannt/vermieden werden.

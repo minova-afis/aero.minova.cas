@@ -56,6 +56,7 @@ public class SelfProbingService {
 				systemExit();
 			}
 		});
+		run();
 	}
 
 	@Scheduled(cron = "${self.probing.cron:-}")

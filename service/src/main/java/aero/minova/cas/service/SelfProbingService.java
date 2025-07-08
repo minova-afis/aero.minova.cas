@@ -36,7 +36,7 @@ public class SelfProbingService {
 		try {
 			// Wir schlafen etwas in der Hoffnung, dass die Log-Nachricht auch wirklich ausgegeben oder in eine Datei etc. ausgeschrieben wurde.
 			Thread.sleep(10000);
-		} catch (InterruptedException ex) {
+		} catch (Throwable ex) {
 			throw new RuntimeException(ex);
 		} finally {
 			System.exit(1);
@@ -76,7 +76,7 @@ public class SelfProbingService {
 				logger.logInfo("The connection to the database failed.");
 				systemExit();
 			}
-		} catch (SQLException e) {
+		} catch (Throwable e) {
 			logger.logError("The connection to the database failed.", e);
 			systemExit();
 		}
@@ -84,7 +84,7 @@ public class SelfProbingService {
 		probe.start();
 		try {
 			probe.join(probingMaxTime);
-		} catch (InterruptedException e) {
+		} catch (Throwable e) {
 			logger.logError("Interrupt during probe.", e);
 		}
 		if (probe.isAlive()) {

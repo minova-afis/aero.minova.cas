@@ -3,9 +3,9 @@
 	<!-- Während Tests führen exzessive Logs nur zu Problemen, weswegen nur Warnungen gelogged werden. -->
 	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
-	<property name="FILE_LOG_THRESHOLD" value="${FILE_LOG_THRESHOLD:-WARN}"/>
-	<logger name="org.springframework" level="WARN"/>
-	<root level="WARN">
+	<property name="FILE_LOG_THRESHOLD" value="${FILE_LOG_THRESHOLD:-TRACE}"/>
+	<logger name="org.springframework" level="TRACE"/>
+	<root level="TRACE">
 		<appender-ref ref="CONSOLE" />
 	</root>
 </configuration>

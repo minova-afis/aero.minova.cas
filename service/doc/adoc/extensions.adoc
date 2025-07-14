@@ -197,7 +197,7 @@ image:./images/Dependencies.png[dependencies,800,800]
 
 Jetzt kann gedebugged werden. 
 
-== Deployment
+== Container-Deployment
 
 Wenn ein Kundenprojekt **nicht** in Kubernetes ausgeliefert wird,
 gibt es einen CI und Release-Workflow, wie bei anderen Projekten.

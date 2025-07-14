@@ -33,12 +33,17 @@ public class SelfProbingService {
 	private int probingMaxTime = 60_000;
 
 	private void systemExit() {
+		logger.logError("Shutting down CAS, because the system is unstable, in order to force a restart of the CAS service.");
 		try {
 			// Wir schlafen etwas in der Hoffnung, dass die Log-Nachricht auch wirklich ausgegeben oder in eine Datei etc. ausgeschrieben wurde.
 			Thread.sleep(10000);
 		} catch (InterruptedException ex) {
 			throw new RuntimeException(ex);
 		} finally {
+			// Wir loggen kurz vorher nochmal, um mit etwas glück sehen zu können, dass System#exit(int) wirklich aufgerufen wird.
+			logger.logError("Executing `java.lang.System.exit(int)`.");
+			System.out.println("Executing `java.lang.System.exit(int)`.");
+			System.out.flush();
 			System.exit(1);
 		}
 	}

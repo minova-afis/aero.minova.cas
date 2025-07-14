@@ -9,6 +9,8 @@ import org.hibernate.Session;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,9 @@ public class SelfProbingService {
 	@Autowired
 	SystemDatabase database;
 
+	@Autowired
+	private ApplicationContext applicationContext;
+
 	@Value("#{new Integer('${self.probing.max.time:60000}')}")
 	private int probingMaxTime = 60_000;
 
@@ -45,6 +50,7 @@ public class SelfProbingService {
 			logger.logError("Executing `java.lang.System.exit(int)`.");
 			System.out.println("Executing `java.lang.System.exit(int)`.");
 			System.out.flush();
+			SpringApplication.exit(applicationContext, () -> 1);
 			System.exit(1);
 		}
 	}

@@ -166,3 +166,19 @@ Kompletter Befehl: `docker build --tag=minova/app . && docker run --name=app -d 
 * Daten aus Container extrahieren: `docker cp app:/opt/aero.minova.cas/ ./target/container-filesystem`
 * Docker Container wieder löschen: `docker rm -f app`
 
+== Container-Deployment
+
+Wenn ein Kundenprojekt **nicht** in Kubernetes ausgeliefert wird,
+gibt es einen CI und Release-Workflow, wie bei anderen Projekten.
+
+Wenn ein Kundenprojekt in Kubernetes ausgeliefert wird,
+dann sollte dazu ein link:https://www.atlassian.com/continuous-delivery/principles/continuous-integration-vs-delivery-vs-deployment[continuous Delivery-Workflow]
+eingerichtet werden.
+Es werden also Tests ausgeführt, ein Container-Image erstellt und automatisiert in das Testsystem des Kunden installiert.
+In diesem Fall wird ein Release-Workflow nicht benötigt.
+
+Wenn es kein Testsystem gibt,
+wird auch ein CI und Release-Workflow verwendet,
+wobei der Release-Workflow **kein** Deployment für das Produktiv-System enthält.
+Sonst ist das Planen vom Deployments schwer,
+da Release-Workflows dauern und zudem beim Releasen immer ein Fehler passieren kann.

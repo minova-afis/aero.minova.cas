@@ -46,11 +46,13 @@ public class SelfProbingService {
 			logger.logError("Error during pre system exit sleep.", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			// Wir loggen kurz vorher nochmal, um mit etwas glück sehen zu können, dass System#exit(int) wirklich aufgerufen wird.
+			logger.logError("Attempting to shutdown Spring Boot.");
+			SpringApplication.exit(applicationContext, () -> 1);
 			logger.logError("Executing `java.lang.System.exit(int)`.");
+			// Falls Spring-Boots-Shutdown nicht funktioniert, versuchen wird System#exit(int).
+			// Wir loggen kurz vorher nochmal, um mit etwas glück sehen zu können, dass System#exit(int) wirklich aufgerufen wird.
 			System.out.println("Executing `java.lang.System.exit(int)`.");
 			System.out.flush();
-			SpringApplication.exit(applicationContext, () -> 1);
 			System.exit(1);
 		}
 	}

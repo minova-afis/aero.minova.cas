@@ -41,6 +41,8 @@ public class SystemDatabase {
 	 * da die {@link Connection} von einem Connection-Pool kommt,
 	 * welche einen {@link Connection}-Wrapper ausgibt,
 	 * der bei {@link Connection#close()} nicht von diesem erstelle Objekte schließt.
+	 * (Allerdings ist dies das Nicht-Schließen der  {@link Statement} nicht das Schlimmste,
+	 * da wir inzwischen die maximale Lebenszeit einer JDBC-Verbindung limitieren.)
 	 */
 	public Connection getConnection() {
 		try {

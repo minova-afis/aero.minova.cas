@@ -75,21 +75,25 @@ public class SelfProbingService {
 	@Scheduled(cron = "${self.probing.cron:-}")
 	private void run() {
 		final var probe = new Thread(() -> {
-		try {
-			/*
-			 * Hiermit werden alle Verbindungen die zum Pool zurückgegeben geschlossen,
-			 * statt diese in den Pool zu tun,
-			 * um zu vermeiden, dass der Pool voll mit Verbindungen läuft,
-			 * welche nicht funktionieren oder einen Fehler hatten,
-			 * während dies Hikari nicht mitbekommt.
-			 * Somit ist es unwahrscheinlicher, dass diese kaputte Verbindungen an den nächsten Nutzer weitergegeben werden.
-			 */
-			database.softEvictConnections();
-			if (database.getConnection().prepareCall("select 1").execute()) {
-				logger.logInfo("The connection to the database is working.");
-			} else {
-				logger.logInfo("The connection to the database failed.");
-				systemExit();
+			try {
+				/*
+				 * Hiermit werden alle Verbindungen die zum Pool zurückgegeben geschlossen,
+				 * statt diese in den Pool zu tun,
+				 * um zu vermeiden, dass der Pool voll mit Verbindungen läuft,
+				 * welche nicht funktionieren oder einen Fehler hatten,
+				 * während dies Hikari nicht mitbekommt.
+				 * Somit ist es unwahrscheinlicher, dass diese kaputte Verbindungen an den nächsten Nutzer weitergegeben werden.
+				 */
+				database.softEvictConnections();
+				try (final var connection = database.getConnection(); final var call = connection.prepareCall("select 1")) {
+					if (call.execute()) {
+						logger.logInfo("The connection to the database is working.");
+					} else {
+						logger.logInfo("The connection to the database failed.");
+						systemExit();
+					}
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
 			}
 		} catch (Throwable e) {
 			logger.logError("The connection to the database failed.", e);

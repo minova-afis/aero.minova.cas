@@ -176,7 +176,9 @@ public class SqlProcedureController {
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		if (inputTable.getName().equals("setup")) {
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+			try (final var connection = database.getConnection(); final var call = connection.createStatement();) {
+				call.execute("set ANSI_WARNINGS off");
+			}
 		}
 		customLogger.logUserRequest("data/procedure: ", inputTable);
 		try {

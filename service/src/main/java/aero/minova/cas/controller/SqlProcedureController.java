@@ -115,10 +115,14 @@ public class SqlProcedureController {
 
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
-		try {
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS off");
+		try (final var connection = database.getConnection()) {
+			try (final var call = connection.createStatement()) {
+				call.execute("set ANSI_WARNINGS off");
+			}
 			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
-			database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
+			try (final var call = connection.createStatement()) {
+				call.execute("set ANSI_WARNINGS on");
+			}
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);

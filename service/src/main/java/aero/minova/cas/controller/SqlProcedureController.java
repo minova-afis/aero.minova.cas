@@ -193,7 +193,9 @@ public class SqlProcedureController {
 			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
 			if (inputTable.getName().equals("setup")) {
-				database.getConnection().createStatement().execute("set ANSI_WARNINGS on");
+				try (final var connection = database.getConnection(); final var call = connection.createStatement()) {
+					call.execute("set ANSI_WARNINGS on");
+				}
 			}
 			return result;
 		} catch (Throwable e) {

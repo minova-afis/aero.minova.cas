@@ -37,6 +37,23 @@
 
 ## Allgemeines
 
+### Connection leak detection triggered
+
+Eine SQL-Verbindung wurde nach der Verwendung nicht geschlossen.
+Das ist ein Programmierfehler und sollte von einem Entwickler behoben werden.
+Als Hotfix muss erstmal nichts gemacht werden,
+solange neue SQL-Verbindungen vom Connection-Pool zur Verfügung stehen.
+Ist dies nicht mehr der Fall, muss der Dienst neu gestartet werden.
+
+```
+2025-07-15T09:16:00.238 Connection leak detection triggered for ConnectionID:174702 ClientConnectionId: 5d114794-552e-48ea-9b0b-f45d3333ffc4 on thread Thread-578, stack trace follows
+java.lang.Exception: Apparent connection leak detected
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:128)
+	at aero.minova.cas.sql.SystemDatabase.getConnection(SystemDatabase.java:44)
+	at aero.minova.cas.service.SelfProbingService.lambda$run$2(SelfProbingService.java:88)
+	at java.base/java.lang.Thread.run(Unknown Source)
+```
+
 ### WFC-Support
 
 Manchmal ist es nicht eindeutig, ob der Fehler im CAS oder in der WFC Anwendung liegt. link:https://github.com/minova-afis/aero.minova.rcp/wiki/Hilfestellung-bei-Support[Hier geht es zur Support Seite der WFC Anwendung]

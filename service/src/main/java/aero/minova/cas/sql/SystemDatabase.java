@@ -68,9 +68,12 @@ public class SystemDatabase {
 
 	/**
 	 * @deprecated Stattdessen sollte try-with verwendet werden.
-	 * Zwar muss man so jeweils die Xxception als RuntimeException neu schmeißen,
+	 * Zwar muss man so jeweils die Exception als RuntimeException neu schmeißen,
 	 * allerdings sollte nicht angenommen werden,
 	 * dass SQL erfolgreich ausgeführt werden konnte, wenn dessen Verbindung nicht geschlossen werden konnte.
+	 * Zudem braucht es keine eigene Close-Methode, da {@link Connection#close()} unabhängig von der Implementierung
+	 * vertrauenswürdig ist. Sollte dies nicht der Fall sein, kann man in {@link #getConnection()}
+	 * einen eigenen {@link Connection}-Wrapper schreiben.
 	 * @param connection
 	 */
 	@Deprecated

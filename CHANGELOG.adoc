@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## Unreleased
+## [UNRELEASED] -- XXXX-XX-XX
+Alle SQL-Verbindungen nach der Verwendung explizit schließen.
 
 ## [13.6.0] — 2025-07-02
 * Maske LDAP User: Mehr Zeichen für KeyText erlauben

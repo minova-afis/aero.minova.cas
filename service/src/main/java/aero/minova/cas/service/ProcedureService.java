@@ -132,7 +132,9 @@ public class ProcedureService {
 		try {
 			connection = systemDatabase.getConnection();
 			if (isSetup) {
-				connection.createStatement().execute("set ANSI_WARNINGS off");
+				try (final var call = connection.createStatement()) {
+					call.execute("set ANSI_WARNINGS off");
+				}
 			}
 			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
 			connection.commit();

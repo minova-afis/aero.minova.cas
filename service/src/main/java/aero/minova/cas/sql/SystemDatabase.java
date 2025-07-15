@@ -39,6 +39,14 @@ public class SystemDatabase {
 		return (HikariDataSource) properties.get("javax.persistence.nonJtaDataSource");
 	}
 
+	/**
+	 * @return Die zurückgegebene Verbindung muss wieder explizit geschlossen werden.
+	 * Garbage Collection schließt über den Finalizer die Verbindung nicht.
+	 *
+	 * Am besten wird dies über ein try-with getätigt und bei einer {@link SQLException},
+	 * sollte diese als {@link RuntimeException} weiter ausgegeben werden und nicht nur gelogged werden,
+	 * da dies impliziert, dass auch die SQL-Befehle nicht richtig ausgeführt wurden.
+	 */
 	public Connection getConnection() {
 		try {
 			Connection connection = dataSource().getConnection();
@@ -49,6 +57,14 @@ public class SystemDatabase {
 		}
 	}
 
+	/**
+	 * @deprecated Stattdessen sollte try-with verwendet werden.
+	 * Zwar muss man so jeweils die Xxception als RuntimeException neu schmeißen,
+	 * allerdings sollte nicht angenommen werden,
+	 * dass SQL erfolgreich ausgeführt werden konnte, wenn dessen Verbindung nicht geschlossen werden konnte.
+	 * @param connection
+	 */
+	@Deprecated
 	public void closeConnection(Connection connection) {
 		try {
 			if (connection != null) {

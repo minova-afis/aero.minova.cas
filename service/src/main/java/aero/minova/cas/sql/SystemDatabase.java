@@ -2,6 +2,7 @@ package aero.minova.cas.sql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 
 import org.hibernate.Session;
@@ -34,6 +35,12 @@ public class SystemDatabase {
 	 * Am besten wird dies über ein try-with getätigt und bei einer {@link SQLException},
 	 * sollte diese als {@link RuntimeException} weiter ausgegeben werden und nicht nur gelogged werden,
 	 * da dies impliziert, dass auch die SQL-Befehle nicht richtig ausgeführt wurden.
+	 *
+	 * {@link Statement} welche mit der Verbindung erstellt wurden,
+	 * sollten auch explizit geschlossen werden,
+	 * da die {@link Connection} von einem Connection-Pool kommt,
+	 * welche einen {@link Connection}-Wrapper ausgibt,
+	 * der bei {@link Connection#close()} nicht von diesem erstelle Objekte schließt.
 	 */
 	public Connection getConnection() {
 		try {

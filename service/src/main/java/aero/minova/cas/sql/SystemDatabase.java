@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.zaxxer.hikari.pool.ProxyConnection;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,8 +54,8 @@ public class SystemDatabase {
 	 * da die {@link Connection} von einem Connection-Pool kommt,
 	 * welche einen {@link Connection}-Wrapper ausgibt,
 	 * der bei {@link Connection#close()} nicht von diesem erstelle Objekte schließt.
-	 * (Allerdings ist dies das Nicht-Schließen der  {@link Statement} nicht das Schlimmste,
-	 * da wir inzwischen die maximale Lebenszeit einer JDBC-Verbindung limitieren.)
+	 * Das Nicht-Schließen der {@link Statement} und {@link java.sql.ResultSet} verursacht keine Probleme,
+	 * da HikariCP beim {@link ProxyConnection#close()} auch alle {@link Statement} der Verbindung schließt.
 	 */
 	public Connection getConnection() {
 		try {

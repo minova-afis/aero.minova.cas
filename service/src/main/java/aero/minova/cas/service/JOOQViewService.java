@@ -1,7 +1,5 @@
 package aero.minova.cas.service;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -18,10 +16,8 @@ import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 @RequiredArgsConstructor
 @Service
@@ -61,31 +57,6 @@ public class JOOQViewService implements ViewServiceInterface {
 		// Die RowLevelSecurity muss schon als "ausgefüllter" String angehängt werden (keine "?"), da die Werte nicht in der Tabelle stehen
 		sqlString += SecurityService.rowLevelSecurity(condition.equals(DSL.noCondition()), authorities);
 		return sqlString;
-	}
-
-	public Table unsecurelyGetIndexView(Table inputTable) {
-		StringBuilder sb = new StringBuilder();
-		List<Row> userGroups = new ArrayList<>();
-		Row inputRow = new Row();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		Table result = new Table();
-		final String viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
-		try (final val connection = systemDatabase.getConnection(); final var preparedStatement = connection.prepareCall(viewQuery)) {
-			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
-					customLogger.errorLogger)) {
-				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
-				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
-					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
-				}
-			}
-		} catch (Exception e) {
-			customLogger.logError("Statement could not be executed: " + sb, e);
-			throw new RuntimeException(e);
-		}
-		return result;
 	}
 
 	@Override

@@ -93,7 +93,7 @@ public class SelfProbingService {
 				} catch (SQLException e) {
 					throw new RuntimeException(e);
 			}
-		} catch (SQLException e) {
+		} catch (Throwable e) {
 			logger.logError("The connection to the database failed.", e);
 			systemExit();
 		}

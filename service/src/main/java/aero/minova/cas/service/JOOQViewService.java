@@ -76,9 +76,9 @@ public class JOOQViewService implements ViewServiceInterface {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		Table result = new Table();
-		final val connection = systemDatabase.getConnection();
 		final String viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
-		try (final var preparedStatement = connection.prepareCall(viewQuery)) {
+		try (final val connection = systemDatabase.getConnection();
+			 final var preparedStatement = connection.prepareCall(viewQuery)) {
 			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
 					customLogger.errorLogger)) {
 				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
@@ -89,8 +89,6 @@ public class JOOQViewService implements ViewServiceInterface {
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}

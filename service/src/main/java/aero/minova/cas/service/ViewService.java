@@ -58,10 +58,9 @@ public class ViewService {
 	}
 
 	public Table executeView(Table inputTable, List<Row> authoritiesForThisTable) throws TableException {
-		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
-		try {
+		try (final val connection = systemDatabase.getConnection()) {
 			inputTable = securityService.columnSecurity(inputTable, authoritiesForThisTable);
 			TableMetaData inputMetaData = inputTable.getMetaData();
 			if (inputTable.getMetaData() == null) {
@@ -91,8 +90,8 @@ public class ViewService {
 			// Die pagingWithSeek-Methode benötigt immer einen KeyLong in der Anfrage. Es gibt allerdings auch einige Anfragen, die keinen KeyLong benötigen,
 			// weswegen dann Fehlermeldungen geworfen werden. Deshalb wird ab jetzt einfach die prepareViewString-Methode verwendet.
 			String viewQuery = viewService.prepareViewString(inputTable, false, 0, authoritiesForThisTable);
-			val preparedStatement = connection.prepareCall(viewQuery);
-			try (PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
+			try (val preparedStatement = connection.prepareCall(viewQuery);
+				 PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
 				customLogger.logSql("Executing statements: " + sb);
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 
@@ -117,14 +116,10 @@ public class ViewService {
 
 					result.fillMetaData(result, limit, totalResults, page);
 				}
-			} finally {
-				preparedStatement.close();
 			}
 		} catch (Throwable e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new TableException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}

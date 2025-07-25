@@ -190,7 +190,7 @@ public class SqlProcedureController {
 			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
 			throw new ProcedureException(e);
 		} finally {
-			if (database.getConnection().isClosed()) {
+			if (!database.getConnection().isClosed()) {
 				database.getConnection().close();
 			}
 		}

@@ -29,6 +29,6 @@ public abstract class DataEntity {
 	@Column(length = 50)
 	private String lastUser = BaseService.getCurrentUser();
 
-	@Column(columnDefinition = "TIMESTAMP")
+	@Column
 	private LocalDateTime lastDate = LocalDateTime.now();
 }

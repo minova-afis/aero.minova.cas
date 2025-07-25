@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		classes = {
 				SecurityConfig.class, CustomLogger.class, ClientRestAPI.class, SystemDatabase.class,
 				SecurityConfigITest.TestApplication.class },
-		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+		webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 
 class SecurityConfigITest {
 	@Autowired

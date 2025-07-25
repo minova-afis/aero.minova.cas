@@ -1,4 +1,5 @@
 name: Release
+run-name: Release ${{ inputs.releaseVersion }}
 on:
   workflow_dispatch:
     inputs:
@@ -15,7 +16,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
           java-package: 'jdk'
       - name: Build
         run: |

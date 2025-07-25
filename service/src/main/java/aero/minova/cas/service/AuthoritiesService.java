@@ -34,14 +34,17 @@ public class AuthoritiesService extends BaseService<Authorities> {
 	public Authorities save(Authorities entity) {
 
 		// Kombination aus Username und Authority/Gruppenname darf es nur einmal geben
-		Optional<Authorities> findByUsernameAndAuthority = ((AuthoritiesRepository) repository).findByUsernameAndAuthority(entity.getUsername(),
-				entity.getAuthority());
+		Optional<Authorities> authority = findByUsernameAndAuthority(entity.getUsername(), entity.getAuthority());
 
-		if (findByUsernameAndAuthority.isPresent() && !Objects.equals(findByUsernameAndAuthority.get().getKeyLong(), entity.getKeyLong())) {
+		if (authority.isPresent() && !Objects.equals(authority.get().getKeyLong(), entity.getKeyLong())) {
 			throw new RuntimeException("msg.DuplicateMatchcodeNotAllowed");
 		}
 
 		return super.save(entity);
+	}
+
+	public Optional<Authorities> findByUsernameAndAuthority(String username, String authority) {
+		return ((AuthoritiesRepository) repository).findByUsernameAndAuthority(username, authority);
 	}
 
 	public List<Authorities> findByUsername(String username) {

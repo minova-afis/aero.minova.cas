@@ -1,13 +1,5 @@
 package aero.minova.cas.service;
 
-import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.*;
-import aero.minova.cas.sql.SqlUtils;
-import aero.minova.cas.sql.SystemDatabase;
-import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -15,6 +7,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.Column;
+import aero.minova.cas.api.domain.DataType;
+import aero.minova.cas.api.domain.Row;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.sql.SqlUtils;
+import aero.minova.cas.sql.SystemDatabase;
+import lombok.val;
 
 @Service
 public class MssqlViewService implements ViewServiceInterface {
@@ -25,13 +30,9 @@ public class MssqlViewService implements ViewServiceInterface {
 	@Autowired
 	CustomLogger customLogger;
 
-	@Autowired
-	private SecurityService securityService;
-
-	public MssqlViewService(SystemDatabase systemDatabase, CustomLogger customLogger, SecurityService securityService) {
+	public MssqlViewService(SystemDatabase systemDatabase, CustomLogger customLogger) {
 		this.systemDatabase = systemDatabase;
 		this.customLogger = customLogger;
-		this.securityService = securityService;
 	}
 
 	public Table unsecurelyGetIndexView(Table inputTable) {
@@ -44,8 +45,7 @@ public class MssqlViewService implements ViewServiceInterface {
 		userGroups.add(inputRow);
 		Table result = new Table();
 		val viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
-		try (val connection = systemDatabase.getConnection();
-			 val preparedStatement = connection.prepareCall(viewQuery)) {
+		try (val connection = systemDatabase.getConnection(); val preparedStatement = connection.prepareCall(viewQuery)) {
 			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
 					customLogger.errorLogger)) {
 				customLogger.logPrivilege("Executing SQL-statement for view:  " + sb);
@@ -60,6 +60,7 @@ public class MssqlViewService implements ViewServiceInterface {
 		return result;
 	}
 
+	@Override
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuilder sb = new StringBuilder();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
@@ -88,22 +89,23 @@ public class MssqlViewService implements ViewServiceInterface {
 			}
 		}
 		sb.append(params.getName());
-		boolean whereClauseExists = false;
+		boolean isFirstWhereClause = true;
 		if (!params.getColumns().isEmpty() && !params.getRows().isEmpty()) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 			if (!where.trim().equals("")) {
-				whereClauseExists = true;
+				isFirstWhereClause = false;
 				sb.append(")");
 			}
 		}
 
-		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = SecurityService.rowLevelSecurity(isFirstWhereClause, authorities);
 		sb.append(onlyAuthorizedRows);
 
 		return sb.toString();
 	}
 
+	@Override
 	public String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuilder where = new StringBuilder();
 		final boolean hasAndClause;
@@ -218,6 +220,7 @@ public class MssqlViewService implements ViewServiceInterface {
 	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen. Wird NICHT für den "normalen" Index-Aufruf verwendet, da immer
 	 * davon ausgegangen wird, dass ein KeyLong in der View/Table vorhanden ist.
 	 */
+	@Override
 	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
 		final StringBuilder sb = new StringBuilder();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
@@ -238,16 +241,16 @@ public class MssqlViewService implements ViewServiceInterface {
 		}
 
 		sb.append("( select Row_Number() over (order by KeyLong) as RowNum, * from ").append(params.getName());
-		boolean whereClauseExists = false;
+		boolean isFirstWhereClause = true;
 		if (!params.getColumns().isEmpty() && !params.getRows().isEmpty()) {
 			final String where = prepareWhereClause(params, autoLike);
 			sb.append(where);
 			if (!where.trim().equals("")) {
-				whereClauseExists = true;
+				isFirstWhereClause = false;
 				sb.append(")");
 			}
 		}
-		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
+		final String onlyAuthorizedRows = SecurityService.rowLevelSecurity(isFirstWhereClause, authorities);
 		sb.append(onlyAuthorizedRows);
 		sb.append(" ) as RowConstraintResult");
 

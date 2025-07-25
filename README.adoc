@@ -20,6 +20,10 @@
 
 image::doc/cas-overview.svg[]
 
+++++
+<img style="width: 100%" src="doc/konzept-von-free-tables-fuer-das-freistellungsportal.png">
+++++
+
 == Beschreibung
 Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank, Erweiterungen basierend auf Java, sowie einem Read-Only-Dateisystem bereit.
 Der Fokus liegt hierbei darauf, das Backend und die Infrastruktur für Eclipse/link:https://github.com/minova-afis/aero.minova.rcp[WFC]-Anwendungen bereitzustellen.
@@ -40,6 +44,7 @@ dass die API möglichst stabil gehalten wird.
 == Weiterführende Dokumentation
 
 * xref:./doc/adoc/support.adoc#[Symptome, deren Ursachen und Lösungen]
+* xref:./doc/docx/konzept-von-free-tables-fuer-das-freistellungsportal.docx#[Konzept von Free Tables für das Freistellungsportal] (xref:./doc/pdf/konzept-von-free-tables-fuer-das-freistellungsportal.pdf#[PDF])
 * xref:./CHANGELOG.adoc#[Changelog]
 * xref:./api/doc/adoc/index.adoc#[CAS API]
 * xref:./service/doc/adoc/index.adoc#[CAS-Dienst]

@@ -1,99 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="true">
-	<property name="APP_LOG_ROOT" value="./target/Internal/logs"/>
-	<property name="LOG_PATTERN" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %m%n"/>
-	
-	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>${LOG_PATTERN}</pattern>
-		</encoder>
-	</appender>
-	
-	<appender name="errorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${APP_LOG_ROOT}/error.log</file>
-		<append>true</append>
-		<encoder>
-			<pattern>${LOG_PATTERN}</pattern>
-		</encoder>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/archived/error_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-			<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-	</appender>
-	<appender name="privilegeLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${APP_LOG_ROOT}/privilege.log</file>
-		<append>true</append>
-		<encoder>
-			<pattern>${LOG_PATTERN}</pattern>
-		</encoder>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/archived/privilege_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-			<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-	</appender>
-	<appender name="springLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${APP_LOG_ROOT}/springLog.log</file>
-		<append>true</append>
-		<encoder>
-			<pattern>${LOG_PATTERN}</pattern>
-		</encoder>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/archived/springLog_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-			<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-	</appender>
-	<appender name="userLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${APP_LOG_ROOT}/userRequests.log</file>
-		<append>true</append>
-		<encoder>
-			<pattern>${LOG_PATTERN}</pattern>
-		</encoder>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/archived/userRequests_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-			<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-	</appender>
-	<appender name="filesLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${APP_LOG_ROOT}/files.log</file>
-		<append>true</append>
-		<encoder>
-			<pattern>${LOG_PATTERN}</pattern>
-		</encoder>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${APP_LOG_ROOT}/archived/files_%d{dd-MM-yyyy}.%i.log</fileNamePattern>
-			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-			<maxFileSize>10MB</maxFileSize>
-			</timeBasedFileNamingAndTriggeringPolicy>
-		</rollingPolicy>
-	</appender>
-	
-	<logger name="ErrorLogger" level="trace" additivity="false">
-		<appender-ref ref="errorLog"/>
-	</logger>
-	<logger name="PrivilegeLogger" level="trace" additivity="false">
-		<appender-ref ref="privilegeLog"/>
-	</logger>
-	<logger name="SqlLogger" level="trace" additivity="false">
-		<appender-ref ref="springLog"/>
-		<appender-ref ref="console"/>
-	</logger>
-	<logger name="UserLogger" level="trace" additivity="false">
-		<appender-ref ref="userLog"/>
-		<appender-ref ref="console"/>
-	</logger>
-		<logger name="FilesLogger" level="trace" additivity="false">
-		<appender-ref ref="filesLog"/>
-		<appender-ref ref="console"/>
-	</logger>
-	<root level="info">
-		<appender-ref ref="console"/>
+<configuration>
+	<!-- Während Tests führen exzessive Logs nur zu Problemen, weswegen nur Warnungen gelogged werden. -->
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	<property name="FILE_LOG_THRESHOLD" value="${FILE_LOG_THRESHOLD:-WARN}"/>
+	<logger name="org.springframework" level="WARN"/>
+	<root level="WARN">
+		<appender-ref ref="CONSOLE" />
 	</root>
 </configuration>

@@ -1,5 +1,7 @@
 package aero.minova.cas.service;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,6 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,10 +34,14 @@ import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.model.Authorities;
+import aero.minova.cas.service.model.ColumnSecurity;
+import aero.minova.cas.service.model.LuUserPrivilegeUserGroup;
 import aero.minova.cas.service.repository.AuthoritiesRepository;
+import aero.minova.cas.service.repository.ColumnSecurityRepository;
 import jakarta.annotation.PostConstruct;
 
 @SpringBootTest(classes = CoreApplicationSystemApplication.class)
@@ -57,6 +67,17 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	@Autowired
 	AuthoritiesRepository authoritiesRepository;
 
+	@Autowired
+	LuUserPrivilegeUserGroupService luUserPrivilegeUserGroupService;
+
+	@Autowired
+	UserGroupService userGroupService;
+
+	@Autowired
+	ColumnSecurityRepository columnSecurityRepository;
+
+	private List<Integer> authorityKeys = Arrays.asList(1, 2, 3, 4, 5);
+
 	@PostConstruct
 	void setupViewServiceTest() {
 
@@ -64,12 +85,41 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		authorizationService.findOrCreateUserPrivilege("xtcasAuthorities");
 		authorizationService.createOrUpdateAdminUser("admin", "$2a$10$l6uLtEVvQAOI7hOXutd7Ye0FtlaL7/npwGu/8YN31EhkHT0wjdtIq");
 
+		// Erlaubnis auf ColumnSecurity Tabelle mit RowLevelSecurity aktiviert
+		LuUserPrivilegeUserGroup privilege = authorizationService.findOrCreateLuUserPrivilegeUserGroup(userGroupService.findEntitiesByKeyText("admin").get(0),
+				authorizationService.findOrCreateUserPrivilege("xtcasColumnSecurity"));
+		privilege.setRowLevelSecurity(true);
+		luUserPrivilegeUserGroupService.save(privilege);
+
 		// Ein paar Daten erstellen
 		authoritiesRepository.save(new Authorities(1, "User1", "test", "user", Timestamp.valueOf("2023-06-18 00:00:00.0").toLocalDateTime(), 1));
 		authoritiesRepository.save(new Authorities(2, "User2", "TEST", "user", Timestamp.valueOf("2023-06-19 00:00:00.0").toLocalDateTime(), 2));
 		authoritiesRepository.save(new Authorities(3, "User3", "not test", "user", Timestamp.valueOf("2023-06-19 08:00:00.0").toLocalDateTime(), 1));
 		authoritiesRepository.save(new Authorities(4, "User4", "testtest", "user", Timestamp.valueOf("2023-06-19 16:00:00.0").toLocalDateTime(), 1));
 		authoritiesRepository.save(new Authorities(5, "User5", "te", null, Timestamp.valueOf("2023-06-20 08:00:00.0").toLocalDateTime(), -1));
+
+		columnSecurityRepository.save(new ColumnSecurity(1, "cs1", "cs1", "cs1", null));
+		columnSecurityRepository.save(new ColumnSecurity(2, "cs2", "cs2", "cs2", "admin"));
+		columnSecurityRepository.save(new ColumnSecurity(3, "cs3", "cs3", "cs3", "niemand"));
+	}
+
+	@Test
+	@DisplayName("RowLevelSecurity ohne weitere Bedingungen")
+	void rowLevelNoConditions() throws Exception {
+		Table indexView = getTableForPrivilegeRequest();
+
+		Table indexViewResult = viewController.getIndexView(indexView);
+		assertTrue(indexViewResult.getRows().size() == 2);
+	}
+
+	@Test
+	@DisplayName("RowLevelSecurity mit weitere Bedingungen")
+	void rowLevelWithConditions() throws Exception {
+		Table indexView = getTableForPrivilegeRequest();
+		indexView.setValue(new Value("cs2", "like"), "KeyText", 0);
+
+		Table indexViewResult = viewController.getIndexView(indexView);
+		assertTrue(indexViewResult.getRows().size() == 1);
 	}
 
 	@Test
@@ -371,6 +421,31 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		}
 	}
 
+	@Test
+	@DisplayName("Limit testen")
+	void testLimit() throws Exception {
+		Table indexView = getTableForRequestWithLimitedRows(1);
+		Table indexViewResult = viewController.getIndexView(indexView);
+		assertEquals(2, indexViewResult.getRows().size());
+		final var freeKeys = authorityKeys.stream().collect(toList());
+		assertTrue(freeKeys.remove(indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue()));
+		assertTrue(freeKeys.remove(indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue()));
+		assertEquals(2, indexViewResult.getMetaData().getLimited());
+		assertEquals(1, indexViewResult.getMetaData().getPage());
+		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
+		assertTrue(indexViewResult.getMetaData().getResultsLeft() >= 2);
+
+		indexView = getTableForRequestWithLimitedRows(2);
+		indexViewResult = viewController.getIndexView(indexView);
+		assertEquals(2, indexViewResult.getRows().size());
+		assertTrue(freeKeys.remove(indexViewResult.getRows().get(0).getValues().get(0).getIntegerValue()));
+		assertTrue(freeKeys.remove(indexViewResult.getRows().get(1).getValues().get(0).getIntegerValue()));
+		assertEquals(2, indexViewResult.getMetaData().getLimited());
+		assertEquals(2, indexViewResult.getMetaData().getPage());
+		assertTrue(indexViewResult.getMetaData().getTotalResults() > 4);
+		assertTrue(indexViewResult.getMetaData().getResultsLeft() >= 0);
+	}
+
 	private Table getTableForRequest() {
 		Table indexView = new Table();
 		indexView.setName("xtcasAuthorities");
@@ -386,6 +461,16 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		return indexView;
 	}
 
+	private Table getTableForPrivilegeRequest() {
+		Table indexView = new Table();
+		indexView.setName("xtcasColumnSecurity");
+		indexView.addColumn(new Column("KeyLong", DataType.INTEGER));
+		indexView.addColumn(new Column("KeyText", DataType.STRING));
+
+		indexView.addRow(getEmptyRow(2));
+		return indexView;
+	}
+
 	private Table getTableForRequestNoAndColumn() {
 		Table indexView = new Table();
 		indexView.setName("xtcasAuthorities");
@@ -397,6 +482,26 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		indexView.addColumn(new Column("lastaction", DataType.INTEGER));
 
 		indexView.addRow(getEmptyRow(6));
+		return indexView;
+	}
+
+	private Table getTableForRequestWithLimitedRows(int page) {
+		Table indexView = new Table();
+		indexView.setName("xtcasAuthorities");
+		indexView.addColumn(new Column("KeyLong", DataType.INTEGER));
+		indexView.addColumn(new Column("Username", DataType.STRING));
+		indexView.addColumn(new Column("Authority", DataType.STRING));
+		indexView.addColumn(new Column("Lastuser", DataType.STRING));
+		indexView.addColumn(new Column("Lastdate", DataType.INSTANT));
+		indexView.addColumn(new Column("lastaction", DataType.INTEGER));
+
+		indexView.addRow(getEmptyRow(6));
+
+		TableMetaData tableMetaData = new TableMetaData();
+		tableMetaData.setLimited(2);
+		tableMetaData.setPage(page);
+		indexView.setMetaData(tableMetaData);
+
 		return indexView;
 	}
 

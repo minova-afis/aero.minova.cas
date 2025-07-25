@@ -1,27 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>cas.service</artifactId>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>cas.service</artifactId>
 
-    <parent>
-        <groupId>aero.minova</groupId>
-        <artifactId>cas.parent</artifactId>
-        <version>13.2.3-SNAPSHOT</version>
-        <relativePath>../</relativePath>
-    </parent>
-
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git
-        </developerConnection>
-        <tag>HEAD</tag>
-    </scm>
-    <dependencyManagement>
+	<parent>
+		<groupId>aero.minova</groupId>
+		<artifactId>cas.parent</artifactId>
+		<version>13.6.1-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+  
+ <dependencyManagement>
         <dependencies>
             <dependency>
                 <!-- Diese BOM wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.25.46</version>
+                <version>2.32.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -32,6 +26,17 @@
             <groupId>aero.minova</groupId>
             <artifactId>cas.api</artifactId>
             <version>${project.parent.version}</version>
+        </dependency>
+        <!-- HUB FUnktionalität -->
+        <dependency>
+            <groupId>ch.minova</groupId>
+            <artifactId>appmodel</artifactId>
+            <version>0.9.9</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.minova</groupId>
+            <artifactId>assist.core</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -169,7 +174,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.16.1</version>
+            <version>2.20.0</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
@@ -194,19 +199,19 @@
             <!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.attachments) bereitgestellt: service/doc/adoc/extensions.adoc -->
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.16.1</version>
+            <version>2.20.0</version>
         </dependency>
         <dependency>
             <!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.sam) bereitgestellt: service/doc/adoc/extensions.adoc -->
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>7.4</version>
+            <version>8.1</version>
         </dependency>
         <dependency>
             <!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.sam) bereitgestellt: service/doc/adoc/extensions.adoc -->
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>2.9.2</version>
+            <version>3.2.1</version>
         </dependency>
         <dependency>
             <!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.cas.plugin.sam) bereitgestellt: service/doc/adoc/extensions.adoc -->
@@ -244,24 +249,23 @@
             <groupId>org.jacoco</groupId>
             <artifactId>org.jacoco.agent</artifactId>
             <classifier>runtime</classifier>
-            <version>0.8.12</version>
+            <version>0.8.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
     		<groupId>org.hibernate.validator</groupId>
     		<artifactId>hibernate-validator</artifactId>
-    		<version>8.0.1.Final</version>
 		</dependency>
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>msal4j</artifactId>
-            <version>1.15.0</version>
+            <version>1.22.0</version>
         </dependency>
         <dependency>
             <!-- Wird für die SeekableInMemoryByteChannel benötigt, mit welcher eine eigene FileSystem Implementierung gemacht wird. -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.26.1</version>
+            <version>1.27.1</version>
         </dependency>
         <dependency>
             <!-- Diese Abhängigkeit wird für Erweiterungen (z.B. https://github.com/minova-afis/aero.minova.github) bereitgestellt: service/doc/adoc/extensions.adoc -->
@@ -273,51 +277,51 @@
         <dependency>
             <groupId>com.azure.spring</groupId>
             <artifactId>spring-cloud-azure-dependencies</artifactId>
-            <version>5.11.0</version>
+            <version>5.22.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
     </dependencies>
 
-    <build>
-        <finalName>aero.minova.cas.service</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <parameters>true</parameters>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/libs
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<finalName>aero.minova.cas.service</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<parameters>true</parameters>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/libs
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Minova Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</repositories>
 </project>

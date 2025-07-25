@@ -1,6 +1,7 @@
 package aero.minova.cas.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -117,5 +118,19 @@ class ErrorMessageTest extends BaseTest {
 		assertThat(sqlError1.getRows()).hasSameSizeAs(exceptionTable.getRows());
 		assertThat(sqlError1.getRows().get(0).getValues().get(0).getStringValue().trim())
 				.isEqualTo(exceptionTable.getRows().get(0).getValues().get(0).getStringValue().trim());
+	}
+
+	@Test
+	void testMessageInsertJournalTemplate() {
+		Exception e = new Exception(
+				"ADO | 25 | msg.InsertJournalTemplate @s @s @s @s | Fehler beim Einfügen des Journalsatzes für\nKunde: CIRCLEKENE\nKontrakt: CIRCLKENE\nLeistungsart: ADDDEL");
+		assertDoesNotThrow(() -> mockSubject.prepareExceptionReturnTable(e));
+	}
+
+	@Test
+	void testMessageWithVerticalSlash() {
+		Exception e = new Exception(
+				"msg.invoice.oiltanking.sap.error %2124360004: No errors occured|0000000006285333 Error by processing an IDOC Idocs status: 51-Error in document: BKPFF $ QS1CLNT110-Profit c....");
+		assertDoesNotThrow(() -> mockSubject.prepareExceptionReturnTable(e));
 	}
 }

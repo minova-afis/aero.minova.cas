@@ -4,10 +4,9 @@ on:
     branches:
       - '**'
   workflow_dispatch:
-
 jobs:
   Build:
     uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/java-continuous-integration.yml@main
+    secrets: inherit
     with:
       dependency-check-goal: 'help'
-    secrets: inherit

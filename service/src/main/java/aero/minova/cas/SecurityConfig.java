@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -19,24 +20,21 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.server.authentication.logout.DelegatingServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.SecurityContextServerLogoutHandler;
-import org.springframework.security.web.server.authentication.logout.WebSessionServerLogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
+import aero.minova.cas.ldap.MultipleLdapDomainsAuthenticationProvider;
+import aero.minova.cas.ldap.MultipleLdapServerAddressesUserDetailsManager;
 import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -44,6 +42,8 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private static final String ADMIN = "admin";
+
+	private static final String MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR = ";";
 
 	@Value("${security_ldap_domain:minova.com}")
 	private String domain;
@@ -59,6 +59,9 @@ public class SecurityConfig {
 
 	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
 	private String allowedOrigins;
+
+	@Autowired
+	SystemDatabase systemDatabase;
 
 	private final DataSource dataSource;
 
@@ -83,33 +86,44 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		DelegatingServerLogoutHandler logoutHandler = new DelegatingServerLogoutHandler(new WebSessionServerLogoutHandler(),
-				new SecurityContextServerLogoutHandler());
+
 		http.authorizeHttpRequests(requests -> requests
-				.requestMatchers("/actuator/**").permitAll().requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
-				.permitAll().anyRequest().fullyAuthenticated()).logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
+				.requestMatchers("/actuator/**").permitAll()
+				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
+				.permitAll().anyRequest().fullyAuthenticated())
+				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
 				.formLogin(form -> form.loginPage("/login")//
 						.defaultSuccessUrl("/")//
 						.permitAll())
 				.httpBasic(Customizer.withDefaults())
-				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
+				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
+						.configurationSource(corsConfigurationSource()))
 
-				// scj: CSRF Should only be enabled if basic auth is replaced by a modern method.
-				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
+				// scj: CSRF Should only be enabled if basic auth is replaced by a modern
+				// method.
+				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security
+													// vulnerabilities.
 		return http.build();
 	}
 
 	@Bean
 	public UserDetailsManager userDetailsManager() {
 		if ("ldap".equals(loginDataSource)) {
-			DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(ldapServerAddress);
-			contextSource.afterPropertiesSet();
-
-			return new LdapUserDetailsManager(contextSource);
+			return new MultipleLdapServerAddressesUserDetailsManager(
+					Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)));
 		} else if ("database".equals(loginDataSource)) {
 			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-			jdbcUserDetailsManager.setUsersByUsernameQuery("select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
-			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select Username,Authority from xtcasAuthorities where Username = ?");
+
+			if (systemDatabase.isSQLDatabase()) {
+				jdbcUserDetailsManager.setUsersByUsernameQuery(
+						"select Username,Password,LastAction as enabled  from xtcasUsers where Username = ?");
+			} else {
+				jdbcUserDetailsManager.setUsersByUsernameQuery(
+						"select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
+			}
+
+			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+					"select Username,Authority from xtcasAuthorities where Username = ?");
 
 			return jdbcUserDetailsManager;
 		} else if (ADMIN.equals(loginDataSource)) {
@@ -131,12 +145,12 @@ public class SecurityConfig {
 
 	@Bean
 	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
-	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(UserDetailsContextMapper userDetailsContextMapper) {
-		ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(domain, ldapServerAddress);
-		provider.setConvertSubErrorCodesToExceptions(true);
-		provider.setUserDetailsContextMapper(userDetailsContextMapper);
-
-		return provider;
+	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(
+			UserDetailsContextMapper userDetailsContextMapper) {
+		return new MultipleLdapDomainsAuthenticationProvider(//
+				Arrays.asList(domain.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
+				Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
+				userDetailsContextMapper);
 	}
 
 	@Bean("ldapUser")
@@ -145,10 +159,12 @@ public class SecurityConfig {
 		return new LdapUserDetailsMapper() {
 			@SuppressWarnings("unchecked")
 			@Override
-			public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
+			public UserDetails mapUserFromContext(DirContextOperations ctx, String username,
+					Collection<? extends GrantedAuthority> authorities)
 					throws RuntimeException {
 				List<String> userSecurityTokens = securityService.loadLDAPUserTokens(username);
-				List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username, userSecurityTokens,
+				List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username,
+						userSecurityTokens,
 						(List<GrantedAuthority>) authorities);
 				return super.mapUserFromContext(ctx, username, grantedAuthorities);
 			}

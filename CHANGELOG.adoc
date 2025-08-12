@@ -9,7 +9,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [13.6.1]—2025-08-12
 Alle SQL-Verbindungen nach der Verwendung explizit schließen.
 
-## [13.6.0] — 2025-07-02
+## [13.6.0]—2025-07-02
 * Maske LDAP User: Mehr Zeichen für KeyText erlauben
 * HUB Funktionalität, siehe link:https://github.com/minova-afis/aero.minova.cas/issues/1272[#1272]
 * Setup komplett loggen
@@ -18,22 +18,22 @@ Alle SQL-Verbindungen nach der Verwendung explizit schließen.
   Gibt es ein SQL-Verbindungsproblem wird der Dienst beendet, damit dieser von Kubernetes automatisch neu gestartet wird.
   Zudem wurden die Hikari-Einstellung so angepasst, dass Verbindungsprobleme besser erkannt/vermieden werden.
 
-## [13.5.3/4] — 2025-01-14
+## [13.5.3/4]—2025-01-14
 * ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern
 * Setup nicht abbrechen, wenn das setup.xml File einer Abhängigkeit nicht gefunden wurde
 * Wenn Prozeduren vom CAS selbst aufgerufen werden User "CAS_JPA" für LastUser in der Datenbank setzten
 * ServiceMessage.messageCreationDate nicht als Timestamp. Sonst bekommen wir mit den SQL-Prozeduren Probleme, da diese einen expliziten Wert in die Spalte einfügen.
 
-## [13.5.2] — 2024-11-04
+## [13.5.2]—2024-11-04
 * Bei Fehler in LDAP Login username Loggen
 * Limit setzten bei Indexanfragen über die Base-Extension korrigieren
 
-## [13.5.1] — 2024-10-17
+## [13.5.1]—2024-10-17
 * LastDate nicht als TIMESTAMP Spalte erstellen
 * Login für Database-User mit SQL Datenbank ausbessern
 * HTML-Dateien beim Bauen wieder mit ausliefern
 
-## [13.5.0] — 2024-10-09
+## [13.5.0]—2024-10-09
 * CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.
 * Es wird nun Java 21 verwendet.
 
@@ -44,20 +44,20 @@ Alle SQL-Verbindungen nach der Verwendung explizit schließen.
 
 * LastDate im Java-Code keinen Default-Wert geben, da es sich um eine TIMESTAMP Spalte handelt, in die in SQL kein explizierter Wert eingetragen werden darf
 
-## [13.4.0] — 2024-07-31
+## [13.4.0]—2024-07-31
 * Umlaute in i18n Datei ausbessern
 * Bei Login über LDAP alternative UPN Suffixe unterstützen
 * Bei Setup Extension Namen nur einmal in UserPrivilege eintragen
 * Suche über BaseExtension ausbessern, Filter werden jetzt korrekt angewendet
 
-## [13.3.0] — 2024-07-08
+## [13.3.0]—2024-07-08
 * Absturz bei Fehler während dem Erstellen von Privilegien über JPA verhindern. Damit ist es wieder möglich, das CAS mit einer leeren Datenbank zu starten.
 * Konfigurierte Bezeichnung des CAS über GET /label abrufbar machen
 * Logging im Fehlerfall ausbessern, Stacktraces werden jetzt mit geloggt
 * Mehrere Ldap Domänen und Adressen unterstützen
 
 
-## [13.2.2] — 2024-04-08
+## [13.2.2]—2024-04-08
 * Modelklassen-Attribute einheitlich auf private
 * javax.validation mit jakarta.validation austauschen -> die @NotNull und @Size Restriktionen werden jetzt tatsächlich überprüft!
 * Technische Logs für fehlerhaftes View-Parameter verbessern.
@@ -67,18 +67,18 @@ Alle SQL-Verbindungen nach der Verwendung explizit schließen.
 * Aussagekräftige Fehlermeldung werfen, wenn in einer i18n-Datei das "=" Trennzeichen für die Properties fehlt.
 
 
-## [13.2.1] — 2024-02-22
+## [13.2.1]—2024-02-22
 * ExtendedDataEntity Klasse für Entities, die auch eine Beschreibung haben sollen
 
-## [13.2.0] — 2024-02-12
+## [13.2.0]—2024-02-12
 * Zusammenfügen von Übersetzungen beim Bauen von Kundenprojekten, da seit der 13er CAS Einführung, Abhängigkeiten nicht mehr richtig bereitgestellt wurden.
 * Tests für Extensions und Services
 
-## [13.1.2] — 2024-02-05
+## [13.1.2]—2024-02-05
 * LocalDateTime statt Timestamp in Entities verwenden
 * Bei Index-Anfragen auch LastAction >0 filtern
 
-## [13.1.1] — 2024-02-02
+## [13.1.1]—2024-02-02
 * Automatisches Einspielen von Postgres/H2 Views ausbessern
 
 ## [13.1.0] -- 2024-02-02

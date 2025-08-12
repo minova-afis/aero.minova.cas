@@ -1,0 +1,855 @@
+# Changelog
+
+Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
+Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
+
+## \[UNRELEASED\] - XXXX-XX-XX
+
+## \[13.6.1\] - 2025-08-12
+
+Alle SQL-Verbindungen nach der Verwendung explizit schließen.
+
+## \[13.6.0\] - 2025-07-02
+
+-   Maske LDAP User: Mehr Zeichen für KeyText erlauben
+
+-   HUB Funktionalität, siehe [\#1272](https://github.com/minova-afis/aero.minova.cas/issues/1272)
+
+-   Setup komplett loggen
+
+-   ConsoleLog definieren und alle System.outs und Stacktraces auch in ein File loggen
+
+-   SelfProbingService mit der Einstellung bereitstellen, womit Verbindungsprobleme zum SQL-Server erkannt werden.
+    Gibt es ein SQL-Verbindungsproblem wird der Dienst beendet, damit dieser von Kubernetes automatisch neu gestartet wird.
+    Zudem wurden die Hikari-Einstellung so angepasst, dass Verbindungsprobleme besser erkannt/vermieden werden.
+
+## \[13.5.3/4\] - 2025-01-14
+
+-   ErrorMessage Spalte in der Datenbank auf Länge von 2000 Zeichen erweitern
+
+-   Setup nicht abbrechen, wenn das setup.xml File einer Abhängigkeit nicht gefunden wurde
+
+-   Wenn Prozeduren vom CAS selbst aufgerufen werden User "CAS\_JPA" für LastUser in der Datenbank setzten
+
+-   ServiceMessage.messageCreationDate nicht als Timestamp. Sonst bekommen wir mit den SQL-Prozeduren Probleme, da diese einen expliziten Wert in die Spalte einfügen.
+
+## \[13.5.2\] - 2024-11-04
+
+-   Bei Fehler in LDAP Login username Loggen
+
+-   Limit setzten bei Indexanfragen über die Base-Extension korrigieren
+
+## \[13.5.1\] - 2024-10-17
+
+-   LastDate nicht als TIMESTAMP Spalte erstellen
+
+-   Login für Database-User mit SQL Datenbank ausbessern
+
+-   HTML-Dateien beim Bauen wieder mit ausliefern
+
+## \[13.5.0\] - 2024-10-09
+
+-   CAS Versiom beim Start auslesen und über /version von Clients auslesbar machen.
+
+-   Es wird nun Java 21 verwendet.
+
+-   RowLevelSecurity mit JOOQ ermöglichen/ausbessern
+
+-   Bequemlichkeits-Methoden für Nutzerverwaltung in Services
+
+-   Fehlerhandling robuster gestalten
+
+-   LastDate im Java-Code keinen Default-Wert geben, da es sich um eine TIMESTAMP Spalte handelt, in die in SQL kein explizierter Wert eingetragen werden darf
+
+## \[13.4.0\] - 2024-07-31
+
+-   Umlaute in i18n Datei ausbessern
+
+-   Bei Login über LDAP alternative UPN Suffixe unterstützen
+
+-   Bei Setup Extension Namen nur einmal in UserPrivilege eintragen
+
+-   Suche über BaseExtension ausbessern, Filter werden jetzt korrekt angewendet
+
+## \[13.3.0\] - 2024-07-08
+
+-   Absturz bei Fehler während dem Erstellen von Privilegien über JPA verhindern. Damit ist es wieder möglich, das CAS mit einer leeren Datenbank zu starten.
+
+-   Konfigurierte Bezeichnung des CAS über GET /label abrufbar machen
+
+-   Logging im Fehlerfall ausbessern, Stacktraces werden jetzt mit geloggt
+
+-   Mehrere Ldap Domänen und Adressen unterstützen
+
+## \[13.2.2\] - 2024-04-08
+
+-   Modelklassen-Attribute einheitlich auf private
+
+-   javax.validation mit jakarta.validation austauschen → die @NotNull und @Size Restriktionen werden jetzt tatsächlich überprüft!
+
+-   Technische Logs für fehlerhaftes View-Parameter verbessern.
+
+-   Erweiterungen dürfen nicht mehr Null zurückgeben,
+    da sonst versucht wird die gleichnamige SQL-Prozedur aufzurufen.
+    Der Zweck von Erweiterung ist es, SQL-Prozeduren zu ersetzen und nicht zu vervollständigen.
+
+-   Aussagekräftige Fehlermeldung werfen, wenn in einer i18n-Datei das "=" Trennzeichen für die Properties fehlt.
+
+## \[13.2.1\] - 2024-02-22
+
+-   ExtendedDataEntity Klasse für Entities, die auch eine Beschreibung haben sollen
+
+## \[13.2.0\] - 2024-02-12
+
+-   Zusammenfügen von Übersetzungen beim Bauen von Kundenprojekten, da seit der 13er CAS Einführung, Abhängigkeiten nicht mehr richtig bereitgestellt wurden.
+
+-   Tests für Extensions und Services
+
+## \[13.1.2\] - 2024-02-05
+
+-   LocalDateTime statt Timestamp in Entities verwenden
+
+-   Bei Index-Anfragen auch LastAction &gt;0 filtern
+
+## \[13.1.1\] - 2024-02-02
+
+-   Automatisches Einspielen von Postgres/H2 Views ausbessern
+
+## \[13.1.0\] - 2024-02-02
+
+-   PreparedStatements und ResultSets nach der Ausführung schließen.
+
+-   Verhindern eines Absturzes, wenn der Wert einer Umgebungsvariable eine andere, unbekannte Umgebungsvariable enthält
+
+-   CAS-Masken über JPA und Extensions bedienen, Prozeduren entfernen
+
+-   Services und Repositories für die CAS DataEntites
+
+-   postgresql Ordner entfernen, da er nicht mehr benötigt wird
+
+-   Bei Login über Datenbank wird LastAction Spalte von xtcasUsers korrekt ausgewertet (vorher nur LastAction = 1 erlaubt)
+
+-   CAS mit H2-Datenbank starten lassen
+
+## \[13.0.11\] - 2023-12-15
+
+-   MdiService zum Erstellen des Default-Menüs
+
+-   Mdis auch mit CAS 13 aus Datenbank ziehen
+
+-   ZipFehler beheben
+
+## \[13.0.10\] - 2023-12-07
+
+-   Debugging-Code entfernen.
+
+## \[13.0.9\] - 2023-12-06
+
+-   Bei Setup Extensionnamen nur einmal in Tabellen xtcasUserPrivilege und tVersion10 eintragen.
+
+## \[13.0.8\] - 2023-12-07
+
+-   Standard Übersetzungen aus dem `aero.minova.app.i18n`-Projekt in das CAS übernehmen,
+    da diese immer benötigt werden.
+
+## \[13.0.7\] - 2023-12-06
+
+-   CAS als fat jar ohne weitere Dateien auslieferbar machen. Dazu wurde die Kompatibilität mit alten App-Projekten gebrochen.
+
+-   Tabellen für das Sicherheits-System werden jetzt über JPA standardmäßig beim starten aufgesetzt, ohne das Setup zu verwenden.
+    Dadurch ist die Verwendung von Postgre einfacher, da die Standarteinstellungen dazu weniger geändert werden müssen.
+    Dies ist für Postgre, da für dieses der Setup-Befehl bisher nie funktioniert hat.
+
+## \[12.67.0\] - 2023-10-13
+
+-   Beim Einfügen von Authorities über die Maske (xpcasInsertAuthorities) wurden LastAction, LastUser und LastDate nicht gesetzt.
+
+-   Benutzeranmeldung über Datenbank fixen. Es wurde keine DataSource initialisiert.
+
+## \[12.66.4\] - 2023-10-06
+
+-   Doppeltes setzen vom UserPrivelege "setup" behoben
+
+## \[12.66.3\] - 2023-10-05
+
+-   Tabellen um eine Hilfsmethode erweitert, mit der man eine Spalte über den Namen finden kann
+
+-   JPA Tabelle für Users um Description erweitert
+
+## \[12.66.2\] - 2023-09-26
+
+-   Dependabot beobachtet nun neben Maven POMs und GitHub Actions auch Container Images
+
+-   Eweitern der Doku zur benutzerspezifischen MDI-Erstellung.
+
+-   Auslesen der LDAP User Tokens korrigieren. Zuvor entstand ein Fehler, da es sich um eine ImmutableList handelte.
+
+## \[12.66.1\] - 2023-09-21
+
+-   final für dataSource in SecurityConfig von Service wiederhergestellt.
+
+-   Authority-Spaltengröße muss dieselbe Größe haben wie die KeyText-Spalte in xtcasUserGroup.
+
+## \[12.66.0\] - 2023-09-12
+
+-   Bestimmung der erlaubten CORS-Origins direkt über URLs statt Profiles
+
+-   InfoLogger zum Loggen allgemeiner Informationen hinzufügen.
+
+-   Das KeyText-Feld der Data-Entity hat nun die Länge von 200, da UserPrivilege diese Länge benötigt. Außerdem wurde das Desciption Feld bei der UserPrivilege-Entity ergänzt.
+
+## \[12.65.19\] - 2023-09-06
+
+-   jgrapht-core Abhängigkeit für das Submodul 'setup' bereitstellen. (Startet man CAS im IntelliJ und möchte DBsetup ausführen, wird kein Fehler wegen fehlender JGraphT Klasse geworfen.)
+
+## \[12.65.18\] - 2023-08-29
+
+-   Update auf SpringBoot 3.1.3
+
+-   jackson-datatype-jsr310, hibernate-jpamodelgen, commons-lang3 Abhängigkeiten für Erweiterungen bereitstellen.
+
+## \[12.65.17\] - 2023-08-21
+
+-   Unique Key aus xtcasUserPrivilege entfernen, da es bei Azure Datenbanken zu Fehlern führt.
+
+## \[12.65.16\] - 2023-08-10
+
+-   Fehler in CAS Masken korrigeren.
+
+## \[12.65.15\] - 2023-08-04
+
+-   Fehler in Prozedur xpcasInsertServiceMessage korrigieren.
+
+## \[12.65.14\] - 2023-08-04
+
+-   Zurückgezogene AWS bom Version zurücksetzen
+
+## \[12.65.13\] - 2023-08-04
+
+-   Fehlender KeyText in Masken und Prozeduren ergänzen.
+
+## \[12.65.12\] - 2023-08-04
+
+-   service.event.dispatcher Abhängigkeit entfernen, da dieser selbst vom CAS abhängig ist und Probleme verursacht
+
+## \[12.65.11\] - 2023-08-03
+
+-   Einige native Queries zu JPA Queries ändern, damit Azure sie auflösen kann.
+
+-   JPA Data Entities Column Textgrößen und Datenfeldtypen korrigieren.
+
+## \[12.65.10\] - 2023-08-03
+
+-   UserContext anhand des JDBC Dialects herausfinden, damit der richige Benutzer nach Ausführen einer Prozedur ermittelt werden kann.
+
+-   Azure Dependency hinzufügen zum besseren Umgehen mit JPA.
+
+## \[12.65.9\] - 2023-08-01
+
+-   Bekannter Fehler "Ungültiger Objektname "xtcasServiceMessageReceiverLoginType" fixen. Man kann das CAS nun auf einer leeren/alten Datenbank starten und dann ein Setup ausführen, auch wenn die Tabelle nicht existiert.
+
+-   aero.minova.service.event.dispatcher Abhängigkeit von setup nach service verschieben, da diese für Extensions benötigt wird und nicht für das Setup beim CAS.
+
+## \[12.65.8\] - 2023-07-25
+
+-   jackson-databind-nullable Abhängigkeit für aero.minova.github-Extension einbinden
+
+## \[12.65.7\] - 2023-07-24
+
+-   Automatisch generierte Doku für Tabellen aktualisieren.
+
+-   Workaround fürs Löschen von Benutzern, da sonst das CAS einfriert und man es neu starten muss.
+
+-   Anpassen der Feldergrößen in der Users-Maske.
+
+## \[12.65.6\] - 2023-07-21
+
+-   DBUser um Description erweitert.
+
+-   Erweiterungen für ganze Transaktionen ermöglichen
+
+## \[12.65.5\] - 2023-07-11
+
+-   ServiceMessageReceiverLoginType Initialisierung über Java Code statt data.sql File durchführen. Damit funktioniert die Initialisierung, egal welche Datenbank verwendet wird
+
+## \[12.65.4\] - 2023-07-10
+
+-   xpcasInsertAllPrivilegesToUserGroup an neue Tabellenstrukturen anpassen, um Setup-Fehler zu beheben.
+
+## \[12.65.3\] - 2023-07-07
+
+-   Login erweitern über Value aero.minova.cas.setup.logging.
+
+## \[12.65.2\] - 2023-07-07
+
+-   Setup-XMLs vom CAS-App-Projekt vervollständigen, um das Setup von Tabellen zu korrigieren.
+    Dabei ist herausgekommen, dass `spring.jpa.hibernate.ddl-auto=create` zusammen mit dem Setup nicht funktioniert.
+    Folglich sollten die Tabellen im CAS oder dessen Erweiterungen,
+    nicht mit JPA aufgesetzt werden und somit `spring.jpa.hibernate.ddl-auto=none` immer gelten.
+
+## \[12.65.1\] - 2023-06-26
+
+-   Spring Boot Version erhöhen auf 3.1.1
+
+-   Extensions können nun ServiceProperties über das dazugehörige Interface ServicePropertiesRepo abfragen.
+
+-   In der Table xtcasCASServices wurde die Spalte ServiceURL von 50 auf 250 Zeichen erhöht.
+
+## \[12.65.0\] - 2023-06-21
+
+-   QueueService auf JPA umstellen.
+
+-   Erweitern des QueueService um BasicAuth und OAuth2.
+
+## \[12.64.2\] - 2023-06-20
+
+-   JOOQViewService ignoriert Cases → Bei Privilegienprüfung ist Case egal
+
+-   Extensions werden ausgeführt, egal ob Cases der Namen zusammenpassen
+
+-   mr-smithers-excellent Release Workflow für Releases verwenden.
+
+-   Basis-Test für ViewServiceInterface-Implementierungen
+
+## \[12.64.1\] - 2023-06-15
+
+-   In CAS Prozeduren die `Last\*` Spalten fühlen, um Truncated Fehler auf Azure zu vermeiden.
+
+-   Helper-Version in Manifest an Helper-pom anpassen.
+
+-   Gemeinsame GitHub Workflows aus <https://github.com/minova-afis/aero.minova.os.github.workflows> verwenden.
+
+-   JOOQViewService kann nun mit 'OR'-Fällen umgehen. Vorher konnte er Queries nur mit 'AND' verbinden.
+
+## \[12.64.0\] - 2023-06-14
+
+-   Testrelease mit neuem Workflow
+
+## \[12.63.10\] - 2023-06-05
+
+-   Helper-Manifest ausbessern
+
+## \[12.63.9\] - 2023-06-02
+
+-   Workflow ReleaseAppAndHelper veröffentlicht die Dockerfile auf Docker.io
+
+## \[12.63.8\] - 2023-06-02
+
+-   Helper Version Updaten
+
+-   Workflow ReleaseAppAndHelper korrigiert
+
+-   Tycho-Version im Client auf 3.0.4 erhöhen
+
+## \[12.63.7\] - 2023-06-02
+
+-   Abschneiden von Daten beim Setup direkt in der Methode processSqlProcedureRequest erlauben
+
+## \[12.63.1 - 12.63.6\] - 2023-06-01
+
+-   Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## \[12.63.0\] - 2023-05-26
+
+-   In CAS Prozeduren die `Last\*` Spalten füllen, um Truncated Fehler auf Azure zu vermeiden
+
+-   Helper-Version in Manifest an Helper-pom anpassen
+
+## \[12.62.0\] - 2023-05-25
+
+-   Reihenfolge der `Setup.xml` Aufrufe wird nun mittels eines Graphen ermittelt, 3rd Party Libraries werden ignoriert.
+
+-   Eventhandling von Ncore für Extensions über `aero.minova.service.event.dispatcher` bereitstellen.
+
+-   Abschneiden von Daten beim Setup ermöglichen (LastUser von AZURE zu lang)
+
+## \[12.61.3\] - 2023-05-23
+
+-   Release Workflow korrigieren, so dass DOCKERFILE wieder auf Docker.io gepushed wird
+
+## \[12.61.2\] - 2023-05-23
+
+-   PasswordEncoderExtension entfernen, Passwort wird schon im Helper verschlüsselt, damit Passwörter nicht in Klartext im Log stehen.
+
+-   Update auf SpringBoot 3.1.0.
+
+-   Bei View-Anfragen die Zeit von Instants und LocalDates mit beachten
+
+-   Für Azure Authentifiezierung fehlende Lib hinzufügen
+
+## \[12.61.1\] - 2023-05-12
+
+-   Fehler NACH Verarbeiten von XProcedures korrekt zurückgeben
+
+-   Autocommit per default auf `false` stellen
+
+## \[12.61.0\] - 2023-05-11
+
+-   AuthorizationController zu AuthorizationService umbenennen, da es kein Controller ist.
+
+## \[12.60.2\] - 2023-05-10
+
+-   Update auf SpringBoot 3.0.6.
+
+-   KeyText in xtcasUser von 10 auf 50 Zeichen verlängert
+
+## \[12.60.1\] - 2023-04-27
+
+-   Konfiguration der DataSource SpringBoot überlassen
+
+-   Verwaltung der JDBC Connections HikariCP überlassen
+
+## \[12.60.0\] - 2023-04-21
+
+-   Update auf SpringBoot 3.0.5.
+
+-   Korrektur der Connectionfreigabe.
+
+-   AuthorizationTest ausbessern (Tabelle leeren, damit andere Tests nicht das Ergebnis beeinflussen)
+
+-   `aero_minova_database_` properties entfernen (sind durch `spring.datasource.` abgedeckt)
+
+-   Fehlermeldung bei Laden von Privilegien verbessern
+
+## \[12.59.1\] - 2023-04-04
+
+-   Update auf SpringBoot 3.0.4.
+
+-   Feld ModulName in MDI-Maske hinzugefügt.
+
+-   Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.20.38.
+
+-   SQL-Fehlermeldungen ohne Default-Übersetzung verarbeiten
+
+-   Connections freigeben nach unsicherem Viewaufruf. Hierdurch soll das Hängenbleiben des CAS verhindert werden.
+
+## \[12.59.0\] - 2023-02-07
+
+-   \#362 Zugriff auf weitere Datenbanken unterstützen (zumindest über Views).
+
+-   Property `aero.minova.database.kind` durch `spring.jooq.sql-dialect` ersetzt.
+
+-   Proof of Concept Test für SQLViewController#getIndexView
+
+-   Kopieren in MDI-Maske ermöglichen, um die Bedienung zu vereinfachen
+
+-   Extension-Doku erweitern.
+
+-   Prozedur xpcasInsertAllPrivilegesToUserGroup anpassen, sodass immer LastAction 1 beim Neueintragen von Privilegien gesetzt wird.
+
+-   CI-Pipeline Updates: `AdoptOpenJDK` wird zu `Eclipse Temurin`.
+
+-   Erhöhe Lombok Version von 1.18.24 auf 1.18.26.
+
+-   Erhöhe Dependency software.amazon.awssdk:bom Version von 2.19.31 auf 2.19.32.
+
+## \[12.58.0\] - 2023-01-27
+
+-   Update auf SpringBoot 3.0.2
+
+-   S3 Abhängigkeit aus AWS SDK’s BOM für Erweiterungen bereitstellen.
+
+## \[12.57.2\] - 2023-01-20
+
+-   Index Filtern mit Postgres ermöglichen
+
+-   connection.close() im Fehlerfall immer aufrufen, systemDatabase.freeUpConnection(connection) nur, wenn alles funktioniert hat. Hintergrund: Bislang haben nach einer fehlerhaften View-Anfrage auch alle weiteren Views nicht mehr funktioniert.
+
+-   [\\425](https://github.com/minova-afis/aero.minova.cas/issues/425): Die [Doku für CAS-Erweiterungen](service/doc/adoc/extensions.xml) wurde vervollständigt.
+    Vor allem wurde das Verwenden von Abhängigkeiten in Erweiterungen dokumentiert,
+    um Auslieferungs-Probleme in der Zukunft zu vermeiden.
+
+-   Hilfsmethode setValue() in Table
+
+## \[12.57.1\] - 2023-01-16
+
+-   Erhöhen der Springboot Version auf 3.0.1, da Artefakt org.springframework.security:spring-security-bom:pom:6.0.0-RC2 in Springboot 3.0.0 nicht gefunden werden konnte und zu Fehlern beim Bauen auf Entwicklerrechnern führte.
+
+-   BUGFIX: XProcedures mit Extension korrekt verarbeiten
+
+-   ValueSerializer um "rule" ergänzen
+
+## \[12.57.0\] - 2023-01-13—DO NOT USE!
+
+-   Spring Security: Umstellung von `WebSecurityConfigurerAdapter` auf Komponenten-basierende Sicherheit
+
+-   Aktualisierung Java 11 LTS auf Java 17 LTS
+
+-   Aktualisierung von JavaX auf Jakarta
+
+-   Update auf SpringBoot 3.0.0
+
+-   `@SpringBootApplication` Annotation OHNE `exclude = { DataSourceAutoConfiguration.class }`, damit automatisch eine `entityManagerFactory` erstellt wird.
+
+-   BUGFIX: Für die LDAP-Gruppen wird `xtcasUser` statt der `xtcasUsers` ausgelesen, um die SecurityTokens zu bestimmen.
+
+-   Rechtevergabe durch AuthorizationController erleichtern, indem dies durch JPA umgesetzt wird und somit auch Datenbank unabhängig ist.
+
+## \[12.56.2\] - 2023-01-10
+
+-   Tabellen um Hilfsmethoden erweitert, mit der leichter auf Values zugegriffen werden kann
+
+-   toString Methoden Tabellen, Columns, Rows und Values ausbessern
+
+-   Auch "com.minova" bei @EntityScan und @EnableJpaRepositories beachten
+
+## \[12.56.1\] - 2023-12-09
+
+-   Richtiger Release zum Verwenden von CAS als Abhängigkeit
+
+## \[12.56.0\] - 2022-12-01
+
+-   toString-Methode für Tabellen, Columns, Rows und Values erstellen.
+
+-   Die Datei application.mdi wird jetzt anhand der xtcasMdi-Tabelle benutzerspezifisch erzeugt.
+
+-   Prüfung auf validen Input für Passwörter beim Inserten und Updaten von DB Usern.
+
+-   Auslesen von UserGroupTokens für DB User bei Anfragen.
+
+-   SQL-Fehler beim Setup beheben.
+
+-   Erhöhe Jackson-dataformat-xml von Version 2.13.3 nach 2.14.0
+
+## \[12.55.1\] - 2022-11-22
+
+-   LDAP: Raise an Active Directory-specific error code instead of a BadCredentialsException
+
+-   Username Spaltenlänge in Error Table korrigiert
+
+-   Mdi Masken, Tabelle und Prozeduren erstellt(samt Icon und Übersetzung)
+
+-   Initialisierungs Prozedur und Skript erstellt
+
+-   Icon Schrott beseitigt
+
+## \[12.55.0\] - 2022-11-11
+
+-   Korrekturen der UserGroup Prozeduren. Sie verwenden nun nicht mehr den UserCode, sondern den KeyText der UserGroup.
+
+-   Korrektur xpcasInsertAuthorities. Es konnte über die Authorities ein Benutzer nur einer UserGruppe zugeordnet werden.
+
+-   Weitere Übersetzungen für die UserGroup Masken und OptionPages.
+
+-   Korrektur xpcasDeleteAuthorities. Obwohl die Authority auf -1 gestellt wurde, hatte man trotzdem volle Rechte. Nun wird sie ganz gelöscht.
+
+-   Neue Icons.
+
+-   Update auf SpringBoot 2.7.5
+
+## \[12.54.3\] - 2022-09-30
+
+Keine Änderungen
+
+## \[12.54.2\] - 2022-09-29
+
+-   Tabellenbezeichnung von xtcasUserPrivileges korrigieren.
+
+## \[12.54.1\] - 2022-09-29
+
+-   Releaseprozess für Helper korrigieren.
+
+## \[12.54.0\] - 2022-09-29
+
+-   \#293 Standardmasken zum Verwalten von Benutzern einbinden.
+
+-   Helper zum Verschlüsseln von Passwörtern innerhalb der Maske.
+
+## \[12.53.0\] - 2022-09-13
+
+-   devWarning in "dev"-Profile verschoben
+
+-   [\#368](https://github.com/minova-afis/aero.minova.cas/issues/368) ServiceProperties Tabelle und Maske erstellen:
+    Hiermit werden zukünftig Dienste über [aero.minova.service](https://github.com/minova-afis/aero.minova.service) konfiguriert.
+    Damit kann man Dienste über eine Maske und somit ohne Dateizugriff einfach und dennoch sicher konfigurieren.
+
+## \[12.52.0\] - 2022-09-02
+
+-   Profil für Dev-System, um CORS für Entwicklungszwecke zu erlauben
+
+## \[12.51.0\] - 2022-08-30
+
+-   Update auf SpringBoot 2.7.3
+
+## \[12.50.0\] - 2022-08-30
+
+-   \#320 Code aufräumen: Datenbankzurgriffe aus den Controllern in einene Service-Klassen verschieben.
+
+## \[12.49.0\] - 2022-08-30
+
+-   Basis-Docker-Image von Adoptium verwenden und dessen Einsatz begründen.
+
+-   \#300 Long als Value unterstützen.
+
+-   \#184 Tests zum Beweisen, dass Http2 Property funktionieren würde, hinzufügen.
+
+-   BUGFIX: Initialisieren des CAS API Objektes mit eigener JSON Instanz.
+
+-   Code aufräumen: Nicht verwendete Ordner `Program Files` und `Shared Date` aus `FileService` entfernen.
+
+-   `org.apache.xmlbeans:xmlbeans`-Abhängigkeit aus Setup-Extension entfernen und dadurch Abhängigkeit-Updates in der Zukunft vereinfachen.
+    Vorher hatten wir die Version 3 verwendet und konnten nicht einfach auf die Version 5 aktualisieren.
+    Zudem wurde aus dem Install-Tool-Code nicht verwendeter Code entfernt.
+    Auch konnten wir die Binaries aus `setup/libs/\*` hiermit entfernen.
+
+## \[12.48.0\] - 2022-07-20
+
+-   \#217 Es wird nicht mehr bei jedem SQL-Aufruf erwartet, dass die View/Tabelle einen KeyLong besitzt.
+
+-   \#341 BUGFIX: Kein Commit mehr zwischen XProcedures.
+
+-   Ein weiteres Format von Fehlermeldungen unterstützen: 'ADO|Zahl|Fehlermeldung'
+
+-   CAS-Client-API um die Methode `sendGenericProcedureRequest` erweitern, um beliebige Objekte von `data/procedure` abzufragen.
+    Dies ist besonders nützlich, wenn beispielsweise ein PDF-Report vom CAS abgefragt wird.
+
+## \[12.47.1\] - 2022-06-24
+
+-   \#274 Fehlermeldungen, welche nicht mit 'msg.' beginnen, verarbeitbar machen.
+
+-   \#291 Doku für Logs hinzugefügt.
+
+## \[12.47.0\] - 2022-06-17
+
+-   API für Extensions, welche Nachrichten an einen Dienst schicken möchten.
+
+## \[12.46.0 - 12.46.1\] - 2022-06-09
+
+-   Neue Property(aero.minova.database.maxResultSetCount) für application.properties, wird für SQL-Prozeduren ausgewertet, um größere Rückgabewerte zu Erlauben.
+
+-   Update auf SpringBoot 2.7.0: MS-SQL Dependency wurde von 9.x auf 10.x aktualisiert. Das heißt der Wert für `encrypt` ist nun per Default `true`. Siehe `support.adoc` und <https://github.com/spring-projects/spring-boot/issues/31157>
+
+## \[12.45.0\] - 2022-05-25
+
+-   Erstelle Standard-Prozedur-Erweiterung `xpcasEncodePassword` damit der Nutzer keine Entwicklungsumgebung braucht,
+    um Passwörter zu hashen.
+
+-   Einbinden des ServiceNotifierServices in den QueueService, damit Dienstextensions Listener registrieren können, ohne dass NullPointerExceptions geworfen werden.
+
+-   Integration von SonarQube, OWASP Dependency-Check und JaCoCo in die CI-Pipeline
+
+-   Update auf SpringBoot 2.6.7
+    \# Update weiterer Abhängigkeiten
+
+## \[12.44.1\] - 2022-05-19
+
+-   Korrektur des ServiceNotifierServices, damit NewsfeedListener angelegt werden können.
+
+-   Automatisches Anlegen eines Admins mit **allen** Rechten am Ende des Setups.
+
+-   Auslagern der Cache Methoden aus dem ServiceNotifierService.
+
+## \[12.44.0\] - 2022-05-13
+
+-   \#305 Keytext-Spalte der xtcasUserPrivilege-Tabelle vergrößern.
+
+-   Setup wieder durchfürbar machen.
+
+-   Falls ein Fehler während des Setups auftritt, wird nun die korrekte HTTPServletResponse zurückgegeben.
+
+## \[12.43.0 \] - 2022-05-05
+
+-   registerServiceMessage-Methode im QueueService korrigieren.
+
+-   \#299 Vorsilbe 'xpcor' für die Prozeduren des ServiceNotifierService ergänzen.
+
+-   \#303 SpringBoot: /actuator ist auf dem Management-Port 8081 zu finden. Per Konfiguration `management.endpoints.enabled-by-default=false` sind alle weiteren Endpunkte deaktiviert.
+
+-   \#302 Extensions aus Kunden-Projekten mit Group-Id 'com.minova' unterstützen.
+
+## \[12.42.0 \] - 2022-05-02
+
+-   \#281: Logs aus Tests in den target-Ordner schreiben, damit diese nicht ausversehen commited werden.
+
+-   Automatisches Speichern, Queueing und Versenden von Nachrichten an andere Dienste implementieren.
+
+## \[12.41.2 - 12.41.3\] - 2022-04-29
+
+Kompatibilitäts-Projekt `aero.monova.core.application.system.app` erstellen,
+um einen Setup-Fehler zu beheben zu können.
+Siehe das [Support-Dokument](doc/adoc/support.adoc) and [Kompatibilitäts-Projekts-README](app.legacy/README.adoc) für Details.
+
+## \[12.41.1\] - 2022-04-25
+
+IsTablePresent-Methode public setzen.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
+
+## \[12.41.0\] - 2022-04-25
+
+Experimentelle CAS-Erweiterung aero.minova.cas.servicenotifier an Änderungen anpassen.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
+
+## \[12.40.4\] - 2022-04-19
+
+Experimentelle CAS-Erweiterung aero.minova.cas.servicenotifier für die Registrierung von Diensten erstellen.
+Es werden Änderungen aus aero.minova.cas.service für die Implementierung benötigt, deshalb der Release.
+
+## \[12.40.3\] - 2022-04-19
+
+Inkompatiblen Änderungen: Umbenennen der Methode getTableForSecurityCheck nach unsecurelyGetIndexView in aero.minova.cas.service.
+
+## \[12.40.1\] - 2022-04-08
+
+Privilegienprüfung auf Prozeduren in PostgreSQL unterstützen.
+
+## \[12.40.0\] - 2022-04-07
+
+Ordner, Paket und Projekt-Namen vereinheitlichen:
+
+-   Die Pakete `aero.minova.core.application.system.*` wurden nach `aero.minova.cas.\*` umbenannt.
+
+-   Die Ordnernamen der Unterprojekte wurde verkürtzt indem der `aero.minova.core.application.system.` Prefix entfernt wurde.
+    Dadurch sind die Ordner einfacher voneinander zu unterscheiden.
+
+## \[12.39.0\] - 2022-04-04
+
+Postgresql bei der Privilegienprüfung unterstützen.
+
+## \[12.38.4\] - 2022-03-31
+
+BUGFIX: Beim Aufruf von XProcedures wurde das Result nicht zurückgegeben. Dies ist nun korrigiert.
+
+## \[12.38.3\] - 2022-03-30
+
+Alle CAS-Abhängigkeiten in den POM auf die neuste Version abgedated.
+
+## \[12.38.2\] - 2022-03-30
+
+BUGFIX: Doppelte Gson-Bean Erstellung unterbinden. Dadurch konnte das CAS nicht mehr starten.
+
+## \[12.38.1\] - 2022-03-30
+
+Verwenden der neuen CAS API als Abhängigkeit im CAS.
+
+## \[12.38.0\] - 2022-03-28
+
+Bereitstellen des aero.minova.cas.api-Moduls, welches Kern-Klassen zum Austausch von HTTP-Anfragen an das CAS enthält.
+
+## \[12.37.0\] - 2022-03-23
+
+Erweiterungen von Views können nun registriert werden.
+
+## \[12.36.5\] - 2022-03-17
+
+`upload/logs` Ursache für Entpackungs-Probleme der hochgeladenen Datei loggen und zurückgeben.
+
+## \[12.36.4\] - 2022-03-04
+
+Korrektur der ForeignKey-Constraints von xtcasAuthorities.
+
+## \[12.36.3\] - 2022-03-02
+
+\#254 Automatische Setup der Tabellen xtcasUsers und xtcasAuthorities.
+Diese Tabellen werden benötigt, damit Benutzer-Logins und deren Security-Token-Zuweisung für Nutzer über im SQL-Server gespeichert und geladen werden können.
+
+Automatische Admin-Rolle erstellen nach einem erfolgreichen Setup.
+
+## \[12.36.2\] - 2022-02-22
+
+Korrektes Anzeigen der letzten Seite einer View.
+
+## \[12.36.1\] - 2022-02-15
+
+Fehlende Prozedur im Setup hinzugefügt.
+
+## \[12.36.0\] - 2022-02-15
+
+Es wird nun ein eigener Logger für das Setup verwendet.
+
+Fehlermeldungen können nun auf zwei verschiedene Arten verarbeitet und dargestellt werden.
+
+## \[12.39.3\] - 2022-04-07
+
+Die Packete `aero.minova.core.application.system.*` nach `aero.minova.cas.\*` umbenennen
+und Ordnerstruktur übersichtlicher gestalten.
+
+## \[12.35.0\] - 2022-02-08
+
+Es können nun auch Kundenprojekte als Abhängigkeit in anderen Kundenprojekten angegeben werden.
+Sie werden beim Setup nun richtig verarbeitet.
+
+## \[12.34.2\] - 2022-01-11
+
+core.application.system.service nutzt nun cas.client für die Kern-Klassen.
+cas.client Package-Namen angepasst.
+
+## \[12.34.1\] - 2022-01-11
+
+Kern-Klassen in cas.client-Unterprojekt ausgelagert.
+
+## \[12.34.0\] - 2022-01-11
+
+Die Extensions werden nun beim Setup-Befehl mitinstalliert.
+
+## \[12.33.1\] - 2022-01-07
+
+Einführen einer Methode, um Prozeduren ungeprüft/ ohne Rechte ausführen zu können.
+
+## \[12.33.0\] - 2021-12-17
+
+Der Setup-Befehl kann nun über die Web-Oberfläche ausgeführt werden.
+
+## \[12.32.0\] - 2021-12-15
+
+Property `app.log.root` einführen, um die Log-Ordner für die Anwendung zu setzen.
+
+## \[12.31.2\] - 2021-12-09
+
+-   Rekursive Extensions-Aufrufe nicht mit Semaphor blockieren.
+
+## \[12.31.1\] - 2021-12-09
+
+-   Bei der Ausführung von SQL-Prozedur-Erweiterungen wird eine Semaphore verwendet, welche verhindert, dass sich die Extension beim Ausführen in die Quere kommen.
+
+-   Bei der Setup-Extension werdend die SQL-Queries jetzt alle mit -fs ausgeführt.
+
+## \[12.30.0\] - 2021-12-08
+
+-   Bei der Ausführung von SQL-Prozeduren werden update counts ignoriert,
+    um die erste ResultSet zu finden.
+
+-   Die Methode `SqlProcedureController#calculateSqlProcedureResult` für Erweiterungen bereitstellen.
+
+## \[12.28.7\] - 2021-12-01
+
+Nach Transaktionen werden nun TransaktionChecker-Prozeduren ausgeführt.
+
+## \[12.28.4\] - 2021-11-30
+
+Bugfixes für das Laden von Privilegien aus der Datenbank
+für die Autorisierung.
+
+## \[12.28.0\] - 2021-11-19
+
+Abhängigkeiten für SOAP-Webdienste werden durch die Setup-Extension zur Verfügung gestellt.
+
+## \[12.27.0\] - 2021-11-18
+
+-   (#211) Es können jetzt Transaktionen (Liste einander abhängender Prozeduren mit IDs) ausgeführt werden.
+
+-   Ein Bug wurde gefixed, bei welchem beim Ausführen von Prozeduren nach der SecurityToken-Spalte gesucht wurde, obwohl die RowLevelSecurity nicht aktiviert war.
+
+## \[12.25.0\] - 2021-11-02
+
+Die Reihenfolge in welcher Dependencies über die `data/procedure` Setup installiert werden,
+wurde an die Version 12.5.0 von
+[aero.minova.app.parent](https://github.com/minova-afis/aero.minova.app.parent/blob/main/CHANGELOG.md#1250---2021-11-03)
+angepasst.
+Ab dieser CAS-Version,
+müssen folglich alle Kundenprojekte auf diese `app.parent`-Version umgestellt werden.
+
+## \[12.24.1\] - 2021-10-25
+
+Setup-Fehler beheben.
+
+## \[12.24.0\] - 2021-10-13
+
+-   \#149: Der Nutzer von Prozedur-Aufrufen über `data/procedure` wird im SQL-Session-Context `casUser` abgelegt
+    und kann mit der Funktion `dbo.xfCasUser()` ermittelt werden.
+    Der Nutzer der SQL-Session kann nicht genutzt werden, da dies immer der SQL-Nutzer des CAS-Dienstes ist.
+
+## \[12.21.28\] - 2021-09-17
+
+-   Installierbares Docker-Image erstellen.
+
+-   Vorherige Versionen sind hier nicht dokumentiert.

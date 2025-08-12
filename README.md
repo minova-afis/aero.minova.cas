@@ -19,6 +19,8 @@
 <img src="doc/cas-overview.svg" alt="cas overview" />
 </figure>
 
+<img style="width: 100%" src="doc/konzept-von-free-tables-fuer-das-freistellungsportal.png">
+
 # Beschreibung
 
 Stellt eine einfache Schnittstelle zu Daten und Prozeduren einer SQL-Datenbank, Erweiterungen basierend auf Java, sowie einem Read-Only-Dateisystem bereit.

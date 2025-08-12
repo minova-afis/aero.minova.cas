@@ -29,6 +29,9 @@ public class SqlDatabase {
 	private Connection connection;
 
 	private void readDatabase() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		if (this.connection != null) {
+			connection.close();
+		}
 		this.connection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.211.55.4/data", "sa", "Minova+0");
 		try {
 			readDataBase(true);
@@ -41,6 +44,9 @@ public class SqlDatabase {
 
 	public HashMap<String, String> readDataBase(final Connection con)
 			throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		if (this.connection != null) {
+			connection.close();
+		}
 		this.connection = con; // DriverManager.getConnection(connectionstring);
 		readDataBase(false);
 		return null;

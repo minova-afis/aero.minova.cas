@@ -59,6 +59,4 @@ dass die API möglichst stabil gehalten wird.
 
 -   [Projektstruktur](./doc/adoc/projectStructure.adoc)
 
--   [Strukturübersicht](./doc/adoc/structure.adoc)
-
 -   [Tabellen-Index](./app/doc/adoc/table-index.adoc)

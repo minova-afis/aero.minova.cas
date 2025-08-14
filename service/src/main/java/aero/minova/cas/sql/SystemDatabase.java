@@ -37,7 +37,7 @@ public class SystemDatabase {
 	 * sollte diese als {@link RuntimeException} weiter ausgegeben werden und nicht nur gelogged werden,
 	 * da dies impliziert, dass auch die SQL-Befehle nicht richtig ausgeführt wurden.
 	 *
-	 * Es ist empfholen {@link Statement} welche mit der Verbindung erstellt wurden auch explizit zu schließen,
+	 * Es ist empfohlen {@link Statement} welche mit der Verbindung erstellt wurden auch explizit zu schließen,
      * um die Lebensdauer des {@link Statement} explizit anzugeben.
 	 * Das Nicht-Schließen der {@link Statement} und {@link java.sql.ResultSet} verursacht aber keine Probleme,
 	 * da HikariCP beim {@link ProxyConnection#close()} auch alle {@link Statement} der Verbindung schließt.

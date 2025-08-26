@@ -23,8 +23,8 @@ Hat man die Gruppen erstellt müssen diese dann mit den Privilegien aus der *xtc
 
 Folgende properties müssen gesetzt werden:
 
-* `security_ldap_domain`: Domain der Nutzer
-* `security_ldap_address`: URL des LDAP bzw. Active Directory (AD) Server
+* `security_ldap_domain`: Domain der Nutzer (Bsp: `minova.com`)
+* `security_ldap_address`: URL des LDAP bzw. Active Directory (AD) Server (Bsp: `ldaps://w22dc2.minova.com:636`)
 
 Dabei ist es möglich, mehrere Domänen oder Adressen anzugeben. 
 Diese müssen jeweils mit einem `;` getrennt werden.

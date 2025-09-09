@@ -41,3 +41,34 @@ select @UserPrivilegeKey = KeyLong from xtcasUserPrivilege where KeyText = 'Beis
 insert into xtcasLuUserPrivilegeUserGroup (UserGroupKey, UserPrivilegeKey, LastDate, LastUser, LastAction, RowLevelSecurity) values ( @UserGroupKey, @UserPrivilegeKey, getDate(), 'support', 1, 1)
 
 ````
+
+
+## 4. Überprüfung der AD-Gruppen
+
+Folgend kann nachgeschaut werden, welche Gruppen ein Nutzer tatsächlich hat:
+
+* Bash
+
+````bash
+ldapsearch -x \
+  -H ldap://10.112.0.4 \
+  -D "support.minova@aadds.skytanking.com" \
+  -w mBMLkyV10WYHUQF09zNx \
+  -b "ou=aaddc users,dc=aadds,dc=skytanking,dc=com" \
+  -s one "(objectClass=*)" cn 
+````
+
+* CMD
+
+Dabei sind die Global Group memberships Namen erfahrungsgemäß hinten abgeschnitten und somit nicht vollständig:
+
+````cmd
+net user support.minova /domain
+````
+
+* Active Directory Explorer v1.52
+
+Das [Programm](https://learn.microsoft.com/en-us/sysinternals/downloads/adexplorer) herunterladen und
+über den LDAP-Server die Gruppen der Nutzer finden.
+In dem Feld `connect to` darf das Protokoll `ldap[s]://` am Anfang nicht angegeben werden.
+In dem Feld User sollte die Domain (= @-Teil) weggelassen werden.

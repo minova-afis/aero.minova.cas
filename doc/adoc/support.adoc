@@ -54,6 +54,11 @@ java.lang.Exception: Apparent connection leak detected
 	at java.base/java.lang.Thread.run(Unknown Source)
 ```
 
+### DB-Verbindungsprobleme
+
+link:https://github.com/brettwooldridge/HikariCP/wiki/Setting-Driver-or-OS-TCP-Keepalive[TCP Keepalive auf Betriebsystem oder JDBC-Treiber-Ebene],
+kann Datenbank-Verbindungs-Probleme beheben.
+
 ### WFC-Support
 
 Manchmal ist es nicht eindeutig, ob der Fehler im CAS oder in der WFC Anwendung liegt. link:https://github.com/minova-afis/aero.minova.rcp/wiki/Hilfestellung-bei-Support[Hier geht es zur Support Seite der WFC Anwendung]

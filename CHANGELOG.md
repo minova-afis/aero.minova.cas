@@ -5,6 +5,12 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+`spring.datasource.hikari.maximumPoolSize` auf den Standardwert von Hikari setzen.
+Dadurch wird die maximale Anzahl an SQL-Verbindung stark reduziert,
+da diese nicht notwendig sind.
+Eine große Anzahl an SQL-Verbindung kann zudem alle Ports des Servers Beschlagnahmen,
+was den Betrieb blockieren kann.
+
 ## \[13.6.1\] - 2025-08-12
 
 Alle SQL-Verbindungen nach der Verwendung explizit schließen.

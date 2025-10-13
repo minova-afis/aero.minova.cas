@@ -252,7 +252,7 @@
             <groupId>org.jacoco</groupId>
             <artifactId>org.jacoco.agent</artifactId>
             <classifier>runtime</classifier>
-            <version>0.8.13</version>
+            <version>0.8.14</version>
             <scope>test</scope>
         </dependency>
         <dependency>

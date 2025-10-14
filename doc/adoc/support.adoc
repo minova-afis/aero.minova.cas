@@ -45,6 +45,11 @@ Als Hotfix muss erstmal nichts gemacht werden,
 solange neue SQL-Verbindungen vom Connection-Pool zur Verfügung stehen.
 Ist dies nicht mehr der Fall, muss der Dienst neu gestartet werden.
 
+Wenn diese Meldung auftaucht, bedeutet dies nicht,
+dass der Thread, welcher die Verbindung nutzt,
+eine Exception bekommt.
+Somit läuft der betroffene Prozess einfach weiter.
+
 ```
 2025-07-15T09:16:00.238 Connection leak detection triggered for ConnectionID:174702 ClientConnectionId: 5d114794-552e-48ea-9b0b-f45d3333ffc4 on thread Thread-578, stack trace follows
 java.lang.Exception: Apparent connection leak detected

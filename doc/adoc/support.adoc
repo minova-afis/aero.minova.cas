@@ -39,7 +39,7 @@
 
 ### Connection leak detection triggered
 
-Eine SQL-Verbindung wurde nach der Verwendung nicht geschlossen.
+Eine SQL-Verbindung wurde nach der Verwendung nicht geschlossen oder wird sehr lange verwendet.
 Das ist ein Programmierfehler und sollte von einem Entwickler behoben werden.
 Als Hotfix muss erstmal nichts gemacht werden,
 solange neue SQL-Verbindungen vom Connection-Pool zur Verfügung stehen.

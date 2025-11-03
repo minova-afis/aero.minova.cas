@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.zip.CRC32;
@@ -238,7 +239,7 @@ public class DBFileService {
 	 * @return
 	 */
 	DBFile saveFile(String path, byte[] data) {
-	    DBFile toSave = getDbFileRepository().findActiveFileByFileName(path)
+	    DBFile toSave = getDbFileRepository().findFirstByKeyTextLikeAndActiveTrue(path)
 	        .orElseGet(() -> {
 	            DBFile newFile = new DBFile();
 	            newFile.setKeyText(path);
@@ -276,10 +277,21 @@ public class DBFileService {
 	public byte[] getFile(String path) {
 	    if(!isDBFilesAvailable() || path == null)
 	        return null;
+	    
 	    try {
-		    byte[] toRet = getDbFileRepository().findActiveFileByFileName(path)
-		            		.map(file -> file.getValue() != null ? file.getValue() : file.getDefaultValue())
-		            		.orElse(null);
+	    	Optional<DBFile> found;
+		    if(path.startsWith("images/")) {
+		    	if(path.toLowerCase().endsWith(".ico"))
+		    		path = path.substring(0, path.length() - ".ico".length()); // Remove .ico postfix
+		    	// ### Image Case ###
+			    // Request: "images/Site", actual DB content is "<appShortName>/images/Site/16x16.png", "...32x32.png" - we select the last one
+		    	found = getDbFileRepository().findTopByKeyTextLikeAndActiveTrueOrderByKeyTextDesc("%" + path + "/%.png");		    		
+	    	} else {
+	    		// Default file...
+		    	found = getDbFileRepository().findFirstByKeyTextLikeAndActiveTrue("%" + path);
+	    	}
+		    byte[] toRet = found.map(file -> file.getValue() != null ? file.getValue() : file.getDefaultValue())
+		            			.orElse(null);
 		    // On-the-fly patching of Forms/OPs for WFC
 		    if(isWFCPatchActive && path.toLowerCase().endsWith(".xml"))
 		    	return patchXMLForm(path, toRet);
@@ -298,7 +310,7 @@ public class DBFileService {
 	    	// On-the-fly patching of Forms/OPs for WFC
 	    	if(isWFCPatchActive && path.toLowerCase().endsWith(".xml"))
 	    		return calculateMD5(getFile(path));
-	        return getDbFileRepository().findMD5OnlyByFileName(path)
+	        return getDbFileRepository().findFirstMD5OnlyByFileName(path)
 	            .map(view -> {
 	                byte[] valueMD5 = view.getValueMD5();
 	                byte[] defaultValueMD5 = view.getDefaultValueMD5();

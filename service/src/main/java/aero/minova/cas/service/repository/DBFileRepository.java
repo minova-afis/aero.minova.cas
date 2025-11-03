@@ -13,8 +13,14 @@ import aero.minova.cas.service.model.DBFileMD5View;
 
 @Repository
 public interface DBFileRepository extends CrudRepository<DBFile, String> {
-    @Query("SELECT f FROM DBFile f WHERE f.keyText LIKE %:fileName AND f.active = true")
-    Optional<DBFile> findActiveFileByFileName(@Param("fileName") String fileName);
+	/** Delivers the first matching entry (if any).
+	 */
+    Optional<DBFile> findFirstByKeyTextLikeAndActiveTrue(String fileName);
+    
+    /** 
+     * Delivers the last matching entry (if any).
+     */
+    Optional<DBFile> findTopByKeyTextLikeAndActiveTrueOrderByKeyTextDesc(String fileName);
     
     /** Find entries, that contain the given infix in the path, e.g. "/images/"
      */
@@ -25,5 +31,5 @@ public interface DBFileRepository extends CrudRepository<DBFile, String> {
     Optional<DBFile> findFirstByActiveTrue();
     
     @Query("SELECT f FROM DBFile f WHERE f.keyText LIKE %:fileName AND f.active = true")
-    Optional<DBFileMD5View> findMD5OnlyByFileName(@Param("fileName") String fileName);
+    Optional<DBFileMD5View> findFirstMD5OnlyByFileName(@Param("fileName") String fileName);
 }

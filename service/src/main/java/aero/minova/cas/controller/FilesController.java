@@ -38,15 +38,18 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.DBFileService;
 import aero.minova.cas.service.FilesService;
+import aero.minova.cas.service.TranslationService;
 import lombok.val;
 
 @RestController
 // benötigt, damit JUnit-Tests nicht abbrechen
 @ConditionalOnProperty(prefix = "application.runner", value = "enabled", havingValue = "true", matchIfMissing = true)
 public class FilesController {
-	
 	@Autowired
 	DBFileService dbFileService;
+	
+	@Autowired
+	TranslationService translationService;
 
 	@Autowired
 	FilesService fileService;
@@ -63,8 +66,11 @@ public class FilesController {
 	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
 	boolean isFatJarMode;
 	
-	@org.springframework.beans.factory.annotation.Value("${dbfiles.active:true}")
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
 	boolean isDBFilesActive;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
+	boolean isDBFilesPreferred;
 
 	// TODO Extension vorerst entfernt, aber für später aufheben
 	// TODO Bytes in JSON durch BASE64 darstellen
@@ -159,11 +165,18 @@ public class FilesController {
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
+	public @ResponseBody byte[] getFile(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
 
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
+		if (isDBFilesActive && isDBFilesPreferred) {
+ 			byte[] toRet = dbFileService.getFile(path);
+ 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+ 				toRet = translationService.translateXML(path, toRet, lang);
+			if(toRet != null)
+				return toRet;
+		}
+		
 		if (generateMDIPerUser && path.contains("application.mdi")) {
-
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
 				return fileService.readMDI();
@@ -172,8 +185,10 @@ public class FilesController {
 			}
 		}
 		
-		if(isDBFilesActive) {
+		if(isDBFilesActive && !isDBFilesPreferred) {
 			byte[] toRet = dbFileService.getFile(path);
+ 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+ 				toRet = translationService.translateXML(path, toRet, lang);
 			if(toRet != null)
 				return toRet;
 		}
@@ -213,7 +228,7 @@ public class FilesController {
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+	public @ResponseBody byte[] getHash(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
 		// Try tFiles first
 		if(isDBFilesActive) {
 			byte[] toRet = dbFileService.getMD5(path);
@@ -229,7 +244,7 @@ public class FilesController {
 			if (path.endsWith(".zip")) {
 				pathContent = getZip(path);
 			} else {
-				pathContent = getFile(path);
+				pathContent = getFile(path, lang);
 			}
 			MessageDigest md;
 			try {

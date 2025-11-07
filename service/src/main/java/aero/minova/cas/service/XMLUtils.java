@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,12 +25,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class XMLUtils {
-	/** Is called to filter lists
-	 */
-	public interface IAcceptor<T> {
-		public boolean accept(T value);
-	}
-	
 	/**
 	 * Create document from XML bytes
 	 */
@@ -69,32 +64,32 @@ public class XMLUtils {
             findElement(ch, tagName, into);
         return into;	
     }
-	
-    /** Find all elements that have given attribute (values)
+
+	/** Find all elements that have given attribute (values)
      * @param el Starting element
      * @param key Desired attribute. It must be present
      * @param value If not null, also the value of the attribute must match
      */
-	public static List<Element> findElementWithAttribute(Element el, String key, XMLUtils.IAcceptor<String> valueAcceptor) {
-		return findElementWithAttribute(el, key, valueAcceptor, null);
-	}
-	
-    /** Find all elements that have given attribute (values)
+    public static List<Element> findElementWithAttribute(Element el, String key, Function<String, Boolean> valueAcceptor) {
+    	return findElementWithAttribute(el, key, valueAcceptor, null);
+    }
+    
+	/** Find all elements that have given attribute (values)
      * @param el Starting element
      * @param key Desired attribute. It must be present
      * @param value If not null, also the value of the attribute must match
      */
-    private static List<Element> findElementWithAttribute(Element el, String key, XMLUtils.IAcceptor<String> valueAcceptor, List<Element> into) {
+    public static List<Element> findElementWithAttribute(Element el, String key, Function<String, Boolean> valueAcceptor, List<Element> into) {
     	if(into == null)
     		into = new LinkedList<>();
         if (el == null || key == null)
             return null;
         
-    	if(el.hasAttribute(key) && (valueAcceptor == null || valueAcceptor.accept(el.getAttribute(key))))
+    	if(el.hasAttribute(key) && (valueAcceptor == null || valueAcceptor.apply(el.getAttribute(key))))
     		into.add(el);
         
-        for(Element ch : toArray(el.getChildNodes()))
-            findElementWithAttribute(ch, key, valueAcceptor, into);
+    	for(Element ch : toArray(el.getChildNodes()))
+    		findElementWithAttribute(ch, key, valueAcceptor, into);
         
         return into;	
     }

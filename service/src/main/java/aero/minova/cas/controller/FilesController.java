@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.cas.CustomLogger;
-import aero.minova.cas.service.DBFileService;
 import aero.minova.cas.service.FilesService;
-import aero.minova.cas.service.RegistryService;
-import aero.minova.cas.service.TranslationService;
+import ch.minova.foundation.rest.db.service.FileService;
+import ch.minova.foundation.rest.db.service.RegistryService;
+import ch.minova.foundation.rest.db.service.TranslationService;
 import lombok.val;
 
 @RestController
@@ -47,7 +47,7 @@ import lombok.val;
 @ConditionalOnProperty(prefix = "application.runner", value = "enabled", havingValue = "true", matchIfMissing = true)
 public class FilesController {
 	@Autowired
-	DBFileService dbFileService;
+	FileService dbFileService;
 	
 	@Autowired
 	RegistryService registryService;

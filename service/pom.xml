@@ -38,6 +38,12 @@
             <artifactId>assist.core</artifactId>
             <version>0.9.6</version>
         </dependency>
+        <!-- NextGen File, Registry and Translation services + Endpoints-->
+        <dependency>
+            <groupId>ch.minova</groupId>
+            <artifactId>foundation.rest.db</artifactId>
+            <version>0.9.3</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

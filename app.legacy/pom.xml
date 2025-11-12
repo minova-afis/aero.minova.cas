@@ -30,7 +30,7 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>12.1.8</version>
+                    <version>12.1.9</version>
                     <configuration>
                         <formats>HTML,JSON,XML</formats>
                         <suppressionFile>owasp-suppressions.xml</suppressionFile>

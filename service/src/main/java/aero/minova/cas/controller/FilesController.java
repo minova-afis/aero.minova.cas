@@ -190,8 +190,7 @@ public class FilesController {
 				throw new RuntimeException("Failed to generate XBS from tRegistry.", e);
 			}
 		}
-		
-		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
+
 		if (isDBFilesActive && isDBFilesPreferred) {
  			byte[] toRet = dbFileService.getFile(path);
  			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
@@ -202,7 +201,7 @@ public class FilesController {
 		
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
 		if (generateMDIPerUser && path.contains("application.mdi")) {
-
+			
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
 				return fileService.readMDI();
@@ -254,7 +253,7 @@ public class FilesController {
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+	public @ResponseBody byte[] getHash(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
 		// Try tFiles first
 		if(isDBFilesActive) {
 			byte[] toRet = dbFileService.getMD5(path);
@@ -270,7 +269,7 @@ public class FilesController {
 			if (path.endsWith(".zip")) {
 				pathContent = getZip(path);
 			} else {
-				pathContent = getFile(path);
+				pathContent = getFile(path, lang);
 			}
 			MessageDigest md;
 			try {

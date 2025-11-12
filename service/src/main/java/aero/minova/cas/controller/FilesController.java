@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.DBFileService;
 import aero.minova.cas.service.FilesService;
+import aero.minova.cas.service.RegistryService;
 import aero.minova.cas.service.TranslationService;
 import lombok.val;
 
@@ -47,6 +48,9 @@ import lombok.val;
 public class FilesController {
 	@Autowired
 	DBFileService dbFileService;
+	
+	@Autowired
+	RegistryService registryService;
 	
 	@Autowired
 	TranslationService translationService;
@@ -68,6 +72,9 @@ public class FilesController {
 	
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
 	boolean isDBFilesActive;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:true}")
+	boolean isDBRegistryActive;
 	
 	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
 	boolean isDBFilesPreferred;
@@ -167,6 +174,24 @@ public class FilesController {
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
 
+		// XBS kann auch aus der tRegistry-Tabelle generiert werden
+		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
+			try {
+				// Generate 
+				byte[] toRet = registryService.getXBSCode(path);
+				if(toRet == null) {
+					String appPrefix = RegistryService.autoCorrectAppPrefix(path);
+					//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+					throw new RuntimeException("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+				} else {
+					return toRet;
+				}
+			} catch (Exception e) {
+//				customLogger.logError("Failed to generate XBS from tRegistry.", e);
+				throw new RuntimeException("Failed to generate XBS from tRegistry.", e);
+			}
+		}
+		
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
 		if (isDBFilesActive && isDBFilesPreferred) {
  			byte[] toRet = dbFileService.getFile(path);

@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -19,8 +18,9 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode
 @ToString(callSuper = true)
-@Table(name = "tFile")
-public class DBFile {	@Id
+@Table(name = "tRegistry")
+public class RegistryEntry {
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer keyLong;
 	
@@ -28,25 +28,13 @@ public class DBFile {	@Id
     @Column(name = "KeyText", length = 1024, nullable = false)
     private String keyText;
 
-    @Lob
+    @Size(max = 1024)
     @Column(name = "DefaultValue")
-    private byte[] defaultValue;
+    private String defaultValue;
 
-    @Column(name = "DefaultValueCRC")
-    private Integer defaultValueCRC;
-    
-    @Column(name = "DefaultValueMD5", length = 16)
-    private byte[] defaultValueMD5;
-
-    @Lob
+    @Size(max = 1024)
     @Column(name = "\"Value\"")
-    private byte[] value;
-
-    @Column(name = "ValueCRC")
-    private Integer valueCRC;
-    
-    @Column(name = "ValueMD5", length = 16)
-    private byte[] valueMD5;
+    private String value;
 
     @Column(name = "Active", nullable = false)
     private Boolean active;

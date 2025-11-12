@@ -12,7 +12,7 @@ import aero.minova.cas.service.model.DBFile;
 import aero.minova.cas.service.model.DBFileMD5View;
 
 @Repository
-public interface DBFileRepository extends CrudRepository<DBFile, String> {
+public interface DBFileRepository extends CrudRepository<DBFile, Integer> {
 	/** Delivers the first matching entry (if any).
 	 */
     Optional<DBFile> findFirstByKeyTextLikeAndActiveTrue(String fileName);

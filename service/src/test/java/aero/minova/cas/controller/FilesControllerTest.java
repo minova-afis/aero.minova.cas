@@ -71,7 +71,7 @@ class FilesControllerTest extends BaseTest {
 	@Test
 	void testLegal() throws Exception {
 		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
-		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo(
+		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.xbs", null)).isEqualTo(
 				"<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -103,7 +103,7 @@ class FilesControllerTest extends BaseTest {
 
 	@Test
 	void testIllegal() {
-		Assertions.assertThrows(IllegalAccessException.class, () -> filesController.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs"));
+		Assertions.assertThrows(IllegalAccessException.class, () -> filesController.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs", null));
 	}
 
 	@Test
@@ -204,7 +204,7 @@ class FilesControllerTest extends BaseTest {
 		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 		filesController.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
-		assertThat(filesController.getFile("Shared Data/Program Files/AFIS.zip")).isEqualTo(filesController.getZip("Shared Data/Program Files/AFIS"));
+		assertThat(filesController.getFile("Shared Data/Program Files/AFIS.zip", null)).isEqualTo(filesController.getZip("Shared Data/Program Files/AFIS"));
 	}
 
 	// Hilfsmethode

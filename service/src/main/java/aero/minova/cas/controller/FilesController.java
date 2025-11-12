@@ -37,13 +37,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
+import ch.minova.foundation.rest.db.service.FileService;
+import ch.minova.foundation.rest.db.service.RegistryService;
+import ch.minova.foundation.rest.db.service.TranslationService;
 import lombok.val;
 
 @RestController
 // benötigt, damit JUnit-Tests nicht abbrechen
 @ConditionalOnProperty(prefix = "application.runner", value = "enabled", havingValue = "true", matchIfMissing = true)
 public class FilesController {
-
+	@Autowired
+	FileService dbFileService;
+	
+	@Autowired
+	RegistryService registryService;
+	
+	@Autowired
+	TranslationService translationService;
+	
 	@Autowired
 	FilesService fileService;
 
@@ -58,6 +69,15 @@ public class FilesController {
 
 	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
 	boolean isFatJarMode;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
+	boolean isDBFilesActive;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:false}")
+	boolean isDBRegistryActive;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
+	boolean isDBFilesPreferred;
 
 	// TODO Extension vorerst entfernt, aber für später aufheben
 	// TODO Bytes in JSON durch BASE64 darstellen
@@ -152,8 +172,34 @@ public class FilesController {
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
-
+	public @ResponseBody byte[] getFile(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
+		// XBS kann auch aus der tRegistry-Tabelle generiert werden
+		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
+			try {
+				// Generate 
+				byte[] toRet = registryService.getXBSCode(path);
+				if(toRet == null) {
+					String appPrefix = RegistryService.autoCorrectAppPrefix(path);
+					//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+					throw new RuntimeException("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+				} else {
+					return toRet;
+				}
+			} catch (Exception e) {
+//				customLogger.logError("Failed to generate XBS from tRegistry.", e);
+				throw new RuntimeException("Failed to generate XBS from tRegistry.", e);
+			}
+		}
+		
+		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
+		if (isDBFilesActive && isDBFilesPreferred) {
+ 			byte[] toRet = dbFileService.getFile(path);
+ 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+ 				toRet = translationService.translateXML(path, toRet, lang);
+			if(toRet != null)
+				return toRet;
+		}
+		
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
 		if (generateMDIPerUser && path.contains("application.mdi")) {
 
@@ -163,6 +209,14 @@ public class FilesController {
 			} catch (Exception e) {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
+		}
+		
+		if(isDBFilesActive && !isDBFilesPreferred) {
+			byte[] toRet = dbFileService.getFile(path);
+ 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+ 				toRet = translationService.translateXML(path, toRet, lang);
+			if(toRet != null)
+				return toRet;
 		}
 
 		// Bei fatJarMode Dateien aus Resourcen
@@ -201,6 +255,13 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+		// Try tFiles first
+		if(isDBFilesActive) {
+			byte[] toRet = dbFileService.getMD5(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
 		if (isFatJarMode) {
 			if (!path.startsWith("/")) {
 				path = "/" + path;
@@ -242,6 +303,13 @@ public class FilesController {
 
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
+		// Try tFiles first
+		if(isDBFilesActive) {
+			byte[] toRet = dbFileService.getFile(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
 		if (isFatJarMode) {
 			final var pathStr = path.toString();
 			if (!path.startsWith("/")) {

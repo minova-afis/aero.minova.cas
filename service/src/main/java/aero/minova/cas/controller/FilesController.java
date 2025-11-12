@@ -73,7 +73,7 @@ public class FilesController {
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
 	boolean isDBFilesActive;
 	
-	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:true}")
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:false}")
 	boolean isDBRegistryActive;
 	
 	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")

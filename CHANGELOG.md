@@ -5,11 +5,17 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
-`spring.datasource.hikari.maximumPoolSize` auf den Standardwert von Hikari setzen.
-Dadurch wird die maximale Anzahl an SQL-Verbindung stark reduziert,
-da diese nicht notwendig sind.
-Eine große Anzahl an SQL-Verbindung kann zudem alle Ports des Servers Beschlagnahmen,
-was den Betrieb blockieren kann.
+- Dateien werden nun auch aus tFile, XBS aus tRegistry bezogen [\#1308](https://github.com/minova-afis/aero.minova.cas/issues/1308)
+
+- Server-seitige Übersetzungen von MDI und XML forms [\#1308](https://github.com/minova-afis/aero.minova.cas/issues/1308)
+
+- Zusätzliche Endpunkte aus [foundation.rest.db](https://github.com/minova-afis/ch.minova.foundation.rest.db)
+
+- `spring.datasource.hikari.maximumPoolSize` auf den Standardwert von Hikari setzen.
+ Dadurch wird die maximale Anzahl an SQL-Verbindung stark reduziert,
+ da diese nicht notwendig sind.
+ Eine große Anzahl an SQL-Verbindung kann zudem alle Ports des Servers Beschlagnahmen,
+ was den Betrieb blockieren kann.
 
 ## \[13.6.1\] - 2025-08-12
 

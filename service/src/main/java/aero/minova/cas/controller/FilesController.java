@@ -160,6 +160,7 @@ public class FilesController {
 //		return fileBytesTable;
 //	}
 
+	
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
@@ -173,26 +174,15 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getFile(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
-		// XBS kann auch aus der tRegistry-Tabelle generiert werden
+		// Should we generate XBS from tRegistry?
 		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
-			try {
-				// Generate 
-				byte[] toRet = registryService.getXBSCode(path);
-				if(toRet == null) {
-					String appPrefix = RegistryService.autoCorrectAppPrefix(path);
-					//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
-					throw new RuntimeException("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
-				} else {
-					return toRet;
-				}
-			} catch (Exception e) {
-//				customLogger.logError("Failed to generate XBS from tRegistry.", e);
-				throw new RuntimeException("Failed to generate XBS from tRegistry.", e);
-			}
+			return getXBSFromRegistry(path);
 		}
 
+		// Are Files from DB preferered compared to File System?
 		if (isDBFilesActive && isDBFilesPreferred) {
  			byte[] toRet = dbFileService.getFile(path);
+ 			// Try to translate if XML or MDI -- if no language is given, no translation will be done
  			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
  				toRet = translationService.translateXML(path, toRet, lang);
 			if(toRet != null)
@@ -201,7 +191,6 @@ public class FilesController {
 		
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
 		if (generateMDIPerUser && path.contains("application.mdi")) {
-			
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
 				return fileService.readMDI();
@@ -210,8 +199,10 @@ public class FilesController {
 			}
 		}
 		
+		// Are Files from DB active but not preferered compared to File System?
 		if(isDBFilesActive && !isDBFilesPreferred) {
 			byte[] toRet = dbFileService.getFile(path);
+			// Try to translate if XML or MDI -- if no language is given, no translation will be done
  			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
  				toRet = translationService.translateXML(path, toRet, lang);
 			if(toRet != null)
@@ -254,8 +245,31 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
+		// Should we generate XBS from tRegistry?
+		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
+			 byte[] xbsCode = getXBSFromRegistry(path);
+			 return (xbsCode == null ? null : MessageDigest.getInstance("MD5").digest(xbsCode));
+		}
+		
 		// Try tFiles first
-		if(isDBFilesActive) {
+		if (isDBFilesActive && isDBFilesPreferred) {
+			byte[] toRet = dbFileService.getMD5(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
+		if (generateMDIPerUser && path.contains("application.mdi")) {
+			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
+			try {
+				byte[] mdi =  fileService.readMDI();
+				return (mdi == null ? null : MessageDigest.getInstance("MD5").digest(mdi));
+			} catch (Exception e) {
+				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
+			}
+		}
+		
+		// Are Files from DB active but not preferered compared to File System?
+		if(isDBFilesActive && !isDBFilesPreferred) {
 			byte[] toRet = dbFileService.getMD5(path);
 			if(toRet != null)
 				return toRet;
@@ -442,6 +456,28 @@ public class FilesController {
 		customLogger.logFiles("Hashing: " + hashedFile.getAbsolutePath());
 
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
+	}
+	
+	/** Generate XBS from tRegistry. Path may be a requested XBS file or a app short name (afis)
+	 * @param path may be a requested XBS file or a app short name (afis)
+	 * @return
+	 * @throws RuntimeException
+	 */
+	private byte[] getXBSFromRegistry(String path) throws RuntimeException {
+		try {
+			// Generate 
+			byte[] toRet = registryService.getXBSCode(path);
+			if(toRet == null) {
+				String appPrefix = RegistryService.autoCorrectAppPrefix(path);
+				//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+				throw new RuntimeException("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+			} else {
+				return toRet;
+			}
+		} catch (Exception e) {
+//			customLogger.logError("Failed to generate XBS from tRegistry.", e);
+			throw new RuntimeException("Failed to generate XBS from tRegistry.", e);
+		}
 	}
 
 	/**

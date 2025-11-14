@@ -28,6 +28,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
@@ -75,9 +76,10 @@ public class SecurityConfig {
 		corsConfiguration.setAllowedMethods(Arrays.asList("*"));
 		corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
 		corsConfiguration.setExposedHeaders(Arrays.asList("*"));
-
+		corsConfiguration.setAllowCredentials(true);
+		
 		corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
-
+		
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", corsConfiguration);
 
@@ -88,9 +90,12 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 		http.authorizeHttpRequests(requests -> requests
-				.requestMatchers("/actuator/**").permitAll()
-				.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
-				.permitAll().anyRequest().fullyAuthenticated())
+					// OPTIONS requests should be allowed without authentication for CORS preflight (standard!)
+					.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+					.requestMatchers("/actuator/**").permitAll()
+					.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
+					.permitAll().anyRequest().fullyAuthenticated()
+				)
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
 				.formLogin(form -> form.loginPage("/login")//
 						.defaultSuccessUrl("/")//
@@ -101,8 +106,7 @@ public class SecurityConfig {
 
 				// scj: CSRF Should only be enabled if basic auth is replaced by a modern
 				// method.
-				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security
-													// vulnerabilities.
+				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
 		return http.build();
 	}
 

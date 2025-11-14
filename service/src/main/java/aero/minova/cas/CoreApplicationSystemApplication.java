@@ -12,9 +12,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@ComponentScan({ "aero.minova", "com.minova" })
-@EntityScan({ "aero.minova", "com.minova" })
-@EnableJpaRepositories({ "aero.minova", "com.minova" })
+@ComponentScan({ "aero.minova", "com.minova", "ch.minova.foundation.rest" })
+@EntityScan({ "aero.minova", "com.minova", "ch.minova.foundation.rest" })
+@EnableJpaRepositories({ "aero.minova", "com.minova", "ch.minova.foundation.rest" })
 @Configuration
 @EnableScheduling
 public class CoreApplicationSystemApplication {

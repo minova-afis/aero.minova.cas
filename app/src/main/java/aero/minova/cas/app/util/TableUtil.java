@@ -145,6 +145,9 @@ public class TableUtil {
 		case ZONED:
 			v = new Value(ZonedDateTime.parse(stringRep), null);
 			break;
+		case BINARY:
+			v = new Value(stringRep.getBytes(), null);
+			break;
 		default:
 			v = stringValue;
 			break;

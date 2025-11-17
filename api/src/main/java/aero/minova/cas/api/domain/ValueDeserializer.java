@@ -95,6 +95,9 @@ public class ValueDeserializer extends com.fasterxml.jackson.databind.JsonDeseri
 			return new Value(BigDecimal.valueOf(Double.parseDouble(value)), rule);
 		case "l":
 			return new Value(Long.parseLong(value), rule);
+		case "x":
+			// Decode Base64
+			return new Value(value == null || value.isEmpty() ? null : java.util.Base64.getDecoder().decode(value), rule);
 		default:
 			break;
 		}

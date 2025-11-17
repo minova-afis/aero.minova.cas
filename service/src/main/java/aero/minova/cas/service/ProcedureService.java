@@ -5,6 +5,7 @@ import static aero.minova.cas.sql.SqlUtils.parseSqlParameter;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
+import java.io.ByteArrayInputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -316,6 +317,8 @@ public class ProcedureService {
 											return new Column(name, DataType.BIGDECIMAL);
 										} else if (type == Types.BIGINT) {
 											return new Column(name, DataType.LONG);
+										} else if (type == Types.BLOB) {
+											return new Column(name, DataType.BINARY);
 										} else {
 											customLogger.logFiles("calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type);
 											throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
@@ -470,6 +473,8 @@ public class ProcedureService {
 								preparedStatement.setObject(i + parameterOffset, null, Types.DECIMAL);
 							} else if (type == DataType.LONG) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
+							} else if (type == DataType.BINARY) {
+								preparedStatement.setNull(i + parameterOffset, Types.BLOB);
 							} else {
 								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
@@ -492,6 +497,13 @@ public class ProcedureService {
 								preparedStatement.setBigDecimal(i + parameterOffset, iVal.getBigDecimalValue());
 							} else if (type == DataType.LONG) {
 								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
+							} else if (type == DataType.BINARY) {
+								byte[] toSet = iVal.getBinaryValue();
+								if (toSet == null) {
+									preparedStatement.setNull(i + parameterOffset, Types.BLOB);
+								} else {
+									preparedStatement.setBinaryStream(i + parameterOffset, new ByteArrayInputStream(toSet), toSet.length);
+								}
 							} else {
 								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
@@ -514,6 +526,8 @@ public class ProcedureService {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.TIMESTAMP);
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
+							} else if (type == DataType.BINARY) {
+								preparedStatement.registerOutParameter(i + parameterOffset, Types.BLOB);
 							} else {
 								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());

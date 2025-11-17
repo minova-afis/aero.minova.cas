@@ -2,11 +2,14 @@ package aero.minova.cas.sql;
 
 import static java.time.ZoneId.systemDefault;
 
+import java.io.ByteArrayInputStream;
+import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -32,6 +35,29 @@ public class SqlUtils {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Read out bytes from blob and free it up to save memory
+	 * 
+	 * @param blob
+	 * @return
+	 * @throws SQLException
+	 * @since 10.61.0
+	 */
+	private static byte[] getBytesFromBlob(Blob blob) throws SQLException {
+		if (blob == null) {
+			return null;
+		}
+		try {
+			long length = blob.length();
+			if (length > Integer.MAX_VALUE) {
+				throw new SQLException("Blob too large to handle as byte[]");
+			}
+			return blob.getBytes(1, (int) length);
+		} finally {
+			blob.free(); // Free-up memory
+		}
+	}
+	
 	public static String toSqlString(Value value) {
 		if (value.getType() == DataType.BOOLEAN) {
 			if (value.getBooleanValue()) {
@@ -73,6 +99,10 @@ public class SqlUtils {
 					} else {
 						value = new Value(sqlSet.getTimestamp(column.getName()).toInstant().atZone(systemDefault()), null);
 					}
+				} else if (column.getType() == DataType.BINARY) {
+					Object blob = sqlSet.getBlob(column.getName());
+					byte[] bytes = (blob instanceof Blob ? getBytesFromBlob((Blob)blob) : null);
+					value = new Value(bytes, null);
 				} else {
 					logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
 							+ column.getType());
@@ -117,6 +147,10 @@ public class SqlUtils {
 								.map(e -> e.toInstant().atZone(systemDefault()))//
 								.orElse(null),
 						null);
+			} else if (column.getType() == DataType.BINARY) {
+				Object blob = statement.getBlob(index);
+				byte[] bytes = (blob instanceof Blob ? getBytesFromBlob((Blob)blob) : null);
+				value = new Value(bytes, null);
 			} else {
 				throw new UnsupportedOperationException();
 			}
@@ -238,6 +272,15 @@ public class SqlUtils {
 							case INSTANT:
 								usedValue = Timestamp.from(iVal.getInstantValue());
 								preparedStatement.setTimestamp(i + parameterOffset, (Timestamp) usedValue);
+								break;
+							case BINARY:
+								byte[] bytes;
+								usedValue = bytes = iVal.getBinaryValue();
+								if (bytes == null) {
+									preparedStatement.setNull(i + parameterOffset, Types.BLOB);
+								} else {
+									preparedStatement.setBinaryStream(i + parameterOffset, new ByteArrayInputStream(bytes), bytes.length);
+								}
 								break;
 							default:
 								usedValue = stringValue;

@@ -199,7 +199,7 @@ public class FilesController {
 			}
 		}
 		
-		// Are Files from DB active but not preferered compared to File System?
+		// Are Files from DB active but not preferred compared to File System?
 		if(isDBFilesActive && !isDBFilesPreferred) {
 			byte[] toRet = dbFileService.getFile(path);
 			// Try to translate if XML or MDI -- if no language is given, no translation will be done
@@ -248,11 +248,18 @@ public class FilesController {
 		// Should we generate XBS from tRegistry?
 		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
 			 byte[] xbsCode = getXBSFromRegistry(path);
-			 return (xbsCode == null ? null : MessageDigest.getInstance("MD5").digest(xbsCode));
+			 return MessageDigest.getInstance("MD5").digest(xbsCode);
 		}
 		
 		// Try tFiles first
 		if (isDBFilesActive && isDBFilesPreferred) {
+			// Translated files have different contents based on language
+ 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+ 				byte[] content = dbFileService.getFile(path);
+ 				content = translationService.translateXML(path, content, lang);
+ 				if(content != null)
+ 					return MessageDigest.getInstance("MD5").digest(content);
+ 			}
 			byte[] toRet = dbFileService.getMD5(path);
 			if(toRet != null)
 				return toRet;
@@ -268,8 +275,16 @@ public class FilesController {
 			}
 		}
 		
-		// Are Files from DB active but not preferered compared to File System?
+		// Are Files from DB active but not preferred compared to File System?
 		if(isDBFilesActive && !isDBFilesPreferred) {
+			// Translated files have different contents based on language
+ 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+ 				byte[] content = dbFileService.getFile(path);
+ 				content = translationService.translateXML(path, content, lang);
+ 				if(content != null)
+ 					return MessageDigest.getInstance("MD5").digest(content);
+ 			}
+			
 			byte[] toRet = dbFileService.getMD5(path);
 			if(toRet != null)
 				return toRet;

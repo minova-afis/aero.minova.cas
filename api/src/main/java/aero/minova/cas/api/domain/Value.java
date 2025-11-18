@@ -93,6 +93,24 @@ public class Value implements Serializable {
 	public Value(Boolean booleanValue) {
 		this(booleanValue, null);
 	}
+	
+	/**
+	 * @param value
+	 * @param rule
+	 *            Gültige Rules sind entweder null oder folgende Strings: "<>", "<=", ">=", "<", ">", "=", "between()", "in()", "!~", "~", "null", "!null"
+	 */
+	public Value(byte[] value, String rule) {
+		type = DataType.BINARY;
+		this.rule = rule;
+		setValue(value);
+	}
+
+	/**
+	 * @param booleanValue
+	 */
+	public Value(byte[] value) {
+		this(value, null);
+	}
 
 	/**
 	 * Der Standard-Konstruktor für Double-Values.
@@ -143,6 +161,7 @@ public class Value implements Serializable {
 		this.rule = rule;
 		setValue(instantValue);
 	}
+	
 
 	public Value(Instant instantValue) {
 		this(instantValue, null);
@@ -223,6 +242,10 @@ public class Value implements Serializable {
 
 	public BigDecimal getBigDecimalValue() {
 		return type == DataType.BIGDECIMAL ? (BigDecimal) value : null;
+	}
+	
+	public byte[] getBinaryValue() {
+		return type == DataType.BINARY ? (byte[]) value : null;
 	}
 
 	public Long getLongValue() {

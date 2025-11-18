@@ -107,6 +107,9 @@ public class SqlViewController {
 	}
 
 	public Table getIndexView(@RequestBody Table inputTable, boolean checkForExtension) throws Exception {
+		if(inputTable != null && inputTable.getName() != null && inputTable.getName().trim().startsWith("dbo.")) {
+			inputTable.setName(inputTable.getName().trim().substring("dbo.".length()));
+		}
 		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
 		List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
 		if (authoritiesForThisTable.isEmpty()) {

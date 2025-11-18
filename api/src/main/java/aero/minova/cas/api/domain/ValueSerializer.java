@@ -56,6 +56,8 @@ public class ValueSerializer extends com.fasterxml.jackson.databind.JsonSerializ
 			return new JsonPrimitive(ruleString + "m-" + value.getBigDecimalValue().toString());
 		case LONG:
 			return new JsonPrimitive(ruleString + "l-" + value.getLongValue().toString());
+		case BINARY:
+			return new JsonPrimitive(ruleString + "x-" + java.util.Base64.getEncoder().encodeToString(value.getBinaryValue()));
 		default:
 			return null;
 		}

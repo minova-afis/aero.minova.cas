@@ -39,6 +39,11 @@
             <version>1.1.6</version>
         </dependency>
         <dependency>
+            <groupId>ch.minova</groupId>
+            <artifactId>foundation.rest.db</artifactId>
+            <version>0.10.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>

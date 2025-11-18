@@ -74,6 +74,9 @@ public class SecurityService {
 	 * @return Enthält alle Gruppen, die ein Recht auf das Privileg haben.
 	 **/
 	public List<Row> getPrivilegePermissions(String privilegeName) {
+		if(privilegeName != null && privilegeName.toLowerCase().startsWith("dbo.")) {
+			privilegeName = privilegeName.substring("dbo.".length());
+		}
 		loadAllPrivileges();
 		@SuppressWarnings("unchecked")
 		List<GrantedAuthority> allUserAuthorities = (List<GrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();

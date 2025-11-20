@@ -1,1 +1,1 @@
-/aero.minova.app.resources/ch.minova.service.mcas.resources.txt
+/aero.minova.app.resources/aero.minova.service.mcas.resources.txt

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<setup name="ch.minova.service.mcas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<setup name="aero.minova.service.mcas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
 	<required-service>
-		<service name="ch.minova.service.mcas"
+		<service name="aero.minova.service.mcas"
 			 service-name="MCAS"
 			 display-name="MicroCAS"
 			 nt-name="MCAS"
@@ -55,7 +55,7 @@
         </node>
     </xbs-code>
     <copy-file>
-        <dircopy fromdir="/BOOT-INF/classes/ch/minova/service/mcas/setup/files" todir="${service}/bin"/>
+        <dircopy fromdir="/BOOT-INF/classes/aero/minova/service/mcas/setup/files" todir="${service}/bin"/>
 		<!-- Application.properties werden durch Assist automatisch um Einträge (falls vorhaden) aus dem XBS-Zweig erweitert -->
 		<filecopy filename="/BOOT-INF/classes/application.properties" todir="${service}/bin"/>
         <filecopy filename="this" todir="${service}/bin"/>

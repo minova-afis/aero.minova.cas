@@ -3,7 +3,7 @@
     <name>Micro CAS</name> 	  <!-- wird automatisch angepasst -->
     <description>MicroCAS</description>
     <executable>H:/Minova/java/jre/bin/java.exe</executable> <!-- wird automatisch angepasst -->
-    <startarguments>-Xmx128m -Xms128m -jar ch.minova.service.mcas.jar</startarguments>
+    <startarguments>-Xmx128m -Xms128m -jar aero.minova.service.mcas.jar</startarguments>
    
     <log mode="rotate"/>
     <logpath>H:/minova/logs/mcas</logpath> <!-- wird automatisch angepasst -->

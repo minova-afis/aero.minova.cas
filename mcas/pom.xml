@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>ch.minova</groupId>
+    <artifactId>service.mcas</artifactId>
+    <version>13.6.2-SNAPSHOT</version>
+    <name>µCAS - Standalone CAS Service</name>
+    <description>
+        Standalone µCAS service with database-based file access.
+        Auto-creates required directory structure for autonomous operation.
+    </description>
+    
+    <!-- Inherit from cas.extension.deployment to get resource processing -->
+    <parent>
+        <groupId>aero.minova</groupId>
+        <artifactId>cas.extension.deployment</artifactId>
+        <version>13.6.2-SNAPSHOT</version>
+        <relativePath>../cas.extension.deployment</relativePath>
+    </parent>
+    
+    <!-- No runtime dependencies needed - we copy structure at build time -->
+    
+    <properties>
+        <!-- Enable database file access by default -->
+        <ng.api.preferdbfiles>true</ng.api.preferdbfiles>
+        <ng.api.dbfiles>true</ng.api.dbfiles>
+        <ng.api.dbregistry>true</ng.api.dbregistry>
+        <ng.api.mdimix>true</ng.api.mdimix>
+    </properties>
+    
+    <build>
+        <finalName>ch.minova.service.mcas</finalName>
+        
+        <plugins>
+            <!-- Auto-create required directories for µCAS -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>create-mcas-directories</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo message="Creating µCAS directory structure..."/>
+                                <mkdir dir="${project.build.outputDirectory}/files"/>
+                                <mkdir dir="${project.build.outputDirectory}/forms"/>
+                                <mkdir dir="${project.build.outputDirectory}/i18n"/>
+                                <mkdir dir="${project.build.outputDirectory}/images"/>
+                                <mkdir dir="${project.build.outputDirectory}/pdf"/>
+                                <mkdir dir="${project.build.outputDirectory}/plugins"/>
+                                <mkdir dir="${project.build.outputDirectory}/reports"/>
+                                <mkdir dir="${project.build.outputDirectory}/setup"/>
+                                <!-- Copy our minimal Setup.xml -->
+                                <copy file="${basedir}/src/main/resources/setup/Setup.xml" 
+                                      todir="${project.build.outputDirectory}/setup"/>
+                                <mkdir dir="${project.build.outputDirectory}/sql"/>
+                                <mkdir dir="${project.build.outputDirectory}/tables"/>
+                                <echo message="µCAS directories created successfully"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- The resource plugin from parent will handle resource generation after copying -->
+            
+            <!-- Override Spring Boot plugin to include database file access libs -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
+                    <layout>ZIP</layout>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                    <!-- Add system properties for µCAS mode -->
+                    <systemPropertyVariables>
+                        <ng.api.preferdbfiles>true</ng.api.preferdbfiles>
+                        <ng.api.dbfiles>true</ng.api.dbfiles>
+                        <ng.api.dbregistry>true</ng.api.dbregistry>
+                        <ng.api.mdimix>true</ng.api.mdimix>
+                        <spring.profiles.active>mcas</spring.profiles.active>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            
+            <!-- Jib plugin for Docker container -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <from>
+                        <image>openjdk:17-jre-alpine</image>
+                        <platforms>
+                            <platform>
+                                <architecture>amd64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
+                    <to>
+                        <image>aero.minova.mcas</image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                            <tag>latest</tag>
+                        </tags>
+                    </to>
+                    <container>
+                        <mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
+                        <ports>
+                            <port>8084</port>
+                            <port>8081</port>
+                        </ports>
+                        <jvmFlags>
+                            <jvmFlag>-Djdk.tls.client.protocols=TLSv1.2</jvmFlag>
+                            <jvmFlag>-Dng.api.preferdbfiles=true</jvmFlag>
+                            <jvmFlag>-Dng.api.dbfiles=true</jvmFlag>
+                            <jvmFlag>-Dng.api.dbregistry=true</jvmFlag>
+                            <jvmFlag>-Dng.api.mdimix=true</jvmFlag>
+                        </jvmFlags>
+                        <environment>
+                            <TZ>Europe/Berlin</TZ>
+                            <LC_ALL>de.UTF-8</LC_ALL>
+                            <LANG>de.UTF-8</LANG>
+                            <LANGUAGE>de:de</LANGUAGE>
+                        </environment>
+                        <user>1000</user>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                    <extraDirectories>
+                        <paths>
+                            <path>
+                                <from>src/main/jib</from>
+                                <into>/</into>
+                            </path>
+                        </paths>
+                    </extraDirectories>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <!-- Deployment configuration for GitHub Packages -->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Minova Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+        </repository>
+    </distributionManagement>
+    
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <tag>HEAD</tag>
+    </scm>
+</project>

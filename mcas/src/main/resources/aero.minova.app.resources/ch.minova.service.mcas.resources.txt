@@ -1,0 +1,11 @@
+/setup/Setup.xml
+/setup/
+/files/
+/forms/
+/i18n/
+/images/
+/pdf/
+/plugins/
+/reports/
+/sql/
+/tables/

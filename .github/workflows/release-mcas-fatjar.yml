@@ -88,20 +88,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: mcas/target/ch.minova.service.mcas.jar
-          asset_name: ch.minova.service.mcas-${{ env.VERSION }}.jar
+          asset_path: mcas/target/aero.minova.service.mcas.jar
+          asset_name: aero.minova.service.mcas-${{ env.VERSION }}.jar
           asset_content_type: application/java-archive
           
       - name: Create artifact summary
         run: |
           echo "## µCAS Fat-JAR Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Group ID**: ch.minova" >> $GITHUB_STEP_SUMMARY
+          echo "- **Group ID**: aero.minova" >> $GITHUB_STEP_SUMMARY
           echo "- **Artifact ID**: service.mcas" >> $GITHUB_STEP_SUMMARY
           echo "- **Repository**: https://maven.pkg.github.com/minova-afis/aero.minova.maven.root" >> $GITHUB_STEP_SUMMARY
-          echo "- **Fat-JAR Size**: $(ls -lh mcas/target/ch.minova.service.mcas.jar | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Fat-JAR Size**: $(ls -lh mcas/target/aero.minova.service.mcas.jar | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
           
-          if [ -f mcas/target/ch.minova.service.mcas.jar ]; then
+          if [ -f mcas/target/aero.minova.service.mcas.jar ]; then
             echo "✅ Fat-JAR successfully built and deployed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ Fat-JAR build failed" >> $GITHUB_STEP_SUMMARY

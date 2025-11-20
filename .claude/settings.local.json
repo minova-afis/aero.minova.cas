@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(export:*)",
+      "Bash(mvn clean:*)",
+      "Bash(java:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "Bash(jar:*)",
+      "Bash(unzip:*)"
+    ],
+    "deny": []
+  }
+}

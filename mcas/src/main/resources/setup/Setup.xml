@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<setup name="ch.minova.service.mcas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/xsd/SetupProperties.xsd">
+	<required-service>
+		<service name="ch.minova.service.mcas"
+			 service-name="MCAS"
+			 display-name="MicroCAS"
+			 nt-name="MCAS"
+			 java-version="21"/>
+	</required-service>
+	<xbs-code>
+        <node name="MCAS">
+            <map>
+                <entry key="" value="Service"/>
+				<!-- Alle Einträge aus diesem Bereich landen bei der Installation in application.properties -->
+				<entry key="" value="Service"/>
+
+				<entry key="ng.api.preferdbfiles" value="true"/>
+				<entry key="ng.api.dbfiles" value="true"/>
+				<entry key="ng.api.dbregistry" value="true"/>
+				<entry key="ng.api.mdimix" value="true"/>
+				
+
+				<entry key="fat.jar.mode" value="true"/>
+				
+				<!-- #### Application Root Path #### -->
+				<entry key="aero.minova.core.application.root.path" value="/"/>
+				
+				<!-- #### Database Configuration (REQUIRED - Override in deployment) #### -->
+				<entry key="spring.datasource.driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+				<entry key="spring.datasource.url" value="jdbc:sqlserver://localhost:1433;databaseName=SKYMUC;encrypt=true;trustServerCertificate=true"/>
+				<entry key="spring.datasource.username" value="sa"/>
+				<entry key="spring.datasource.password" value="Minova+0"/>
+				
+				<!-- #### JPA/Hibernate Settings (Required for CAS) #### -->
+				<entry key="spring.jpa.hibernate.ddl-auto" value="update"/>
+				<entry key="spring.jpa.database-platform" value="org.hibernate.dialect.SQLServerDialect"/>
+				<entry key="spring.jpa.hibernate.naming.physical-strategy" value="org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl"/>
+				
+				<!-- #### JSON Processing #### -->
+				<entry key="spring.http.converters.preferred-json-mapper" value="gson"/>
+				
+				<!-- #### Authentication Method #### -->
+				<entry key="login_dataSource" value="admin"/>
+				
+				<!-- #### Server Configuration #### -->
+				<entry key="server.servlet.context-path" value="/cas"/>
+				<entry key="server.port" value="8084"/>
+				<entry key="cors.allowed.origins" value="https://ng-dev.minova.com,https://ng.minova.com,http://localhost,https://editor.swagger.io/"/>
+				
+				<!-- #### Management/Monitoring #### -->
+				<entry key="management.server.port" value="8091"/>
+				<entry key="management.endpoints.enabled-by-default" value="false"/>
+            </map>
+        </node>
+    </xbs-code>
+    <copy-file>
+        <dircopy fromdir="/BOOT-INF/classes/ch/minova/service/mcas/setup/files" todir="${service}/bin"/>
+		<!-- Application.properties werden durch Assist automatisch um Einträge (falls vorhaden) aus dem XBS-Zweig erweitert -->
+		<filecopy filename="/BOOT-INF/classes/application.properties" todir="${service}/bin"/>
+        <filecopy filename="this" todir="${service}/bin"/>
+        <!--dircopy fromdir="/BOOT-INF/lib" todir="${service}/lib"/-->
+    </copy-file>
+</setup>

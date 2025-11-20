@@ -35,6 +35,7 @@
         <module>cas.extension.parent</module>
         <module>cas.extension.deployment</module>
         <module>customer-build-project</module>
+        <module>mcas</module>
     </modules>
 
     <repositories>

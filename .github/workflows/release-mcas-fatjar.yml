@@ -1,5 +1,5 @@
 name: Release µCAS Service jar
-run-name: Release ${{ inputs.version }}
+run-name: Release µCAS Service jar ${{ inputs.version }}
 on:
   # Trigger on new releases
   release:
@@ -82,19 +82,30 @@ jobs:
                       -Dpassword=$GITHUB_ACCESS_TOKEN \
                       --settings .github/settings.xml
           
-      - name: Build and deploy µCAS fat-jar
+      - name: Build and install µCAS fat-jar
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
-          echo "Building and deploying µCAS fat-jar to GitHub Packages..."
-          mvn clean deploy -pl mcas -am -B -DskipTests \
+          echo "Building µCAS fat-jar and installing dependencies..."
+          mvn clean install -pl mcas -am -B -DskipTests \
                       -Dusername=$GITHUB_ACCESS_TOKEN \
                       -Dpassword=$GITHUB_ACCESS_TOKEN \
                       --settings .github/settings.xml
           
-
+      - name: Deploy to GitHub Packages
+        env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+        run: |
+          echo "Deploying µCAS fat-jar to GitHub Packages..."
+          mvn deploy -pl mcas -B -DskipTests \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      --settings .github/settings.xml
+          
       - name: Create and push Git tag
         if: ${{ !contains(env.VERSION, 'SNAPSHOT') }}
         env:

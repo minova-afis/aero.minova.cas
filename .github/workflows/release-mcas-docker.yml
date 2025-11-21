@@ -1,5 +1,5 @@
 name: Release µCAS Container
-run-name: Release ${{ inputs.version }}
+run-name: Release µCAS Container ${{ inputs.version }}
 on:
   # Trigger on new releases
   release:

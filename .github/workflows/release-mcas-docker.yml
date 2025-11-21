@@ -1,5 +1,5 @@
 name: Release µCAS Container
-
+run-name: Release ${{ inputs.version }}
 on:
   # Trigger on new releases
   release:
@@ -177,6 +177,20 @@ jobs:
             else
               echo "ℹ️ Health endpoint not accessible (may be disabled)"
             fi
+
+      - name: Create and push Git tag
+        if: ${{ env.SNAPSHOT == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="mcas_${{ env.VERSION }}"
+          echo "Creating tag: $TAG_NAME"
+          
+          # Create and push the tag
+          git tag -a "$TAG_NAME" -m "µCAS Release ${{ env.VERSION }}"
+          git push origin "$TAG_NAME"
+          
+          echo "✅ Created and pushed tag: $TAG_NAME"
           else
             echo "❌ Container failed to start"
             docker logs mcas-test

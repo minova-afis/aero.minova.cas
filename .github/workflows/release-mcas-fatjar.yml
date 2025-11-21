@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release (e.g. 13.6.2)'
+        description: 'Version to release (e.g. 1.0.0)'
         required: false
         default: ''
 
@@ -42,13 +42,14 @@ jobs:
             
       - name: Configure Git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "service@minova.com"
+          git config --global user.name "minova-worker"
           
       - name: Determine version
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         id: version
         run: |
           if [ "${{ github.event.inputs.version }}" != "" ]; then
@@ -58,7 +59,7 @@ jobs:
             # Remove 'v' prefix if present
             VERSION=${VERSION#v}
           else
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout --settings .github/settings.xml)
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml)
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -68,27 +69,42 @@ jobs:
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         if: ${{ !contains(env.VERSION, 'SNAPSHOT') }}
         run: |
           # Update version in mcas module
-          mvn versions:set -DnewVersion=${{ env.VERSION }} -pl mcas
-          mvn versions:commit -pl mcas
+          mvn versions:set -DnewVersion=${{ env.VERSION }} -pl mcas \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      --settings .github/settings.xml
+          mvn versions:commit -pl mcas\
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      --settings .github/settings.xml
           
       - name: Build and test
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Building µCAS fat-jar..."
-          mvn clean verify -pl mcas -B
+          mvn clean verify -pl mcas -B \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      --settings .github/settings.xml
           
       - name: Deploy to GitHub Packages
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Deploying µCAS fat-jar to GitHub Packages..."
-          mvn deploy -pl mcas -B -DskipTests -s .github/settings.xml
+          mvn deploy -pl mcas -B -DskipTests \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      --settings .github/settings.xml
             
       - name: Upload fat-jar as release asset
         if: github.event_name == 'release'

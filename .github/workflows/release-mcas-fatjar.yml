@@ -101,7 +101,7 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Deploying µCAS fat-jar to GitHub Packages..."
-          mvn deploy -pl mcas -am -B -DskipTests \
+          mvn deploy -pl mcas -B -DskipTests \
                       -Dusername=$GITHUB_ACCESS_TOKEN \
                       -Dpassword=$GITHUB_ACCESS_TOKEN \
                       --settings .github/settings.xml

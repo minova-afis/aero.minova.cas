@@ -8,7 +8,11 @@
       "Bash(rm:*)",
       "Bash(mv:*)",
       "Bash(jar:*)",
-      "Bash(unzip:*)"
+      "Bash(unzip:*)",
+      "Bash(cat:*)",
+      "Bash(cp:*)",
+      "Bash(sed:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

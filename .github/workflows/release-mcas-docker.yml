@@ -40,10 +40,10 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           
       - name: Cache Maven dependencies
@@ -68,6 +68,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
       - name: Determine version and image tags
+        env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         id: meta
         run: |
           if [ "${{ github.event.inputs.version }}" != "" ]; then
@@ -77,7 +81,7 @@ jobs:
             # Remove 'v' prefix if present
             VERSION=${VERSION#v}
           else
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -pl mcas)
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -pl mcas -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml)
           fi
           
           # Set environment variables
@@ -104,6 +108,10 @@ jobs:
           echo "Image tags: $TAGS"
           
       - name: Update version in pom.xml
+        env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         if: ${{ env.SNAPSHOT == 'false' }}
         run: |
           # Update version in mcas module
@@ -111,6 +119,10 @@ jobs:
           mvn versions:commit -pl mcas
           
       - name: Build and push Docker image
+        env:
+          MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
+          MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Building µCAS Docker container..."
           
@@ -127,12 +139,12 @@ jobs:
           
           if [ "${{ github.event.inputs.push_to_registry }}" == "false" ]; then
             echo "Building image locally only (not pushing to registry)..."
-            mvn compile jib:dockerBuild -pl mcas -B \
+            mvn compile jib:dockerBuild -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
               -Djib.to.image="${{ env.FULL_IMAGE_NAME }}:local" \
               -Djib.container.mainClass=aero.minova.cas.CoreApplicationSystemApplication
           else
             echo "Building and pushing image to registry..."
-            mvn compile jib:build -pl mcas -B \
+            mvn compile jib:build -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
               -Djib.to.image="$JIB_TAGS" \
               -Djib.container.mainClass=aero.minova.cas.CoreApplicationSystemApplication
           fi

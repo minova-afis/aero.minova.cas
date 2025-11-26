@@ -145,12 +145,12 @@ jobs:
           
           if [ "${{ github.event.inputs.push_to_registry }}" == "false" ]; then
             echo "Building image locally only (not pushing to registry)..."
-            mvn compile jib:dockerBuild -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
+            mvn compile com.google.cloud.tools:jib-maven-plugin:3.4.0:dockerBuild -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
               -Djib.to.image="${{ env.FULL_IMAGE_NAME }}:local" \
               -Djib.container.mainClass=aero.minova.cas.CoreApplicationSystemApplication
           else
             echo "Building and pushing image to registry..."
-            mvn compile jib:build -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
+            mvn compile com.google.cloud.tools:jib-maven-plugin:3.4.0:build -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
               -Djib.to.image="$JIB_TAGS" \
               -Djib.container.mainClass=aero.minova.cas.CoreApplicationSystemApplication
           fi

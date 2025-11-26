@@ -116,29 +116,21 @@ jobs:
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         if: ${{ !contains(env.VERSION, 'SNAPSHOT') }}
         run: |
           # Update version in mcas module
           mvn versions:set -DnewVersion=${{ env.VERSION }} -pl mcas \
-                      -Dusername=$GITHUB_ACCESS_TOKEN \
-                      -Dpassword=$GITHUB_ACCESS_TOKEN \
                       --settings .github/settings.xml
-          mvn versions:commit -pl mcas\
-                      -Dusername=$GITHUB_ACCESS_TOKEN \
-                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+          mvn versions:commit -pl mcas \
                       --settings .github/settings.xml
           
       - name: Build and install µCAS fat-jar
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Building µCAS fat-jar and installing dependencies..."
           mvn clean install -pl mcas -am -B -DskipTests \
-                      -Dusername=$GITHUB_ACCESS_TOKEN \
-                      -Dpassword=$GITHUB_ACCESS_TOKEN \
                       --settings .github/settings.xml
           
       - name: Deploy to GitHub Packages
@@ -146,12 +138,9 @@ jobs:
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Deploying µCAS fat-jar to GitHub Packages..."
           mvn deploy -pl mcas -B -DskipTests \
-                      -Dusername=$GITHUB_ACCESS_TOKEN \
-                      -Dpassword=$GITHUB_ACCESS_TOKEN \
                       --settings .github/settings.xml
 
       - name: Upload fat-jar as release asset
@@ -170,7 +159,6 @@ jobs:
         env:
           MAIN_GITHUB_RELEASE_USERNAME: ${{ secrets.MAIN_GITHUB_RELEASE_USERNAME }}
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
-          GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Building and pushing µCAS container with Jib..."
 
@@ -186,9 +174,11 @@ jobs:
           echo "Image: $FULL_IMAGE_NAME"
           echo "Tags: $TAGS"
 
-          # Run Jib ONLY on mcas module in offline mode
-          # All dependencies and POMs already cached from previous build step
-          mvn com.google.cloud.tools:jib-maven-plugin:3.4.0:build -pl mcas -B -o \
+          # Run Jib on mcas module only
+          # Environment variables provide GitHub Packages authentication via settings.xml
+          # Maven Central remains unauthenticated (as it should be)
+          mvn com.google.cloud.tools:jib-maven-plugin:3.4.0:build -pl mcas -B \
+            --settings .github/settings.xml \
             -Djib.to.image="$FULL_IMAGE_NAME" \
             -Djib.to.tags="$TAGS" \
             -Djib.to.auth.username="${{ github.actor }}" \

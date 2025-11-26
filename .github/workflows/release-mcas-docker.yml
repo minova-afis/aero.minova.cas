@@ -64,8 +64,8 @@ jobs:
           
       - name: Configure Git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "service@minova.com"
+          git config --global user.name "minova-worker"
           
       - name: Determine version and image tags
         env:
@@ -115,8 +115,14 @@ jobs:
         if: ${{ env.SNAPSHOT == 'false' }}
         run: |
           # Update version in mcas module
-          mvn versions:set -DnewVersion=${{ env.VERSION }} -pl mcas
-          mvn versions:commit -pl mcas
+          mvn versions:set -DnewVersion=${{ env.VERSION }} -pl mcas \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      --settings .github/settings.xml
+          mvn versions:commit -pl mcas \
+                      -Dusername=$GITHUB_ACCESS_TOKEN \
+                      -Dpassword=$GITHUB_ACCESS_TOKEN \
+                      --settings .github/settings.xml
           
       - name: Build and push Docker image
         env:

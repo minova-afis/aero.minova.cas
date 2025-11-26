@@ -135,11 +135,35 @@ jobs:
           MAIN_GITHUB_RELEASE_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
-          echo "Building µCAS fat-jar and installing dependencies..."
-          mvn clean install -pl mcas -am -B -DskipTests \
-                      -Dusername=$GITHUB_ACCESS_TOKEN \
-                      -Dpassword=$GITHUB_ACCESS_TOKEN \
-                      --settings .github/settings.xml
+          if [ "${{ env.BUILD_CONTAINER }}" = "true" ]; then
+            echo "Building µCAS fat-jar and container in single Maven invocation..."
+
+            # Determine image tags
+            FULL_IMAGE_NAME="${{ env.REGISTRY }}/minova-afis/${{ env.IMAGE_NAME }}"
+
+            if [[ "${{ env.VERSION }}" == *"SNAPSHOT"* ]]; then
+              TAGS="snapshot,latest-snapshot"
+            else
+              TAGS="${{ env.VERSION }},latest"
+            fi
+
+            # Build fat-jar AND container in one Maven command
+            mvn clean install com.google.cloud.tools:jib-maven-plugin:3.4.0:build \
+              -pl mcas -am -B -DskipTests \
+              -Dusername=$GITHUB_ACCESS_TOKEN \
+              -Dpassword=$GITHUB_ACCESS_TOKEN \
+              --settings .github/settings.xml \
+              -Djib.to.image="$FULL_IMAGE_NAME" \
+              -Djib.to.tags="$TAGS" \
+              -Djib.to.auth.username="${{ github.actor }}" \
+              -Djib.to.auth.password="${{ secrets.GITHUB_TOKEN }}"
+          else
+            echo "Building µCAS fat-jar only..."
+            mvn clean install -pl mcas -am -B -DskipTests \
+              -Dusername=$GITHUB_ACCESS_TOKEN \
+              -Dpassword=$GITHUB_ACCESS_TOKEN \
+              --settings .github/settings.xml
+          fi
           
       - name: Deploy to GitHub Packages
         if: env.BUILD_FATJAR == 'true'
@@ -164,37 +188,6 @@ jobs:
           asset_path: mcas/target/aero.minova.service.mcas.jar
           asset_name: aero.minova.service.mcas-${{ env.VERSION }}.jar
           asset_content_type: application/java-archive
-
-      - name: Log in to Container Registry
-        if: env.BUILD_CONTAINER == 'true'
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
-
-      - name: Build and push container with Jib
-        if: env.BUILD_CONTAINER == 'true'
-        run: |
-          echo "Building and pushing µCAS container with Jib..."
-
-          # Determine image tags
-          FULL_IMAGE_NAME="${{ env.REGISTRY }}/minova-afis/${{ env.IMAGE_NAME }}"
-
-          if [[ "${{ env.VERSION }}" == *"SNAPSHOT"* ]]; then
-            TAGS="snapshot,latest-snapshot"
-          else
-            TAGS="${{ env.VERSION }},latest"
-          fi
-
-          echo "Image: $FULL_IMAGE_NAME"
-          echo "Tags: $TAGS"
-
-          # Build and push with Jib using pom.xml configuration
-          # Note: Dependencies already resolved from earlier 'mvn clean install' step
-          # Only need container registry authentication here
-          mvn com.google.cloud.tools:jib-maven-plugin:3.4.0:build -pl mcas -B \
-            -Djib.to.image="$FULL_IMAGE_NAME" \
-            -Djib.to.tags="$TAGS" \
-            -Djib.to.auth.username="${{ github.actor }}" \
-            -Djib.to.auth.password="${{ secrets.GITHUB_TOKEN }}"
 
       - name: Create and push Git tag
         if: ${{ !contains(env.VERSION, 'SNAPSHOT') }}

@@ -131,27 +131,47 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.MAIN_GITHUB_RELEASE_TOKEN }}
         run: |
           echo "Building µCAS Docker container..."
-          
-          # Configure Jib to use the determined tags
+
+          # First, build dependencies without running Jib
+          echo "Building dependencies..."
+          mvn clean install -pl mcas -am -DskipTests -B \
+            -Dusername=$GITHUB_ACCESS_TOKEN \
+            -Dpassword=$GITHUB_ACCESS_TOKEN \
+            --settings .github/settings.xml
+
+          # Extract just the tag names (e.g., "1.0.0,latest") from full image references
           IFS=',' read -ra TAG_ARRAY <<< "${{ env.TAGS }}"
           JIB_TAGS=""
-          for tag in "${TAG_ARRAY[@]}"; do
+          for full_tag in "${TAG_ARRAY[@]}"; do
+            # Extract just the tag part after the last colon
+            tag_name="${full_tag##*:}"
             if [ -z "$JIB_TAGS" ]; then
-              JIB_TAGS="$tag"
+              JIB_TAGS="$tag_name"
             else
-              JIB_TAGS="$JIB_TAGS,$tag"
+              JIB_TAGS="$JIB_TAGS,$tag_name"
             fi
           done
-          
+
+          echo "Image: ${{ env.FULL_IMAGE_NAME }}"
+          echo "Tags: $JIB_TAGS"
+
           if [ "${{ github.event.inputs.push_to_registry }}" == "false" ]; then
             echo "Building image locally only (not pushing to registry)..."
-            mvn compile com.google.cloud.tools:jib-maven-plugin:3.4.0:dockerBuild -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
-              -Djib.to.image="${{ env.FULL_IMAGE_NAME }}:local" \
+            mvn com.google.cloud.tools:jib-maven-plugin:3.4.0:dockerBuild -pl mcas -B \
+              -Dusername=$GITHUB_ACCESS_TOKEN \
+              -Dpassword=$GITHUB_ACCESS_TOKEN \
+              --settings .github/settings.xml \
+              -Djib.to.image="${{ env.FULL_IMAGE_NAME }}" \
+              -Djib.to.tags=local \
               -Djib.container.mainClass=aero.minova.cas.CoreApplicationSystemApplication
           else
             echo "Building and pushing image to registry..."
-            mvn compile com.google.cloud.tools:jib-maven-plugin:3.4.0:build -pl mcas -am -B -Dusername=$GITHUB_ACCESS_TOKEN -Dpassword=$GITHUB_ACCESS_TOKEN --settings .github/settings.xml \
-              -Djib.to.image="$JIB_TAGS" \
+            mvn com.google.cloud.tools:jib-maven-plugin:3.4.0:build -pl mcas -B \
+              -Dusername=$GITHUB_ACCESS_TOKEN \
+              -Dpassword=$GITHUB_ACCESS_TOKEN \
+              --settings .github/settings.xml \
+              -Djib.to.image="${{ env.FULL_IMAGE_NAME }}" \
+              -Djib.to.tags="$JIB_TAGS" \
               -Djib.container.mainClass=aero.minova.cas.CoreApplicationSystemApplication
           fi
           

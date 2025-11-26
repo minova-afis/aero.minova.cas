@@ -101,6 +101,8 @@
 
 ### Kubernetes Deployment
 
+**Simple Example** (for testing):
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -166,6 +168,18 @@ spec:
     port: 8091
     targetPort: 8091
 ```
+
+**Production Deployment** (Kustomize + ArgoCD):
+
+For production customer deployments using GitOps, see **[DEPLOYMENT.md](./DEPLOYMENT.md)** for comprehensive deployment documentation including:
+- Kustomize-based configuration management
+- ArgoCD GitOps workflows
+- Environment-specific overlays (development/production)
+- Multi-location deployments
+- Monitoring and troubleshooting guides
+
+**Current Deployments:**
+- **SkyTanking Berlin (BER)** - Development environment serving as backend for next-gen web interface
 
 ## Configuration
 

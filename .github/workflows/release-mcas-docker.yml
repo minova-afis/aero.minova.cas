@@ -189,7 +189,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG_NAME="mcas_${{ env.VERSION }}"
+          TAG_NAME="mcas_container_${{ env.VERSION }}"
           echo "Creating tag: $TAG_NAME"
           
           # Create and push the tag

@@ -7,30 +7,28 @@
 ### Traditional CAS Deployment
 - Requires customer-specific setup files and infrastructure
 - Needs file system access for forms, configurations, and resources
-- Complex deployment with multiple dependencies
 - Customer-specific build and deployment processes
 
 ### µCAS Innovation
 - **Database-Driven**: All resources (forms, configurations, i18n files) are fetched directly from the database using the NextGen API
-- **Zero Configuration**: Works out-of-the-box with minimal setup
+- **(Almost) Zero Configuration**: Works out-of-the-box with minimal setup
 - **Fully Standalone**: Single artifact deployment with embedded resources
 - **Self-Contained**: No external file dependencies beyond database connection
 
 ## Key Features
 
-- ✅ **NextGen Database File Access**: Resources loaded from database instead of file system
-- ✅ **Fat-JAR Ready**: Single executable JAR with all dependencies included
-- ✅ **Container Native**: Optimized for Docker and Kubernetes deployments  
-- ✅ **Database Agnostic**: Supports SQL Server, PostgreSQL, MySQL, H2
-- ✅ **Production Ready**: Built-in monitoring, security, and error handling
-- ✅ **Backward Compatible**: Compatible with existing CAS workflows and APIs
+- **NextGen Database File Access**: Resources loaded from database instead of file system
+- **Fat-JAR Ready**: Single executable JAR with all dependencies included
+- **Container Native**: Optimized for Docker and Kubernetes deployments  
+- **Database Agnostic**: Supports SQL Server, PostgreSQL, MySQL, H2
+- **Backward Compatible**: Compatible with existing CAS workflows and APIs
 
 ## Release Artifacts
 
 ### Fat-JAR Distribution
 - **Artifact**: `aero.minova.service.mcas.jar` (~98MB)
 - **Use Case**: On-premise deployments, development, testing
-- **Deployment**: Simple `java -jar` execution
+- **Deployment**: Simple `java -jar` execution or Assist driven (as any other service)
 - **Repository**: [GitHub Packages](https://maven.pkg.github.com/minova-afis/aero.minova.maven.root)
 
 ### Docker Container
@@ -283,11 +281,3 @@ spring.jpa.show-sql=true
 ## Contributing
 
 µCAS is part of the larger CAS ecosystem. See the main [CAS repository](https://github.com/minova-afis/aero.minova.cas) for contribution guidelines.
-
-## License
-
-Licensed under the same terms as the main CAS project.
-
----
-
-**µCAS** - Making CAS deployment simple, scalable, and standalone.

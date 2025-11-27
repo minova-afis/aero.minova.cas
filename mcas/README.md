@@ -44,6 +44,51 @@
 - SQL Server, PostgreSQL, or other supported database
 - Database with CAS schema initialized
 
+### Assist Deployment
+
+1. **Add mcas as dependency** in the Customer's Setup
+
+```xml
+<setup name="de.minova.oas.awb">
+   <required-modules>
+      ...
+      <module major="1" name="aero.minova.service.mcas"/>
+   </required-modules>
+   <required-service name-prefix="OAS" service-host="localhost">
+      ...
+      <service name="aero.minova.service.mcas" service-name="MCAS"/>
+   </required-service>
+</setup>
+```
+
+2. Add customer-specific settings for the µCAS (DB connection)
+
+```xml
+<setup name="de.minova.oas.awb">
+   <xbs-code>
+      ...
+      <node name="Database">
+         <map>
+            <!-- Let Assist write XBS and Files to DB -->
+            <entry key="SyncRegistry" value="true"/>
+            <entry key="SyncFiles" value="true"/>
+         </map>
+      </node>
+      <node name="MCAS">
+         <map>
+            <!-- Change any application.properties here -->
+            <entry key="spring.datasource.url" value="jdbc:sqlserver://localhost:1433;databaseName=SKYMUC;encrypt=true;trustServerCertificate=true"/>
+            <!-- If not integrated security -->
+            <entry key="spring.datasource.username" value="sa"/>
+            <entry key="spring.datasource.password" value="MyPa55w0rd"/>
+         </map>
+      </node>
+   <xbs-code>
+</setup>
+```
+
+4. Install MCAS as any other service, i.e. follow the Assist issuer
+
 ### Fat-JAR Deployment
 
 1. **Download the latest release**:

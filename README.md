@@ -30,6 +30,10 @@ Eine Illustration der Struktur wird [hier](./doc/adoc/structure.adoc) bereitgest
 
 Für die alten Hasen unter uns: ein sehr großer Teil vom CAS stellt eine REST-Schnittstelle zu den SQL-Funktionalitäten vom Ncore und dem Install-Tool bereit.
 
+# µCAS
+
+Seit November 2025 gibt es eine allgemeine Micro-CAS Version, die auf jedem Bestandssystem installiert werden kann, um eine REST-Schnittstelle für DB Operationen bereitstellt und Applikationsdateien (Forms, Übersetzungen, Bilder) direkt aus der Datenbank bezieht und diese ebenfalls über REST liefert. [Weitere Infos](https://github.com/minova-afis/aero.minova.cas/tree/main/mcas)
+
 # Status
 
 Wir sind jetzt an einem Punkt angekommen,
@@ -58,5 +62,7 @@ dass die API möglichst stabil gehalten wird.
 -   [How to Extensions und App-Projekte](./service/doc/adoc/extensions.adoc)
 
 -   [Projektstruktur](./doc/adoc/projectStructure.adoc)
+
+-   [µCas](https://github.com/minova-afis/aero.minova.cas/tree/main/mcas)
 
 -   [Tabellen-Index](./app/doc/adoc/table-index.adoc)

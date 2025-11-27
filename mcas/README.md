@@ -25,7 +25,12 @@
 
 ## Release Artifacts
 
-### Fat-JAR Distribution
+Both artifacts are release with the [same workflow](https://github.com/minova-afis/aero.minova.cas/actions/workflows/release-mcas.yml). By default fat-jar and container are released
+
+<img width="467" height="452" alt="grafik" src="https://github.com/user-attachments/assets/0fb9d71b-5475-4470-b225-8f627004a4a5" />
+
+
+### Fat-JAR
 - **Artifact**: `aero.minova.service.mcas.jar` (~98MB)
 - **Use Case**: On-premise deployments, development, testing
 - **Deployment**: Simple `java -jar` execution or Assist driven (as any other service)
@@ -40,9 +45,9 @@
 ## Quick Start
 
 ### Prerequisites
-- Java 17+ (recommended: Java 21)
+- Java 21
 - SQL Server, PostgreSQL, or other supported database
-- Database with CAS schema initialized
+- Database with CAS schema initialized (can also be initialized with MCAS)
 
 ### Assist Deployment
 
@@ -76,6 +81,7 @@
       </node>
       <node name="MCAS">
          <map>
+            <entry key="server.port" value="8084"/>
             <!-- Change any application.properties here -->
             <entry key="spring.datasource.url" value="jdbc:sqlserver://localhost:1433;databaseName=SKYMUC;encrypt=true;trustServerCertificate=true"/>
             <!-- If not integrated security -->
@@ -88,8 +94,10 @@
 ```
 
 4. Install MCAS as any other service, i.e. follow the Assist issuer
+   
+5. Short Test and Initial Setup: when sarted navigate in browser to *http://localhost:8084/cas*, login with default CAS *admin* credentials (see KeePass) and execute Setup. In future this step will be obsoleted by [automatic reparair&recovery](https://github.com/minova-afis/aero.minova.cas/issues/1441)
 
-### Fat-JAR Deployment
+### Direct Fat-JAR Execution
 
 1. **Download the latest release**:
    ```bash
@@ -226,7 +234,7 @@ For production customer deployments using GitOps, see **[DEPLOYMENT.md](./DEPLOY
 
 ## Configuration
 
-µCAS uses Spring Boot's configuration system. Key configuration options:
+µCAS uses Spring Boot's configuration system (application.properties). If installed via Assist, the properties can also be defined as XBS values in the Customer's Setup. Key configuration options:
 
 ### Database Configuration (Required)
 ```properties

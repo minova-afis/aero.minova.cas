@@ -129,6 +129,10 @@
                             <jvmFlag>-Dng.api.dbfiles=true</jvmFlag>
                             <jvmFlag>-Dng.api.dbregistry=true</jvmFlag>
                             <jvmFlag>-Dng.api.mdimix=true</jvmFlag>
+                            <!-- JVM Memory Configuration for Container -->
+                            <jvmFlag>-XX:MaxRAMPercentage=95.0</jvmFlag>
+                            <jvmFlag>-XX:InitialRAMPercentage=75.0</jvmFlag>
+                            <jvmFlag>-XX:+UseContainerSupport</jvmFlag>
                         </jvmFlags>
                         <environment>
                             <TZ>Europe/Berlin</TZ>

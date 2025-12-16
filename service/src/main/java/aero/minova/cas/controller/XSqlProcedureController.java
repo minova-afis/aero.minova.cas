@@ -141,13 +141,14 @@ public class XSqlProcedureController {
 				try {
 					connection.rollback();
 				} catch (Exception e1) {
-					customLogger.logError("Couldn't roll back xSqlProcedure execution", e);
+					customLogger.logError("Couldn't roll back XSqlProcedure execution", e);
 				}
 			}
 			throw new XProcedureException(inputTables, resultSets, e);
 		} finally {
 			systemDatabase.closeConnection(connection);
 		}
+		customLogger.logSql("XSqlProcedure successfully executed: " + sb);
 		return new ResponseEntity<>(resultSets, HttpStatus.ACCEPTED);
 	}
 

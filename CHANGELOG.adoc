@@ -6,6 +6,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [UNRELEASED] -- XXXX-XX-XX
 
 * spring.datasource.hikari.maximumPoolSize=30000 entfernen
+* Loggen, wenn XSqlProcedure fertig ausgeführt wurde
 
 ## [12.69.?] -- 2025-??-??
 * Alle SQL-Verbindungen nach der Verwendung explizit schließen.

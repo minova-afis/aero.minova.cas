@@ -16,6 +16,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
  da diese nicht notwendig sind.
  Eine große Anzahl an SQL-Verbindung kann zudem alle Ports des Servers Beschlagnahmen,
  was den Betrieb blockieren kann.
+ 
+ - Loggen, wenn XSqlProcedure fertig ausgeführt wurde
 
 ## \[13.6.1\] - 2025-08-12
 

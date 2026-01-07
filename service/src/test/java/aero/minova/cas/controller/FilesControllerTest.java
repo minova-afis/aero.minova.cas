@@ -11,7 +11,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +24,7 @@ import aero.minova.cas.BaseTest;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -71,15 +71,15 @@ class FilesControllerTest extends BaseTest {
 	@Test
 	void testLegal() throws Exception {
 		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
-		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.xbs")).isEqualTo(
-				"<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.xbs", null))
+				.isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
 	void testLegalHash() throws Exception {
 		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 		filesController.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.xbs"));
-		assertThat(filesController.getHash("Shared Data/Program Files/AFIS/AFIS.xbs"))
+		assertThat(filesController.getHash("Shared Data/Program Files/AFIS/AFIS.xbs", null))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -88,8 +88,7 @@ class FilesControllerTest extends BaseTest {
 		val metaDataFolder = programFilesFolder.resolve(".metadata");
 		Files.createDirectories(metaDataFolder);
 
-		Files.write(metaDataFolder.resolve("beispielLog.log"),
-				"<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
+		Files.write(metaDataFolder.resolve("beispielLog.log"), "<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
 		filesController.createZip(Paths.get("Shared Data/Program Files/.metadata"));
 
 		// dabei wird der Logs Ordner erzeugt
@@ -97,13 +96,12 @@ class FilesControllerTest extends BaseTest {
 
 		File found = findFile("beispielLog.log", internalFolder.resolve("UserLogs").toFile());
 		assertThat(found).isNotNull();
-		assertThat(Files.readAllBytes(found.toPath()))
-				.isEqualTo("<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
+		assertThat(Files.readAllBytes(found.toPath())).isEqualTo("<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
 	void testIllegal() {
-		Assertions.assertThrows(IllegalAccessException.class, () -> filesController.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs"));
+		Assertions.assertThrows(IllegalAccessException.class, () -> filesController.getFile("../Shared Data/Program Files/AFIS/AFIS.xbs", null));
 	}
 
 	@Test
@@ -189,7 +187,7 @@ class FilesControllerTest extends BaseTest {
 		assertThat(Files.readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
 				.isNotEmpty();
 		assertThat(Files.readAllBytes(md5Folder.resolve("Internal").resolve("Zips").resolve("Shared Data").resolve("Program Files").resolve("AFIS.zip.md5")))
-				.isEqualTo(filesController.getHash("Shared Data/Program Files/AFIS.zip"));
+				.isEqualTo(filesController.getHash("Shared Data/Program Files/AFIS.zip", null));
 
 		// das zippen ist nicht deterministisch und würde auf github dazu führen, dass der Test abbricht, obwohl er local funktioniert
 		// assertThat(readAllBytes(programFilesFolder.resolve("AFIS.zip.md5"))).isEqualTo("51a1713197b136586344905c9847daff".getBytes(StandardCharsets.UTF_8));
@@ -204,7 +202,7 @@ class FilesControllerTest extends BaseTest {
 		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 		filesController.createZip(Paths.get("Shared Data/Program Files/AFIS"));
 
-		assertThat(filesController.getFile("Shared Data/Program Files/AFIS.zip")).isEqualTo(filesController.getZip("Shared Data/Program Files/AFIS"));
+		assertThat(filesController.getFile("Shared Data/Program Files/AFIS.zip", null)).isEqualTo(filesController.getZip("Shared Data/Program Files/AFIS"));
 	}
 
 	// Hilfsmethode

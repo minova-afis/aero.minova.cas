@@ -32,9 +32,37 @@
     
     <build>
         <finalName>aero.minova.service.mcas</finalName>
-        
+
         <plugins>
-            <!-- Auto-create required directories for µCAS -->
+            <!-- Extract cas.app resources (setup/sql/tables) from dependency -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-cas-app-resources</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>aero.minova</groupId>
+                                    <artifactId>cas.app</artifactId>
+                                    <version>${project.parent.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/cas-app-extracted</outputDirectory>
+                                    <includes>setup/**,sql/**,tables/**</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Copy extracted cas.app resources to correct location -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -57,18 +85,43 @@
                                 <mkdir dir="${project.build.outputDirectory}/plugins"/>
                                 <mkdir dir="${project.build.outputDirectory}/reports"/>
                                 <mkdir dir="${project.build.outputDirectory}/setup"/>
-                                <!-- Copy our minimal Setup.xml -->
-                                <copy file="${basedir}/src/main/resources/setup/Setup.xml" 
-                                      todir="${project.build.outputDirectory}/setup"/>
                                 <mkdir dir="${project.build.outputDirectory}/sql"/>
                                 <mkdir dir="${project.build.outputDirectory}/tables"/>
-                                <echo message="µCAS directories created successfully"/>
+
+                                <!-- Copy cas.app Setup.xml to discoverable location -->
+                                <echo message="Copying cas.app resources (setup/sql/tables)..."/>
+                                <mkdir dir="${project.build.outputDirectory}/setup/cas.app"/>
+                                <copy file="${project.build.directory}/cas-app-extracted/setup/Setup.xml"
+                                      todir="${project.build.outputDirectory}/setup/cas.app"
+                                      failonerror="true"/>
+
+                                <!-- Copy all SQL scripts from cas.app -->
+                                <copy todir="${project.build.outputDirectory}/sql" failonerror="true">
+                                    <fileset dir="${project.build.directory}/cas-app-extracted/sql">
+                                        <include name="**/*.sql"/>
+                                    </fileset>
+                                </copy>
+
+                                <!-- Copy all table definitions from cas.app -->
+                                <copy todir="${project.build.outputDirectory}/tables" failonerror="true">
+                                    <fileset dir="${project.build.directory}/cas-app-extracted/tables">
+                                        <include name="**/*.xml"/>
+                                        <include name="**/*.xsd"/>
+                                    </fileset>
+                                </copy>
+
+                                <!-- Copy MCAS's own Setup.xml (references cas.app as dependency) -->
+                                <copy file="${basedir}/src/main/resources/setup/Setup.xml"
+                                      todir="${project.build.outputDirectory}/setup"
+                                      failonerror="true"/>
+
+                                <echo message="µCAS directories and cas.app resources prepared successfully"/>
                             </target>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- The resource plugin from parent will handle resource generation after copying -->
             
             <!-- Override Spring Boot plugin to include database file access libs -->

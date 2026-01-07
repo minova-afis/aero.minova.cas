@@ -17,11 +17,50 @@
 
 ## Key Features
 
+- **Automatic Database Setup** ⭐ NEW: Zero-touch database initialization on first boot
 - **NextGen Database File Access**: Resources loaded from database instead of file system
 - **Fat-JAR Ready**: Single executable JAR with all dependencies included
-- **Container Native**: Optimized for Docker and Kubernetes deployments  
+- **Container Native**: Optimized for Docker and Kubernetes deployments
 - **Database Agnostic**: Supports SQL Server, PostgreSQL, MySQL, H2
 - **Backward Compatible**: Compatible with existing CAS workflows and APIs
+
+### Automatic Setup (New in 13.7.0)
+
+µCAS now features **automatic database setup** that eliminates manual configuration steps:
+
+**Traditional CAS workflow:**
+```bash
+1. Deploy CAS
+2. Navigate to http://localhost:8084/cas
+3. Login with admin credentials
+4. Click "Setup" button
+5. Wait for setup to complete
+6. Configure database authentication
+```
+
+**µCAS auto-setup workflow:**
+```bash
+1. Deploy MCAS with database connection
+2. Done! ✅ (Setup runs automatically on first boot)
+```
+
+**How it works:**
+- On first boot, µCAS detects if database tables exist
+- If not, it automatically runs the setup procedure
+- Creates all required tables, views, and stored procedures
+- Sets up admin user and default privileges
+- Ready to use immediately
+
+**Configuration:**
+```properties
+# Enable auto-setup (default: true for µCAS)
+ng.api.autosetup=true
+
+# Force setup on every boot (useful for dev/testing)
+ng.api.autosetup.force=false
+```
+
+**Note:** Auto-setup requires `login_dataSource=admin` on first boot. After setup completes, you can switch to `database` or `ldap` authentication.
 
 ## Release Artifacts
 

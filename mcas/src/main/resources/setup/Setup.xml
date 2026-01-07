@@ -19,7 +19,7 @@
 				<entry key="ng.api.dbfiles" value="true"/>
 				<entry key="ng.api.dbregistry" value="true"/>
 				<entry key="ng.api.mdimix" value="true"/>
-				
+				<entry key="ng.api.autosetup" value="true"/>
 
 				<entry key="fat.jar.mode" value="true"/>
 				
@@ -29,8 +29,10 @@
 				<!-- #### Database Configuration (REQUIRED - Override in deployment) #### -->
 				<entry key="spring.datasource.driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
 				<entry key="spring.datasource.url" value="jdbc:sqlserver://localhost:1433;databaseName=SKYMUC;encrypt=true;trustServerCertificate=true"/>
+				<!-- UserName/Pass can either be defined in the URL or as separate settings - but _not_ at the same time  
 				<entry key="spring.datasource.username" value="sa"/>
 				<entry key="spring.datasource.password" value="Minova+0"/>
+				 -->
 				
 				<!-- #### JPA/Hibernate Settings (Required for CAS) #### -->
 				<entry key="spring.jpa.hibernate.ddl-auto" value="update"/>
@@ -41,6 +43,8 @@
 				<entry key="spring.http.converters.preferred-json-mapper" value="gson"/>
 				
 				<!-- #### Authentication Method #### -->
+				<!-- IMPORTANT: admin auth required for auto-setup (setup creates database tables)
+				     After first boot with auto-setup, you can switch to 'database' -->
 				<entry key="login_dataSource" value="admin"/>
 				
 				<!-- #### Server Configuration #### -->

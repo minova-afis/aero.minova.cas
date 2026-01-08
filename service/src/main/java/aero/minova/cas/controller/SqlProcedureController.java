@@ -15,6 +15,7 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.service.BaseService;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
@@ -37,7 +39,7 @@ import lombok.Setter;
 
 @RestController
 public class SqlProcedureController {
-
+	private static final String USER_CAS_SETUP = "CAS_AUTOSETUP";
 	@Autowired
 	CustomLogger customLogger;
 
@@ -49,6 +51,9 @@ public class SqlProcedureController {
 
 	@Autowired
 	public SystemDatabase database;
+
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
 	@Setter
 	QueueService queueService;
@@ -131,6 +136,7 @@ public class SqlProcedureController {
 
 	/**
 	 * Erstellt eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden. Wird nach dem erfolgreichen Setup ausgeführt.
+	 * Creates admin UserGroup, admin User, and grants all privileges to the admin group.
 	 */
 	public void setupPrivileges() {
 		try {
@@ -149,9 +155,14 @@ public class SqlProcedureController {
 				try (final var call = connection.createStatement()) {
 					call.execute("set ANSI_WARNINGS off");
 				}
-				procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
-				try (final var call = connection.createStatement()) {
-					call.execute("set ANSI_WARNINGS on");
+
+				// Create admin UserGroup with all privileges
+				try {
+					procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
+				} finally {
+					try (final var call = connection.createStatement()) {
+						call.execute("set ANSI_WARNINGS on");
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -159,6 +170,91 @@ public class SqlProcedureController {
 			throw new RuntimeException(e);
 		}
 
+	}
+	
+	/**
+	 *  Creates a default admin user for initial login after auto-setup.
+	 * This eliminates the need for manual user creation or login_dataSource=admin workaround.
+	 */
+	public void setupDefaultAdminUser() {
+		customLogger.logSetup("Check default admin user...");
+	
+		try {
+			try (final var connection = database.getConnection()) {
+				try (final var call = connection.createStatement()) {
+					call.execute("set ANSI_WARNINGS off");
+				}
+				try {
+					// Create default admin user for initial login (idempotent - only if not exists)
+					customLogger.logSetup("About to call setupDefaultAdminUser(connection)...");
+					setupDefaultAdminUser(connection);
+					customLogger.logSetup("setupDefaultAdminUser(connection) returned successfully");
+				} finally {
+					try (final var call = connection.createStatement()) {
+						call.execute("set ANSI_WARNINGS on");
+					}
+				}
+			}
+		} catch (Exception e) {
+			customLogger.logError("Error while trying to setup default admin user!", e);
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	/**
+	 * Creates a default admin user for initial login after auto-setup.
+	 * This eliminates the need for manual user creation or login_dataSource=admin workaround.
+	 *
+	 * User: admin
+	 * Password: rqgzxTf71EAx8chvchMi (same as in-memory admin)
+	 * Authority: admin
+	 *
+	 * Admin should change this password after first login.
+	 */
+	private void setupDefaultAdminUser(Connection connection) throws SQLException {
+		// Check if admin user already exists (idempotent)
+		String checkUserSql = "SELECT COUNT(*) FROM dbo.xtcasUsers WHERE Username = 'admin'";
+		try (var stmt = connection.createStatement(); var rs = stmt.executeQuery(checkUserSql)) {
+			if (rs.next() && rs.getInt(1) > 0) {
+				customLogger.logSetup("Admin user already exists - skipping creation");
+				return;
+			}
+		}
+
+		// Password is same as in SecurityConfig for in-memory admin
+		String defaultPassword = "rqgzxTf71EAx8chvchMi";
+		String hashedPassword = passwordEncoder.encode(defaultPassword);
+
+		// Insert admin user into xtcasUsers
+		String insertUserSql = "INSERT INTO dbo.xtcasUsers (KeyText, Username, Password, Description, LastDate, LastAction, LastUser) " +
+				"VALUES ('admin', 'admin', ?, 'Default admin user - change password after first login', GETDATE(), 1, '"+USER_CAS_SETUP+"')";
+		try (var stmt = connection.prepareStatement(insertUserSql)) {
+			stmt.setString(1, hashedPassword);
+			stmt.executeUpdate();
+			customLogger.logSetup("Created default admin user - Username: admin, Password: [CAS DEFAULT]");
+		}
+		
+		checkUserSql = "SELECT COUNT(*) FROM dbo.xtcasAuthorities WHERE Username = 'admin'";
+		try (var stmt = connection.createStatement(); var rs = stmt.executeQuery(checkUserSql)) {
+			if (rs.next() && rs.getInt(1) > 0) {
+				customLogger.logSetup("Admin authority already exists - skipping creation");
+				return;
+			}
+		}
+
+		// Insert admin authority into xtcasAuthorities
+		String insertAuthoritySql = "INSERT INTO dbo.xtcasAuthorities (KeyText, Username, Authority, LastDate, LastAction, LastUser) " +
+				"VALUES ('admin', 'admin', 'admin', GETDATE(), 1, '"+USER_CAS_SETUP+"')";
+		try (var stmt = connection.createStatement()) {
+			stmt.executeUpdate(insertAuthoritySql);
+			customLogger.logSetup("Granted admin authority to default admin user");
+		}
+
+		// Commit the transaction since auto-commit is disabled
+		connection.commit();
+		
+		customLogger.logSetup("IMPORTANT: Default admin user created. Please change password after first login!");
 	}
 
 	/**
@@ -248,6 +344,16 @@ public class SqlProcedureController {
 	 */
 	private List<Row> checkForPrivilegeAndBootstrapExtension(Table inputTable) throws Exception, ProcedureException {
 		final List<Row> privilegeRequest = new ArrayList<>();
+
+		// Allow auto-setup to bypass privilege checks entirely
+		// CAS_AUTOSETUP is a temporary security context created during automatic database initialization
+		String currentUser = BaseService.getCurrentUser();
+		if (USER_CAS_SETUP.equals(currentUser)) {
+			// Auto-setup has implicit admin privileges - no database checks needed
+			// Return empty privilege list which grants unrestricted access
+			return privilegeRequest;
+		}
+
 		if (securityService.arePrivilegeStoresSetup()) {
 			privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
 			if (privilegeRequest.isEmpty()) {

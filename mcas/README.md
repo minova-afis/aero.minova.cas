@@ -1,5 +1,8 @@
 # µCAS - Micro Core Application System
 
+> [!NOTE]
+> AFIS µCAS Testsystem. Navigate to https://ng-dev.minova.com, type URL=https://saas-app-dev.minova.com/minova/ng-minova-mcas/cas als URL, User=admin und Pass=[CAS-Pass] (see KeePass)
+
 µCAS (Micro CAS) is a standalone, lightweight version of the Minova Core Application System (CAS) that operates autonomously without requiring customer-specific configuration files or infrastructure. Besides that µCAS offers *file*, *shared-file*, *registry* and *translation* REST endpoints that can be accessed by other services -- [more details](https://github.com/minova-afis/ch.minova.foundation.rest.db).
 
 ## What Makes µCAS Different

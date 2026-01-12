@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,9 +69,7 @@ public class SetupService {
 				// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.
 				// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
 				try (final var connection = database.getConnection()) {
-					try (final var call = connection.createStatement()) {
-						call.execute("set ANSI_WARNINGS off");
-					}
+					setAnsiWarnings(connection, false);
 					readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
 							, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
 							, service.getSystemFolder().resolve("setup")//
@@ -80,9 +79,7 @@ public class SetupService {
 
 					// Diese Methode darf erst ganz zum Schluss ausgeführt werden, damit sichergestellt werden kann, dass der Admin tatsächlich ALLE Rechte bekommt.
 					spc.setupPrivileges();
-					try (final var call = connection.createStatement()) {
-						call.execute("set ANSI_WARNINGS on");
-					}
+					setAnsiWarnings(connection, true);
 				}
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
@@ -90,6 +87,23 @@ public class SetupService {
 			}
 		});
 		spc.registerExtensionBootstrapCheck(PROCEDURE_NAME, inputTable -> true);
+	}
+
+	/**
+	 * Sets ANSI_WARNINGS on or off for the connection.
+	 * ANSI_WARNINGS OFF ignores warnings for data truncation and allows longer SQL usernames.
+	 *
+	 * @param connection The database connection
+	 * @param enabled true to enable ANSI_WARNINGS, false to disable
+	 */
+	private void setAnsiWarnings(Connection connection, boolean enabled) {
+		String sql = enabled ? "set ANSI_WARNINGS on" : "set ANSI_WARNINGS off";
+		try (var statement = connection.createStatement()) {
+			statement.execute(sql);
+		} catch (Exception e) {
+			logger.logError("Failed to set ANSI_WARNINGS to " + enabled, e);
+			throw new RuntimeException("Failed to set ANSI_WARNINGS", e);
+		}
 	}
 
 	/**
@@ -212,7 +226,9 @@ public class SetupService {
 
 					logger.logSetup("Executing Script " + procedureName);
 					try {
-						connection.prepareCall(procedure).execute();
+						try (var stmt = connection.prepareCall(procedure)) {
+							stmt.execute();
+						}
 						connection.commit();
 					} catch (Exception e) {
 						logger.logSetup("Script " + procedureName + " is being executed.");
@@ -222,7 +238,9 @@ public class SetupService {
 							procedure = "create" + procedure;
 						}
 
-						connection.prepareCall(procedure).execute();
+						try (var stmt = connection.prepareCall(procedure)) {
+							stmt.execute();
+						}
 						connection.commit();
 					}
 				} catch (Exception e) {

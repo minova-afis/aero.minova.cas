@@ -54,10 +54,8 @@ public class JOOQViewService implements ViewServiceInterface {
 		}
 
 		String sqlString = query.getSQL();
-
 		// Die RowLevelSecurity muss schon als "ausgefüllter" String angehängt werden (keine "?"), da die Werte nicht in der Tabelle stehen
 		sqlString += SecurityService.rowLevelSecurity(condition.equals(DSL.noCondition()), authorities);
-
 		return sqlString;
 	}
 

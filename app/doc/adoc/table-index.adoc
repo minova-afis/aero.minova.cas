@@ -4,12 +4,7 @@
 
     
         
-* link:xtcasAuthorities.adoc[]
-
-    
-    
-        
-* link:xtcasCASServices.adoc[]
+* link:xtcasNewsfeedListener.adoc[]
 
     
     
@@ -19,12 +14,12 @@
     
     
         
-* link:xtcasError.adoc[]
+* link:xtcasCASServices.adoc[]
 
     
     
         
-* link:xtcasLuUserPrivilegeUserGroup.adoc[]
+* link:xtcasUsers.adoc[]
 
     
     
@@ -34,12 +29,7 @@
     
     
         
-* link:xtcasMdiType.adoc[]
-
-    
-    
-        
-* link:xtcasNewsfeedListener.adoc[]
+* link:xtcasLuUserPrivilegeUserGroup.adoc[]
 
     
     
@@ -49,17 +39,7 @@
     
     
         
-* link:xtcasServiceMessage.adoc[]
-
-    
-    
-        
-* link:xtcasServiceMessageReceiverLoginType.adoc[]
-
-    
-    
-        
-* link:xtcasServiceProperties.adoc[]
+* link:xtcasAuthorities.adoc[]
 
     
     
@@ -69,16 +49,36 @@
     
     
         
-* link:xtcasUserGroup.adoc[]
-
-    
-    
-        
 * link:xtcasUserPrivilege.adoc[]
 
     
     
         
-* link:xtcasUsers.adoc[]
+* link:xtcasUserGroup.adoc[]
+
+    
+    
+        
+* link:xtcasMdiType.adoc[]
+
+    
+    
+        
+* link:xtcasServiceMessage.adoc[]
+
+    
+    
+        
+* link:xtcasServiceProperties.adoc[]
+
+    
+    
+        
+* link:xtcasServiceMessageReceiverLoginType.adoc[]
+
+    
+    
+        
+* link:xtcasError.adoc[]
 
     

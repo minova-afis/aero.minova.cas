@@ -2,6 +2,7 @@ package aero.minova.cas.controller;
 
 import static java.nio.file.Files.readAllBytes;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
+import ch.minova.foundation.db.NextGen;
 import ch.minova.foundation.rest.db.service.FileService;
 import ch.minova.foundation.rest.db.service.RegistryService;
 import ch.minova.foundation.rest.db.service.TranslationService;
@@ -63,12 +65,17 @@ public class FilesController {
 
 	@Autowired
 	SqlProcedureController spc;
+	
 
 	@org.springframework.beans.factory.annotation.Value("${generate.mdi.per.user:true}")
 	boolean generateMDIPerUser;
 
 	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
 	boolean isFatJarMode;
+	
+	// Is set to false in MCAS mode, as the integrated (demo) XBS would lead to wrong application name detection
+	@org.springframework.beans.factory.annotation.Value("${readPackedXBS:true}")
+	boolean readPackedXBS;
 	
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
 	boolean isDBFilesActive;
@@ -209,6 +216,15 @@ public class FilesController {
 				return toRet;
 		}
 
+		return getIncludedFile(path);
+	}
+	
+	/** Get file included in this CAS installation -- either within the jar or on the file system
+	 * @param path
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] getIncludedFile(String path) throws Exception {
 		// Bei fatJarMode Dateien aus Resourcen
 		if (isFatJarMode) {
 			if (!path.startsWith("/")) {
@@ -473,25 +489,70 @@ public class FilesController {
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
 	
-	/** Generate XBS from tRegistry. Path may be a requested XBS file or a app short name (afis)
+	/**
+	 * Modern Minova Registry can be modified via:
+	 * - fully compliant Spring-tech: application.properties incl. profiles, System.env, System.properties
+	 * - ENV vars starting with REG_* prefix
+	 * - XBS files
+	 * - tREgistry table
+	 * 
+	 * Such that different sources are just different carriers of the Registry values
+	 * 
+	 * In common applications (services) Registry is created like this:
+	 * Map<String, String> registry =
+	 *    NextGen.Registry.create()
+	 *                    .withApplicationProperties()
+	 *                    .withEnv()
+	 *                    .withDB(null)
+	 *                    .get();
+	 *                    
+	 * ... CAS however is special, since the Registry it constructs here is not _for itself_ but rather
+	 *     for external application users. I.e. the application.properties of CAS are defining CAS' itself and not
+	 *     for example AFIS/SIS/... applications. Therefore in this function we are _not_ updating the actual
+	 *     App registry with CAS' application.properties.
+	 *     
+	 * Beginning with 2026 the requested XBS is constructed from
+	 * 1. Packaged XBS (if any)
+	 * 2. ENV vars (REG_* prefixed keys)
+	 * 3. tRegistry
+	 * 
 	 * @param path may be a requested XBS file or a app short name (afis)
 	 * @return
 	 * @throws RuntimeException
 	 */
 	private byte[] getXBSFromRegistry(String path) throws RuntimeException {
+		// tRegistry can contain branches for multiple applications (tta/*, afis/*, sis/*)
+		// In general the application is detected in the _packaged_ XBS (ApplicationID) -- which is not
+		// feasible with µCAS, as no application specific files are included (ony basic application.xbs with CAS specific code)
+		// Therefore
+		// - if specific XBS was requested (AFIS.xbs) => use the name as application name
+		// - if application.xbs is requested => use application
 		try {
-			// Generate 
-			byte[] toRet = registryService.getXBSCode(path);
-			if(toRet == null) {
+			byte[] xbs = null;
+			if(readPackedXBS) {
+				try {
+					xbs = getIncludedFile(path);
+					customLogger.logFiles("Internal XBS found for " + path + " -> update with ENV and tRegistry");
+				} catch(Exception ex) {
+					customLogger.logFiles("No internal XBS found for " + path + " -> construct new with ENV and tRegistry");
+				}
+			}
+			
+			
+			// Build-up registry
+			NextGen.Registry reg = NextGen.Registry.create()
+							.tryWithXBS(xbs == null ? null : new ByteArrayInputStream(xbs))
+			                .withEnv()
+			                .with(registryService::loadInto); // We use JPA registry connector instead of the built-in MSSQL (.withDB);
+			
+			if(reg.get().isEmpty()) {
 				String appPrefix = RegistryService.autoCorrectAppPrefix(path);
 				//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
-				throw new RuntimeException("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
-			} else {
-				return toRet;
+				throw new RuntimeException("Failed to generate XBS -- no values found in ENV or tRegistry" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
 			}
+			return reg.getXBS();
 		} catch (Exception e) {
-//			customLogger.logError("Failed to generate XBS from tRegistry.", e);
-			throw new RuntimeException("Failed to generate XBS from tRegistry.", e);
+			throw new RuntimeException("Failed to generate XBS", e);
 		}
 	}
 

@@ -215,8 +215,19 @@ public class FilesController {
 			if(toRet != null)
 				return toRet;
 		}
-
-		return getIncludedFile(path);
+		
+		// Even without tRegistry we want to have the ability to change XBS entries with System.env and System.properties
+		byte[] toRet = getIncludedFile(path);
+		if(path.toLowerCase().endsWith(".xbs") && toRet != null) try {
+			toRet = NextGen.Registry.create()
+					                .withXBS(new ByteArrayInputStream(toRet))
+					                .withEnv()
+					                .getXBS();
+		} catch(Exception ex) {
+			customLogger.logError("Failed to auto-update XBS with ENV", ex);
+		}
+		
+		return toRet;
 	}
 	
 	/** Get file included in this CAS installation -- either within the jar or on the file system

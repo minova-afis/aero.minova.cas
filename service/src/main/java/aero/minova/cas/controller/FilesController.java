@@ -2,6 +2,8 @@ package aero.minova.cas.controller;
 
 import static java.nio.file.Files.readAllBytes;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -9,10 +11,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +38,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
+import ch.minova.foundation.db.NextGen;
+import ch.minova.foundation.rest.db.service.FileService;
+import ch.minova.foundation.rest.db.service.RegistryService;
+import ch.minova.foundation.rest.db.service.TranslationService;
 import lombok.val;
 
 @RestController
 // benötigt, damit JUnit-Tests nicht abbrechen
 @ConditionalOnProperty(prefix = "application.runner", value = "enabled", havingValue = "true", matchIfMissing = true)
 public class FilesController {
-
+	@Autowired
+	FileService dbFileService;
+	
+	@Autowired
+	RegistryService registryService;
+	
+	@Autowired
+	TranslationService translationService;
+	
 	@Autowired
 	FilesService fileService;
 
@@ -46,9 +65,26 @@ public class FilesController {
 
 	@Autowired
 	SqlProcedureController spc;
+	
 
 	@org.springframework.beans.factory.annotation.Value("${generate.mdi.per.user:true}")
 	boolean generateMDIPerUser;
+
+	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
+	boolean isFatJarMode;
+	
+	// Is set to false in MCAS mode, as the integrated (demo) XBS would lead to wrong application name detection
+	@org.springframework.beans.factory.annotation.Value("${readPackedXBS:true}")
+	boolean readPackedXBS;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
+	boolean isDBFilesActive;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:false}")
+	boolean isDBRegistryActive;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
+	boolean isDBFilesPreferred;
 
 	// TODO Extension vorerst entfernt, aber für später aufheben
 	// TODO Bytes in JSON durch BASE64 darstellen
@@ -131,6 +167,7 @@ public class FilesController {
 //		return fileBytesTable;
 //	}
 
+	
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
@@ -143,11 +180,24 @@ public class FilesController {
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
-		path = path.replace('\\', '/');
+	public @ResponseBody byte[] getFile(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
+		// Should we generate XBS from tRegistry?
+		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
+			return getXBSFromRegistry(path);
+		}
 
+		// Are Files from DB preferered compared to File System?
+		if (isDBFilesActive && isDBFilesPreferred) {
+ 			byte[] toRet = dbFileService.getFile(path);
+ 			// Try to translate if XML or MDI -- if no language is given, no translation will be done
+ 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+ 				toRet = translationService.translateXML(path, toRet, lang);
+			if(toRet != null)
+				return toRet;
+		}
+		
+		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
 		if (generateMDIPerUser && path.contains("application.mdi")) {
-
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
 				return fileService.readMDI();
@@ -155,6 +205,50 @@ public class FilesController {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
 		}
+		
+		// Are Files from DB active but not preferred compared to File System?
+		if(isDBFilesActive && !isDBFilesPreferred) {
+			byte[] toRet = dbFileService.getFile(path);
+			// Try to translate if XML or MDI -- if no language is given, no translation will be done
+ 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+ 				toRet = translationService.translateXML(path, toRet, lang);
+			if(toRet != null)
+				return toRet;
+		}
+		
+		// Even without tRegistry we want to have the ability to change XBS entries with System.env and System.properties
+		byte[] toRet = getIncludedFile(path);
+		if(path.toLowerCase().endsWith(".xbs") && toRet != null) try {
+			toRet = NextGen.Registry.create()
+					                .withXBS(new ByteArrayInputStream(toRet))
+					                .withEnv()
+					                .getXBS();
+		} catch(Exception ex) {
+			customLogger.logError("Failed to auto-update XBS with ENV", ex);
+		}
+		
+		return toRet;
+	}
+	
+	/** Get file included in this CAS installation -- either within the jar or on the file system
+	 * @param path
+	 * @return
+	 * @throws Exception
+	 */
+	private byte[] getIncludedFile(String path) throws Exception {
+		// Bei fatJarMode Dateien aus Resourcen
+		if (isFatJarMode) {
+			if (!path.startsWith("/")) {
+				path = "/" + path;
+			}
+			if (path.endsWith(".zip")) {
+				return getZip(path.substring(0, path.length() - 4));
+			}
+			return getClass().getResourceAsStream(path).readAllBytes();
+		}
+
+		// Ansonsten Dateisystem nutzen
+		path = path.replace('\\', '/');
 
 		String extension = FilenameUtils.getExtension(path);
 		// Zur Abwärtskompatibilität Dateiendung überprüfen und, falls diese Zip ist, getZip aufrufen.
@@ -177,7 +271,72 @@ public class FilesController {
 	 *             diesem Namen in dem gewünschten Pfad gibt.
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+	public @ResponseBody byte[] getHash(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
+		// Should we generate XBS from tRegistry?
+		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
+			 byte[] xbsCode = getXBSFromRegistry(path);
+			 return MessageDigest.getInstance("MD5").digest(xbsCode);
+		}
+		
+		// Try tFiles first
+		if (isDBFilesActive && isDBFilesPreferred) {
+			// Translated files have different contents based on language
+ 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+ 				byte[] content = dbFileService.getFile(path);
+ 				content = translationService.translateXML(path, content, lang);
+ 				if(content != null)
+ 					return MessageDigest.getInstance("MD5").digest(content);
+ 			}
+			byte[] toRet = dbFileService.getMD5(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
+		if (generateMDIPerUser && path.contains("application.mdi")) {
+			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
+			try {
+				byte[] mdi =  fileService.readMDI();
+				return (mdi == null ? null : MessageDigest.getInstance("MD5").digest(mdi));
+			} catch (Exception e) {
+				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
+			}
+		}
+		
+		// Are Files from DB active but not preferred compared to File System?
+		if(isDBFilesActive && !isDBFilesPreferred) {
+			// Translated files have different contents based on language
+ 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+ 				byte[] content = dbFileService.getFile(path);
+ 				content = translationService.translateXML(path, content, lang);
+ 				if(content != null)
+ 					return MessageDigest.getInstance("MD5").digest(content);
+ 			}
+			
+			byte[] toRet = dbFileService.getMD5(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
+		if (isFatJarMode) {
+			if (!path.startsWith("/")) {
+				path = "/" + path;
+			}
+			final byte[] pathContent;
+			if (path.endsWith(".zip")) {
+				pathContent = getZip(path);
+			} else {
+				pathContent = getFile(path, lang);
+			}
+			MessageDigest md;
+			try {
+				md = MessageDigest.getInstance("MD5");
+			} catch (NoSuchAlgorithmException e) {
+				throw new RuntimeException("msg.MD5Error");
+			}
+			md.update(pathContent);
+			String fx = "%0" + (md.getDigestLength() * 2) + "x";
+			return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
+		}
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/hash: " + path);
 		// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im MD5 Ordner nachgestellt.
@@ -199,6 +358,70 @@ public class FilesController {
 
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
+		// Try tFiles first
+		if(isDBFilesActive) {
+			byte[] toRet = dbFileService.getFile(path);
+			if(toRet != null)
+				return toRet;
+		}
+		
+		if (isFatJarMode) {
+			final var pathStr = path.toString();
+			if (!path.startsWith("/")) {
+				path = "/" + path;
+			}
+			final List<String> matchingResources = new ArrayList<>();
+			final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resources.txt").readAllBytes());
+			for (final var resourceListPath : deployedResources.split("\n")) {
+				if (resourceListPath.isBlank()) {
+					continue;
+				}
+				final var resourceList = new String(getClass().getResourceAsStream(resourceListPath).readAllBytes());
+				for (final var resource : resourceList.split("\n")) {
+					if (resource.isBlank()) {
+						continue;
+					}
+					if (resource.startsWith(pathStr) && !matchingResources.contains(resource)) {
+						matchingResources.add(resource);
+					}
+				}
+			}
+			String resourcePathLog = null;
+			ZipEntry ze = null;
+			ByteArrayOutputStream fos = new ByteArrayOutputStream();
+			try (ZipOutputStream zos = new ZipOutputStream(fos);) {
+
+				for (String resourcePath : matchingResources) {
+					resourcePathLog = resourcePath;
+					if (isFileResource(resourcePath)) {
+						ze = new ZipEntry(resourcePath.substring(1));
+
+						// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen
+						// Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,
+						// wenn die Zip erstellt wird.
+						ze.setCreationTime(FileTime.from(Instant.EPOCH));
+						ze.setTime(0);
+						zos.putNextEntry(ze);
+
+						final var resourceContent = getClass().getResourceAsStream(resourcePath).readAllBytes();
+						zos.write(resourceContent, 0, resourceContent.length);
+						zos.closeEntry();
+					}
+				}
+			} catch (Exception e) {
+				if (ze != null) {
+					customLogger.logFiles("Error while zipping file " + ze.getName());
+					throw new RuntimeException("msg.ZipError %" + ze.getName());
+				} else {
+					// Landet nur hier, wenn es nicht mal bis in das erste if geschafft hat.
+					customLogger.logFiles("Error while accessing file path for file to zip.");
+					throw new RuntimeException("Error while accessing file path " + resourcePathLog + " for file to zip.", e);
+				}
+			} finally {
+				fos.close();
+			}
+			return fos.toByteArray();
+		}
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/zip: " + path);
 		String toBeResolved = path;
@@ -224,6 +447,10 @@ public class FilesController {
 	@RequestMapping(value = "upload/logs", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	@ResponseStatus(value = HttpStatus.OK)
 	public @ResponseBody void getLogs(@RequestBody byte[] log) throws IOException {
+		if (isFatJarMode) {
+			customLogger.logUserRequest("Ignoring `upload/logs` because the fat jar mode is active and therefore not file system access is used.");
+			return;
+		}
 		// Doppelpunkte müssen raus, da Sonderzeichen im Filenamen nicht erlaubt sind
 		String logFolderName = ("Log-" + LocalDateTime.now()).replace(":", "-");
 		File logFileFolder = fileService.getLogsFolder().resolve(logFolderName).toFile();
@@ -272,6 +499,73 @@ public class FilesController {
 
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
+	
+	/**
+	 * Modern Minova Registry can be modified via:
+	 * - fully compliant Spring-tech: application.properties incl. profiles, System.env, System.properties
+	 * - ENV vars starting with REG_* prefix
+	 * - XBS files
+	 * - tREgistry table
+	 * 
+	 * Such that different sources are just different carriers of the Registry values
+	 * 
+	 * In common applications (services) Registry is created like this:
+	 * Map<String, String> registry =
+	 *    NextGen.Registry.create()
+	 *                    .withApplicationProperties()
+	 *                    .withEnv()
+	 *                    .withDB(null)
+	 *                    .get();
+	 *                    
+	 * ... CAS however is special, since the Registry it constructs here is not _for itself_ but rather
+	 *     for external application users. I.e. the application.properties of CAS are defining CAS' itself and not
+	 *     for example AFIS/SIS/... applications. Therefore in this function we are _not_ updating the actual
+	 *     App registry with CAS' application.properties.
+	 *     
+	 * Beginning with 2026 the requested XBS is constructed from
+	 * 1. Packaged XBS (if any)
+	 * 2. ENV vars (REG_* prefixed keys)
+	 * 3. tRegistry
+	 * 
+	 * @param path may be a requested XBS file or a app short name (afis)
+	 * @return
+	 * @throws RuntimeException
+	 */
+	private byte[] getXBSFromRegistry(String path) throws RuntimeException {
+		// tRegistry can contain branches for multiple applications (tta/*, afis/*, sis/*)
+		// In general the application is detected in the _packaged_ XBS (ApplicationID) -- which is not
+		// feasible with µCAS, as no application specific files are included (ony basic application.xbs with CAS specific code)
+		// Therefore
+		// - if specific XBS was requested (AFIS.xbs) => use the name as application name
+		// - if application.xbs is requested => use application
+		try {
+			byte[] xbs = null;
+			if(readPackedXBS) {
+				try {
+					xbs = getIncludedFile(path);
+					customLogger.logFiles("Internal XBS found for " + path + " -> update with ENV and tRegistry");
+				} catch(Exception ex) {
+					customLogger.logFiles("No internal XBS found for " + path + " -> construct new with ENV and tRegistry");
+				}
+			}
+			
+			
+			// Build-up registry
+			NextGen.Registry reg = NextGen.Registry.create()
+							.tryWithXBS(xbs == null ? null : new ByteArrayInputStream(xbs))
+			                .withEnv()
+			                .with(registryService::loadInto); // We use JPA registry connector instead of the built-in MSSQL (.withDB);
+			
+			if(reg.get().isEmpty()) {
+				String appPrefix = RegistryService.autoCorrectAppPrefix(path);
+				//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+				throw new RuntimeException("Failed to generate XBS -- no values found in ENV or tRegistry" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+			}
+			return reg.getXBS();
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to generate XBS", e);
+		}
+	}
 
 	/**
 	 * Hashed beim Starten des CAS alle Dateien und speichert deren MD5-Dateien im Internal/MD5-Ordner.
@@ -284,6 +578,10 @@ public class FilesController {
 	@Order(2)
 	@RequestMapping(value = "files/hashAll")
 	public void hashAll() throws Exception {
+		if (isFatJarMode) {
+			// In diesem Modus werden die Zips bei jeder Anfrage on the fly neu generiert.
+			return;
+		}
 		List<Path> programFiles = fileService.populateFilesList(fileService.getSystemFolder());
 		for (Path path : programFiles) {
 			// Mit dieser If-Abfrage wird verhindert, dass es .md5-Dateiketten gibt
@@ -309,6 +607,10 @@ public class FilesController {
 	@Order(1)
 	@RequestMapping(value = "files/zipAll")
 	public void zipAll() throws Exception {
+		if (isFatJarMode) {
+			// In diesem Modus werden die Zips bei jeder Anfrage on the fly neu generiert.
+			return;
+		}
 		List<Path> programFiles = fileService.populateFilesList(fileService.getSystemFolder());
 		for (Path path : programFiles) {
 			if (path.startsWith(fileService.getZipsFolder().getParent().toString())) {
@@ -316,18 +618,22 @@ public class FilesController {
 			}
 
 			// XXX String fileSuffix = path.toString().substring(path.toString().lastIndexOf(".") + 1 );
-			String fileSuffix = FilenameUtils.getExtension( path.toString() );
+			String fileSuffix = FilenameUtils.getExtension(path.toString());
 			// es kann sein, dass von einem vorherigen Start bereits gezippte Dateien vorhanden sind, welche schon gehashed wurden
 			if (fileSuffix.equalsIgnoreCase("md5")) {
 				String filePrefix = path.toString().substring(0, path.toString().lastIndexOf("."));
 				// XXX fileSuffix = path.toString().substring(filePrefix.lastIndexOf(".") + 1 );
-				fileSuffix = FilenameUtils.getExtension( path.toString() );
+				fileSuffix = FilenameUtils.getExtension(path.toString());
 			}
 			// wir wollen nicht noch einen zip von einer zip Datei, wir wollen allerdings hier NUR Directories haben
 			if ((!fileSuffix.toLowerCase().contains("zip")) && (path.toFile().isDirectory())) {
 				createZip(fileService.getSystemFolder().toAbsolutePath().relativize(path.toAbsolutePath()));
 			}
 		}
+	}
+
+	private boolean isFileResource(String resourcePath) {
+		return !resourcePath.endsWith("/");
 	}
 
 	/**
@@ -343,7 +649,10 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/createZip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public void createZip(@RequestParam Path path) throws Exception {
-
+		if (isFatJarMode) {
+			// In diesem Modus werden die Zips bei jeder Anfrage on the fly neu generiert.
+			return;
+		}
 		List<Path> fileList = fileService.populateFilesList(fileService.getSystemFolder().resolve(path));
 
 		// Path für die neue ZIP-Datei zusammenbauen
@@ -363,5 +672,4 @@ public class FilesController {
 		customLogger.logFiles("Zipping: " + zipFile);
 		fileService.zip(fileService.getSystemFolder().toString(), zipFile, fileList);
 	}
-
 }

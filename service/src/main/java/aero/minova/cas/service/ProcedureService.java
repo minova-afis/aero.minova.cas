@@ -94,6 +94,21 @@ public class ProcedureService {
 	}
 
 	/**
+	 * Sets ANSI_WARNINGS on or off for the connection.
+	 * ANSI_WARNINGS OFF ignores warnings for data truncation and allows longer SQL usernames.
+	 *
+	 * @param connection The database connection
+	 * @param enabled true to enable ANSI_WARNINGS, false to disable
+	 * @throws SQLException if statement execution fails
+	 */
+	private void setAnsiWarnings(Connection connection, boolean enabled) throws SQLException {
+		String sql = enabled ? "set ANSI_WARNINGS on" : "set ANSI_WARNINGS off";
+		try (var statement = connection.createStatement()) {
+			statement.execute(sql);
+		}
+	}
+
+	/**
 	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
 	 * zurückgegeben.
 	 *
@@ -128,26 +143,29 @@ public class ProcedureService {
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest, boolean isSetup) throws Exception {
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
-		Connection connection = null;
 
-		try {
-			connection = systemDatabase.getConnection();
-			if (isSetup) {
-				try (final var call = connection.createStatement()) {
-					call.execute("set ANSI_WARNINGS off");
+		try (Connection connection = systemDatabase.getConnection()) {
+			try {
+				if (isSetup) {
+					setAnsiWarnings(connection, false);
 				}
+				result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
+				connection.commit();
+				customLogger.logSql("Procedure successfully executed: " + sb);
+				if (isSetup) {
+					setAnsiWarnings(connection, true);
+				}
+			} catch (Exception e) {
+				// Explicit rollback: connection held during complex multi-step logic in calculateSqlProcedureResult().
+				// Immediately release database locks and log rollback explicitly for clarity.
+				try {
+					connection.rollback();
+					customLogger.logError("Procedure rolled back due to error: " + sb, e);
+				} catch (SQLException rollbackEx) {
+					customLogger.logError("Rollback failed after procedure error", rollbackEx);
+				}
+				throw new ProcedureException(e);
 			}
-			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
-			connection.commit();
-			customLogger.logSql("Procedure successfully executed: " + sb);
-			if (isSetup) {
-				connection.createStatement().execute("set ANSI_WARNINGS on");
-			}
-		} catch (Exception e) {
-			customLogger.logError("Procedure could not be executed: " + sb, e);
-			throw new ProcedureException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}

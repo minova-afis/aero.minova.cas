@@ -37,6 +37,23 @@ public class InstallToolIntegration {
 	boolean isFatJarMode;
 
 	/**
+	 * Sets ANSI_WARNINGS on or off for the connection.
+	 * ANSI_WARNINGS OFF ignores warnings for data truncation and allows longer SQL usernames.
+	 *
+	 * @param connection The database connection
+	 * @param enabled true to enable ANSI_WARNINGS, false to disable
+	 */
+	private void setAnsiWarnings(Connection connection, boolean enabled) {
+		String sql = enabled ? "set ANSI_WARNINGS on" : "set ANSI_WARNINGS off";
+		try (var statement = connection.createStatement()) {
+			statement.execute(sql);
+		} catch (Exception e) {
+			logger.logError("Failed to set ANSI_WARNINGS to " + enabled, e);
+			throw new RuntimeException("Failed to set ANSI_WARNINGS", e);
+		}
+	}
+
+	/**
 	 * Installiert eine gegebene "Setup.xml" mit dem Install-Tool. Es wird der Code möglichst so ausgeführt, als würde man das Tool mit update schema (us),
 	 * update database (ud) und module only (mo). Es wird also nur die SQL-Datenbank der "Setup.xml" installiert und die Abhängkeiten ignoriert.
 	 *
@@ -44,8 +61,7 @@ public class InstallToolIntegration {
 	 *            Die "Setup.xml" welche installiert wird.
 	 */
 	public void installSetup(Path setupXml) {
-		final Connection connection = systemDatabase.getConnection();
-		try {
+		try (final Connection connection = systemDatabase.getConnection()) {
 			connection.setAutoCommit(true);
 			BaseSetup.parameter = System.getProperties();
 			if (!BaseSetup.parameter.containsKey("fs")) {
@@ -66,9 +82,9 @@ public class InstallToolIntegration {
 			setup.readSchema();
 			// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.
 			// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
-			connection.createStatement().execute("set ANSI_WARNINGS off");
-			try (final ResultSet rs = connection.createStatement()
-					.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'")) {
+			setAnsiWarnings(connection, false);
+			try (var stmt = connection.createStatement();
+				 final ResultSet rs = stmt.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'")) {
 				rs.next();
 				final Optional<Path> tableLibrary = Optional.of(files.getSystemFolder().resolve("tables"));
 				final Optional<Path> sqlLibrary = Optional.of(files.getSystemFolder().resolve("sql"));
@@ -83,12 +99,10 @@ public class InstallToolIntegration {
 				}
 				setup.handleSqlScripts(connection, sqlLibrary);
 			}
-			connection.createStatement().execute("set ANSI_WARNINGS on");
+			setAnsiWarnings(connection, true);
 			connection.commit();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 	}
 }

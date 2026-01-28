@@ -31,6 +31,7 @@ public class HubController {
 		
 		try {
 			customLogger.logInfo("Connect to Hub " + hubHost + " as " + clientName + "...");
+			ch.minova.assist.data.Environment.get().settings.setSaveAllowed(false); // never save Assist.ini
 			ch.minova.assist.data.Environment.get().setInstanceName(clientName);
 			HubClient hc = ch.minova.assist.data.Environment.get().getDeployment().getHubClient();
 			if(hubHost.contains(":")) {

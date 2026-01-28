@@ -1,251 +1,294 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    
-    <artifactId>aero.minova.service.mcas</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
-    <name>µCAS - Standalone CAS Service</name>
-    <description>
-        Standalone µCAS service with database-based file access.
-        Auto-creates required directory structure for autonomous operation.
-    </description>
-    
-    <!-- Inherit from cas.extension.deployment to get resource processing -->
-    <parent>
-        <groupId>aero.minova</groupId>
-        <artifactId>cas.extension.deployment</artifactId>
-        <version>13.6.2-SNAPSHOT</version>
-        <relativePath>../cas.extension.deployment</relativePath>
-    </parent>
-    
-    <!-- No runtime dependencies needed - we copy structure at build time -->
-    
-    <properties>
-        <!-- Enable database file access by default -->
-        <ng.api.preferdbfiles>true</ng.api.preferdbfiles>
-        <ng.api.dbfiles>true</ng.api.dbfiles>
-        <ng.api.dbregistry>true</ng.api.dbregistry>
-        <ng.api.mdimix>true</ng.api.mdimix>
-    </properties>
-    
-    <build>
-        <finalName>aero.minova.service.mcas</finalName>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-        <plugins>
-            <!-- Generate dependency graph FIRST (before antrun copies it) -->
-            <plugin>
-                <groupId>com.github.ferstl</groupId>
-                <artifactId>depgraph-maven-plugin</artifactId>
-                <version>4.0.3</version>
-                <executions>
-                    <execution>
-                        <id>generate-dependency-graph</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>graph</goal>
-                        </goals>
-                        <configuration>
-                            <graphFormat>json</graphFormat>
-                            <showDuplicates>true</showDuplicates>
-                            <showConflicts>true</showConflicts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+	<artifactId>aero.minova.service.mcas</artifactId>
+	<version>1.0.3-SNAPSHOT</version>
+	<name>µCAS - Standalone CAS Service</name>
+	<description>
+		Standalone µCAS service with database-based file access.
+		Auto-creates required directory structure for autonomous operation.
+	</description>
 
-            <!-- Extract cas.app resources (setup/sql/tables) from dependency -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-cas-app-resources</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>aero.minova</groupId>
-                                    <artifactId>cas.app</artifactId>
-                                    <version>${project.parent.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/cas-app-extracted</outputDirectory>
-                                    <includes>setup/**,sql/**,tables/**</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+	<!-- Inherit from cas.extension.deployment to get resource processing -->
+	<parent>
+		<groupId>aero.minova</groupId>
+		<artifactId>cas.extension.deployment</artifactId>
+		<version>13.6.2-SNAPSHOT</version>
+		<relativePath>../cas.extension.deployment</relativePath>
+	</parent>
 
-            <!-- Copy extracted cas.app resources to correct location -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>create-mcas-directories</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <echo message="Creating µCAS directory structure..."/>
-                                <mkdir dir="${project.build.outputDirectory}/files"/>
-                                <mkdir dir="${project.build.outputDirectory}/forms"/>
-                                <mkdir dir="${project.build.outputDirectory}/i18n"/>
-                                <mkdir dir="${project.build.outputDirectory}/images"/>
-                                <mkdir dir="${project.build.outputDirectory}/pdf"/>
-                                <mkdir dir="${project.build.outputDirectory}/plugins"/>
-                                <mkdir dir="${project.build.outputDirectory}/reports"/>
-                                <mkdir dir="${project.build.outputDirectory}/setup"/>
-                                <mkdir dir="${project.build.outputDirectory}/sql"/>
-                                <mkdir dir="${project.build.outputDirectory}/tables"/>
+	<!-- No runtime dependencies needed - we copy structure at build time -->
 
-                                <!-- Copy cas.app Setup.xml with correct naming for findSetupXml -->
-                                <echo message="Copying cas.app Setup.xml as dependency setup file..."/>
-                                <copy file="${project.build.directory}/cas-app-extracted/setup/Setup.xml"
-                                      tofile="${project.build.outputDirectory}/setup/aero.minova.cas.app.setup.xml"
-                                      failonerror="true"/>
+	<properties>
+		<!-- Enable database file access by default -->
+		<ng.api.preferdbfiles>true</ng.api.preferdbfiles>
+		<ng.api.dbfiles>true</ng.api.dbfiles>
+		<ng.api.dbregistry>true</ng.api.dbregistry>
+		<ng.api.mdimix>true</ng.api.mdimix>
+	</properties>
 
-                                <!-- Copy all SQL scripts from cas.app -->
-                                <copy todir="${project.build.outputDirectory}/sql" failonerror="true">
-                                    <fileset dir="${project.build.directory}/cas-app-extracted/sql">
-                                        <include name="**/*.sql"/>
-                                    </fileset>
-                                </copy>
+	<build>
+		<finalName>aero.minova.service.mcas</finalName>
 
-                                <!-- Copy all table definitions from cas.app -->
-                                <copy todir="${project.build.outputDirectory}/tables" failonerror="true">
-                                    <fileset dir="${project.build.directory}/cas-app-extracted/tables">
-                                        <include name="**/*.xml"/>
-                                        <include name="**/*.xsd"/>
-                                    </fileset>
-                                </copy>
+		<plugins>
+			<!-- Generate dependency graph FIRST (before antrun copies it) -->
+			<plugin>
+				<groupId>com.github.ferstl</groupId>
+				<artifactId>depgraph-maven-plugin</artifactId>
+				<version>4.0.3</version>
+				<executions>
+					<execution>
+						<id>generate-dependency-graph</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>graph</goal>
+						</goals>
+						<configuration>
+							<graphFormat>json</graphFormat>
+							<showDuplicates>true</showDuplicates>
+							<showConflicts>true</showConflicts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-                                <!-- Copy MCAS's own Setup.xml (references cas.app as dependency) -->
-                                <copy file="${basedir}/src/main/resources/setup/Setup.xml"
-                                      todir="${project.build.outputDirectory}/setup"
-                                      failonerror="true"/>
+			<!-- Extract cas.app resources (setup/sql/tables) from dependency -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-cas-app-resources</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>aero.minova</groupId>
+									<artifactId>cas.app</artifactId>
+									<version>${project.parent.version}</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>
+										${project.build.directory}/cas-app-extracted</outputDirectory>
+									<includes>setup/**,sql/**,tables/**</includes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-                                <!-- Copy dependency-graph.json (created by depgraph plugin) BEFORE resource scanning -->
-                                <echo message="Copying dependency-graph.json to setup directory..."/>
-                                <copy file="${project.build.directory}/dependency-graph.json"
-                                      todir="${project.build.outputDirectory}/setup"
-                                      failonerror="true"/>
+			<!-- Copy extracted cas.app resources to correct location -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>create-mcas-directories</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo
+									message="Creating µCAS directory structure..." />
+								<mkdir
+									dir="${project.build.outputDirectory}/files" />
+								<mkdir
+									dir="${project.build.outputDirectory}/forms" />
+								<mkdir
+									dir="${project.build.outputDirectory}/i18n" />
+								<mkdir
+									dir="${project.build.outputDirectory}/images" />
+								<mkdir
+									dir="${project.build.outputDirectory}/pdf" />
+								<mkdir
+									dir="${project.build.outputDirectory}/plugins" />
+								<mkdir
+									dir="${project.build.outputDirectory}/reports" />
+								<mkdir
+									dir="${project.build.outputDirectory}/setup" />
+								<mkdir
+									dir="${project.build.outputDirectory}/sql" />
+								<mkdir
+									dir="${project.build.outputDirectory}/tables" />
 
-                                <echo message="µCAS directories and cas.app resources prepared successfully"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+								<!-- Copy cas.app Setup.xml with correct naming
+								for findSetupXml -->
+								<echo
+									message="Copying cas.app Setup.xml as dependency setup file..." />
+								<copy
+									file="${project.build.directory}/cas-app-extracted/setup/Setup.xml"
+									tofile="${project.build.outputDirectory}/setup/aero.minova.cas.app.setup.xml"
+									failonerror="true" />
 
-            <!-- The resource plugin from parent will handle resource generation after copying -->
-            
-            <!-- Override Spring Boot plugin to include database file access libs -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
-                    <layout>ZIP</layout>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                    <!-- Add system properties for µCAS mode -->
-                    <systemPropertyVariables>
-                        <ng.api.preferdbfiles>true</ng.api.preferdbfiles>
-                        <ng.api.dbfiles>true</ng.api.dbfiles>
-                        <ng.api.dbregistry>true</ng.api.dbregistry>
-                        <ng.api.mdimix>true</ng.api.mdimix>
-                        <spring.profiles.active>mcas</spring.profiles.active>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            
-            <!-- Jib plugin for Docker container -->
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <from>
-                        <image>eclipse-temurin:21-jre-alpine</image>
-                        <platforms>
-                            <platform>
-                                <architecture>amd64</architecture>
-                                <os>linux</os>
-                            </platform>
-                        </platforms>
-                    </from>
-                    <to>
-                        <image>aero.minova.mcas</image>
-                        <tags>
-                            <tag>${project.version}</tag>
-                            <tag>latest</tag>
-                        </tags>
-                    </to>
-                    <container>
-                        <mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
-                        <ports>
-                            <port>8084</port>
-                            <port>8081</port>
-                        </ports>
-                        <jvmFlags>
-                            <jvmFlag>-Djdk.tls.client.protocols=TLSv1.2</jvmFlag>
-                            <jvmFlag>-Dng.api.preferdbfiles=true</jvmFlag>
-                            <jvmFlag>-Dng.api.dbfiles=true</jvmFlag>
-                            <jvmFlag>-Dng.api.dbregistry=true</jvmFlag>
-                            <jvmFlag>-Dng.api.mdimix=true</jvmFlag>
-                            <!-- JVM Memory Configuration for Container -->
-                            <jvmFlag>-XX:MaxRAMPercentage=95.0</jvmFlag>
-                            <jvmFlag>-XX:InitialRAMPercentage=75.0</jvmFlag>
-                            <jvmFlag>-XX:+UseContainerSupport</jvmFlag>
-                        </jvmFlags>
-                        <environment>
-                            <TZ>Europe/Berlin</TZ>
-                            <LC_ALL>de.UTF-8</LC_ALL>
-                            <LANG>de.UTF-8</LANG>
-                            <LANGUAGE>de:de</LANGUAGE>
-                        </environment>
-                        <user>1000</user>
-                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                    </container>
-                    <extraDirectories>
-                        <paths>
-                            <path>
-                                <from>src/main/jib</from>
-                                <into>/</into>
-                            </path>
-                        </paths>
-                    </extraDirectories>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    
-    <!-- Deployment configuration for GitHub Packages -->
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Minova Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
-        </repository>
-    </distributionManagement>
-    
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <tag>HEAD</tag>
-    </scm>
+								<!-- Copy all SQL scripts from cas.app -->
+								<copy
+									todir="${project.build.outputDirectory}/sql"
+									failonerror="true">
+									<fileset
+										dir="${project.build.directory}/cas-app-extracted/sql">
+										<include name="**/*.sql" />
+									</fileset>
+								</copy>
+
+								<!-- Copy all table definitions from cas.app -->
+								<copy
+									todir="${project.build.outputDirectory}/tables"
+									failonerror="true">
+									<fileset
+										dir="${project.build.directory}/cas-app-extracted/tables">
+										<include name="**/*.xml" />
+										<include name="**/*.xsd" />
+									</fileset>
+								</copy>
+
+								<!-- Copy MCAS's own Setup.xml (references
+								cas.app as dependency) -->
+								<copy
+									file="${basedir}/src/main/resources/setup/Setup.xml"
+									todir="${project.build.outputDirectory}/setup"
+									failonerror="true" />
+
+								<!-- Copy dependency-graph.json (created by
+								depgraph plugin) BEFORE resource scanning -->
+								<echo
+									message="Copying dependency-graph.json to setup directory..." />
+								<copy
+									file="${project.build.directory}/dependency-graph.json"
+									todir="${project.build.outputDirectory}/setup"
+									failonerror="true" />
+
+								<echo
+									message="µCAS directories and cas.app resources prepared successfully" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- The resource plugin from parent will handle resource generation
+			after copying -->
+
+			<!-- Override Spring Boot plugin to include database file access
+			libs -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
+					<layout>ZIP</layout>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+					<!-- Add system properties for µCAS mode -->
+					<systemPropertyVariables>
+						<ng.api.preferdbfiles>true</ng.api.preferdbfiles>
+						<ng.api.dbfiles>true</ng.api.dbfiles>
+						<ng.api.dbregistry>true</ng.api.dbregistry>
+						<ng.api.mdimix>true</ng.api.mdimix>
+						<spring.profiles.active>mcas</spring.profiles.active>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+
+			<!-- Jib plugin for Docker container -->
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.0</version>
+				<configuration>
+					<from>
+						<image>eclipse-temurin:21-jre-alpine</image>
+						<platforms>
+							<platform>
+								<architecture>amd64</architecture>
+								<os>linux</os>
+							</platform>
+						</platforms>
+					</from>
+					<to>
+						<image>aero.minova.mcas</image>
+						<tags>
+							<tag>${project.version}</tag>
+							<tag>latest</tag>
+						</tags>
+					</to>
+					<container>
+						<workingDirectory>/application</workingDirectory>
+						<mainClass>
+							aero.minova.cas.CoreApplicationSystemApplication</mainClass>
+						<ports>
+							<port>8084</port>
+							<port>8081</port>
+						</ports>
+						<jvmFlags>
+							<jvmFlag>-Djdk.tls.client.protocols=TLSv1.2</jvmFlag>
+							<jvmFlag>-Dng.api.preferdbfiles=true</jvmFlag>
+							<jvmFlag>-Dng.api.dbfiles=true</jvmFlag>
+							<jvmFlag>-Dng.api.dbregistry=true</jvmFlag>
+							<jvmFlag>-Dng.api.mdimix=true</jvmFlag>
+							<!-- JVM Memory Configuration for Container -->
+							<jvmFlag>-XX:MaxRAMPercentage=95.0</jvmFlag>
+							<jvmFlag>-XX:InitialRAMPercentage=75.0</jvmFlag>
+							<jvmFlag>-XX:+UseContainerSupport</jvmFlag>
+						</jvmFlags>
+						<environment>
+							<TZ>Europe/Berlin</TZ>
+							<LC_ALL>de.UTF-8</LC_ALL>
+							<LANG>de.UTF-8</LANG>
+							<LANGUAGE>de:de</LANGUAGE>
+						</environment>
+						<user>1000</user>
+						<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+					</container>
+					<extraDirectories>
+						<paths>
+							<path>
+								<from>src/main/jib</from>
+								<into>/</into>
+							</path>
+						</paths>
+
+						<!-- Permissions can only be set for extraDirectories -->
+						<permissions>
+							<permission>
+								<file>/application</file>
+								<mode>777</mode>
+							</permission>
+							<permission>
+								<file>/application/**</file>
+								<mode>777</mode>
+							</permission>
+						</permissions>
+					</extraDirectories>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Deployment configuration for GitHub Packages -->
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Minova Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+		</repository>
+	</distributionManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+		<tag>HEAD</tag>
+	</scm>
 </project>

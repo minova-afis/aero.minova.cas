@@ -50,13 +50,13 @@ import lombok.val;
 public class FilesController {
 	@Autowired
 	FileService dbFileService;
-	
+
 	@Autowired
 	RegistryService registryService;
-	
+
 	@Autowired
 	TranslationService translationService;
-	
+
 	@Autowired
 	FilesService fileService;
 
@@ -65,24 +65,23 @@ public class FilesController {
 
 	@Autowired
 	SqlProcedureController spc;
-	
 
 	@org.springframework.beans.factory.annotation.Value("${generate.mdi.per.user:true}")
 	boolean generateMDIPerUser;
 
 	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
 	boolean isFatJarMode;
-	
+
 	// Is set to false in MCAS mode, as the integrated (demo) XBS would lead to wrong application name detection
 	@org.springframework.beans.factory.annotation.Value("${readPackedXBS:true}")
 	boolean readPackedXBS;
-	
+
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
 	boolean isDBFilesActive;
-	
+
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:false}")
 	boolean isDBRegistryActive;
-	
+
 	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
 	boolean isDBFilesPreferred;
 
@@ -167,7 +166,6 @@ public class FilesController {
 //		return fileBytesTable;
 //	}
 
-	
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
@@ -188,14 +186,14 @@ public class FilesController {
 
 		// Are Files from DB preferered compared to File System?
 		if (isDBFilesActive && isDBFilesPreferred) {
- 			byte[] toRet = dbFileService.getFile(path);
- 			// Try to translate if XML or MDI -- if no language is given, no translation will be done
- 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
- 				toRet = translationService.translateXML(path, toRet, lang);
-			if(toRet != null)
+			byte[] toRet = dbFileService.getFile(path);
+			// Try to translate if XML or MDI -- if no language is given, no translation will be done
+			if (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+				toRet = translationService.translateXML(path, toRet, lang);
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
 		if (generateMDIPerUser && path.contains("application.mdi")) {
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
@@ -205,32 +203,32 @@ public class FilesController {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
 		}
-		
+
 		// Are Files from DB active but not preferred compared to File System?
-		if(isDBFilesActive && !isDBFilesPreferred) {
+		if (isDBFilesActive && !isDBFilesPreferred) {
 			byte[] toRet = dbFileService.getFile(path);
 			// Try to translate if XML or MDI -- if no language is given, no translation will be done
- 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
- 				toRet = translationService.translateXML(path, toRet, lang);
-			if(toRet != null)
+			if (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+				toRet = translationService.translateXML(path, toRet, lang);
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		// Even without tRegistry we want to have the ability to change XBS entries with System.env and System.properties
 		byte[] toRet = getIncludedFile(path);
-		if(path.toLowerCase().endsWith(".xbs") && toRet != null) try {
-			toRet = NextGen.Registry.create()
-					                .withXBS(new ByteArrayInputStream(toRet))
-					                .withEnv()
-					                .getXBS();
-		} catch(Exception ex) {
-			customLogger.logError("Failed to auto-update XBS with ENV", ex);
-		}
-		
+		if (path.toLowerCase().endsWith(".xbs") && toRet != null)
+			try {
+				toRet = NextGen.Registry.create().withXBS(new ByteArrayInputStream(toRet)).withEnv().getXBS();
+			} catch (Exception ex) {
+				customLogger.logError("Failed to auto-update XBS with ENV", ex);
+			}
+
 		return toRet;
 	}
-	
-	/** Get file included in this CAS installation -- either within the jar or on the file system
+
+	/**
+	 * Get file included in this CAS installation -- either within the jar or on the file system
+	 * 
 	 * @param path
 	 * @return
 	 * @throws Exception
@@ -272,51 +270,53 @@ public class FilesController {
 	 */
 	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getHash(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
+		customLogger.logUserRequest("files/hash: " + path);
+
 		// Should we generate XBS from tRegistry?
 		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
-			 byte[] xbsCode = getXBSFromRegistry(path);
-			 return MessageDigest.getInstance("MD5").digest(xbsCode);
+			byte[] xbsCode = getXBSFromRegistry(path);
+			return MessageDigest.getInstance("MD5").digest(xbsCode);
 		}
-		
+
 		// Try tFiles first
 		if (isDBFilesActive && isDBFilesPreferred) {
 			// Translated files have different contents based on language
- 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
- 				byte[] content = dbFileService.getFile(path);
- 				content = translationService.translateXML(path, content, lang);
- 				if(content != null)
- 					return MessageDigest.getInstance("MD5").digest(content);
- 			}
+			if (lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+				byte[] content = dbFileService.getFile(path);
+				content = translationService.translateXML(path, content, lang);
+				if (content != null)
+					return MessageDigest.getInstance("MD5").digest(content);
+			}
 			byte[] toRet = dbFileService.getMD5(path);
-			if(toRet != null)
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		if (generateMDIPerUser && path.contains("application.mdi")) {
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
-				byte[] mdi =  fileService.readMDI();
+				byte[] mdi = fileService.readMDI();
 				return (mdi == null ? null : MessageDigest.getInstance("MD5").digest(mdi));
 			} catch (Exception e) {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
 		}
-		
+
 		// Are Files from DB active but not preferred compared to File System?
-		if(isDBFilesActive && !isDBFilesPreferred) {
+		if (isDBFilesActive && !isDBFilesPreferred) {
 			// Translated files have different contents based on language
- 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
- 				byte[] content = dbFileService.getFile(path);
- 				content = translationService.translateXML(path, content, lang);
- 				if(content != null)
- 					return MessageDigest.getInstance("MD5").digest(content);
- 			}
-			
+			if (lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+				byte[] content = dbFileService.getFile(path);
+				content = translationService.translateXML(path, content, lang);
+				if (content != null)
+					return MessageDigest.getInstance("MD5").digest(content);
+			}
+
 			byte[] toRet = dbFileService.getMD5(path);
-			if(toRet != null)
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		if (isFatJarMode) {
 			if (!path.startsWith("/")) {
 				path = "/" + path;
@@ -337,8 +337,13 @@ public class FilesController {
 			String fx = "%0" + (md.getDigestLength() * 2) + "x";
 			return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
 		}
+
+		// Bei XBS und MDI geben wir einen leeren Hash zurück, damit FreeTables sie immer frisch anfragt
+		if (path.endsWith(".xbs") || path.endsWith(".mdi")) {
+			return new byte[0];
+		}
+
 		path = path.replace('\\', '/');
-		customLogger.logUserRequest("files/hash: " + path);
 		// Wir wollen den Pfad ab dem SystemsFolder, denn dieser wird im MD5 Ordner nachgestellt.
 		String toBeResolved = path + ".md5";
 
@@ -359,12 +364,12 @@ public class FilesController {
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
 		// Try tFiles first
-		if(isDBFilesActive) {
+		if (isDBFilesActive) {
 			byte[] toRet = dbFileService.getFile(path);
-			if(toRet != null)
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		if (isFatJarMode) {
 			final var pathStr = path.toString();
 			if (!path.startsWith("/")) {
@@ -499,35 +504,18 @@ public class FilesController {
 
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
-	
+
 	/**
-	 * Modern Minova Registry can be modified via:
-	 * - fully compliant Spring-tech: application.properties incl. profiles, System.env, System.properties
-	 * - ENV vars starting with REG_* prefix
-	 * - XBS files
-	 * - tREgistry table
+	 * Modern Minova Registry can be modified via: - fully compliant Spring-tech: application.properties incl. profiles, System.env, System.properties - ENV
+	 * vars starting with REG_* prefix - XBS files - tREgistry table Such that different sources are just different carriers of the Registry values In common
+	 * applications (services) Registry is created like this: Map<String, String> registry = NextGen.Registry.create() .withApplicationProperties() .withEnv()
+	 * .withDB(null) .get(); ... CAS however is special, since the Registry it constructs here is not _for itself_ but rather for external application users.
+	 * I.e. the application.properties of CAS are defining CAS' itself and not for example AFIS/SIS/... applications. Therefore in this function we are _not_
+	 * updating the actual App registry with CAS' application.properties. Beginning with 2026 the requested XBS is constructed from 1. Packaged XBS (if any) 2.
+	 * ENV vars (REG_* prefixed keys) 3. tRegistry
 	 * 
-	 * Such that different sources are just different carriers of the Registry values
-	 * 
-	 * In common applications (services) Registry is created like this:
-	 * Map<String, String> registry =
-	 *    NextGen.Registry.create()
-	 *                    .withApplicationProperties()
-	 *                    .withEnv()
-	 *                    .withDB(null)
-	 *                    .get();
-	 *                    
-	 * ... CAS however is special, since the Registry it constructs here is not _for itself_ but rather
-	 *     for external application users. I.e. the application.properties of CAS are defining CAS' itself and not
-	 *     for example AFIS/SIS/... applications. Therefore in this function we are _not_ updating the actual
-	 *     App registry with CAS' application.properties.
-	 *     
-	 * Beginning with 2026 the requested XBS is constructed from
-	 * 1. Packaged XBS (if any)
-	 * 2. ENV vars (REG_* prefixed keys)
-	 * 3. tRegistry
-	 * 
-	 * @param path may be a requested XBS file or a app short name (afis)
+	 * @param path
+	 *            may be a requested XBS file or a app short name (afis)
 	 * @return
 	 * @throws RuntimeException
 	 */
@@ -540,26 +528,25 @@ public class FilesController {
 		// - if application.xbs is requested => use application
 		try {
 			byte[] xbs = null;
-			if(readPackedXBS) {
+			if (readPackedXBS) {
 				try {
 					xbs = getIncludedFile(path);
 					customLogger.logFiles("Internal XBS found for " + path + " -> update with ENV and tRegistry");
-				} catch(Exception ex) {
+				} catch (Exception ex) {
 					customLogger.logFiles("No internal XBS found for " + path + " -> construct new with ENV and tRegistry");
 				}
 			}
-			
-			
+
 			// Build-up registry
-			NextGen.Registry reg = NextGen.Registry.create()
-							.tryWithXBS(xbs == null ? null : new ByteArrayInputStream(xbs))
-			                .withEnv()
-			                .with(registryService::loadInto); // We use JPA registry connector instead of the built-in MSSQL (.withDB);
-			
-			if(reg.get().isEmpty()) {
+			NextGen.Registry reg = NextGen.Registry.create().tryWithXBS(xbs == null ? null : new ByteArrayInputStream(xbs)).withEnv()
+					.with(registryService::loadInto); // We use JPA registry connector instead of the built-in MSSQL (.withDB);
+
+			if (reg.get().isEmpty()) {
 				String appPrefix = RegistryService.autoCorrectAppPrefix(path);
-				//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
-				throw new RuntimeException("Failed to generate XBS -- no values found in ENV or tRegistry" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+				// customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application
+				// '"+appPrefix+"'"));
+				throw new RuntimeException(
+						"Failed to generate XBS -- no values found in ENV or tRegistry" + (appPrefix == null ? "" : " for Application '" + appPrefix + "'"));
 			}
 			return reg.getXBS();
 		} catch (Exception e) {

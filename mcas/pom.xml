@@ -204,10 +204,6 @@
                         </ports>
                         <jvmFlags>
                             <jvmFlag>-Djdk.tls.client.protocols=TLSv1.2</jvmFlag>
-                            <jvmFlag>-Dng.api.preferdbfiles=true</jvmFlag>
-                            <jvmFlag>-Dng.api.dbfiles=true</jvmFlag>
-                            <jvmFlag>-Dng.api.dbregistry=true</jvmFlag>
-                            <jvmFlag>-Dng.api.mdimix=true</jvmFlag>
                             <!-- JVM Memory Configuration for Container -->
                             <jvmFlag>-XX:MaxRAMPercentage=95.0</jvmFlag>
                             <jvmFlag>-XX:InitialRAMPercentage=75.0</jvmFlag>

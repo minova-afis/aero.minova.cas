@@ -317,7 +317,11 @@ public class FilesController {
 				return toRet;
 		}
 		
-		if (isFatJarMode) {
+		// Even in non-fatjar mode we want in-situ MD5 calculation for mdi and xbs -- as both may have dynamic content
+		boolean liveMD5calc = path.toLowerCase().endsWith(".mdi") ||
+				              path.toLowerCase().endsWith(".xbs");
+		
+		if (isFatJarMode || liveMD5calc) {
 			if (!path.startsWith("/")) {
 				path = "/" + path;
 			}

@@ -70,16 +70,16 @@ class FilesControllerTest extends BaseTest {
 
 	@Test
 	void testLegal() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
-		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.xbs", null))
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.notxbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.notxbs", null))
 				.isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
 	void testLegalHash() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
-		filesController.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.xbs"));
-		assertThat(filesController.getHash("Shared Data/Program Files/AFIS/AFIS.xbs", null))
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.notxbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		filesController.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.notxbs"));
+		assertThat(filesController.getHash("Shared Data/Program Files/AFIS/AFIS.notxbs", null))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 	}
 

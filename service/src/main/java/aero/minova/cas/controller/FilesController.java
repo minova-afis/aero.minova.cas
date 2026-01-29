@@ -317,7 +317,10 @@ public class FilesController {
 				return toRet;
 		}
 
-		if (isFatJarMode) {
+		// Even in non-fatjar mode we want in-situ MD5 calculation for mdi and xbs -- as both may have dynamic content
+		boolean liveMD5calc = path.toLowerCase().endsWith(".mdi") || path.toLowerCase().endsWith(".xbs");
+
+		if (isFatJarMode || liveMD5calc) {
 			if (!path.startsWith("/")) {
 				path = "/" + path;
 			}
@@ -336,11 +339,6 @@ public class FilesController {
 			md.update(pathContent);
 			String fx = "%0" + (md.getDigestLength() * 2) + "x";
 			return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
-		}
-
-		// Bei XBS und MDI geben wir einen leeren Hash zurück, damit FreeTables sie immer frisch anfragt
-		if (path.endsWith(".xbs") || path.endsWith(".mdi")) {
-			return new byte[0];
 		}
 
 		path = path.replace('\\', '/');

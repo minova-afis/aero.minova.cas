@@ -11,7 +11,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +24,7 @@ import aero.minova.cas.BaseTest;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -70,16 +70,16 @@ class FilesControllerTest extends BaseTest {
 
 	@Test
 	void testLegal() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
-		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.xbs", null)).isEqualTo(
-				"<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.notxbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		assertThat(filesController.getFile("Shared Data/Program Files/AFIS/AFIS.notxbs", null))
+				.isEqualTo("<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test
 	void testLegalHash() throws Exception {
-		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.xbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
-		filesController.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.xbs"));
-		assertThat(filesController.getHash("Shared Data/Program Files/AFIS/AFIS.xbs", null))
+		Files.write(programFilesFolder.resolve("AFIS").resolve("AFIS.notxbs"), "<preferences></preferences>".getBytes(StandardCharsets.UTF_8));
+		filesController.hashFile(Paths.get("Shared Data/Program Files/AFIS/AFIS.notxbs"));
+		assertThat(filesController.getHash("Shared Data/Program Files/AFIS/AFIS.notxbs", null))
 				.isEqualTo("093544245ba5b8739014ac4e5a273520".getBytes(StandardCharsets.UTF_8));
 	}
 
@@ -88,8 +88,7 @@ class FilesControllerTest extends BaseTest {
 		val metaDataFolder = programFilesFolder.resolve(".metadata");
 		Files.createDirectories(metaDataFolder);
 
-		Files.write(metaDataFolder.resolve("beispielLog.log"),
-				"<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
+		Files.write(metaDataFolder.resolve("beispielLog.log"), "<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
 		filesController.createZip(Paths.get("Shared Data/Program Files/.metadata"));
 
 		// dabei wird der Logs Ordner erzeugt
@@ -97,8 +96,7 @@ class FilesControllerTest extends BaseTest {
 
 		File found = findFile("beispielLog.log", internalFolder.resolve("UserLogs").toFile());
 		assertThat(found).isNotNull();
-		assertThat(Files.readAllBytes(found.toPath()))
-				.isEqualTo("<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
+		assertThat(Files.readAllBytes(found.toPath())).isEqualTo("<text>Oh nein!Ein Fehler in der Anwendung!</text>".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test

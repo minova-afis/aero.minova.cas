@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 
+* Für XBS und MDI Hash live ausrechnen, damit FreeTables sie immer frisch anfragt
+
 ## [12.70.1] -- 2026-01-28
 * XBS (und andere Dateien) über Datenbank auslesen
 

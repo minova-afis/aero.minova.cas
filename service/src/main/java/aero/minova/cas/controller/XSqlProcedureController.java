@@ -107,10 +107,8 @@ public class XSqlProcedureController {
 		customLogger.logUserRequest("data/x-procedure: ", inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
-		Connection connection = null;
 		StringBuffer sb = new StringBuffer();
 		try {
-
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
 
 			// Soll die Transaktion von einer Erweiterung bearbeitet werden?
@@ -120,12 +118,25 @@ public class XSqlProcedureController {
 
 			} else { // Ansonsten die Prozeduren einzeln verarbeiten
 
-				connection = systemDatabase.getConnection();
-				resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
-				// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
-				checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
-				// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
-				connection.commit();
+				try (Connection connection = systemDatabase.getConnection()) {
+					try {
+						resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+						// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
+						checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+						// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
+						connection.commit();
+					} catch (Throwable e) {
+						// Explicit rollback: connection held during complex multi-step transaction (processXProcedures, followUp checks).
+						// Immediately release database locks and log rollback explicitly for clarity.
+						try {
+							connection.rollback();
+							customLogger.logError("XSqlProcedure rolled back due to error: " + sb, e);
+						} catch (Exception rollbackEx) {
+							customLogger.logError("Rollback failed after XSqlProcedure error", rollbackEx);
+						}
+						throw e;
+					}
+				}
 			}
 
 			// Nachdem alle Prozeduren und Folgeprozeduren bzw. die Erweiterung erfolgreich durchgelaufen sind, kann man die Nachrichten über den QueueService
@@ -137,17 +148,9 @@ public class XSqlProcedureController {
 			}
 		} catch (Throwable e) {
 			customLogger.logError("XSqlProcedure could not be executed: " + sb, e);
-			if (connection != null) {
-				try {
-					connection.rollback();
-				} catch (Exception e1) {
-					customLogger.logError("Couldn't roll back XSqlProcedure execution", e);
-				}
-			}
 			throw new XProcedureException(inputTables, resultSets, e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
+
 		customLogger.logSql("XSqlProcedure successfully executed: " + sb);
 		return new ResponseEntity<>(resultSets, HttpStatus.ACCEPTED);
 	}

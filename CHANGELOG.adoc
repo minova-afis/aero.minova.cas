@@ -6,6 +6,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 ## [UNRELEASED] -- XXXX-XX-XX
 
 * Feldlänge in CAS-Maske an Datenbankspalten anpassen
+* CAS-Menüs weiter hinten anordnen
 
 ## [12.70.2] -- 2026-01-29
 * Für XBS und MDI Hash live ausrechnen, damit FreeTables sie immer frisch anfragt

@@ -5,6 +5,8 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 
+
+## [12.70.4] -- 2026-02-04
 * Feldlänge in CAS-Maske an Datenbankspalten anpassen
 * CAS-Menüs weiter hinten anordnen
 

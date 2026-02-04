@@ -5,10 +5,10 @@
             <number/>            		
         </column>        		
         <column name="KeyText" text="@xtcasUserPrivilege.KeyText">		
-            <text length="50"/>            		
+            <text length="100"/>            		
         </column>        		
         <column name="Description" text="@xtcasUserPrivilege.Description">
-            <text length="50"/>            		
+            <text length="100"/>            		
         </column>
     </index-view>    	
     <detail id="Detail" procedure-prefix="xpcas" procedure-suffix="UserPrivilege">        		
@@ -17,10 +17,10 @@
                 <number/>                			
             </field>            			
             <field name="KeyText" sql-index="1" text="@xtcasUserPrivilege.KeyText" required="true" key-type="user">                				
-                <text length="50"/>                			
+                <text length="100"/>                			
             </field>            			
             <field name="Description" sql-index="2" text="@xtcasUserPrivilege.Description" number-columns-spanned="4" fill="toright">                				
-                <text length="50"/>                			
+                <text length="100"/>                			
             </field>		
         </head>        	
     </detail>    

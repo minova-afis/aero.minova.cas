@@ -6,13 +6,13 @@
 			<number/>
 		</column>
 		<column name="KeyText" text="@xtcasUser.KeyText">
-			<text length="50"/>
+			<text length="100"/>
 		</column>
 		<column name="UserSecurityToken" text="@xtcasUser.UserSecurityToken">
-			<text length="50"/>
+			<text length="100"/>
 		</column>
 		<column name="Memberships" text="@xtcasUser.Memberships">
-			<text length="250"/>
+			<text length="500"/>
 		</column>
 	</index-view>
 	<detail id="Detail" procedure-prefix="xpcas" procedure-suffix="User">
@@ -27,7 +27,7 @@
 				<text length="100"/>
 			</field>
 			<field name="Memberships" sql-index="3" text="@xtcasUser.Memberships" number-columns-spanned="4" fill="toright">
-				<text length="250"/>
+				<text length="500"/>
 			</field>
 		</head>
 	</detail>

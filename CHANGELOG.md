@@ -20,6 +20,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
  - Loggen, wenn XSqlProcedure fertig ausgeführt wurde
  
  - Feldlänge in CAS-Maske an Datenbankspalten anpassen
+ 
+ - CAS-Menüs weiter hinten anordnen
 
 ## \[13.6.1\] - 2025-08-12
 

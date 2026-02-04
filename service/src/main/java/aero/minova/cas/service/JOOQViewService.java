@@ -30,6 +30,7 @@ public class JOOQViewService implements ViewServiceInterface {
 	private final CustomLogger customLogger;
 	private final SecurityService securityService;
 
+	@Override
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean isCounting, List<Row> authorities) throws IllegalArgumentException {
 
 		if (params.getName() == null || params.getName().trim().length() == 0) {
@@ -67,6 +68,7 @@ public class JOOQViewService implements ViewServiceInterface {
 		return query.getSQL();
 	}
 
+	@Override
 	public Table unsecurelyGetIndexView(Table inputTable) {
 		StringBuilder sb = new StringBuilder();
 		List<Row> userGroups = new ArrayList<>();
@@ -76,10 +78,9 @@ public class JOOQViewService implements ViewServiceInterface {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		Table result = new Table();
-		final val connection = systemDatabase.getConnection();
-		try {
-			final String viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
-			val preparedStatement = connection.prepareCall(viewQuery);
+
+		final String viewQuery = prepareViewString(inputTable, false, ViewServiceInterface.IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
+		try (final val connection = systemDatabase.getConnection(); final var preparedStatement = connection.prepareCall(viewQuery)) {
 			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
 					customLogger.errorLogger)) {
 				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
@@ -87,12 +88,9 @@ public class JOOQViewService implements ViewServiceInterface {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
 			}
-
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}

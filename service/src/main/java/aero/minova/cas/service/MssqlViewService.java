@@ -39,6 +39,7 @@ public class MssqlViewService implements ViewServiceInterface {
 		this.securityService = securityService;
 	}
 
+	@Override
 	public Table unsecurelyGetIndexView(Table inputTable) {
 		StringBuilder sb = new StringBuilder();
 		List<Row> userGroups = new ArrayList<>();
@@ -48,13 +49,12 @@ public class MssqlViewService implements ViewServiceInterface {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		Table result = new Table();
-		val connection = systemDatabase.getConnection();
-		try {
-			val viewQuery = prepareViewString(inputTable, false, IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
-			val preparedStatement = connection.prepareCall(viewQuery);
+
+		final String viewQuery = prepareViewString(inputTable, false, ViewServiceInterface.IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
+		try (final val connection = systemDatabase.getConnection(); final var preparedStatement = connection.prepareCall(viewQuery)) {
 			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
 					customLogger.errorLogger)) {
-				customLogger.logPrivilege("Executing SQL-statement for view:  " + sb);
+				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
@@ -62,12 +62,11 @@ public class MssqlViewService implements ViewServiceInterface {
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new RuntimeException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
 
+	@Override
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuilder sb = new StringBuilder();
 		if (params.getName() == null || params.getName().trim().length() == 0) {
@@ -112,6 +111,7 @@ public class MssqlViewService implements ViewServiceInterface {
 		return sb.toString();
 	}
 
+	@Override
 	public String prepareWhereClause(Table params, boolean autoLike) {
 		final StringBuilder where = new StringBuilder();
 		final boolean hasAndClause;
@@ -221,6 +221,7 @@ public class MssqlViewService implements ViewServiceInterface {
 	 * Pagination nach der Seek-Methode; bessere Performance als Offset bei großen Datensätzen. Wird NICHT für den "normalen" Index-Aufruf verwendet, da immer
 	 * davon ausgegangen wird, dass ein KeyLong in der View/Table vorhanden ist.
 	 */
+	@Override
 	public String pagingWithSeek(Table params, boolean autoLike, int maxRows, boolean count, int page, List<Row> authorities) {
 		final StringBuilder sb = new StringBuilder();
 		if (params.getName() == null || params.getName().trim().length() == 0) {

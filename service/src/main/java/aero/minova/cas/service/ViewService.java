@@ -50,7 +50,6 @@ public class ViewService {
 	}
 
 	public Table executeView(Table inputTable, List<Row> authoritiesForThisTable) throws TableException {
-		final val connection = systemDatabase.getConnection();
 		Table result = new Table();
 		StringBuilder sb = new StringBuilder();
 		try {
@@ -82,39 +81,39 @@ public class ViewService {
 			// Deshalb verwenden wir stattdessen die prepareViewString-Methode, welche minimal langsamer ist.
 			// Die pagingWithSeek-Methode benötigt immer einen KeyLong in der Anfrage. Es gibt allerdings auch einige Anfragen, die keinen KeyLong benötigen,
 			// weswegen dann Fehlermeldungen geworfen werden. Deshalb wird ab jetzt einfach die prepareViewString-Methode verwendet.
+			// Slavi '26: keep connection only as long as it is technically required.
 			String viewQuery = viewService.prepareViewString(inputTable, false, 0, authoritiesForThisTable);
-			val preparedStatement = connection.prepareCall(viewQuery);
-			try (PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
+			try (val connection = systemDatabase.getConnection();
+					val preparedStatement = connection.prepareCall(viewQuery);
+					PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
 				customLogger.logSql("Executing statements: " + sb);
+
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
-
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
-
-					int totalResults = 0;
-					if (!result.getRows().isEmpty()) {
-						totalResults = result.getRows().size();
-					}
-
-					// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
-					if (limit > 0) {
-						List<Row> resultRows = new ArrayList<>();
-						for (int i = 0; i < limit; i++) {
-							int rowPointer = i + (limit * (page - 1));
-							if (rowPointer < result.getRows().size()) {
-								resultRows.add(result.getRows().get(rowPointer));
-							}
-						}
-						result.setRows(resultRows);
-					}
-
-					result.fillMetaData(result, limit, totalResults, page);
 				}
 			}
+
+			int totalResults = 0;
+			if (!result.getRows().isEmpty()) {
+				totalResults = result.getRows().size();
+			}
+
+			// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
+			if (limit > 0) {
+				List<Row> resultRows = new ArrayList<>();
+				for (int i = 0; i < limit; i++) {
+					int rowPointer = i + (limit * (page - 1));
+					if (rowPointer < result.getRows().size()) {
+						resultRows.add(result.getRows().get(rowPointer));
+					}
+				}
+				result.setRows(resultRows);
+			}
+
+			result.fillMetaData(result, limit, totalResults, page);
 		} catch (Throwable e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new TableException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}

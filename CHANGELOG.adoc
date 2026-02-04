@@ -4,7 +4,7 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
-
+- Datenbank-Connection-Handling verbessern
 
 ## [12.70.4] -- 2026-02-04
 * Feldlänge in CAS-Maske an Datenbankspalten anpassen

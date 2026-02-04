@@ -88,14 +88,31 @@ public class ProcedureService {
 	}
 
 	/**
+	 * Sets ANSI_WARNINGS on or off for the connection. ANSI_WARNINGS OFF ignores warnings for data truncation and allows longer SQL usernames.
+	 *
+	 * @param connection
+	 *            The database connection
+	 * @param enabled
+	 *            true to enable ANSI_WARNINGS, false to disable
+	 * @throws SQLException
+	 *             if statement execution fails
+	 */
+	private void setAnsiWarnings(Connection connection, boolean enabled) throws SQLException {
+		String sql = enabled ? "set ANSI_WARNINGS on" : "set ANSI_WARNINGS off";
+		try (var statement = connection.createStatement()) {
+			statement.execute(sql);
+		}
+	}
+
+	/**
 	 * Führt eine Prozedur mit den übergebenen Parametern aus. Falls die Prozedur Output-Parameter zurückgibt, werden diese auch im SqlProcedureResult
 	 * zurückgegeben.
 	 *
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
-	 * 	          können alle Spalten gesehen werden.
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist, können alle Spalten gesehen
+	 *            werden.
 	 * @return Resultat SqlProcedureResult der Ausführung
 	 * @throws Exception
 	 *             Fehler bei der Ausführung
@@ -111,8 +128,8 @@ public class ProcedureService {
 	 * @param inputTable
 	 *            Ausführungs-Parameter im Form einer Table
 	 * @param privilegeRequest
-	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist,
-	 *            können alle Spalten gesehen werden.
+	 *            eine Liste von Rows im Format (PrivilegName,UserSecurityToken,RowLevelSecurity-Bit). Wenn die Liste leer ist, können alle Spalten gesehen
+	 *            werden.
 	 * @param isSetup
 	 *            <code>true</code>, falls es sich um einen Aufruf im Rahmen des Setup handelt
 	 * @return Resultat SqlProcedureResult der Ausführung
@@ -122,26 +139,29 @@ public class ProcedureService {
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest, boolean isSetup) throws Exception {
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer sb = new StringBuffer();
-		Connection connection = null;
 
-		try {
-			connection = systemDatabase.getConnection();
-			if (isSetup) {
-				try (final var call = connection.createStatement()) {
-					call.execute("set ANSI_WARNINGS off");
+		try (Connection connection = systemDatabase.getConnection()) {
+			try {
+				if (isSetup) {
+					setAnsiWarnings(connection, false);
 				}
+				result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
+				connection.commit();
+				customLogger.logSql("Procedure successfully executed: " + sb);
+				if (isSetup) {
+					setAnsiWarnings(connection, true);
+				}
+			} catch (Exception e) {
+				// Explicit rollback: connection held during complex multi-step logic in calculateSqlProcedureResult().
+				// Immediately release database locks and log rollback explicitly for clarity.
+				try {
+					connection.rollback();
+					customLogger.logError("Procedure rolled back due to error: " + sb, e);
+				} catch (SQLException rollbackEx) {
+					customLogger.logError("Rollback failed after procedure error", rollbackEx);
+				}
+				throw new ProcedureException(e);
 			}
-			result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
-			connection.commit();
-			customLogger.logSql("Procedure successfully executed: " + sb);
-			if (isSetup) {
-				connection.createStatement().execute("set ANSI_WARNINGS on");
-			}
-		} catch (Exception e) {
-			customLogger.logError("Procedure could not be executed: " + sb, e);
-			throw new ProcedureException(e);
-		} finally {
-			systemDatabase.closeConnection(connection);
 		}
 		return result;
 	}
@@ -260,19 +280,16 @@ public class ProcedureService {
 
 			preparedStatement.registerOutParameter(1, Types.INTEGER);
 			preparedStatement.execute();
-			{   /*
+			{ /*
 				 * Man würde hier erwarten, dass der Code wie in folgender Doku aussieht:
-				 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16
-				 *
-				 * Das liegt vor allem daran, dass eine SQL-Prozedur sehr viele
-				 * verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat.
-				 *
-				 * Folgender Artikel umreist, dass ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+				 * https://learn.microsoft.com/en-us/sql/connect/jdbc/parsing-the-results?view=sql-server-ver16 Das liegt vor allem daran, dass eine
+				 * SQL-Prozedur sehr viele verschiedene Arten von Rückgabewerte, wie beispielsweise selects oder Warnungen, hat. Folgender Artikel umreist, dass
+				 * ganze ganz gut: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
 				 */
 				int i = 0;
 				while (preparedStatement.getResultSet() == null) {
-					/* Es kann sein, dass am Anfang einige ResultsSets leer sind.
-					 * Diese muss man manuel rausfiltern.
+					/*
+					 * Es kann sein, dass am Anfang einige ResultsSets leer sind. Diese muss man manuel rausfiltern.
 					 */
 
 					if (!preparedStatement.getMoreResults() && (preparedStatement.getUpdateCount() == -1)) {
@@ -280,9 +297,8 @@ public class ProcedureService {
 						break;
 					}
 					/**
-					 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets.
-					 * Sind mehr vorhanden, ist das Verhalten der Treiber nicht kontrollierbar:
-					 * https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
+					 * Viele JDBC-Treiber unterstützen nur eine bestimmte Anzahl an ResultSets. Sind mehr vorhanden, ist das Verhalten der Treiber nicht
+					 * kontrollierbar: https://blog.jooq.org/how-i-incorrectly-fetched-jdbc-resultsets-again/
 					 */
 					if (++i >= maxResultSetCount) {
 						customLogger.logSql(
@@ -319,7 +335,7 @@ public class ProcedureService {
 								} else if (type == Types.BIGINT) {
 									return new Column(name, DataType.LONG);
 								} else {
-									customLogger.logFiles( "calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type );
+									customLogger.logFiles("calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type);
 									throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 								}
 							} catch (Exception e) {
@@ -459,7 +475,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BIGINT);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
@@ -481,7 +497,7 @@ public class ProcedureService {
 							} else if (type == DataType.LONG) {
 								preparedStatement.setLong(i + parameterOffset, iVal.getLongValue());
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -503,7 +519,7 @@ public class ProcedureService {
 							} else if (type == DataType.BIGDECIMAL) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.DECIMAL);
 							} else {
-								customLogger.logFiles( "fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type );
+								customLogger.logFiles("fillCallableSqlProcedureStatement(): unknown ColumnType for column " + i + ", type:" + type);
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
@@ -514,13 +530,11 @@ public class ProcedureService {
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor.
-	 * Siehe {@link #prepareProcedureString(Table, Set)}.
+	 * Bereitet einen Prozedur-String vor. Siehe {@link #prepareProcedureString(Table, Set)}.
 	 *
 	 * @param params
-	 * 			gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
-	 * @return
-	 * 			die SQL-Anweisung
+	 *            gibt den Namen der aufgerufen SQL-Procedure und Anzahl der Parameter vor
+	 * @return die SQL-Anweisung
 	 * @throws IllegalArgumentException
 	 *             wenn der Name in der <code>params</code>-Table leer ist.
 	 */
@@ -529,17 +543,16 @@ public class ProcedureService {
 	}
 
 	/**
-	 * Bereitet einen Prozedur-String vor.
-	 * Als Ergebnis entsteht ein SQL call-Statement in der Form:<br><ol>
-	 *     <li>{ ? = call procName() }</li>
-	 *     <li>{ call procName() }</li>
-	 *     <li>{ call procName( ? ) }</li>
-	 *     <li>{ call procName( ?,?, &#8230; ) }</li>
-	 *     <li>{ ? = call procName( ?,?, &#8230; ) }</li>
+	 * Bereitet einen Prozedur-String vor. Als Ergebnis entsteht ein SQL call-Statement in der Form:<br>
+	 * <ol>
+	 * <li>{ ? = call procName() }</li>
+	 * <li>{ call procName() }</li>
+	 * <li>{ call procName( ? ) }</li>
+	 * <li>{ call procName( ?,?, &#8230; ) }</li>
+	 * <li>{ ? = call procName( ?,?, &#8230; ) }</li>
 	 * </ol>
-	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table.
-	 * Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl der Spalten der params-Table.
-	 * <br>
+	 * Der aufgerufene Name procName ergibt sich aus dem Namen der übergebenen params-Table. Die Anzahl der ?-Parameter-Platzhalter ergibt sich aus der Anzahl
+	 * der Spalten der params-Table. <br>
 	 * ToDo: prüfen, ob der Name weiter geprüft werden kann oder escaped werden sollte
 	 *
 	 * @param params

@@ -20,7 +20,7 @@
 			<field name="KeyLong" key-type="primary" sql-index="0" visible="false">
 				<number/>
 			</field>
-			<field name="KeyText" sql-index="1" text="@xtcasUser.KeyText" required="true" key-type="user" fill="toright">
+			<field name="KeyText" sql-index="1" text="@xtcasUser.KeyText" required="true" key-type="user" number-columns-spanned="4" fill="toright">
 				<text length="100"/>
 			</field>
 			<field name="UserSecurityToken" sql-index="2" text="@xtcasUser.UserSecurityToken" number-columns-spanned="4" required="true" fill="toright">

@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,7 @@ import aero.minova.cas.controller.SqlViewController;
 import aero.minova.cas.service.FilesService;
 import aero.minova.cas.setup.dependency.DependencyOrder;
 import aero.minova.cas.sql.SystemDatabase;
+import jakarta.annotation.PostConstruct;
 import lombok.val;
 
 /**
@@ -66,9 +67,7 @@ public class SetupService {
 				// ANSI_WARNINGS OFF ignoriert Warnung bei zu langen Datensätzen und schneidet stattdessen diese direkt ab.
 				// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
 				try (final var connection = database.getConnection()) {
-					try (final var call = connection.createStatement()) {
-						call.execute("set ANSI_WARNINGS off");
-					}
+					setAnsiWarnings(connection, false);
 					readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
 							, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
 							, service.getSystemFolder().resolve("setup")//
@@ -76,11 +75,10 @@ public class SetupService {
 					svc.setupExtensions();
 					spc.setupExtensions();
 
-					// Diese Methode darf erst ganz zum Schluss ausgeführt werden, damit sichergestellt werden kann, dass der Admin tatsächlich ALLE Rechte bekommt.
+					// Diese Methode darf erst ganz zum Schluss ausgeführt werden, damit sichergestellt werden kann, dass der Admin tatsächlich ALLE Rechte
+					// bekommt.
 					spc.setupPrivileges();
-					try (final var call = connection.createStatement()) {
-						call.execute("set ANSI_WARNINGS on");
-					}
+					setAnsiWarnings(connection, true);
 				}
 				return new ResponseEntity(result, HttpStatus.ACCEPTED);
 			} catch (Exception e) {
@@ -89,12 +87,32 @@ public class SetupService {
 		});
 		spc.registerExtensionBootstrapCheck(PROCEDURE_NAME, inputTable -> true);
 	}
-	
+
+	/**
+	 * Sets ANSI_WARNINGS on or off for the connection. ANSI_WARNINGS OFF ignores warnings for data truncation and allows longer SQL usernames.
+	 *
+	 * @param connection
+	 *            The database connection
+	 * @param enabled
+	 *            true to enable ANSI_WARNINGS, false to disable
+	 */
+	private void setAnsiWarnings(Connection connection, boolean enabled) {
+		String sql = enabled ? "set ANSI_WARNINGS on" : "set ANSI_WARNINGS off";
+		try (var statement = connection.createStatement()) {
+			statement.execute(sql);
+		} catch (Exception e) {
+			logger.logError("Failed to set ANSI_WARNINGS to " + enabled, e);
+			throw new RuntimeException("Failed to set ANSI_WARNINGS", e);
+		}
+	}
+
 	/**
 	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück.
 	 *
-	 * @param arg Ein String, in welchem die benötigten Dependencies stehen.
-	 * @throws IOException Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
+	 * @param arg
+	 *            Ein String, in welchem die benötigten Dependencies stehen.
+	 * @throws IOException
+	 *             Wenn kein Setup-File für eine benötigte Dependency gefunden werden kann.
 	 */
 	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
 		List<String> dependencies = DependencyOrder.determineDependencyOrder(Files.readString(dependencyList));
@@ -126,7 +144,8 @@ public class SetupService {
 	/**
 	 * Das ist ein Hack, wil wir Probleme haben über Maven die gewünschte Ordnerstruktur zu bekommen. Wir wollen, dass es erstmal grundsätzlich läuft.
 	 *
-	 * @param dependency Name der Abhängigkeit.
+	 * @param dependency
+	 *            Name der Abhängigkeit.
 	 * @return Setup.xml der Abhängigkeit.
 	 */
 	private Path findSetupXml(String dependency, Path dependencySetupsDir) {
@@ -152,7 +171,7 @@ public class SetupService {
 						throw new RuntimeException(e);
 					}
 				}
-				return Optional.<Path>empty();
+				return Optional.<Path> empty();
 			}).filter(Optional::isPresent).map(Optional::get).findFirst();
 			if (result.isEmpty()) {
 				throw new NoSuchFileException("No setup file found with the name " + niceSetupFile);
@@ -166,7 +185,8 @@ public class SetupService {
 	/**
 	 * Liest ein einzelnes Setup-File und gibt eine Liste von benötigten SQl-Dateien zurück.
 	 *
-	 * @param dependencySetupFile Das Setup-File, welches gescannt werden soll.
+	 * @param dependencySetupFile
+	 *            Das Setup-File, welches gescannt werden soll.
 	 * @return Die Liste an SQL-Dateinamen für das gescannte Setup-File.
 	 */
 	List<String> readProceduresToList(File dependencySetupFile) {
@@ -197,8 +217,10 @@ public class SetupService {
 	/**
 	 * TODO Entfernen Liest die übergebene Liste an SQL-Dateinamen und installiert die jeweils dazugehörige Datei.
 	 *
-	 * @param procedures Die Liste an SQL-Dateinamen.
-	 * @throws NoSuchFileException Falls die Datei passend zum Namen nicht existiert.
+	 * @param procedures
+	 *            Die Liste an SQL-Dateinamen.
+	 * @throws NoSuchFileException
+	 *             Falls die Datei passend zum Namen nicht existiert.
 	 */
 	@Deprecated
 	void runScripts(List<String> procedures) throws NoSuchFileException {
@@ -213,7 +235,9 @@ public class SetupService {
 
 					logger.logSetup("Executing Script " + procedureName);
 					try {
-						connection.prepareCall(procedure).execute();
+						try (var stmt = connection.prepareCall(procedure)) {
+							stmt.execute();
+						}
 						connection.commit();
 					} catch (Exception e) {
 						logger.logSetup("Script " + procedureName + " is being executed.");
@@ -223,7 +247,9 @@ public class SetupService {
 							procedure = "create" + procedure;
 						}
 
-						connection.prepareCall(procedure).execute();
+						try (var stmt = connection.prepareCall(procedure)) {
+							stmt.execute();
+						}
 						connection.commit();
 					}
 				} catch (Exception e) {

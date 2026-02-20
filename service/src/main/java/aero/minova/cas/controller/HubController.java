@@ -21,13 +21,22 @@ public class HubController {
 	private void init() {
 		String hubHost = env.getProperty("minova.hub.host");
 		String clientName = env.getProperty("minova.hub.client.name");
+        String instanceName = env.getProperty("instance.name");
 		String appName = env.getProperty("spring.application.name");
 		
 		if(hubHost == null)
 			return;
-		// If no client name is set, try application name instead
-		if(clientName == null)
-			clientName = (appName == null ? "CAS" : appName.replace(" ", "-"));
+
+        // Client name not specified -- Is the instance name set?
+        if(clientName == null && instanceName != null)
+        	clientName = instanceName;
+        
+        // Is the Spring appName set
+        if(clientName == null && appName != null)
+            clientName = appName.replace(" ", "-");
+
+        if(clientName == null)
+            clientName = "CAS";
 		
 		try {
 			customLogger.logInfo("Connect to Hub " + hubHost + " as " + clientName + "...");

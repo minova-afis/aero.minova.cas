@@ -31,12 +31,12 @@
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>appmodel</artifactId>
-            <version>0.9.9</version>
+            <version>0.11.0</version>
         </dependency>
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>assist.core</artifactId>
-            <version>1.1.6</version>
+            <version>1.2.7</version>
         </dependency>
         <dependency>
             <groupId>ch.minova</groupId>

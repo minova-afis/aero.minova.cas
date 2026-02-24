@@ -328,7 +328,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		} else {
 			username = "unknown";
 		}
-		String errorStatement = "INSERT INTO xtcasError (Username, ErrorMessage, Date) VALUES (?,?,?)";
+		String errorStatement = "INSERT INTO dbo.xtcasError (Username, ErrorMessage, Date) VALUES (?,?,?)";
 
 		try (val connection = systemDatabase.getConnection()) {
 			Timestamp timeOfError = Timestamp.from(Instant.now());
@@ -348,11 +348,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 			}
 			connection.commit();
 		} catch (SQLException e1) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e1.printStackTrace(pw);
+			// We don't need to spam the log file with always same "error to save error", each 200 lines
+//			StringWriter sw = new StringWriter();
+//			PrintWriter pw = new PrintWriter(sw);
+//			e1.printStackTrace(pw);
 
-			customLogger.logError("CAS : Error could not be saved in database." + "/n" + sw, e1);
+			customLogger.logError("CAS : Error could not be saved in database. " + e1.getMessage());
 		}
 	}
 }

@@ -12,8 +12,8 @@
 	<main role="main" class="flex-shrink-0">
 		<div class="container" sec:authorize="isAuthenticated()">
 			<ul class="list-group" sec:authorize="isAuthenticated()">
-				<li class="list-group-item">		
-					<form action="/cas/setup" method="post">
+				<li class="list-group-item">
+					<form th:action="@{/setup}" method="post">
 						<a class="nav-link" href="#" onclick="this.parentNode.submit()">Setup</a>
 					</form>
 				</li>

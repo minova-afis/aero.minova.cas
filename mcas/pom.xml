@@ -20,8 +20,6 @@
         <relativePath>../cas.extension.deployment</relativePath>
     </parent>
     
-    <!-- No runtime dependencies needed - we copy structure at build time -->
-    
     <properties>
         <!-- Enable database file access by default -->
         <ng.api.preferdbfiles>true</ng.api.preferdbfiles>
@@ -29,7 +27,7 @@
         <ng.api.dbregistry>true</ng.api.dbregistry>
         <ng.api.mdimix>true</ng.api.mdimix>
     </properties>
-    
+
     <build>
         <finalName>aero.minova.service.mcas</finalName>
 

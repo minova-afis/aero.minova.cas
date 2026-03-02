@@ -93,12 +93,23 @@ public class SecurityConfig {
 					// OPTIONS requests should be allowed without authentication for CORS preflight (standard!)
 					.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 					.requestMatchers("/actuator/**").permitAll()
-					.requestMatchers("/", "/public/**", "/img/**", "/js/**", "/theme/**", "/index", "/login", "/layout")
-					.permitAll().anyRequest().fullyAuthenticated()
+					// Static assets for the legacy setup page (/cas/setup)
+					.requestMatchers("/public/**", "/img/**", "/js/**", "/theme/**").permitAll()
+					// Legacy setup/login pages — public so anonymous users see the login form
+					.requestMatchers("/", "/index", "/login", "/setup").permitAll()
+					// Embedded React UI — served at /ui/**; this is the primary login page, must be public
+					.requestMatchers("/ui", "/ui/**").permitAll()
+					.anyRequest().fullyAuthenticated()
 				)
-				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"))
-				.formLogin(form -> form.loginPage("/login")//
-						.defaultSuccessUrl("/")//
+				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/ui/"))
+				// formLogin covers the legacy Thymeleaf setup page; loginPage points to the
+				// React UI so unauthenticated browser redirects land on the React login screen.
+				.formLogin(form -> form.loginPage("/ui/")//
+						// Explicit: without this Spring Security silently sets loginProcessingUrl=loginPage,
+						// which would move form processing from POST /login to POST /ui/ — breaking the
+						// legacy Thymeleaf setup page that posts to /login.
+						.loginProcessingUrl("/login")//
+						.defaultSuccessUrl("/ui/")//
 						.permitAll())
 				.httpBasic(Customizer.withDefaults())
 				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer

@@ -8,21 +8,19 @@ public class FrontPageController {
 
 	private static final String FRONTPAGE = "index.html";
 
+	/** Redirect /cas/ to the embedded React UI. */
 	@GetMapping("")
 	public String root() {
+		return "redirect:ui/";
+	}
+
+	/** Old CAS setup/login page — moved to /cas/setup. */
+	@GetMapping({"setup", "index", "index.html"})
+	public String setup() {
 		return FRONTPAGE;
 	}
 
-	@GetMapping("index")
-	public String index() {
-		return FRONTPAGE;
-	}
-
-	@GetMapping("index.html")
-	public String indexFull() {
-		return FRONTPAGE;
-	}
-
+	/** Spring Security login page (anonymous users landing here see the login form). */
 	@GetMapping("login")
 	public String login() {
 		return FRONTPAGE;

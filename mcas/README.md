@@ -26,6 +26,7 @@
 - **Container Native**: Optimized for Docker and Kubernetes deployments
 - **Database Agnostic**: Supports SQL Server, PostgreSQL, MySQL, H2
 - **Backward Compatible**: Compatible with existing CAS workflows and APIs
+- **Embedded Web UI**: Optionally ships with [Minova NG React GUI](https://github.com/minova-afis/ch.minova.gui.react) served at `/cas/ui/`
 
 ### Automatic Setup (New in 13.7.0)
 
@@ -64,6 +65,14 @@ ng.api.autosetup.force=false
 ```
 
 **Note:** Auto-setup requires `login_dataSource=admin` on first boot. After setup completes, you can switch to `database` or `ldap` authentication.
+
+## Embedded Web UI
+
+µCAS optionally embeds the [Minova NG React GUI](https://github.com/minova-afis/ch.minova.gui.react) — a modern browser-based frontend served directly from the JAR at `/cas/ui/`.
+
+When the `ch.minova:gui.react` Maven artifact is included as a dependency, the UI is available at `http://localhost:8084/cas/ui/` without any additional setup. The frontend auto-detects that it is running embedded and derives the backend URL from the server address automatically.
+
+See [Direct Integration](https://github.com/minova-afis/ch.minova.gui.react/blob/main/doc/DirectIntegration.md) for details.
 
 ## Release Artifacts
 

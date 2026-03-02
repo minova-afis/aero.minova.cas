@@ -80,11 +80,14 @@ public class CommunicationController {
 		} catch (Exception e) {
 			success = false;
 		}
+		// Normalize: context-path "/" must not produce "//setupSuccess"
+		// (browser treats "//path" as a protocol-relative URL → "http://path").
+		String base = "/".equals(homePath) ? "" : homePath;
 		if (success) {
-			httpServletResponse.setHeader("Location", homePath + "/setupSuccess");
+			httpServletResponse.setHeader("Location", base + "/setupSuccess");
 			httpServletResponse.setStatus(302);
 		} else {
-			httpServletResponse.setHeader("Location", homePath + "/setupError");
+			httpServletResponse.setHeader("Location", base + "/setupError");
 			httpServletResponse.setStatus(302);
 		}
 	}

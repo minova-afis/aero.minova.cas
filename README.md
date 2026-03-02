@@ -30,6 +30,12 @@ Eine Illustration der Struktur wird [hier](./doc/adoc/structure.adoc) bereitgest
 
 Für die alten Hasen unter uns: ein sehr großer Teil vom CAS stellt eine REST-Schnittstelle zu den SQL-Funktionalitäten vom Ncore und dem Install-Tool bereit.
 
+# UI
+
+Seit März 2026 beinhaltet jedes CAS (und µCAS) die [Minova NG Web-UI](https://github.com/minova-afis/ch.minova.gui.react), die direkt unter
+dem root des CAS aufgerufen wird (https://host:port/), die alte Setup-Routine ist dabei unter /setup nach-wie-vor verfügbar.
+Die eingebettete NextGen-UI Version ist in der pom aufgeführt.
+
 # µCAS
 
 Seit November 2025 gibt es eine allgemeine Micro-CAS Version, die auf jedem Bestandssystem installiert werden kann, um eine REST-Schnittstelle für DB Operationen bereitstellt und Applikationsdateien (Forms, Übersetzungen, Bilder) direkt aus der Datenbank bezieht und diese ebenfalls über REST liefert. [Weitere Infos](https://github.com/minova-afis/aero.minova.cas/tree/main/mcas)

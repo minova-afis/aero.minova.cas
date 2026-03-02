@@ -10,26 +10,26 @@
 	<link rel="shortcut icon"
 		href="https://www.minova.de/files/cto_layout/img/favicon.ico"
 		type="image/x-icon" />
-	<link rel="apple-touch-icon" href="/cas/img/apple-touch-icon.png" />
-	<link rel="stylesheet" href="/cas/theme/bootstrap/bootstrap.css" />
-	<link rel="stylesheet" href="/cas/theme/minova.css" />
-	<script src="/cas/js/jquery-3.3.1.slim.min.js"></script>
-	<script src="/cas/js/popper-1.14.7.min.js"></script>
-	<script src="/cas/js/bootstrap-4.3.1.min.js"></script>
+	<link rel="apple-touch-icon" th:href="@{/img/apple-touch-icon.png}" />
+	<link rel="stylesheet" th:href="@{/theme/bootstrap/bootstrap.css}" />
+	<link rel="stylesheet" th:href="@{/theme/minova.css}" />
+	<script th:src="@{/js/jquery-3.3.1.slim.min.js}"></script>
+	<script th:src="@{/js/popper-1.14.7.min.js}"></script>
+	<script th:src="@{/js/bootstrap-4.3.1.min.js}"></script>
 </th:block>
 </head>
 
 <body class="d-flex flex-column h-100 bg-light">
 	<header th:fragment="header">
 		<nav class="navbar navbar-dark bg-primary">
-			<a class="navbar-brand" href="/cas/"
+			<a class="navbar-brand" th:href="@{/}"
 				th:text="${@environment.getProperty('spring.application.name')}"></a>
 			<div class="mr-auto"></div>
 			<div sec:authorize="isAnonymous()">
-				<a role="button" href="/cas/login" class="btn btn-primary">Login</a>
+				<a role="button" th:href="@{/login}" class="btn btn-primary">Login</a>
 			</div>
 			<div sec:authorize="isAuthenticated()">
-				<a role="button" href="/cas/logout" class="btn btn-primary">Logout</a>
+				<a role="button" th:href="@{/logout}" class="btn btn-primary">Logout</a>
 			</div>
 		</nav>
 	</header>

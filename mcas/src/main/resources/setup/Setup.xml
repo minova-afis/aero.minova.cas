@@ -50,7 +50,7 @@
 				<!-- #### Server Configuration #### -->
 				<entry key="server.servlet.context-path" value="/cas"/>
 				<entry key="server.port" value="8084"/>
-				<entry key="cors.allowed.origins" value="https://ng-dev.minova.com,https://ng.minova.com,http://localhost,https://editor.swagger.io/"/>
+				<entry key="cors.allowed.origins" value="https://ng-dev.minova.com,https://ng.minova.com,http://localhost,http://localhost:3000,https://editor.swagger.io/"/>
 				
 				<!-- #### Management/Monitoring #### -->
 				<entry key="management.server.port" value="8091"/>

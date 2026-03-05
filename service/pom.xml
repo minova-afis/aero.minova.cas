@@ -11,7 +11,7 @@
 
     <properties>
         <!-- Embedded React UI — bump to match the desired ch.minova:gui.react release -->
-        <gui.react.version>1.3.6</gui.react.version>
+        <gui.react.version>1.6.0</gui.react.version>
     </properties>
  <dependencyManagement>
         <dependencies>

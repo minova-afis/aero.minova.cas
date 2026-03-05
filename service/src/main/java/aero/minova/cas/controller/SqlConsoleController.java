@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -90,7 +91,17 @@ public class SqlConsoleController {
     // ── Endpoint ───────────────────────────────────────────────────────────────
 
     @PostMapping(value = "data/execute-sql", produces = "application/json")
-    public ResponseEntity<SqlConsoleResponse> executeSql(@RequestBody SqlConsoleRequest request) {
+    public ResponseEntity<SqlConsoleResponse> executeSql(
+            @RequestBody SqlConsoleRequest request,
+            Principal principal) {
+
+        if (principal == null || !"admin".equals(principal.getName())) {
+            log.warn("data/execute-sql: rejected — caller '{}' is not admin",
+                    principal != null ? principal.getName() : "<unauthenticated>");
+            return ResponseEntity.status(403)
+                    .body(SqlConsoleResponse.error("Access denied: admin login required"));
+        }
+
         final String sql = request.getSql() != null ? request.getSql().trim() : "";
         log.info("data/execute-sql: {}", sql.length() > 120 ? sql.substring(0, 120) + "…" : sql);
 

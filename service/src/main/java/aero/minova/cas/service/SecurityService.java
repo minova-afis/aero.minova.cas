@@ -57,9 +57,12 @@ public class SecurityService {
 
 	public boolean isTablePresent(String tableName) throws Exception {
 		try (final Connection connection = systemDatabase.getConnection()) {
-			return connection.getMetaData()//
-					.getTables(null, null, tableName, null)//
-					.next();
+			// how: close connection
+			boolean result = connection.getMetaData() 		
+					.getTables(null, null, tableName, null)	
+					.next(); 								
+			connection.commit(); 							
+			return result;									
 		}
 	}
 

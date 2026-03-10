@@ -59,6 +59,7 @@ public class MssqlViewService implements ViewServiceInterface {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
 			}
+			connection.commit(); // how: without commit -> rollback
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new RuntimeException(e);

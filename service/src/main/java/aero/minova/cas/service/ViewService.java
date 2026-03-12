@@ -91,7 +91,8 @@ public class ViewService {
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
-			}
+				connection.commit(); // how: without commit -> rollback
+		    }
 
 			int totalResults = 0;
 			if (!result.getRows().isEmpty()) {

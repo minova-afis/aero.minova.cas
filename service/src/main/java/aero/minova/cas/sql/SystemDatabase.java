@@ -57,7 +57,10 @@ public class SystemDatabase {
 	public Connection getConnection() {
 		try {
 			Connection connection = dataSource().getConnection();
-			connection.setAutoCommit(false);
+			// how: check if autocommit true set to false
+			if ( connection.getAutoCommit() ) {
+				connection.setAutoCommit(false);
+			}
 			return connection;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

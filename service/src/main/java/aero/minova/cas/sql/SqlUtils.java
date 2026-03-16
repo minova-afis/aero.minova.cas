@@ -47,8 +47,8 @@ public class SqlUtils {
 	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser) throws ProcedureException {
 		try {
 			Row row = new Row();
+			Value value; // how: reduce reference objects
 			for (Column column : outputTable.getColumns()) {
-				Value value;
 				if (column.getType() == DataType.STRING) {
 					value = new Value(sqlSet.getString(column.getName()), null);
 				} else if (column.getType() == DataType.INTEGER) {

@@ -115,18 +115,8 @@ public class SqlProcedureController {
 
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
-		// how: wir holen uns eine 'Connection', ändern 'ANSI_WARNINGS off',
-		// führen 'procedureService.unsecurelyProcessProcedure' aus ohne die geänderte Connection und 
-		// setzen wieder 'ANSI_WARNINGS on'! Mit der geänderten Connection wird keine Aktion ausgeführt!
-		//try (final var connection = database.getConnection()) {
-		//	try (final var call = connection.createStatement()) {
-		//		call.execute("set ANSI_WARNINGS off");
-		//	}
 		try {	// how: only open Try - catch
 			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
-		//	try (final var call = connection.createStatement()) {
-		//		call.execute("set ANSI_WARNINGS on");
-		//	}
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);
@@ -149,18 +139,8 @@ public class SqlProcedureController {
 			adminSetupRow.addValue(new Value("admin", null));
 
 			adminPrivilegeTable.addRow(adminSetupRow);
-			// how: wir holen uns eine 'Connection', ändern 'ANSI_WARNINGS off',
-			// führen 'procedureService.unsecurelyProcessProcedure' aus ohne die geänderte Connection und 
-			// setzen wieder 'ANSI_WARNINGS on'! Mit der geänderten Connection wird keine Aktion ausgeführt!
-			//try (final var connection = database.getConnection()) {
-			//	try (final var call = connection.createStatement()) {
-			//		call.execute("set ANSI_WARNINGS off");
-			//	}
-				procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
-			//	try (final var call = connection.createStatement()) {
-			//		call.execute("set ANSI_WARNINGS on");
-			//	}
-			//}
+
+			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup privileges for admin!", e);
 			throw new RuntimeException(e);
@@ -182,12 +162,6 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		// how: wir holen uns eine 'Connection', ändern 'ANSI_WARNINGS' und schließen die Connection wieder ohne die Connection zu verwenden!
-		//if (inputTable.getName().equals("setup")) {
-		//	try (final var connection = database.getConnection(); final var call = connection.createStatement();) {
-		//		call.execute("set ANSI_WARNINGS off");
-		//	}
-		//}
 		customLogger.logUserRequest("data/procedure: ", inputTable);
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
@@ -201,12 +175,6 @@ public class SqlProcedureController {
 			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
 
-    		// how: wir holen uns eine 'Connection', ändern 'ANSI_WARNINGS' und schließen die Connection wieder ohne die Connection zu verwenden!
-			//if (inputTable.getName().equals("setup")) {
-			//	try (final var connection = database.getConnection(); final var call = connection.createStatement()) {
-			//		call.execute("set ANSI_WARNINGS on");
-			//	}
-			//}
 			return result;
 		} catch (Throwable e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);

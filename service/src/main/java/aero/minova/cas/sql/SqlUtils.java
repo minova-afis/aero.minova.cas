@@ -49,7 +49,6 @@ public class SqlUtils {
 			Row row = new Row();
 			Value value; // how: reduce reference objects
 			for (Column column : outputTable.getColumns()) {
-				// Value value; // how: reduce reference objects
 				if (column.getType() == DataType.STRING) {
 					value = new Value(sqlSet.getString(column.getName()), null);
 				} else if (column.getType() == DataType.INTEGER) {

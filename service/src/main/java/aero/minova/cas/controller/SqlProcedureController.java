@@ -120,14 +120,8 @@ public class SqlProcedureController {
 
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
-		try (final var connection = database.getConnection()) {
-			try (final var call = connection.createStatement()) {
-				call.execute("set ANSI_WARNINGS off");
-			}
+		try {
 			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
-			try (final var call = connection.createStatement()) {
-				call.execute("set ANSI_WARNINGS on");
-			}
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
 			throw new RuntimeException(e);
@@ -135,8 +129,8 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Erstellt eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden. Wird nach dem erfolgreichen Setup ausgeführt.
-	 * Creates admin UserGroup, admin User, and grants all privileges to the admin group.
+	 * Erstellt eine Admin-Rolle erstellt, welcher alle Rechte zugewiesen werden. Wird nach dem erfolgreichen Setup ausgeführt. Creates admin UserGroup, admin
+	 * User, and grants all privileges to the admin group.
 	 */
 	public void setupPrivileges() {
 		try {
@@ -151,34 +145,23 @@ public class SqlProcedureController {
 			adminSetupRow.addValue(new Value("admin", null));
 
 			adminPrivilegeTable.addRow(adminSetupRow);
-			try (final var connection = database.getConnection()) {
-				try (final var call = connection.createStatement()) {
-					call.execute("set ANSI_WARNINGS off");
-				}
 
-				// Create admin UserGroup with all privileges
-				try {
-					procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
-				} finally {
-					try (final var call = connection.createStatement()) {
-						call.execute("set ANSI_WARNINGS on");
-					}
-				}
-			}
+			// Create admin UserGroup with all privileges
+			procedureService.unsecurelyProcessProcedure(adminPrivilegeTable, true);
+
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup privileges for admin!", e);
 			throw new RuntimeException(e);
 		}
 
 	}
-	
+
 	/**
-	 *  Creates a default admin user for initial login after auto-setup.
-	 * This eliminates the need for manual user creation or login_dataSource=admin workaround.
+	 * Creates a default admin user for initial login after auto-setup. This eliminates the need for manual user creation or login_dataSource=admin workaround.
 	 */
 	public void setupDefaultAdminUser() {
 		customLogger.logSetup("Check default admin user...");
-	
+
 		try {
 			try (final var connection = database.getConnection()) {
 				try (final var call = connection.createStatement()) {
@@ -203,14 +186,8 @@ public class SqlProcedureController {
 	}
 
 	/**
-	 * Creates a default admin user for initial login after auto-setup.
-	 * This eliminates the need for manual user creation or login_dataSource=admin workaround.
-	 *
-	 * User: admin
-	 * Password: rqgzxTf71EAx8chvchMi (same as in-memory admin)
-	 * Authority: admin
-	 *
-	 * Admin should change this password after first login.
+	 * Creates a default admin user for initial login after auto-setup. This eliminates the need for manual user creation or login_dataSource=admin workaround.
+	 * User: admin Password: rqgzxTf71EAx8chvchMi (same as in-memory admin) Authority: admin Admin should change this password after first login.
 	 */
 	private void setupDefaultAdminUser(Connection connection) throws SQLException {
 		// Check if admin user already exists (idempotent)
@@ -227,14 +204,14 @@ public class SqlProcedureController {
 		String hashedPassword = passwordEncoder.encode(defaultPassword);
 
 		// Insert admin user into xtcasUsers
-		String insertUserSql = "INSERT INTO dbo.xtcasUsers (KeyText, Username, Password, Description, LastDate, LastAction, LastUser) " +
-				"VALUES ('admin', 'admin', ?, 'Default admin user - change password after first login', GETDATE(), 1, '"+USER_CAS_SETUP+"')";
+		String insertUserSql = "INSERT INTO dbo.xtcasUsers (KeyText, Username, Password, Description, LastDate, LastAction, LastUser) "
+				+ "VALUES ('admin', 'admin', ?, 'Default admin user - change password after first login', GETDATE(), 1, '" + USER_CAS_SETUP + "')";
 		try (var stmt = connection.prepareStatement(insertUserSql)) {
 			stmt.setString(1, hashedPassword);
 			stmt.executeUpdate();
 			customLogger.logSetup("Created default admin user - Username: admin, Password: [CAS DEFAULT]");
 		}
-		
+
 		checkUserSql = "SELECT COUNT(*) FROM dbo.xtcasAuthorities WHERE Username = 'admin'";
 		try (var stmt = connection.createStatement(); var rs = stmt.executeQuery(checkUserSql)) {
 			if (rs.next() && rs.getInt(1) > 0) {
@@ -244,8 +221,8 @@ public class SqlProcedureController {
 		}
 
 		// Insert admin authority into xtcasAuthorities
-		String insertAuthoritySql = "INSERT INTO dbo.xtcasAuthorities (KeyText, Username, Authority, LastDate, LastAction, LastUser) " +
-				"VALUES ('admin', 'admin', 'admin', GETDATE(), 1, '"+USER_CAS_SETUP+"')";
+		String insertAuthoritySql = "INSERT INTO dbo.xtcasAuthorities (KeyText, Username, Authority, LastDate, LastAction, LastUser) "
+				+ "VALUES ('admin', 'admin', 'admin', GETDATE(), 1, '" + USER_CAS_SETUP + "')";
 		try (var stmt = connection.createStatement()) {
 			stmt.executeUpdate(insertAuthoritySql);
 			customLogger.logSetup("Granted admin authority to default admin user");
@@ -253,7 +230,7 @@ public class SqlProcedureController {
 
 		// Commit the transaction since auto-commit is disabled
 		connection.commit();
-		
+
 		customLogger.logSetup("IMPORTANT: Default admin user created. Please change password after first login!");
 	}
 
@@ -271,11 +248,6 @@ public class SqlProcedureController {
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
-		if (inputTable.getName().equals("setup")) {
-			try (final var connection = database.getConnection(); final var call = connection.createStatement();) {
-				call.execute("set ANSI_WARNINGS off");
-			}
-		}
 		customLogger.logUserRequest("data/procedure: ", inputTable);
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
@@ -288,11 +260,7 @@ public class SqlProcedureController {
 
 			ResponseEntity result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
 			queueService.accept(inputTable, result);
-			if (inputTable.getName().equals("setup")) {
-				try (final var connection = database.getConnection(); final var call = connection.createStatement()) {
-					call.execute("set ANSI_WARNINGS on");
-				}
-			}
+
 			return result;
 		} catch (Throwable e) {
 			customLogger.logError("Error while trying to execute procedure: " + inputTable.getName(), e);

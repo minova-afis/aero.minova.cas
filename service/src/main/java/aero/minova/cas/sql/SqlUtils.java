@@ -57,7 +57,7 @@ public class SqlUtils {
 			blob.free(); // Free-up memory
 		}
 	}
-	
+
 	public static String toSqlString(Value value) {
 		if (value.getType() == DataType.BOOLEAN) {
 			if (value.getBooleanValue()) {
@@ -73,8 +73,8 @@ public class SqlUtils {
 	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser) throws ProcedureException {
 		try {
 			Row row = new Row();
+			Value value;
 			for (Column column : outputTable.getColumns()) {
-				Value value;
 				if (column.getType() == DataType.STRING) {
 					value = new Value(sqlSet.getString(column.getName()), null);
 				} else if (column.getType() == DataType.INTEGER) {
@@ -101,7 +101,7 @@ public class SqlUtils {
 					}
 				} else if (column.getType() == DataType.BINARY) {
 					Object blob = sqlSet.getBlob(column.getName());
-					byte[] bytes = (blob instanceof Blob ? getBytesFromBlob((Blob)blob) : null);
+					byte[] bytes = (blob instanceof Blob ? getBytesFromBlob((Blob) blob) : null);
 					value = new Value(bytes, null);
 				} else {
 					logger.warn(conversionUser.getClass().getSimpleName() + ": Ausgabe-Typ wird nicht unterstützt. Er wird als String dargestellt: "
@@ -149,7 +149,7 @@ public class SqlUtils {
 						null);
 			} else if (column.getType() == DataType.BINARY) {
 				Object blob = statement.getBlob(index);
-				byte[] bytes = (blob instanceof Blob ? getBytesFromBlob((Blob)blob) : null);
+				byte[] bytes = (blob instanceof Blob ? getBytesFromBlob((Blob) blob) : null);
 				value = new Value(bytes, null);
 			} else {
 				throw new UnsupportedOperationException();

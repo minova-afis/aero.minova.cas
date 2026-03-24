@@ -57,9 +57,11 @@ public class SecurityService {
 
 	public boolean isTablePresent(String tableName) throws Exception {
 		try (final Connection connection = systemDatabase.getConnection()) {
-			return connection.getMetaData()//
+			boolean result = connection.getMetaData()//
 					.getTables(null, null, tableName, null)//
 					.next();
+			connection.commit();
+			return result;
 		}
 	}
 
@@ -74,7 +76,7 @@ public class SecurityService {
 	 * @return Enthält alle Gruppen, die ein Recht auf das Privileg haben.
 	 **/
 	public List<Row> getPrivilegePermissions(String privilegeName) {
-		if(privilegeName != null && privilegeName.toLowerCase().startsWith("dbo.")) {
+		if (privilegeName != null && privilegeName.toLowerCase().startsWith("dbo.")) {
 			privilegeName = privilegeName.substring("dbo.".length());
 		}
 		loadAllPrivileges();

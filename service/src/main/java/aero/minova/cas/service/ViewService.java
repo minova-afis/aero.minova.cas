@@ -84,15 +84,16 @@ public class ViewService {
 			// Slavi '26: keep connection only as long as it is technically required.
 			String viewQuery = viewService.prepareViewString(inputTable, false, 0, authoritiesForThisTable);
 			try (val connection = systemDatabase.getConnection();
-				 val preparedStatement = connection.prepareCall(viewQuery);
-			     PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
+					val preparedStatement = connection.prepareCall(viewQuery);
+					PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
 				customLogger.logSql("Executing statements: " + sb);
-				
+
 				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
+				connection.commit();
 			}
-			
+
 			int totalResults = 0;
 			if (!result.getRows().isEmpty()) {
 				totalResults = result.getRows().size();
@@ -193,10 +194,9 @@ public class ViewService {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		Table result = new Table();
-		
+
 		final String viewQuery = prepareViewString(inputTable, false, ViewServiceInterface.IF_LESS_THAN_ZERO_THEN_MAX_ROWS, false, userGroups);
-		try (final val connection = systemDatabase.getConnection();
-			 final var preparedStatement = connection.prepareCall(viewQuery)) {
+		try (final val connection = systemDatabase.getConnection(); final var preparedStatement = connection.prepareCall(viewQuery)) {
 			try (PreparedStatement preparedViewStatement = SqlUtils.fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb,
 					customLogger.errorLogger)) {
 				customLogger.logPrivilege("Executing SQL-statement for view: " + sb);
@@ -204,6 +204,7 @@ public class ViewService {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
 			}
+			connection.commit(); // how: without commit -> rollback
 		} catch (Exception e) {
 			customLogger.logError("Statement could not be executed: " + sb, e);
 			throw new RuntimeException(e);

@@ -51,7 +51,6 @@ import lombok.Setter;
 @Service
 @Setter
 public class FilesService {
-
 	@org.springframework.beans.factory.annotation.Value("${aero_minova_core_application_root_path:.}")
 	private String rootPath;
 

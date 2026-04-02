@@ -23,6 +23,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.ContentPatcher;
 import aero.minova.cas.service.FilesService;
 import ch.minova.foundation.db.NextGen;
 import ch.minova.foundation.rest.db.service.FileService;
@@ -66,6 +68,8 @@ public class FilesController {
 	@Autowired
 	SqlProcedureController spc;
 	
+	@Autowired
+	ContentPatcher contentPatcher;
 
 	@org.springframework.beans.factory.annotation.Value("${generate.mdi.per.user:true}")
 	boolean generateMDIPerUser;
@@ -77,97 +81,95 @@ public class FilesController {
 	@org.springframework.beans.factory.annotation.Value("${readPackedXBS:true}")
 	boolean readPackedXBS;
 	
+    @Value("${application:#{null}}")
+    private String application;
+	
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
 	boolean isDBFilesActive;
+
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles.patch.active:true}")
+	boolean isWFCPatchActive;
+	
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles.resolveforms:false}")
+	boolean isResolveFormsActive;
 	
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:false}")
 	boolean isDBRegistryActive;
 	
 	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
 	boolean isDBFilesPreferred;
-
-	// TODO Extension vorerst entfernt, aber für später aufheben
-	// TODO Bytes in JSON durch BASE64 darstellen
-//	@PostConstruct
-//	public void setup() throws Exception {
-//		// fügt Extension hinzu
-//		spc.registerExtension("files/read", inputTable -> {
-//			try {
-//				SqlProcedureResult result = new SqlProcedureResult();
-//				result.setResultSet(getFiles(inputTable.getRows()));
-//				result.setReturnCode(1);
-//				return new ResponseEntity(result, HttpStatus.ACCEPTED);
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//		});
-//		spc.registerExtension("files/hash", inputTable -> {
-//			try {
-//				SqlProcedureResult result = new SqlProcedureResult();
-//				result.setResultSet(getHashes(inputTable.getRows()));
-//				result.setReturnCode(1);
-//				return new ResponseEntity(result, HttpStatus.ACCEPTED);
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//		});
-//	}
-//
-//	public Table getFiles(@RequestParam List<Row> pathList) throws Exception {
-//		Table fileBytesTable = new Table();
-//		fileBytesTable.addColumn(new Column("FileName", DataType.STRING));
-//		fileBytesTable.addColumn(new Column("FileBytes", DataType.STRING));
-//
-//		for (Row row : pathList) {
-//			Row fileBytesRow = new Row();
-//			String fileName = row.getValues().get(0).getStringValue().replace('\\', '/');
-//
-//			// Überprüfen, ob File existiert und überprüfen, ob Berechtigung für dieses File gegeben sind
-//			val filePath = files.checkLegalPath(fileName);
-//			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + fileName).getRows();
-//
-//			if (!privileges.isEmpty()) {
-//				logger.info("files/read: " + filePath);
-//				fileBytesRow.addValue(new Value(fileName, null));
-//				fileBytesRow.addValue(new Value(readAllBytes(filePath).toString(), null));
-//				fileBytesTable.addRow(fileBytesRow);
-//			} else {
-//				throw new RuntimeException("msg.PrivilegeError %" + fileName);
-//			}
-//		}
-//		return fileBytesTable;
-//	}
-//
-//	public Table getHashes(@RequestParam List<Row> pathList) throws Exception {
-//		Table fileBytesTable = new Table();
-//		fileBytesTable.addColumn(new Column("FileName", DataType.STRING));
-//		fileBytesTable.addColumn(new Column("FileBytes", DataType.STRING));
-//
-//		for (Row row : pathList) {
-//			Row fileBytesRow = new Row();
-//			String fileName = row.getValues().get(0).getStringValue().replace('\\', '/');
-//			String toBeResolved = fileName.replace(files.getSystemFolder().toString() + "/", "") + ".md5";
-//			Path md5FilePath = files.getMd5Folder().resolve(toBeResolved);
-//
-//			// Überprüfen, ob File existiert und überprüfen, ob Berechtigung für dieses File gegeben sind
-//			val filePath = files.checkLegalPath(md5FilePath);
-//
-//			// Beim Überprüfen der Berechtigung schauen wir, ob die Berechtigung für die Datei, zu welcher der Hash gehört, freigegeben ist
-//			List<Row> privileges = svc.getPrivilegePermissions("files/read:" + fileName).getRows();
-//
-//			if (!privileges.isEmpty()) {
-//				logger.info("checking Hash for file: " + fileName);
-//				fileBytesRow.addValue(new Value(fileName, null));
-//				fileBytesRow.addValue(new Value(readAllBytes(filePath).toString(), null));
-//				fileBytesTable.addRow(fileBytesRow);
-//			} else {
-//				throw new RuntimeException("msg.PrivilegeError %" + fileName);
-//			}
-//		}
-//		return fileBytesTable;
-//	}
-
 	
+	/** Calculate MD5
+	 * @param content
+	 * @return
+	 */
+	private byte[] calculateMD5(byte[] content) {
+		if (content == null)
+			return null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			return md.digest(content);
+		} catch (NoSuchAlgorithmException e) {
+			customLogger.logError("MD5 algorithm not available", e);
+			return null;
+		}
+	}
+	
+	/** Get requested file from the DB and
+	 * 1. patch XML forms it for WFC
+	 * 2. Add option pages directly into forms 
+	 * 3. trananslate forms and mdi if language is specified
+	 * @param path
+	 * @param lang
+	 * @return
+	 */
+	byte[] getFileFromTable(String path, String lang) {
+		if(path == null)
+			return null;
+		byte[] toRet = null;
+		
+		// E.g. if "Driver.xml" is asked -> request "afis/Driver.xml"
+		if(application != null && !application.isEmpty() &&
+			!path.toLowerCase().startsWith(application.toLowerCase()) &&
+			!path.toLowerCase().startsWith("/" + application.toLowerCase())) {
+			toRet = dbFileService.getFile(application + (path.startsWith("/") ? "" : "/") + path);
+			if(toRet == null) {
+				// Fallback
+				toRet = dbFileService.getFile(path);
+			}
+		} else {
+			toRet = dbFileService.getFile(path);
+		}
+		
+		// On-the-fly patching of Forms/OPs for WFC
+		if (isWFCPatchActive && path.toLowerCase().endsWith(".xml"))
+			toRet = contentPatcher.patchXMLForm(path, toRet);
+		
+		// On the fly inclusion of option-pages and forms -- the UI should get a finished definition
+		// https://github.com/minova-afis/aero.minova.cas/issues/1473
+		if(isResolveFormsActive && path.toLowerCase().endsWith(".xml"))
+			toRet = contentPatcher.resolveXMLForm(path, toRet);
+		
+		// Try to translate if XML or MDI -- if no language is given, no translation will be done
+		if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+			toRet = translationService.translateXML(path, toRet, lang);
+		
+		// On-the-fly XBS patching
+		if (isWFCPatchActive && path.toLowerCase().endsWith("xbs"))
+			toRet = contentPatcher.patchXBS(path, toRet);
+		
+		return toRet;
+	}
+	
+	public byte[] getMD5FromTable(String path, String lang) {
+		if(path == null)
+			return null;
+		// On-the-fly patching of Forms/OPs for WFC
+		if (isWFCPatchActive && path.toLowerCase().endsWith(".xml"))
+			return calculateMD5(getFileFromTable(path, lang));
+		return dbFileService.getMD5(path);
+	}
+			
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
@@ -188,10 +190,7 @@ public class FilesController {
 
 		// Are Files from DB preferered compared to File System?
 		if (isDBFilesActive && isDBFilesPreferred) {
- 			byte[] toRet = dbFileService.getFile(path);
- 			// Try to translate if XML or MDI -- if no language is given, no translation will be done
- 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
- 				toRet = translationService.translateXML(path, toRet, lang);
+ 			byte[] toRet = getFileFromTable(path, lang);
 			if(toRet != null)
 				return toRet;
 		}
@@ -208,10 +207,7 @@ public class FilesController {
 		
 		// Are Files from DB active but not preferred compared to File System?
 		if(isDBFilesActive && !isDBFilesPreferred) {
-			byte[] toRet = dbFileService.getFile(path);
-			// Try to translate if XML or MDI -- if no language is given, no translation will be done
- 			if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
- 				toRet = translationService.translateXML(path, toRet, lang);
+ 			byte[] toRet = getFileFromTable(path, lang);
 			if(toRet != null)
 				return toRet;
 		}
@@ -275,17 +271,15 @@ public class FilesController {
 		// Should we generate XBS from tRegistry?
 		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
 			 byte[] xbsCode = getXBSFromRegistry(path);
-			 return MessageDigest.getInstance("MD5").digest(xbsCode);
+			 return calculateMD5(xbsCode);
 		}
 		
 		// Try tFiles first
 		if (isDBFilesActive && isDBFilesPreferred) {
 			// Translated files have different contents based on language
  			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
- 				byte[] content = dbFileService.getFile(path);
- 				content = translationService.translateXML(path, content, lang);
- 				if(content != null)
- 					return MessageDigest.getInstance("MD5").digest(content);
+ 				byte[] content = getFileFromTable(path, lang);
+ 				return calculateMD5(content);
  			}
 			byte[] toRet = dbFileService.getMD5(path);
 			if(toRet != null)
@@ -296,7 +290,7 @@ public class FilesController {
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
 				byte[] mdi =  fileService.readMDI();
-				return (mdi == null ? null : MessageDigest.getInstance("MD5").digest(mdi));
+				return calculateMD5(mdi);
 			} catch (Exception e) {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
@@ -306,10 +300,8 @@ public class FilesController {
 		if(isDBFilesActive && !isDBFilesPreferred) {
 			// Translated files have different contents based on language
  			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
- 				byte[] content = dbFileService.getFile(path);
- 				content = translationService.translateXML(path, content, lang);
- 				if(content != null)
- 					return MessageDigest.getInstance("MD5").digest(content);
+ 				byte[] content = getFileFromTable(path, lang);
+ 				return calculateMD5(content);
  			}
 			
 			byte[] toRet = dbFileService.getMD5(path);
@@ -331,15 +323,9 @@ public class FilesController {
 			} else {
 				pathContent = getFile(path, lang);
 			}
-			MessageDigest md;
-			try {
-				md = MessageDigest.getInstance("MD5");
-			} catch (NoSuchAlgorithmException e) {
-				throw new RuntimeException("msg.MD5Error");
-			}
-			md.update(pathContent);
-			String fx = "%0" + (md.getDigestLength() * 2) + "x";
-			return String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
+			byte[] md5 = calculateMD5(pathContent);
+			String fx = "%0" + (md5.length * 2) + "x";
+			return String.format(fx, new BigInteger(1, md5)).getBytes(StandardCharsets.UTF_8);
 		}
 		path = path.replace('\\', '/');
 		customLogger.logUserRequest("files/hash: " + path);
@@ -364,7 +350,7 @@ public class FilesController {
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
 		// Try tFiles first
 		if(isDBFilesActive) {
-			byte[] toRet = dbFileService.getFile(path);
+			byte[] toRet = getFileFromTable(path, null);
 			if(toRet != null)
 				return toRet;
 		}
@@ -479,15 +465,9 @@ public class FilesController {
 	 */
 	public void hashFile(Path p) throws Exception {
 		final val filePath = fileService.checkLegalPath(p);
-		MessageDigest md;
-		try {
-			md = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("msg.MD5Error");
-		}
-		md.update(readAllBytes(filePath));
-		String fx = "%0" + (md.getDigestLength() * 2) + "x";
-		byte[] hashOfFile = String.format(fx, new BigInteger(1, md.digest())).getBytes(StandardCharsets.UTF_8);
+		byte[] md5 = calculateMD5(readAllBytes(filePath));
+		String fx = "%0" + (md5.length * 2) + "x";
+		byte[] hashOfFile = String.format(fx, new BigInteger(1, md5)).getBytes(StandardCharsets.UTF_8);
 
 		// Path für die neue MD5-Datei zusammenbauen
 		Path mdDataName = fileService.getMd5Folder().resolve(p);
@@ -552,7 +532,6 @@ public class FilesController {
 					customLogger.logFiles("No internal XBS found for " + path + " -> construct new with ENV and tRegistry");
 				}
 			}
-			
 			
 			// Build-up registry
 			NextGen.Registry reg = NextGen.Registry.create()
@@ -635,6 +614,7 @@ public class FilesController {
 			}
 		}
 	}
+
 
 	private boolean isFileResource(String resourcePath) {
 		return !resourcePath.endsWith("/");

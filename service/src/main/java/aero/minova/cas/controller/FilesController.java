@@ -147,8 +147,8 @@ public class FilesController {
 		
 		// On the fly inclusion of option-pages and forms -- the UI should get a finished definition
 		// https://github.com/minova-afis/aero.minova.cas/issues/1473
-		if(isResolveFormsActive && path.toLowerCase().endsWith(".xml"))
-			toRet = contentPatcher.resolveXMLForm(path, toRet);
+		if(isResolveFormsActive && application != null && !application.isEmpty() && path.toLowerCase().endsWith(".xml"))
+			toRet = contentPatcher.resolveXMLForm(application, path, toRet);
 		
 		// Try to translate if XML or MDI -- if no language is given, no translation will be done
 		if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))

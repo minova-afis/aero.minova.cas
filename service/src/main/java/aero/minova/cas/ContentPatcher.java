@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import ch.minova.foundation.rest.db.model.RegistryEntry;
 import ch.minova.foundation.rest.db.model.RegistryNode;
 import ch.minova.foundation.rest.db.service.FileService;
 import ch.minova.foundation.rest.db.service.RegistryService;
@@ -183,7 +185,7 @@ public class ContentPatcher {
 	 * @param toRet
 	 * @return
 	 */
-	public byte[] resolveXMLForm(String path, byte[] form) {
+	public byte[] resolveXMLForm(String application, String path, byte[] form) {
 		if(form == null)
 			return null;
 		
@@ -203,17 +205,24 @@ public class ContentPatcher {
 			// But also double keys as two entries...
 			// AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Key0
 			// AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Key1
-			RegistryNode ops = registryService.getSubtree((path.startsWith("/") ? "" : "/") + path + "/OptionPages/");
-			for(RegistryNode op : ops.getChildren().values()) try {
-				byte[] opCode = dbFileService.getFile(op.getName());
-				if(opCode == null) {
-					customLogger.logError("Failed to add " + op.getName() + " option page to " + path + ": option page doesn't exist in tFile");
-					continue;
+			String prefix = (application == null ? "" : application) +
+					 		(path.startsWith("/") ? "" : "/") + path +
+							"/OptionPages/";
+			
+			RegistryNode ops = registryService.getSubtree(prefix); // E.g. AFIS/Item.xml/OptionPages
+			if(ops != null && !ops.getChildren().isEmpty()) {
+				for(RegistryNode op : ops.getChildren().values()) try {
+					byte[] opCode = dbFileService.getFile(op.getName());
+					if(opCode == null) {
+						customLogger.logError("Failed to add " + op.getName() + " option page to " + path + ": option page doesn't exist in tFile");
+						continue;
+					}
+					Document opDoc = XMLUtils.getDocument(opCode);
+					addOptionPage(formDoc, opDoc);
+				} catch(Exception ex1) {
+					customLogger.logError("Failed to add " + op.getName() + " option page to " + path, ex1);				
 				}
-				Document opDoc = XMLUtils.getDocument(form);
-				addOptionPage(formDoc, opDoc);
-			} catch(Exception ex1) {
-				customLogger.logError("Failed to add " + op.getName() + " option page to " + path, ex1);				
+				toRet = XMLUtils.toBytes(formDoc);
 			}
 		} catch (Exception ex) {
 			customLogger.logError("Failed to resolve XML form " + path, ex);
@@ -226,18 +235,89 @@ public class ContentPatcher {
 				CACHE.put(path.toLowerCase(), new CacheEntry(initialHash, toRet));
 			}
 		}
-		return null;
+		return toRet;
 	}
-	
+		
 	/**
 	 * Integrate option page into form
 	 * See https://github.com/minova-afis/aero.minova.cas/issues/1473
 	 */
-	private void addOptionPage(Document form, Document op) {
-		// Grids are integrated as-is, i.e. added at the end detail
-		
-		// <form><detail><page>... or <form><detail><head> are converted to <optionpage>
-		
-		
+	private void addOptionPage(Document form, Document op) throws IllegalArgumentException {
+		if (form == null || op == null)
+			return;
+
+		// Get the detail part first
+		List<Element> els = XMLUtils.findElement(form.getDocumentElement(), "detail");
+		if (els.size() == 0)
+			throw new IllegalArgumentException("Form has no detail");
+		Element detail = els.get(0);
+
+		Element opRoot = op.getDocumentElement();
+		if ("grid".equalsIgnoreCase(opRoot.getTagName())) {
+			// Grids are integrated as-is, i.e. added at the end of detail
+			Node toAdd = form.importNode(opRoot, true);
+			detail.appendChild(toAdd);
+
+		} else if ("form".equalsIgnoreCase(opRoot.getTagName())) {
+			// <form><detail><page>... or <form><detail><head> are converted to <optionpage>
+
+			NodeList opRootChildren = opRoot.getElementsByTagName("detail");
+			if (opRootChildren.getLength() == 0 || !(opRootChildren.item(0) instanceof Element))
+				throw new IllegalArgumentException("Option page has no detail");
+
+			Element opDetail = (Element) opRootChildren.item(0);
+			Node opDetailChildNode = opDetail.getFirstChild();
+			while (opDetailChildNode != null && !(opDetailChildNode instanceof Element))
+				opDetailChildNode = opDetailChildNode.getNextSibling();
+
+			if (!(opDetailChildNode instanceof Element))
+				throw new IllegalArgumentException("Option page's detail has a wrong child");
+
+			Element source = (Element) opDetailChildNode;
+			if (!"page".equalsIgnoreCase(source.getTagName()) && !"head".equalsIgnoreCase(source.getTagName())) {
+				throw new IllegalArgumentException("Option page's detail must either contain head or page child");
+			}
+
+			// Create <optionpage>
+			Element optionPage = form.createElement("optionpage");
+
+			// Copy child content from page/head into optionpage
+			NodeList children = source.getChildNodes();
+			for (int i = 0; i < children.getLength(); i++) {
+				Node imported = form.importNode(children.item(i), true);
+				optionPage.appendChild(imported);
+			}
+
+			// Copy image and text from form
+			optionPage.setAttribute("icon", opRoot.getAttribute("icon"));
+			optionPage.setAttribute("text", opRoot.getAttribute("title"));
+
+			NamedNodeMap toCopy = opDetail.getAttributes();
+			for (int i = 0; i < toCopy.getLength(); i++) {
+				Node attr = toCopy.item(i);
+				optionPage.setAttribute(attr.getNodeName(), attr.getNodeValue());
+			}
+
+			// Also transfer attributes from page/head itself if present
+			NamedNodeMap sourceAttrs = source.getAttributes();
+			for (int i = 0; i < sourceAttrs.getLength(); i++) {
+				Node attr = sourceAttrs.item(i);
+				optionPage.setAttribute(attr.getNodeName(), attr.getNodeValue());
+			}
+
+			// Integrate events as last child of <optionpage>
+			opRootChildren = opRoot.getElementsByTagName("events");
+			if (opRootChildren.getLength() > 0 && opRootChildren.item(0) instanceof Element) {
+				Element events = (Element) opRootChildren.item(0);
+				Node importedEvents = form.importNode(events, true);
+				optionPage.appendChild(importedEvents);
+			}
+
+			// Add <optionpage> into detail
+			detail.appendChild(optionPage);
+
+		} else {
+			throw new IllegalArgumentException("Unsupported option page type: " + opRoot.getTagName());
+		}
 	}
 }

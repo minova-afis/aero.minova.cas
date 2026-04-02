@@ -51,7 +51,7 @@
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>foundation.rest.db</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -22,6 +22,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
  - Feldlänge in CAS-Maske an Datenbankspalten anpassen
  
  - CAS-Menüs weiter hinten anordnen
+ 
+ - ANSI_WARNINGS im SqlProcedureController nicht mehr setzen
+ 
+ - Alle Datenbank-Connections auch commiten
 
 ## \[13.6.1\] - 2025-08-12
 

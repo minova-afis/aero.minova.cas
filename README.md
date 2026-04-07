@@ -38,7 +38,9 @@ Die eingebettete NextGen-UI Version ist in der pom aufgeführt.
 
 # µCAS
 
-Seit November 2025 gibt es eine allgemeine Micro-CAS Version, die auf jedem Bestandssystem installiert werden kann, um eine REST-Schnittstelle für DB Operationen bereitstellt und Applikationsdateien (Forms, Übersetzungen, Bilder) direkt aus der Datenbank bezieht und diese ebenfalls über REST liefert. [Weitere Infos](https://github.com/minova-afis/aero.minova.cas/tree/main/mcas)
+Seit November 2025 gibt es eine allgemeine Micro-CAS Version, die auf jedem Bestandssystem installiert werden kann, um eine REST-Schnittstelle für DB Operationen bereitstellt und Applikationsdateien (Forms, Übersetzungen, Bilder) direkt aus der Datenbank bezieht und diese ebenfalls über REST liefert. Auch löst auf Wunsch CAS automatisch [alle option pages auf](https://github.com/minova-afis/aero.minova.cas/blob/main/doc/md/OptionPageResolve.md), damit die UI slim bleibt. 
+
+[Weitere Infos](https://github.com/minova-afis/aero.minova.cas/tree/main/mcas)
 
 # Status
 

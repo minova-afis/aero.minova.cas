@@ -2,8 +2,10 @@ package aero.minova.cas;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,22 @@ import ch.minova.foundation.rest.db.service.XMLUtils;
  * See also https://github.com/minova-afis/aero.minova.cas/issues/1473
  */
 public class ContentPatcher {
+	private static final String NODE_FORM = "form";
+	private static final String NODE_DETAIL = "detail";
+	private static final String NODE_PAGE = "page";
+	private static final String NODE_HEAD = "head";
+	private static final String NODE_GRID = "grid";
+	private static final String NODE_EVENTS = "events";
+	private static final String NODE_OPTIONPAGE = "optionpage";
+	
+	private static final String ATTR_ICON = "icon";
+	private static final String ATTR_ID = "id";
+	private static final String ATTR_NAME = "name";
+	private static final String ATTR_TEXT = "text";
+	private static final String ATTR_MAP_TO = "map-to";
+	private static final String ATTR_KEY_TYPE = "key-type";
+	private static final String ATTR_TITLE = "title";
+	
 	@Autowired
 	FileService dbFileService;
 	
@@ -209,6 +227,14 @@ public class ContentPatcher {
 					 		(path.startsWith("/") ? "" : "/") + path +
 							"/OptionPages/";
 			
+			// getSubtree converts value list to a tree, based on the given prefix, e.g.
+			//   AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Key0
+			//   AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Key1
+			// ->
+			//   OptionPages
+			//             |- LuSupplierCustomerExHydrant.op.xml
+			//                                                  |- Key0 = SupplierKey
+			//                                                  |- Key1 = CustomerKey
 			RegistryNode ops = registryService.getSubtree(prefix); // E.g. AFIS/Item.xml/OptionPages
 			if(ops != null && !ops.getChildren().isEmpty()) {
 				for(RegistryNode op : ops.getChildren().values()) try {
@@ -218,7 +244,16 @@ public class ContentPatcher {
 						continue;
 					}
 					Document opDoc = XMLUtils.getDocument(opCode);
-					addOptionPage(formDoc, opDoc);
+					// Now we need the key-Map:
+					// - Key = Key within the parent Detail, e.g. KeyLong (by name, new-stlye) or Key0 (by index, legacy-style)
+					// - Value = key within option page, e.g. SupplierKey (only by name)
+					Map<String, String> keyMapping = new LinkedHashMap<String, String>();
+					for(RegistryNode key : op.getChildren().values()) {
+						if(key.getChildren().isEmpty() && key.hasValue()) {
+							keyMapping.put(key.getName(), key.getValue());
+						}
+					}
+					addOptionPage(formDoc, opDoc, keyMapping);
 				} catch(Exception ex1) {
 					customLogger.logError("Failed to add " + op.getName() + " option page to " + path, ex1);				
 				}
@@ -237,31 +272,31 @@ public class ContentPatcher {
 		}
 		return toRet;
 	}
-		
+	
 	/**
 	 * Integrate option page into form
 	 * See https://github.com/minova-afis/aero.minova.cas/issues/1473
 	 */
-	private void addOptionPage(Document form, Document op) throws IllegalArgumentException {
+	private void addOptionPage(Document form, Document op, Map<String, String> keyMapping) throws IllegalArgumentException {
 		if (form == null || op == null)
 			return;
 
 		// Get the detail part first
-		List<Element> els = XMLUtils.findElement(form.getDocumentElement(), "detail");
+		List<Element> els = XMLUtils.findElement(form.getDocumentElement(), NODE_DETAIL);
 		if (els.size() == 0)
 			throw new IllegalArgumentException("Form has no detail");
 		Element detail = els.get(0);
 
 		Element opRoot = op.getDocumentElement();
-		if ("grid".equalsIgnoreCase(opRoot.getTagName())) {
+		Element toAdd = null;
+		if (NODE_GRID.equalsIgnoreCase(opRoot.getTagName())) {
 			// Grids are integrated as-is, i.e. added at the end of detail
-			Node toAdd = form.importNode(opRoot, true);
-			detail.appendChild(toAdd);
+			toAdd = (Element)form.importNode(opRoot, true);
 
-		} else if ("form".equalsIgnoreCase(opRoot.getTagName())) {
+		} else if (NODE_FORM.equalsIgnoreCase(opRoot.getTagName())) {
 			// <form><detail><page>... or <form><detail><head> are converted to <optionpage>
 
-			NodeList opRootChildren = opRoot.getElementsByTagName("detail");
+			NodeList opRootChildren = opRoot.getElementsByTagName(NODE_DETAIL);
 			if (opRootChildren.getLength() == 0 || !(opRootChildren.item(0) instanceof Element))
 				throw new IllegalArgumentException("Option page has no detail");
 
@@ -273,51 +308,92 @@ public class ContentPatcher {
 			if (!(opDetailChildNode instanceof Element))
 				throw new IllegalArgumentException("Option page's detail has a wrong child");
 
-			Element source = (Element) opDetailChildNode;
-			if (!"page".equalsIgnoreCase(source.getTagName()) && !"head".equalsIgnoreCase(source.getTagName())) {
+			Element headOrPage = (Element) opDetailChildNode;
+			if (!NODE_PAGE.equalsIgnoreCase(headOrPage.getTagName()) && !NODE_HEAD.equalsIgnoreCase(headOrPage.getTagName())) {
 				throw new IllegalArgumentException("Option page's detail must either contain head or page child");
 			}
 
 			// Create <optionpage>
-			Element optionPage = form.createElement("optionpage");
+			Element optionPage = form.createElement(NODE_OPTIONPAGE);
 
 			// Copy child content from page/head into optionpage
-			NodeList children = source.getChildNodes();
+			NodeList children = headOrPage.getChildNodes();
 			for (int i = 0; i < children.getLength(); i++) {
 				Node imported = form.importNode(children.item(i), true);
 				optionPage.appendChild(imported);
 			}
 
 			// Copy image and text from form
-			optionPage.setAttribute("icon", opRoot.getAttribute("icon"));
-			optionPage.setAttribute("text", opRoot.getAttribute("title"));
+			optionPage.setAttribute(ATTR_ICON, opRoot.getAttribute(ATTR_ICON));
+			optionPage.setAttribute(ATTR_TEXT, opRoot.getAttribute(ATTR_TITLE));
 
 			NamedNodeMap toCopy = opDetail.getAttributes();
 			for (int i = 0; i < toCopy.getLength(); i++) {
 				Node attr = toCopy.item(i);
+				// Do not take-over the ID if its equal to "Detail" (same as the default main detail-id)
+				if(ATTR_ID.equalsIgnoreCase(attr.getNodeName()) && "detail".equalsIgnoreCase(attr.getNodeValue()))
+					continue;
 				optionPage.setAttribute(attr.getNodeName(), attr.getNodeValue());
 			}
 
 			// Also transfer attributes from page/head itself if present
-			NamedNodeMap sourceAttrs = source.getAttributes();
+			NamedNodeMap sourceAttrs = headOrPage.getAttributes();
 			for (int i = 0; i < sourceAttrs.getLength(); i++) {
 				Node attr = sourceAttrs.item(i);
 				optionPage.setAttribute(attr.getNodeName(), attr.getNodeValue());
 			}
 
 			// Integrate events as last child of <optionpage>
-			opRootChildren = opRoot.getElementsByTagName("events");
+			opRootChildren = opRoot.getElementsByTagName(NODE_EVENTS);
 			if (opRootChildren.getLength() > 0 && opRootChildren.item(0) instanceof Element) {
 				Element events = (Element) opRootChildren.item(0);
 				Node importedEvents = form.importNode(events, true);
 				optionPage.appendChild(importedEvents);
 			}
 
-			// Add <optionpage> into detail
-			detail.appendChild(optionPage);
-
+			toAdd = optionPage;
+			
 		} else {
 			throw new IllegalArgumentException("Unsupported option page type: " + opRoot.getTagName());
+		}
+		
+		// Now set the key bindings with map-to attribute
+		addKeyMappings(detail, toAdd, keyMapping);
+		// Add grid or optionpage
+		detail.appendChild(toAdd);
+	}
+	
+	/** 
+	 * Adds map-to attribute to all option-page key-fields pointing to the according parent keys
+	 * Supports legacy (index-based, e.g. Key0, Key1) and new parent key names (name-based, e.g. KeyLong)
+	 * @param detail Form's detail node
+	 * @param toAdd either grid or optionpage node
+	 * @param keyMapping Key = index or name-based detail key, value = name-based op's key
+	 * @throws IllegalArgumentException
+	 */
+	private void addKeyMappings(Element detail, Element toAdd, Map<String, String> keyMapping) throws IllegalArgumentException {
+		// Now set the key bindings with map-to attribute
+		for(Entry<String, String> entry : keyMapping.entrySet()) {
+			String detailKey = entry.getKey();
+			final String opKey = entry.getValue();
+			if(detailKey.isEmpty() || opKey.isEmpty())
+				throw new IllegalArgumentException("Empty key-mapping detected for " + toAdd.getTagName());
+			// First find the field-value with index
+			List<Element> opFields = XMLUtils.findElementWithAttribute(toAdd, "name", val -> opKey.equalsIgnoreCase(val));
+			if(opFields.size() == 0)
+				throw new IllegalArgumentException("Mapped key '"+opKey+"' not found in " + toAdd.getTagName());
+			// Separate between legacy (index-based) and new-style (name-based)
+			if(detailKey.toLowerCase().startsWith("key") && Character.isDigit(detailKey.charAt(detailKey.length()-1))) {
+				// Legacy, by index
+				int keyIndex = Integer.parseInt(detailKey.substring("key".length()));
+				List<Element> detailKeys = XMLUtils.findElementWithAttribute(detail, ATTR_KEY_TYPE, val -> "primary".equalsIgnoreCase(val));
+				if(keyIndex >= detailKeys.size())
+					throw new IllegalArgumentException("Failed to map op-key '"+opKey+"' to a detail key #"+keyIndex+": detail has only " +detailKeys.size() + " keys");
+				// Now change index-based key to name-based
+				detailKey = detailKeys.get(keyIndex).getAttribute(ATTR_NAME);
+			}
+			// Tell the UI how the key is mapped to parent -- by name
+			opFields.get(0).setAttribute(ATTR_MAP_TO, detailKey);
 		}
 	}
 }

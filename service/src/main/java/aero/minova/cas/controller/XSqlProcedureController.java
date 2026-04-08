@@ -354,6 +354,25 @@ public class XSqlProcedureController {
 		}
 		return Optional.empty();
 	}
+	
+	/**
+	 * Findet den Value anhand des Spaltennamens.
+	 *
+	 * @param dependency
+	 *            Die XTable, welche den gewünschten Value enthält.
+	 * @param columnName
+	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
+	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen oder null, wenn die Spalte nicht gefunden werden kann.
+	 */
+	Optional<Value> findValueInColumn(XTable dependency, String columnName, int row) {
+		for (int i = 0; i < dependency.getTable().getColumns().size(); i++) {
+			if (dependency.getTable().getColumns().get(i).getName().equals(columnName)) {
+				return Optional.ofNullable(dependency.getTable().getRows().get(row).getValues().get(i));
+			}
+		}
+		return Optional.empty();
+	}
+
 
 	/**
 	 * Findet die gesuchte Referenz-Tabelle in den ResultSets.
@@ -373,6 +392,15 @@ public class XSqlProcedureController {
 			}
 		}
 		throw new RuntimeException("Cannot find SqlProcedureResult with Id " + idToFind);
+	}
+	
+	XTable findXTable(String idToFind, List<XTable> tables){
+		for (XTable xtable : tables) {
+			if (xtable.getId().equals(idToFind)) {
+				return xtable;
+			}
+		}
+		throw new RuntimeException("Cannot find xTable with Id " + idToFind);
 	}
 
 	/**
@@ -489,6 +517,15 @@ public class XSqlProcedureController {
 								// zurück.
 								if (keyLongOfRow == null) {
 									keyLongOfRow = findValueInColumn(xsqlResults.get(0).getResultSet(), "KeyLong", 0).orElse(null);
+								}
+								
+								// Falls immer noch kein KeyLong gefunden werden konnte, schauen wir stattdessen in der Input-Table.
+								if (keyLongOfRow == null) {
+									// Finde InputTable mit demselben Namen.
+									XTable inputTable = findXTable(dependencyTableName, inputTables);
+									
+									// Schaue, ob diese einen KeyLong als Input hat.
+									keyLongOfRow = findValueInColumn(inputTable, "KeyLong", i).orElse(null);
 								}
 								Row innerRow = new Row();
 								innerRow.addValue(keyLongOfRow);

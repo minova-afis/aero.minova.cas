@@ -440,17 +440,15 @@ public class XSqlProcedureController {
 		privilegeRequest.addColumn(new Column("KeyText", DataType.STRING));
 		privilegeRequest.addColumn(new Column("TransactionChecker", DataType.STRING));
 
-		List<Row> inputRows = new ArrayList<>(); // ToDo - was passiert mit inputRows?
 		for (XTable xTable : inputTables) {
 			Row requestParam = new Row();
-			privilegeRequest.getRows().add(requestParam);
 			requestParam.addValue(new Value(xTable.getTable().getName(), null));
 			requestParam.addValue(null);
-
-			inputRows.add(requestParam);
+			
+			privilegeRequest.getRows().add(requestParam);
 		}
 		try {
-			customLogger.logInfo("Checking for follow.up procedures...");
+			customLogger.logInfo("Checking for follow up procedures...");
 			Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
 			// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.

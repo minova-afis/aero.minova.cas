@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,8 +38,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.cas.CustomLogger;
 import aero.minova.cas.ContentPatcher;
+import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
 import ch.minova.foundation.db.NextGen;
 import ch.minova.foundation.rest.db.service.FileService;
@@ -240,7 +241,10 @@ public class FilesController {
 			if (path.endsWith(".zip")) {
 				return getZip(path.substring(0, path.length() - 4));
 			}
-			return getClass().getResourceAsStream(path).readAllBytes();
+			InputStream is = getClass().getResourceAsStream(path);
+			if(is == null)
+				throw new IOException(path + " file not included in CAS build");
+			return is.readAllBytes();
 		}
 
 		// Ansonsten Dateisystem nutzen

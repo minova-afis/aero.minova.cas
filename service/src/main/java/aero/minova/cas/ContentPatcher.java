@@ -3,6 +3,7 @@ package aero.minova.cas;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,6 +33,7 @@ public class ContentPatcher {
 	private static final String NODE_PAGE = "page";
 	private static final String NODE_HEAD = "head";
 	private static final String NODE_GRID = "grid";
+	private static final String NODE_DYNAMIC = "dynamic";
 	private static final String NODE_EVENTS = "events";
 	private static final String NODE_OPTIONPAGE = "optionpage";
 	
@@ -42,6 +44,15 @@ public class ContentPatcher {
 	private static final String ATTR_MAP_TO = "map-to";
 	private static final String ATTR_KEY_TYPE = "key-type";
 	private static final String ATTR_TITLE = "title";
+	private static final String ATTR_PROPERTY = "property";
+	private static final String ATTR_VISIBLE = "visible";
+	
+	private static final String XBS_NODE_OPTIONPAGES = "OptionPages";
+//	private static final String XBS_NODE_DEPENDINGFIELDS = "DependingFields";
+	private static final String XBS_VAL_PRIORITY = "priority";
+	private static final String XBS_VAL_VISIBLE = "visible";
+	private static final String XBS_VAL_VISIBLE_WHEN = "visible-when";
+	
 	
 	@Autowired
 	FileService dbFileService;
@@ -196,9 +207,25 @@ public class ContentPatcher {
 		}
 		return toRet;
 	}
+	
+	/** Returns the priority of given OptionPage or Integer.MAX_VALUE if none defined
+	 * @throws NumberFormatException If the number of the priority is invalid
+	 */
+	private static double getOptionPagePriority(RegistryNode op) throws NumberFormatException {
+		if(op != null) {
+			for(RegistryNode ch : op.getChildren().values()) {
+				if(XBS_VAL_PRIORITY.equalsIgnoreCase(ch.getName())) try {
+					return Double.parseDouble(ch.getValue());
+				} catch(NumberFormatException ex) {
+					throw new NumberFormatException("Bad priority defined for " + op.getName() + ": " + ch.getValue());
+				}
+			}
+		}
+		return Integer.MAX_VALUE;
+	}
 
 	/**
-	 * Inject all defined option pages and FORM into the basic form
+	 * Inject all defined option pages and FORM into the basic form.
 	 * @param path
 	 * @param toRet
 	 * @return
@@ -225,19 +252,24 @@ public class ContentPatcher {
 			// AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Key1
 			String prefix = (application == null ? "" : application) +
 					 		(path.startsWith("/") ? "" : "/") + path +
-							"/OptionPages/";
+							"/"+XBS_NODE_OPTIONPAGES+"/";
 			
 			// getSubtree converts value list to a tree, based on the given prefix, e.g.
 			//   AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Key0
 			//   AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Key1
+			//   AFIS/LuSupplierCustomer.xml/OptionPages/LuSupplierCustomerExHydrant.op.xml/Priority
 			// ->
 			//   OptionPages
 			//             |- LuSupplierCustomerExHydrant.op.xml
 			//                                                  |- Key0 = SupplierKey
 			//                                                  |- Key1 = CustomerKey
+			//                                                  |- Priority = 2
 			RegistryNode ops = registryService.getSubtree(prefix); // E.g. AFIS/Item.xml/OptionPages
 			if(ops != null && !ops.getChildren().isEmpty()) {
-				for(RegistryNode op : ops.getChildren().values()) try {
+				List<RegistryNode> opList = new LinkedList<>(ops.getChildren().values());
+				// The option-pages can also be defined with prioritiy. Probably to enforce one OP working before the other (wyld)
+				opList.sort((a, b) -> Double.compare(getOptionPagePriority(a), getOptionPagePriority(b)));
+				for(RegistryNode op : opList) try {
 					byte[] opCode = dbFileService.getFile(op.getName());
 					if(opCode == null) {
 						customLogger.logError("Failed to add " + op.getName() + " option page to " + path + ": option page doesn't exist in tFile");
@@ -248,17 +280,26 @@ public class ContentPatcher {
 					// - Key = Key within the parent Detail, e.g. KeyLong (by name, new-stlye) or Key0 (by index, legacy-style)
 					// - Value = key within option page, e.g. SupplierKey (only by name)
 					Map<String, String> keyMapping = new LinkedHashMap<String, String>();
-					for(RegistryNode key : op.getChildren().values()) {
-						if(key.getChildren().isEmpty() && key.hasValue()) {
-							keyMapping.put(key.getName(), key.getValue());
+					// Further attributes written in the XBS, such as "visible" or "visible-when"
+					Map<String, String> opAtttributes = new LinkedHashMap<String, String>();
+					for(RegistryNode opNode : op.getChildren().values()) {
+						String key = opNode.getName();
+						if(opNode.getChildren().isEmpty() && opNode.hasValue()) {
+							if(XBS_VAL_VISIBLE.equalsIgnoreCase(key) ||
+							   XBS_VAL_VISIBLE_WHEN.equalsIgnoreCase(key) ||
+							   XBS_VAL_PRIORITY.equalsIgnoreCase(key)) {
+								opAtttributes.put(key, opNode.getValue());
+							} else {
+								keyMapping.put(key, opNode.getValue());
+							}
 						}
 					}
-					addOptionPage(formDoc, opDoc, keyMapping);
+					addOptionPage(formDoc, opDoc, keyMapping, opAtttributes);
 				} catch(Exception ex1) {
 					customLogger.logError("Failed to add " + op.getName() + " option page to " + path, ex1);				
 				}
-				toRet = XMLUtils.toBytes(formDoc);
 			}
+			toRet = XMLUtils.toBytes(formDoc);
 		} catch (Exception ex) {
 			customLogger.logError("Failed to resolve XML form " + path, ex);
 		}
@@ -277,15 +318,14 @@ public class ContentPatcher {
 	 * Integrate option page into form
 	 * See https://github.com/minova-afis/aero.minova.cas/issues/1473
 	 */
-	private void addOptionPage(Document form, Document op, Map<String, String> keyMapping) throws IllegalArgumentException {
+	private void addOptionPage(Document form, Document op, Map<String, String> keyMapping, Map<String, String> opAttributes) throws IllegalArgumentException {
 		if (form == null || op == null)
 			return;
 
 		// Get the detail part first
-		List<Element> els = XMLUtils.findElement(form.getDocumentElement(), NODE_DETAIL);
-		if (els.size() == 0)
+		Element detail = XMLUtils.findFirstElement(form.getDocumentElement(), NODE_DETAIL);
+		if (detail == null)
 			throw new IllegalArgumentException("Form has no detail");
-		Element detail = els.get(0);
 
 		Element opRoot = op.getDocumentElement();
 		Element toAdd = null;
@@ -356,11 +396,45 @@ public class ContentPatcher {
 		} else {
 			throw new IllegalArgumentException("Unsupported option page type: " + opRoot.getTagName());
 		}
-		
+		// Apply attributes
+		applyAttributes(form, toAdd, opAttributes);
 		// Now set the key bindings with map-to attribute
 		addKeyMappings(detail, toAdd, keyMapping);
 		// Add grid or optionpage
 		detail.appendChild(toAdd);
+	}
+	
+	/** The option page may also have attributes set in the Registry, such as "visible" and "visible-when"
+	 * It *-when attributes are converted into the corresponding dynamic-blocks
+	 * @param detail
+	 * @param toAdd
+	 * @param opAttributes
+	 * @throws IllegalArgumentException
+	 */
+	private void applyAttributes(Document formDoc, Element toAdd, Map<String, String> opAttributes) throws IllegalArgumentException {
+		if(opAttributes == null || formDoc == null || toAdd == null)
+			return;
+		for(Entry<String, String> entry : opAttributes.entrySet()) {
+			String key = entry.getKey();
+			if(XBS_VAL_VISIBLE.equalsIgnoreCase(key)) {
+				toAdd.setAttribute(ATTR_VISIBLE, entry.getValue());
+			} else if(key.toLowerCase().endsWith("-when")) {
+				// Generate dynamics block: <dynamic property="visible">!app.isSUMode()</dynamic>
+				String property = key.substring(0, key.length() - "-when".length());
+				Element dynamic = formDoc.createElement(NODE_DYNAMIC);
+				dynamic.setAttribute(ATTR_PROPERTY, property);
+				dynamic.setTextContent(entry.getValue());
+				if(toAdd.getFirstChild() != null) {
+					toAdd.insertBefore(dynamic, toAdd.getFirstChild());
+				} else {
+					toAdd.appendChild(dynamic);
+				}
+			} else if(XBS_VAL_PRIORITY.equalsIgnoreCase(key)) {
+				// Do nothing, handled already
+			} else {
+				customLogger.filesLogger.info("Unknown '" + key + "' registry attribute for option page");
+			}
+		}
 	}
 	
 	/** 
@@ -372,6 +446,8 @@ public class ContentPatcher {
 	 * @throws IllegalArgumentException
 	 */
 	private void addKeyMappings(Element detail, Element toAdd, Map<String, String> keyMapping) throws IllegalArgumentException {
+		if(keyMapping == null || detail == null || toAdd == null)
+			return;
 		// Now set the key bindings with map-to attribute
 		for(Entry<String, String> entry : keyMapping.entrySet()) {
 			String detailKey = entry.getKey();
@@ -379,8 +455,8 @@ public class ContentPatcher {
 			if(detailKey.isEmpty() || opKey.isEmpty())
 				throw new IllegalArgumentException("Empty key-mapping detected for " + toAdd.getTagName());
 			// First find the field-value with index
-			List<Element> opFields = XMLUtils.findElementWithAttribute(toAdd, "name", val -> opKey.equalsIgnoreCase(val));
-			if(opFields.size() == 0)
+			Element opField = XMLUtils.findFirstElementWithAttribute(toAdd, "name", val -> opKey.equalsIgnoreCase(val));
+			if(opField == null)
 				throw new IllegalArgumentException("Mapped key '"+opKey+"' not found in " + toAdd.getTagName());
 			// Separate between legacy (index-based) and new-style (name-based)
 			if(detailKey.toLowerCase().startsWith("key") && Character.isDigit(detailKey.charAt(detailKey.length()-1))) {
@@ -393,7 +469,7 @@ public class ContentPatcher {
 				detailKey = detailKeys.get(keyIndex).getAttribute(ATTR_NAME);
 			}
 			// Tell the UI how the key is mapped to parent -- by name
-			opFields.get(0).setAttribute(ATTR_MAP_TO, detailKey);
+			opField.setAttribute(ATTR_MAP_TO, detailKey);
 		}
 	}
 }

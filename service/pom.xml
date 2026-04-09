@@ -11,7 +11,7 @@
 
     <properties>
         <!-- Embedded React UI — bump to match the desired ch.minova:gui.react release -->
-        <gui.react.version>1.6.0</gui.react.version>
+        <gui.react.version>1.8.1</gui.react.version>
     </properties>
  <dependencyManagement>
         <dependencies>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>foundation.rest.db</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

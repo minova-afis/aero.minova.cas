@@ -107,7 +107,7 @@ public class XSqlProcedureController {
 		customLogger.logUserRequest("data/x-procedure: ", inputTables);
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
-		StringBuffer sb = new StringBuffer();
+		StringBuffer sbLog = new StringBuffer();
 		try {
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
 
@@ -120,9 +120,9 @@ public class XSqlProcedureController {
 
 				try (Connection connection = systemDatabase.getConnection()) {
 					try {
-						resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+						resultSets = processXProcedures(inputTables, resultSets, sbLog, connection, inputTablesWithResults);
 						// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
-						checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+						checkFollowUpProcedures(inputTables, resultSets, sbLog, connection, inputTablesWithResults);
 						// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
 						connection.commit();
 					} catch (Throwable e) {
@@ -130,7 +130,7 @@ public class XSqlProcedureController {
 						// Immediately release database locks and log rollback explicitly for clarity.
 						try {
 							connection.rollback();
-							customLogger.logError("XSqlProcedure rolled back due to error: " + sb, e);
+							customLogger.logError("XSqlProcedure rolled back due to error: " + sbLog, e);
 						} catch (Exception rollbackEx) {
 							customLogger.logError("Rollback failed after XSqlProcedure error", rollbackEx);
 						}
@@ -147,11 +147,11 @@ public class XSqlProcedureController {
 				}
 			}
 		} catch (Throwable e) {
-			customLogger.logError("XSqlProcedure could not be executed: " + sb, e);
+			customLogger.logError("XSqlProcedure could not be executed: " + sbLog, e);
 			throw new XProcedureException(inputTables, resultSets, e);
 		}
 
-		customLogger.logSql("XSqlProcedure successfully executed: " + sb);
+		customLogger.logSql("XSqlProcedure successfully executed: " + sbLog);
 		return new ResponseEntity<>(resultSets, HttpStatus.ACCEPTED);
 	}
 
@@ -225,7 +225,7 @@ public class XSqlProcedureController {
 	 *            Eine Liste an XTables, welche Prozeduren enthalten ausgeführt werden sollen.
 	 * @param resultSets
 	 *            Die bisher noch leere Liste an XSqlResultSets, welche in dieser Methode gefüllt weden.
-	 * @param sb
+	 * @param sbLog
 	 *            Ein StringBuffer für das Loggen der Prozedur-Aufrufe
 	 * @param connection
 	 *            Eine Connection zur Datenbank.
@@ -236,7 +236,7 @@ public class XSqlProcedureController {
 	 * @throws Exception
 	 *             Wirft einen Fehler, falls das Privileg nicht vorhanden ist oder es einen Fehler bei der Ausführung der Prozedur gab.
 	 */
-	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sb, Connection connection,
+	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sbLog, Connection connection,
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) throws Exception {
 		for (XTable xt : inputTables) {
 			SqlProcedureResult result = new SqlProcedureResult();
@@ -259,8 +259,15 @@ public class XSqlProcedureController {
 				result = (SqlProcedureResult) extensionResult.getBody();
 				customLogger.logSql("Extension succesfully executed with name: " + filledTable.getName());
 			} else {
-				result = procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
-				customLogger.logSql("Procedure succesfully executed: " + sb.toString());
+				StringBuffer sbLogProc = new StringBuffer();
+				try {
+					result = procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sbLogProc);
+					customLogger.logSql("Procedure succesfully executed: " + sbLogProc.toString());
+					sbLog.append("\r\n\t").append("SUCCESS " + sbLogProc.toString());
+				} catch(Exception ex) {
+					sbLog.append("\r\n\t").append("FAIL " + sbLogProc.toString());
+					throw ex;
+				}
 			}
 			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompatibilität da, damit hier keine NullPointerException geworfen wird.
 			if (inputTablesWithResults != null) {
@@ -424,7 +431,7 @@ public class XSqlProcedureController {
 	 *            Die XSqlProcedureResults, welche die ausgeführten Prozeduren geliefert haben.
 	 * @param connection
 	 *            Die Verbindung zur Datenbank.
-	 * @param sb
+	 * @param sbLog
 	 *            Ein StringBuffer, welcher das Ausführen der Check-Prozeduren loggt.
 	 * @param inputTablesWithResults
 	 *            Eine Map, in welcher die InputTables und deren SqlProcedureResults gespeichert werden. Wird zum Versenden von Nachrichten über den
@@ -432,7 +439,7 @@ public class XSqlProcedureController {
 	 * @throws RuntimeException
 	 *             "msg.PrivilegeError"
 	 */
-	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlResults, StringBuffer sb, Connection connection,
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlResults, StringBuffer sbLog, Connection connection,
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) {
 		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
 		Table privilegeRequest = new Table();
@@ -506,7 +513,7 @@ public class XSqlProcedureController {
 
 				}
 			}
-			processXProcedures(checksXtables, xsqlResults, sb, connection, inputTablesWithResults);
+			processXProcedures(checksXtables, xsqlResults, sbLog, connection, inputTablesWithResults);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while trying to find follow up procedures.", e);
 		}

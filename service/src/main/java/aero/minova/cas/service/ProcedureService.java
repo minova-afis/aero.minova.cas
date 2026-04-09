@@ -142,16 +142,16 @@ public class ProcedureService {
 	 */
 	public SqlProcedureResult processSqlProcedureRequest(Table inputTable, List<Row> privilegeRequest, boolean isSetup) throws Exception {
 		SqlProcedureResult result = new SqlProcedureResult();
-		StringBuffer sb = new StringBuffer();
+		StringBuffer log = new StringBuffer();
 
 		try (Connection connection = systemDatabase.getConnection()) {
 			try {
 				if (isSetup) {
 					setAnsiWarnings(connection, false);
 				}
-				result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, sb);
+				result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, log);
 				connection.commit();
-				customLogger.logSql("Procedure successfully executed: " + sb);
+				customLogger.logSql("Procedure successfully executed: " + log);
 				if (isSetup) {
 					setAnsiWarnings(connection, true);
 				}
@@ -160,7 +160,7 @@ public class ProcedureService {
 				// Immediately release database locks and log rollback explicitly for clarity.
 				try {
 					connection.rollback();
-					customLogger.logError("Procedure rolled back due to error: " + sb, e);
+					customLogger.logError("Procedure rolled back due to error: " + log, e);
 				} catch (SQLException rollbackEx) {
 					customLogger.logError("Rollback failed after procedure error", rollbackEx);
 				}
@@ -229,7 +229,7 @@ public class ProcedureService {
 	 *            Die offene Connection zu der Datenbank, welche die Prozedur ausführen soll.
 	 * @param result
 	 *            Das SQL-Result, welches innerhalb der Methode verändert und dann returned wird.
-	 * @param sb
+	 * @param sbLog
 	 *            Ein StringBuffer, welcher im Fehlerfall die Fehlermeldung bis zum endgültigen Throw als String aufnimmt.
 	 * @return result das veränderte SqlProcedureResult.
 	 * @throws SQLException
@@ -238,7 +238,7 @@ public class ProcedureService {
 	 *             Falls generell ein Fehler geworfen wird, zum Beispiel beim Konvertieren der Typen.
 	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
-			SqlProcedureResult result, StringBuffer sb) throws SQLException, ProcedureException {
+			SqlProcedureResult result, StringBuffer sbLog) throws SQLException, ProcedureException {
 		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
 
 		result.setReturnCodes(new ArrayList<>());
@@ -268,17 +268,21 @@ public class ProcedureService {
 		} else {
 			limit = inputMetaData.getLimited();
 		}
-		final Set<ExecuteStrategy> executeStrategies = new HashSet<>();
-		executeStrategies.add(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0);
-		final val procedureCall = prepareProcedureString(inputTable, executeStrategies);
-		sb.append(procedureCall);
+		// Creates 
+		final val procedureCall = prepareProcedureString(inputTable, ExecuteStrategy.with(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0));
 		setUserContextFor(connection);
 
 		// Jede Row ist eine Abfrage.
 		for (int j = 0; j < inputTable.getRows().size(); j++) {
 			SqlProcedureResult resultForThisRow = new SqlProcedureResult();
 			try (final var preparedStatement = connection.prepareCall(procedureCall)) {
-				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, sb, j);
+				StringBuffer paramLog = new StringBuffer();
+				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, paramLog, j);
+				// Inject param logs into the actual call for better logging
+				sbLog.append(sbLog.length() > 0 ? "\r\n\t" : "")
+					 .append(procedureCall.substring(0, procedureCall.indexOf("(") + 1) +
+							 paramLog.toString() +
+							 procedureCall.substring(procedureCall.indexOf(")")));
 				preparedStatement.registerOutParameter(1, Types.INTEGER);
 				preparedStatement.execute();
 				{ /*
@@ -467,14 +471,27 @@ public class ProcedureService {
 		return result;
 	}
 
-	public void fillCallableSqlProcedureStatement(CallableStatement preparedStatement, Table inputTable, int parameterOffset, StringBuffer sb, int row) {
+	/** Fills in values from table into the prepared statement
+	 * @param preparedStatement
+	 * @param inputTable
+	 * @param parameterOffset
+	 * @param sbLog
+	 * @param row
+	 * @return
+	 */
+	public void fillCallableSqlProcedureStatement(CallableStatement preparedStatement, Table inputTable, int parameterOffset, StringBuffer sbLog, int row) {
+		final var sbLogFin = (sbLog == null ? new StringBuffer() : sbLog);
 		range(0, inputTable.getColumns().size())//
 				.forEach(i -> {
 					try {
 						val iVal = inputTable.getRows().get(row).getValues().get(i);
 						val type = inputTable.getColumns().get(i).getType();
-						if (iVal == null) {
-							sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal);
+						val ot = inputTable.getColumns().get(i).getOutputType();
+						if (iVal == null && ot == OutputType.OUTPUT) {
+							// Do not set NULL for parameter defined as output
+							sbLogFin.append(sbLog.length() > 0 ? ", " : "").append("[OUT]");
+						} else if (iVal == null) {
+							sbLogFin.append(sbLog.length() > 0 ? ", " : "").append("null");
 							if (type == DataType.BOOLEAN) {
 								preparedStatement.setObject(i + parameterOffset, null, Types.BOOLEAN);
 							} else if (type == DataType.DOUBLE) {
@@ -498,7 +515,9 @@ public class ProcedureService {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
-							sb.append(" ; Position: " + (i + parameterOffset) + ", Value: " + iVal.getValue().toString());
+							sbLogFin.append(sbLog.length() > 0 ? ", " : "")
+									.append(type == DataType.BINARY ? "<binary>" : iVal.getValue().toString())
+									.append(ot == OutputType.OUTPUT ? " [INOUT]" : "");
 							if (type == DataType.BOOLEAN) {
 								preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
 							} else if (type == DataType.DOUBLE) {
@@ -527,7 +546,7 @@ public class ProcedureService {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
-						if (inputTable.getColumns().get(i).getOutputType() == OutputType.OUTPUT) {
+						if (ot == OutputType.OUTPUT /* || ot == OutputType.INPUTOUTPUT*/) {
 							if (type == DataType.BOOLEAN) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.BOOLEAN);
 							} else if (type == DataType.DOUBLE) {

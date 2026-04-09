@@ -1,7 +1,5 @@
 package aero.minova.cas;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.stream.StreamSupport;
 
@@ -45,7 +43,6 @@ public class CustomLogger {
 
 	private static final String LOGFORMAT = "{}: {}";
 
-	private static final String ERRORLOGFORMAT = "{}: {}: \n{}";
 
 	private static final String USERREQUESTLOGFORMAT = "{}: {} {}";
 
@@ -66,10 +63,7 @@ public class CustomLogger {
 	}
 
 	public void logError(String logMessage, Throwable e) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		e.printStackTrace(pw);
-		errorLogger.error(ERRORLOGFORMAT, getUser(), logMessage, sw);
+		errorLogger.error(LOGFORMAT, getUser(), logMessage, e);
 	}
 
 	public void logError(Exception e) {

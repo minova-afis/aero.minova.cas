@@ -150,6 +150,19 @@ public enum ExecuteStrategy {
 		}
 		return toRet;
 	}
+	
+	/** Returns the list of desired strategies
+	 * @param strategies
+	 * @return
+	 */
+	public static Set<ExecuteStrategy> with(ExecuteStrategy... strategies) {
+		Set<ExecuteStrategy> toRet = new HashSet<>();
+		if(strategies != null) {
+			for(ExecuteStrategy s : strategies)
+				toRet.add(s);
+		}
+		return toRet;
+	}
 
 	/**
 	 * @param strategy

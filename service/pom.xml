@@ -10,8 +10,8 @@
 	</parent>
 
     <properties>
-        <!-- Embedded React UI — bump to match the desired ch.minova:gui.react release -->
-        <gui.react.version>1.6.0</gui.react.version>
+        <!-- Embedded React UI — bump to match the desired ch.minova:web.ui release -->
+        <web.ui.version>1.8.4</web.ui.version>
     </properties>
  <dependencyManagement>
         <dependencies>
@@ -29,8 +29,8 @@
         <!-- Embedded React UI — served at /ui/ when context-path=/ (default) -->
         <dependency>
             <groupId>ch.minova</groupId>
-            <artifactId>gui.react</artifactId>
-            <version>${gui.react.version}</version>
+            <artifactId>web.ui</artifactId>
+            <version>${web.ui.version}</version>
         </dependency>
         <dependency>
             <groupId>aero.minova</groupId>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>foundation.rest.db</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -344,7 +344,7 @@
 		<repository>
 			<id>github-gui-react</id>
 			<name>GitHub Minova GUI React Packages</name>
-			<url>https://maven.pkg.github.com/minova-afis/ch.minova.gui.react</url>
+			<url>https://maven.pkg.github.com/minova-afis/web.ui</url>
 		</repository>
 	</repositories>
 </project>

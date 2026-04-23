@@ -335,12 +335,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 				callableErrorStatement.setString(1, username);
 				callableErrorStatement.setString(2, e.getMessage());
 				
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
 				customLogger.logSql("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage());
 				// Der Stacktrace wird nicht in der Datenbank gespeichert, da das Feld einfach viel zu lang ist. Deswegen geben wir ihn im ErrorLog aus.
-				customLogger.logError("CAS: Showing Stacktrace : " + sw, e);
+				customLogger.logError("CAS: Showing Stacktrace", e);
 				
 				callableErrorStatement.executeUpdate();
 			}

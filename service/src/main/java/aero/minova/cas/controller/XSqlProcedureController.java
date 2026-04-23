@@ -307,6 +307,7 @@ public class XSqlProcedureController {
 					int position = 0;
 
 					String stringValue = v.getStringValue();
+
 					/*
 					 * Bei mehreren Rows in einer Referenztabelle, wird mit - die Position angegeben, in der geschickten Table z.B. r-parent_call-0-KeyLong. Der
 					 * Value dazu würde hier folgendermaßen aussehen: Value("0-KeyLong","parent_call")
@@ -323,56 +324,19 @@ public class XSqlProcedureController {
 						throw new RuntimeException("No output parameters for resultset with id " + dependency.getId());
 					}
 
-					Value newValue = findValueInColumn(dependency.getResultSet(), stringValue, position).orElse(null);
+					Value newValue = dependency.getResultSet().getOutputParameters().getValue(stringValue, position);
 					if (newValue == null) {
 						throw new RuntimeException("No reference value found for column " + stringValue + " in row " + position + " !");
 					}
+
 					// Tausche Value mit dem Ergebnis aus einem der ResultSets aus.
-					r.getValues().remove(i);
-					r.getValues().add(i, newValue);
+					r.getValues().set(i, newValue);
 				}
 			}
 		}
 
 		return workingTable;
 	}
-
-	/**
-	 * Findet den Value anhand des Spaltennamens.
-	 *
-	 * @param dependency
-	 *            Das SqlProcedureResult, welches den gewünschten Value enthält.
-	 * @param columnName
-	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
-	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen oder null, wenn die Spalte nicht gefunden werden kann.
-	 */
-	Optional<Value> findValueInColumn(SqlProcedureResult dependency, String columnName, int row) {
-		for (int i = 0; i < dependency.getOutputParameters().getColumns().size(); i++) {
-			if (dependency.getOutputParameters().getColumns().get(i).getName().equals(columnName)) {
-				return Optional.ofNullable(dependency.getOutputParameters().getRows().get(row).getValues().get(i));
-			}
-		}
-		return Optional.empty();
-	}
-	
-	/**
-	 * Findet den Value anhand des Spaltennamens.
-	 *
-	 * @param dependency
-	 *            Die XTable, welche den gewünschten Value enthält.
-	 * @param columnName
-	 *            Der Spaltenname der Spalte, welche den gesuchten Value enthält.
-	 * @return Der Value aus der Spalte mit dem gesuchten Spaltennamen oder null, wenn die Spalte nicht gefunden werden kann.
-	 */
-	Optional<Value> findValueInColumn(XTable dependency, String columnName, int row) {
-		for (int i = 0; i < dependency.getTable().getColumns().size(); i++) {
-			if (dependency.getTable().getColumns().get(i).getName().equals(columnName)) {
-				return Optional.ofNullable(dependency.getTable().getRows().get(row).getValues().get(i));
-			}
-		}
-		return Optional.empty();
-	}
-
 
 	/**
 	 * Findet die gesuchte Referenz-Tabelle in den ResultSets.
@@ -393,14 +357,21 @@ public class XSqlProcedureController {
 		}
 		throw new RuntimeException("Cannot find SqlProcedureResult with Id " + idToFind);
 	}
-	
-	XTable findXTable(String idToFind, List<XTable> tables){
+
+	/**
+	 * Findet die gesuchte Referenz-Tabelle in den InputTables.
+	 * 
+	 * @param idToFind
+	 * @param tables
+	 * @return
+	 */
+	XTable findXTable(String idToFind, List<XTable> tables) {
 		for (XTable xtable : tables) {
-			if (xtable.getId().equals(idToFind)) {
+			if (xtable.getTable().getName().equals(idToFind)) {
 				return xtable;
 			}
 		}
-		throw new RuntimeException("Cannot find xTable with Id " + idToFind);
+		return null;
 	}
 
 	/**
@@ -436,9 +407,11 @@ public class XSqlProcedureController {
 	 *            Die Verbindung zur Datenbank.
 	 * @param sb
 	 *            Ein StringBuffer, welcher das Ausführen der Check-Prozeduren loggt.
+	 * @throws Exception
 	 */
 	@Deprecated
-	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlResults, StringBuffer sb, Connection connection) {
+	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlResults, StringBuffer sb, Connection connection)
+			throws Exception {
 		checkFollowUpProcedures(inputTables, xsqlResults, sb, connection, null);
 	}
 
@@ -461,7 +434,7 @@ public class XSqlProcedureController {
 	 *             "msg.PrivilegeError"
 	 */
 	private void checkFollowUpProcedures(List<XTable> inputTables, List<XSqlProcedureResult> xsqlResults, StringBuffer sb, Connection connection,
-			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) {
+			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) throws Exception {
 		// Die nötigen Check-Prozeduren aus der xtcasUserPrivilege-Tabelle auslesen.
 		Table privilegeRequest = new Table();
 		privilegeRequest.setName("xtcasUserPrivilege");
@@ -472,78 +445,89 @@ public class XSqlProcedureController {
 			Row requestParam = new Row();
 			requestParam.addValue(new Value(xTable.getTable().getName(), null));
 			requestParam.addValue(null);
-			
 			privilegeRequest.getRows().add(requestParam);
 		}
-		try {
-			customLogger.logInfo("Checking for follow up procedures...");
-			Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
-			// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.
-			if (checksPerPrivilege.getRows().isEmpty()) {
-				throw new RuntimeException("msg.PrivilegeError");
-			}
+		Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
-			// Neue Prozedur-Aufrufe für alle gefundenen TransactionChecker zusammenbauen.
-			List<XTable> checksXtables = new ArrayList<>();
-			for (Row privilegeCheck : checksPerPrivilege.getRows()) {
-				if (privilegeCheck.getValues().size() >= 2 && privilegeCheck.getValues().get(1) != null) {
-					String dependencyTableName = privilegeCheck.getValues().get(0).getStringValue();
-					String transactionChecker = privilegeCheck.getValues().get(1).getStringValue();
+		// Wir müssen ja eigentlich einen Eintrag in der Datenbank dazu haben, sonst hätten wir sie bisher nicht ausführen können.
+		if (checksPerPrivilege.getRows().isEmpty()) {
+			throw new RuntimeException("msg.PrivilegeError");
+		}
 
-					// Alle ResultSets mit diesem Namen (nicht ID) müssen gecheckt werden.
-					List<XSqlProcedureResult> resultsToCheck = findxSqlResultSetByName(dependencyTableName, xsqlResults);
+		// Neue Prozedur-Aufrufe für alle gefundenen TransactionChecker zusammenbauen.
+		List<XTable> checksXtables = new ArrayList<>();
+		for (Row privilegeCheck : checksPerPrivilege.getRows()) {
+			if (privilegeCheck.getValues().size() >= 2 && privilegeCheck.getValues().get(1) != null) {
+				String dependencyTableName = privilegeCheck.getValues().get(0).getStringValue();
+				String transactionChecker = privilegeCheck.getValues().get(1).getStringValue();
 
-					// Falls keine passenden OutputParameter gefunden werden können, muss das ResultSet des Haupt-Aufrufs (der erste in der Transaktion)
-					// verwendet werden.
-					if (resultsToCheck.isEmpty()) {
-						resultsToCheck.add(xsqlResults.get(0));
-					}
+				// Alle ResultSets mit diesem Namen (nicht ID) müssen gecheckt werden.
+				List<XSqlProcedureResult> resultsToCheck = findxSqlResultSetByName(dependencyTableName, xsqlResults);
 
-					// Und von diesen muss jede Row geprüft werden. Dabei holen wir uns jedes Mal den KeyLong (siehe Doku).
-					for (XSqlProcedureResult res : resultsToCheck) {
-						XTable followUpCheck = new XTable();
-						followUpCheck.setId(dependencyTableName + transactionChecker);
-						Table innerTable = new Table();
-						innerTable.setName(transactionChecker);
-						innerTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-						List<Row> checkArguments = new ArrayList<>();
+				// Falls keine passenden OutputParameter gefunden werden können, muss das ResultSet des Haupt-Aufrufs (der erste in der Transaktion)
+				// verwendet werden.
+				if (resultsToCheck.isEmpty()) {
+					resultsToCheck.add(xsqlResults.get(0));
+				}
 
-						if (res.getResultSet().getOutputParameters() != null && res.getResultSet().getOutputParameters().getRows() != null) {
-							for (int i = 0; i < res.getResultSet().getOutputParameters().getRows().size(); i++) {
-								Value keyLongOfRow = findValueInColumn(res.getResultSet(), "KeyLong", i).orElse(null);
+				// Und von diesen muss jede Row geprüft werden. Dabei holen wir uns jedes Mal den KeyLong (siehe Doku).
+				for (XSqlProcedureResult res : resultsToCheck) {
+					XTable followUpCheck = new XTable();
+					followUpCheck.setId(dependencyTableName + "." + transactionChecker);
+					Table innerTable = new Table();
+					innerTable.setName(transactionChecker);
+					innerTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+					List<Row> checkArguments = new ArrayList<>();
 
-								// Falls die Prozedur bzw. dessen ResultSet keinen KeyLong als Output hatte, greifen wir auf den KeyLong des Haupt-ResultsSets
-								// zurück.
-								if (keyLongOfRow == null) {
-									keyLongOfRow = findValueInColumn(xsqlResults.get(0).getResultSet(), "KeyLong", 0).orElse(null);
-								}
-								
-								// Falls immer noch kein KeyLong gefunden werden konnte, schauen wir stattdessen in der Input-Table.
-								if (keyLongOfRow == null) {
-									// Finde InputTable mit demselben Namen.
-									XTable inputTable = findXTable(dependencyTableName, inputTables);
-									
-									// Schaue, ob diese einen KeyLong als Input hat.
-									keyLongOfRow = findValueInColumn(inputTable, "KeyLong", i).orElse(null);
-								}
+					if (res.getResultSet().getOutputParameters() != null && res.getResultSet().getOutputParameters().getRows() != null) {
+						for (int i = 0; i < res.getResultSet().getOutputParameters().getRows().size(); i++) {
+							Value keyLongOfRow = res.getResultSet().getOutputParameters().getValue("KeyLong", i);
+
+							// Falls die Prozedur bzw. dessen ResultSet keinen KeyLong als Output hatte, greifen wir auf den KeyLong des Haupt-ResultsSets
+							// zurück.
+							if (keyLongOfRow == null) {
+								keyLongOfRow = xsqlResults.get(0).getResultSet().getOutputParameters().getValue("KeyLong", 0);
+							}
+
+							if (keyLongOfRow != null) {
 								Row innerRow = new Row();
 								innerRow.addValue(keyLongOfRow);
 								checkArguments.add(innerRow);
 								innerTable.setRows(checkArguments);
 							}
 						}
-						// Es werden XTables verwendet, da die Prozeduren von den Ergebnissen anderer Prozeduren abhängen und so die bereits vorhandenen
-						// Methoden wiederverwendet werden können.
+					}
+
+					// Falls es kein Output gibt oder dort kein KeyLong gefunden werden konnte, schauen wir stattdessen in der Input-Table.
+					if (innerTable.getRows().isEmpty()) {
+						XTable inputTable = findXTable(dependencyTableName, inputTables);
+
+						if (inputTable != null) {
+							Value keyLongOfRow = inputTable.getTable().getValue("KeyLong", 0);
+							if (keyLongOfRow != null) {
+								Row innerRow = new Row();
+								innerRow.addValue(keyLongOfRow);
+								checkArguments.add(innerRow);
+								innerTable.setRows(checkArguments);
+							}
+						}
+					}
+
+					// Es werden XTables verwendet, da die Prozeduren von den Ergebnissen anderer Prozeduren abhängen und so die bereits vorhandenen
+					// Methoden wiederverwendet werden können.
+					if (innerTable.getRows().isEmpty()) {
+						customLogger.logError("No Keys found for follow up check " + transactionChecker + " for procedure " + dependencyTableName
+								+ "! Check will be skipped.");
+					} else {
 						followUpCheck.setTable(innerTable);
 						checksXtables.add(followUpCheck);
 					}
-
 				}
+
 			}
-			processXProcedures(checksXtables, xsqlResults, sb, connection, inputTablesWithResults);
-		} catch (Exception e) {
-			throw new RuntimeException("Error while trying to find follow up procedures.", e);
 		}
+		processXProcedures(checksXtables, xsqlResults, sb, connection, inputTablesWithResults);
 	}
+
 }

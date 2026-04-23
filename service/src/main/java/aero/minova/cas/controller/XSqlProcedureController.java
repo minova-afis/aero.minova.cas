@@ -305,6 +305,7 @@ public class XSqlProcedureController {
 					int position = 0;
 
 					String stringValue = v.getStringValue();
+
 					/*
 					 * Bei mehreren Rows in einer Referenztabelle, wird mit - die Position angegeben, in der geschickten Table z.B. r-parent_call-0-KeyLong. Der
 					 * Value dazu würde hier folgendermaßen aussehen: Value("0-KeyLong","parent_call")
@@ -325,9 +326,9 @@ public class XSqlProcedureController {
 					if (newValue == null) {
 						throw new RuntimeException("No reference value found for column " + stringValue + " in row " + position + " !");
 					}
+
 					// Tausche Value mit dem Ergebnis aus einem der ResultSets aus.
-					r.getValues().remove(i);
-					r.getValues().add(i, newValue);
+					r.getValues().set(i, newValue);
 				}
 			}
 		}

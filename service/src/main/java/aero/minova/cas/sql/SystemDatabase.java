@@ -45,7 +45,7 @@ public class SystemDatabase {
 			}
 			return connection;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("No connection to the database available.", e);
 		}
 	}
 

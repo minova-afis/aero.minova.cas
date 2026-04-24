@@ -237,7 +237,7 @@ public class XSqlProcedureController {
 	 *             Wirft einen Fehler, falls das Privileg nicht vorhanden ist oder es einen Fehler bei der Ausführung der Prozedur gab.
 	 */
 	private List<XSqlProcedureResult> processXProcedures(List<XTable> inputTables, List<XSqlProcedureResult> resultSets, StringBuffer sbLog, Connection connection,
-			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) throws Exception {
+			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) {
 		for (XTable xt : inputTables) {
 			SqlProcedureResult result = new SqlProcedureResult();
 			// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
@@ -248,7 +248,7 @@ public class XSqlProcedureController {
 			if (securityService.arePrivilegeStoresSetup()) {
 				privilegeRequest.addAll(securityService.getPrivilegePermissions(filledTable.getName()));
 				if (privilegeRequest.isEmpty()) {
-					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
+					throw new RuntimeException("msg.PrivilegeError %" + filledTable.getName());
 				}
 			}
 
@@ -264,9 +264,12 @@ public class XSqlProcedureController {
 					result = procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sbLogProc);
 					customLogger.logSql("Procedure succesfully executed: " + sbLogProc.toString());
 					sbLog.append("\r\n\t").append("SUCCESS " + sbLogProc.toString());
-				} catch(Exception ex) {
+				} catch(RuntimeException ex) {
 					sbLog.append("\r\n\t").append("FAIL " + sbLogProc.toString());
 					throw ex;
+				} catch(Exception ex) {
+					sbLog.append("\r\n\t").append("FAIL " + sbLogProc.toString());
+					throw new RuntimeException(ex.getMessage() ,ex);
 				}
 			}
 			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompatibilität da, damit hier keine NullPointerException geworfen wird.
@@ -456,7 +459,6 @@ public class XSqlProcedureController {
 
 			inputRows.add(requestParam);
 		}
-		try {
 			customLogger.logInfo("Checking for follow.up procedures...");
 			Table checksPerPrivilege = securityService.unsecurelyGetIndexView(privilegeRequest);
 
@@ -514,8 +516,5 @@ public class XSqlProcedureController {
 				}
 			}
 			processXProcedures(checksXtables, xsqlResults, sbLog, connection, inputTablesWithResults);
-		} catch (Exception e) {
-			throw new RuntimeException("Error while trying to find follow up procedures.", e);
-		}
 	}
 }

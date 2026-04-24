@@ -51,17 +51,19 @@ public class SecurityService {
 	 * @throws Exception
 	 *             Fehler bei der Ermittelung
 	 */
-	public boolean arePrivilegeStoresSetup() throws Exception {
+	public boolean arePrivilegeStoresSetup() {
 		return isTablePresent("xvcasusersecurity");
 	}
 
-	public boolean isTablePresent(String tableName) throws Exception {
+	public boolean isTablePresent(String tableName) {
 		try (final Connection connection = systemDatabase.getConnection()) {
 			boolean result = connection.getMetaData()//
 					.getTables(null, null, tableName, null)//
 					.next();
 			connection.commit();
 			return result;
+		} catch (Throwable ex) {
+			throw new RuntimeException(ex.getMessage(), ex);
 		}
 	}
 

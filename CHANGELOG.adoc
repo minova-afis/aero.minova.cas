@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 * Alle Datenbank-Connections auch commiten
+* Für TransactionChecks auch in den Input-Tabellen suchen
 
 ## [12.71.0] -- 2026-02-04
 * Datenbank-Connection-Handling verbessern

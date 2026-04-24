@@ -311,7 +311,7 @@ public class XSqlProcedureController {
 				// Die Referenz-Id steht in der Rule des Values. Im Value des Values steht, in welcher Column das der gewünschte Parameter steht.
 				if (v != null && v.getRule() != null) {
 					XSqlProcedureResult dependency = findxSqlResultSet(v.getRule(), dependencies);
-					int position = 0;
+					int rowIndex = 0;
 
 					String stringValue = v.getStringValue();
 
@@ -322,7 +322,7 @@ public class XSqlProcedureController {
 					if (stringValue.contains("-")) {
 						// Spaltennamen könnten auch '-' enthalten, deshalb kein Split.
 						String positionString = stringValue.substring(0, stringValue.indexOf("-"));
-						position = Integer.parseInt(positionString);
+						rowIndex = Integer.parseInt(positionString);
 						stringValue = stringValue.substring(positionString.length() + 1);
 					}
 
@@ -331,9 +331,9 @@ public class XSqlProcedureController {
 						throw new RuntimeException("No output parameters for resultset with id " + dependency.getId());
 					}
 
-					Value newValue = dependency.getResultSet().getOutputParameters().getValue(stringValue, position);
+					Value newValue = dependency.getResultSet().getOutputParameters().getValue(stringValue, rowIndex);
 					if (newValue == null) {
-						throw new RuntimeException("No reference value found for column " + stringValue + " in row " + position + " !");
+						throw new RuntimeException("No reference value found for column " + stringValue + " in row " + rowIndex + " !");
 					}
 
 					// Tausche Value mit dem Ergebnis aus einem der ResultSets aus.
@@ -482,8 +482,8 @@ public class XSqlProcedureController {
 
 				// Und von diesen muss jede Row geprüft werden. Dabei holen wir uns jedes Mal den KeyLong (siehe Doku).
 				for (XSqlProcedureResult res : resultsToCheck) {
-					XTable followUpCheck = new XTable();
-					followUpCheck.setId(dependencyTableName + "." + transactionChecker);
+					XTable checkTable = new XTable();
+					checkTable.setId(dependencyTableName + "." + transactionChecker);
 					Table innerTable = new Table();
 					innerTable.setName(transactionChecker);
 					innerTable.addColumn(new Column("KeyLong", DataType.INTEGER));
@@ -529,11 +529,10 @@ public class XSqlProcedureController {
 						customLogger.logError("No Keys found for follow up check " + transactionChecker + " for procedure " + dependencyTableName
 								+ "! Check will be skipped.");
 					} else {
-						followUpCheck.setTable(innerTable);
-						checksXtables.add(followUpCheck);
+						checkTable.setTable(innerTable);
+						checksXtables.add(checkTable);
 					}
 				}
-
 			}
 
 			processXProcedures(checksXtables, xsqlResults, sb, connection, inputTablesWithResults);

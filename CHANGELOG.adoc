@@ -4,6 +4,8 @@ Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog].
 
 ## [UNRELEASED] -- XXXX-XX-XX
+
+## [12.71.1] -- 2026-04-24
 * Alle Datenbank-Connections auch commiten
 * Für TransactionChecks auch in den Input-Tabellen suchen
 

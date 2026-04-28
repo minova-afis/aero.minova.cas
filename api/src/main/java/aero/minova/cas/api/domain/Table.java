@@ -5,12 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Table implements Serializable {
-	private static final long serialVersionUID = 202106161633L;
+	private static final long serialVersionUID = 202603161620L;
 	private String name;
 	private TableMetaData metaData;
-	private List<Column> columns = new ArrayList<>();
-	private List<Row> rows = new ArrayList<>();
+	private List<Column> columns;
+	private List<Row> rows;
 	private ErrorMessage returnErrorMessage;
+
+	// how: default constructor
+	public Table() {
+		this.columns = new ArrayList<>();
+		this.rows = new ArrayList<>();
+	}
+	
+	// how: constructor with the ability to set arrayList capacity
+	public Table(int initialColumnsCapacity, int initialRowsCapacity) {
+		this.columns = new ArrayList<>(initialColumnsCapacity);
+		this.rows = new ArrayList<>(initialRowsCapacity);
+	}
 
 	public String getName() {
 		return name;

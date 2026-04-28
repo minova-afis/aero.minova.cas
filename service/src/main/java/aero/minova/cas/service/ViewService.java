@@ -100,15 +100,31 @@ public class ViewService {
 			}
 
 			// Falls es ein Limit gibt, müssen die auszugebenden Rows begrenzt werden.
+			
+			// how: Prinziell sollte das Paging schon beim Daten holen berücksichtig werden.
 			if (limit > 0) {
-				List<Row> resultRows = new ArrayList<>();
-				for (int i = 0; i < limit; i++) {
-					int rowPointer = i + (limit * (page - 1));
-					if (rowPointer < result.getRows().size()) {
-						resultRows.add(result.getRows().get(rowPointer));
+				if ( (page == 1) && (totalResults <= limit)) {
+					// how: if first page and totalResults <= limit -> do nothing, we have already the result!
+				} else {
+					// how: if possible set size of ArrayList.
+					int startIndex = limit * (page - 1);
+					int arraySize = (totalResults - startIndex) <= limit ? (totalResults - startIndex) : limit;
+				
+					List<Row> resultRows = new ArrayList<>(arraySize);
+					for (int loopi = startIndex; loopi < startIndex + arraySize; loopi++) {
+						resultRows.add(result.getRows().get(loopi));
 					}
+					result.setRows(resultRows);
 				}
-				result.setRows(resultRows);
+				//List<Row> resultRows = new ArrayList<>();
+				//for (int i = 0; i < limit; i++) {
+				//	int rowPointer = i + (limit * (page - 1));
+				//	if (rowPointer < result.getRows().size()) {
+				//		System.out.println("rowPointer: " + rowPointer);
+				//		resultRows.add(result.getRows().get(rowPointer));
+				//	}
+				//}
+				//result.setRows(resultRows);
 			}
 
 			result.fillMetaData(result, limit, totalResults, page);

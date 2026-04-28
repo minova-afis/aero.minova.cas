@@ -46,7 +46,7 @@ public class SqlUtils {
 
 	public static Row convertSqlResultToRow(Table outputTable, ResultSet sqlSet, Logger logger, Object conversionUser) throws ProcedureException {
 		try {
-			Row row = new Row();
+			Row row = new Row(outputTable.getColumns().size());	// how: set initial capacity
 			Value value; // how: reduce reference objects
 			for (Column column : outputTable.getColumns()) {
 				if (column.getType() == DataType.STRING) {
@@ -137,12 +137,13 @@ public class SqlUtils {
 
 	public static Table convertSqlResultToTable(Table inputTable, ResultSet sqlSet, Logger logger, Object conversionUser) {
 		try {
-			Table outputTable = new Table();
+			Table outputTable = new Table(10, 100);	// how: test preset capacity cols 10, rows 100 
 			outputTable.setName(inputTable.getName());
 			outputTable.setColumns(//
 					inputTable.getColumns().stream()//
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
 							.collect(Collectors.toList()));
+			// TODO: how: if possible check row size for preset row capacity 
 			while (sqlSet.next()) {
 				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, logger, conversionUser));
 			}
@@ -171,8 +172,9 @@ public class SqlUtils {
 			Logger logger) {
 		int parameterOffset = 1;
 		sb.append(query);
-
-		List<Value> inputValues = new ArrayList<>();
+		int defaultArrayListSize = inputTable.getRows().size() * inputTable.getColumns().size();	// how: calc default arrayList capacity 
+		List<Value> inputValues = new ArrayList<>(defaultArrayListSize);							// how: set default arrayList capacity
+		//List<Value> inputValues = new ArrayList<>();
 		for (Row row : inputTable.getRows()) {
 			for (int i = 0; i < row.getValues().size(); i++) {
 				// nur die Values von den Spalten, welche nicht die AND_FIELD Spalte ist, interessiert uns

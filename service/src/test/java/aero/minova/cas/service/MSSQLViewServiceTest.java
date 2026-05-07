@@ -122,9 +122,10 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 BookingDate from vWorkingTimeIndex2\r\n" //
-						+ "where ((BookingDate <= ?)\r\n"//
-						+ "  and (BookingDate > ?))");
+				.isEqualTo("""
+						select top 1000 BookingDate from vWorkingTimeIndex2\r
+						where ((BookingDate <= ?)\r
+						  and (BookingDate > ?))""");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -153,9 +154,10 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\n" //
-						+ "where ((EmployeeText like ?)\r\n"//
-						+ "   or (EmployeeText like ?))");
+				.isEqualTo("""
+						select top 1000 EmployeeText from vWorkingTimeIndex2\r
+						where ((EmployeeText like ?)\r
+						   or (EmployeeText like ?))""");
 	}
 
 	@Test
@@ -237,7 +239,7 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
 		intputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
 		// Wenn es keine Row bei der InputTable gibt, gibt es auch keine Where-Bedingung.
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("");
+		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEmpty();
 	}
 
 	@Test
@@ -290,9 +292,14 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 0"
-						+ "\r\nand RowNum <= 3 order by RowNum");
+				.isEqualTo("""
+						select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
+						\r
+						where ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult\
+						\r
+						where RowNum > 0\
+						\r
+						and RowNum <= 3 order by RowNum""");
 	}
 
 	@DisplayName("Zeige alles auf erster Seite.")
@@ -308,8 +315,13 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
-				.isEqualTo("select * from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2" + " ) as RowConstraintResult"
-						+ "\r\nwhere RowNum > 0" + "\r\nand RowNum <= 3 order by RowNum");
+				.isEqualTo("""
+						select * from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
+						 ) as RowConstraintResult\
+						\r
+						where RowNum > 0\
+						\r
+						and RowNum <= 3 order by RowNum""");
 	}
 
 	@DisplayName("Zeige Einträge auf höherer Page.")
@@ -334,9 +346,14 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 12"
-						+ "\r\nand RowNum <= 15 order by RowNum");
+				.isEqualTo("""
+						select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
+						\r
+						where ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult\
+						\r
+						where RowNum > 12\
+						\r
+						and RowNum <= 15 order by RowNum""");
 	}
 
 	@DisplayName("Zeige alle Einträge (auch wenn Page eingestellt ist).")
@@ -361,8 +378,12 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2"
-						+ "\r\nwhere ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult" + "\r\nwhere RowNum > 0");
+				.isEqualTo("""
+						select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
+						\r
+						where ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult\
+						\r
+						where RowNum > 0""");
 	}
 
 	private void testWhereWithOneCondition(String stringValue, String rule, String expectedWhereClause) {

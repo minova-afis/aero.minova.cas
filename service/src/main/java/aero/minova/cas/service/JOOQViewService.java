@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jooq.Condition;
+import org.jooq.OrderField;
 import org.jooq.Query;
 import org.jooq.SelectField;
 import org.jooq.impl.DSL;
@@ -47,10 +48,11 @@ public class JOOQViewService implements ViewServiceInterface {
 		}
 
 		List<SelectField<Object>> fields = new ArrayList<>();
-
+		List<OrderField<Object>> orderFields = new ArrayList<>();
 		for (Column column : params.getColumns()) {
 			if (!column.getName().equals(Column.AND_FIELD_NAME)) {
 				fields.add(DSL.field(column.getName()));
+				orderFields.add(DSL.field(column.getName()));
 			}
 		}
 
@@ -58,11 +60,11 @@ public class JOOQViewService implements ViewServiceInterface {
 
 		// Hier wird nur unterschieden, ob die Einträge gezählt werden sollen oder nicht.
 		if (isCounting) {
-			query = DSL.selectCount().from(params.getName()).where(condition);
+			query = DSL.selectCount().from(params.getName()).where(condition).orderBy(orderFields);
 		} else if (maxRows > 0) {
-			query = DSL.select(fields).from(params.getName()).where(condition).limit(maxRows);
+			query = DSL.select(fields).from(params.getName()).where(condition).orderBy(orderFields).limit(maxRows);
 		} else {
-			query = DSL.select(fields).from(params.getName()).where(condition);
+			query = DSL.select(fields).from(params.getName()).where(condition).orderBy(orderFields);
 		}
 
 		return query.getSQL();

@@ -67,7 +67,7 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))");
+				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))\r\norder by EmployeeText");
 		assertThat(inputTable.getRows().get(0).getValues().get(0).getStringValue()).isEqualTo("AVM%");
 	}
 
@@ -93,7 +93,7 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ? and CustomerText like ?))");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ? and CustomerText like ?))\r\norder by EmployeeText, CustomerText");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -125,7 +125,8 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 				.isEqualTo("""
 						select top 1000 BookingDate from vWorkingTimeIndex2\r
 						where ((BookingDate <= ?)\r
-						  and (BookingDate > ?))""");
+						  and (BookingDate > ?))\r
+						order by BookingDate""");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -157,7 +158,8 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 				.isEqualTo("""
 						select top 1000 EmployeeText from vWorkingTimeIndex2\r
 						where ((EmployeeText like ?)\r
-						   or (EmployeeText like ?))""");
+						   or (EmployeeText like ?))\r
+						order by EmployeeText""");
 	}
 
 	@Test
@@ -197,7 +199,7 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))");
+				.isEqualTo("select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))\r\norder by EmployeeText, CustomerText");
 	}
 
 	@Test

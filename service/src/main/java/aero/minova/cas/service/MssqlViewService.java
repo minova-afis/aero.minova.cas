@@ -70,7 +70,7 @@ public class MssqlViewService implements ViewServiceInterface {
 	@Override
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean count, List<Row> authorities) throws IllegalArgumentException {
 		final StringBuilder sb = new StringBuilder();
-		if (params.getName() == null || params.getName().trim().length() == 0) {
+		if (params.getName() == null || params.getName().trim().isEmpty()) {
 			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 
@@ -109,7 +109,18 @@ public class MssqlViewService implements ViewServiceInterface {
 		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 
+		String orderByClause = getOrderByString(params);
+		sb.append(orderByClause);
+
 		return sb.toString();
+	}
+
+	protected String getOrderByString(Table params) {
+		List<String> columns = params.getColumns().stream().filter(c -> !Objects.equals(c.getName(), Column.AND_FIELD_NAME)).map(Column::getName).toList();
+		if (columns.isEmpty()) {
+			return "";
+		}
+		return "\r\norder by " + String.join(", ", columns);
 	}
 
 	@Override

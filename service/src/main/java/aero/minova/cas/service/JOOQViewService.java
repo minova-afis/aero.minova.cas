@@ -60,7 +60,7 @@ public class JOOQViewService implements ViewServiceInterface {
 
 		// Hier wird nur unterschieden, ob die Einträge gezählt werden sollen oder nicht.
 		if (isCounting) {
-			query = DSL.selectCount().from(params.getName()).where(condition).orderBy(orderFields);
+			query = DSL.selectCount().from(params.getName()).where(condition);
 		} else if (maxRows > 0) {
 			query = DSL.select(fields).from(params.getName()).where(condition).orderBy(orderFields).limit(maxRows);
 		} else {

@@ -109,8 +109,10 @@ public class MssqlViewService implements ViewServiceInterface {
 		final String onlyAuthorizedRows = securityService.rowLevelSecurity(whereClauseExists, authorities);
 		sb.append(onlyAuthorizedRows);
 
-		String orderByClause = getOrderByString(params);
-		sb.append(orderByClause);
+		if (!count) {
+			String orderByClause = getOrderByString(params);
+			sb.append(orderByClause);
+		}
 
 		return sb.toString();
 	}

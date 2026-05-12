@@ -82,7 +82,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 		inputTable.addRow(inputRow);
 
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, true, userGroups))//
-				.isEqualTo("select count(*) from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? order by EmployeeText");
+				.isEqualTo("select count(*) from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ?");
 	}
 
 	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")

@@ -108,7 +108,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 		inputTable.addRow(inputRow);
 
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? limit ?");
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? order by EmployeeText limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
@@ -128,7 +128,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo(
-						"select EmployeeText, CustomerText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? and cast(CustomerText as varchar) ilike ?) limit ?");
+						"select EmployeeText, CustomerText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? and cast(CustomerText as varchar) ilike ?) order by EmployeeText, CustomerText limit ?");
 	}
 
 	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
@@ -165,7 +165,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo(
-						"select BookingDate from vWorkingTimeIndex2 where (BookingDate <= ? or BookingDate < ? or BookingDate >= ? or BookingDate > ? or BookingDate <> ?) limit ?");
+						"select BookingDate from vWorkingTimeIndex2 where (BookingDate <= ? or BookingDate < ? or BookingDate >= ? or BookingDate > ? or BookingDate <> ?) order by BookingDate limit ?");
 	}
 
 	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
@@ -190,7 +190,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
 				.isEqualTo(
-						"select EmployeeText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? or cast(EmployeeText as varchar) ilike ?) limit ?");
+						"select EmployeeText from vWorkingTimeIndex2 where (cast(EmployeeText as varchar) ilike ? or cast(EmployeeText as varchar) ilike ?) order by EmployeeText limit ?");
 	}
 
 	@Test
@@ -206,7 +206,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 		inputTable.addRow(inputRow);
 
 		assertThat(testSubject.prepareViewString(inputTable, true, -1, userGroups))//
-				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ?");
+				.isEqualTo("select EmployeeText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? order by EmployeeText");
 	}
 
 	@Test
@@ -250,7 +250,8 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 		inputRow.addValue(new Value(false, null));
 		userGroups.add(inputRow);
 		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select EmployeeText, CustomerText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? limit ?");
+				.isEqualTo(
+						"select EmployeeText, CustomerText from vWorkingTimeIndex2 where cast(EmployeeText as varchar) ilike ? order by EmployeeText, CustomerText limit ?");
 	}
 
 	@Test

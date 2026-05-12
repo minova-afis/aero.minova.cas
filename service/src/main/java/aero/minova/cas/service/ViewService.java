@@ -44,7 +44,7 @@ public class ViewService {
 		if (systemDatabase.isSQLDatabase()) {
 			viewService = new MssqlViewService(systemDatabase, customLogger);
 		} else {
-			viewService = new JOOQViewService(systemDatabase, customLogger);
+			viewService = new JOOQViewService();
 		}
 		securityService.setViewService(this);
 	}

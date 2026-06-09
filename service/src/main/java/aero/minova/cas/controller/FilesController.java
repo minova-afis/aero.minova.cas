@@ -166,8 +166,7 @@ public class FilesController {
 //		return fileBytesTable;
 //	}
 
-	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
+	public byte[] getFile(String path) throws Exception {
 		return getFile(path, null);
 	}
 
@@ -263,8 +262,7 @@ public class FilesController {
 		return readAllBytes(inputPath);
 	}
 
-	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
-	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+	public byte[] getHash(String path) throws Exception {
 		return getHash(path, null);
 	}
 

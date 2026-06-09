@@ -5,6 +5,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+- getFile(String path) und getHash(String path) wieder hinzufügen für Abwärtskompatibilität, da diese von einigen Extensions verwendet werden.
+
 - Dateien werden nun auch aus tFile, XBS aus tRegistry bezogen [\#1308](https://github.com/minova-afis/aero.minova.cas/issues/1308)
 
 - Server-seitige Übersetzungen von MDI und XML forms [\#1308](https://github.com/minova-afis/aero.minova.cas/issues/1308)

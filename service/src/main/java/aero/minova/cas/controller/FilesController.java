@@ -53,13 +53,13 @@ import lombok.val;
 public class FilesController {
 	@Autowired
 	FileService dbFileService;
-	
+
 	@Autowired
 	RegistryService registryService;
-	
+
 	@Autowired
 	TranslationService translationService;
-	
+
 	@Autowired
 	FilesService fileService;
 
@@ -68,7 +68,7 @@ public class FilesController {
 
 	@Autowired
 	SqlProcedureController spc;
-	
+
 	@Autowired
 	ContentPatcher contentPatcher;
 
@@ -77,30 +77,32 @@ public class FilesController {
 
 	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
 	boolean isFatJarMode;
-	
+
 	// Is set to false in MCAS mode, as the integrated (demo) XBS would lead to wrong application name detection
 	@org.springframework.beans.factory.annotation.Value("${readPackedXBS:true}")
 	boolean readPackedXBS;
-	
-    @Value("${application:#{null}}")
-    private String application;
-	
+
+	@Value("${application:#{null}}")
+	private String application;
+
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
 	boolean isDBFilesActive;
 
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles.patch.active:true}")
 	boolean isWFCPatchActive;
-	
+
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles.resolveforms:false}")
 	boolean isResolveFormsActive;
-	
+
 	@org.springframework.beans.factory.annotation.Value("${ng.api.dbregistry:false}")
 	boolean isDBRegistryActive;
-	
+
 	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
 	boolean isDBFilesPreferred;
-	
-	/** Calculate MD5
+
+	/**
+	 * Calculate MD5
+	 * 
 	 * @param content
 	 * @return
 	 */
@@ -115,62 +117,66 @@ public class FilesController {
 			return null;
 		}
 	}
-	
-	/** Get requested file from the DB and
-	 * 1. patch XML forms it for WFC
-	 * 2. Add option pages directly into forms 
-	 * 3. trananslate forms and mdi if language is specified
+
+	/**
+	 * Get requested file from the DB and 1. patch XML forms it for WFC 2. Add option pages directly into forms 3. trananslate forms and mdi if language is
+	 * specified
+	 * 
 	 * @param path
 	 * @param lang
 	 * @return
 	 */
 	byte[] getFileFromTable(String path, String lang) {
-		if(path == null)
+		if (path == null)
 			return null;
 		byte[] toRet = null;
-		
+
 		// E.g. if "Driver.xml" is asked -> request "afis/Driver.xml"
-		if(application != null && !application.isEmpty() &&
-			!path.toLowerCase().startsWith(application.toLowerCase()) &&
-			!path.toLowerCase().startsWith("/" + application.toLowerCase())) {
+		if (application != null && !application.isEmpty() && !path.toLowerCase().startsWith(application.toLowerCase())
+				&& !path.toLowerCase().startsWith("/" + application.toLowerCase())) {
 			toRet = dbFileService.getFile(application + (path.startsWith("/") ? "" : "/") + path);
-			if(toRet == null) {
+			if (toRet == null) {
 				// Fallback
 				toRet = dbFileService.getFile(path);
 			}
 		} else {
 			toRet = dbFileService.getFile(path);
 		}
-		
+
 		// On-the-fly patching of Forms/OPs for WFC
 		if (isWFCPatchActive && path.toLowerCase().endsWith(".xml"))
 			toRet = contentPatcher.patchXMLForm(path, toRet);
-		
+
 		// On the fly inclusion of option-pages and forms -- the UI should get a finished definition
 		// https://github.com/minova-afis/aero.minova.cas/issues/1473
-		if(isResolveFormsActive && application != null && !application.isEmpty() && path.toLowerCase().endsWith(".xml"))
+		if (isResolveFormsActive && application != null && !application.isEmpty() && path.toLowerCase().endsWith(".xml"))
 			toRet = contentPatcher.resolveXMLForm(application, path, toRet);
-		
+
 		// Try to translate if XML or MDI -- if no language is given, no translation will be done
-		if(path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
+		if (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))
 			toRet = translationService.translateXML(path, toRet, lang);
-		
+
 		// On-the-fly XBS patching
 		if (isWFCPatchActive && path.toLowerCase().endsWith("xbs"))
 			toRet = contentPatcher.patchXBS(path, toRet);
-		
+
 		return toRet;
 	}
-	
+
 	public byte[] getMD5FromTable(String path, String lang) {
-		if(path == null)
+		if (path == null)
 			return null;
 		// On-the-fly patching of Forms/OPs for WFC
 		if (isWFCPatchActive && path.toLowerCase().endsWith(".xml"))
 			return calculateMD5(getFileFromTable(path, lang));
 		return dbFileService.getMD5(path);
 	}
-			
+
+	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
+		return getFile(path, null);
+	}
+
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
@@ -191,11 +197,11 @@ public class FilesController {
 
 		// Are Files from DB preferered compared to File System?
 		if (isDBFilesActive && isDBFilesPreferred) {
- 			byte[] toRet = getFileFromTable(path, lang);
-			if(toRet != null)
+			byte[] toRet = getFileFromTable(path, lang);
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
 		if (generateMDIPerUser && path.contains("application.mdi")) {
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
@@ -205,29 +211,29 @@ public class FilesController {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
 		}
-		
+
 		// Are Files from DB active but not preferred compared to File System?
-		if(isDBFilesActive && !isDBFilesPreferred) {
- 			byte[] toRet = getFileFromTable(path, lang);
-			if(toRet != null)
+		if (isDBFilesActive && !isDBFilesPreferred) {
+			byte[] toRet = getFileFromTable(path, lang);
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		// Even without tRegistry we want to have the ability to change XBS entries with System.env and System.properties
 		byte[] toRet = getIncludedFile(path);
-		if(path.toLowerCase().endsWith(".xbs") && toRet != null) try {
-			toRet = NextGen.Registry.create()
-					                .withXBS(new ByteArrayInputStream(toRet))
-					                .withEnv()
-					                .getXBS();
-		} catch(Exception ex) {
-			customLogger.logError("Failed to auto-update XBS with ENV", ex);
-		}
-		
+		if (path.toLowerCase().endsWith(".xbs") && toRet != null)
+			try {
+				toRet = NextGen.Registry.create().withXBS(new ByteArrayInputStream(toRet)).withEnv().getXBS();
+			} catch (Exception ex) {
+				customLogger.logError("Failed to auto-update XBS with ENV", ex);
+			}
+
 		return toRet;
 	}
-	
-	/** Get file included in this CAS installation -- either within the jar or on the file system
+
+	/**
+	 * Get file included in this CAS installation -- either within the jar or on the file system
+	 * 
 	 * @param path
 	 * @return
 	 * @throws Exception
@@ -242,7 +248,7 @@ public class FilesController {
 				return getZip(path.substring(0, path.length() - 4));
 			}
 			InputStream is = getClass().getResourceAsStream(path);
-			if(is == null)
+			if (is == null)
 				throw new IOException(path + " file not included in CAS build");
 			return is.readAllBytes();
 		}
@@ -260,6 +266,11 @@ public class FilesController {
 		return readAllBytes(inputPath);
 	}
 
+	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+		return getHash(path, null);
+	}
+
 	/**
 	 * Sucht die MD5-Datei bestimmten Files im Internal/MD5-Verzeichnis und gibt diese zurück.
 	 *
@@ -274,49 +285,48 @@ public class FilesController {
 	public @ResponseBody byte[] getHash(@RequestParam String path, @RequestParam(required = false) String lang) throws Exception {
 		// Should we generate XBS from tRegistry?
 		if (isDBRegistryActive && RegistryService.canHandleXBSRequest(path)) {
-			 byte[] xbsCode = getXBSFromRegistry(path);
-			 return calculateMD5(xbsCode);
+			byte[] xbsCode = getXBSFromRegistry(path);
+			return calculateMD5(xbsCode);
 		}
-		
+
 		// Try tFiles first
 		if (isDBFilesActive && isDBFilesPreferred) {
 			// Translated files have different contents based on language
- 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
- 				byte[] content = getFileFromTable(path, lang);
- 				return calculateMD5(content);
- 			}
+			if (lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+				byte[] content = getFileFromTable(path, lang);
+				return calculateMD5(content);
+			}
 			byte[] toRet = dbFileService.getMD5(path);
-			if(toRet != null)
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		if (generateMDIPerUser && path.contains("application.mdi")) {
 			// Falls es beim Auslesen der Mdi zu einem Fehler kommt, wird stattdessen eine StandardMdi aus dem Root-Path zurückgegeben.
 			try {
-				byte[] mdi =  fileService.readMDI();
+				byte[] mdi = fileService.readMDI();
 				return calculateMD5(mdi);
 			} catch (Exception e) {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
 		}
-		
+
 		// Are Files from DB active but not preferred compared to File System?
-		if(isDBFilesActive && !isDBFilesPreferred) {
+		if (isDBFilesActive && !isDBFilesPreferred) {
 			// Translated files have different contents based on language
- 			if(lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
- 				byte[] content = getFileFromTable(path, lang);
- 				return calculateMD5(content);
- 			}
-			
+			if (lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
+				byte[] content = getFileFromTable(path, lang);
+				return calculateMD5(content);
+			}
+
 			byte[] toRet = dbFileService.getMD5(path);
-			if(toRet != null)
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		// Even in non-fatjar mode we want in-situ MD5 calculation for mdi and xbs -- as both may have dynamic content
-		boolean liveMD5calc = path.toLowerCase().endsWith(".mdi") ||
-				              path.toLowerCase().endsWith(".xbs");
-		
+		boolean liveMD5calc = path.toLowerCase().endsWith(".mdi") || path.toLowerCase().endsWith(".xbs");
+
 		if (isFatJarMode || liveMD5calc) {
 			if (!path.startsWith("/")) {
 				path = "/" + path;
@@ -353,12 +363,12 @@ public class FilesController {
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
 		// Try tFiles first
-		if(isDBFilesActive) {
+		if (isDBFilesActive) {
 			byte[] toRet = getFileFromTable(path, null);
-			if(toRet != null)
+			if (toRet != null)
 				return toRet;
 		}
-		
+
 		if (isFatJarMode) {
 			final var pathStr = path.toString();
 			if (!path.startsWith("/")) {
@@ -487,35 +497,18 @@ public class FilesController {
 
 		Files.write(Paths.get(hashedFile.getAbsolutePath()), hashOfFile);
 	}
-	
+
 	/**
-	 * Modern Minova Registry can be modified via:
-	 * - fully compliant Spring-tech: application.properties incl. profiles, System.env, System.properties
-	 * - ENV vars starting with REG_* prefix
-	 * - XBS files
-	 * - tREgistry table
+	 * Modern Minova Registry can be modified via: - fully compliant Spring-tech: application.properties incl. profiles, System.env, System.properties - ENV
+	 * vars starting with REG_* prefix - XBS files - tREgistry table Such that different sources are just different carriers of the Registry values In common
+	 * applications (services) Registry is created like this: Map<String, String> registry = NextGen.Registry.create() .withApplicationProperties() .withEnv()
+	 * .withDB(null) .get(); ... CAS however is special, since the Registry it constructs here is not _for itself_ but rather for external application users.
+	 * I.e. the application.properties of CAS are defining CAS' itself and not for example AFIS/SIS/... applications. Therefore in this function we are _not_
+	 * updating the actual App registry with CAS' application.properties. Beginning with 2026 the requested XBS is constructed from 1. Packaged XBS (if any) 2.
+	 * ENV vars (REG_* prefixed keys) 3. tRegistry
 	 * 
-	 * Such that different sources are just different carriers of the Registry values
-	 * 
-	 * In common applications (services) Registry is created like this:
-	 * Map<String, String> registry =
-	 *    NextGen.Registry.create()
-	 *                    .withApplicationProperties()
-	 *                    .withEnv()
-	 *                    .withDB(null)
-	 *                    .get();
-	 *                    
-	 * ... CAS however is special, since the Registry it constructs here is not _for itself_ but rather
-	 *     for external application users. I.e. the application.properties of CAS are defining CAS' itself and not
-	 *     for example AFIS/SIS/... applications. Therefore in this function we are _not_ updating the actual
-	 *     App registry with CAS' application.properties.
-	 *     
-	 * Beginning with 2026 the requested XBS is constructed from
-	 * 1. Packaged XBS (if any)
-	 * 2. ENV vars (REG_* prefixed keys)
-	 * 3. tRegistry
-	 * 
-	 * @param path may be a requested XBS file or a app short name (afis)
+	 * @param path
+	 *            may be a requested XBS file or a app short name (afis)
 	 * @return
 	 * @throws RuntimeException
 	 */
@@ -528,25 +521,25 @@ public class FilesController {
 		// - if application.xbs is requested => use application
 		try {
 			byte[] xbs = null;
-			if(readPackedXBS) {
+			if (readPackedXBS) {
 				try {
 					xbs = getIncludedFile(path);
 					customLogger.logFiles("Internal XBS found for " + path + " -> update with ENV and tRegistry");
-				} catch(Exception ex) {
+				} catch (Exception ex) {
 					customLogger.logFiles("No internal XBS found for " + path + " -> construct new with ENV and tRegistry");
 				}
 			}
-			
+
 			// Build-up registry
-			NextGen.Registry reg = NextGen.Registry.create()
-							.tryWithXBS(xbs == null ? null : new ByteArrayInputStream(xbs))
-			                .withEnv()
-			                .with(registryService::loadInto); // We use JPA registry connector instead of the built-in MSSQL (.withDB);
-			
-			if(reg.get().isEmpty()) {
+			NextGen.Registry reg = NextGen.Registry.create().tryWithXBS(xbs == null ? null : new ByteArrayInputStream(xbs)).withEnv()
+					.with(registryService::loadInto); // We use JPA registry connector instead of the built-in MSSQL (.withDB);
+
+			if (reg.get().isEmpty()) {
 				String appPrefix = RegistryService.autoCorrectAppPrefix(path);
-				//customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
-				throw new RuntimeException("Failed to generate XBS -- no values found in ENV or tRegistry" + (appPrefix == null ? "" : " for Application '"+appPrefix+"'"));
+				// customLogger.logError("Failed to generate XBS from tRegistry -- no values found" + (appPrefix == null ? "" : " for Application
+				// '"+appPrefix+"'"));
+				throw new RuntimeException(
+						"Failed to generate XBS -- no values found in ENV or tRegistry" + (appPrefix == null ? "" : " for Application '" + appPrefix + "'"));
 			}
 			return reg.getXBS();
 		} catch (Exception e) {
@@ -618,7 +611,6 @@ public class FilesController {
 			}
 		}
 	}
-
 
 	private boolean isFileResource(String resourcePath) {
 		return !resourcePath.endsWith("/");

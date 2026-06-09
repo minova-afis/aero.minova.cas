@@ -166,6 +166,11 @@ public class FilesController {
 //		return fileBytesTable;
 //	}
 
+	@RequestMapping(value = "files/read", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	public @ResponseBody byte[] getFile(@RequestParam String path) throws Exception {
+		return getFile(path, null);
+	}
+
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
@@ -256,6 +261,11 @@ public class FilesController {
 		val inputPath = fileService.checkLegalPath(Paths.get(path));
 		customLogger.logUserRequest("files/read: " + path);
 		return readAllBytes(inputPath);
+	}
+
+	@RequestMapping(value = "files/hash", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
+	public @ResponseBody byte[] getHash(@RequestParam String path) throws Exception {
+		return getHash(path, null);
 	}
 
 	/**

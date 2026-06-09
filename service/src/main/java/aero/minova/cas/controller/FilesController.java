@@ -328,9 +328,6 @@ public class FilesController {
 		boolean liveMD5calc = path.toLowerCase().endsWith(".mdi") || path.toLowerCase().endsWith(".xbs");
 
 		if (isFatJarMode || liveMD5calc) {
-			if (!path.startsWith("/")) {
-				path = "/" + path;
-			}
 			final byte[] pathContent;
 			if (path.endsWith(".zip")) {
 				pathContent = getZip(path);

@@ -40,13 +40,8 @@
         <!-- HUB FUnktionalität -->
         <dependency>
             <groupId>ch.minova</groupId>
-            <artifactId>appmodel</artifactId>
-            <version>0.11.0</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.minova</groupId>
             <artifactId>assist.core</artifactId>
-            <version>1.2.7</version>
+            <version>1.4.6</version>
         </dependency>
         <dependency>
             <groupId>ch.minova</groupId>

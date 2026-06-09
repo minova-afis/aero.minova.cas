@@ -30,6 +30,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
  - Alle Datenbank-Connections auch commiten
  
  - Für TransactionChecks auch in den Input-Tabellen suchen
+ 
+ - Fehlermeldung bei XBS- und MDI-Hash-Anfragen vermeiden
+ 
+ - Alle View-Anfragen nach allen Spalten sortieren, wodurch die Reihenfolge der Elemente eindeutiger wird und somit die Zeilen der einzelnen Pages über mehrere View-Anfragen hinweg möglichst gleich bleiben. Der Inhalt der Pages bleibt bspw. nicht gleich, wenn eine neue Zeile zur View hinzukommt.
 
 ## \[13.6.1\] - 2025-08-12
 

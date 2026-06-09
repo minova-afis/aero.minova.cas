@@ -10,32 +10,27 @@ import org.jooq.SelectField;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
-import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
-import aero.minova.cas.sql.SystemDatabase;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
 public class JOOQViewService implements ViewServiceInterface {
-	private final SystemDatabase systemDatabase;
-	private final CustomLogger customLogger;
 
 	@Override
 	public String prepareViewString(Table params, boolean autoLike, int maxRows, boolean isCounting, List<Row> authorities) throws IllegalArgumentException {
 
-		if (params.getName() == null || params.getName().trim().length() == 0) {
+		if (params.getName() == null || params.getName().trim().isEmpty()) {
 			throw new IllegalArgumentException("msg.ViewNullName");
 		}
 
 		Condition condition = prepareWhereClauseGetCondition(params, autoLike);
 
 		List<SelectField<Object>> fields = new ArrayList<>();
-
 		for (Column column : params.getColumns()) {
 			if (!column.getName().equals(Column.AND_FIELD_NAME)) {
 				fields.add(DSL.field(column.getName()));
@@ -47,8 +42,6 @@ public class JOOQViewService implements ViewServiceInterface {
 		// Hier wird nur unterschieden, ob die Einträge gezählt werden sollen oder nicht.
 		if (isCounting) {
 			query = DSL.selectCount().from(params.getName()).where(condition);
-		} else if (maxRows > 0) {
-			query = DSL.select(fields).from(params.getName()).where(condition).limit(maxRows);
 		} else {
 			query = DSL.select(fields).from(params.getName()).where(condition);
 		}
@@ -57,6 +50,14 @@ public class JOOQViewService implements ViewServiceInterface {
 
 		// Die RowLevelSecurity muss schon als "ausgefüllter" String angehängt werden (keine "?"), da die Werte nicht in der Tabelle stehen
 		sqlString += SecurityService.rowLevelSecurity(condition.equals(DSL.noCondition()), authorities);
+
+		if (!isCounting) {
+			sqlString += MssqlViewService.prepareOrderByClause(params);
+		}
+
+		if (maxRows > 0 && !isCounting) {
+			sqlString += " limit ?";
+		}
 
 		return sqlString;
 	}

@@ -5,6 +5,7 @@ Das Format basiert auf link:https://keepachangelog.com/en/1.0.0[Keep a Changelog
 
 ## [UNRELEASED] -- XXXX-XX-XX
 
+## [12.71.3] -- 2026-06-10
 * getFile(String path) und getHash(String path) wieder hinzufügen für Abwärtskompatibilität, da diese von einigen Extensions verwendet werden.
 
 ## [12.71.2] -- 2026-05-12

@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,6 +36,13 @@ import jakarta.annotation.PostConstruct;
  */
 @Service
 @ConditionalOnProperty(name = "ng.api.autosetup", havingValue = "true", matchIfMissing = false)
+// SqlProcedureController.queueService is wired manually by QueueService's own @PostConstruct
+// (circular-dependency workaround, see SqlProcedureController#queueService). Without this,
+// Spring's component-scan order decides whether that wiring has happened before executeSetup()
+// below calls into SqlProcedureController, and that order isn't guaranteed — it was observed to
+// consistently NPE (this.queueService == null) under Jib-built container images while succeeding
+// locally. @DependsOn makes QueueService's initialization deterministic instead of order-dependent.
+@DependsOn("queueService")
 public class AutoSetupService {
 
 	@Autowired

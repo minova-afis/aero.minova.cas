@@ -5,8 +5,8 @@ on:
       - '**'
   workflow_dispatch:
 jobs:
-  Build:
-    uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/java-continuous-integration.yml@main
+  Build: #Change the branch to which is pointint due to issues with sonarqube step. (After issue is resolved please move back)
+    uses: minova-afis/aero.minova.os.github.workflows/.github/workflows/java-continuous-integration.yml@hoj_java_21
     secrets: inherit
     with:
       dependency-check-goal: 'help'

@@ -259,7 +259,9 @@ public class SqlProcedureController {
 			}
 
 			ResponseEntity result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
-			queueService.accept(inputTable, result);
+			if (queueService != null) {
+				queueService.accept(inputTable, result);
+			}
 
 			return result;
 		} catch (Throwable e) {
@@ -284,7 +286,9 @@ public class SqlProcedureController {
 			if (extensions.containsKey(inputTable.getName())) {
 				final var extension = extensions.get(inputTable.getName());
 				extResult = extension.apply(inputTable);
-				queueService.accept(inputTable, extResult);
+				if (queueService != null) {
+					queueService.accept(inputTable, extResult);
+				}
 				if (extResult == null) {
 					customLogger.logError(
 							"Extension " + extension

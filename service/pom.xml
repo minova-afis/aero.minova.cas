@@ -41,12 +41,17 @@
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>assist.core</artifactId>
-            <version>1.4.6</version>
+            <version>1.5.2</version>
         </dependency>
         <dependency>
             <groupId>ch.minova</groupId>
             <artifactId>foundation.rest.db</artifactId>
             <version>1.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.minova</groupId>
+            <artifactId>foundation.rest.auth</artifactId>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -95,6 +100,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

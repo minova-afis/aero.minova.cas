@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import aero.minova.cas.CustomLogger;
@@ -39,6 +40,9 @@ public class SecurityService {
 
 	@Autowired
 	public CustomLogger customLogger;
+
+	@Autowired
+	OidcRoleProvisioningService oidcRoleProvisioningService;
 
 	@org.springframework.beans.factory.annotation.Value("${login_dataSource:}")
 	private String dataSource;
@@ -143,6 +147,14 @@ public class SecurityService {
 					userSecurityTokens = loadLDAPUserTokens(authentication.getName());
 				} else if (dataSource.equalsIgnoreCase("database")) {
 					userSecurityTokens = loadDatabaseUserTokens(authentication.getName());
+				} else if (dataSource.equalsIgnoreCase("oidc")) {
+					// The JWT's roles are authoritative for OIDC users — no xtcasAuthorities/xtcasUser lookup.
+					// They're merged into userSecurityTokens below via `authorities` (the JWT-derived
+					// GrantedAuthorities already on this Authentication). We only need to make sure a matching
+					// xtcasUserGroup row exists for each role before that merge, so it isn't silently a no-op.
+					List<String> roleNames = authentication.getAuthorities().stream()
+							.map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+					oidcRoleProvisioningService.ensureRolesProvisioned(roleNames);
 				}
 
 				List<GrantedAuthority> oldAuthorities = (List<GrantedAuthority>) authentication.getAuthorities();
@@ -157,9 +169,17 @@ public class SecurityService {
 					updatedAuthorities.add(authority);
 				}
 
-				// Neue Authentication mit den alten Logindaten erstellen und in den Context setzen.
-				Authentication newAuth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(),
-						updatedAuthorities);
+				// Neue Authentication mit den alten Logindaten erstellen und in den Context setzen. Ein
+				// JwtAuthenticationToken (OIDC) muss dabei sein Typ behalten, statt stillschweigend zu einem
+				// UsernamePasswordAuthenticationToken degradiert zu werden — sonst würde jeder zukünftige Code, der
+				// z.B. per `instanceof JwtAuthenticationToken` oder auf den Jwt-Claims arbeitet, unbemerkt brechen.
+				Authentication newAuth;
+				if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+					newAuth = new JwtAuthenticationToken(jwtAuth.getToken(), updatedAuthorities, jwtAuth.getName());
+				} else {
+					newAuth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(),
+							updatedAuthorities);
+				}
 
 				SecurityContextHolder.getContext().setAuthentication(newAuth);
 			}

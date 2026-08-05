@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -87,7 +89,8 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http,
+			ObjectProvider<JwtAuthenticationConverter> jwtAuthenticationConverterProvider) throws Exception {
 
 		http.authorizeHttpRequests(requests -> requests
 					// OPTIONS requests should be allowed without authentication for CORS preflight (standard!)
@@ -99,6 +102,8 @@ public class SecurityConfig {
 					.requestMatchers("/", "/index", "/login", "/setup").permitAll()
 					// Embedded React UI — served at /ui/**; this is the primary login page, must be public
 					.requestMatchers("/ui", "/ui/**").permitAll()
+					// foundation.rest.auth's auth-type discovery endpoint — always public
+					.requestMatchers("/auth").permitAll()
 					.anyRequest().fullyAuthenticated()
 				)
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/ui/"))
@@ -118,6 +123,16 @@ public class SecurityConfig {
 				// scj: CSRF Should only be enabled if basic auth is replaced by a modern
 				// method.
 				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
+
+		if ("oidc".equals(loginDataSource)) {
+			JwtAuthenticationConverter converter = jwtAuthenticationConverterProvider.getIfAvailable();
+			if (converter == null) {
+				throw new IllegalStateException(
+						"login_dataSource=oidc also requires foundation.rest.auth.mode=oidc and its oidc.* properties to be set");
+			}
+			http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)));
+		}
+
 		return http.build();
 	}
 
@@ -149,6 +164,12 @@ public class SecurityConfig {
 					.authorities(ADMIN) //
 					.build();
 			return new InMemoryUserDetailsManager(user);
+		} else if ("oidc".equals(loginDataSource)) {
+			// OIDC-authenticated requests never consult this bean — the Authentication is built directly from the
+			// JWT by foundation.rest.auth's JwtAuthenticationConverter. This empty manager only exists so
+			// .httpBasic()/.formLogin() (which stay active unconditionally for every mode) have something to bind
+			// to instead of failing to wire up; Basic/form-login attempts simply won't succeed in this mode.
+			return new InMemoryUserDetailsManager();
 		}
 		throw new IllegalArgumentException("dataSource contains unknown parameter '" + loginDataSource + "'");
 	}

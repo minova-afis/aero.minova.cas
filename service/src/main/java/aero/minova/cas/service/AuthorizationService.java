@@ -189,6 +189,26 @@ public class AuthorizationService {
 	}
 
 	/**
+	 * Ensures a UserGroup exists for an OIDC role name, auto-provisioning it on first sight. The literal "admin"
+	 * role gets every current privilege (mirrors {@link #createOrUpdateAdminUser}); every other role gets zero
+	 * privileges — an operator grants what's actually needed rather than pruning from a broad default. Unlike
+	 * {@link #createOrUpdateAdminUser}, no {@code Users}/{@code xtcasAuthorities} row is created — OIDC roles come
+	 * straight from the JWT on every request, there's no local username/password account to provision.
+	 *
+	 * @param roleName
+	 * @return
+	 */
+	public UserGroup ensureRoleGroupExists(String roleName) {
+		UserGroup group = createOrUpdateUserGroup(roleName, "#" + roleName);
+		if ("admin".equals(roleName)) {
+			for (UserPrivilege priv : userPrivilegeRepository.findByLastActionGreaterThan(0)) {
+				findOrCreateLuUserPrivilegeUserGroup(group, priv);
+			}
+		}
+		return group;
+	}
+
+	/**
 	 * Erstellt eine Authority (Zuorndung zwischen Benutzer und BenutzerGruppe), wenn diese noch nicht existiert
 	 * 
 	 * @param username

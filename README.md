@@ -67,6 +67,8 @@ dass die API möglichst stabil gehalten wird.
 
 -   [Property Übersicht](./service/doc/adoc/properties.adoc)
 
+-   [Authentication & Access Management](./doc/md/Authentication.md)
+
 -   [How to Extensions und App-Projekte](./service/doc/adoc/extensions.adoc)
 
 -   [Projektstruktur](./doc/adoc/projectStructure.adoc)

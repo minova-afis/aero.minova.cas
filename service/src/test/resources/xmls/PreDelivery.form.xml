@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	helper-class="ch.minova.afis.shipment.helper.ShipmentHelper"
+	icon="FuellingInput.ico" title="Pre Delivery"
+	xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd">
+	<index-view id="IndexView" index-report="auto"
+		source="dbo.vAFISPreDeliveriesIndex">
+		<column key="true" name="KeyLong" size="0">
+			<number />
+		</column>
+		<column name="DeliveryNoteDate" size="80" text="Buchungsdatum">
+			<short-date />
+		</column>
+		<column aggregate="count" name="DeliveryNoteID"
+			text="Lieferschein-Nr.">
+			<text />
+		</column>
+		<column name="TruckText" text="Fahrzeug">
+			<text />
+		</column>
+		<column name="Driver" text="Operator">
+			<text />
+		</column>
+		<column name="Supplier" text="Einlagerer">
+			<text />
+		</column>
+		<column name="Item" text="Produkt">
+			<text />
+		</column>
+		<column name="Customer" text="Kunde">
+			<text />
+		</column>
+		<column name="Registration" text="Registrierung">
+			<text />
+		</column>
+		<column name="FlightNo" text="Flugnummer">
+			<text />
+		</column>
+		<column name="TakeOffDate" text="Abflugdatum">
+			<short-date />
+		</column>
+		<column name="FuellingType" text="Betankungsart">
+			<text />
+		</column>
+		<column name="Quantity" text="Menge">
+			<number />
+		</column>
+	</index-view>
+	<detail import="Shipment.ShipmentDetail" />
+</form>

@@ -2,11 +2,13 @@ package aero.minova.cas;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,6 +48,7 @@ public class ContentPatcher {
 	private static final String ATTR_TITLE = "title";
 	private static final String ATTR_PROPERTY = "property";
 	private static final String ATTR_VISIBLE = "visible";
+	private static final String ATTR_IMPORT = "import";
 	
 	private static final String XBS_NODE_OPTIONPAGES = "OptionPages";
 //	private static final String XBS_NODE_DEPENDINGFIELDS = "DependingFields";
@@ -111,6 +114,93 @@ public class ContentPatcher {
 			customLogger.logError("Failed to patch form " + fileName, ex);
 		}
 		return data;
+	}
+
+	/**
+	 * Resolve top-level &lt;index-view/&gt;, &lt;detail/&gt; (or similar) elements carrying an
+	 * <code>import="FormName.ElementId"</code> attribute: the referenced form is fetched, the
+	 * top-level element with matching <code>id</code> is located within it, and the stub element
+	 * is replaced by a deep copy of it. Attributes already present on the stub (other than
+	 * "import" itself) take precedence over -- i.e. "override" -- the ones coming from the
+	 * imported element; anything not overridden is inherited as-is.
+	 *
+	 * Only top-level children of the referenced form's root are considered as import targets, and
+	 * only top-level children of the current form's root are considered as import stubs -- nested
+	 * imports (e.g. within a grid or optionpage) are not supported.
+	 *
+	 * This is independent of WFC-specific patching ({@link #patchXMLForm}) or option-page resolution
+	 * ({@link #resolveXMLForm}) -- it is a structural, always-needed step that has to run before both,
+	 * regardless of which of those (if any) is active for the current front-end.
+	 */
+	public byte[] resolveImports(String fileName, byte[] data) {
+		return resolveImports(fileName, data, new HashSet<>());
+	}
+
+	private byte[] resolveImports(String fileName, byte[] data, Set<String> visited) {
+		try {
+			Document doc = XMLUtils.getDocument(data);
+			if (doc == null)
+				return data;
+			resolveImports(fileName, doc, visited);
+			return XMLUtils.toBytes(doc);
+		} catch (Exception ex) {
+			customLogger.logError("Failed to resolve imports in form " + fileName, ex);
+		}
+		return data;
+	}
+
+	private void resolveImports(String fileName, Document doc, Set<String> visited) {
+		if (fileName != null)
+			visited.add(fileName.toLowerCase());
+
+		for (Element stub : XMLUtils.toArray(doc.getDocumentElement().getChildNodes())) {
+			if (!stub.hasAttribute(ATTR_IMPORT))
+				continue;
+			String ref = stub.getAttribute(ATTR_IMPORT);
+			try {
+				int dot = ref.indexOf('.');
+				if (dot <= 0 || dot == ref.length() - 1)
+					throw new IllegalArgumentException("Expected 'FormName.ElementId', got '" + ref + "'");
+				String refForm = ref.substring(0, dot);
+				String refId = ref.substring(dot + 1);
+				String refFile = refForm + ".xml";
+
+				if (visited.contains(refFile.toLowerCase()))
+					throw new IllegalArgumentException("Import cycle detected (" + fileName + " -> " + refFile + ")");
+
+				byte[] refData = dbFileService.getFile(refFile);
+				if (refData == null)
+					throw new IllegalArgumentException("Referenced form '" + refFile + "' not found");
+
+				// Recursively resolve imports within the referenced form first, in case it imports further elements itself
+				Document refDoc = XMLUtils.getDocument(resolveImports(refFile, refData, new HashSet<>(visited)));
+				if (refDoc == null)
+					throw new IllegalArgumentException("Referenced form '" + refFile + "' could not be parsed");
+
+				Element target = null;
+				for (Element candidate : XMLUtils.toArray(refDoc.getDocumentElement().getChildNodes())) {
+					if (refId.equalsIgnoreCase(candidate.getAttribute(ATTR_ID))) {
+						target = candidate;
+						break;
+					}
+				}
+				if (target == null)
+					throw new IllegalArgumentException("Element with id '" + refId + "' not found in '" + refFile + "'");
+
+				Element imported = (Element) doc.importNode(target, true);
+				// Local attributes on the stub override/extend what is inherited from the imported element
+				NamedNodeMap localAttrs = stub.getAttributes();
+				for (int i = 0; i < localAttrs.getLength(); i++) {
+					Node attr = localAttrs.item(i);
+					if (ATTR_IMPORT.equalsIgnoreCase(attr.getNodeName()))
+						continue;
+					imported.setAttribute(attr.getNodeName(), attr.getNodeValue());
+				}
+				stub.getParentNode().replaceChild(imported, stub);
+			} catch (Exception ex) {
+				customLogger.logError("Failed to resolve import='" + ref + "' in " + fileName, ex);
+			}
+		}
 	}
 	
 	/**

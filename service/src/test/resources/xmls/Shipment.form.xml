@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	helper-class="ch.minova.afis.shipment.helper.ShipmentHelper"
+	icon="ShipmentAircraft.ico" title="Lieferschein">
+	<index-view id="IndexView" index-report="auto"
+		source="dbo.vAFISShipmentIndex">
+		<column key="true" name="KeyLong" size="0">
+			<number />
+		</column>
+		<column name="DeliveryNoteDate" size="80" text="Buchungsdatum">
+			<short-date />
+		</column>
+		<column aggregate="COUNT" name="DeliveryNoteID"
+			text="Lieferschein-Nr.">
+			<text />
+		</column>
+		<column name="GA" text="GA">
+			<boolean />
+		</column>
+		<column name="TicketNumber" text="Liefernummer">
+			<text />
+		</column>
+		<column name="TruckText" text="Fahrzeug">
+			<text />
+		</column>
+		<column name="Driver" text="Operator">
+			<text />
+		</column>
+		<column name="Supplier" text="Einlagerer">
+			<text />
+		</column>
+		<column name="Item" text="Produkt">
+			<text />
+		</column>
+		<column name="Customer" text="Kunde">
+			<text />
+		</column>
+		<column name="Registration" text="Registrierung">
+			<text />
+		</column>
+		<column name="FlightNo" text="Flugnummer">
+			<text />
+		</column>
+		<column name="TakeOffDate" text="Abflugdatum">
+			<short-date />
+		</column>
+		<column name="FuellingType" text="Betankungsart">
+			<text />
+		</column>
+		<column name="MeterStart" text="Zähler Start">
+			<number />
+		</column>
+		<column name="MeterEnd" text="Zähler Ende">
+			<number />
+		</column>
+		<column name="Quantity" text="Menge" total="true">
+			<number />
+		</column>
+		<column name="Liter15" text="Liter 15°C" total="true">
+			<number />
+		</column>
+		<column name="DeliveredWeight" text="Gewicht (kg)" total="true">
+			<number />
+		</column>
+		<column name="DeliveredGallons" text="Gelieferte Gallonen"
+			total="true">
+			<number />
+		</column>
+		<column name="Canceled" text="Storno">
+			<boolean />
+		</column>
+		<column name="Corrected" text="Korrektur">
+			<boolean />
+		</column>
+		<column name="ClosingNo" text="Tagesabschlussnr.">
+			<text />
+		</column>
+		<column name="VatText" text="MwSt">
+			<boolean />
+		</column>
+		<column name="TaxCodeText" text="Steuerart">
+			<text />
+		</column>
+		<column name="CustomsCertificate" text="Erlaubnisschein">
+			<text length="25" />
+		</column>
+		<column name="OrderText1" text="Bemerkungen">
+			<text length="50" />
+		</column>
+		<column name="Delivered" text="Geliefert">
+			<boolean />
+		</column>
+		<column name="VehicleMeterText" text="Zähler Fahrzeug">
+			<text />
+		</column>
+		<column name="DeliveredStartTime" text="Startzeit">
+			<short-time />
+		</column>
+		<column name="DeliveredEndTime" text="Endzeit">
+			<short-time />
+		</column>
+		<column name="AircraftTypeText" text="Flugzeugtyp">
+			<text length="20" />
+		</column>
+		<column name="AmbientDensity" text="Spez. Gewicht">
+			<number decimals="1" />
+		</column>
+		<column name="StandardDensity" text="Dichte 15°C">
+			<number decimals="1" />
+		</column>
+		<column name="AmbientTemperature" text="Temperatur">
+			<number decimals="1" />
+		</column>
+		<column name="FlightFieldPositionText" text="Position">
+			<text length="10" />
+		</column>
+		<column name="DestinationAirportText" text="Ziel">
+			<text length="10" />
+		</column>
+		<column name="OrderRemarks" text="Geliefert an">
+			<text length="50" />
+		</column>
+		<column name="UrbelegID" text="Urbeleg Nr.">
+			<text length="20" />
+		</column>
+		<column name="ArrivalTime" text="Ankunftszeit">
+			<short-time />
+		</column>
+		<column name="OriginAirportText" text="Herkunftsflughafen">
+			<text length="20" />
+		</column>
+		<column name="CreditCardCompanyText" text="Kartentyp">
+			<text length="20" />
+		</column>
+		<column name="TotalPrice" text="Gesamtpreis">
+			<money decimals="2" />
+		</column>
+		<column name="DeliveryReceipt" text="Gedruckt">
+			<boolean />
+		</column>
+		<column name="ExternalOutboundId" text="Externe Id">
+			<text length="30" />
+		</column>
+		<column name="TruckFuelOriginTypeKeyText"
+			text="Kraftstoffherkunft">
+			<text length="10" />
+		</column>
+		<column name="UserCode3" text="SAF">
+			<boolean />
+		</column>
+		<column name="PIT" text="Pit Position">
+			<text length="20" />
+		</column>
+		<column name="CustomerDescr" text="Kundenbeschreibung">
+			<text length="50" />
+		</column>
+		<column name="TakeOffTime" text="Abflugzeit">
+			<text length="20" />
+		</column>
+		<column name="DriverText" text="Operator">
+			<text length="20" />
+		</column>
+		<column name="DriverADRNumber" text="ADR-Ausweis">
+			<text length="25" />
+		</column>
+		<column name="Nozzle" text="Nozzle-Betankung">
+			<boolean />
+		</column>
+		<column name="DefuellingDeliveryNoteID" text="Produktherkunft">
+			<text />
+		</column>
+		<column name="NightFuelling" text="Nachtbetankung">
+			<boolean />
+		</column>
+		<column name="MonthlyClosingKeyText" text="Monatsabschluss">
+			<text length="10" />
+		</column>
+		<column name="HangarRefueling" text="Werftbetankung">
+			<boolean />
+		</column>
+		<column name="ManuallyEntered" text="Manuelle Eingabe">
+			<boolean />
+		</column>
+		<column name="DeliveredTonnes" text="Gewicht (t)">
+			<number decimals="3" />
+		</column>
+		<column name="VolumeCorrectionFactor" text="VCF">
+			<number decimals="4" />
+		</column>
+	</index-view>
+	<detail id="ShipmentDetail"
+		procedure-suffix="AFISBookingShipment" type="booking">
+		<head>
+			<button enabled="false" icon="SaveRemarks.Command"
+				id="updateRemarks" text="Bemerkung speichern">
+				<dynamic property="enabled">KeyLong &gt; 0 &amp;&amp;
+					(bundle.findLocalValue('OrderText1').hasChanged() ||
+					bundle.findLocalValue('OrderText2').hasChanged())
+				</dynamic>
+			</button>
+			<field key-type="primary" name="KeyLong" sql-index="0"
+				text="ID" visible="false">
+				<number />
+			</field>
+			<field name="UrbelegID" number-columns-spanned="4"
+				required="false" sql-index="49" text="Urbeleg Nr." visible="false">
+				<text length="10" />
+			</field>
+			<field name="DeliveryNoteID" required="false" sql-index="2"
+				text="Lieferschein-Nr.">
+				<text length="10" />
+				<dynamic property="required">KeyLong &gt; 0 ||
+					tools.getSiteParameter("ManualDeliveryNoteId")==1</dynamic>
+				<dynamic property="read-only">tools.getSiteParameter("DeliveryNoteIDResetDaily")==0</dynamic>
+			</field>
+			<field name="DeliveryNoteDate" required="true" sql-index="1"
+				text="Buchungsdatum">
+				<short-date />
+			</field>
+			<field name="AirportKey" number-columns-spanned="4"
+				read-only="true" sql-index="48" text="Flughafen">
+				<lookup table="tAirport" />
+			</field>
+			<field name="SupplierKey" number-columns-spanned="4"
+				required="true" sql-index="3" text="Einlagerer">
+				<lookup filter-blocked="true" table="vShipmentSupplier" />
+			</field>
+		</head>
+		<page icon="CustomsOffice.ico" text="HZA-Erlaubnis">
+			<field fill="toright" name="CustomsCertificateRemark"
+				number-columns-spanned="4" number-rows-spanned="2" offline="true"
+				read-only="true" text="" visible="false">
+				<text length="256" />
+			</field>
+		</page>
+		<page icon="Aircraft.ico" text="Flug">
+			<field name="FlightNo" required="true" sql-index="5"
+				text="Flugnummer">
+				<text length="8" />
+			</field>
+			<field name="FlightSuffix" sql-index="44" text="Suffix">
+				<text length="2" />
+			</field>
+			<field name="TakeOffDate" required="true" sql-index="6"
+				text="Abflugdatum">
+				<short-date />
+			</field>
+			<field name="TakeOffTime" read-only="true" sql-index="56"
+				text="Abflugzeit">
+				<short-time />
+			</field>
+			<field name="GeneralAviation" required="true" sql-index="11"
+				text="GA">
+				<boolean />
+			</field>
+			<field name="DestinationAirportKey" number-columns-spanned="4"
+				required="true" sql-index="10" text="Ziel">
+				<lookup table="tAirport" />
+			</field>
+			<field name="Registration" required="true" sql-index="7"
+				text="Registrierung">
+				<text length="10" />
+			</field>
+			<field name="CurrentFlightFieldPositionKey" required="true"
+				sql-index="9" text="Position">
+				<lookup table="tFlightFieldPosition" />
+			</field>
+			<field name="AircraftTypeKey" number-columns-spanned="4"
+				required="true" sql-index="8" text="Flugzeugtyp">
+				<lookup table="vShipmentAircraftType" />
+			</field>
+			<field name="CustomerKey" number-columns-spanned="4"
+				required="true" sql-index="4" text="Kunde">
+				<lookup filter-blocked="true" table="tCustomer" />
+			</field>
+		</page>
+		<page icon="Truck.ico" text="Betankung">
+			<field name="FuellingTypeKey" number-columns-spanned="4"
+				required="true" sql-index="12" tab-index="0" text="Betankungsart">
+				<lookup table="tFuellingType" />
+			</field>
+			<field name="VehicleMeterKey" number-columns-spanned="4"
+				required="true" sql-index="13" tab-index="1" text="Zähler Fahrzeug">
+				<lookup table="vVehicleMeterLookup" />
+			</field>
+			<field name="ArrivalTime" required="true" sql-index="14"
+				tab-index="2" text="Ankunftszeit">
+				<date-time />
+				<dynamic property="required">tools.getSiteParameter("ManualDeliveryNoteId")!=1</dynamic>
+			</field>
+			<field name="TotalAmbientVolume" required="true" sql-index="17"
+				tab-index="6" text="Zähler Ende">
+				<number />
+			</field>
+			<field name="DeliveredStartTime" required="true" sql-index="15"
+				tab-index="3" text="Startzeit">
+				<date-time />
+				<dynamic property="required">tools.getSiteParameter("ManualDeliveryNoteId")!=1</dynamic>
+			</field>
+			<field name="StartTotalAmbientVolume" required="true"
+				sql-index="18" tab-index="7" text="Zähler Start">
+				<number />
+			</field>
+			<field name="DeliveredEndTime" required="true" sql-index="16"
+				tab-index="4" text="Endzeit">
+				<date-time />
+				<dynamic property="required">tools.getSiteParameter("ManualDeliveryNoteId")==1</dynamic>
+			</field>
+			<field name="DeliveredQuantity" read-only="true" sql-index="19"
+				tab-index="8" text="Menge" unit-text="l">
+				<number />
+			</field>
+			<field name="FuellingTime" read-only="true" sql-index="43"
+				tab-index="5" text="Betankungsdauer">
+				<text length="20" />
+			</field>
+			<field name="DeliveredStandardVolume" sql-index="41"
+				tab-index="9" text="Liter 15°C gelief." unit-text="l">
+				<number />
+				<dynamic property="read-only">tools.getSiteParameter("InsertStandardVolumeManual")!=1
+					&amp;&amp; tools.getSiteParameter("DailyClosingCalcNoDensity")!=1
+				</dynamic>
+			</field>
+			<field name="DriverKey" number-columns-spanned="4"
+				required="true" sql-index="20" tab-index="10" text="Fahrer">
+				<lookup table="tDriver" />
+			</field>
+			<field name="DetectorTest" required="true" sql-index="21"
+				tab-index="11" text="Visual Check">
+				<boolean tristate="true" />
+			</field>
+			<field name="TruckFuelOriginTypeKey" sql-index="55"
+				text="Kraftstoffherkunft">
+				<lookup table="tTruckFuelOriginType" />
+			</field>
+		</page>
+		<page icon="Tax.ico" text="Steuer">
+			<field name="TaxCodeKey" number-columns-spanned="4"
+				required="true" sql-index="22" text="Steuerart">
+				<lookup table="tTaxCode" />
+			</field>
+			<field fill="toright" name="CustomsCertificate"
+				number-columns-spanned="4" sql-index="24" text="Erlaubnisschein">
+				<text length="25" />
+			</field>
+			<field fill="toright" name="CustomsOffice"
+				number-columns-spanned="4" sql-index="25" text="Zollamt">
+				<text length="25" />
+			</field>
+			<field name="WithVAT" required="true" sql-index="23"
+				text="MwSt">
+				<boolean />
+			</field>
+		</page>
+		<page icon="Accounting.ico" text="Abrechnung">
+			<field name="CreditCardCompanyKey" sql-index="26"
+				text="Kartentyp">
+				<lookup table="tCreditCardCompany" />
+			</field>
+			<field name="ValidUntil" sql-index="27" text="Gültig bis">
+				<short-date />
+			</field>
+			<field fill="toright" name="OrderRemarks"
+				number-columns-spanned="4" number-rows-spanned="3" sql-index="28"
+				text="Geliefert an">
+				<text length="135" />
+			</field>
+			<field fill="toright" name="OrderReference"
+				number-columns-spanned="4" sql-index="29" text="Carnet-Nummer">
+				<text length="50" />
+			</field>
+			<field name="ItemKey" number-columns-spanned="4"
+				required="true" sql-index="30" text="Produkt">
+				<lookup table="tItem" />
+			</field>
+			<field name="NetPrice" read-only="true" sql-index="32"
+				text="Nettopreis" unit-text="EUR">
+				<money decimals="2" />
+			</field>
+			<field name="PricePerUnit" read-only="true" sql-index="31"
+				text="Preis/100L" unit-text="EUR">
+				<money decimals="3" />
+			</field>
+			<field name="Tax" read-only="true" sql-index="33"
+				text="Steuerbetrag" unit-text="EUR">
+				<money decimals="2" />
+			</field>
+			<field name="TaxPerUnit" read-only="true" sql-index="45"
+				text="MinöSt/1000L" unit-text="EUR">
+				<money decimals="3" />
+			</field>
+			<field name="VAT" number-columns-spanned="4" read-only="true"
+				sql-index="34" text="MWSt-Betrag" unit-text="EUR">
+				<money decimals="2" />
+			</field>
+			<field name="TotalPrice" number-columns-spanned="4"
+				read-only="true" sql-index="35" text="Gesamtpreis" unit-text="EUR">
+				<money decimals="2" />
+			</field>
+		</page>
+		<page icon="Formular.ico" text="Bemerkungen">
+			<field fill="toright" name="OrderText1"
+				number-columns-spanned="4" sql-index="36" text="Bemerkungen">
+				<text length="50" />
+			</field>
+			<field fill="toright" name="OrderText2"
+				number-columns-spanned="4" sql-index="37" text="">
+				<text length="50" />
+			</field>
+		</page>
+		<page icon="ItemTemperatureRange" text="Dichten / Temperaturen"
+			visible="false">
+			<dynamic property="visible">tools.getSiteParameter("DailyClosingCalcStandardDensity")==1
+				|| app.isSUMode() ||
+				tools.getSiteParameter("DailyClosingCalcNoDensity") == 1 ||
+				tools.getSiteParameter("DailyClosingDensity")=="TEMP=S,DENSITY=DCF.SD,TIME=S.DE"
+			</dynamic>
+			<field name="AmbientTemperature" number-columns-spanned="4"
+				read-only="true" required="false" sql-index="38" text="Temperatur">
+				<number decimals="1" />
+				<dynamic property="read-only">(tools.getSiteParameter("DailyClosingCalcNoDensity")
+					!= 1 &amp;&amp; tools.getSiteParameter("DailyClosingDensity") !=
+					"TEMP=S,DENSITY=DCF.SD,TIME=S.DE") ||
+					(tools.getSiteParameter("DailyClosingDensity") !=
+					"TEMP=S,DENSITY=DCF.SD,TIME=S.DE" &amp;&amp;
+					tools.getSiteParameter("DailyClosingDensity") != null)</dynamic>
+				<dynamic property="required">
+					tools.getSiteParameter("DailyClosingCalcNoDensity") == 1 ||
+					tools.getSiteParameter("DailyClosingDensity") ==
+					"TEMP=S,DENSITY=DCF.SD,TIME=S.DE"</dynamic>
+			</field>
+			<field name="AmbientDensity" read-only="true" sql-index="40"
+				text="Spez. Gewicht">
+				<number decimals="1" />
+				<dynamic property="read-only">
+					tools.getSiteParameter("DailyClosingCalcNoDensity") != 1</dynamic>
+			</field>
+			<field name="StandardDensity" read-only="true" sql-index="39"
+				text="Dichte 15°C">
+				<number decimals="1" />
+				<dynamic property="read-only">
+					tools.getSiteParameter("DailyClosingCalcNoDensity") != 1</dynamic>
+				<dynamic property="required">
+					tools.getSiteParameter("DailyClosingCalcNoDensity") == 1</dynamic>
+			</field>
+		</page>
+		<page icon="Warning.ico" text="Debug" visible="false">
+			<dynamic property="visible">app.isSUMode()</dynamic>
+			<field name="DeliveredKilo" read-only="true" sql-index="42"
+				text="Gewicht (kg)" unit-text="kg">
+				<number />
+			</field>
+			<field name="OriginalKey" read-only="true" sql-index="50"
+				text="OriginalKey">
+				<number />
+			</field>
+			<field name="CorrectedKey" read-only="true" sql-index="51"
+				text="CorrectedKey">
+				<number />
+			</field>
+			<field name="CanceledKey" read-only="true" sql-index="52"
+				text="CanceledKey">
+				<number />
+			</field>
+			<field name="IsBooked" read-only="true" sql-index="53"
+				text="Gebucht">
+				<boolean />
+			</field>
+			<field name="IsCanceled" read-only="true" sql-index="54"
+				text="IsCanceled">
+				<boolean />
+			</field>
+			<field name="TaxPerUnitFactor" read-only="true" sql-index="46"
+				text="TaxPerUnitFactor">
+				<number />
+			</field>
+			<field name="UnitPriceFactor" read-only="true" sql-index="47"
+				text="UnitPriceFactor">
+				<number />
+			</field>
+		</page>
+		<optionpage icon="Interface" procedure-prefix="op"
+			procedure-suffix="ShipmentBPXML" text="IATA XML">
+			<button enabled="true" icon="Import.Command" id="refresh"
+				text="Action.Refresh">
+				<dynamic property="enabled"> KeyLong != null &amp;&amp;
+					Parent_CanceledKey == null &amp;&amp; !Parent_IsCanceled </dynamic>
+			</button>
+			<field key-type="primary" map-to="KeyLong" name="KeyLong"
+				read-only="true" sql-index="0" text="ID" visible="false">
+				<number />
+			</field>
+			<field name="CustomerCode" number-columns-spanned="4"
+				sql-index="1" text="Kundencode">
+				<text length="10" />
+			</field>
+			<field name="SAFProduct" number-columns-spanned="4"
+				sql-index="2" text="SAF">
+				<boolean />
+			</field>
+			<field name="PrivateFlight" number-columns-spanned="4"
+				sql-index="3" text="Privatflug">
+				<boolean />
+			</field>
+			<events>
+				<onclick refid="refresh">
+					<procedure name="opRefreshShipmentBPXMLRequired">
+						<param field-name="KeyLong" />
+					</procedure>
+					<binder action="read" />
+				</onclick>
+			</events>
+		</optionpage>
+		<optionpage icon="ParameterPage.ico"
+			id="tShipment.defuelling" procedure-suffix="LuDefuellingRefuelling"
+			text="Disposition">
+			<field key-type="primary" map-to="KeyLong" name="ShipmentKey"
+				sql-index="0" visible="false">
+				<number />
+			</field>
+			<field name="DefuellingKey" sql-index="1" text="Enttankung">
+				<lookup procedure-prefix="spLuDefuellingRefuelling">
+					<param field-name="ShipmentKey" />
+				</lookup>
+			</field>
+			<field name="AmbientTemperature" number-columns-spanned="4"
+				read-only="false" required="false" sql-index="2" text="Temperatur">
+				<number decimals="1" />
+				<dynamic property="required">Defuelling == 1 &amp;&amp;
+					DefuellingIsClosed == 1</dynamic>
+			</field>
+			<field name="AmbientDensity" read-only="false" sql-index="3"
+				text="Spez. Gewicht">
+				<number decimals="1" />
+				<dynamic property="required">Defuelling == 1 &amp;&amp;
+					DefuellingIsClosed == 1</dynamic>
+			</field>
+			<field name="StandardDensity" read-only="false" sql-index="4"
+				text="Dichte 15°C">
+				<number decimals="1" />
+				<dynamic property="required">Defuelling == 1 &amp;&amp;
+					DefuellingIsClosed == 1</dynamic>
+			</field>
+			<field name="Defuelling" sql-index="5" visible="false">
+				<number />
+			</field>
+			<field name="DefuellingIsClosed" sql-index="6" visible="false">
+				<number />
+			</field>
+			<field name="ItemKey" sql-index="7" visible="false">
+				<number />
+			</field>
+			<events>
+				<value-change field-name="DefuellingKey" type="USER">
+					<jscript>
+						if (DefuellingKey != null) {
+						ambientTemperature = tools.getSQLValue('tShipment', 'KeyLong', DefuellingKey,
+						'AmbientTemperature');
+						ambientDensity = tools.getSQLValue('tShipment', 'KeyLong', DefuellingKey,
+						'AmbientDensity');
+						standardDensity = tools.getSQLValue('tShipment', 'KeyLong', DefuellingKey,
+						'StandardDensity');
+						tools.set('AmbientTemperature', ambientTemperature);
+						tools.set('AmbientDensity', ambientDensity);
+						tools.set('StandardDensity', standardDensity);
+						}
+					</jscript>
+				</value-change>
+				<value-change field-name="AmbientDensity" type="USER">
+					<instance class="ch.minova.iso.JIso" object-name="iso" />
+					<jscript>
+						if (AmbientDensity != null &amp;&amp; AmbientTemperature != null
+						&amp;&amp; StandardDensity == null) {
+						iso.calculateStandardDensity(AmbientDensity, AmbientTemperature,
+						ItemKey);
+						tools.set('StandardDensity', iso.getStandardDensity())
+						} else if (AmbientDensity == null &amp;&amp; AmbientTemperature !=
+						null &amp;&amp; StandardDensity != null) {
+						iso.calculateAmbientDensity(StandardDensity, AmbientTemperature,
+						ItemKey);
+						tools.set('AmbientDensity', iso.getAmbientDensity())
+						}
+					</jscript>
+				</value-change>
+				<value-change field-name="StandardDensity" type="USER">
+					<instance class="ch.minova.iso.JIso" object-name="iso" />
+					<jscript>
+						if (AmbientDensity != null &amp;&amp; AmbientTemperature != null
+						&amp;&amp; StandardDensity == null) {
+						iso.calculateStandardDensity(AmbientDensity, AmbientTemperature,
+						ItemKey);
+						tools.set('StandardDensity', iso.getStandardDensity())
+						} else if (AmbientDensity == null &amp;&amp; AmbientTemperature !=
+						null &amp;&amp; StandardDensity != null) {
+						iso.calculateAmbientDensity(StandardDensity, AmbientTemperature,
+						ItemKey);
+						tools.set('AmbientDensity', iso.getAmbientDensity())
+						}
+					</jscript>
+				</value-change>
+				<value-change field-name="AmbientTemperature"
+					type="USER">
+					<instance class="ch.minova.iso.JIso" object-name="iso" />
+					<jscript>
+						if (AmbientDensity != null &amp;&amp; AmbientTemperature != null
+						&amp;&amp; StandardDensity == null) {
+						iso.calculateStandardDensity(AmbientDensity, AmbientTemperature,
+						ItemKey);
+						tools.set('StandardDensity', iso.getStandardDensity())
+						} else if (AmbientDensity == null &amp;&amp; AmbientTemperature !=
+						null &amp;&amp; StandardDensity != null) {
+						iso.calculateAmbientDensity(StandardDensity, AmbientTemperature,
+						ItemKey);
+						tools.set('AmbientDensity', iso.getAmbientDensity())
+						}
+					</jscript>
+				</value-change>
+			</events>
+		</optionpage>
+		<optionpage icon="ParameterPage.ico"
+			id="tAircraftType.Nozzle" procedure-suffix="AircraftTypeNozzle"
+			text="Nozzle-Betankung">
+			<field key-type="primary" map-to="KeyLong" name="KeyLong"
+				sql-index="0" visible="false">
+				<number />
+			</field>
+			<field name="Nozzle" read-only="true" sql-index="1"
+				text="Nozzle-Betankung">
+				<boolean />
+			</field>
+			<events>
+				<value-change field-name="Parent_AircraftTypeKey">
+					<jscript>
+						var vShipmentAircraftType =
+						bundle.findValue('Parent_AircraftTypeKey');
+						var vAircraftTypeRow = vShipmentAircraftType.getValue();
+						var bNozzle = vAircraftTypeRow.getValueContent('Nozzle',
+						java.lang.Boolean.class);
+						tools.set('Nozzle', bNozzle);
+					</jscript>
+				</value-change>
+			</events>
+		</optionpage>
+		<grid button-delete-visible="false" button-insert-visible="false"
+			delete-requires-all-params="true" fill="auto"
+			icon="FlightScheduleLog.ico" number-rows-spanned="4"
+			procedure-suffix="ShipmentPerFlight" read-only="true"
+			title="Lieferscheine pro Flug">
+			<field key-type="primary" map-to="KeyLong" name="KeyLong"
+				sql-index="0" visible="false">
+				<number />
+			</field>
+			<field name="Number" sql-index="1" text="Nummer" visible="true">
+				<number />
+			</field>
+			<field name="FlightNo" sql-index="2" text="Flugnummer"
+				visible="true">
+				<text />
+			</field>
+			<field name="DeliveryNoteID" sql-index="3"
+				text="Lieferschein-Nr." visible="true">
+				<text />
+			</field>
+			<field name="FuellingType" sql-index="4" text="Betankungsart"
+				visible="true">
+				<text />
+			</field>
+			<field name="DeliveryNoteDate" sql-index="5"
+				text="Buchungsdatum" visible="false">
+				<date-time />
+			</field>
+			<field aggregate="sum" name="Quantity" sql-index="6"
+				text="Menge" visible="true">
+				<number />
+			</field>
+			<field aggregate="sum" name="Liter15" sql-index="7"
+				text="Liter 15°C" visible="true">
+				<number />
+			</field>
+		</grid>
+	</detail>
+	<events>
+		<onclick refid="updateRemarks">
+			<procedure name="spAFISBookingUpdateOrderText">
+				<param field-name="KeyLong" />
+				<param field-name="OrderText1" />
+				<param field-name="OrderText2" />
+			</procedure>
+			<binder action="read" />
+		</onclick>
+	</events>
+</form>

@@ -119,9 +119,9 @@ public class FilesController {
 	}
 
 	/**
-	 * Get requested file from the DB and 1. patch XML forms it for WFC 2. Add option pages directly into forms 3. trananslate forms and mdi if language is
-	 * specified
-	 * 
+	 * Get requested file from the DB and 1. resolve &lt;tag import="FormName.ElementId"/&gt; references 2. patch XML forms it for WFC 3. Add option pages
+	 * directly into forms 4. trananslate forms and mdi if language is specified
+	 *
 	 * @param path
 	 * @param lang
 	 * @return
@@ -142,6 +142,10 @@ public class FilesController {
 		} else {
 			toRet = dbFileService.getFile(path);
 		}
+
+		// Resolve <tag import="FormName.ElementId"/> references -- structural, needed regardless of WFC/option-page settings
+		if (path.toLowerCase().endsWith(".xml"))
+			toRet = contentPatcher.resolveImports(path, toRet);
 
 		// On-the-fly patching of Forms/OPs for WFC
 		if (isWFCPatchActive && path.toLowerCase().endsWith(".xml"))

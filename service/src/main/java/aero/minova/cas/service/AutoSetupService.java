@@ -54,6 +54,16 @@ public class AutoSetupService {
 	@Autowired
 	SqlProcedureController sqlProcedureController;
 
+	/**
+	 * Optional on purpose: this bean only exists when {@code foundation.rest.auth.claims.enabled=true} (see
+	 * {@link ClaimsSeedingService}'s own {@code @ConditionalOnProperty}). {@code required = false} means
+	 * Spring leaves this {@code null} instead of failing context startup when the flag is off — a deployment
+	 * that hasn't opted into the Groups+Claims model must keep booting exactly as it did before that model
+	 * existed.
+	 */
+	@Autowired(required = false)
+	ClaimsSeedingService claimsSeedingService;
+
 	@Value("${ng.api.autosetup.force:false}")
 	private boolean forceSetup;
 
@@ -233,6 +243,14 @@ public class AutoSetupService {
 			// Execute setup using the same controller method as manual setup
 			sqlProcedureController.executeProcedure(setupTable);
 			sqlProcedureController.setupDefaultAdminUser();
+
+			if (claimsSeedingService != null) {
+				claimsSeedingService.seedAdminClaims();
+				logger.logSetup("Seeded bootstrap admin Groups+Claims (foundation.rest.auth)");
+			} else {
+				logger.logInfo("foundation.rest.auth.claims.enabled is not set - skipping Groups+Claims seeding");
+			}
+
 			logger.logInfo("Automatic database setup completed successfully");
 			logger.logSetup("Automatic database setup completed successfully");
 		} catch (Exception e) {

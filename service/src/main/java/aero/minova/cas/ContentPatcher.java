@@ -546,8 +546,17 @@ public class ContentPatcher {
 				throw new IllegalArgumentException("Empty key-mapping detected for " + toAdd.getTagName());
 			// First find the field-value with index
 			Element opField = XMLUtils.findFirstElementWithAttribute(toAdd, "name", val -> opKey.equalsIgnoreCase(val));
-			if(opField == null)
-				throw new IllegalArgumentException("Mapped key '"+opKey+"' not found in " + toAdd.getTagName());
+			if(opField == null) {
+				// Devs sometimes don't keep the OP's field name in sync with the name configured in the registry
+				// (it still worked in the legacy UI, see patchXBS's analogous fallback). If the OP has exactly one
+				// primary key, fall back to it unambiguously instead of dropping the whole option page.
+				List<Element> primaryFields = XMLUtils.findElementWithAttribute(toAdd, ATTR_KEY_TYPE, val -> "primary".equalsIgnoreCase(val));
+				if(primaryFields.size() != 1)
+					throw new IllegalArgumentException("Mapped key '"+opKey+"' not found in " + toAdd.getTagName());
+				opField = primaryFields.get(0);
+				customLogger.logFiles("Mapped key '" + opKey + "' not found in " + toAdd.getTagName() + " -> auto change to its only primary key '"
+						+ opField.getAttribute(ATTR_NAME) + "'");
+			}
 			// Separate between legacy (index-based) and new-style (name-based)
 			if(detailKey.toLowerCase().startsWith("key") && Character.isDigit(detailKey.charAt(detailKey.length()-1))) {
 				// Legacy, by index

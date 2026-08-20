@@ -7,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -36,6 +37,9 @@ public class SqlConsoleController {
 
     /** Maximum rows returned for SELECT queries to prevent memory exhaustion. */
     private static final int MAX_ROWS = 500;
+
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_AUTHORITY = "ROLE_ADMIN";
 
     private final SystemDatabase systemDatabase;
 
@@ -90,14 +94,30 @@ public class SqlConsoleController {
 
     // ── Endpoint ───────────────────────────────────────────────────────────────
 
+    /**
+     * Accepts either the legacy {@code admin} username (basic/form/LDAP/database login) or, for OIDC logins where
+     * the username is the end-user's own identity, the {@code ROLE_ADMIN} authority derived from the JWT's roles
+     * claim (see {@code foundation.rest.auth}'s {@code RolesClaimAuthoritiesConverter}, which prefixes raw role
+     * values with "ROLE_" so it lines up with Spring's own convention).
+     */
+    private static boolean isAdmin(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated())
+            return false;
+        if (ADMIN_USERNAME.equals(authentication.getName()))
+            return true;
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(ADMIN_AUTHORITY::equals);
+    }
+
     @PostMapping(value = "data/execute-sql", produces = "application/json")
     public ResponseEntity<SqlConsoleResponse> executeSql(
             @RequestBody SqlConsoleRequest request,
-            Principal principal) {
+            Authentication authentication) {
 
-        if (principal == null || !"admin".equals(principal.getName())) {
+        if (!isAdmin(authentication)) {
             log.warn("data/execute-sql: rejected — caller '{}' is not admin",
-                    principal != null ? principal.getName() : "<unauthenticated>");
+                    authentication != null ? authentication.getName() : "<unauthenticated>");
             return ResponseEntity.status(403)
                     .body(SqlConsoleResponse.error("Access denied: admin login required"));
         }

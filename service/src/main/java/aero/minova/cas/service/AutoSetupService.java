@@ -55,14 +55,18 @@ public class AutoSetupService {
 	SqlProcedureController sqlProcedureController;
 
 	/**
-	 * Optional on purpose: this bean only exists when {@code foundation.rest.auth.claims.enabled=true} (see
-	 * {@link ClaimsSeedingService}'s own {@code @ConditionalOnProperty}). {@code required = false} means
+	 * Optional on purpose: this bean only exists when {@code foundation.rest.auth.grants.enabled=true} (see
+	 * {@link GrantsDiscoveryService}'s own {@code @ConditionalOnProperty}). {@code required = false} means
 	 * Spring leaves this {@code null} instead of failing context startup when the flag is off — a deployment
-	 * that hasn't opted into the Groups+Claims model must keep booting exactly as it did before that model
+	 * that hasn't opted into the Groups+Grants model must keep booting exactly as it did before that model
 	 * existed.
+	 * <p>
+	 * Called unconditionally on every {@link #autoSetup()} pass, not just when {@link #executeSetup()} itself
+	 * runs — see that call site's comment for why (a new form must become visible to admin the very next boot,
+	 * not stay invisible until the database looks uninitialized again).
 	 */
 	@Autowired(required = false)
-	ClaimsSeedingService claimsSeedingService;
+	GrantsDiscoveryService grantsDiscoveryService;
 
 	@Value("${ng.api.autosetup.force:false}")
 	private boolean forceSetup;
@@ -107,6 +111,19 @@ public class AutoSetupService {
 			} else {
 				logger.logInfo("Database already initialized - skipping setup");
 			}
+
+			// Runs every autoSetup() pass, independent of whether executeSetup() itself ran above — the Grants
+			// model is additive/discovery-based (no wildcards), so a form added since the last boot needs the
+			// admin group to pick up its new grants on THIS boot, not only at first-time setup. Placed after the
+			// if/else above so xtcasMdi is guaranteed populated by the time discovery reads it, whether that
+			// happened just now (first-time setup) or on some earlier boot (already-initialized database).
+			if (grantsDiscoveryService != null) {
+				grantsDiscoveryService.discoverAndSeedAdmin();
+				logger.logSetup("Grants discovery: admin group is in sync with the current form set (foundation.rest.auth)");
+			} else {
+				logger.logInfo("foundation.rest.auth.grants.enabled is not set - skipping Grants discovery");
+			}
+
 			setupSucceeded = true;
 		} catch (Exception e) {
 			setupException = e;
@@ -244,12 +261,8 @@ public class AutoSetupService {
 			sqlProcedureController.executeProcedure(setupTable);
 			sqlProcedureController.setupDefaultAdminUser();
 
-			if (claimsSeedingService != null) {
-				claimsSeedingService.seedAdminClaims();
-				logger.logSetup("Seeded bootstrap admin Groups+Claims (foundation.rest.auth)");
-			} else {
-				logger.logInfo("foundation.rest.auth.claims.enabled is not set - skipping Groups+Claims seeding");
-			}
+			// Grants discovery/seeding is no longer called from here — it now runs unconditionally from
+			// autoSetup() on every pass (see that method), not just when executeSetup() itself runs.
 
 			logger.logInfo("Automatic database setup completed successfully");
 			logger.logSetup("Automatic database setup completed successfully");

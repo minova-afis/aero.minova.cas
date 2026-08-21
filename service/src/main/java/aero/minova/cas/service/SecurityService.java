@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import ch.minova.foundation.rest.auth.claims.persistence.GroupMemberRepository;
+import ch.minova.foundation.rest.auth.grants.persistence.GroupMemberRepository;
 import ch.minova.foundation.rest.auth.config.AuthProperties;
 
 import aero.minova.cas.CustomLogger;
@@ -47,14 +47,14 @@ public class SecurityService {
 	@Autowired
 	OidcRoleProvisioningService oidcRoleProvisioningService;
 
-	// Only exists as a bean when foundation.rest.auth.claims.enabled=true (ClaimsAutoConfiguration is
+	// Only exists as a bean when foundation.rest.auth.grants.enabled=true (GrantsAutoConfiguration is
 	// @ConditionalOnProperty-gated) - required = false so login_dataSource=database keeps working exactly as
-	// before on any deployment that hasn't opted into Groups+Claims. See loadClaimsGroupTokens().
+	// before on any deployment that hasn't opted into Groups+Grants. See loadGrantsGroupTokens().
 	@Autowired(required = false)
 	GroupMemberRepository groupMemberRepository;
 
 	// Unconditionally registered (foundation.rest.auth's AutoConfiguration itself is unconditional), so this is
-	// always safe to inject even when claims are disabled - only actually read inside loadClaimsGroupTokens(),
+	// always safe to inject even when grants are disabled - only actually read inside loadGrantsGroupTokens(),
 	// which short-circuits before touching it if groupMemberRepository is null.
 	@Autowired
 	AuthProperties authProperties;
@@ -162,11 +162,11 @@ public class SecurityService {
 					userSecurityTokens = loadLDAPUserTokens(authentication.getName());
 				} else if (dataSource.equalsIgnoreCase("database")) {
 					userSecurityTokens = loadDatabaseUserTokens(authentication.getName());
-					// Groups+Claims bridging (aero.minova.cas#1497): tNgGroupMembers membership, merged in as
+					// Groups+Grants bridging (aero.minova.cas#1497): tNgGroupMembers membership, merged in as
 					// plain authority strings alongside the legacy xtcasAuthorities/xtcasUserGroup tokens above -
 					// loadUserGroupPrivileges() below treats every string in userSecurityTokens uniformly, so this
-					// needs no changes there. A no-op (empty list) when claims are disabled.
-					userSecurityTokens.addAll(loadClaimsGroupTokens(authentication.getName()));
+					// needs no changes there. A no-op (empty list) when grants are disabled.
+					userSecurityTokens.addAll(loadGrantsGroupTokens(authentication.getName()));
 				} else if (dataSource.equalsIgnoreCase("oidc")) {
 					// The JWT's roles are authoritative for OIDC users — no xtcasAuthorities/xtcasUser lookup.
 					// They're merged into userSecurityTokens below via `authorities` (the JWT-derived
@@ -526,18 +526,18 @@ public class SecurityService {
 	}
 
 	/**
-	 * Groups+Claims bridging (aero.minova.cas#1497): {@code tNgGroupMembers} group memberships for
+	 * Groups+Grants bridging (aero.minova.cas#1497): {@code tNgGroupMembers} group memberships for
 	 * {@code username}, converted into the same {@code rolesPrefix}-prefixed authority-string shape
-	 * {@code ch.minova.foundation.rest.auth.claims.check.ClaimsChecker} already expects from OIDC role claims
-	 * (see {@code GroupNames.extract} there) - so the exact same {@code ClaimsChecker.groupsOf(...)} logic
+	 * {@code ch.minova.foundation.rest.auth.grants.check.GrantsChecker} already expects from OIDC role claims
+	 * (see {@code GroupNames.extract} there) - so the exact same {@code GrantsChecker.groupsOf(...)} logic
 	 * resolves group membership identically regardless of whether the caller authenticated via OIDC or via
 	 * {@code login_dataSource=database}, with zero changes needed on the {@code foundation.rest.auth} side.
 	 * <p>
-	 * Returns an empty list, never {@code null}, when {@code foundation.rest.auth.claims.enabled} is off -
+	 * Returns an empty list, never {@code null}, when {@code foundation.rest.auth.grants.enabled} is off -
 	 * {@link GroupMemberRepository} simply doesn't exist as a bean then, same pattern as
-	 * {@code AutoSetupService}'s {@code ClaimsSeedingService} field.
+	 * {@code AutoSetupService}'s {@code GrantsDiscoveryService} field.
 	 */
-	public List<String> loadClaimsGroupTokens(String username) {
+	public List<String> loadGrantsGroupTokens(String username) {
 		if (groupMemberRepository == null) {
 			return List.of();
 		}

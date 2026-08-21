@@ -23,10 +23,12 @@ import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.TransactionOverhead;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.api.domain.XProcedureException;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
+import aero.minova.cas.profiling.Profiler;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
@@ -55,6 +57,9 @@ public class XSqlProcedureController {
 
 	@Autowired
 	QueueService queueService;
+
+	@org.springframework.beans.factory.annotation.Value("${cas.profiling.always-enabled:false}")
+	boolean alwaysProfile;
 
 	/**
 	 * Das sind Registrierungen, die ausgeführt werden, wenn eine Prozedur in der Liste mit den Namen der Registrierung ausgeführt werden soll.
@@ -105,54 +110,77 @@ public class XSqlProcedureController {
 	public ResponseEntity<List<XSqlProcedureResult>> executeProcedures(@RequestBody List<XTable> inputTables) throws Exception {
 
 		customLogger.logUserRequest("data/x-procedure: ", inputTables);
+		boolean profiling = alwaysProfile || inputTables.stream().anyMatch(xt -> xt.getTable().isProfile());
+		Profiler profiler = profiling ? Profiler.push() : null;
 		List<XSqlProcedureResult> resultSets = new ArrayList<>();
 
 		StringBuffer sb = new StringBuffer();
 		try {
-			Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
+			try {
+				Map<Table, List<SqlProcedureResult>> inputTablesWithResults = new HashMap<>();
 
-			// Soll die Transaktion von einer Erweiterung bearbeitet werden?
-			Optional<List<XSqlProcedureResult>> checkForExtensions = checkForExtensions(inputTables, inputTablesWithResults);
-			if (checkForExtensions.isPresent()) {
-				resultSets = checkForExtensions.get();
+				// Soll die Transaktion von einer Erweiterung bearbeitet werden?
+				Optional<List<XSqlProcedureResult>> checkForExtensions = checkForExtensions(inputTables, inputTablesWithResults);
+				if (checkForExtensions.isPresent()) {
+					resultSets = checkForExtensions.get();
 
-			} else { // Ansonsten die Prozeduren einzeln verarbeiten
+				} else { // Ansonsten die Prozeduren einzeln verarbeiten
 
-				try (Connection connection = systemDatabase.getConnection()) {
-					try {
-						resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
-						// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
-						checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
-						// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
-						connection.commit();
-					} catch (Throwable e) {
-						// Explicit rollback: connection held during complex multi-step transaction (processXProcedures, followUp checks).
-						// Immediately release database locks and log rollback explicitly for clarity.
+					try (Connection connection = Profiler.timeConnectionAcquisition(systemDatabase::getConnection)) {
 						try {
-							connection.rollback();
-							customLogger.logError("XSqlProcedure rolled back due to error: " + sb, e);
-						} catch (Exception rollbackEx) {
-							customLogger.logError("Rollback failed after XSqlProcedure error", rollbackEx);
+							resultSets = processXProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+							// Hier werden die Checks nach der eigentlichen Anfrage ausgeführt.
+							checkFollowUpProcedures(inputTables, resultSets, sb, connection, inputTablesWithResults);
+							// Erst wenn auch die Checks erfolgreich waren, wird der Commit gesendet.
+							long commitStart = Profiler.startTimer();
+							connection.commit();
+							Profiler.stopTimer(commitStart, Profiler::recordCommitNanos);
+						} catch (Throwable e) {
+							// Explicit rollback: connection held during complex multi-step transaction (processXProcedures, followUp checks).
+							// Immediately release database locks and log rollback explicitly for clarity.
+							try {
+								connection.rollback();
+								customLogger.logError("XSqlProcedure rolled back due to error: " + sb, e);
+							} catch (Exception rollbackEx) {
+								customLogger.logError("Rollback failed after XSqlProcedure error", rollbackEx);
+							}
+							throw e;
 						}
-						throw e;
 					}
 				}
-			}
 
-			// Nachdem alle Prozeduren und Folgeprozeduren bzw. die Erweiterung erfolgreich durchgelaufen sind, kann man die Nachrichten über den QueueService
-			// verschicken.
-			for (Map.Entry<Table, List<SqlProcedureResult>> mapEntry : inputTablesWithResults.entrySet()) {
-				for (SqlProcedureResult result : mapEntry.getValue()) {
-					queueService.accept(mapEntry.getKey(), new ResponseEntity<>(result, HttpStatus.ACCEPTED));
+				// Nachdem alle Prozeduren und Folgeprozeduren bzw. die Erweiterung erfolgreich durchgelaufen sind, kann man die Nachrichten über den
+				// QueueService verschicken.
+				long queueDispatchStart = Profiler.startTimer();
+				for (Map.Entry<Table, List<SqlProcedureResult>> mapEntry : inputTablesWithResults.entrySet()) {
+					for (SqlProcedureResult result : mapEntry.getValue()) {
+						queueService.accept(mapEntry.getKey(), new ResponseEntity<>(result, HttpStatus.ACCEPTED));
+					}
 				}
+				Profiler.stopTimer(queueDispatchStart, Profiler::recordQueueDispatchNanos);
+			} catch (Throwable e) {
+				customLogger.logError("XSqlProcedure could not be executed: " + sb, e);
+				throw new XProcedureException(inputTables, resultSets, e);
 			}
-		} catch (Throwable e) {
-			customLogger.logError("XSqlProcedure could not be executed: " + sb, e);
-			throw new XProcedureException(inputTables, resultSets, e);
-		}
 
-		customLogger.logSql("XSqlProcedure successfully executed: " + sb);
-		return new ResponseEntity<>(resultSets, HttpStatus.ACCEPTED);
+			customLogger.logSql("XSqlProcedure successfully executed: " + sb);
+			if (profiling) {
+				// Anteile, die nur der gesamten Transaktion zuzurechnen sind (Connection-Aufbau, Commit, Nachrichtenversand), werden bei jedem Ergebnis
+				// zusätzlich zu dessen eigener (bereits individueller) SQL/Java-Aufteilung hinterlegt.
+				TransactionOverhead transactionOverhead = profiler.toTransactionOverhead();
+				for (XSqlProcedureResult xResult : resultSets) {
+					if (xResult.getResultSet() != null && xResult.getResultSet().getProfilingResult() != null) {
+						xResult.getResultSet().getProfilingResult().setTransactionOverhead(transactionOverhead);
+					}
+				}
+				return ResponseEntity.status(HttpStatus.ACCEPTED).header("X-Profiling-Time", profiler.getTotalMs() + "ms").body(resultSets);
+			}
+			return new ResponseEntity<>(resultSets, HttpStatus.ACCEPTED);
+		} finally {
+			if (profiling) {
+				Profiler.pop();
+			}
+		}
 	}
 
 	/**
@@ -240,25 +268,41 @@ public class XSqlProcedureController {
 			Map<Table, List<SqlProcedureResult>> inputTablesWithResults) throws Exception {
 		for (XTable xt : inputTables) {
 			SqlProcedureResult result = new SqlProcedureResult();
-			// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
-			Table filledTable = fillInDependencies(xt, resultSets);
+			Table filledTable;
 
-			// Rechteprüfung
-			final List<Row> privilegeRequest = new ArrayList<>();
-			if (securityService.arePrivilegeStoresSetup()) {
-				privilegeRequest.addAll(securityService.getPrivilegePermissions(filledTable.getName()));
-				if (privilegeRequest.isEmpty()) {
-					throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
+			// Falls Profiling für die Transaktion aktiv ist, bekommt jede einzelne Prozedur (inkl. ihrer eigenen Rechteprüfung) zusätzlich zur
+			// Gesamt-Transaktion eine eigene, unabhängige Messung - sonst würden alle Prozeduren einer XProcedure denselben (aufsummierten) Wert der
+			// Gesamt-Transaktion zeigen.
+			boolean profileThisProcedure = Profiler.isActive();
+			Profiler procedureProfiler = profileThisProcedure ? Profiler.push() : null;
+			try {
+				// Referenzen auf Ergebnisse bereits ausgeführter Prozeduren auflösen.
+				filledTable = fillInDependencies(xt, resultSets);
+
+				// Rechteprüfung
+				final List<Row> privilegeRequest = new ArrayList<>();
+				if (securityService.arePrivilegeStoresSetup()) {
+					privilegeRequest.addAll(Profiler.timePrivilegeCheck(() -> securityService.getPrivilegePermissions(filledTable.getName())));
+					if (privilegeRequest.isEmpty()) {
+						throw new ProcedureException("msg.PrivilegeError %" + filledTable.getName());
+					}
+				}
+
+				ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).orElse(null);
+
+				// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunden wurde, normal ausführen.
+				if (extensionResult != null) {
+					result = (SqlProcedureResult) extensionResult.getBody();
+				} else {
+					result = procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+				}
+			} finally {
+				if (profileThisProcedure) {
+					Profiler.pop();
 				}
 			}
-
-			ResponseEntity extensionResult = sqlProcedureController.checkForExtension(filledTable).orElse(null);
-
-			// Falls Extension gefunden wurde, Extension ausführen, falls keine gefunden wurde, normal ausführen.
-			if (extensionResult != null) {
-				result = (SqlProcedureResult) extensionResult.getBody();
-			} else {
-				result = procedureService.calculateSqlProcedureResult(filledTable, privilegeRequest, connection, result, sb);
+			if (profileThisProcedure) {
+				result.setProfilingResult(procedureProfiler.toProfilingResult());
 			}
 			// Die erste if-Bedingung ist eigentlich nur für die Abwärtskompatibilität da, damit hier keine NullPointerException geworfen wird.
 			if (inputTablesWithResults != null) {

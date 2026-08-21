@@ -14,6 +14,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.TableMetaData;
+import aero.minova.cas.profiling.Profiler;
 import aero.minova.cas.sql.SqlUtils;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.annotation.PostConstruct;
@@ -83,15 +84,18 @@ public class ViewService {
 			// weswegen dann Fehlermeldungen geworfen werden. Deshalb wird ab jetzt einfach die prepareViewString-Methode verwendet.
 			// Slavi '26: keep connection only as long as it is technically required.
 			String viewQuery = viewService.prepareViewString(inputTable, false, 0, authoritiesForThisTable);
-			try (val connection = systemDatabase.getConnection();
+			try (val connection = Profiler.timeConnectionAcquisition(systemDatabase::getConnection);
 					val preparedStatement = connection.prepareCall(viewQuery);
 					PreparedStatement preparedViewStatement = fillPreparedViewString(inputTable, preparedStatement, viewQuery, sb)) {
-				customLogger.logSql("Executing statements: " + sb);
+				Profiler.timeLogging(() -> customLogger.logSql("Executing statements: " + sb));
 
-				try (ResultSet resultSet = preparedViewStatement.executeQuery()) {
+				try (ResultSet resultSet = Profiler.timeSql(preparedViewStatement::executeQuery)) {
 					result = SqlUtils.convertSqlResultToTable(inputTable, resultSet, customLogger.userLogger, this);
 				}
-				connection.commit(); // how: without commit -> rollback
+				// how: without commit -> rollback
+				long commitStart = Profiler.startTimer();
+				connection.commit();
+				Profiler.stopTimer(commitStart, Profiler::recordCommitNanos);
 		    }
 
 			int totalResults = 0;

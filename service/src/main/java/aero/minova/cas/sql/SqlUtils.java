@@ -24,6 +24,7 @@ import aero.minova.cas.api.domain.ProcedureException;
 import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.profiling.Profiler;
 import lombok.val;
 
 public class SqlUtils {
@@ -143,8 +144,8 @@ public class SqlUtils {
 					inputTable.getColumns().stream()//
 							.filter(column -> !Objects.equals(column.getName(), Column.AND_FIELD_NAME))//
 							.collect(Collectors.toList()));
-			while (sqlSet.next()) {
-				outputTable.addRow(SqlUtils.convertSqlResultToRow(outputTable, sqlSet, logger, conversionUser));
+			while (Profiler.timeSql(sqlSet::next)) {
+				outputTable.addRow(Profiler.timeRowConversion(() -> SqlUtils.convertSqlResultToRow(outputTable, sqlSet, logger, conversionUser)));
 			}
 			return outputTable;
 		} catch (Throwable e) {

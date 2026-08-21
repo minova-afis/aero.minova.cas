@@ -11,6 +11,14 @@ public class Table implements Serializable {
 	private List<Column> columns = new ArrayList<>();
 	private List<Row> rows = new ArrayList<>();
 	private ErrorMessage returnErrorMessage;
+	/**
+	 * Falls gesetzt, wird für diese eine Anfrage Profiling aktiviert, unabhängig von der globalen Einstellung {@code cas.profiling.always-enabled}.
+	 */
+	private boolean profile;
+	/**
+	 * Nur befüllt, falls Profiling für diese Anfrage aktiv war.
+	 */
+	private ProfilingResult profilingResult;
 
 	public String getName() {
 		return name;
@@ -149,6 +157,22 @@ public class Table implements Serializable {
 
 	public void setReturnErrorMessage(ErrorMessage errorMessage) {
 		this.returnErrorMessage = errorMessage;
+	}
+
+	public boolean isProfile() {
+		return profile;
+	}
+
+	public void setProfile(boolean profile) {
+		this.profile = profile;
+	}
+
+	public ProfilingResult getProfilingResult() {
+		return profilingResult;
+	}
+
+	public void setProfilingResult(ProfilingResult profilingResult) {
+		this.profilingResult = profilingResult;
 	}
 
 	@Override

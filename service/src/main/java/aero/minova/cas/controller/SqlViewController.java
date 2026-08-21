@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
@@ -22,6 +24,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableException;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.profiling.Profiler;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.SecurityService;
 import aero.minova.cas.service.ViewService;
@@ -40,6 +43,9 @@ public class SqlViewController {
 
 	@Autowired
 	ProcedureService procedureService;
+
+	@org.springframework.beans.factory.annotation.Value("${cas.profiling.always-enabled:false}")
+	boolean alwaysProfile;
 
 	final Object extensionSynchronizer = new Object();
 
@@ -102,8 +108,31 @@ public class SqlViewController {
 	@PostMapping(value = "data/index", produces = "application/json")
 	public Table getIndexView(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest(": data/view: ", inputTable);
+		boolean profiling = alwaysProfile || inputTable.isProfile();
+		Profiler profiler = profiling ? Profiler.push() : null;
+
+		try {
+			Table result = getIndexViewResult(inputTable);
+
+			if (profiling) {
+				result.setProfilingResult(profiler.toProfilingResult());
+				result.getProfilingResult().setTransactionOverhead(profiler.toTransactionOverhead());
+				ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+				if (attributes != null) {
+					attributes.getResponse().setHeader("X-Profiling-Time", profiler.getTotalMs() + "ms");
+				}
+			}
+			return result;
+		} finally {
+			if (profiling) {
+				Profiler.pop();
+			}
+		}
+	}
+
+	private Table getIndexViewResult(Table inputTable) throws Exception {
 		// Die Privilegien-Abfrage muss vor allem Anderen passieren. Falls das Privileg nicht vorhanden ist MUSS eine TableException geworfen werden.
-		List<Row> authoritiesForThisTable = securityService.getPrivilegePermissions(inputTable.getName());
+		List<Row> authoritiesForThisTable = Profiler.timePrivilegeCheck(() -> securityService.getPrivilegePermissions(inputTable.getName()));
 		if (authoritiesForThisTable.isEmpty()) {
 			throw new TableException(new RuntimeException("msg.PrivilegeError %" + inputTable.getName()));
 		}

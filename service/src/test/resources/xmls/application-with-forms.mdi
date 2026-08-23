@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<main icon="AFIS.ico" titel="AFIS">
+
+   <!-- <action action="AFISDashboard.xml" icon="Information.ico" id="AFISDashboard" text="Dashboard" type="dashboard"/>
+  -->
+
+   <action action="AfisDispatchConfiguration.xml" generic="true" icon="Site" id="AfisDispatchConfiguration" text="Dispatch Configuration"/>
+
+   <action action="AfisDispatchRestriction.xml" generic="true" icon="AfisDispatchRestriction.ico" id="AfisDispatchRestriction" text="Sanction List"/>
+
+   <action action="Aircraft.xml" icon="Aircraft.ico" id="Aircraft" text="Aircraft"/>
+
+   <action action="AircraftType.xml" icon="Aircraft.ico" id="AircraftType" text="Aircraft Type"/>
+
+   <action action="Airline.xml" icon="Airline.ico" id="Airline" text="Airline"/>
+
+   <action action="AirlineGroup.xml" generic="true" icon="AirlineFilter" id="AirlineGroup" text="Airline Group"/>
+
+   <action action="Airport.xml" icon="Airport.ico" id="Airport" text="Airport"/>
+
+   <action action="ch.minova.e4.afis.dispatch.form" dialog="true" documentation="Dispatch" icon="AfisDispatch.ico" id="Dispatch" shortcut="CTRL_D" text="Dispatch"/>
+
+   <action action="ch.minova.iso.calculator.IsoCalculatorForm" dialog="true" icon="Iso.ico" id="Iso" text="ISO Calculator"/>
+
+   <action action="Contact.xml" generic="true" icon="Address.ico" id="Contact" text="Address"/>
+
+   <action action="ContaminationLog.xml" generic="true" icon="TruckMeterItem.ico" id="ContaminationLog" text="Contamination"/>
+
+   <action action="ContaminationLogShort.xml" generic="true" icon="TruckMeterItem.ico" id="ContaminationLogShort" text="Contamination add. info"/>
+
+   <action action="Contractlist.xml" icon="Administration.ico" id="Contractlist" text="Contract List"/>
+
+   <action action="CopyFlightSchedule.xml" documentation="CopyFlightSchedule" icon="Copy.ico" id="CopyFlightSchedule" shortcut="CTRL_C" text="Copy Flight Schedule"/>
+
+   <action action="CreditCardCompany.xml" icon="CreditCard.ico" id="CreditCardCompany" text="Card Type"/>
+
+   <action action="Customer.xml" generic="true" icon="Customer.ico" id="Customer" text="Customer"/>
+
+   <action action="DailyClosing.xml" documentation="false" icon="DailyClosing.ico" id="DailyClosing" text="Daily Closing"/>
+
+   <action action="DailyCorrectionFactors.xml" icon="DailyCorrectionFactors.ico" id="DailyCorrectionFactors" text="Density Calculation"/>
+
+   <action action="Dashboard.xml" icon="Information.ico" id="Dashboard" text="Dashboard" type="dashboard"/>
+
+   <action action="DelayCode.xml" generic="true" icon="DelayCode.ico" id="DelayCode" text="Delay Code"/>
+
+   <action action="Driver.xml" generic="true" icon="Driver.ico" id="Driver" text="Driver"/>
+
+   <action action="ETicketDensity.xml" generic="true" icon="ETicketDensity" id="ETicketDensity" text="E-Ticket Density"/>
+
+   <action action="File.xml" generic="true" icon="Attachment.ico" id="File" text="File"/>
+
+   <action action="FlightAnalysis.xml" generic="true" icon="FlightAnalysis.ico" id="FlightAnalysis" text="Flight Analysis"/>
+
+   <action action="FlightFieldPosition.xml" icon="Position.ico" id="FlightFieldPosition" text="Position"/>
+
+   <action action="FlightFieldPositionGroup.xml" generic="true" icon="PositionGroup.ico" id="FlightFieldPositionGroup" text="Position Group"/>
+
+   <action action="FlightFilter.xml" icon="FlightFilter.ico" id="FlightFilter" text="Flight Filter"/>
+
+   <action action="FlightScheduleLog.xml" generic="true" icon="FlightSchedule.ico" id="FlightScheduleLog" text="Flight Schedule Log"/>
+
+   <action action="GAFuelling.xml" generic="true" icon="FuellingInputGA.ico" id="GAFuelling" text="General Aviation"/>
+
+   <action action="Item.xml" generic="true" icon="Item.ico" id="Item" text="Product"/>
+
+   <action action="JobDefinition.xml" icon="JobDefinition.ico" id="JobDefinition" text="Job Definition"/>
+
+   <action action="JobDestination.xml" icon="JobDestination.ico" id="JobDestination" text="Transmission Line"/>
+
+   <action action="JobExecutorQueue.xml" generic="true" icon="Queue" id="JobExecutorQueue" text="JobExecutor Queue"/>
+
+   <action action="JobResult.xml" icon="JobTransmissionResult.ico" id="JobResult" text="Data Transfer"/>
+
+   <action action="LoadingArea.xml" generic="true" icon="LoadingArea.ico" id="LoadingArea" text="Loading Area"/>
+
+   <action action="LuCustomerFlightNumber.xml" generic="true" icon="FlightCustomer.ico" id="LuCustomerFlightNumber" text="Flight Number-Customer"/>
+
+   <action action="LuSupplierAircraftCreditCardCompany.xml" icon="SupplierAircraftCreditCard.ico" id="LuSupplierAircraftCreditCardCompany" text="Supplier-Aircraft Registration-Credit Card"/>
+
+   <action action="LuSupplierCustomer.xml" icon="LuSupplierCustomer.ico" id="LuSupplierCustomer" text="Supplier-Customer"/>
+
+   <action action="LuSupplierCustomerAircraft.xml" icon="SupplierCustomerAircraft.ico" id="LuSupplierCustomerAircraft" text="Supplier-Customer-Aircraft"/>
+
+   <action action="LuSupplierCustomerSplittingContract.xml" icon="Contract.ico" id="SplittingContract" text="Quantity Allocation"/>
+
+   <action action="Modul.xml" icon="Moduls.ico" id="Modul" text="Installed Modules"/>
+
+   <action action="MonthlyClosing.xml" documentation="false" icon="MonthlyClosing.ico" id="MonthlyClosing" text="Monthly Closing"/>
+
+   <action action="OrderPartner.xml" generic="true" icon="OrderPartner.ico" id="OrderPartner" text="Order Partner"/>
+
+   <action action="OrderReceiver.xml" generic="true" icon="OrderReceiver.ico" id="OrderReceiver" text="Order Receiver"/>
+
+   <action action="Pit.xml" icon="PitPosition.ico" id="Pit" text="Pit Position"/>
+
+   <action action="PreDelivery.xml" documentation="PreDelivery" generic="true" icon="FuellingInput.ico" id="PreDeliveries" text="Pre-Delivery"/>
+
+   <action action="Productivity.xml" generic="true" icon="Productivity.ico" id="Productivity" text="Productivity"/>
+
+   <action action="RBFuelling.xml" icon="RBFuelling.ico" id="RBFuelling" text="Tank Truck"/>
+
+   <action action="Registry.xml" generic="true" icon="Preferences.ico" id="Registry" text="Registry"/>
+
+   <action action="SharedFile.xml" generic="true" icon="Attachment.ico" id="SharedFile" text="Documents"/>
+
+   <action action="ShiftPauseTime.xml" generic="true" icon="DriverPauseTimes.ico" id="ShiftPauseTime" text="Shift Pause"/>
+
+   <action action="ShiftPlan.xml" generic="true" icon="ShiftPlan.ico" id="ShiftPlan" text="Shift Plan"/>
+
+   <action action="ShiftTimes.xml" generic="true" icon="DriverShiftTimes.ico" id="ShiftTimes" text="Shifts"/>
+
+   <action action="Shipment.xml" generic="true" icon="ShipmentAircraft.ico" id="Shipment" text="Delivery Note"/>
+
+   <action action="ShippingAgency.xml" generic="true" icon="ShippingAgency.ico" id="ShippingAgency" text="Forwarder"/>
+
+   <action action="ShortJobDestination.xml" icon="JobDestination.ico" id="ShortJobDestination" text="Transmission Line"/>
+
+   <action action="ShortTank.xml" generic="true" icon="Tank.ico" id="ShortTank" text="Tank"/>
+
+   <action action="Site.xml" generic="true" icon="Site.ico" id="Site" text="Site"/>
+
+   <action action="SiteParameter.xml" generic="true" icon="Site.ico" id="SiteParameter" text="SiteParameter"/>
+
+   <action action="Statistic" icon="Statistic.ico" id="statistic" text="Statistics"/>
+
+   <action action="StatisticDelaycodes.xml" icon="delaycode.ico" id="StatisticDelaycodes" text="Statistic Operational-Codes"/>
+
+   <action action="STIM.xml" generic="true" icon="STIM.ico" id="STIM" text="STIM"/>
+
+   <action action="Supplier.xml" generic="true" icon="Supplier.ico" id="Supplier" text="Supplier"/>
+
+   <action action="Tank.xml" generic="true" icon="Tank.ico" id="Tank" text="Tank"/>
+
+   <action action="TaxCode.xml" generic="true" icon="Tax.ico" id="TaxCode" text="Tax Code"/>
+
+   <action action="Truck.xml" generic="true" icon="Truck.ico" id="Truck" text="Tank Truck"/>
+
+   <action action="TruckConfiguration.xml" generic="true" icon="TruckConfiguration.ico" id="TruckConfiguration" text="Truck Configuration"/>
+
+   <action action="TruckPool.xml" generic="true" icon="TruckPool.ico" id="TruckPool" text="Truck Pool"/>
+
+   <action action="UserGroup.xml" generic="true" icon="UserGroup.ico" id="UserGroup" text="User Group"/>
+
+   <action action="UserPrivilege.xml" generic="true" icon="UserPrivilege.ico" id="UserPrivilege" text="User Privilege"/>
+
+   <action action="Vat.xml" generic="true" icon="Vat.ico" id="VATXML" text="VAT"/>
+
+   <action action="YearlyClosing.xml" icon="YearlyClosing" id="YearlyClosing" text="Yearly Closing"/>
+
+   <menu id="main">
+
+      <menu id="masterdata" position="10.0" text="Master Data">
+
+         <entry id="Contact" position="10.0" separatorbefore="true" type="action"/>
+
+         <entry id="Supplier" position="40.0" type="action"/>
+
+         <entry id="OrderPartner" position="50.0" type="action"/>
+
+         <entry id="ShortTank" position="60.0" type="action"/>
+
+         <entry id="Tank" position="60.0" type="action"/>
+
+         <entry id="Item" position="70.0" type="action"/>
+
+         <entry id="Customer" position="85.0" type="action"/>
+
+         <entry id="TaxCode" position="90.0" type="action"/>
+
+         <entry id="VATXML" position="94.0" separatorafter="true" type="action"/>
+
+         <entry position="94.001" type="separator"/>
+
+         <entry id="OrderReceiver" position="110.0" separatorbefore="true" type="action"/>
+
+         <entry position="139.999" type="separator"/>
+
+         <entry id="ShippingAgency" position="140.0" separatorbefore="true" type="action"/>
+
+         <entry id="Truck" position="150.0" type="action"/>
+
+         <entry id="Driver" position="160.0" type="action"/>
+
+         <entry id="DelayCode" position="160.0" type="action"/>
+
+         <entry id="Aircraft" position="165.0" type="action"/>
+
+         <entry id="ShiftPauseTime" position="220.0" type="action"/>
+
+         <entry id="ShiftTimes" position="221.0" type="action"/>
+
+         <entry id="ShiftPlan" position="222.0" type="action"/>
+
+      </menu>
+
+      <menu id="definition" position="20.0" text="Allocation">
+
+         <entry id="LuCustomerFlightNumber" position="5.0" separatorafter="true" type="action"/>
+
+         <entry position="5.001" type="separator"/>
+
+         <entry id="LuSupplierCustomer" position="15.0" separatorbefore="true" type="action"/>
+
+         <entry id="LuSupplierAircraftCreditCardCompany" position="25.0" type="action"/>
+
+         <entry id="LuSupplierCustomerAircraft" position="27.0" type="action"/>
+
+         <entry id="CreditCardCompany" position="85.0" type="action"/>
+
+      </menu>
+
+      <menu id="handling" position="30.0" text="Manual Handling">
+
+         <entry id="Dispatch" position="7.0" separatorafter="true" type="action"/>
+
+         <entry position="7.001" type="separator"/>
+
+         <entry id="CopyFlightSchedule" position="55.0" type="action"/>
+
+         <entry id="ETicketDensity" position="95.0" type="action"/>
+
+         <entry id="Iso" position="100.0" type="action"/>
+
+      </menu>
+
+      <menu id="deliveries" position="35.0" text="Refuelings">
+
+         <entry id="PreDeliveries" position="15.0" type="action"/>
+
+         <entry id="Shipment" position="25.0" type="action"/>
+
+         <entry id="RBFuelling" position="35.0" separatorafter="true" type="action"/>
+
+         <entry position="35.001" type="separator"/>
+
+         <entry id="GAFuelling" position="45.0" separatorbefore="true" type="action"/>
+
+      </menu>
+
+      <menu id="information" position="50.0" text="Information">
+
+         <entry id="FlightScheduleLog" position="5.0" type="action"/>
+
+         <entry id="FlightAnalysis" position="7.0" type="action"/>
+
+         <entry id="statistic" position="10.0" type="action"/>
+
+         <entry id="Productivity" position="11.0" type="action"/>
+
+         <entry position="24.999" type="separator"/>
+
+         <entry id="ContaminationLog" position="25.0" separatorafter="true" separatorbefore="true" type="action"/>
+
+         <entry id="ContaminationLogShort" position="25.0" separatorafter="true" separatorbefore="true" type="action"/>
+
+         <entry id="StatisticDelaycodes" position="25.0" separatorbefore="true" type="action"/>
+
+         <entry position="25.001" type="separator"/>
+
+         <entry position="25.001" type="separator"/>
+
+         <entry position="29.999" type="separator"/>
+
+         <entry id="Contractlist" position="30.0" separatorbefore="true" type="action"/>
+
+      </menu>
+
+      <menu id="closing" position="60.0" text="Closings">
+
+         <entry id="DailyCorrectionFactors" position="5.0" type="action"/>
+
+         <entry id="DailyClosing" position="10.0" separatorafter="true" type="action"/>
+
+         <entry position="10.001" type="separator"/>
+
+         <entry id="MonthlyClosing" position="20.0" type="action"/>
+
+         <entry id="YearlyClosing" position="30.0" type="action"/>
+
+         <entry position="69.999" type="separator"/>
+
+         <entry id="JobResult" position="70.0" separatorbefore="true" type="action"/>
+
+      </menu>
+
+      <menu id="configuration" position="70.0" text="Configuration">
+
+         <entry id="Modul" position="2.0" type="action"/>
+
+         <entry id="TruckConfiguration" position="12.0" type="action"/>
+
+         <entry id="AfisDispatchRestriction" position="14.0" type="action"/>
+
+         <entry id="FlightFilter" position="15.0" separatorafter="true" type="action"/>
+
+         <entry position="15.001" type="separator"/>
+
+         <entry id="LoadingArea" position="20.0" type="action"/>
+
+         <entry position="24.999" type="separator"/>
+
+         <entry id="FlightFieldPosition" position="25.0" separatorbefore="true" type="action"/>
+
+         <entry id="FlightFieldPositionGroup" position="25.1" type="action"/>
+
+         <entry id="AircraftType" position="35.0" type="action"/>
+
+         <entry id="Pit" position="42.0" type="action"/>
+
+         <entry id="Airport" position="65.0" type="action"/>
+
+         <entry id="Airline" position="66.0" type="action"/>
+
+         <entry id="AirlineGroup" position="67.0" type="action"/>
+
+         <entry id="TruckPool" position="75.0" separatorafter="true" type="action"/>
+
+         <entry position="75.001" type="separator"/>
+
+         <entry id="SplittingContract" position="105.0" separatorbefore="true" type="action"/>
+
+         <entry id="ShortJobDestination" position="160.0" type="action"/>
+
+         <entry id="UserGroup" position="215.0" type="action"/>
+
+         <entry id="UserPrivilege" position="220.0" type="action"/>
+
+         <entry id="Site" position="250.0" type="action"/>
+
+         <entry id="SiteParameter" position="251.0" type="action"/>
+
+         <entry id="SharedFile" position="251.0" type="action"/>
+
+         <entry id="File" position="252.0" type="action"/>
+
+         <entry id="Registry" position="252.0" type="action"/>
+
+         <entry id="AfisDispatchConfiguration" position="260.0" type="action"/>
+
+      </menu>
+
+      <menu id="tools" position="80.0" text="Tools">
+
+         <entry id="JobExecutorQueue" position="5.0" type="action"/>
+
+         <entry id="JobDefinition" position="10.0" type="action"/>
+
+         <entry position="29.999" type="separator"/>
+
+         <entry id="JobDestination" position="30.0" separatorbefore="true" type="action"/>
+
+         <entry id="STIM" position="40.0" separatorafter="true" type="action"/>
+
+      </menu>
+
+   </menu>
+
+   <toolbar>
+
+      <entry id="Dispatch" position="7.0" type="action"/>
+
+      <entry id="Contact" position="10.0" type="action"/>
+
+      <entry id="Supplier" position="20.0" type="action"/>
+
+      <entry id="Predeliveries" position="21.0" type="action"/>
+
+      <entry id="Tank" position="30.0" type="action"/>
+
+      <entry id="Shipment" position="31.0" type="action"/>
+
+      <entry id="Item" position="40.0" type="action"/>
+
+      <entry id="RBFuelling" position="41.0" type="action"/>
+
+      <entry id="GAFuelling" position="42.0" type="action"/>
+
+      <entry id="ShippingAgency" position="50.0" type="action"/>
+
+      <entry id="Truck" position="60.0" type="action"/>
+
+      <entry id="Driver" position="70.0" type="action"/>
+
+      <entry id="OrderReceiver" position="90.0" type="action"/>
+
+      <entry id="Iso" position="210.0" type="action"/>
+
+   </toolbar>
+
+</main>

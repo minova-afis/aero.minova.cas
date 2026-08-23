@@ -1,5 +1,6 @@
 package aero.minova.cas.service;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -8,9 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import ch.minova.foundation.rest.auth.grants.Action;
 import ch.minova.foundation.rest.auth.grants.persistence.GrantEntity;
@@ -21,6 +29,7 @@ import ch.minova.foundation.rest.auth.grants.persistence.GroupGrantRepository;
 import ch.minova.foundation.rest.auth.grants.persistence.GroupMemberEntity;
 import ch.minova.foundation.rest.auth.grants.persistence.GroupMemberRepository;
 import ch.minova.foundation.rest.auth.grants.persistence.GroupRepository;
+import ch.minova.foundation.rest.db.service.FileService;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
@@ -51,6 +60,16 @@ import aero.minova.cas.api.domain.Value;
  * (and therefore its otherwise-required repository dependencies) simply doesn't exist unless
  * {@code foundation.rest.auth.grants.enabled} is set. {@link AutoSetupService} injects this optionally
  * ({@code @Autowired(required = false)}) and skips it cleanly if it's absent.
+ * <p>
+ * <strong>{@code xtcasMdi} is not always the real source of truth for a deployment's menu</strong> — see #1499.
+ * A deployment configured with {@code ng.api.dbfiles=true} + {@code ng.api.preferdbfiles=true} serves
+ * {@code application.mdi} as a static, pre-uploaded file from {@code DBFileService}'s generic file store
+ * (mirroring {@code FilesController#getFile()}'s own priority order), and the {@code xtcasMdi}-driven dynamic
+ * generation path is never reached at all for that request — meaning {@code xtcasMdi} itself can sit at just
+ * the minimal CAS-bootstrap seed while the real, served menu has dozens of forms discovery would otherwise miss
+ * entirely. {@link #discoverFormResourcePaths()} checks for that static file first and parses it directly when
+ * present, falling back to the original {@code xtcasMdi}-table query unchanged for any deployment that doesn't
+ * use this configuration.
  */
 @Service
 @ConditionalOnProperty(prefix = "foundation.rest.auth.grants", name = "enabled", havingValue = "true")
@@ -89,6 +108,30 @@ public class GrantsDiscoveryService {
 
 	@Autowired
 	protected CustomLogger logger;
+
+	/**
+	 * Same bean {@code FilesController} uses for its static-file lookup — needed to check whether
+	 * {@code application.mdi} is actually being served from there instead of {@code xtcasMdi}. See this class's
+	 * own header comment and #1499.
+	 */
+	@Autowired
+	FileService dbFileService;
+
+	/** Mirrors {@code FilesController}'s own {@code ng.api.dbfiles} flag — same default. Fully-qualified
+	 * {@code @Value} (not imported) to avoid colliding with {@link aero.minova.cas.api.domain.Value}, already
+	 * imported above and used throughout this class for SQL values — same reason {@code FilesController} itself
+	 * spells this annotation out fully-qualified rather than importing it. */
+	@org.springframework.beans.factory.annotation.Value("${ng.api.dbfiles:true}")
+	boolean isDBFilesActive;
+
+	/** Mirrors {@code FilesController}'s own {@code ng.api.preferdbfiles} flag — same default. */
+	@org.springframework.beans.factory.annotation.Value("${ng.api.preferdbfiles:false}")
+	boolean isDBFilesPreferred;
+
+	/** Mirrors {@code FilesController}'s own {@code application} property — used to build the same
+	 * {@code "{application}/application.mdi"}-prefixed lookup path {@code getFileFromTable} tries first. */
+	@org.springframework.beans.factory.annotation.Value("${application:#{null}}")
+	private String application;
 
 	/** Internal representation of one xtcasMdi row — either a menu (category) or a form entry. Mirrors PermissionsService's MdiRow. */
 	private record MdiRow(String keyText, String parentMenu, boolean isForm) {
@@ -184,8 +227,24 @@ public class GrantsDiscoveryService {
 	 *         around; NOT the flat {@code /form/{formName}} convention {@code web.ui.common}'s self-service
 	 *         {@code claimsPathForTileAction} currently uses. That's a known, accepted follow-up (see CONTEXT.md)
 	 *         — self-service needs updating to match before the two halves resolve against the same paths.
+	 *         <p>
+	 *         Checks for a static, pre-uploaded {@code application.mdi} first (see this class's own header
+	 *         comment and #1499) and parses it directly when present; falls back to the original
+	 *         {@code xtcasMdi}-table query unchanged otherwise — including when a static file exists but
+	 *         couldn't be parsed, or parsed to zero forms, rather than seeding nothing.
 	 */
 	private List<String> discoverFormResourcePaths() {
+		byte[] staticMdi = resolveStaticApplicationMdi();
+		if (staticMdi != null) {
+			List<String> fromStaticFile = discoverFormResourcePathsFromMdiXml(staticMdi);
+			if (!fromStaticFile.isEmpty()) {
+				return fromStaticFile;
+			}
+			logger.logSetup(
+					"Grants discovery: a static application.mdi is being served (ng.api.dbfiles + ng.api.preferdbfiles), "
+							+ "but it parsed to zero forms — falling back to xtcasMdi, which is likely also incomplete for this deployment");
+		}
+
 		List<MdiRow> mdiRows = loadMdiRows();
 		Map<String, MdiRow> menusById = new LinkedHashMap<>();
 		for (MdiRow row : mdiRows) {
@@ -204,6 +263,117 @@ public class GrantsDiscoveryService {
 			}
 		}
 		return paths;
+	}
+
+	// ─── Static-file MDI resolution + parsing (#1499) ───────────────────────────
+
+	/**
+	 * Mirrors {@code FilesController#getFile()}'s first priority check for {@code application.mdi} — a
+	 * deployment configured with {@code ng.api.dbfiles} + {@code ng.api.preferdbfiles} serves a static,
+	 * pre-uploaded MDI from {@code DBFileService} instead of ever reaching the {@code xtcasMdi}-driven
+	 * generation path. Returns {@code null} if that's not how this deployment is configured (or no such file
+	 * exists there despite the config), meaning the caller should use the existing {@code xtcasMdi}-table-driven
+	 * discovery — unchanged for any deployment that doesn't use this configuration.
+	 * <p>
+	 * Deliberately does <em>not</em> reuse {@code FilesController#getFileFromTable()} itself — that method also
+	 * runs XBS-patching/import-resolution/translation, none of which matter for parsing the raw {@code <menu>}
+	 * structure, and duplicating just the lookup here avoids a service depending on controller-layer code.
+	 */
+	private byte[] resolveStaticApplicationMdi() {
+		if (!isDBFilesActive || !isDBFilesPreferred) {
+			return null;
+		}
+		String path = "application.mdi";
+		if (application != null && !application.isEmpty()) {
+			byte[] prefixed = dbFileService.getFile(application + "/" + path);
+			if (prefixed != null) {
+				return prefixed;
+			}
+		}
+		return dbFileService.getFile(path);
+	}
+
+	/**
+	 * Parses a raw {@code application.mdi} document into the same {@code /form/{category}/{formName}} path
+	 * shape {@link #discoverFormResourcePaths()} produces from {@code xtcasMdi} directly. Only reads the
+	 * {@code <menu>} tree — {@code <action>}/{@code <toolbar>} elements are deliberately ignored, since each
+	 * {@code <entry type="action" id="...">} already carries the form's own KeyText directly (confirmed against
+	 * {@code FilesService#readMDI()}'s own generation: the {@code <entry id="...">} matches the form row's
+	 * KeyText 1:1, no need to cross-reference the sibling {@code <action>} element's own {@code id}/{@code action}
+	 * attributes, which don't always match each other). Nested submenus (deeper than one level under the root
+	 * {@code <menu>}) are flattened into their top-level ancestor category, matching
+	 * {@link #resolveTopLevelMenu}'s existing semantic for the DB-driven path. Returns an empty list (never
+	 * throws) on any parse failure — the caller falls back to {@code xtcasMdi} rather than seeding nothing.
+	 */
+	// Package-private (not private) so GrantsDiscoveryServiceTest can call it directly without a Spring context —
+	// pure XML parsing, no injected bean is involved.
+	List<String> discoverFormResourcePathsFromMdiXml(byte[] mdiXml) {
+		List<String> paths = new ArrayList<>();
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			factory.setXIncludeAware(false);
+			factory.setExpandEntityReferences(false);
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(new ByteArrayInputStream(mdiXml));
+
+			Element root = doc.getDocumentElement(); // <main>
+			Element rootMenu = firstDirectChildElement(root, "menu"); // <menu id="main">
+			if (rootMenu == null) {
+				return paths;
+			}
+			for (Element category : directChildElements(rootMenu, "menu")) {
+				String categoryId = category.getAttribute("id");
+				if (!categoryId.isEmpty()) {
+					collectFormEntries(category, categoryId, paths);
+				}
+			}
+		} catch (Exception e) {
+			logger.logError("Grants discovery: could not parse the served application.mdi -- falling back to xtcasMdi", e);
+			return new ArrayList<>();
+		}
+		return paths;
+	}
+
+	/** Recursively collects every {@code <entry type="action" id="...">} under {@code menu}, attributing it to
+	 * {@code categoryId} regardless of nesting depth. */
+	private void collectFormEntries(Element menu, String categoryId, List<String> paths) {
+		NodeList children = menu.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+			if (!(child instanceof Element)) {
+				continue;
+			}
+			Element el = (Element) child;
+			if ("entry".equals(el.getTagName()) && "action".equals(el.getAttribute("type"))) {
+				String formKeyText = el.getAttribute("id");
+				if (!formKeyText.isEmpty()) {
+					paths.add("/form/" + categoryId + "/" + formKeyText);
+				}
+			} else if ("menu".equals(el.getTagName())) {
+				// Nested sub-menu -- still belongs to the same top-level category.
+				collectFormEntries(el, categoryId, paths);
+			}
+		}
+	}
+
+	private Element firstDirectChildElement(Element parent, String tagName) {
+		for (Element el : directChildElements(parent, tagName)) {
+			return el;
+		}
+		return null;
+	}
+
+	private List<Element> directChildElements(Element parent, String tagName) {
+		List<Element> result = new ArrayList<>();
+		NodeList children = parent.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+			if (child instanceof Element && tagName.equals(((Element) child).getTagName())) {
+				result.add((Element) child);
+			}
+		}
+		return result;
 	}
 
 	/**

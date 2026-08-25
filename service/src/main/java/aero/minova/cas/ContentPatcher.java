@@ -49,6 +49,8 @@ public class ContentPatcher {
 	private static final String ATTR_PROPERTY = "property";
 	private static final String ATTR_VISIBLE = "visible";
 	private static final String ATTR_IMPORT = "import";
+	private static final String ATTR_DEFAULT = "default";
+	private static final String VAL_STATIC = "static";
 	
 	private static final String XBS_NODE_OPTIONPAGES = "OptionPages";
 //	private static final String XBS_NODE_DEPENDINGFIELDS = "DependingFields";
@@ -314,6 +316,41 @@ public class ContentPatcher {
 		return Integer.MAX_VALUE;
 	}
 
+	/** The same option page can be added more than once under OptionPages (e.g. to add it once per tank),
+	 * disambiguated in the registry with a trailing "#&lt;n&gt;", e.g. "Foo.op.xml#1", "Foo.op.xml#2".
+	 * Strips that suffix to get back the actual file name to load from tFile.
+	 */
+	private static String stripDisambiguator(String opName) {
+		if(opName == null)
+			return null;
+		int hash = opName.indexOf('#');
+		return (hash < 0 ? opName : opName.substring(0, hash));
+	}
+
+	/** Counterpart to {@link #stripDisambiguator(String)}: returns the part after "#", e.g. "1" for
+	 * "Foo.op.xml#1", or null if the option page is not disambiguated.
+	 */
+	private static String getDisambiguator(String opName) {
+		if(opName == null)
+			return null;
+		int hash = opName.indexOf('#');
+		return (hash < 0 || hash == opName.length() - 1 ? null : opName.substring(hash + 1));
+	}
+
+	/** Registry entries under an OptionPage that are neither key-mappings nor known attributes (visible,
+	 * visible-when, priority) may instead set a default value for one of the option page's "static" fields,
+	 * e.g. &lt;field key-type="static" name="TankNumber" .../&gt;. This is used to distinguish between
+	 * multiple instances of the same option page (see {@link #stripDisambiguator(String)}).
+	 * @return true if a matching static field was found (and patched with the default value), false otherwise
+	 */
+	private boolean applyStaticFieldDefault(Document opDoc, String name, String value) {
+		Element field = XMLUtils.findFirstElementWithAttribute(opDoc.getDocumentElement(), ATTR_NAME, val -> name.equalsIgnoreCase(val));
+		if(field == null || !VAL_STATIC.equalsIgnoreCase(field.getAttribute(ATTR_KEY_TYPE)))
+			return false;
+		field.setAttribute(ATTR_DEFAULT, value);
+		return true;
+	}
+
 	/**
 	 * Inject all defined option pages and FORM into the basic form.
 	 * @param path
@@ -360,7 +397,7 @@ public class ContentPatcher {
 				// The option-pages can also be defined with prioritiy. Probably to enforce one OP working before the other (wyld)
 				opList.sort((a, b) -> Double.compare(getOptionPagePriority(a), getOptionPagePriority(b)));
 				for(RegistryNode op : opList) try {
-					byte[] opCode = dbFileService.getFile(op.getName());
+					byte[] opCode = dbFileService.getFile(stripDisambiguator(op.getName()));
 					if(opCode == null) {
 						customLogger.logError("Failed to add " + op.getName() + " option page to " + path + ": option page doesn't exist in tFile");
 						continue;
@@ -379,12 +416,12 @@ public class ContentPatcher {
 							   XBS_VAL_VISIBLE_WHEN.equalsIgnoreCase(key) ||
 							   XBS_VAL_PRIORITY.equalsIgnoreCase(key)) {
 								opAtttributes.put(key, opNode.getValue());
-							} else {
+							} else if(!applyStaticFieldDefault(opDoc, key, opNode.getValue())) {
 								keyMapping.put(key, opNode.getValue());
 							}
 						}
 					}
-					addOptionPage(formDoc, opDoc, keyMapping, opAtttributes);
+					addOptionPage(formDoc, opDoc, keyMapping, opAtttributes, getDisambiguator(op.getName()));
 				} catch(Exception ex1) {
 					customLogger.logError("Failed to add " + op.getName() + " option page to " + path, ex1);				
 				}
@@ -408,7 +445,7 @@ public class ContentPatcher {
 	 * Integrate option page into form
 	 * See https://github.com/minova-afis/aero.minova.cas/issues/1473
 	 */
-	private void addOptionPage(Document form, Document op, Map<String, String> keyMapping, Map<String, String> opAttributes) throws IllegalArgumentException {
+	private void addOptionPage(Document form, Document op, Map<String, String> keyMapping, Map<String, String> opAttributes, String idSuffix) throws IllegalArgumentException {
 		if (form == null || op == null)
 			return;
 
@@ -485,6 +522,13 @@ public class ContentPatcher {
 			
 		} else {
 			throw new IllegalArgumentException("Unsupported option page type: " + opRoot.getTagName());
+		}
+		// If the same option page (file) is added more than once, disambiguate its id so it stays unique in the
+		// form. Most option pages don't end up with an id at all (e.g. the op-page's own <detail id="Detail">
+		// is intentionally not taken over above), so fall back to the tag name -- same default used by patchXMLForm.
+		if(idSuffix != null && !idSuffix.isEmpty()) {
+			String baseId = (toAdd.hasAttribute(ATTR_ID) ? toAdd.getAttribute(ATTR_ID) : toAdd.getTagName());
+			toAdd.setAttribute(ATTR_ID, baseId + "_" + idSuffix);
 		}
 		// Apply attributes
 		applyAttributes(form, toAdd, opAttributes);

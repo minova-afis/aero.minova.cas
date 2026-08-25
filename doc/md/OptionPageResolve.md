@@ -167,5 +167,60 @@ main detail's primary fields. That is, the UI has all required information withi
 </form>
 ```
 
+## Adding the same option page multiple times
 
+Sometimes the very same option page needs to be added more than once to a form, e.g. one *EntryTankMeasurementPercentage.op.xml*
+per tank of an *Entry.xml*. Since the Registry node name below *OptionPages* must be unique, each additional occurrence is
+disambiguated with a trailing ```#<n>```, e.g.:
+
+```xml
+<node name="Entry.xml">
+   <map/>
+   <node name="OptionPages">
+      <map/>
+      <node name="EntryTankMeasurementPercentage.op.xml#1">
+         <map>
+            <entry key="key0" value="KeyLong"/>
+            <entry key="tanknumber" value="1"/>
+         </map>
+      </node>
+      <node name="EntryTankMeasurementPercentage.op.xml#2">
+         <map>
+            <entry key="key0" value="KeyLong"/>
+            <entry key="tanknumber" value="2"/>
+         </map>
+      </node>
+   </node>
+</node>
+```
+
+The ```#<n>``` suffix is stripped before the option page is loaded from *tFile* -- both nodes above load the very same
+*EntryTankMeasurementPercentage.op.xml*. To keep the resulting *optionpage* elements distinguishable in the merged form, the
+suffix is instead appended (as ```_<n>```) to the generated *optionpage*'s (or *grid*'s) ```id``` attribute -- falling back to
+the tag name (```optionpage``` / ```grid```) if the option page doesn't already have one of its own -- e.g.
+```id="optionpage_1"``` and ```id="optionpage_2"```.
+
+## Setting default values on static fields
+
+An option page added multiple times this way is otherwise identical -- the front-end has no way to tell one occurrence apart
+from another (e.g. which tank a page belongs to) unless this is encoded in the data itself. For this, an option page can define
+a *static* field, e.g.:
+
+```xml
+<field key-type="static" name="TankNumber" sql-index="1" text="@tEntryTankMeasurement.TankNo" visible="false">
+	<number/>
+</field>
+```
+
+Any Registry entry below the option page node whose key matches (case-insensitively) the ```name``` of such a static field
+sets that field's ```default``` attribute to the entry's value -- instead of being treated as a key-mapping. In the example
+above, ```tanknumber``` on the first occurrence results in:
+
+```xml
+<field key-type="static" name="TankNumber" sql-index="1" text="Tanknummer" visible="false" default="1">
+	<number/>
+</field>
+```
+
+and analogously ```default="2"``` for the second occurrence, etc.
 

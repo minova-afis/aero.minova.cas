@@ -38,7 +38,8 @@ public class ContentPatcher {
 	private static final String NODE_DYNAMIC = "dynamic";
 	private static final String NODE_EVENTS = "events";
 	private static final String NODE_OPTIONPAGE = "optionpage";
-	
+	private static final String NODE_SECTION = "section";
+
 	private static final String ATTR_ICON = "icon";
 	private static final String ATTR_ID = "id";
 	private static final String ATTR_NAME = "name";
@@ -461,29 +462,34 @@ public class ContentPatcher {
 			toAdd = (Element)form.importNode(opRoot, true);
 
 		} else if (NODE_FORM.equalsIgnoreCase(opRoot.getTagName())) {
-			// <form><detail><page>... or <form><detail><head> are converted to <optionpage>
+			// <form><detail><head>?<page>* are converted to a single <optionpage>
 
 			NodeList opRootChildren = opRoot.getElementsByTagName(NODE_DETAIL);
 			if (opRootChildren.getLength() == 0 || !(opRootChildren.item(0) instanceof Element))
 				throw new IllegalArgumentException("Option page has no detail");
 
 			Element opDetail = (Element) opRootChildren.item(0);
-			Node opDetailChildNode = opDetail.getFirstChild();
-			while (opDetailChildNode != null && !(opDetailChildNode instanceof Element))
-				opDetailChildNode = opDetailChildNode.getNextSibling();
 
-			if (!(opDetailChildNode instanceof Element))
+			// Collect all head/page units, in document order (there is at most one <head>, always first,
+			// followed by zero or more <page>, see XMLOptionPageDetail.xsd)
+			List<Element> units = new LinkedList<>();
+			for (Node n = opDetail.getFirstChild(); n != null; n = n.getNextSibling()) {
+				if (n instanceof Element) {
+					String tag = ((Element) n).getTagName();
+					if (NODE_HEAD.equalsIgnoreCase(tag) || NODE_PAGE.equalsIgnoreCase(tag))
+						units.add((Element) n);
+				}
+			}
+			if (units.isEmpty())
 				throw new IllegalArgumentException("Option page's detail has a wrong child");
 
-			Element headOrPage = (Element) opDetailChildNode;
-			if (!NODE_PAGE.equalsIgnoreCase(headOrPage.getTagName()) && !NODE_HEAD.equalsIgnoreCase(headOrPage.getTagName())) {
-				throw new IllegalArgumentException("Option page's detail must either contain head or page child");
-			}
+			Element headOrPage = units.get(0);
 
 			// Create <optionpage>
 			Element optionPage = form.createElement(NODE_OPTIONPAGE);
 
-			// Copy child content from page/head into optionpage
+			// Copy child content from the first head/page into optionpage, as-is (unchanged behavior for
+			// the common single-page option page)
 			NodeList children = headOrPage.getChildNodes();
 			for (int i = 0; i < children.getLength(); i++) {
 				Node imported = form.importNode(children.item(i), true);
@@ -508,6 +514,52 @@ public class ContentPatcher {
 			for (int i = 0; i < sourceAttrs.getLength(); i++) {
 				Node attr = sourceAttrs.item(i);
 				optionPage.setAttribute(attr.getNodeName(), attr.getNodeValue());
+			}
+
+			// Further pages can't be merged as loose fields into <optionpage> (the XSD only allows either
+			// loose fields/separators/grids OR one-or-more <section> as a page's content, not both), so each
+			// further <page> becomes a <section> of its own, carrying over the page's own attributes/content.
+			// A <section> can't itself contain <section> children though, so if the page's content already
+			// includes (possibly alongside plain fields) one or more <section>, those are extracted and added
+			// as additional sibling sections instead of being nested; the wrapper is only kept if it still has
+			// content of its own once its nested sections are removed.
+			for (int u = 1; u < units.size(); u++) {
+				Element extraPage = units.get(u);
+
+				Element section = form.createElement(NODE_SECTION);
+				NamedNodeMap extraPageAttrs = extraPage.getAttributes();
+				for (int i = 0; i < extraPageAttrs.getLength(); i++) {
+					Node attr = extraPageAttrs.item(i);
+					section.setAttribute(attr.getNodeName(), attr.getNodeValue());
+				}
+				NodeList extraPageChildren = extraPage.getChildNodes();
+				for (int i = 0; i < extraPageChildren.getLength(); i++) {
+					section.appendChild(form.importNode(extraPageChildren.item(i), true));
+				}
+
+				List<Element> nestedSections = new LinkedList<>();
+				Node child = section.getFirstChild();
+				while (child != null) {
+					Node next = child.getNextSibling();
+					if (child instanceof Element && NODE_SECTION.equalsIgnoreCase(((Element) child).getTagName())) {
+						section.removeChild(child);
+						nestedSections.add((Element) child);
+					}
+					child = next;
+				}
+
+				boolean hasRemainingContent = false;
+				for (Node c = section.getFirstChild(); c != null; c = c.getNextSibling()) {
+					if (c instanceof Element) {
+						hasRemainingContent = true;
+						break;
+					}
+				}
+				if (hasRemainingContent)
+					optionPage.appendChild(section);
+
+				for (Element nestedSection : nestedSections)
+					optionPage.appendChild(nestedSection);
 			}
 
 			// Integrate events as last child of <optionpage>

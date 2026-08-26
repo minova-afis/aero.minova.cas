@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="Tank.ico" title="@tTank" xsi:noNamespaceSchemaLocation="../../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLOptionPage.xsd" helper-class="ch.minova.tta.entry.helper.partunloading.EntryPartUnloadingHelper">
+	<detail procedure-suffix="PartUnloadingBookingQuantities">
+		<head>
+			<field name="KeyLong" text="@tEntry.KeyLong" key-type="primary" sql-index="0" visible="false">
+				<number/>
+			</field>
+			<field name="TankNumber" text="Tanknummer" key-type="static" sql-index="1" visible="false">
+				<number/>
+			</field>
+			<field name="TankKey" text="@tStockExit.TankKey" required="false" sql-index="2" tab-index="0" number-columns-spanned="4">
+				<lookup table="tTank"/>
+				<dynamic property="required">TankNumber==1</dynamic>
+				
+			</field>
+			<field name="ISOCalc" offline="true" tab-index="1" text="@IsoCalculator.Quantity">
+				<editor editor="ch.minova.tta.IsoXMLCalculator">
+					
+					<ref-field field-name="AmbientDensity" type="AmbientDensity"/>
+					<ref-field field-name="MeasuredTemperature" type="MeasuredTemperature"/>
+					<ref-field field-name="AmbientTemperatureAfter" type="AmbientTemperature"/>
+					<ref-field field-name="StandardDensity" type="StandardDensity"/>
+					<ref-field field-name="AmbientVolume" type="AmbientVolume"/>
+					<ref-field field-name="StandardVolume" type="StandardVolume"/>
+					<ref-field field-name="Weight" type="Weight"/>
+					<ref-field field-name="Mass" type="Mass"/>
+					<ref-field field-name="Gallons" type="Gallons"/>
+				</editor>
+			</field>
+			<field name="AmbientVolume" text="@tStockExit.AmbientVolume" required="false" sql-index="8" tab-index="6" unit-text="@tUnit.liter">
+				<number/>
+			</field>
+			<field name="AmbientDensity" text="@tStockExit.AmbientDensity" required="false" sql-index="9" tab-index="2" unit-text="kg/m³">
+				<number decimals="1"/>
+			</field>
+			<field name="StandardVolume" text="@tStockExit.StandardVolume" required="false" sql-index="7" tab-index="7" unit-text="@tUnit.liter">
+				<number/>
+			</field>
+			<field name="MeasuredTemperature" text="@tStockExit.MeasuredTemperature" required="false" sql-index="10" tab-index="3" unit-text="@tUnit.celcius">
+				<number decimals="1"/>
+			</field>
+			<field name="Weight" text="@tStockExit.Weight" required="false" sql-index="5" tab-index="8" unit-text="kg">
+				<number/>
+			</field>
+			<field name="AmbientTemperatureAfter" text="@tStockExit.AmbientTemperature" required="false" sql-index="13" tab-index="4" unit-text="@tUnit.celcius">
+				<number decimals="1"/>
+			</field>
+			<field name="Mass" text="@tStockExit.Mass" required="false" sql-index="6" tab-index="9" unit-text="kg">
+				<number/>
+			</field>
+			<field name="StandardDensity" text="@tStockExit.StandardDensity" required="false" sql-index="11" tab-index="5" unit-text="kg/m³">
+				<number decimals="1"/>
+			</field>
+			<field name="Gallons" text="@Gallons" required="false" sql-index="12" tab-index="10" unit-text="gal">
+				<number/>
+			</field>
+		</head>
+		<page text="Debug" visible="false" icon="Warning.ico">
+			<field name="Quantity" text="Menge" sql-index="3" visible="false" number-columns-spanned="4">
+				<number/>
+			</field>
+			<field name="UnitKey" text="@tUnit" visible="false" sql-index="4">
+				<lookup table="tUnit"/>
+			</field>
+		</page>
+	</detail>
+</form>

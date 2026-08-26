@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?><form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" icon="Entry.ico" title="@tStockEntry.Administration" xsi:noNamespaceSchemaLocation="../../../../../../ch.minova.install/src/ch/minova/install/xsd/XMLForm.xsd" helper-class="ch.minova.tta.entry.helper.EntryHelper">
+	
+	<index-view id="IndexView" index-report="auto" source="dbo.vEntryIndex">
+		<column name="KeyText" size="60" text="@tEntry.KeyText">
+			<text length="10"/>
+		</column>
+		<column key="true" name="KeyLong" size="0" text="@KeyLong">
+			<number/>
+		</column>
+		<column name="BookingDay" size="60" text="@BookingDay">
+			<short-date/>
+		</column>
+		<column name="BookingDate" size="60" text="@BookingDate">
+			<date-time/>
+		</column>
+		<column name="TaxResponsableText" size="60" text="@tTaxResponsable">
+			<text length="60"/>
+		</column>
+		<column name="SupplierText" size="60" text="@tSupplier">
+			<text length="20"/>
+		</column>
+		<column name="TankText" size="60" text="@Tank">
+			<text length="20"/>
+		</column>
+		<column name="ItemText" size="60" text="@Item">
+			<text length="20"/>
+		</column>
+		<column name="DispatchNote" size="60" text="@tEntry.DispatchNote">
+			<text length="80"/>
+		</column>
+		<column name="Weight" size="60" text="@tStock.Weight" total="true">
+			<number/>
+		</column>
+		<column name="StandardVolume" size="60" text="@StandardVolume" total="true">
+			<number/>
+		</column>
+		<column name="Canceled" size="60" text="@tEntry.Canceled">
+			<boolean/>
+		</column>
+		<column name="Corrected" size="60" text="@tEntry.Corrected">
+			<boolean/>
+		</column>
+		<column name="Closed" size="60" text="@tEntry.Closed">
+			<boolean/>
+		</column>
+		<column name="AmbientVolume" size="60" text="@AmbientVolume" total="true">
+			<number/>
+		</column>
+		<column name="ModeOfTransportTypeText" size="60" text="@tModeOfTransportType">
+			<text length="60"/>
+		</column>
+		<column name="Mass" size="60" text="@tStock.Mass" total="true">
+			<number/>
+		</column>
+		<column name="TransportName" size="60" text="@tEntry.TransportName">
+			<text length="60"/>
+		</column>
+		<column name="Gallons" size="60" text="@Gallons" total="true">
+			<number/>
+		</column>
+		<column name="TaxCodeText" size="60" text="@tTaxCode">
+			<text length="60"/>
+		</column>
+		<column name="ClosingText" size="80" text="@tDailyClosing">
+			<text length="60"/>
+		</column>
+		<column name="LoadingPlace" size="80" text="@tEntry.LoadingPlace">
+			<text length="60"/>
+		</column>
+		<column name="AnalysisExists" size="60" text="@tEntry.AnalysisExists">
+			<boolean/>
+		</column>
+		<column name="Sample" size="60" text="@tEntry.Sample">
+			<text length="60"/>
+		</column>
+		<column name="AnalysisEntryText" size="60" text="@tEntry.AnalysisEntryKey">
+			<text length="10"/>
+		</column>
+		<column name="VehicleCount" size="40" text="@tEntry.VehicleCount" total="true">
+			<number/>
+		</column>
+		<column name="NoticedStandardVolume" size="60" text="@tEntry.NoticedStandardVolume" total="true">
+			<number/>
+		</column>
+		<column name="NoticedAmbientVolume" size="60" text="@tEntry.NoticedAmbientVolume" total="true">
+			<number/>
+		</column>
+		<column name="NoticedMass" size="60" text="@tEntry.NoticedMass" total="true">
+			<number/>
+		</column>
+		<column name="NoticedWeight" size="60" text="@tEntry.NoticedWeight" total="true">
+			<number/>
+		</column>
+		<column name="PreviousDocumentReference" size="60" text="@tEntry.PreviousDocumentReference">
+			<text length="20"/>
+		</column>
+		<column name="BatchNumber" text="@tEntry.BatchNumber">
+			<text length="20"/>
+		</column>
+		<column name="Remarks" text="@tEntry.Remarks">
+			<text length="50"/>
+		</column>
+		<column name="SpecialRemarks" text="@tEntry.SpecialRemarks">
+			<text length="50"/>
+		</column>
+		<column name="ExpectedDateOfArrival" size="60" text="@tEntry.ExpectedDateOfArrival">
+			<date-time/>
+		</column>
+		<column name="UnloadingPlant" text="@tEntry.UnloadingPlant">
+			<text length="20"/>
+		</column>
+		<column name="UnloadingStartDate" size="60" text="@tEntry.UnloadingStartDate">
+			<date-time/>
+		</column>
+		<column name="UnloadingStopDate" size="60" text="@tEntry.UnloadingStopDate">
+			<date-time/>
+		</column>
+		<column name="SupplierCompany" text="@tEntry.SupplierCompany">
+			<text length="50"/>
+		</column>
+		<column name="NoticedQuantity" size="60" text="@tEntry.NoticedQuantity" total="true">
+			<number/>
+		</column>
+		<column name="NoticedQuantity2" size="60" text="@tEntry.NoticedQuantity2" total="true">
+			<number/>
+		</column>
+		<column name="SourceItemText" size="60" text="@tEntry.SourceItemKey">
+			<text length="20"/>
+		</column>
+		<column name="MeterText" size="60" text="@tMeter">
+			<text length="20"/>
+		</column>
+		<column name="DepotText" size="60" text="@tEntry.DepotKey">
+			<text length="20"/>
+		</column>
+		<column name="TaxFreeReceiverText" size="60" text="@tTaxFreeReceiver">
+			<text length="20"/>
+		</column>
+		<column name="ArcCode" size="60" text="@tEntry.ARCCode">
+			<text length="25"/>
+		</column>
+		<column name="CustomsPositionText" text="@tEntry.CustomsPositionKey">
+			<text/>
+		</column>
+		<column name="CreationDate" size="60" text="@CreationDate">
+			<date-time/>
+		</column>
+		<column name="AnnouncementDay" size="60" text="@AnnouncementDay">
+			<short-date/>
+		</column>
+		<column name="AnnouncementDate" size="60" text="@AnnouncementDate">
+			<date-time/>
+		</column>
+		<column name="QuantityDeterminationTypeText" text="@tEntry.QuantityDeterminationTypeKey">
+			<text length="50"/>
+		</column>
+		<column name="IsBooked" size="60" text="@tEntry.IsBooked">
+			<boolean/>
+		</column>
+		<column name="EDECAcceptance" size="60" text="@tEntry.EDECAcceptance">
+			<boolean/>
+		</column>
+		
+	</index-view>
+	
+	<detail type="booking" procedure-suffix="EntryBooking" execute-always="true" button-copy-visible="true" button-announce-visible="true">
+		<head>
+			<button id="export" text="@Action.Export" icon="SendToCustoms.Command.ico">
+				<dynamic property="enabled">IsBooked &amp;&amp; CanceledKey==null &amp;&amp; !IsCanceled &amp;&amp; app.getPrefSystem("LicenseData/nctsdefinitionkey",
+					"0")&gt;0?true:false</dynamic>
+				
+			</button>
+			<field name="KeyLong" text="@tEntry.KeyLong" key-type="primary" sql-index="0" visible="false">
+				<number/>
+			</field>
+			<field name="KeyText" text="@tEntry.KeyText" sql-index="2" key-type="user">
+				<text length="10"/>
+				
+			</field>
+			<field name="BookingDate" text="@tEntry.BookingDate" sql-index="3" required="true">
+				<date-time/>
+				
+			</field>
+			<field name="ModeOfTransportTypeKey" text="@tModeOfTransportType" sql-index="4" required="true">
+				<lookup table="vModeOfTransportEntry" return-all-fields="true"/>
+				
+			</field>
+			<field name="StockEntryCount" text="@Booked" sql-index="1" read-only="true">
+				<boolean/>
+				
+			</field>
+			<field name="Remarks" text="@tEntry.Remarks" sql-index="5" fill="toright" number-columns-spanned="4">
+				<text length="50"/>
+				
+			</field>
+			<field name="AnnouncementDate" text="@AnnouncementDate" sql-index="54">
+				<date-time/>
+				<dynamic property="read-only">KeyLong != null &amp;&amp; IsBooked == 1</dynamic>
+			</field>
+		</head>
+		<page text="@LoadingData" icon="LoadingInformation.ico">
+			<field name="ClearanceDate" text="@tEntry.LoadingDate" sql-index="28">
+				<date-time/>
+				
+			</field>
+			<field name="EntryLoadTypeKey" text="@EntryLoadType" sql-index="47" number-columns-spanned="4">
+				<lookup table="vEntryLoadType" return-all-fields="true"/>
+				
+			</field>
+			<field name="EntryLoadDocument" text="@tEntry.LoadingNumber" sql-index="48" fill="toright" number-columns-spanned="4">
+				<text length="100"/>
+				
+			</field>
+			<field name="Sample" text="@tEntry.Sample" sql-index="30" fill="toright" number-columns-spanned="4">
+				<text length="30"/>
+				
+			</field>
+		</page>
+		<page text="@tVehicle" icon="Vehicle.ico">
+			<field name="VehicleKey" text="@tVehicle" sql-index="51" number-columns-spanned="4">
+				<lookup procedure-prefix="spEntryVehicle">
+					<param field-name="ModeOfTransportTypeKey"/>
+				</lookup>
+			</field>
+			<field name="TransportName" text="@tEntry.TransportName" sql-index="33" fill="toright" number-columns-spanned="4">
+				<text length="30"/>
+				
+			</field>
+			<field name="ShippingCompany" text="@tEntry.ShippingCompany" sql-index="31" fill="toright" number-columns-spanned="4">
+				<text length="50"/>
+				
+			</field>
+			<field name="VehicleCount" text="@tEntry.VehicleCount" sql-index="34">
+				<number/>
+				
+			</field>
+			<field name="CheckVehicleCount" text="@tEntry.CheckVehicleCount" sql-index="49">
+				<number/>
+				
+			</field>
+		</page>
+		<page text="@tEntry.LoadingPlace" icon="LoadingPlace.ico">
+			<field name="LoadingPlaceKey" text="@tEntry.LoadingPlace" sql-index="52" number-columns-spanned="4">
+				<lookup procedure-prefix="spLoadingPlace"/>
+			</field>
+			<field name="LoadingPlace" text="@tEntry.DescriptionLoadingPlace" sql-index="29" fill="toright" number-columns-spanned="4">
+				<text length="50"/>
+				
+			</field>
+			<field name="SupplierCompany" text="@tEntry.SupplierCompany" sql-index="32" fill="toright" number-columns-spanned="4">
+				<text length="50"/>
+				
+			</field>
+			<field name="CountryCodeKey" text="@CountryCode" sql-index="39" number-columns-spanned="4">
+				<lookup table="tCountryCode"/>
+				
+			</field>
+		</page>
+		<page text="@Avis" icon="LoadingPaper.ico">
+			<field name="QuantityDetermination" text="@tEntry.QuantityDeterminationTypeKey" required="true" sql-index="13" tab-index="0">
+				<lookup table="vEntryQuantityDeterminationType" return-all-fields="true"/>
+				
+			</field>
+			<field name="NoticedAmbientVolume" text="@tEntry.AmbientVolume" required="true" sql-index="17" tab-index="4" unit-text="@unit.AmbientVolume">
+				<number/>
+				
+			</field>
+			<field name="NoticedAmbientDensity" text="@tEntry.AmbientDensity" required="true" sql-index="18" tab-index="1" unit-text="@unit.Density">
+				<number decimals="1"/>
+				
+			</field>
+			<field name="NoticedStandardVolume" text="@tEntry.StandardVolume" required="true" sql-index="16" tab-index="5" unit-text="@unit.StandardVolume">
+				<number/>
+				
+			</field>
+			<field name="NoticedAmbientTemperature" text="@tEntry.MeasuredTemperature" required="true" sql-index="19" tab-index="2" unit-text="@tUnit.celcius">
+				<number decimals="1"/>
+				
+			</field>
+			<field name="NoticedWeight" text="@tEntry.Weight" required="true" sql-index="14" tab-index="6" unit-text="@unit.Weight">
+				<number/>
+				
+			</field>
+			<field name="NoticedStandardDensity" text="@tEntry.StandardDensity" required="true" sql-index="20" tab-index="3" unit-text="@unit.Density">
+				<number decimals="1"/>
+				
+			</field>
+			<field name="NoticedMass" text="@tEntry.Mass" required="true" sql-index="15" tab-index="7" unit-text="@unit.Mass">
+				<number/>
+				
+			</field>
+			<field name="NoticedGallons" text="@tEntry.Gallons" sql-index="46" tab-index="8" unit-text="@unit.Gallons">
+				<number/>
+				
+			</field>
+		</page>
+		<page text="@Unload" icon="WorkingTime.ico">
+			<field name="ExpectedDateOfArrival" text="@ArrivalDate" sql-index="35">
+				<date-time/>
+				
+			</field>
+			<field name="UnloadingPlant" text="@tEntry.UnloadingPlant" sql-index="50" fill="toright" number-columns-spanned="4">
+				<text length="20"/>
+				
+			</field>
+			<field name="UnloadStartDate" text="@UnloadingStart" sql-index="36">
+				<date-time/>
+				
+			</field>
+			<field name="UnloadStopDate" text="@Until" sql-index="37">
+				<date-time/>
+				
+			</field>
+		</page>
+		<page text="@tEntry.Group.SourceStock" icon="Stock.ico">
+			<button text="@Action.ChangeDispatchNote" icon="SaveRecord.Command.ico" id="ChangeDispatchNote" enabled="false">
+				<dynamic property="enabled">IsBooked &amp;&amp; CanceledKey==null &amp;&amp; !IsCanceled</dynamic>
+			</button>
+			<field name="TaxResponsableKey" text="@tEntry.TaxResponsableKey" sql-index="6" required="true" number-columns-spanned="4">
+				<lookup table="tTaxResponsable"/>
+				
+			</field>
+			<field name="SupplierKey" text="@tEntry.SupplierKey" sql-index="7" required="true" number-columns-spanned="4">
+				<lookup table="vEntrySupplier" return-all-fields="true"/>
+				
+			</field>
+			<field name="TankKey" text="@tStockEntry.TankKey" sql-index="8" required="false" number-columns-spanned="4">
+				<lookup table="tTank"/>
+				
+			</field>
+			<field name="ItemKey" text="@tEntry.ItemKey" sql-index="9" required="true" number-columns-spanned="4">
+				<lookup table="vEntryItem" return-all-fields="true"/>
+				
+			</field>
+			<field name="FormUsed" offline="true" visible="false" default="Entry">
+				<text length="10"/>
+				
+			</field>
+			<field name="TaxCodeKey" text="@tEntry.TaxCodeKey" sql-index="11" required="true" number-columns-spanned="4">
+				<lookup procedure-prefix="spBookingTaxCode">
+					<param field-name="ItemKey"/>
+					<param field-name="FormUsed"/>
+				</lookup>
+				
+			</field>
+			<field name="DepotKey" text="@tEntry.DepotKey" sql-index="38" number-columns-spanned="4" required="false">
+				<lookup procedure-prefix="spEntryDepot"/>
+				
+			</field>
+			<field name="TaxFreeReceiverKey" text="@tTaxFreeReceiver" sql-index="10" number-columns-spanned="4" required="false">
+				<lookup table="tTaxFreeReceiver"/>
+				
+			</field>
+			<field name="DispatchNote" text="@tEntry.DispatchNote" sql-index="12" fill="toright" number-columns-spanned="4" required="false">
+				<text length="30"/>
+				
+			</field>
+		</page>
+		<page text="@Booked" icon="BookedQuantity.ico">
+			
+			<field name="BookingAmbientDensity" text="@tEntry.AmbientDensity" sql-index="25" tab-index="0" read-only="true" unit-text="@unit.Density">
+				<number decimals="1"/>
+			</field>
+			<field name="BookingAmbientVolume" text="@tEntry.AmbientVolume" sql-index="24" tab-index="4" read-only="true" unit-text="@unit.AmbientVolume">
+				<number/>
+			</field>
+			<field name="BookingAmbientTemperature" text="@tEntry.MeasuredTemperature" sql-index="26" tab-index="1" read-only="true" unit-text="@tUnit.celcius">
+				<number decimals="1"/>
+			</field>
+			<field name="BookingStandardVolume" text="@tEntry.StandardVolume" sql-index="23" tab-index="5" read-only="true" unit-text="@unit.StandardVolume">
+				<number/>
+			</field>
+			<field name="BookingStandardDensity" text="@tEntry.StandardDensity" sql-index="27" tab-index="3" read-only="true" unit-text="@unit.Density">
+				<number decimals="1"/>
+			</field>
+			<field name="BookingWeight" text="@tEntry.Weight" sql-index="21" tab-index="6" read-only="true" unit-text="@unit.Weight">
+				<number/>
+			</field>
+			<field name="BookingMass" text="@tEntry.Mass" sql-index="22" tab-index="7" read-only="true" unit-text="@unit.Mass">
+				<number/>
+			</field>
+			<field name="BookingGallons" text="@tEntry.Gallons" sql-index="45" tab-index="8" read-only="true" unit-text="@unit.Gallons">
+				<number/>
+			</field>
+		</page>
+		<page text="@tEntry.Debug" visible="false" icon="Warning.ico">
+			<field name="OriginalKey" text="@tEntry.OriginalKey" sql-index="40" read-only="true">
+				<number/>
+			</field>
+			<field name="CorrectedKey" text="@tEntry.CorrectedKey" sql-index="41" read-only="true">
+				<number/>
+			</field>
+			<field name="CanceledKey" text="@tEntry.CanceledKey" sql-index="42" read-only="true">
+				<number/>
+			</field>
+			<field name="IsBooked" text="@tEntry.IsBooked" sql-index="43" read-only="true">
+				<boolean/>
+			</field>
+			<field name="IsCanceled" text="@tEntry.IsCanceled" sql-index="44" read-only="true">
+				<boolean/>
+			</field>
+			<field name="JobDefinitionKey" visible="false" offline="true" text="@tJobDefinition">
+				<text length="20"/>
+			</field>
+			<field name="JobDefinitionText" visible="false" offline="true">
+				<text length="20"/>
+			</field>
+			<field name="GallonsUsed" text="@tSupplier.GallonsUsed" offline="true" read-only="true">
+				<boolean/>
+			</field>
+			<field name="BookingTypeKey" text="BookingTypeKey" sql-index="53" read-only="true" default="3">
+				<number/>
+			</field>
+		</page>
+	</detail>
+	<events>
+		<onclick refid="ChangeDispatchNote">
+			<procedure name="spChangeDispatchNoteEntryBooking">
+				<param field-name="KeyLong" type="OUTPUT"/>
+				<param field-name="StockEntryCount" type="OUTPUT"/>
+				<param field-name="KeyText"/>
+				<param field-name="BookingDate"/>
+				<param field-name="ModeOfTransportTypeKey"/>
+				<param field-name="Remarks"/>
+				<param field-name="TaxResponsableKey"/>
+				<param field-name="SupplierKey"/>
+				<param field-name="TankKey"/>
+				<param field-name="ItemKey"/>
+				<param field-name="TaxFreeReceiverKey"/>
+				<param field-name="TaxCodeKey"/>
+				<param field-name="DispatchNote"/>
+				<param field-name="QuantityDetermination"/>
+				<param field-name="NoticedWeight"/>
+				<param field-name="NoticedMass"/>
+				<param field-name="NoticedStandardVolume"/>
+				<param field-name="NoticedAmbientVolume"/>
+				<param field-name="NoticedAmbientDensity"/>
+				<param field-name="NoticedAmbientTemperature"/>
+				<param field-name="NoticedStandardDensity"/>
+				<param field-name="BookingWeight"/>
+				<param field-name="BookingMass"/>
+				<param field-name="BookingStandardVolume"/>
+				<param field-name="BookingAmbientVolume"/>
+				<param field-name="BookingAmbientDensity"/>
+				<param field-name="BookingAmbientTemperature"/>
+				<param field-name="BookingStandardDensity"/>
+				<param field-name="ClearanceDate"/>
+				<param field-name="LoadingPlace"/>
+				<param field-name="Sample"/>
+				<param field-name="ShippingCompany"/>
+				<param field-name="SupplierCompany"/>
+				<param field-name="TransportName"/>
+				<param field-name="VehicleCount"/>
+				<param field-name="ExpectedDateOfArrival"/>
+				<param field-name="UnloadStartDate"/>
+				<param field-name="UnloadStopDate"/>
+				<param field-name="DepotKey"/>
+				<param field-name="CountryCodeKey"/>
+				<param field-name="OriginalKey"/>
+				<param field-name="CorrectedKey"/>
+				<param field-name="CanceledKey"/>
+				<param field-name="IsBooked"/>
+				<param field-name="IsCanceled"/>
+				<param field-name="BookingGallons"/>
+				<param field-name="NoticedGallons"/>
+				<param field-name="EntryLoadTypeKey"/>
+				<param field-name="EntryLoadDocument"/>
+				<param field-name="CheckVehicleCount"/>
+				<param field-name="UnloadingPlant"/>
+				<param field-name="VehicleKey"/>
+				<param field-name="LoadingPlaceKey"/>
+			</procedure>
+		</onclick>
+		<onclick refid="export">
+			<serviceevent class="ch.minova.service.JobExecutorEvent" service="JobExecutor" wait-for-answer="300" reload="true">
+				<ref-param ref-name="JobDefinitionText"/>
+				<ref-param ref-name="KeyLong" type="int"/>
+			</serviceevent>
+		</onclick>
+		<onbinder action="save">
+			<procedure name="spRunBookingStarter">
+				<param field-name="KeyLong"/>
+			</procedure>
+			<binder action="read"/>
+		</onbinder>
+	</events>
+</form>

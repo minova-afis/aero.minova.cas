@@ -166,6 +166,10 @@ public class FilesController {
 //		return fileBytesTable;
 //	}
 
+	public byte[] getFile(String path) throws Exception {
+		return getFile(path, null);
+	}
+
 	/**
 	 * Verarbeitet User-Anfragen zum Senden eines Files. Falls das angefragte File gefunden werden kann, wird es zurückgegeben, andernfalls wird entweder eine
 	 * FileNotFoundException oder eine IllegalAccessException geworfen.
@@ -258,6 +262,10 @@ public class FilesController {
 		return readAllBytes(inputPath);
 	}
 
+	public byte[] getHash(String path) throws Exception {
+		return getHash(path, null);
+	}
+
 	/**
 	 * Sucht die MD5-Datei bestimmten Files im Internal/MD5-Verzeichnis und gibt diese zurück.
 	 *
@@ -321,9 +329,6 @@ public class FilesController {
 		boolean liveMD5calc = path.toLowerCase().endsWith(".mdi") || path.toLowerCase().endsWith(".xbs");
 
 		if (isFatJarMode || liveMD5calc) {
-			if (!path.startsWith("/")) {
-				path = "/" + path;
-			}
 			final byte[] pathContent;
 			if (path.endsWith(".zip")) {
 				pathContent = getZip(path);

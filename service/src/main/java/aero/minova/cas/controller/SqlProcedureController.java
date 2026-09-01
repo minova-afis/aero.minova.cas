@@ -28,6 +28,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.profiling.Profiler;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.QueueService;
 import aero.minova.cas.service.SecurityService;
@@ -53,6 +54,9 @@ public class SqlProcedureController {
 
 	@Setter
 	QueueService queueService;
+
+	@org.springframework.beans.factory.annotation.Value("${cas.profiling.always-enabled:false}")
+	boolean alwaysProfile;
 
 	final Object extensionSynchronizer = new Object();
 
@@ -115,7 +119,7 @@ public class SqlProcedureController {
 
 			extensionSetupTable.addRow(extensionSetupRows);
 		}
-		try {	// how: only open Try - catch
+		try { // how: only open Try - catch
 			procedureService.unsecurelyProcessProcedure(extensionSetupTable, true);
 		} catch (Exception e) {
 			customLogger.logError("Error while trying to setup extension privileges!", e);
@@ -163,6 +167,8 @@ public class SqlProcedureController {
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: ", inputTable);
+		boolean profiling = alwaysProfile || inputTable.isProfile();
+		Profiler profiler = profiling ? Profiler.push() : null;
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
 
@@ -172,7 +178,16 @@ public class SqlProcedureController {
 				return extensionResult.get();
 			}
 
-			val result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
+			val body = processSqlProcedureRequest(inputTable, privilegeRequest);
+
+			ResponseEntity result;
+			if (profiling) {
+				body.setProfilingResult(profiler.toProfilingResult());
+				body.getProfilingResult().setTransactionOverhead(profiler.toTransactionOverhead());
+				result = ResponseEntity.status(HttpStatus.ACCEPTED).header("X-Profiling-Time", profiler.getTotalMs() + "ms").body(body);
+			} else {
+				result = new ResponseEntity(body, HttpStatus.ACCEPTED);
+			}
 			queueService.accept(inputTable, result);
 
 			return result;
@@ -181,6 +196,10 @@ public class SqlProcedureController {
 
 			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
 			throw new ProcedureException(e);
+		} finally {
+			if (profiling) {
+				Profiler.pop();
+			}
 		}
 	}
 
@@ -219,7 +238,7 @@ public class SqlProcedureController {
 	private List<Row> checkForPrivilegeAndBootstrapExtension(Table inputTable) throws Exception, ProcedureException {
 		final List<Row> privilegeRequest = new ArrayList<>();
 		if (securityService.arePrivilegeStoresSetup()) {
-			privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
+			privilegeRequest.addAll(Profiler.timePrivilegeCheck(() -> securityService.getPrivilegePermissions(inputTable.getName())));
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}

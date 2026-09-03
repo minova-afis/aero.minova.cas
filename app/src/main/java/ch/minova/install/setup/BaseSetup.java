@@ -36,6 +36,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import aero.minova.cas.CustomLogger;
+import aero.minova.cas.resources.ResourcePath;
 import aero.minova.cas.setup.xml.setup.ScriptType;
 import aero.minova.cas.setup.xml.setup.SetupType;
 import aero.minova.cas.setup.xml.setup.TableschemaType;
@@ -449,7 +450,11 @@ public class BaseSetup {
 			return readFromJarFileToInputStream(getVersionInfo().getModulName(), "tables", tableName + ".table.xml");
 		} else {
 			try {
-				if (true) {
+				// tableLibrary kann entweder ein virtueller ResourcePath (Fat-Jar-Classpath) oder ein echter Pfad auf der
+				// Festplatte sein (Nicht-Fat-Jar-Modus, oder das CAS-12-Legacy-Verzeichnis, siehe doc/md/CAS12Compatibility.md).
+				// FILE_SYSTEM_PROVIDER.walk(...) akzeptiert ausschliesslich ResourcePaths und wirft sonst eine
+				// IllegalArgumentException, daher muss hier unterschieden werden.
+				if (tableLibrary.get() instanceof ResourcePath) {
 					final Optional<Path> tableXml = FILE_SYSTEM_PROVIDER.walk(tableLibrary.get()).stream().map(path -> {
 						// TODO Einheitliche XML-Namen verwenden.
 						if (Files.isRegularFile(path) && path.getFileName().toString().equals(tableName + ".table.xml")

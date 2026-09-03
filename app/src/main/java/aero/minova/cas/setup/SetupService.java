@@ -25,6 +25,7 @@ import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.controller.SqlViewController;
+import aero.minova.cas.resources.ResourcePath;
 import aero.minova.cas.service.FilesService;
 import aero.minova.cas.setup.dependency.DependencyOrder;
 import aero.minova.cas.sql.SystemDatabase;
@@ -70,10 +71,26 @@ public class SetupService {
 				// So können auch längere SQL Benutzernamen genutzt werden, ohne die Tabellen anzupasssen (Siehe Azure SKY).
 				try (final var connection = database.getConnection()) {
 					setAnsiWarnings(connection, false);
-					readSetups(service.getSystemFolder().resolve("setup").resolve("Setup.xml")//
-							, service.getSystemFolder().resolve("setup").resolve("dependency-graph.json")//
-							, service.getSystemFolder().resolve("setup")//
-							, true);
+					final Path nativeRoot = service.getSystemFolder();
+					readSetups(nativeRoot.resolve("setup").resolve("Setup.xml")//
+							, nativeRoot.resolve("setup").resolve("dependency-graph.json")//
+							, nativeRoot.resolve("setup")//
+							, true, nativeRoot, true);
+
+					// Abwärtskompatibilität zu CAS 12: Ist ein Legacy-Verzeichnis konfiguriert, wird dessen Setup zusätzlich
+					// ausgeführt (nicht statt des CAS-13-eigenen), damit sichergestellt ist, dass sowohl native als auch aus
+					// CAS 12 übernommene Schemas/Prozeduren installiert werden. Fehlt dort ein Setup (z.B. weil der Kunde
+					// keine eigene DB-relevante Legacy-Konfiguration hat), wird das nur geloggt, nicht als Fehler behandelt.
+					// Siehe doc/md/CAS12Compatibility.md.
+					if (service.hasLegacyFallback()) {
+						final Path legacyRoot = service.getLegacyRoot();
+						logger.logSetup("Legacy-Verzeichnis konfiguriert (" + legacyRoot + ") -- führe zusätzliches Setup aus.");
+						readSetups(legacyRoot.resolve("setup").resolve("Setup.xml")//
+								, legacyRoot.resolve("setup").resolve("dependency-graph.json")//
+								, legacyRoot.resolve("setup")//
+								, true, legacyRoot, false);
+					}
+
 					svc.setupExtensions();
 					spc.setupExtensions();
 
@@ -107,38 +124,56 @@ public class SetupService {
 	}
 
 	/**
-	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück. Wird eine Setup.xml nicht gefunden läuft
-	 * das Setup trotzdem weiter
+	 * Liest die setup-Dateien der Dependencies und gibt eine Liste an Strings mit den benötigten SQL-Dateien zurück. Wird eine Setup.xml einer Dependency
+	 * nicht gefunden läuft das Setup trotzdem weiter.
 	 *
-	 * @param arg
-	 *            Ein String, in welchem die benötigten Dependencies stehen.
+	 * @param setupPath
+	 *            Pfad zur Haupt-"Setup.xml".
+	 * @param dependencyList
+	 *            Pfad zur "dependency-graph.json".
+	 * @param dependencySetupsDir
+	 *            Verzeichnis, in dem nach den "Setup.xml"s der Dependencies gesucht wird.
+	 * @param setupTableSchemas
+	 *            Ob Tabellen-Schemas installiert werden sollen.
+	 * @param filesRoot
+	 *            Wurzelverzeichnis, unter dem sich "tables" und "sql" für diesen Lauf befinden (siehe {@link InstallToolIntegration#installSetup(Path, Path)}).
+	 * @param required
+	 *            Ob eine fehlende Haupt-"Setup.xml" das Setup abbrechen soll (true, CAS-13-eigenes Setup) oder nur geloggt wird (false, optionaler
+	 *            CAS-12-Legacy-Lauf, siehe doc/md/CAS12Compatibility.md).
 	 */
-	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas) throws IOException {
-		List<String> dependencies = DependencyOrder.determineDependencyOrder(Files.readString(dependencyList));
-		logger.logSetup("Dependency Installation Order: " + dependencies);
+	List<String> readSetups(Path setupPath, Path dependencyList, Path dependencySetupsDir, boolean setupTableSchemas, Path filesRoot, boolean required)
+			throws IOException {
 		final List<String> procedures = new ArrayList<>();
-		for (String dependency : dependencies) {
-			logger.logSetup("Searching for setup.xml for dependency " + dependency);
-			final Optional<Path> setupXml = findSetupXml(dependency, dependencySetupsDir);
-			if (setupXml.isEmpty()) {
-				logger.logError("No setup file found for dependency " + dependency + ". Continuing with setup.");
-				continue;
+		if (Files.exists(dependencyList)) {
+			List<String> dependencies = DependencyOrder.determineDependencyOrder(Files.readString(dependencyList));
+			logger.logSetup("Dependency Installation Order: " + dependencies);
+			for (String dependency : dependencies) {
+				logger.logSetup("Searching for setup.xml for dependency " + dependency);
+				final Optional<Path> setupXml = findSetupXml(dependency, dependencySetupsDir);
+				if (setupXml.isEmpty()) {
+					logger.logError("No setup file found for dependency " + dependency + ". Continuing with setup.");
+					continue;
+				}
+				logger.logSetup("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);
+				if (setupTableSchemas) {
+					installToolIntegration.installSetup(setupXml.get(), filesRoot);
+				}
+				final List<String> newProcedures = readProceduresToList(setupXml.get());
+				procedures.addAll(newProcedures);
 			}
-			logger.logSetup("Installing setup: " + setupXml + ", " + dependency + ", " + dependencySetupsDir);
-			if (setupTableSchemas) {
-				installToolIntegration.installSetup(setupXml.get());
-			}
-			final List<String> newProcedures = readProceduresToList(setupXml.get());
-			procedures.addAll(newProcedures);
+		} else {
+			logger.logSetup("No dependency list found at " + dependencyList + " -- skipping dependency setups for this run.");
 		}
 		if (Files.exists(setupPath)) {
 			if (setupTableSchemas) {
-				installToolIntegration.installSetup(setupPath);
+				installToolIntegration.installSetup(setupPath, filesRoot);
 			}
 			List<String> newProcedures = readProceduresToList(setupPath);
 			procedures.addAll(newProcedures);
-		} else {
+		} else if (required) {
 			throw new NoSuchFileException("No main-setup file '" + setupPath + "' found!");
+		} else {
+			logger.logSetup("No main setup file '" + setupPath + "' found -- skipping this optional setup run.");
 		}
 		return procedures;
 	}
@@ -150,7 +185,7 @@ public class SetupService {
 	 *            Name der Abhängigkeit.
 	 * @return Setup.xml der Abhängigkeit.
 	 */
-	private Optional<Path> findSetupXml(String dependency, Path dependencySetupsDir) {
+	private Optional<Path> findSetupXml(String dependency, Path dependencySetupsDir) throws IOException {
 		String niceSetupFile = dependency + ".setup.xml";
 		Path dependencySetupFile = dependencySetupsDir.resolve(niceSetupFile);
 		if (Files.exists(dependencySetupFile)) {
@@ -163,14 +198,33 @@ public class SetupService {
 		 */
 		final String adjustedDependency = dependency.substring(dependency.indexOf(".", dependency.indexOf(".") + 1) + 1);
 
-		return FILE_SYSTEM_PROVIDER.walk(dependencySetupsDir).stream().map(dir -> {
-			if ((dir.toString().startsWith("setup/" + adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency))
-					&& dir.getFileName().toString().equalsIgnoreCase("Setup.xml")) {
-				return Optional.of(dir);
-			}
-			return Optional.<Path> empty();
-		}).filter(Optional::isPresent).map(Optional::get).findFirst();
+		// dependencySetupsDir kann entweder ein virtueller ResourcePath (Fat-Jar-Classpath) oder ein echter Pfad auf der
+		// Festplatte sein (Nicht-Fat-Jar-Modus, oder das CAS-12-Legacy-Verzeichnis, siehe doc/md/CAS12Compatibility.md).
+		// FILE_SYSTEM_PROVIDER.walk(...) akzeptiert ausschliesslich ResourcePaths und wirft sonst eine IllegalArgumentException,
+		// daher muss hier unterschieden werden (analog zu BaseSetup.readTableXml).
+		if (dependencySetupsDir instanceof ResourcePath) {
+			return FILE_SYSTEM_PROVIDER.walk(dependencySetupsDir).stream().map(dir -> {
+				if ((dir.toString().startsWith("setup/" + adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency))
+						&& dir.getFileName().toString().equalsIgnoreCase("Setup.xml")) {
+					return Optional.of(dir);
+				}
+				return Optional.<Path> empty();
+			}).filter(Optional::isPresent).map(Optional::get).findFirst();
+		}
 
+		if (!Files.isDirectory(dependencySetupsDir)) {
+			return Optional.empty();
+		}
+		try (var files = Files.walk(dependencySetupsDir)) {
+			return files.map(dir -> {
+				String relative = "setup/" + dependencySetupsDir.relativize(dir).toString().replace('\\', '/');
+				if ((relative.startsWith("setup/" + adjustedDependency + "-") || dir.getFileName().toString().equals(adjustedDependency))
+						&& dir.getFileName().toString().equalsIgnoreCase("Setup.xml")) {
+					return Optional.of(dir);
+				}
+				return Optional.<Path> empty();
+			}).filter(Optional::isPresent).map(Optional::get).findFirst();
+		}
 	}
 
 	/**

@@ -44,6 +44,33 @@ spring.datasource.password=XXX
 
 TODO: Vielleicht könnten wird die Aufteilung in `cas.extension.parent` und `cas.extension.deployment` in Zukunft irgendwie abschaffen.
 
+== Abwärtskompatibilität zu CAS 12
+
+Für CAS-12-Kundenprojekte, die noch nicht auf die obige Struktur umgebaut wurden, kann optional
+`legacy.system.files.path` gesetzt werden (z.B. auf das alte `system-files`-Verzeichnis). Ist die
+Property gesetzt, hat dieses Verzeichnis im `fat.jar.mode` Vorrang vor dem Fat-Jar: Dateien werden
+zuerst dort gesucht, und nur falls dort nicht gefunden, aus dem Fat-Jar geladen (gilt für
+`files/read`, `files/hash` und `files/zip`). Grund: Ist `legacy.system.files.path` konfiguriert,
+enthält dieses Verzeichnis die vollständigen, massgeblichen Daten für diese Installation und soll
+daher eine gleichnamige (evtl. nur generische) CAS-13-eigene Ressource überschreiben können.
+
+Für kompilierte CAS-12-Extension-Jars (`docker-extension-layer`) gibt es dagegen KEINEN Fallback im
+obigen Sinn -- Java-Klassen müssen bereits beim Start auf dem Classpath liegen, ein "erst
+CAS-13-Weg versuchen, dann CAS-12-Weg" wie bei Dateien ist hier nicht möglich. Stattdessen wird das
+Verzeichnis `/opt/aero.minova.cas/lib-legacy/` unconditional bei jedem Start über Spring Boots
+`PropertiesLauncher` (`loader.path`) auf den Classpath gelegt, falls es existiert -- fehlt das
+Verzeichnis, wird es stillschweigend ignoriert.
+
+WICHTIG: `loader.path` wird dafür als `ENV LOADER_PATH` im Root-`Dockerfile` gesetzt, NICHT in
+einer `application.properties`. `PropertiesLauncher` löst `loader.path` auf, bevor der Classpath aus
+den `BOOT-INF/lib/*.jar`-Abhängigkeiten aufgebaut ist -- ein Eintrag in einer dort verschachtelten
+`application.properties` (z.B. in `cas.service.jar`, wenn dieses als Abhängigkeit in
+`customer-build-project`s Fat-Jar landet) wird zu diesem Zeitpunkt nicht gelesen und hat daher
+keinen Effekt.
+
+Details und die noch offene Frage der Binärkompatibilität alter Extension-Jars siehe
+`doc/md/CAS12Compatibility.md`.
+
 
 Alle internen und externen Abhängigkeiten können frei hinzugefügt werden.
 

@@ -12,6 +12,14 @@ LABEL maintainer=service@minova.com
 COPY customer-build-project/target/aero.minova.cas.jar /opt/aero.minova.cas/lib/
 
 ENV aero_minova_core_application_root_path='/'
+
+# CAS-12-Abwärtskompatibilität (siehe doc/md/CAS12Compatibility.md): Verzeichnis für alte,
+# kompilierte Extension-Jars. Muss als ENV (nicht als application.properties-Eintrag) gesetzt
+# werden, da Spring Boots PropertiesLauncher "loader.path" bootet, bevor der Classpath aus den
+# BOOT-INF/lib/*.jar-Abhängigkeiten (u.a. cas.service.jar) aufgebaut ist -- ein Eintrag in einer
+# dort verschachtelten application.properties wird zu diesem Zeitpunkt nicht gelesen. Existiert das
+# Verzeichnis nicht (Standardfall ohne Legacy-Extensions), wird es von PropertiesLauncher ignoriert.
+ENV LOADER_PATH=/opt/aero.minova.cas/lib-legacy/
 ENTRYPOINT ["/opt/java/openjdk/bin/java"]
 CMD ["-jar", "/opt/aero.minova.cas/lib/aero.minova.cas.jar"]
 

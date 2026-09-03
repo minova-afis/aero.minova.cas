@@ -66,7 +66,7 @@ the fat jar" bullet under "What changed" below for the full rationale.
 New config property (default empty = fallback disabled):
 
 ```properties
-legacy.system.files.path=/opt/aero.minova.cas/system-files
+legacy.system.files.path=/opt/aero.minova.cas/system-files-legacy
 ```
 
 ### `service/src/main/java/aero/minova/cas/service/FilesService.java`

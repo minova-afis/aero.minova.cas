@@ -118,11 +118,16 @@ carries over unchanged.
 
 ## 6. Known gap — not yet verified
 
-- **Extension jar binary/API compatibility.** Old extension jars were compiled against CAS 12's
-  `cas.service`/`cas.setup` API surface and the CAS-12-era `registerExtension(...)` calling
-  convention. Being on the classpath and registering (confirmed above) does not by itself prove
-  every extension's behavior is still correct against CAS 13's current APIs — worth a closer
-  functional check per extension, especially for less commonly exercised code paths.
+- **Extension jar binary/API compatibility — accepted risk, explicitly not addressed.** Old
+  extension jars were compiled against CAS 12's `cas.service`/`cas.setup` API surface and the
+  CAS-12-era `registerExtension(...)` calling convention. Being on the classpath and registering
+  (confirmed above) does not by itself prove every extension's behavior is still correct against
+  CAS 13's current APIs. Because registration happens eagerly (`@PostConstruct`), a signature break
+  hit on that path fails loudly at CAS boot — but a break inside the registered procedure/view
+  logic itself stays latent until that specific procedure is actually invoked, possibly long after
+  boot. Decision: not verified further (e.g. no diff of `Table`/`Row`/`Column`/`Value` and other
+  extension-facing domain APIs between v12/v13) — will be diagnosed reactively if/when it comes up
+  per extension, rather than pre-verified.
 - Building the full reactor (`mvn package`/`install` from repo root or `-pl app -am`) currently
   fails in this environment at `cas.resource.maven.plugin:generate-resource-file` on `cas.app`
   (`ResourceListGenerator was not able to copy messages_de.properties ... `) — reproducible even

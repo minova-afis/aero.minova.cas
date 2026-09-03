@@ -247,14 +247,26 @@ the fuzzy fallback lookup finds a real-disk `Setup.xml` via a non-exact-name mat
 same real customer system that originally surfaced the `findSetupXml` bug, and both the CAS 13
 native setup pass and the CAS 12 legacy setup pass executed successfully.
 
-## Known gap: extension jar binary compatibility (deferred)
+## Known gap: extension jar binary compatibility (accepted risk, not addressed)
 
 This assumes old extension jars (compiled against CAS 12's `cas.service`/`cas.setup` APIs and the
 `registerExtension(...)` calling convention from that version) still link and behave correctly
 against CAS 13's current API surface once they're on the classpath. That's a binary-API-compatibility
-question, not a classpath-loading one, and hasn't been verified here. Per decision: treated as safe
-for now; if it turns out old extension jars don't load or misbehave once actually on the classpath,
-that will be diagnosed and fixed separately from the loading mechanism above.
+question, not a classpath-loading one, and hasn't been verified here.
+
+Java resolves method calls lazily per call-site, not eagerly for a whole class at load time. Since
+extensions in this codebase register via a `@PostConstruct` method that calls
+`registerExtension(...)` immediately, a signature break on that eager registration path fails
+loudly at CAS boot (`NoSuchMethodError`/`NoClassDefFoundError`/`AbstractMethodError`). A break
+*inside* the registered procedure/view lambda itself, however, stays completely latent — the
+extension loads and registers fine, and only crashes the first time someone actually invokes that
+specific procedure, however long after boot that is.
+
+**Decision (explicit, not an oversight): this risk is accepted as-is.** No further verification or
+mitigation (e.g. diffing `Table`/`Row`/`Column`/`Value`/`SqlProcedureResult` and other
+extension-facing APIs between v12 and v13) was done. If an old extension jar breaks at runtime, it
+will be diagnosed and fixed reactively when it comes up, separately from the loading mechanism
+above.
 
 ## Operator-facing summary
 

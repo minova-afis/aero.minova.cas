@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
     <artifactId>aero.minova.service.mcas</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>13.7.0</version>
     <name>µCAS - Standalone CAS Service</name>
     <description>
         Standalone µCAS service with database-based file access.
@@ -16,7 +14,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.deployment</artifactId>
-        <version>13.6.2-SNAPSHOT</version>
+        <version>13.7.0</version>
         <relativePath>../cas.extension.deployment</relativePath>
     </parent>
     
@@ -95,51 +93,45 @@
                         </goals>
                         <configuration>
                             <target>
-                                <echo message="Creating µCAS directory structure..."/>
-                                <mkdir dir="${project.build.outputDirectory}/files"/>
-                                <mkdir dir="${project.build.outputDirectory}/forms"/>
-                                <mkdir dir="${project.build.outputDirectory}/i18n"/>
-                                <mkdir dir="${project.build.outputDirectory}/images"/>
-                                <mkdir dir="${project.build.outputDirectory}/pdf"/>
-                                <mkdir dir="${project.build.outputDirectory}/plugins"/>
-                                <mkdir dir="${project.build.outputDirectory}/reports"/>
-                                <mkdir dir="${project.build.outputDirectory}/setup"/>
-                                <mkdir dir="${project.build.outputDirectory}/sql"/>
-                                <mkdir dir="${project.build.outputDirectory}/tables"/>
+                                <echo message="Creating µCAS directory structure..." />
+                                <mkdir dir="${project.build.outputDirectory}/files" />
+                                <mkdir dir="${project.build.outputDirectory}/forms" />
+                                <mkdir dir="${project.build.outputDirectory}/i18n" />
+                                <mkdir dir="${project.build.outputDirectory}/images" />
+                                <mkdir dir="${project.build.outputDirectory}/pdf" />
+                                <mkdir dir="${project.build.outputDirectory}/plugins" />
+                                <mkdir dir="${project.build.outputDirectory}/reports" />
+                                <mkdir dir="${project.build.outputDirectory}/setup" />
+                                <mkdir dir="${project.build.outputDirectory}/sql" />
+                                <mkdir dir="${project.build.outputDirectory}/tables" />
 
                                 <!-- Copy cas.app Setup.xml with correct naming for findSetupXml -->
-                                <echo message="Copying cas.app Setup.xml as dependency setup file..."/>
-                                <copy file="${project.build.directory}/cas-app-extracted/setup/Setup.xml"
-                                      tofile="${project.build.outputDirectory}/setup/aero.minova.cas.app.setup.xml"
-                                      failonerror="true"/>
+                                <echo message="Copying cas.app Setup.xml as dependency setup file..." />
+                                <copy file="${project.build.directory}/cas-app-extracted/setup/Setup.xml" tofile="${project.build.outputDirectory}/setup/aero.minova.cas.app.setup.xml" failonerror="true" />
 
                                 <!-- Copy all SQL scripts from cas.app -->
                                 <copy todir="${project.build.outputDirectory}/sql" failonerror="true">
                                     <fileset dir="${project.build.directory}/cas-app-extracted/sql">
-                                        <include name="**/*.sql"/>
+                                        <include name="**/*.sql" />
                                     </fileset>
                                 </copy>
 
                                 <!-- Copy all table definitions from cas.app -->
                                 <copy todir="${project.build.outputDirectory}/tables" failonerror="true">
                                     <fileset dir="${project.build.directory}/cas-app-extracted/tables">
-                                        <include name="**/*.xml"/>
-                                        <include name="**/*.xsd"/>
+                                        <include name="**/*.xml" />
+                                        <include name="**/*.xsd" />
                                     </fileset>
                                 </copy>
 
                                 <!-- Copy MCAS's own Setup.xml (references cas.app as dependency) -->
-                                <copy file="${basedir}/src/main/resources/setup/Setup.xml"
-                                      todir="${project.build.outputDirectory}/setup"
-                                      failonerror="true"/>
+                                <copy file="${basedir}/src/main/resources/setup/Setup.xml" todir="${project.build.outputDirectory}/setup" failonerror="true" />
 
                                 <!-- Copy dependency-graph.json (created by depgraph plugin) BEFORE resource scanning -->
-                                <echo message="Copying dependency-graph.json to setup directory..."/>
-                                <copy file="${project.build.directory}/dependency-graph.json"
-                                      todir="${project.build.outputDirectory}/setup"
-                                      failonerror="true"/>
+                                <echo message="Copying dependency-graph.json to setup directory..." />
+                                <copy file="${project.build.directory}/dependency-graph.json" todir="${project.build.outputDirectory}/setup" failonerror="true" />
 
-                                <echo message="µCAS directories and cas.app resources prepared successfully"/>
+                                <echo message="µCAS directories and cas.app resources prepared successfully" />
                             </target>
                         </configuration>
                     </execution>
@@ -254,6 +246,6 @@
     
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <tag>HEAD</tag>
+        <tag>v13.7.0</tag>
     </scm>
 </project>

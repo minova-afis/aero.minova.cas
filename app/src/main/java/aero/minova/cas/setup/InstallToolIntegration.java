@@ -61,6 +61,20 @@ public class InstallToolIntegration {
 	 *            Die "Setup.xml" welche installiert wird.
 	 */
 	public void installSetup(Path setupXml) {
+		installSetup(setupXml, files.getSystemFolder());
+	}
+
+	/**
+	 * Wie {@link #installSetup(Path)}, aber "tables" und "sql" werden relativ zu einem explizit übergebenen Wurzelverzeichnis aufgelöst statt relativ zu
+	 * {@link FilesService#getSystemFolder()}. Wird für die CAS-12-Abwärtskompatibilität benötigt, um ein zusätzliches Setup gegen das Legacy-Verzeichnis
+	 * auszuführen (siehe doc/md/CAS12Compatibility.md).
+	 *
+	 * @param setupXml
+	 *            Die "Setup.xml" welche installiert wird.
+	 * @param filesRoot
+	 *            Wurzelverzeichnis, unter dem sich "tables" und "sql" befinden.
+	 */
+	public void installSetup(Path setupXml, Path filesRoot) {
 		try (final Connection connection = systemDatabase.getConnection()) {
 			connection.setAutoCommit(true);
 			BaseSetup.parameter = System.getProperties();
@@ -86,8 +100,8 @@ public class InstallToolIntegration {
 			try (var stmt = connection.createStatement();
 				 final ResultSet rs = stmt.executeQuery("select COUNT(*) as Anzahl from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'tVersion10'")) {
 				rs.next();
-				final Optional<Path> tableLibrary = Optional.of(files.getSystemFolder().resolve("tables"));
-				final Optional<Path> sqlLibrary = Optional.of(files.getSystemFolder().resolve("sql"));
+				final Optional<Path> tableLibrary = Optional.of(filesRoot.resolve("tables"));
+				final Optional<Path> sqlLibrary = Optional.of(filesRoot.resolve("sql"));
 
 				setup.readoutSchemaCreate(connection, tableLibrary, sqlLibrary);
 				if (rs.getInt("Anzahl") == 0) {

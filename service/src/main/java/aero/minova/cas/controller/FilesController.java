@@ -18,7 +18,10 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -250,10 +253,22 @@ public class FilesController {
 			if (path.endsWith(".zip")) {
 				return getZip(path.substring(0, path.length() - 4));
 			}
+
+			// Abwärtskompatibilität zu CAS 12: Ist ein Legacy-Verzeichnis konfiguriert, hat es Vorrang vor dem Fat-Jar --
+			// ein konfiguriertes CAS-12-system-files-Verzeichnis enthält alle für diese Installation relevanten Daten
+			// und soll daher die (evtl. nur generische) CAS-13-Version derselben Datei überschreiben können. Siehe
+			// doc/md/CAS12Compatibility.md.
+			Optional<Path> legacyFile = fileService.resolveLegacyFile(path);
+			if (legacyFile.isPresent()) {
+				return readAllBytes(legacyFile.get());
+			}
+
 			InputStream is = getClass().getResourceAsStream(path);
-			if (is == null)
-				throw new IOException(path + " file not included in CAS build");
-			return is.readAllBytes();
+			if (is != null) {
+				return is.readAllBytes();
+			}
+
+			throw new IOException(path + " file not included in CAS build");
 		}
 
 		// Ansonsten Dateisystem nutzen
@@ -389,15 +404,46 @@ public class FilesController {
 					}
 				}
 			}
+			// Abwärtskompatibilität zu CAS 12: zusätzlich alle Dateien aus dem alten system-files-Verzeichnis auf der Festplatte
+			// einsammeln (siehe doc/md/CAS12Compatibility.md).
+			final List<Path> legacyMatches = fileService.listLegacyFiles(pathStr);
+
 			String resourcePathLog = null;
 			ZipEntry ze = null;
+			// Ist ein Legacy-Verzeichnis konfiguriert, hat es Vorrang vor dem Fat-Jar -- ein konfiguriertes CAS-12-
+			// system-files-Verzeichnis enthält alle für diese Installation relevanten Daten und soll daher gleichnamige
+			// (evtl. nur generische) CAS-13-Einträge überschreiben können. Daher werden Legacy-Einträge zuerst geschrieben.
+			final Set<String> writtenEntryNames = new HashSet<>();
 			ByteArrayOutputStream fos = new ByteArrayOutputStream();
 			try (ZipOutputStream zos = new ZipOutputStream(fos);) {
+
+				if (!legacyMatches.isEmpty()) {
+					Path legacyRoot = fileService.getLegacyRoot();
+					for (Path legacyFile : legacyMatches) {
+						if (Files.isDirectory(legacyFile)) {
+							continue;
+						}
+						String entryName = legacyRoot.relativize(legacyFile).toString().replace('\\', '/');
+						resourcePathLog = entryName;
+						ze = new ZipEntry(entryName);
+						ze.setCreationTime(FileTime.from(Instant.EPOCH));
+						ze.setTime(0);
+						zos.putNextEntry(ze);
+						zos.write(Files.readAllBytes(legacyFile));
+						zos.closeEntry();
+						writtenEntryNames.add(entryName);
+					}
+				}
 
 				for (String resourcePath : matchingResources) {
 					resourcePathLog = resourcePath;
 					if (isFileResource(resourcePath)) {
-						ze = new ZipEntry(resourcePath.substring(1));
+						String entryName = resourcePath.substring(1);
+						if (writtenEntryNames.contains(entryName)) {
+							// Bereits über das Legacy-Verzeichnis enthalten -- dieses hat Vorrang vor dem Fat-Jar.
+							continue;
+						}
+						ze = new ZipEntry(entryName);
 
 						// CreationTime der Zip und Änderungs-Zeitpunkt der Zip auf diese festen
 						// Zeitpunkte setzen, da sich sonst jedes Mal der md5 Wert ändert,

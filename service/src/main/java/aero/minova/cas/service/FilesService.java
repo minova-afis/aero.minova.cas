@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -58,6 +60,11 @@ public class FilesService {
 	boolean permissionCheck;
 	@org.springframework.beans.factory.annotation.Value("${fat.jar.mode:false}")
 	boolean isFatJarMode;
+
+	// Abwärtskompatibilität zu CAS 12: optionaler Pfad zum alten "system-files"-Verzeichnis auf der Festplatte, siehe
+	// doc/md/CAS12Compatibility.md. Leer = Fallback deaktiviert.
+	@org.springframework.beans.factory.annotation.Value("${legacy.system.files.path:}")
+	private String legacySystemFilesPath;
 
 	@Autowired
 	SecurityService securityUtils;
@@ -155,6 +162,63 @@ public class FilesService {
 	}
 
 	/**
+	 * Ist der CAS-12-Legacy-Fallback konfiguriert (siehe {@link #legacySystemFilesPath})?
+	 */
+	public boolean hasLegacyFallback() {
+		return legacySystemFilesPath != null && !legacySystemFilesPath.isBlank();
+	}
+
+	/**
+	 * Wurzelverzeichnis des CAS-12-Legacy-Fallbacks. Nur gültig, falls {@link #hasLegacyFallback()} true zurückgibt.
+	 */
+	public Path getLegacyRoot() {
+		return Paths.get(legacySystemFilesPath).toAbsolutePath().normalize();
+	}
+
+	/**
+	 * Löst einen im Fat-Jar nicht gefundenen Pfad gegen das alte CAS-12 system-files-Verzeichnis auf. Wird von {@code FilesController} als Fallback
+	 * genutzt, wenn eine Datei nicht im Fat-Jar enthalten ist (siehe doc/md/CAS12Compatibility.md).
+	 *
+	 * @param relativePath
+	 *            Pfad relativ zum System-Ordner, z.B. "/tables/foo.table.xml".
+	 * @return Pfad auf der Festplatte, falls die Datei im Legacy-Verzeichnis existiert.
+	 */
+	public Optional<Path> resolveLegacyFile(String relativePath) {
+		if (!hasLegacyFallback()) {
+			return Optional.empty();
+		}
+		String cleaned = relativePath.startsWith("/") ? relativePath.substring(1) : relativePath;
+		Path legacyRoot = getLegacyRoot();
+		Path resolved = legacyRoot.resolve(cleaned).toAbsolutePath().normalize();
+		if (!resolved.startsWith(legacyRoot) || !Files.isRegularFile(resolved)) {
+			return Optional.empty();
+		}
+		return Optional.of(resolved);
+	}
+
+	/**
+	 * Listet alle Dateien im Legacy-Verzeichnis (siehe {@link #resolveLegacyFile}) unterhalb des übergebenen relativen Pfad-Präfixes auf, z.B. für den
+	 * on-the-fly Zip-Fallback in {@code FilesController#getZip}.
+	 *
+	 * @param relativePrefix
+	 *            Pfad relativ zum System-Ordner.
+	 * @return Liste aller Dateien/Ordner unterhalb des Präfixes, oder eine leere Liste, falls kein Fallback konfiguriert ist oder der Ordner nicht
+	 *         existiert.
+	 */
+	public List<Path> listLegacyFiles(String relativePrefix) throws FileNotFoundException {
+		if (!hasLegacyFallback()) {
+			return List.of();
+		}
+		String cleaned = relativePrefix.startsWith("/") ? relativePrefix.substring(1) : relativePrefix;
+		Path legacyRoot = getLegacyRoot();
+		Path target = legacyRoot.resolve(cleaned).toAbsolutePath().normalize();
+		if (!target.startsWith(legacyRoot) || !isDirectory(target)) {
+			return List.of();
+		}
+		return populateFilesList(target);
+	}
+
+	/**
 	 * Diese Methode erzeugt eine Liste aller vorhandenen Files in einem Directory. Falls sich noch weitere Directories in diesem befinden, wird deren Inhalt
 	 * ebenfalls aufgelistet
 	 *
@@ -171,8 +235,9 @@ public class FilesService {
 			throw new FileNotFoundException("Cannot access sub folder: " + dir);
 		}
 		for (File file : files) {
-			filesListInDir.add(Paths.get(file.getAbsolutePath()));
-			if (file.isDirectory()) {
+			Path filePath = Paths.get(file.getAbsolutePath());
+			filesListInDir.add(filePath);
+			if (file.isDirectory() && !Files.isSymbolicLink(filePath)) {
 				filesListInDir.addAll(populateFilesList(file.toPath()));
 			}
 		}

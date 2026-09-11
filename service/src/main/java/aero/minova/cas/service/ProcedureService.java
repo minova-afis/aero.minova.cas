@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -94,12 +93,14 @@ public class ProcedureService {
 	}
 
 	/**
-	 * Sets ANSI_WARNINGS on or off for the connection.
-	 * ANSI_WARNINGS OFF ignores warnings for data truncation and allows longer SQL usernames.
+	 * Sets ANSI_WARNINGS on or off for the connection. ANSI_WARNINGS OFF ignores warnings for data truncation and allows longer SQL usernames.
 	 *
-	 * @param connection The database connection
-	 * @param enabled true to enable ANSI_WARNINGS, false to disable
-	 * @throws SQLException if statement execution fails
+	 * @param connection
+	 *            The database connection
+	 * @param enabled
+	 *            true to enable ANSI_WARNINGS, false to disable
+	 * @throws SQLException
+	 *             if statement execution fails
 	 */
 	private void setAnsiWarnings(Connection connection, boolean enabled) throws SQLException {
 		String sql = enabled ? "set ANSI_WARNINGS on" : "set ANSI_WARNINGS off";
@@ -268,7 +269,7 @@ public class ProcedureService {
 		} else {
 			limit = inputMetaData.getLimited();
 		}
-		// Creates 
+		// Creates
 		final val procedureCall = prepareProcedureString(inputTable, ExecuteStrategy.with(ExecuteStrategy.RETURN_CODE_IS_ERROR_IF_NOT_0));
 		setUserContextFor(connection);
 
@@ -279,10 +280,8 @@ public class ProcedureService {
 				StringBuffer paramLog = new StringBuffer();
 				fillCallableSqlProcedureStatement(preparedStatement, inputTable, parameterOffset, paramLog, j);
 				// Inject param logs into the actual call for better logging
-				sbLog.append(sbLog.length() > 0 ? "\r\n\t" : "")
-					 .append(procedureCall.substring(0, procedureCall.indexOf("(") + 1) +
-							 paramLog.toString() +
-							 procedureCall.substring(procedureCall.indexOf(")")));
+				sbLog.append(sbLog.length() > 0 ? "\r\n\t" : "").append(
+						procedureCall.substring(0, procedureCall.indexOf("(") + 1) + paramLog.toString() + procedureCall.substring(procedureCall.indexOf(")")));
 				preparedStatement.registerOutParameter(1, Types.INTEGER);
 				preparedStatement.execute();
 				{ /*
@@ -323,8 +322,8 @@ public class ProcedureService {
 						resultSet.setColumns(//
 								range(0, metaData.getColumnCount()).mapToObj(i -> {
 									try {
-										val type = metaData.getColumnType(i + resultSetOffset);
-										val name = metaData.getColumnName(i + resultSetOffset);
+										int type = metaData.getColumnType(i + resultSetOffset);
+										String name = metaData.getColumnName(i + resultSetOffset);
 										if (type == Types.BOOLEAN || Types.BIT == type) {
 											return new Column(name, DataType.BOOLEAN);
 										} else if (type == Types.DOUBLE) {
@@ -335,18 +334,18 @@ public class ProcedureService {
 											return new Column(name, DataType.INTEGER);
 										} else if ((type == Types.VARCHAR) || (type == Types.NVARCHAR)) {
 											return new Column(name, DataType.STRING);
-										} else if (type == Types.DECIMAL) {
+										} else if (type == Types.DECIMAL || type == Types.NUMERIC) {
 											return new Column(name, DataType.BIGDECIMAL);
 										} else if (type == Types.BIGINT) {
 											return new Column(name, DataType.LONG);
 										} else if (type == Types.BLOB) {
 											return new Column(name, DataType.BINARY);
 										} else {
-											customLogger.logFiles("calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type);
+											customLogger.logError("calculateSqlProcedureResult(): unbekannter ColumnType für column " + i + ", Typ:" + type);
 											throw new UnsupportedOperationException("msg.UnsupportedResultSetError %" + i);
 										}
-									} catch (Exception e) {
-										throw new RuntimeException("msg.ParseResultSetError");
+									} catch (SQLException e) {
+										throw new RuntimeException("msg.ParseResultSetError", e);
 									}
 								}).collect(toList()));
 						int totalResults = 0;
@@ -471,7 +470,9 @@ public class ProcedureService {
 		return result;
 	}
 
-	/** Fills in values from table into the prepared statement
+	/**
+	 * Fills in values from table into the prepared statement
+	 * 
 	 * @param preparedStatement
 	 * @param inputTable
 	 * @param parameterOffset
@@ -515,8 +516,7 @@ public class ProcedureService {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						} else {
-							sbLogFin.append(sbLog.length() > 0 ? ", " : "")
-									.append(type == DataType.BINARY ? "<binary>" : iVal.getValue().toString())
+							sbLogFin.append(sbLog.length() > 0 ? ", " : "").append(type == DataType.BINARY ? "<binary>" : iVal.getValue().toString())
 									.append(ot == OutputType.OUTPUT ? " [INOUT]" : "");
 							if (type == DataType.BOOLEAN) {
 								preparedStatement.setBoolean(i + parameterOffset, iVal.getBooleanValue());
@@ -546,7 +546,7 @@ public class ProcedureService {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
-						if (ot == OutputType.OUTPUT /* || ot == OutputType.INPUTOUTPUT*/) {
+						if (ot == OutputType.OUTPUT /* || ot == OutputType.INPUTOUTPUT */) {
 							if (type == DataType.BOOLEAN) {
 								preparedStatement.registerOutParameter(i + parameterOffset, Types.BOOLEAN);
 							} else if (type == DataType.DOUBLE) {

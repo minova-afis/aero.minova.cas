@@ -43,7 +43,6 @@ public class CustomLogger {
 
 	private static final String LOGFORMAT = "{}: {}";
 
-
 	private static final String USERREQUESTLOGFORMAT = "{}: {} {}";
 
 	@Autowired
@@ -116,7 +115,7 @@ public class CustomLogger {
 		final MutablePropertySources sources = ((AbstractEnvironment) env).getPropertySources();
 		StreamSupport.stream(sources.spliterator(), false)//
 				.filter(EnumerablePropertySource.class::isInstance)//
-				.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())//
+				.map(ps -> ((EnumerablePropertySource<?>) ps).getPropertyNames())//
 				.flatMap(Arrays::stream)//
 				.distinct()//
 				.filter(prop -> !(prop.contains("credentials") || prop.contains("password")))//

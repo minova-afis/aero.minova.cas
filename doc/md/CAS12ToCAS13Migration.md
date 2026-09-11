@@ -73,6 +73,36 @@ need a different legacy-lib path than the image default, override it explicitly:
 Anything else the deployment already sets (DB connection, `login_dataSource`, SMTP env vars, etc.)
 carries over unchanged.
 
+### Cloud Deployment
+
+Some cloud deployments (Kubernetes pod specs, kustomize patches, etc.) hardcode the
+container's `command`/`args` instead of relying on the base image's default `ENTRYPOINT`/`CMD`,
+usually to inject JVM system properties (truststore, JNDI/LDAP flags, ...). If a customer repo's
+deployment does this, its `-cp`/main-class invocation is a leftover from CAS 12's exploded-layer
+deployment style and needs to change too, or boot fails with:
+
+```
+Error: Could not find or load main class aero.minova.cas.CoreApplicationSystemApplication
+Caused by: java.lang.ClassNotFoundException: aero.minova.cas.CoreApplicationSystemApplication
+```
+
+```diff
+--cp "/opt/aero.minova.cas/lib/*" aero.minova.cas.CoreApplicationSystemApplication
++-jar /opt/aero.minova.cas/lib/aero.minova.cas.jar
+```
+
+Why: `/opt/aero.minova.cas/lib/aero.minova.cas.jar` is a Spring Boot repackaged executable
+("fat") jar — its own classes live nested under `BOOT-INF/classes/` inside the jar, not at the
+jar's root. `java -jar` works because Spring Boot's own loader (`JarLauncher`) knows how to unpack
+`BOOT-INF/classes`/`BOOT-INF/lib` at runtime; that's also what the CAS 13 base image's own default
+`CMD` does. Putting the outer jar on a plain `-cp` and naming
+`aero.minova.cas.CoreApplicationSystemApplication` directly makes the JVM classloader scan only the
+jar's root for that class — where it doesn't exist — hence the `ClassNotFoundException` above. This
+only bit deployments that override `command`/`args`; anything using the base image's default launch
+command was unaffected. Confirmed against `aero.minova.travelexpenses`'s cloud (dev) deployment,
+which hardcoded the old `-cp`/main-class form in its kustomize pod patch — switching to `-jar` fixed
+the boot failure.
+
 ## 4. Behavior changes to be aware of
 
 - **MD5/zip caches are no longer pre-built at startup.** CAS 12 pre-computed `.md5` files and

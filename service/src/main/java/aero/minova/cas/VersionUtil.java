@@ -12,7 +12,7 @@ public class VersionUtil {
 
 	private VersionUtil() {}
 
-	private static Pattern VERSION_REGEX = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)[-.]?([A-Z]+)?");
+	private static final Pattern VERSION_REGEX = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)[-.]?([A-Z]+)?");
 
 	public static Properties getVersion() throws IOException {
 		Properties properties = new Properties();
@@ -31,14 +31,12 @@ public class VersionUtil {
 		Matcher matcher = VERSION_REGEX.matcher(properties.getProperty("version"));
 		matcher.matches();
 
-		VersionResponse response = new VersionResponse(properties.getProperty("groupId"), //
+		return new VersionResponse(properties.getProperty("groupId"), //
 				properties.getProperty("artifactId"), //
 				Integer.valueOf(matcher.group(1)), //
 				Integer.valueOf(matcher.group(2)), //
 				Integer.valueOf(matcher.group(3)), //
-				matcher.groupCount() == 4 ? matcher.group(4) : null);
-
-		return response;
+				matcher.group(4));
 	}
 
 }

@@ -4,9 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.NoSuchFileException;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ import aero.minova.cas.api.domain.XProcedureException;
 import aero.minova.cas.api.domain.XSqlProcedureResult;
 import aero.minova.cas.api.domain.XTable;
 import aero.minova.cas.sql.SystemDatabase;
-import lombok.val;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
@@ -330,15 +328,13 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		String errorStatement = "INSERT INTO dbo.xtcasError (Username, ErrorMessage) VALUES (?,?)";
 
-		try (val connection = systemDatabase.getConnection()) {
+		try (Connection connection = systemDatabase.getConnection()) {
 			try (CallableStatement callableErrorStatement = connection.prepareCall(errorStatement)) {
 				callableErrorStatement.setString(1, username);
 				callableErrorStatement.setString(2, e.getMessage());
-				
+
 				customLogger.logSql("CAS : Execute : " + errorStatement + " with values: " + username + ", " + e.getMessage());
-				// Der Stacktrace wird nicht in der Datenbank gespeichert, da das Feld einfach viel zu lang ist. Deswegen geben wir ihn im ErrorLog aus.
-				customLogger.logError("CAS: Showing Stacktrace", e);
-				
+
 				callableErrorStatement.executeUpdate();
 			}
 			connection.commit();

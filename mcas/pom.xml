@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     
     <artifactId>aero.minova.service.mcas</artifactId>
-    <version>13.7.1</version>
+    <version>13.7.2-SNAPSHOT</version>
     <name>µCAS - Standalone CAS Service</name>
     <description>
         Standalone µCAS service with database-based file access.
@@ -14,7 +14,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.deployment</artifactId>
-        <version>13.7.1</version>
+        <version>13.7.2-SNAPSHOT</version>
         <relativePath>../cas.extension.deployment</relativePath>
     </parent>
     
@@ -246,6 +246,6 @@
     
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <tag>v13.7.1</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>

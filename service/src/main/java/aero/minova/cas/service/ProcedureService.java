@@ -31,6 +31,7 @@ import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.TableMetaData;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.profiling.Profiler;
 import aero.minova.cas.sql.ExecuteStrategy;
 import aero.minova.cas.sql.SystemDatabase;
 import jakarta.persistence.EntityManager;
@@ -145,14 +146,16 @@ public class ProcedureService {
 		SqlProcedureResult result = new SqlProcedureResult();
 		StringBuffer log = new StringBuffer();
 
-		try (Connection connection = systemDatabase.getConnection()) {
+		try (Connection connection = Profiler.timeConnectionAcquisition(systemDatabase::getConnection)) {
 			try {
 				if (isSetup) {
 					setAnsiWarnings(connection, false);
 				}
 				result = calculateSqlProcedureResult(inputTable, privilegeRequest, connection, result, log);
+				long commitStart = Profiler.startTimer();
 				connection.commit();
-				customLogger.logSql("Procedure successfully executed: " + log);
+				Profiler.stopTimer(commitStart, Profiler::recordCommitNanos);
+				Profiler.timeLogging(() -> customLogger.logSql("Procedure successfully executed: " + log));
 				if (isSetup) {
 					setAnsiWarnings(connection, true);
 				}
@@ -282,6 +285,7 @@ public class ProcedureService {
 				// Inject param logs into the actual call for better logging
 				sbLog.append(sbLog.length() > 0 ? "\r\n\t" : "").append(
 						procedureCall.substring(0, procedureCall.indexOf("(") + 1) + paramLog.toString() + procedureCall.substring(procedureCall.indexOf(")")));
+				long sqlStart = Profiler.startTimer();
 				preparedStatement.registerOutParameter(1, Types.INTEGER);
 				preparedStatement.execute();
 				{ /*
@@ -311,6 +315,7 @@ public class ProcedureService {
 						}
 					}
 				}
+				Profiler.stopTimer(sqlStart);
 				// ToDo ich kann mir gar nicht vorstellen, dass hier noch ResultSets vorhanden sind, nachdem weiter oben
 				// mit getMoreResults() alles abgeholt wurde.
 				if (null != preparedStatement.getResultSet() || (preparedStatement.getMoreResults() && null != preparedStatement.getResultSet())) {
@@ -355,21 +360,21 @@ public class ProcedureService {
 							securityTokenInColumn = securityService.findSecurityTokenColumn(resultSet);
 						}
 						resultSet.setMetaData(new TableMetaData());
-						while (sqlResultSet.next()) {
+						while (Profiler.timeSql(sqlResultSet::next)) {
 							Row rowToBeAdded = null;
 							if (limit > 0) {
 								// nur die Menge an Rows, welche auf der gewünschten Page liegen
 								if (sqlResultSet.getRow() > ((page - 1) * limit) && sqlResultSet.getRow() <= (page * limit)) {
-									rowToBeAdded = convertSqlResultToRow(resultSet//
+									rowToBeAdded = Profiler.timeRowConversion(() -> convertSqlResultToRow(resultSet//
 											, sqlResultSet//
 											, customLogger.userLogger//
-											, this);
+											, this));
 								}
 							} else {
-								rowToBeAdded = convertSqlResultToRow(resultSet//
+								rowToBeAdded = Profiler.timeRowConversion(() -> convertSqlResultToRow(resultSet//
 										, sqlResultSet//
 										, customLogger.userLogger//
-										, this);
+										, this));
 							}
 
 							/*

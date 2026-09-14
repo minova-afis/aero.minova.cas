@@ -10,4 +10,8 @@ public class SqlProcedureResult {
 	private Table outputParameters;
 	private List<Integer> returnCodes;
 	private int returnCode;
+	/**
+	 * Nur befüllt, falls Profiling für diese Anfrage aktiv war.
+	 */
+	private ProfilingResult profilingResult;
 }

@@ -5,6 +5,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+- Profiling hinzufügen, kann über properties oder die Anfragen gesteuert werden
+
 ## \[13.7.0\] - 2026-09-07
 
 - getFile(String path) und getHash(String path) wieder hinzufügen für Abwärtskompatibilität, da diese von einigen Extensions verwendet werden.

@@ -29,6 +29,7 @@ import aero.minova.cas.api.domain.Row;
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
+import aero.minova.cas.profiling.Profiler;
 import aero.minova.cas.service.BaseService;
 import aero.minova.cas.service.ProcedureService;
 import aero.minova.cas.service.QueueService;
@@ -57,6 +58,9 @@ public class SqlProcedureController {
 
 	@Setter
 	QueueService queueService;
+
+	@org.springframework.beans.factory.annotation.Value("${cas.profiling.always-enabled:false}")
+	boolean alwaysProfile;
 
 	final Object extensionSynchronizer = new Object();
 
@@ -249,6 +253,8 @@ public class SqlProcedureController {
 	@PostMapping(value = "data/procedure")
 	public ResponseEntity executeProcedure(@RequestBody Table inputTable) throws Exception {
 		customLogger.logUserRequest("data/procedure: ", inputTable);
+		boolean profiling = alwaysProfile || inputTable.isProfile();
+		Profiler profiler = profiling ? Profiler.push() : null;
 		try {
 			final List<Row> privilegeRequest = checkForPrivilegeAndBootstrapExtension(inputTable);
 
@@ -258,7 +264,16 @@ public class SqlProcedureController {
 				return extensionResult.get();
 			}
 
-			ResponseEntity result = new ResponseEntity(processSqlProcedureRequest(inputTable, privilegeRequest), HttpStatus.ACCEPTED);
+			SqlProcedureResult body = processSqlProcedureRequest(inputTable, privilegeRequest);
+
+			ResponseEntity result;
+			if (profiling) {
+				body.setProfilingResult(profiler.toProfilingResult());
+				body.getProfilingResult().setTransactionOverhead(profiler.toTransactionOverhead());
+				result = ResponseEntity.status(HttpStatus.ACCEPTED).header("X-Profiling-Time", profiler.getTotalMs() + "ms").body(body);
+			} else {
+				result = new ResponseEntity(body, HttpStatus.ACCEPTED);
+			}
 			if (queueService != null) {
 				queueService.accept(inputTable, result);
 			}
@@ -269,6 +284,10 @@ public class SqlProcedureController {
 
 			// Jede Exception, die irgendwo im Code geworfen wird, sollte am Ende als ProcedureException raus kommen.
 			throw new ProcedureException(e);
+		} finally {
+			if (profiling) {
+				Profiler.pop();
+			}
 		}
 	}
 
@@ -327,7 +346,7 @@ public class SqlProcedureController {
 		}
 
 		if (securityService.arePrivilegeStoresSetup()) {
-			privilegeRequest.addAll(securityService.getPrivilegePermissions(inputTable.getName()));
+			privilegeRequest.addAll(Profiler.timePrivilegeCheck(() -> securityService.getPrivilegePermissions(inputTable.getName())));
 			if (privilegeRequest.isEmpty()) {
 				throw new ProcedureException("msg.PrivilegeError %" + inputTable.getName());
 			}

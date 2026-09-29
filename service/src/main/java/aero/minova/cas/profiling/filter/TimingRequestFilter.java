@@ -88,14 +88,7 @@ public class TimingRequestFilter extends OncePerRequestFilter {
                     serializerDuration,
                     deserializerCount,
                     deserializerDuration);
-            
-	
-	    	//if (headerContentEncoding != null) {  		
-	    	//	log.debug("--- TimingRequestFilter End --- (Duration Filter / Duration Controller): (" + durationTimeInMs + "ms / " + headerProfiling + ") " + headerContentEncoding + " - " + logMsg);
-	    	//} else {
-	    	//	log.debug("--- TimingRequestFilter End --- (Duration Filter / Duration Controller): (" + durationTimeInMs + "ms / " + headerProfiling + ") " + logMsg);
-	    	//}
-            
+                        
         }
     }
 }

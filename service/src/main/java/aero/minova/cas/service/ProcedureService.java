@@ -243,7 +243,7 @@ public class ProcedureService {
 	 */
 	public SqlProcedureResult calculateSqlProcedureResult(Table inputTable, List<Row> privilegeRequest, final java.sql.Connection connection,
 			SqlProcedureResult result, StringBuffer sbLog) throws SQLException, ProcedureException {
-		List<String> userSecurityTokensToBeChecked = securityService.extractUserTokens(privilegeRequest);
+		List<String> userSecurityTokensToBeChecked = SecurityService.extractUserTokens(privilegeRequest);
 
 		result.setReturnCodes(new ArrayList<>());
 		result.setReturnCode(0);
@@ -423,7 +423,7 @@ public class ProcedureService {
 					if (securityService.isRowAccessValid(userSecurityTokensToBeChecked, outputValues, securityTokenInColumn)) {
 						resultRow = outputValues;
 					} else {
-						for (Value ignored : outputValues.getValues()) {
+						for (int i = 0; i < outputValues.getValues().size(); i++) {
 							resultRow.addValue(null);
 						}
 					}
@@ -490,9 +490,9 @@ public class ProcedureService {
 		range(0, inputTable.getColumns().size())//
 				.forEach(i -> {
 					try {
-						val iVal = inputTable.getRows().get(row).getValues().get(i);
-						val type = inputTable.getColumns().get(i).getType();
-						val ot = inputTable.getColumns().get(i).getOutputType();
+						Value iVal = inputTable.getRows().get(row).getValues().get(i);
+						DataType type = iVal != null ? iVal.getType() : inputTable.getColumns().get(i).getType();
+						OutputType ot = inputTable.getColumns().get(i).getOutputType();
 						if (iVal == null && ot == OutputType.OUTPUT) {
 							// Do not set NULL for parameter defined as output
 							sbLogFin.append(sbLog.length() > 0 ? ", " : "").append("[OUT]");
@@ -575,7 +575,7 @@ public class ProcedureService {
 								throw new IllegalArgumentException("msg.UnknownType %" + type.name());
 							}
 						}
-					} catch (Exception e) {
+					} catch (SQLException e) {
 						throw new RuntimeException("msg.ParseError %" + i, e);
 					}
 				});

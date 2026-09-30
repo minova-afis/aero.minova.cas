@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
-    <artifactId>aero.minova.service.mcas</artifactId>
-    <version>13.7.3-SNAPSHOT</version>
-    <name>µCAS - Standalone CAS Service</name>
-    <description>
-        Standalone µCAS service with database-based file access.
-        Auto-creates required directory structure for autonomous operation.
-    </description>
-    
+
     <!-- Inherit from cas.extension.deployment to get resource processing -->
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.deployment</artifactId>
-        <version>13.7.3-SNAPSHOT</version>
+        <version>13.8.0</version>
         <relativePath>../cas.extension.deployment</relativePath>
     </parent>
-    
+
+    <artifactId>aero.minova.service.mcas</artifactId>
+    <version>13.8.0</version>
+    <name>µCAS - Standalone CAS Service</name>
+    <description>Standalone µCAS service with database-based file access.
+        Auto-creates required directory structure for autonomous operation.</description>
+
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <tag>v13.8.0</tag>
+    </scm>
+
+    <!-- Deployment configuration for GitHub Packages -->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Minova Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <!-- Enable database file access by default -->
         <ng.api.preferdbfiles>true</ng.api.preferdbfiles>
@@ -38,10 +50,10 @@
                 <executions>
                     <execution>
                         <id>generate-dependency-graph</id>
-                        <phase>initialize</phase>
                         <goals>
                             <goal>graph</goal>
                         </goals>
+                        <phase>initialize</phase>
                         <configuration>
                             <graphFormat>json</graphFormat>
                             <showDuplicates>true</showDuplicates>
@@ -58,10 +70,10 @@
                 <executions>
                     <execution>
                         <id>unpack-cas-app-resources</id>
-                        <phase>initialize</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
+                        <phase>initialize</phase>
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
@@ -87,10 +99,10 @@
                 <executions>
                     <execution>
                         <id>create-mcas-directories</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <target>
                                 <echo message="Creating µCAS directory structure..." />
@@ -107,17 +119,17 @@
 
                                 <!-- Copy cas.app Setup.xml with correct naming for findSetupXml -->
                                 <echo message="Copying cas.app Setup.xml as dependency setup file..." />
-                                <copy file="${project.build.directory}/cas-app-extracted/setup/Setup.xml" tofile="${project.build.outputDirectory}/setup/aero.minova.cas.app.setup.xml" failonerror="true" />
+                                <copy failonerror="true" file="${project.build.directory}/cas-app-extracted/setup/Setup.xml" tofile="${project.build.outputDirectory}/setup/aero.minova.cas.app.setup.xml" />
 
                                 <!-- Copy all SQL scripts from cas.app -->
-                                <copy todir="${project.build.outputDirectory}/sql" failonerror="true">
+                                <copy failonerror="true" todir="${project.build.outputDirectory}/sql">
                                     <fileset dir="${project.build.directory}/cas-app-extracted/sql">
                                         <include name="**/*.sql" />
                                     </fileset>
                                 </copy>
 
                                 <!-- Copy all table definitions from cas.app -->
-                                <copy todir="${project.build.outputDirectory}/tables" failonerror="true">
+                                <copy failonerror="true" todir="${project.build.outputDirectory}/tables">
                                     <fileset dir="${project.build.directory}/cas-app-extracted/tables">
                                         <include name="**/*.xml" />
                                         <include name="**/*.xsd" />
@@ -125,11 +137,11 @@
                                 </copy>
 
                                 <!-- Copy MCAS's own Setup.xml (references cas.app as dependency) -->
-                                <copy file="${basedir}/src/main/resources/setup/Setup.xml" todir="${project.build.outputDirectory}/setup" failonerror="true" />
+                                <copy failonerror="true" file="${basedir}/src/main/resources/setup/Setup.xml" todir="${project.build.outputDirectory}/setup" />
 
                                 <!-- Copy dependency-graph.json (created by depgraph plugin) BEFORE resource scanning -->
                                 <echo message="Copying dependency-graph.json to setup directory..." />
-                                <copy file="${project.build.directory}/dependency-graph.json" todir="${project.build.outputDirectory}/setup" failonerror="true" />
+                                <copy failonerror="true" file="${project.build.directory}/dependency-graph.json" todir="${project.build.outputDirectory}/setup" />
 
                                 <echo message="µCAS directories and cas.app resources prepared successfully" />
                             </target>
@@ -139,7 +151,7 @@
             </plugin>
 
             <!-- The resource plugin from parent will handle resource generation after copying -->
-            
+
             <!-- Override Spring Boot plugin to include database file access libs -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -163,89 +175,74 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
-            
-			<!-- Jib plugin for Docker container -->
-			<plugin>
-				<groupId>com.google.cloud.tools</groupId>
-				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.4.0</version>
-				<configuration>
-					<from>
-						<image>eclipse-temurin:21-jre-alpine</image>
-						<platforms>
-							<platform>
-								<architecture>amd64</architecture>
-								<os>linux</os>
-							</platform>
-						</platforms>
-					</from>
-					<to>
-						<image>aero.minova.mcas</image>
-						<tags>
-							<tag>${project.version}</tag>
-							<tag>latest</tag>
-						</tags>
-					</to>
-					<container>
-						<workingDirectory>/application</workingDirectory>
-						<mainClass>
-							aero.minova.cas.CoreApplicationSystemApplication</mainClass>
-						<ports>
-							<port>8084</port>
-							<port>8081</port>
-						</ports>
-						<jvmFlags>
-							<jvmFlag>-Djdk.tls.client.protocols=TLSv1.2</jvmFlag>
-							<!-- JVM Memory Configuration for Container -->
-							<jvmFlag>-XX:MaxRAMPercentage=95.0</jvmFlag>
-							<jvmFlag>-XX:InitialRAMPercentage=75.0</jvmFlag>
-							<jvmFlag>-XX:+UseContainerSupport</jvmFlag>
-						</jvmFlags>
-						<environment>
-							<TZ>Europe/Berlin</TZ>
-							<LC_ALL>de.UTF-8</LC_ALL>
-							<LANG>de.UTF-8</LANG>
-							<LANGUAGE>de:de</LANGUAGE>
-						</environment>
-						<user>1000</user>
-						<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-					</container>
-					<extraDirectories>
-						<paths>
-							<path>
-								<from>src/main/jib</from>
-								<into>/</into>
-							</path>
-						</paths>
 
-						<!-- Permissions can only be set for extraDirectories -->
-						<permissions>
-							<permission>
-								<file>/application</file>
-								<mode>777</mode>
-							</permission>
-							<permission>
-								<file>/application/**</file>
-								<mode>777</mode>
-							</permission>
-						</permissions>
-					</extraDirectories>
-				</configuration>
-			</plugin>
+            <!-- Jib plugin for Docker container -->
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:21-jre-alpine</image>
+                        <platforms>
+                            <platform>
+                                <architecture>amd64</architecture>
+                                <os>linux</os>
+                            </platform>
+                        </platforms>
+                    </from>
+                    <to>
+                        <image>aero.minova.mcas</image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                            <tag>latest</tag>
+                        </tags>
+                    </to>
+                    <container>
+                        <workingDirectory>/application</workingDirectory>
+                        <mainClass>aero.minova.cas.CoreApplicationSystemApplication</mainClass>
+                        <ports>
+                            <port>8084</port>
+                            <port>8081</port>
+                        </ports>
+                        <jvmFlags>
+                            <jvmFlag>-Djdk.tls.client.protocols=TLSv1.2</jvmFlag>
+                            <!-- JVM Memory Configuration for Container -->
+                            <jvmFlag>-XX:MaxRAMPercentage=95.0</jvmFlag>
+                            <jvmFlag>-XX:InitialRAMPercentage=75.0</jvmFlag>
+                            <jvmFlag>-XX:+UseContainerSupport</jvmFlag>
+                        </jvmFlags>
+                        <environment>
+                            <TZ>Europe/Berlin</TZ>
+                            <LC_ALL>de.UTF-8</LC_ALL>
+                            <LANG>de.UTF-8</LANG>
+                            <LANGUAGE>de:de</LANGUAGE>
+                        </environment>
+                        <user>1000</user>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                    <extraDirectories>
+                        <paths>
+                            <path>
+                                <from>src/main/jib</from>
+                                <into>/</into>
+                            </path>
+                        </paths>
+
+                        <!-- Permissions can only be set for extraDirectories -->
+                        <permissions>
+                            <permission>
+                                <file>/application</file>
+                                <mode>777</mode>
+                            </permission>
+                            <permission>
+                                <file>/application/**</file>
+                                <mode>777</mode>
+                            </permission>
+                        </permissions>
+                    </extraDirectories>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    
-    <!-- Deployment configuration for GitHub Packages -->
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Minova Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
-        </repository>
-    </distributionManagement>
-    
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <tag>HEAD</tag>
-    </scm>
 </project>

@@ -1,27 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cas.extension.deployment</artifactId>
-    <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
-    <packaging>pom</packaging>
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.parent</artifactId>
-        <version>13.7.3-SNAPSHOT</version>
+        <version>13.8.0</version>
         <relativePath>../cas.extension.parent</relativePath>
     </parent>
+    <artifactId>cas.extension.deployment</artifactId>
+    <packaging>pom</packaging>
+    <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <tag>v13.8.0</tag>
+    </scm>
     <build>
         <plugins>
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
-                <version>13.7.3-SNAPSHOT</version>
+                <version>13.8.0</version>
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>
-                        <phase>process-resources</phase>
                         <goals>
                             <goal>generate-resource-file</goal>
                         </goals>
+                        <phase>process-resources</phase>
                         <configuration>
                             <createDeployList>true</createDeployList>
                         </configuration>
@@ -73,10 +78,10 @@
                 <executions>
                     <execution>
                         <id>copy-depgraph-to-setup</id>
-                        <phase>process-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>process-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/setup</outputDirectory>
                             <resources>
@@ -93,8 +98,4 @@
             </plugin>
         </plugins>
     </build>
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-      <tag>HEAD</tag>
-  </scm>
 </project>

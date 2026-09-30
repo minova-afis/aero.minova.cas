@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cas.parent</artifactId>
-    <version>13.7.3-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>aero.minova.cas</name>
 
     <parent>
         <groupId>aero.minova</groupId>
@@ -12,17 +8,10 @@
         <version>11.3.4</version>
         <relativePath />
     </parent>
-
-    <properties>
-        <sonar.dependencyCheck.jsonReportPath>target/dependency-check-report.json</sonar.dependencyCheck.jsonReportPath>
-        <sonar.dependencyCheck.htmlReportPath>target/dependency-check-report.html</sonar.dependencyCheck.htmlReportPath>
-    </properties>
-
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
+    <artifactId>cas.parent</artifactId>
+    <version>13.8.0</version>
+    <packaging>pom</packaging>
+    <name>aero.minova.cas</name>
 
     <modules>
         <module>resource-plugin</module>
@@ -37,6 +26,17 @@
         <module>customer-build-project</module>
         <module>mcas</module>
     </modules>
+
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</developerConnection>
+        <tag>v13.8.0</tag>
+    </scm>
+
+    <properties>
+        <sonar.dependencyCheck.jsonReportPath>target/dependency-check-report.json</sonar.dependencyCheck.jsonReportPath>
+        <sonar.dependencyCheck.htmlReportPath>target/dependency-check-report.html</sonar.dependencyCheck.htmlReportPath>
+    </properties>
 
     <repositories>
         <repository>

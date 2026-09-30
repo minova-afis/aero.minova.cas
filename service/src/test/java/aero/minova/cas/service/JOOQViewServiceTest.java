@@ -310,7 +310,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 		val row = new Row();
 		row.addValue(new Value("test", rule));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("cast(KeyText as varchar) ilike 'test%'");
+		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("cast(\n  KeyText\n  as varchar\n) ilike 'test%'");
 	}
 
 	@ParameterizedTest
@@ -322,7 +322,7 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 		val row = new Row();
 		row.addValue(new Value("test", rule));
 		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("cast(KeyText as varchar) not ilike 'test%'");
+		assertThat(testSubject.prepareWhereClause(intputTable, true).toString()).isEqualTo("cast(\n  KeyText\n  as varchar\n) not ilike 'test%'");
 	}
 
 	@Test
@@ -401,8 +401,8 @@ class JOOQViewServiceTest extends ViewServiceBaseTest<JOOQViewService> {
 		row2.addValue(new Value(false, null));
 		intputTable.getRows().add(row2);
 		assertThat(testSubject.prepareWhereClause(intputTable, true).toString().strip())
-				.isEqualTo("(\n" + "  (\n" + "    KeyLong is not null\n" + "    and cast(KeyText as varchar) ilike 'test%'\n" + "  )\n" + "  or (\n"
-						+ "    KeyLong = '3'\n" + "    and KeyText is null\n" + "  )\n" + ")");
+				.isEqualTo("(\n" + "  (\n" + "    KeyLong is not null\n" + "    and cast(\n" + "      KeyText\n" + "      as varchar\n"
+						+ "    ) ilike 'test%'\n" + "  )\n" + "  or (\n" + "    KeyLong = '3'\n" + "    and KeyText is null\n" + "  )\n" + ")");
 	}
 
 	@Test

@@ -1,5 +1,10 @@
 package aero.minova.cas.service;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +14,7 @@ import aero.minova.cas.service.model.Mdi;
 import aero.minova.cas.service.model.MdiType;
 import aero.minova.cas.service.repository.MdiRepository;
 import aero.minova.cas.service.repository.MdiTypeRepository;
+import aero.minova.cas.sql.SystemDatabase;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -23,8 +29,17 @@ public class MdiService extends BaseService<Mdi> {
 	@Autowired
 	AuthorizationService authorizationService;
 
+	@Autowired
+	SystemDatabase systemDatabase;
+
 	/**
-	 * Äquivalent zum Einspielen von xtcasMdiType.form.xml über setup, dort werden die 3 Typen auch angelegt
+	 * Äquivalent zum Einspielen von xtcasMdiType.table.xml über setup, dort werden die 3 Typen auch angelegt.
+	 *
+	 * KeyLong wird hier bewusst fest vorgegeben, genau wie im &lt;values&gt;-Block von xtcasMdiType.table.xml. Da die
+	 * Spalte trotzdem als IDENTITY definiert ist, lehnen sowohl Hibernates persist() als auch merge() eine bereits
+	 * vorgegebene ID auf einer IDENTITY-Spalte ab; die Zeilen müssen daher per direktem Insert angelegt werden, bei
+	 * SQL Server zusätzlich umrahmt von SET IDENTITY_INSERT (analog zu XmlDatabaseTable#generateUpdateValues, das
+	 * genau dies beim Einspielen von xtcasMdiType.table.xml über setup macht).
 	 */
 	public void setupMdiTypes() {
 
@@ -36,23 +51,34 @@ public class MdiService extends BaseService<Mdi> {
 			return;
 		}
 
-		MdiType mdiType = new MdiType();
-		mdiType.setKeyLong(1);
-		mdiType.setKeyText("form");
-		mdiType.setDescription("Form of Menu");
-		mdiTypeRepository.save(mdiType);
+		boolean isSQLServer = systemDatabase.isSQLDatabase();
+		try (Connection connection = systemDatabase.getConnection()) {
+			if (isSQLServer) {
+				connection.createStatement().execute("SET IDENTITY_INSERT xtcasMdiType ON");
+			}
+			insertMdiType(connection, 1, "form", "Form of Menu");
+			insertMdiType(connection, 2, "menu", "Menu of WFC");
+			insertMdiType(connection, 3, "application", "General Application Info");
+			if (isSQLServer) {
+				connection.createStatement().execute("SET IDENTITY_INSERT xtcasMdiType OFF");
+			}
+			connection.commit();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-		mdiType = new MdiType();
-		mdiType.setKeyLong(2);
-		mdiType.setKeyText("menu");
-		mdiType.setDescription("Menu of WFC");
-		mdiTypeRepository.save(mdiType);
-
-		mdiType = new MdiType();
-		mdiType.setKeyLong(3);
-		mdiType.setKeyText("application");
-		mdiType.setDescription("General Application Info");
-		mdiTypeRepository.save(mdiType);
+	private void insertMdiType(Connection connection, int keyLong, String keyText, String description) throws SQLException {
+		String sql = "INSERT INTO xtcasMdiType (KeyLong, KeyText, Description, LastUser, LastDate, LastAction) VALUES (?, ?, ?, ?, ?, ?)";
+		try (PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setInt(1, keyLong);
+			statement.setString(2, keyText);
+			statement.setString(3, description);
+			statement.setString(4, BaseService.getCurrentUser());
+			statement.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+			statement.setInt(6, 1);
+			statement.executeUpdate();
+		}
 	}
 
 	/**

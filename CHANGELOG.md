@@ -6,6 +6,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ## \[UNRELEASED\] - XXXX-XX-XX
 
 - software.amazon.awssdk bom von 2.39.1 auf 2.55.6 aktualisieren
+- Weitere Abhängigkeiten-Updates
 
 ## \[13.7.2\] - 2026-09-28
 

@@ -5,7 +5,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.parent</artifactId>
-        <version>13.8.0</version>
+        <version>13.8.1-SNAPSHOT</version>
     </parent>
     <artifactId>cas.dev</artifactId>
     <description>Hiermit kann man einfach CAS mit Plugins in der IDE ausführen.</description>

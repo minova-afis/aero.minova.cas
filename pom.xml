@@ -74,6 +74,20 @@
                 <artifactId>dependency-check-maven</artifactId>
                 <version>12.1.9</version>
             </plugin>
+            <!-- Von aero.minova:maven.root (via spring.maven.root) geerbt: spotless-maven-plugin formatiert sonst bei
+			jedem "mvn verify"/"install" (bzw. jedem Goal, das die verify-Phase erreicht) automatisch den gesamten
+			Java-Code neu (Palantir-Style), unabhängig davon, ob Dateien tatsächlich geändert wurden. Hier deaktiviert,
+			da dies sonst bei jedem Build zu großflächigen, ungewollten Whitespace-Diffs führt. -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>spotless-apply</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

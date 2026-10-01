@@ -1,5 +1,12 @@
 package aero.minova.cas.controller;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
 import aero.minova.cas.sql.SystemDatabase;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +19,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * DEVELOPER TOOL — executes arbitrary SQL against the application database.
@@ -101,10 +101,8 @@ public class SqlConsoleController {
      * values with "ROLE_" so it lines up with Spring's own convention).
      */
     private static boolean isAdmin(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated())
-            return false;
-        if (ADMIN_USERNAME.equals(authentication.getName()))
-            return true;
+        if (authentication == null || !authentication.isAuthenticated()) return false;
+        if (ADMIN_USERNAME.equals(authentication.getName())) return true;
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(ADMIN_AUTHORITY::equals);
@@ -112,14 +110,13 @@ public class SqlConsoleController {
 
     @PostMapping(value = "data/execute-sql", produces = "application/json")
     public ResponseEntity<SqlConsoleResponse> executeSql(
-            @RequestBody SqlConsoleRequest request,
-            Authentication authentication) {
+            @RequestBody SqlConsoleRequest request, Authentication authentication) {
 
         if (!isAdmin(authentication)) {
-            log.warn("data/execute-sql: rejected — caller '{}' is not admin",
+            log.warn(
+                    "data/execute-sql: rejected — caller '{}' is not admin",
                     authentication != null ? authentication.getName() : "<unauthenticated>");
-            return ResponseEntity.status(403)
-                    .body(SqlConsoleResponse.error("Access denied: admin login required"));
+            return ResponseEntity.status(403).body(SqlConsoleResponse.error("Access denied: admin login required"));
         }
 
         final String sql = request.getSql() != null ? request.getSql().trim() : "";
@@ -169,7 +166,10 @@ public class SqlConsoleController {
                 }
 
             } catch (Exception e) {
-                try { conn.rollback(); } catch (Exception ignored) { }
+                try {
+                    conn.rollback();
+                } catch (Exception ignored) {
+                }
                 log.warn("data/execute-sql: SQL error", e);
                 return ResponseEntity.ok(SqlConsoleResponse.error(e.getMessage()));
             }

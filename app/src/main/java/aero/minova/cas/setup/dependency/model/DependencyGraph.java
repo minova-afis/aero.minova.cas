@@ -9,9 +9,9 @@ import java.util.List;
  * welche alle Abhängigkeiten eines Moduls enthält.
  */
 public class DependencyGraph implements Serializable {
-	private List<Dependency> dependencies = new ArrayList<>();
+    private List<Dependency> dependencies = new ArrayList<>();
 
-	public List<Dependency> getDependencies() {
-		return dependencies;
-	}
+    public List<Dependency> getDependencies() {
+        return dependencies;
+    }
 }

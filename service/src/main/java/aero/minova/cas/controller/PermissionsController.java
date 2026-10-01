@@ -2,6 +2,9 @@ package aero.minova.cas.controller;
 
 import java.util.Set;
 
+import aero.minova.cas.service.PermissionsService;
+import aero.minova.cas.service.PermissionsService.TreeResponse;
+import aero.minova.cas.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,10 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import aero.minova.cas.service.PermissionsService;
-import aero.minova.cas.service.PermissionsService.TreeResponse;
-import aero.minova.cas.service.SecurityService;
 
 /**
  * Read-only "Access Rights" permissions tree, backing web.ui's Access Rights view (minova-afis/web.ui#129).
@@ -36,36 +35,37 @@ import aero.minova.cas.service.SecurityService;
 @RestController
 public class PermissionsController {
 
-	private static final Set<String> VALID_DEPTHS = Set.of("category", "category+form", "full");
+    private static final Set<String> VALID_DEPTHS = Set.of("category", "category+form", "full");
 
-	@Autowired
-	PermissionsService permissionsService;
+    @Autowired
+    PermissionsService permissionsService;
 
-	@Autowired
-	SecurityService securityService;
+    @Autowired
+    SecurityService securityService;
 
-	/**
-	 * @param depth
-	 *            "category", "category+form" (default), or "full". "full" additionally requires item-level detail
-	 *            (same admin gate as the endpoint itself -- there is no separate, lesser gate for it).
-	 */
-	@GetMapping(value = "/permissions/tree", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<TreeResponse> getTree(@RequestParam(defaultValue = "category+form") String depth) {
-		if (!isCurrentUserAdmin()) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
+    /**
+     * @param depth
+     *            "category", "category+form" (default), or "full". "full" additionally requires item-level detail
+     *            (same admin gate as the endpoint itself -- there is no separate, lesser gate for it).
+     */
+    @GetMapping(value = "/permissions/tree", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TreeResponse> getTree(@RequestParam(defaultValue = "category+form") String depth) {
+        if (!isCurrentUserAdmin()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
-		String effectiveDepth = VALID_DEPTHS.contains(depth) ? depth : "category+form";
-		return ResponseEntity.ok(permissionsService.getTree(effectiveDepth));
-	}
+        String effectiveDepth = VALID_DEPTHS.contains(depth) ? depth : "category+form";
+        return ResponseEntity.ok(permissionsService.getTree(effectiveDepth));
+    }
 
-	private boolean isCurrentUserAdmin() {
-		// Defensive, same as SecurityService.getPrivilegePermissions -- the client normally already triggers
-		// POST /loadPrivileges after login, but this endpoint shouldn't rely on that having happened.
-		securityService.loadAllPrivileges();
+    private boolean isCurrentUserAdmin() {
+        // Defensive, same as SecurityService.getPrivilegePermissions -- the client normally already triggers
+        // POST /loadPrivileges after login, but this endpoint shouldn't rely on that having happened.
+        securityService.loadAllPrivileges();
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		return authentication != null
-				&& authentication.getAuthorities().stream().anyMatch(authority -> "admin".equalsIgnoreCase(authority.getAuthority()));
-	}
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null
+                && authentication.getAuthorities().stream()
+                        .anyMatch(authority -> "admin".equalsIgnoreCase(authority.getAuthority()));
+    }
 }

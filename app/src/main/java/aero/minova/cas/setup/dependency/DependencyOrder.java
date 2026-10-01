@@ -1,5 +1,13 @@
 package aero.minova.cas.setup.dependency;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import aero.minova.cas.setup.dependency.model.Dependency;
 import aero.minova.cas.setup.dependency.model.DependencyGraph;
 import com.google.gson.Gson;
@@ -8,15 +16,6 @@ import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.EdgeReversedGraph;
-
-import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class DependencyOrder {
     private DependencyOrder() {
@@ -60,8 +59,7 @@ public class DependencyOrder {
         while (!graph.vertexSet().isEmpty()) {
             List<String> dependenciesWithoutFurtherDependencies = findVerticesWithoutIncomingEdges(graph);
 
-            if (dependenciesWithoutFurtherDependencies.isEmpty())
-                throw new RuntimeException("INTERNAL: Cyclic link?");
+            if (dependenciesWithoutFurtherDependencies.isEmpty()) throw new RuntimeException("INTERNAL: Cyclic link?");
             Collections.sort(dependenciesWithoutFurtherDependencies);
             orderedDependencies.addAll(dependenciesWithoutFurtherDependencies);
             graph.removeAllVertices(dependenciesWithoutFurtherDependencies);
@@ -87,12 +85,14 @@ public class DependencyOrder {
 
         boolean cyclesDetected = cycleDetector.detectCycles();
         if (cyclesDetected) {
-            throw new RuntimeException("Cycles within following vertices detected: " + String.join(", ", cycleDetector.findCycles()));
+            throw new RuntimeException(
+                    "Cycles within following vertices detected: " + String.join(", ", cycleDetector.findCycles()));
         }
         return cyclesDetected;
     }
 
-    private static Graph<String, DefaultEdge> convertRelationsToDirectedGraph(Map<String, Set<String>> dependencyRelations) {
+    private static Graph<String, DefaultEdge> convertRelationsToDirectedGraph(
+            Map<String, Set<String>> dependencyRelations) {
         final Graph<String, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
 
         for (Map.Entry<String, Set<String>> entry : dependencyRelations.entrySet()) {
@@ -122,8 +122,8 @@ public class DependencyOrder {
     }
 
     private static Map<String, Set<String>> extractDependencyRelationsFromJson(String json) {
-        final List<Dependency> dependencies = new Gson().fromJson(json, DependencyGraph.class)
-                .getDependencies();
+        final List<Dependency> dependencies =
+                new Gson().fromJson(json, DependencyGraph.class).getDependencies();
 
         final Map<String, Set<String>> dependencyMapping = new HashMap<>();
         dependencies.forEach(d -> {

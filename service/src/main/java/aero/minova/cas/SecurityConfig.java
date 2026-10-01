@@ -6,6 +6,11 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import aero.minova.cas.ldap.MultipleLdapDomainsAuthenticationProvider;
+import aero.minova.cas.ldap.MultipleLdapServerAddressesUserDetailsManager;
+import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,182 +39,180 @@ import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 
-import aero.minova.cas.ldap.MultipleLdapDomainsAuthenticationProvider;
-import aero.minova.cas.ldap.MultipleLdapServerAddressesUserDetailsManager;
-import aero.minova.cas.service.SecurityService;
-import aero.minova.cas.sql.SystemDatabase;
-import lombok.RequiredArgsConstructor;
-
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 
-	private static final String ADMIN = "admin";
+    private static final String ADMIN = "admin";
 
-	private static final String MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR = ";";
+    private static final String MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR = ";";
 
-	@Value("${security_ldap_domain:minova.com}")
-	private String domain;
+    @Value("${security_ldap_domain:minova.com}")
+    private String domain;
 
-	@Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
-	private String ldapServerAddress;
+    @Value("${security_ldap_address:ldap://mindcsrv.minova.com:3268/}")
+    private String ldapServerAddress;
 
-	@Value("${login_dataSource:}")
-	private String loginDataSource;
+    @Value("${login_dataSource:}")
+    private String loginDataSource;
 
-	@Value("${server.port:8084}")
-	private String serverPort;
+    @Value("${server.port:8084}")
+    private String serverPort;
 
-	@Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
-	private String allowedOrigins;
+    @Value("${cors.allowed.origins:http://localhost:8100,https://localhost:8100}")
+    private String allowedOrigins;
 
-	@Autowired
-	SystemDatabase systemDatabase;
+    @Autowired
+    SystemDatabase systemDatabase;
 
-	private final DataSource dataSource;
+    private final DataSource dataSource;
 
-	@Bean
-	public SpringSecurityDialect springSecurityDialect() {
-		return new SpringSecurityDialect();
-	}
+    @Bean
+    public SpringSecurityDialect springSecurityDialect() {
+        return new SpringSecurityDialect();
+    }
 
-	CorsConfigurationSource corsConfigurationSource() {
-	    CorsConfiguration corsConfiguration = new CorsConfiguration();
-	
-	    corsConfiguration.setAllowedMethods(List.of("*"));
-	    corsConfiguration.setAllowedHeaders(List.of("*"));
-	    corsConfiguration.setExposedHeaders(List.of("*"));
-	    corsConfiguration.setAllowCredentials(true);
-	
-	    corsConfiguration.setAllowedOriginPatterns(
-	        Arrays.stream(allowedOrigins.split(","))
-	            .map(String::trim)
-	            .toList()
-	    );
-	
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	
-	    source.registerCorsConfiguration("/**", corsConfiguration);
-	
-	    return source;
-	}
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http,
-			ObjectProvider<JwtAuthenticationConverter> jwtAuthenticationConverterProvider) throws Exception {
+        corsConfiguration.setAllowedMethods(List.of("*"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setExposedHeaders(List.of("*"));
+        corsConfiguration.setAllowCredentials(true);
 
-		http.authorizeHttpRequests(requests -> requests
-					// OPTIONS requests should be allowed without authentication for CORS preflight (standard!)
-					.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-					.requestMatchers("/actuator/**").permitAll()
-					// Static assets for the legacy setup page (/cas/setup)
-					.requestMatchers("/public/**", "/img/**", "/js/**", "/theme/**").permitAll()
-					// Legacy setup/login pages — public so anonymous users see the login form
-					.requestMatchers("/", "/index", "/login", "/setup").permitAll()
-					// Embedded React UI — served at /ui/**; this is the primary login page, must be public
-					.requestMatchers("/ui", "/ui/**").permitAll()
-					// foundation.rest.auth's auth-type discovery endpoint — always public
-					.requestMatchers("/auth").permitAll()
-					.anyRequest().fullyAuthenticated()
-				)
-				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/ui/"))
-				// formLogin covers the legacy Thymeleaf setup page; loginPage points to the
-				// React UI so unauthenticated browser redirects land on the React login screen.
-				.formLogin(form -> form.loginPage("/ui/")//
-						// Explicit: without this Spring Security silently sets loginProcessingUrl=loginPage,
-						// which would move form processing from POST /login to POST /ui/ — breaking the
-						// legacy Thymeleaf setup page that posts to /login.
-						.loginProcessingUrl("/login")//
-						.defaultSuccessUrl("/ui/")//
-						.permitAll())
-				.httpBasic(Customizer.withDefaults())
-				.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
-						.configurationSource(corsConfigurationSource()))
+        corsConfiguration.setAllowedOriginPatterns(
+                Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList());
 
-				// scj: CSRF Should only be enabled if basic auth is replaced by a modern
-				// method.
-				.csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security vulnerabilities.
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-		if ("oidc".equals(loginDataSource)) {
-			JwtAuthenticationConverter converter = jwtAuthenticationConverterProvider.getIfAvailable();
-			if (converter == null) {
-				throw new IllegalStateException(
-						"login_dataSource=oidc also requires foundation.rest.auth.mode=oidc and its oidc.* properties to be set");
-			}
-			http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)));
-		}
+        source.registerCorsConfiguration("/**", corsConfiguration);
 
-		return http.build();
-	}
+        return source;
+    }
 
-	@Bean
-	public UserDetailsManager userDetailsManager() {
-		if ("ldap".equals(loginDataSource)) {
-			return new MultipleLdapServerAddressesUserDetailsManager(
-					Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)));
-		} else if ("database".equals(loginDataSource)) {
-			JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+    @Bean
+    public SecurityFilterChain filterChain(
+            HttpSecurity http, ObjectProvider<JwtAuthenticationConverter> jwtAuthenticationConverterProvider)
+            throws Exception {
 
-			if (systemDatabase.isSQLDatabase()) {
-				jdbcUserDetailsManager.setUsersByUsernameQuery(
-						"select Username,Password,LastAction as enabled  from xtcasUsers where Username = ?");
-			} else {
-				jdbcUserDetailsManager.setUsersByUsernameQuery(
-						"select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
-			}
+        http.authorizeHttpRequests(requests -> requests
+                        // OPTIONS requests should be allowed without authentication for CORS preflight (standard!)
+                        .requestMatchers(CorsUtils::isPreFlightRequest)
+                        .permitAll()
+                        .requestMatchers("/actuator/**")
+                        .permitAll()
+                        // Static assets for the legacy setup page (/cas/setup)
+                        .requestMatchers("/public/**", "/img/**", "/js/**", "/theme/**")
+                        .permitAll()
+                        // Legacy setup/login pages — public so anonymous users see the login form
+                        .requestMatchers("/", "/index", "/login", "/setup")
+                        .permitAll()
+                        // Embedded React UI — served at /ui/**; this is the primary login page, must be public
+                        .requestMatchers("/ui", "/ui/**")
+                        .permitAll()
+                        // foundation.rest.auth's auth-type discovery endpoint — always public
+                        .requestMatchers("/auth")
+                        .permitAll()
+                        .anyRequest()
+                        .fullyAuthenticated())
+                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/ui/"))
+                // formLogin covers the legacy Thymeleaf setup page; loginPage points to the
+                // React UI so unauthenticated browser redirects land on the React login screen.
+                .formLogin(form -> form.loginPage("/ui/") //
+                        // Explicit: without this Spring Security silently sets loginProcessingUrl=loginPage,
+                        // which would move form processing from POST /login to POST /ui/ — breaking the
+                        // legacy Thymeleaf setup page that posts to /login.
+                        .loginProcessingUrl("/login") //
+                        .defaultSuccessUrl("/ui/") //
+                        .permitAll())
+                .httpBasic(Customizer.withDefaults())
+                .cors(httpSecurityCorsConfigurer ->
+                        httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
 
-			jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
-					"select Username,Authority from xtcasAuthorities where Username = ?");
+                // scj: CSRF Should only be enabled if basic auth is replaced by a modern
+                // method.
+                .csrf((csrf) -> csrf.disable()); // TODO: Reconsider this, as disabling CSRF can lead to security
+        // vulnerabilities.
 
-			return jdbcUserDetailsManager;
-		} else if (ADMIN.equals(loginDataSource)) {
-			UserDetails user = User //
-					.withUsername(ADMIN) //
-					.password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")) //
-					.roles(ADMIN) //
-					.authorities(ADMIN) //
-					.build();
-			return new InMemoryUserDetailsManager(user);
-		} else if ("oidc".equals(loginDataSource)) {
-			// OIDC-authenticated requests never consult this bean — the Authentication is built directly from the
-			// JWT by foundation.rest.auth's JwtAuthenticationConverter. This empty manager only exists so
-			// .httpBasic()/.formLogin() (which stay active unconditionally for every mode) have something to bind
-			// to instead of failing to wire up; Basic/form-login attempts simply won't succeed in this mode.
-			return new InMemoryUserDetailsManager();
-		}
-		throw new IllegalArgumentException("dataSource contains unknown parameter '" + loginDataSource + "'");
-	}
+        if ("oidc".equals(loginDataSource)) {
+            JwtAuthenticationConverter converter = jwtAuthenticationConverterProvider.getIfAvailable();
+            if (converter == null) {
+                throw new IllegalStateException(
+                        "login_dataSource=oidc also requires foundation.rest.auth.mode=oidc and its oidc.* properties to be set");
+            }
+            http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)));
+        }
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+        return http.build();
+    }
 
-	@Bean
-	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
-	AuthenticationProvider activeDirectoryLdapAuthenticationProvider(
-			UserDetailsContextMapper userDetailsContextMapper) {
-		return new MultipleLdapDomainsAuthenticationProvider(//
-				Arrays.asList(domain.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
-				Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
-				userDetailsContextMapper);
-	}
+    @Bean
+    public UserDetailsManager userDetailsManager() {
+        if ("ldap".equals(loginDataSource)) {
+            return new MultipleLdapServerAddressesUserDetailsManager(
+                    Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)));
+        } else if ("database".equals(loginDataSource)) {
+            JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 
-	@Bean("ldapUser")
-	@ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
-	UserDetailsContextMapper userDetailsContextMapper(SecurityService securityService) throws RuntimeException {
-		return new LdapUserDetailsMapper() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public UserDetails mapUserFromContext(DirContextOperations ctx, String username,
-					Collection<? extends GrantedAuthority> authorities)
-					throws RuntimeException {
-				List<String> userSecurityTokens = securityService.loadLDAPUserTokens(username);
-				List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(username,
-						userSecurityTokens,
-						(List<GrantedAuthority>) authorities);
-				return super.mapUserFromContext(ctx, username, grantedAuthorities);
-			}
-		};
-	}
+            if (systemDatabase.isSQLDatabase()) {
+                jdbcUserDetailsManager.setUsersByUsernameQuery(
+                        "select Username,Password,LastAction as enabled  from xtcasUsers where Username = ?");
+            } else {
+                jdbcUserDetailsManager.setUsersByUsernameQuery(
+                        "select Username,Password,LastAction>0 as enabled  from xtcasUsers where Username = ?");
+            }
+
+            jdbcUserDetailsManager.setAuthoritiesByUsernameQuery(
+                    "select Username,Authority from xtcasAuthorities where Username = ?");
+
+            return jdbcUserDetailsManager;
+        } else if (ADMIN.equals(loginDataSource)) {
+            UserDetails user = User //
+                    .withUsername(ADMIN) //
+                    .password(passwordEncoder().encode("rqgzxTf71EAx8chvchMi")) //
+                    .roles(ADMIN) //
+                    .authorities(ADMIN) //
+                    .build();
+            return new InMemoryUserDetailsManager(user);
+        } else if ("oidc".equals(loginDataSource)) {
+            // OIDC-authenticated requests never consult this bean — the Authentication is built directly from the
+            // JWT by foundation.rest.auth's JwtAuthenticationConverter. This empty manager only exists so
+            // .httpBasic()/.formLogin() (which stay active unconditionally for every mode) have something to bind
+            // to instead of failing to wire up; Basic/form-login attempts simply won't succeed in this mode.
+            return new InMemoryUserDetailsManager();
+        }
+        throw new IllegalArgumentException("dataSource contains unknown parameter '" + loginDataSource + "'");
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
+    AuthenticationProvider activeDirectoryLdapAuthenticationProvider(
+            UserDetailsContextMapper userDetailsContextMapper) {
+        return new MultipleLdapDomainsAuthenticationProvider( //
+                Arrays.asList(domain.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
+                Arrays.asList(ldapServerAddress.split(SecurityConfig.MULTIPLE_LDAP_CONFIGURATIONS_SEPERATOR)), //
+                userDetailsContextMapper);
+    }
+
+    @Bean("ldapUser")
+    @ConditionalOnProperty(value = "login_dataSource", havingValue = "ldap")
+    UserDetailsContextMapper userDetailsContextMapper(SecurityService securityService) throws RuntimeException {
+        return new LdapUserDetailsMapper() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public UserDetails mapUserFromContext(
+                    DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities)
+                    throws RuntimeException {
+                List<String> userSecurityTokens = securityService.loadLDAPUserTokens(username);
+                List<GrantedAuthority> grantedAuthorities = securityService.loadUserGroupPrivileges(
+                        username, userSecurityTokens, (List<GrantedAuthority>) authorities);
+                return super.mapUserFromContext(ctx, username, grantedAuthorities);
+            }
+        };
+    }
 }

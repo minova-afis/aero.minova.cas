@@ -3,7 +3,6 @@ package aero.minova.cas.resources;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,7 +92,8 @@ public class ResourcePath implements Path {
             newPath.addAll(((ResourcePath) other).path);
             return new ResourcePath(newPath, fileSystem);
         } else {
-            throw new UnsupportedOperationException("Only " + getClass().getName() + " are supported and not " + other.getClass().getName() + ".");
+            throw new UnsupportedOperationException("Only " + getClass().getName() + " are supported and not "
+                    + other.getClass().getName() + ".");
         }
     }
 
@@ -118,7 +118,8 @@ public class ResourcePath implements Path {
     }
 
     @Override
-    public WatchKey register(WatchService watcher, WatchEvent.Kind<?>[] events, WatchEvent.Modifier... modifiers) throws IOException {
+    public WatchKey register(WatchService watcher, WatchEvent.Kind<?>[] events, WatchEvent.Modifier... modifiers)
+            throws IOException {
         throw new UnsupportedOperationException();
     }
 

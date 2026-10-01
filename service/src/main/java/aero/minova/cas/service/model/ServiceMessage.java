@@ -9,6 +9,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,29 +21,29 @@ import lombok.ToString;
 @Table(name = "xtcasServiceMessage")
 public class ServiceMessage extends DataEntity {
 
-	@NotNull
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "CASServiceKey", nullable = false)
-	private CASServices casService;
+    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "CASServiceKey", nullable = false)
+    private CASServices casService;
 
-	@NotNull
-	@Lob
-	@Column(name = "Message")
-	private String message;
+    @NotNull
+    @Lob
+    @Column(name = "Message")
+    private String message;
 
-	@NotNull
-	@Column(name = "IsSent")
-	private boolean isSent = false;
+    @NotNull
+    @Column(name = "IsSent")
+    private boolean isSent = false;
 
-	@NotNull
-	@Column(name = "NumberOfAttempts")
-	private int numberOfAttempts = 0;
+    @NotNull
+    @Column(name = "NumberOfAttempts")
+    private int numberOfAttempts = 0;
 
-	@NotNull
-	@Column(name = "MessageCreationDate")
-	private LocalDateTime messageCreationDate = LocalDateTime.now();
+    @NotNull
+    @Column(name = "MessageCreationDate")
+    private LocalDateTime messageCreationDate = LocalDateTime.now();
 
-	@NotNull
-	@Column(name = "Failed")
-	private boolean failed = false;
+    @NotNull
+    @Column(name = "Failed")
+    private boolean failed = false;
 }

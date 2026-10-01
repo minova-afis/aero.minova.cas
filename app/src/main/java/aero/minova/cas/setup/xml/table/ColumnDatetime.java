@@ -10,9 +10,11 @@ import lombok.Setter;
 public class ColumnDatetime {
     private boolean identity;
     private boolean nullable = true;
+
     public boolean getIdentity() {
         return identity;
     }
+
     public boolean getNullable() {
         return nullable;
     }

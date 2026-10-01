@@ -3,6 +3,12 @@ package aero.minova.cas.service;
 import java.sql.Connection;
 import java.util.Collections;
 
+import jakarta.annotation.PostConstruct;
+
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.controller.SqlProcedureController;
+import aero.minova.cas.sql.SystemDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,12 +19,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import aero.minova.cas.CustomLogger;
-import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.controller.SqlProcedureController;
-import aero.minova.cas.sql.SystemDatabase;
-import jakarta.annotation.PostConstruct;
 
 /**
  * Automatically runs database setup on application startup when enabled.
@@ -45,230 +45,228 @@ import jakarta.annotation.PostConstruct;
 @DependsOn("queueService")
 public class AutoSetupService {
 
-	@Autowired
-	protected CustomLogger logger;
+    @Autowired
+    protected CustomLogger logger;
 
-	@Autowired
-	SystemDatabase database;
+    @Autowired
+    SystemDatabase database;
 
-	@Autowired
-	SqlProcedureController sqlProcedureController;
+    @Autowired
+    SqlProcedureController sqlProcedureController;
 
-	/**
-	 * Optional on purpose: this bean only exists when {@code foundation.rest.auth.grants.enabled=true} (see
-	 * {@link GrantsDiscoveryService}'s own {@code @ConditionalOnProperty}). {@code required = false} means
-	 * Spring leaves this {@code null} instead of failing context startup when the flag is off — a deployment
-	 * that hasn't opted into the Groups+Grants model must keep booting exactly as it did before that model
-	 * existed.
-	 * <p>
-	 * Called unconditionally on every {@link #autoSetup()} pass, not just when {@link #executeSetup()} itself
-	 * runs — see that call site's comment for why (a new form must become visible to admin the very next boot,
-	 * not stay invisible until the database looks uninitialized again).
-	 */
-	@Autowired(required = false)
-	GrantsDiscoveryService grantsDiscoveryService;
+    /**
+     * Optional on purpose: this bean only exists when {@code foundation.rest.auth.grants.enabled=true} (see
+     * {@link GrantsDiscoveryService}'s own {@code @ConditionalOnProperty}). {@code required = false} means
+     * Spring leaves this {@code null} instead of failing context startup when the flag is off — a deployment
+     * that hasn't opted into the Groups+Grants model must keep booting exactly as it did before that model
+     * existed.
+     * <p>
+     * Called unconditionally on every {@link #autoSetup()} pass, not just when {@link #executeSetup()} itself
+     * runs — see that call site's comment for why (a new form must become visible to admin the very next boot,
+     * not stay invisible until the database looks uninitialized again).
+     */
+    @Autowired(required = false)
+    GrantsDiscoveryService grantsDiscoveryService;
 
-	@Value("${ng.api.autosetup.force:false}")
-	private boolean forceSetup;
+    @Value("${ng.api.autosetup.force:false}")
+    private boolean forceSetup;
 
-	private boolean setupSucceeded = false;
-	private Exception setupException = null;
+    private boolean setupSucceeded = false;
+    private Exception setupException = null;
 
-	/**
-	 * Runs automatically after Spring context initialization.
-	 * Checks if setup is needed and executes it if required.
-	 *
-	 * <p>Creates a temporary security context with CAS_AUTOSETUP user to allow
-	 * setup procedures to execute with elevated privileges. The context is
-	 * cleared immediately after setup completes.</p>
-	 *
-	 * <p><strong>Important:</strong> This method will NOT prevent application startup on failure.
-	 * If auto-setup fails, the error is logged prominently but the application continues.
-	 * This prevents boot-loops in cloud environments. Check logs for setup errors.</p>
-	 */
-	@PostConstruct
-	public void autoSetup() {
-		logger.logInfo("Auto-setup service enabled - checking if database setup is required...");
+    /**
+     * Runs automatically after Spring context initialization.
+     * Checks if setup is needed and executes it if required.
+     *
+     * <p>Creates a temporary security context with CAS_AUTOSETUP user to allow
+     * setup procedures to execute with elevated privileges. The context is
+     * cleared immediately after setup completes.</p>
+     *
+     * <p><strong>Important:</strong> This method will NOT prevent application startup on failure.
+     * If auto-setup fails, the error is logged prominently but the application continues.
+     * This prevents boot-loops in cloud environments. Check logs for setup errors.</p>
+     */
+    @PostConstruct
+    public void autoSetup() {
+        logger.logInfo("Auto-setup service enabled - checking if database setup is required...");
 
-		// Create temporary authentication context for auto-setup
-		// This grants the setup process admin privileges without requiring login_dataSource=admin
-		Authentication auth = new UsernamePasswordAuthenticationToken(
-			"CAS_AUTOSETUP",
-			null,
-			Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))
-		);
-		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-		securityContext.setAuthentication(auth);
-		SecurityContextHolder.setContext(securityContext);
+        // Create temporary authentication context for auto-setup
+        // This grants the setup process admin privileges without requiring login_dataSource=admin
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                "CAS_AUTOSETUP", null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(auth);
+        SecurityContextHolder.setContext(securityContext);
 
-		try {
-			if (forceSetup) {
-				logger.logInfo("Force setup enabled - running setup unconditionally");
-				executeSetup();
-			} else if (isSetupNeeded()) {
-				logger.logInfo("Database setup required - executing setup procedure");
-				executeSetup();
-			} else {
-				logger.logInfo("Database already initialized - skipping setup");
-			}
+        try {
+            if (forceSetup) {
+                logger.logInfo("Force setup enabled - running setup unconditionally");
+                executeSetup();
+            } else if (isSetupNeeded()) {
+                logger.logInfo("Database setup required - executing setup procedure");
+                executeSetup();
+            } else {
+                logger.logInfo("Database already initialized - skipping setup");
+            }
 
-			// Runs every autoSetup() pass, independent of whether executeSetup() itself ran above — the Grants
-			// model is additive/discovery-based (no wildcards), so a form added since the last boot needs the
-			// admin group to pick up its new grants on THIS boot, not only at first-time setup. Placed after the
-			// if/else above so xtcasMdi is guaranteed populated by the time discovery reads it, whether that
-			// happened just now (first-time setup) or on some earlier boot (already-initialized database).
-			if (grantsDiscoveryService != null) {
-				grantsDiscoveryService.discoverAndSeedAdmin();
-				logger.logSetup("Grants discovery: admin group is in sync with the current form set (foundation.rest.auth)");
-			} else {
-				logger.logInfo("foundation.rest.auth.grants.enabled is not set - skipping Grants discovery");
-			}
+            // Runs every autoSetup() pass, independent of whether executeSetup() itself ran above — the Grants
+            // model is additive/discovery-based (no wildcards), so a form added since the last boot needs the
+            // admin group to pick up its new grants on THIS boot, not only at first-time setup. Placed after the
+            // if/else above so xtcasMdi is guaranteed populated by the time discovery reads it, whether that
+            // happened just now (first-time setup) or on some earlier boot (already-initialized database).
+            if (grantsDiscoveryService != null) {
+                grantsDiscoveryService.discoverAndSeedAdmin();
+                logger.logSetup(
+                        "Grants discovery: admin group is in sync with the current form set (foundation.rest.auth)");
+            } else {
+                logger.logInfo("foundation.rest.auth.grants.enabled is not set - skipping Grants discovery");
+            }
 
-			setupSucceeded = true;
-		} catch (Exception e) {
-			setupException = e;
-			setupSucceeded = false;
+            setupSucceeded = true;
+        } catch (Exception e) {
+            setupException = e;
+            setupSucceeded = false;
 
-			// Log error prominently multiple times to ensure visibility in logs
-			logger.logError("╔════════════════════════════════════════════════════════════════════╗", null);
-			logger.logError("║                     AUTO-SETUP FAILED!                             ║", null);
-			logger.logError("╠════════════════════════════════════════════════════════════════════╣", null);
-			logger.logError("║  Database initialization failed but application will continue.     ║", null);
-			logger.logError("║  The application may NOT function correctly!                       ║", null);
-			logger.logError("║                                                                    ║", null);
-			logger.logError("║  Possible causes:                                                  ║", null);
-			logger.logError("║  - Database connection issues                                      ║", null);
-			logger.logError("║  - Insufficient database permissions                               ║", null);
-			logger.logError("║  - Incompatible database schema                                    ║", null);
-			logger.logError("║  - SQL script errors                                               ║", null);
-			logger.logError("║                                                                    ║", null);
-			logger.logError("║  Check logs above for detailed error information.                  ║", null);
-			logger.logError("║  You may need to run setup manually via POST /setup endpoint.      ║", null);
-			logger.logError("╚════════════════════════════════════════════════════════════════════╝", null);
-			logger.logError("Auto-setup exception details:", e);
+            // Log error prominently multiple times to ensure visibility in logs
+            logger.logError("╔════════════════════════════════════════════════════════════════════╗", null);
+            logger.logError("║                     AUTO-SETUP FAILED!                             ║", null);
+            logger.logError("╠════════════════════════════════════════════════════════════════════╣", null);
+            logger.logError("║  Database initialization failed but application will continue.     ║", null);
+            logger.logError("║  The application may NOT function correctly!                       ║", null);
+            logger.logError("║                                                                    ║", null);
+            logger.logError("║  Possible causes:                                                  ║", null);
+            logger.logError("║  - Database connection issues                                      ║", null);
+            logger.logError("║  - Insufficient database permissions                               ║", null);
+            logger.logError("║  - Incompatible database schema                                    ║", null);
+            logger.logError("║  - SQL script errors                                               ║", null);
+            logger.logError("║                                                                    ║", null);
+            logger.logError("║  Check logs above for detailed error information.                  ║", null);
+            logger.logError("║  You may need to run setup manually via POST /setup endpoint.      ║", null);
+            logger.logError("╚════════════════════════════════════════════════════════════════════╝", null);
+            logger.logError("Auto-setup exception details:", e);
 
-			// DO NOT throw exception - allow application to start
-			// This prevents boot-loops in Kubernetes/cloud environments
-			// Operators can check logs and health endpoints to diagnose issues
-		} finally {
-			// Always clear the security context after setup completes
-			// This ensures the temporary admin privileges don't persist
-			SecurityContextHolder.clearContext();
-			logger.logInfo("Auto-setup security context cleared");
-		}
-	}
+            // DO NOT throw exception - allow application to start
+            // This prevents boot-loops in Kubernetes/cloud environments
+            // Operators can check logs and health endpoints to diagnose issues
+        } finally {
+            // Always clear the security context after setup completes
+            // This ensures the temporary admin privileges don't persist
+            SecurityContextHolder.clearContext();
+            logger.logInfo("Auto-setup security context cleared");
+        }
+    }
 
-	/**
-	 * Returns whether auto-setup succeeded.
-	 * Can be used by health checks or monitoring.
-	 */
-	public boolean isSetupSucceeded() {
-		return setupSucceeded;
-	}
+    /**
+     * Returns whether auto-setup succeeded.
+     * Can be used by health checks or monitoring.
+     */
+    public boolean isSetupSucceeded() {
+        return setupSucceeded;
+    }
 
-	/**
-	 * Returns the exception that caused setup failure, if any.
-	 */
-	public Exception getSetupException() {
-		return setupException;
-	}
+    /**
+     * Returns the exception that caused setup failure, if any.
+     */
+    public Exception getSetupException() {
+        return setupException;
+    }
 
-	/**
-	 * Checks if database setup is needed by verifying xtcasUsers table exists and has users.
-	 *
-	 * <p><strong>Critical Check:</strong> If xtcasUsers is absent OR empty, nobody can login
-	 * when using login_dataSource=database. This check ensures the database is in a usable state.</p>
-	 *
-	 * <p>Setup is needed if:</p>
-	 * <ul>
-	 *   <li>xtcasUsers table does not exist</li>
-	 *   <li>xtcasUsers table exists but is empty</li>
-	 *   <li>Database state cannot be verified (connection issues)</li>
-	 * </ul>
-	 *
-	 * @return true if setup should be run, false if database is already initialized
-	 */
-	private boolean isSetupNeeded() {
-		try (Connection connection = database.getConnection()) {
+    /**
+     * Checks if database setup is needed by verifying xtcasUsers table exists and has users.
+     *
+     * <p><strong>Critical Check:</strong> If xtcasUsers is absent OR empty, nobody can login
+     * when using login_dataSource=database. This check ensures the database is in a usable state.</p>
+     *
+     * <p>Setup is needed if:</p>
+     * <ul>
+     *   <li>xtcasUsers table does not exist</li>
+     *   <li>xtcasUsers table exists but is empty</li>
+     *   <li>Database state cannot be verified (connection issues)</li>
+     * </ul>
+     *
+     * @return true if setup should be run, false if database is already initialized
+     */
+    private boolean isSetupNeeded() {
+        try (Connection connection = database.getConnection()) {
 
-			// Step 1: Check if xtcasUsers table exists
-			logger.logInfo("Checking if xtcasUsers table exists...");
-			String tableExistsQuery = database.isSQLDatabase()
-				? "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'xtcasUsers'"
-				: "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'xtcasUsers'";
+            // Step 1: Check if xtcasUsers table exists
+            logger.logInfo("Checking if xtcasUsers table exists...");
+            String tableExistsQuery = database.isSQLDatabase()
+                    ? "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'xtcasUsers'"
+                    : "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'xtcasUsers'";
 
-			boolean tableExists = false;
-			try (var statement = connection.createStatement();
-			     var resultSet = statement.executeQuery(tableExistsQuery)) {
+            boolean tableExists = false;
+            try (var statement = connection.createStatement();
+                    var resultSet = statement.executeQuery(tableExistsQuery)) {
 
-				if (resultSet.next()) {
-					tableExists = resultSet.getInt(1) > 0;
-				}
-			}
+                if (resultSet.next()) {
+                    tableExists = resultSet.getInt(1) > 0;
+                }
+            }
 
-			if (!tableExists) {
-				logger.logInfo("> Table xtcasUsers does not exist - setup REQUIRED");
-				logger.logInfo("  Reason: Without xtcasUsers, database authentication is impossible");
-				return true;
-			}
-			logger.logInfo(" Table xtcasUsers exists");
+            if (!tableExists) {
+                logger.logInfo("> Table xtcasUsers does not exist - setup REQUIRED");
+                logger.logInfo("  Reason: Without xtcasUsers, database authentication is impossible");
+                return true;
+            }
+            logger.logInfo(" Table xtcasUsers exists");
 
-			// Step 2: Check if xtcasUsers has at least one user
-			logger.logInfo("Checking if xtcasUsers table has users...");
-			int userCount = 0;
-			try (var statement = connection.createStatement();
-			     var resultSet = statement.executeQuery("SELECT COUNT(*) FROM xtcasUsers WHERE LastAction > 0")) {
+            // Step 2: Check if xtcasUsers has at least one user
+            logger.logInfo("Checking if xtcasUsers table has users...");
+            int userCount = 0;
+            try (var statement = connection.createStatement();
+                    var resultSet = statement.executeQuery("SELECT COUNT(*) FROM xtcasUsers WHERE LastAction > 0")) {
 
-				if (resultSet.next()) {
-					userCount = resultSet.getInt(1);
-				}
-			}
+                if (resultSet.next()) {
+                    userCount = resultSet.getInt(1);
+                }
+            }
 
-			if (userCount == 0) {
-				logger.logInfo("> Table xtcasUsers is empty - setup REQUIRED");
-				logger.logInfo("  Reason: Without users, nobody can login");
-				return true;
-			}
+            if (userCount == 0) {
+                logger.logInfo("> Table xtcasUsers is empty - setup REQUIRED");
+                logger.logInfo("  Reason: Without users, nobody can login");
+                return true;
+            }
 
-			logger.logInfo("> Table xtcasUsers has " + userCount + " active user(s)");
-			logger.logInfo("  Database appears initialized - skipping setup");
+            logger.logInfo("> Table xtcasUsers has " + userCount + " active user(s)");
+            logger.logInfo("  Database appears initialized - skipping setup");
 
-			connection.commit();
-			return false;
+            connection.commit();
+            return false;
 
-		} catch (Exception e) {
-			// If we can't verify database state, assume setup is needed
-			// This is safe because setup is idempotent
-			logger.logInfo("> Could not verify database state - assuming setup is needed");
-			logger.logInfo("  Error: " + e.getMessage());
-			logger.logInfo("  This is normal for first-time installations");
-			return true;
-		}
-	}
+        } catch (Exception e) {
+            // If we can't verify database state, assume setup is needed
+            // This is safe because setup is idempotent
+            logger.logInfo("> Could not verify database state - assuming setup is needed");
+            logger.logInfo("  Error: " + e.getMessage());
+            logger.logInfo("  This is normal for first-time installations");
+            return true;
+        }
+    }
 
-	/**
-	 * Executes the setup procedure by calling the same logic as POST /setup endpoint.
-	 * This ensures identical behavior whether setup runs automatically or manually.
-	 */
-	private void executeSetup() throws Exception {
-		logger.logSetup("Starting automatic database setup...");
+    /**
+     * Executes the setup procedure by calling the same logic as POST /setup endpoint.
+     * This ensures identical behavior whether setup runs automatically or manually.
+     */
+    private void executeSetup() throws Exception {
+        logger.logSetup("Starting automatic database setup...");
 
-		Table setupTable = new Table();
-		setupTable.setName("setup");
+        Table setupTable = new Table();
+        setupTable.setName("setup");
 
-		try {
-			// Execute setup using the same controller method as manual setup
-			sqlProcedureController.executeProcedure(setupTable);
-			sqlProcedureController.setupDefaultAdminUser();
+        try {
+            // Execute setup using the same controller method as manual setup
+            sqlProcedureController.executeProcedure(setupTable);
+            sqlProcedureController.setupDefaultAdminUser();
 
-			// Grants discovery/seeding is no longer called from here — it now runs unconditionally from
-			// autoSetup() on every pass (see that method), not just when executeSetup() itself runs.
+            // Grants discovery/seeding is no longer called from here — it now runs unconditionally from
+            // autoSetup() on every pass (see that method), not just when executeSetup() itself runs.
 
-			logger.logInfo("Automatic database setup completed successfully");
-			logger.logSetup("Automatic database setup completed successfully");
-		} catch (Exception e) {
-			logger.logError("Automatic database setup failed!", e);
-			throw e;
-		}
-	}
+            logger.logInfo("Automatic database setup completed successfully");
+            logger.logSetup("Automatic database setup completed successfully");
+        } catch (Exception e) {
+            logger.logError("Automatic database setup failed!", e);
+            throw e;
+        }
+    }
 }

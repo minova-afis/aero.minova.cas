@@ -25,7 +25,8 @@ public class XmlDatabaseTable {
     private boolean identity = false;
     private final String setIdentitiy = "SET IDENTITY_INSERT";
     private String DBCollation = "null";
-    private final String ifexistsconstrain = "select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME = '";
+    private final String ifexistsconstrain =
+            "select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME = '";
     private final String ifexistsconstrainend = "'";
 
     public boolean isIdentity() {
@@ -136,12 +137,14 @@ public class XmlDatabaseTable {
         }
         final List<ForeignKey> fkeys = t.getForeignkey();
         for (int i = 0; i < fkeys.size(); i++) {
-            final XmlForeignKeyContraint fkc = new XmlForeignKeyContraint(t, fkeys.get(i), fkeys.get(i).getColumn());
+            final XmlForeignKeyContraint fkc =
+                    new XmlForeignKeyContraint(t, fkeys.get(i), fkeys.get(i).getColumn());
             this.foreignKeyContraint.add(fkc);
         }
         final List<UniqueKey> ukeys = t.getUniquekey();
         for (int i = 0; i < ukeys.size(); i++) {
-            final XmlUniqueKeyConstraint ukc = new XmlUniqueKeyConstraint(t, ukeys.get(i), ukeys.get(i).getColumn());
+            final XmlUniqueKeyConstraint ukc =
+                    new XmlUniqueKeyConstraint(t, ukeys.get(i), ukeys.get(i).getColumn());
             this.uniqueKeyConstraint.add(ukc);
         }
         // auslesen wie viele Rows,
@@ -166,7 +169,6 @@ public class XmlDatabaseTable {
         for (final XmlDatabaseColumn dbc : this.columnVector) {
             dbc.generateSql(sw, firstColumn);
             firstColumn = false;
-
         }
         sw.write(")");
     }
@@ -192,13 +194,17 @@ public class XmlDatabaseTable {
                 }
             } else {
                 sw.write(",[KeyLong_Original] int");
-                System.out.println(MessageFormat
-                        .format("Die angeführte Tabelle {0} hat keinen PrimaryKey desshalb wird angenommen, dass Es einen KeyLong gibt.", this.name));
-                // throw new NullPointerException(MessageFormat.format("Die angeführte Tabelle {0} hat keinen PrimaryKey", name));
+                System.out.println(MessageFormat.format(
+                        "Die angeführte Tabelle {0} hat keinen PrimaryKey desshalb wird angenommen, dass Es einen KeyLong gibt.",
+                        this.name));
+                // throw new NullPointerException(MessageFormat.format("Die angeführte Tabelle {0} hat keinen
+                // PrimaryKey", name));
             }
-            sw.write(", [LoggingDate] datetime default (CURRENT_TIMESTAMP), [LoggingUser] nvarchar(100) default (SYSTEM_USER)");
+            sw.write(
+                    ", [LoggingDate] datetime default (CURRENT_TIMESTAMP), [LoggingUser] nvarchar(100) default (SYSTEM_USER)");
             final String dummy = sw.toString();
-            // Wir legen in jeder Loggingtabelle einen Keylong an, im Falle von Tabellen die nicht mit einem solchen ausgestattet sind wird ein neuer angelegt.
+            // Wir legen in jeder Loggingtabelle einen Keylong an, im Falle von Tabellen die nicht mit einem solchen
+            // ausgestattet sind wird ein neuer angelegt.
             if (!dummy.contains("[KeyLong]") && !dummy.contains("[keylong]")) {
                 sw.write(", [KeyLong] int identity (1, 1)");
             }
@@ -206,7 +212,9 @@ public class XmlDatabaseTable {
         sw.write(")");
     }
 
-    public String compareConstrainsFK(final SqlDatabaseTable sqlTable, final Connection connection, final HashMap<String, String> mymap) throws SQLException {
+    public String compareConstrainsFK(
+            final SqlDatabaseTable sqlTable, final Connection connection, final HashMap<String, String> mymap)
+            throws SQLException {
         Vector<SqlConstraint> vSqlConstraint;
         vSqlConstraint = sqlTable.getConstraints();
         final HashMap<String, String> hashConstraints = new HashMap<String, String>();
@@ -216,13 +224,18 @@ public class XmlDatabaseTable {
         String constriants = "";
         // "SqlForeignKeyConstraint"
         for (int h = 0; h < getforeignKeyContraint().size(); h++) {
-            constraintskey = "fk_" + getforeignKeyContraint().get(h).getTableName() + "_" + getforeignKeyContraint().get(h).getColumnName();
-            constrintsValue = "fk_" + getforeignKeyContraint().get(h).getTableName() + "_" + getforeignKeyContraint().get(h).getColumnName() + "(";
+            constraintskey = "fk_" + getforeignKeyContraint().get(h).getTableName() + "_"
+                    + getforeignKeyContraint().get(h).getColumnName();
+            constrintsValue = "fk_" + getforeignKeyContraint().get(h).getTableName() + "_"
+                    + getforeignKeyContraint().get(h).getColumnName() + "(";
             for (int k = 0; k < getforeignKeyContraint().get(h).getForeignKeyColumns().length; k++) {
                 if (k > 0) {
                     constrintsValue += ", ";
                 }
-                constrintsValue += getforeignKeyContraint().get(h).getForeignKeyColumns()[k].getLocalColumnName();
+                constrintsValue += getforeignKeyContraint()
+                        .get(h)
+                        .getForeignKeyColumns()[k]
+                        .getLocalColumnName();
             }
             if (getforeignKeyContraint().get(h).getForeignKeyColumns().length == 0) {
                 constrintsValue += getforeignKeyContraint().get(h).getColumnName();
@@ -235,7 +248,10 @@ public class XmlDatabaseTable {
                 boolean fk_found = false;
                 for (int i = 0; i < getforeignKeyContraint().size(); i++) {
                     if (mymap.containsKey(getforeignKeyContraint().get(i).getName())) {
-                        if (sqlconstraint.getName().equalsIgnoreCase(getforeignKeyContraint().get(i).getName())) {
+                        if (sqlconstraint
+                                .getName()
+                                .equalsIgnoreCase(
+                                        getforeignKeyContraint().get(i).getName())) {
                             getforeignKeyContraint().remove(i);
                             fk_found = true;
                             i = getforeignKeyContraint().size();
@@ -275,7 +291,8 @@ public class XmlDatabaseTable {
      * @return
      * @throws SQLException
      */
-    public String compareConstrainsPK_UK(final SqlDatabaseTable sqlTable, final Connection connection, final HashMap<String, String> mymap)
+    public String compareConstrainsPK_UK(
+            final SqlDatabaseTable sqlTable, final Connection connection, final HashMap<String, String> mymap)
             throws SQLException {
         Vector<SqlConstraint> vSqlConstraint;
         vSqlConstraint = sqlTable.getConstraints();
@@ -291,7 +308,8 @@ public class XmlDatabaseTable {
                 if (k > 0) {
                     constrintsValue += ", ";
                 }
-                constrintsValue += getPrimaryKeyConstraint().getColumnNames().get(k).toString();
+                constrintsValue +=
+                        getPrimaryKeyConstraint().getColumnNames().get(k).toString();
                 constrintsValue += ")";
                 hashConstraints.put(constraintskey.toLowerCase(), constrintsValue);
             }
@@ -308,8 +326,10 @@ public class XmlDatabaseTable {
                     constraintskey += "_";
                     constraintValues += ",";
                 }
-                constraintValues += getuniqueKeyConstraint().get(j).getUniqueKeyColumns()[l].getLocalColumnName();
-                constraintskey += getuniqueKeyConstraint().get(j).getUniqueKeyColumns()[l].getLocalColumnName();
+                constraintValues +=
+                        getuniqueKeyConstraint().get(j).getUniqueKeyColumns()[l].getLocalColumnName();
+                constraintskey +=
+                        getuniqueKeyConstraint().get(j).getUniqueKeyColumns()[l].getLocalColumnName();
             }
             constrintsValue = constraintskey + constraintValues + ")";
             hashConstraints.put(constraintskey.toLowerCase(), constrintsValue);
@@ -324,7 +344,9 @@ public class XmlDatabaseTable {
                 // getPrimaryKeyConstraint().getName() + ifexistsconstrainend);
                 if (!mymap.containsKey(getPrimaryKeyConstraint().getName())) {
                     // Hier findet der Vergleich der Namen statt
-                    if (!sqlconstraint.getName().equalsIgnoreCase(getPrimaryKeyConstraint().getName())) {
+                    if (!sqlconstraint
+                            .getName()
+                            .equalsIgnoreCase(getPrimaryKeyConstraint().getName())) {
                         // Check if existing constraint is Hibernate-generated (contains __)
                         // If so, skip both drop and recreate - Hibernate constraint is functionally correct
                         if (!isHibernateGeneratedConstraint(sqlconstraint.getName())) {
@@ -348,12 +370,21 @@ public class XmlDatabaseTable {
             } else if (sqlconstraint.getName().toLowerCase().startsWith("uk")) {
                 boolean uk_found = false;
                 for (int i = 0; i < getuniqueKeyConstraint().size(); i++) {
-                    rs = connection.createStatement().executeQuery(
-                            this.ifexistsconstrain + getuniqueKeyConstraint().get(i).getNameOfConstriant().toLowerCase() + this.ifexistsconstrainend);
+                    rs = connection
+                            .createStatement()
+                            .executeQuery(this.ifexistsconstrain
+                                    + getuniqueKeyConstraint()
+                                            .get(i)
+                                            .getNameOfConstriant()
+                                            .toLowerCase()
+                                    + this.ifexistsconstrainend);
                     if (rs.next()) {
                         // Hier findet der Vergleich der Namen statt
 
-                        if (sqlconstraint.getName().equalsIgnoreCase((getuniqueKeyConstraint().get(i).getNameOfConstriant()))) {
+                        if (sqlconstraint
+                                .getName()
+                                .equalsIgnoreCase(
+                                        (getuniqueKeyConstraint().get(i).getNameOfConstriant()))) {
                             getuniqueKeyConstraint().remove(i);
                             uk_found = true;
                             i = getuniqueKeyConstraint().size();
@@ -401,7 +432,8 @@ public class XmlDatabaseTable {
      */
     private void dropConstraint(final String tableName, final String constraintName, final Connection connection) {
         // Dieser Constraints muss nicht m,ehr überprüft werden er ist bereits vorhanden
-        String SQlCodeDrop = "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME= '";
+        String SQlCodeDrop =
+                "IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME= '";
         SQlCodeDrop += constraintName;
         SQlCodeDrop += "') BEGIN ALTER TABLE dbo.[" + tableName + "] DROP CONSTRAINT [" + constraintName + "] END";
         try {
@@ -419,7 +451,6 @@ public class XmlDatabaseTable {
         if (getPrimaryKeyConstraint() != null) {
             constraints += "\n";
             constraints += getPrimaryKeyConstraint().getSQLCode();
-
         }
         return constraints;
     }

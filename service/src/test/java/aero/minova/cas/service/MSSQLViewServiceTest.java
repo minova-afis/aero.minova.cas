@@ -12,11 +12,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import aero.minova.cas.CoreApplicationSystemApplication;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
@@ -25,278 +20,289 @@ import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.sql.SqlUtils;
 import lombok.val;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
-//benötigt, damit JUnit-Tests nicht abbrechen
-//IGNORECASE=true, damit sich H2-Datenbank wie SQL verhält
-@SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = {	"application.runner.enabled=false",
-																					"spring.datasource.url=jdbc:h2:mem:testdb;IGNORECASE=true" })
+// benötigt, damit JUnit-Tests nicht abbrechen
+// IGNORECASE=true, damit sich H2-Datenbank wie SQL verhält
+@SpringBootTest(
+        classes = CoreApplicationSystemApplication.class,
+        properties = {"application.runner.enabled=false", "spring.datasource.url=jdbc:h2:mem:testdb;IGNORECASE=true"})
 class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 
-	@DisplayName("Wähle Einträge ohne Einschränkungen aus.")
-	@Test
-	void testPrepareViewString_withStarSelect() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 * from vWorkingTimeIndex2");
-	}
+    @DisplayName("Wähle Einträge ohne Einschränkungen aus.")
+    @Test
+    void testPrepareViewString_withStarSelect() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups)) //
+                .isEqualTo("select top 1000 * from vWorkingTimeIndex2");
+    }
 
-	@DisplayName("Wähle alle Einträge mit einem bestimmten Wert eines Feldes.")
-	@Test
-	void testPrepareViewString_withSelectByOneAttributeValue() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))\r\norder by EmployeeText");
-		assertThat(inputTable.getRows().get(0).getValues().get(0).getStringValue()).isEqualTo("AVM%");
-	}
+    @DisplayName("Wähle alle Einträge mit einem bestimmten Wert eines Feldes.")
+    @Test
+    void testPrepareViewString_withSelectByOneAttributeValue() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("AVM", null));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups)) //
+                .isEqualTo(
+                        "select top 1000 EmployeeText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))\r\norder by EmployeeText");
+        assertThat(inputTable.getRows().get(0).getValues().get(0).getStringValue())
+                .isEqualTo("AVM%");
+    }
 
-	@DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
-	@Test
-	void testPrepareViewString_withSelectByMultipleAttributeValue() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo(
-						"select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ? and CustomerText like ?))\r\norder by EmployeeText, CustomerText");
-	}
+    @DisplayName("Wähle alle Einträge mit jeweils einen bestimmten Werten in zwei Feldern.")
+    @Test
+    void testPrepareViewString_withSelectByMultipleAttributeValue() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+        inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("AVM", null));
+            inputRow.addValue(new Value("MIN", null));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups)) //
+                .isEqualTo(
+                        "select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ? and CustomerText like ?))\r\norder by EmployeeText, CustomerText");
+    }
 
-	@DisplayName("Wähle alle Einträge eines Datumsbereiches.")
-	@Test
-	void testPrepareViewString_withSelectByMultipleConditionsOnSameAttribute() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("BookingDate", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value(LocalDate.of(2020, 7, 31).toString(), "<="));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value(LocalDate.of(2020, 7, 29).toString(), ">"));
-			inputRow.addValue(new Value(true, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("""
+    @DisplayName("Wähle alle Einträge eines Datumsbereiches.")
+    @Test
+    void testPrepareViewString_withSelectByMultipleConditionsOnSameAttribute() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("BookingDate", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value(LocalDate.of(2020, 7, 31).toString(), "<="));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value(LocalDate.of(2020, 7, 29).toString(), ">"));
+            inputRow.addValue(new Value(true, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups)) //
+                .isEqualTo("""
 						select top 1000 BookingDate from vWorkingTimeIndex2\r
 						where ((BookingDate <= ?)\r
 						  and (BookingDate > ?))\r
 						order by BookingDate""");
-	}
+    }
 
-	@DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
-	@Test
-	void testPrepareViewString_withSelectByMultipleOptionalRules() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("WIS", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo("""
+    @DisplayName("Wähle all Einträge von 2 Mitarbeitern aus.")
+    @Test
+    void testPrepareViewString_withSelectByMultipleOptionalRules() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("AVM", null));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("WIS", null));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups)) //
+                .isEqualTo("""
 						select top 1000 EmployeeText from vWorkingTimeIndex2\r
 						where ((EmployeeText like ?)\r
 						   or (EmployeeText like ?))\r
 						order by EmployeeText""");
-	}
+    }
 
-	@Test
-	void testConvertSqlResultToRow_UnsupportedTypes() throws Exception {
-		val outputTable = new Table();
-		outputTable.setName("vWorkingTimeIndex2");
-		outputTable.addColumn(new Column("LastDate", null));
-		val sqlSet = Mockito.mock(ResultSet.class);
-		val time = Instant.ofEpochMilli(1598613904487L).toString();
-		when(sqlSet.getString("LastDate")).thenReturn(time);
-		@val
-		aero.minova.cas.api.domain.Row testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+    @Test
+    void testConvertSqlResultToRow_UnsupportedTypes() throws Exception {
+        val outputTable = new Table();
+        outputTable.setName("vWorkingTimeIndex2");
+        outputTable.addColumn(new Column("LastDate", null));
+        val sqlSet = Mockito.mock(ResultSet.class);
+        val time = Instant.ofEpochMilli(1598613904487L).toString();
+        when(sqlSet.getString("LastDate")).thenReturn(time);
+        @val
+        aero.minova.cas.api.domain.Row testResult =
+                SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
 
-		assertThat(testResult.getValues()).hasSize(1);
-		assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
-	}
+        assertThat(testResult.getValues()).hasSize(1);
+        assertThat(testResult.getValues().get(0).getStringValue()).isEqualTo(time);
+    }
 
-	@DisplayName("Wähle alle Einträge mit einem bestimmten Wert eines Feldes.")
-	@Test
-	void testPrepareViewString_withSelectByAttributesWithoutConstraint() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(null);
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups))//
-				.isEqualTo(
-						"select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))\r\norder by EmployeeText, CustomerText");
-	}
+    @DisplayName("Wähle alle Einträge mit einem bestimmten Wert eines Feldes.")
+    @Test
+    void testPrepareViewString_withSelectByAttributesWithoutConstraint() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+        inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("AVM", null));
+            inputRow.addValue(null);
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.prepareViewString(inputTable, true, 1000, userGroups)) //
+                .isEqualTo(
+                        "select top 1000 EmployeeText, CustomerText from vWorkingTimeIndex2\r\nwhere ((EmployeeText like ?))\r\norder by EmployeeText, CustomerText");
+    }
 
-	@Test
-	void testAllDataTypes() throws Exception {
-		val outputTable = new Table();
-		outputTable.setName("vWorkingTimeIndex2");
-		outputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
-		outputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
-		outputTable.addColumn(new Column("DOUBLE", DataType.DOUBLE));
-		outputTable.addColumn(new Column("INTEGER", DataType.INTEGER));
-		outputTable.addColumn(new Column("LONG", DataType.LONG));
-		outputTable.addColumn(new Column("STRING", DataType.STRING));
-		outputTable.addColumn(new Column("ZONED", DataType.ZONED));
-		val sqlSet = Mockito.mock(ResultSet.class);
-		val time = Instant.ofEpochMilli(1598613904487L);
-		when(sqlSet.getTimestamp("INSTANT")).thenReturn(Timestamp.from(time));
-		when(sqlSet.getBoolean("BOOLEAN")).thenReturn(true);
-		when(sqlSet.getDouble("DOUBLE")).thenReturn(3d);
-		when(sqlSet.getInt("INTEGER")).thenReturn(5);
-		when(sqlSet.getLong("LONG")).thenReturn(7L);
-		when(sqlSet.getString("STRING")).thenReturn("string");
-		when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
-		@val
-		aero.minova.cas.api.domain.Row testResult = SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
-		assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
-		assertThat(testResult.getValues().get(1).getBooleanValue()).isTrue();
-		assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);
-		assertThat(testResult.getValues().get(3).getIntegerValue()).isEqualTo(5);
-		assertThat(testResult.getValues().get(4).getLongValue()).isEqualTo(7L);
-		assertThat(testResult.getValues().get(5).getStringValue()).isEqualTo("string");
-		assertThat(testResult.getValues().get(6).getZonedDateTimeValue()).isEqualTo(time.atZone(ZoneId.systemDefault()));
-	}
+    @Test
+    void testAllDataTypes() throws Exception {
+        val outputTable = new Table();
+        outputTable.setName("vWorkingTimeIndex2");
+        outputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
+        outputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
+        outputTable.addColumn(new Column("DOUBLE", DataType.DOUBLE));
+        outputTable.addColumn(new Column("INTEGER", DataType.INTEGER));
+        outputTable.addColumn(new Column("LONG", DataType.LONG));
+        outputTable.addColumn(new Column("STRING", DataType.STRING));
+        outputTable.addColumn(new Column("ZONED", DataType.ZONED));
+        val sqlSet = Mockito.mock(ResultSet.class);
+        val time = Instant.ofEpochMilli(1598613904487L);
+        when(sqlSet.getTimestamp("INSTANT")).thenReturn(Timestamp.from(time));
+        when(sqlSet.getBoolean("BOOLEAN")).thenReturn(true);
+        when(sqlSet.getDouble("DOUBLE")).thenReturn(3d);
+        when(sqlSet.getInt("INTEGER")).thenReturn(5);
+        when(sqlSet.getLong("LONG")).thenReturn(7L);
+        when(sqlSet.getString("STRING")).thenReturn("string");
+        when(sqlSet.getTimestamp("ZONED")).thenReturn(Timestamp.from(time));
+        @val
+        aero.minova.cas.api.domain.Row testResult =
+                SqlUtils.convertSqlResultToRow(outputTable, sqlSet, NOP_LOGGER, this);
+        assertThat(testResult.getValues().get(0).getInstantValue()).isEqualTo(time);
+        assertThat(testResult.getValues().get(1).getBooleanValue()).isTrue();
+        assertThat(testResult.getValues().get(2).getDoubleValue()).isEqualTo(3d);
+        assertThat(testResult.getValues().get(3).getIntegerValue()).isEqualTo(5);
+        assertThat(testResult.getValues().get(4).getLongValue()).isEqualTo(7L);
+        assertThat(testResult.getValues().get(5).getStringValue()).isEqualTo("string");
+        assertThat(testResult.getValues().get(6).getZonedDateTimeValue())
+                .isEqualTo(time.atZone(ZoneId.systemDefault()));
+    }
 
-	@Test
-	void test_prepareWhereClause_AndColumnNotAtEnd() {
-		val intputTable = new Table();
-		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
-		intputTable.addColumn(new Column("&", DataType.BOOLEAN));
-		intputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
-		// Wenn es keine Row bei der InputTable gibt, gibt es auch keine Where-Bedingung.
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEmpty();
-	}
+    @Test
+    void test_prepareWhereClause_AndColumnNotAtEnd() {
+        val intputTable = new Table();
+        intputTable.setName("vWorkingTimeIndex2");
+        intputTable.addColumn(new Column("INSTANT", DataType.INSTANT));
+        intputTable.addColumn(new Column("&", DataType.BOOLEAN));
+        intputTable.addColumn(new Column("BOOLEAN", DataType.BOOLEAN));
+        // Wenn es keine Row bei der InputTable gibt, gibt es auch keine Where-Bedingung.
+        assertThat(testSubject.prepareWhereClause(intputTable, true)).isEmpty();
+    }
 
-	@Test
-	void test_SearchViaString() {
-		testWhereWithOneCondition("1", null, "\r\nwhere ((KeyLong like ?)");
-	}
+    @Test
+    void test_SearchViaString() {
+        testWhereWithOneCondition("1", null, "\r\nwhere ((KeyLong like ?)");
+    }
 
-	@Test
-	void test_whereWithIn() {
-		testWhereWithOneCondition("1,2,3", "in()", "\r\nwhere ((KeyLong in(?, ?, ?))");
-	}
+    @Test
+    void test_whereWithIn() {
+        testWhereWithOneCondition("1,2,3", "in()", "\r\nwhere ((KeyLong in(?, ?, ?))");
+    }
 
-	@Test
-	void test_whereWithBetween() {
-		testWhereWithOneCondition("1,2,3", "between()", "\r\nwhere ((KeyLong between ? and ?)");
-	}
+    @Test
+    void test_whereWithBetween() {
+        testWhereWithOneCondition("1,2,3", "between()", "\r\nwhere ((KeyLong between ? and ?)");
+    }
 
-	@Test
-	void test_whereNULL() {
-		val intputTable = new Table();
-		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		intputTable.addColumn(new Column("KeyText", DataType.STRING));
-		val row = new Row();
-		row.addValue(new Value("", "is !null"));
-		row.addValue(new Value("", "is null"));
-		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo("\r\nwhere ((KeyLong is not null and KeyText is null)");
-	}
+    @Test
+    void test_whereNULL() {
+        val intputTable = new Table();
+        intputTable.setName("vWorkingTimeIndex2");
+        intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+        intputTable.addColumn(new Column("KeyText", DataType.STRING));
+        val row = new Row();
+        row.addValue(new Value("", "is !null"));
+        row.addValue(new Value("", "is null"));
+        intputTable.getRows().add(row);
+        assertThat(testSubject.prepareWhereClause(intputTable, true))
+                .isEqualTo("\r\nwhere ((KeyLong is not null and KeyText is null)");
+    }
 
-	@DisplayName("Zeige erste Seite.")
-	@Test
-	void testPaging() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
-				.isEqualTo("""
+    @DisplayName("Zeige erste Seite.")
+    @Test
+    void testPaging() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+        inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("AVM", null));
+            inputRow.addValue(new Value("MIN", null));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups)) //
+                .isEqualTo("""
 						select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
 						\r
 						where ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult\
@@ -304,53 +310,53 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 						where RowNum > 0\
 						\r
 						and RowNum <= 3 order by RowNum""");
-	}
+    }
 
-	@DisplayName("Zeige alles auf erster Seite.")
-	@Test
-	void testPagingWithNoAttributes() {
-		Table inputTable = new Table();
+    @DisplayName("Zeige alles auf erster Seite.")
+    @Test
+    void testPagingWithNoAttributes() {
+        Table inputTable = new Table();
 
-		inputTable.setName("vWorkingTimeIndex2");
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups))//
-				.isEqualTo("""
+        inputTable.setName("vWorkingTimeIndex2");
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 1, userGroups)) //
+                .isEqualTo("""
 						select * from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
 						 ) as RowConstraintResult\
 						\r
 						where RowNum > 0\
 						\r
 						and RowNum <= 3 order by RowNum""");
-	}
+    }
 
-	@DisplayName("Zeige Einträge auf höherer Page.")
-	@Test
-	void testPagingOnHighPage() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5, userGroups))//
-				.isEqualTo("""
+    @DisplayName("Zeige Einträge auf höherer Page.")
+    @Test
+    void testPagingOnHighPage() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+        inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("AVM", null));
+            inputRow.addValue(new Value("MIN", null));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.pagingWithSeek(inputTable, true, 3, false, 5, userGroups)) //
+                .isEqualTo("""
 						select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
 						\r
 						where ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult\
@@ -358,45 +364,45 @@ class MSSQLViewServiceTest extends ViewServiceBaseTest<MssqlViewService> {
 						where RowNum > 12\
 						\r
 						and RowNum <= 15 order by RowNum""");
-	}
+    }
 
-	@DisplayName("Zeige alle Einträge (auch wenn Page eingestellt ist).")
-	@Test
-	void testPagingAllEntries() {
-		Table inputTable = new Table();
-		inputTable.setName("vWorkingTimeIndex2");
-		inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
-		inputTable.addColumn(new Column("CustomerText", DataType.STRING));
-		inputTable.addColumn(Column.AND_FIELD);
-		{
-			Row inputRow = new Row();
-			inputRow.addValue(new Value("AVM", null));
-			inputRow.addValue(new Value("MIN", null));
-			inputRow.addValue(new Value(false, null));
-			inputTable.addRow(inputRow);
-		}
-		Row inputRow = new Row();
-		List<Row> userGroups = new ArrayList<>();
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value("", null));
-		inputRow.addValue(new Value(false, null));
-		userGroups.add(inputRow);
-		assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5, userGroups))//
-				.isEqualTo("""
+    @DisplayName("Zeige alle Einträge (auch wenn Page eingestellt ist).")
+    @Test
+    void testPagingAllEntries() {
+        Table inputTable = new Table();
+        inputTable.setName("vWorkingTimeIndex2");
+        inputTable.addColumn(new Column("EmployeeText", DataType.STRING));
+        inputTable.addColumn(new Column("CustomerText", DataType.STRING));
+        inputTable.addColumn(Column.AND_FIELD);
+        {
+            Row inputRow = new Row();
+            inputRow.addValue(new Value("AVM", null));
+            inputRow.addValue(new Value("MIN", null));
+            inputRow.addValue(new Value(false, null));
+            inputTable.addRow(inputRow);
+        }
+        Row inputRow = new Row();
+        List<Row> userGroups = new ArrayList<>();
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value("", null));
+        inputRow.addValue(new Value(false, null));
+        userGroups.add(inputRow);
+        assertThat(testSubject.pagingWithSeek(inputTable, true, 0, false, 5, userGroups)) //
+                .isEqualTo("""
 						select EmployeeText, CustomerText from ( select Row_Number() over (order by KeyLong) as RowNum, * from vWorkingTimeIndex2\
 						\r
 						where ((EmployeeText like ? and CustomerText like ?)) ) as RowConstraintResult\
 						\r
 						where RowNum > 0""");
-	}
+    }
 
-	private void testWhereWithOneCondition(String stringValue, String rule, String expectedWhereClause) {
-		val intputTable = new Table();
-		intputTable.setName("vWorkingTimeIndex2");
-		intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
-		val row = new Row();
-		row.addValue(new Value(stringValue, rule));
-		intputTable.getRows().add(row);
-		assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo(expectedWhereClause);
-	}
+    private void testWhereWithOneCondition(String stringValue, String rule, String expectedWhereClause) {
+        val intputTable = new Table();
+        intputTable.setName("vWorkingTimeIndex2");
+        intputTable.addColumn(new Column("KeyLong", DataType.INTEGER));
+        val row = new Row();
+        row.addValue(new Value(stringValue, rule));
+        intputTable.getRows().add(row);
+        assertThat(testSubject.prepareWhereClause(intputTable, true)).isEqualTo(expectedWhereClause);
+    }
 }

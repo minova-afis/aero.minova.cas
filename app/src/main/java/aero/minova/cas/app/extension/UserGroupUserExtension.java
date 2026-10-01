@@ -2,9 +2,7 @@ package aero.minova.cas.app.extension;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
@@ -18,80 +16,80 @@ import aero.minova.cas.controller.SqlProcedureController;
 import aero.minova.cas.service.AuthorizationService;
 import aero.minova.cas.service.UserService;
 import aero.minova.cas.service.model.User;
-import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserGroupUserExtension {
 
-	@Autowired
-	protected SqlProcedureController sqlProcedureController;
+    @Autowired
+    protected SqlProcedureController sqlProcedureController;
 
-	@Autowired
-	protected CustomLogger logger;
+    @Autowired
+    protected CustomLogger logger;
 
-	@Autowired
-	protected AuthorizationService authorizationService;
+    @Autowired
+    protected AuthorizationService authorizationService;
 
-	@Autowired
-	protected UserService userService;
+    @Autowired
+    protected UserService userService;
 
-	@PostConstruct
-	public void setup() {
-		String formName = "UserGroupUser";
-		sqlProcedureController.registerExtension("xpcasInsert" + formName, this::insert);
-		sqlProcedureController.registerExtension("xpcasUpdate" + formName, this::update);
-		sqlProcedureController.registerExtension("xpcasDelete" + formName, this::delete);
-		sqlProcedureController.registerExtension("xpcasRead" + formName, this::read);
-		authorizationService.createDefaultPrivilegesForMask(formName, "xpcas", "xvcas");
+    @PostConstruct
+    public void setup() {
+        String formName = "UserGroupUser";
+        sqlProcedureController.registerExtension("xpcasInsert" + formName, this::insert);
+        sqlProcedureController.registerExtension("xpcasUpdate" + formName, this::update);
+        sqlProcedureController.registerExtension("xpcasDelete" + formName, this::delete);
+        sqlProcedureController.registerExtension("xpcasRead" + formName, this::read);
+        authorizationService.createDefaultPrivilegesForMask(formName, "xpcas", "xvcas");
 
-		authorizationService.findOrCreateUserPrivilege("xvcasUserIndex2");
-	}
+        authorizationService.findOrCreateUserPrivilege("xvcasUserIndex2");
+    }
 
-	public ResponseEntity<SqlProcedureResult> insert(Table inputTable) {
+    public ResponseEntity<SqlProcedureResult> insert(Table inputTable) {
 
-		for (Row r : inputTable.getRows()) {
-			userService.addUserToUserGroup(//
-					inputTable.getValue("UserKey", r).getIntegerValue(), //
-					inputTable.getValue("KeyLong", r).getIntegerValue());
-		}
+        for (Row r : inputTable.getRows()) {
+            userService.addUserToUserGroup( //
+                    inputTable.getValue("UserKey", r).getIntegerValue(), //
+                    inputTable.getValue("KeyLong", r).getIntegerValue());
+        }
 
-		return ResponseEntityUtil.createResponseEntity(null, true);
+        return ResponseEntityUtil.createResponseEntity(null, true);
+    }
 
-	}
+    public ResponseEntity<SqlProcedureResult> update(Table inputTable) {
+        // Can't update because we dont know the old value, so just do nothing
+        return ResponseEntityUtil.createResponseEntity(null, true);
+    }
 
-	public ResponseEntity<SqlProcedureResult> update(Table inputTable) {
-		// Can't update because we dont know the old value, so just do nothing
-		return ResponseEntityUtil.createResponseEntity(null, true);
-	}
+    public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
 
-	public ResponseEntity<SqlProcedureResult> delete(Table inputTable) {
+        for (Row r : inputTable.getRows()) {
+            userService.removeUserFromUserGroup( //
+                    inputTable.getValue("UserKey", r).getIntegerValue(), //
+                    inputTable.getValue("KeyLong", r).getIntegerValue());
+        }
+        return ResponseEntityUtil.createResponseEntity(null, true);
+    }
 
-		for (Row r : inputTable.getRows()) {
-			userService.removeUserFromUserGroup(//
-					inputTable.getValue("UserKey", r).getIntegerValue(), //
-					inputTable.getValue("KeyLong", r).getIntegerValue());
-		}
-		return ResponseEntityUtil.createResponseEntity(null, true);
+    public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
 
-	}
+        int userGroupKey = inputTable.getValue("KeyLong", 0).getIntegerValue();
+        List<User> users = userService.findUsersInUserGroup(userGroupKey);
 
-	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
+        Table res = new Table();
+        res.setName(inputTable.getName());
+        res.addColumn(new Column("KeyLong", DataType.INTEGER));
+        res.addColumn(new Column("UserKey", DataType.INTEGER));
 
-		int userGroupKey = inputTable.getValue("KeyLong", 0).getIntegerValue();
-		List<User> users = userService.findUsersInUserGroup(userGroupKey);
+        for (User u : users) {
+            Row r = new Row();
+            r.addValue(new Value(userGroupKey));
+            r.addValue(new Value(u.getKeyLong()));
+            res.addRow(r);
+        }
 
-		Table res = new Table();
-		res.setName(inputTable.getName());
-		res.addColumn(new Column("KeyLong", DataType.INTEGER));
-		res.addColumn(new Column("UserKey", DataType.INTEGER));
-
-		for (User u : users) {
-			Row r = new Row();
-			r.addValue(new Value(userGroupKey));
-			r.addValue(new Value(u.getKeyLong()));
-			res.addRow(r);
-		}
-
-		return ResponseEntityUtil.createResponseEntity(res, true);
-	}
+        return ResponseEntityUtil.createResponseEntity(res, true);
+    }
 }

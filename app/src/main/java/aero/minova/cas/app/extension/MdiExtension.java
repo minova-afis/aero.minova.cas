@@ -1,20 +1,20 @@
 package aero.minova.cas.app.extension;
 
-import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
 import aero.minova.cas.service.model.Mdi;
-import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
 
 @Component
 public class MdiExtension extends BaseExtension<Mdi> {
 
-	@PostConstruct
-	public void setupPrivileges() {
-		authorizationService.findOrCreateUserPrivilege("xtcasMdiType"); // Berechtigung für Lookup
+    @PostConstruct
+    public void setupPrivileges() {
+        authorizationService.findOrCreateUserPrivilege("xtcasMdiType"); // Berechtigung für Lookup
 
-		viewPrefix = "xvcas";
-		procedurePrefix = "xpcas";
-		tablePrefix = "xtcas";
-		super.basicSetup();
-	}
+        viewPrefix = "xvcas";
+        procedurePrefix = "xpcas";
+        tablePrefix = "xtcas";
+        super.basicSetup();
+    }
 }

@@ -11,9 +11,11 @@ public class ColumnVarchar {
     private boolean identity;
     private boolean nullable = true;
     private Integer length;
+
     public boolean getIdentity() {
         return identity;
     }
+
     public boolean getNullable() {
         return nullable;
     }

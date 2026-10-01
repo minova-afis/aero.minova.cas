@@ -12,25 +12,25 @@ import lombok.Getter;
 @Getter
 public class OAuth2Token {
 
-	private static final DateTimeFormatter OAUTHSERVERFORMAT = DateTimeFormatter.ofPattern("ddMMMyyyyHH:mm:ssz", Locale.ENGLISH);
+    private static final DateTimeFormatter OAUTHSERVERFORMAT =
+            DateTimeFormatter.ofPattern("ddMMMyyyyHH:mm:ssz", Locale.ENGLISH);
 
-	String token;
+    String token;
 
-	Instant expiryDate;
+    Instant expiryDate;
 
-	public OAuth2Token(String token, String expiryDate) {
-		this.token = token;
-		setExpiryDate(expiryDate);
-	}
+    public OAuth2Token(String token, String expiryDate) {
+        this.token = token;
+        setExpiryDate(expiryDate);
+    }
 
-	private void setExpiryDate(String expiryDate) {
-		try {
-			LocalDateTime ldt = LocalDateTime.parse(expiryDate, OAUTHSERVERFORMAT);
-			ZonedDateTime zdt = ldt.atZone(TimeZone.getDefault().toZoneId());
-			this.expiryDate = zdt.toInstant();
-		} catch (Exception e) {
-			throw new RuntimeException("Could not parse Expiry Date from the OAuth2 token.", e);
-		}
-	}
-
+    private void setExpiryDate(String expiryDate) {
+        try {
+            LocalDateTime ldt = LocalDateTime.parse(expiryDate, OAUTHSERVERFORMAT);
+            ZonedDateTime zdt = ldt.atZone(TimeZone.getDefault().toZoneId());
+            this.expiryDate = zdt.toInstant();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not parse Expiry Date from the OAuth2 token.", e);
+        }
+    }
 }

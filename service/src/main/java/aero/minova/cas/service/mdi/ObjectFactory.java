@@ -12,51 +12,50 @@ import jakarta.xml.bind.annotation.XmlRegistry;
 @XmlRegistry
 public class ObjectFactory {
 
-	/**
-	 * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: aero.minova.rcp.form.menu.mdi
-	 */
-	public ObjectFactory() {}
+    /**
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: aero.minova.rcp.form.menu.mdi
+     */
+    public ObjectFactory() {}
 
-	/**
-	 * Create an instance of {@link Main }
-	 */
-	public Main createMain() {
-		return new Main();
-	}
+    /**
+     * Create an instance of {@link Main }
+     */
+    public Main createMain() {
+        return new Main();
+    }
 
-	/**
-	 * Create an instance of {@link Main.Action }
-	 */
-	public Main.Action createMainAction() {
-		return new Main.Action();
-	}
+    /**
+     * Create an instance of {@link Main.Action }
+     */
+    public Main.Action createMainAction() {
+        return new Main.Action();
+    }
 
-	/**
-	 * Create an instance of {@link Main.Menu }
-	 */
-	public Main.Menu createMainMenu() {
-		return new Main.Menu();
-	}
+    /**
+     * Create an instance of {@link Main.Menu }
+     */
+    public Main.Menu createMainMenu() {
+        return new Main.Menu();
+    }
 
-	/**
-	 * Create an instance of {@link Main.Entry }
-	 */
-	public Main.Entry createMainEntry() {
-		return new Main.Entry();
-	}
+    /**
+     * Create an instance of {@link Main.Entry }
+     */
+    public Main.Entry createMainEntry() {
+        return new Main.Entry();
+    }
 
-	/**
-	 * Create an instance of {@link Main.Toolbar }
-	 */
-	public Main.Toolbar createMainToolbar() {
-		return new Main.Toolbar();
-	}
+    /**
+     * Create an instance of {@link Main.Toolbar }
+     */
+    public Main.Toolbar createMainToolbar() {
+        return new Main.Toolbar();
+    }
 
-	/**
-	 * Create an instance of {@link MenuType }
-	 */
-	public MenuType createMenuType() {
-		return new MenuType();
-	}
-
+    /**
+     * Create an instance of {@link MenuType }
+     */
+    public MenuType createMenuType() {
+        return new MenuType();
+    }
 }

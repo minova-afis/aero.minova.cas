@@ -29,26 +29,25 @@ import com.google.gson.JsonSerializer;
  */
 public class TemporalSerializer implements JsonSerializer<Temporal> {
 
-	@Override
-	public JsonElement serialize(Temporal src, Type typeOfSrc, JsonSerializationContext context) {
-		StringBuilder sb = new StringBuilder();
-		if (src.isSupported(ChronoField.YEAR)) {
-			String year = "0000" + src.get(ChronoField.YEAR);
-			String month = "00" + src.get(ChronoField.MONTH_OF_YEAR);
-			String day = "00" + src.get(ChronoField.DAY_OF_MONTH);
-			sb.append(year.substring(year.length() - 4));
-			sb.append(month.substring(month.length() - 2));
-			sb.append(day.substring(day.length() - 2));
-		}
-		if (src.isSupported(ChronoField.HOUR_OF_DAY)) {
-			String hour = "00" + src.get(ChronoField.HOUR_OF_DAY);
-			String minute = "00" + src.get(ChronoField.MINUTE_OF_HOUR);
-			String second = "00" + src.get(ChronoField.SECOND_OF_MINUTE);
-			sb.append(hour.substring(hour.length() - 2));
-			sb.append(minute.substring(minute.length() - 2));
-			sb.append(second.substring(second.length() - 2));
-		}
-		return new JsonPrimitive(Long.valueOf(sb.toString()));
-	}
-
+    @Override
+    public JsonElement serialize(Temporal src, Type typeOfSrc, JsonSerializationContext context) {
+        StringBuilder sb = new StringBuilder();
+        if (src.isSupported(ChronoField.YEAR)) {
+            String year = "0000" + src.get(ChronoField.YEAR);
+            String month = "00" + src.get(ChronoField.MONTH_OF_YEAR);
+            String day = "00" + src.get(ChronoField.DAY_OF_MONTH);
+            sb.append(year.substring(year.length() - 4));
+            sb.append(month.substring(month.length() - 2));
+            sb.append(day.substring(day.length() - 2));
+        }
+        if (src.isSupported(ChronoField.HOUR_OF_DAY)) {
+            String hour = "00" + src.get(ChronoField.HOUR_OF_DAY);
+            String minute = "00" + src.get(ChronoField.MINUTE_OF_HOUR);
+            String second = "00" + src.get(ChronoField.SECOND_OF_MINUTE);
+            sb.append(hour.substring(hour.length() - 2));
+            sb.append(minute.substring(minute.length() - 2));
+            sb.append(second.substring(second.length() - 2));
+        }
+        return new JsonPrimitive(Long.valueOf(sb.toString()));
+    }
 }

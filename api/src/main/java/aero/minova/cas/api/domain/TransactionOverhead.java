@@ -8,46 +8,45 @@ import java.io.Serializable;
  * einzelnen Ergebnisses mit demselben (gemeinsamen) Wert befüllt - darf daher NICHT über alle Ergebnisse aufsummiert werden.
  */
 public class TransactionOverhead implements Serializable {
-	private static final long serialVersionUID = 202608211300L;
+    private static final long serialVersionUID = 202608211300L;
 
-	private long connectionAcquisitionMs;
-	private long commitMs;
-	private long queueDispatchMs;
+    private long connectionAcquisitionMs;
+    private long commitMs;
+    private long queueDispatchMs;
 
-	public TransactionOverhead() {
-	}
+    public TransactionOverhead() {}
 
-	public TransactionOverhead(long connectionAcquisitionMs, long commitMs, long queueDispatchMs) {
-		this.connectionAcquisitionMs = connectionAcquisitionMs;
-		this.commitMs = commitMs;
-		this.queueDispatchMs = queueDispatchMs;
-	}
+    public TransactionOverhead(long connectionAcquisitionMs, long commitMs, long queueDispatchMs) {
+        this.connectionAcquisitionMs = connectionAcquisitionMs;
+        this.commitMs = commitMs;
+        this.queueDispatchMs = queueDispatchMs;
+    }
 
-	public long getConnectionAcquisitionMs() {
-		return connectionAcquisitionMs;
-	}
+    public long getConnectionAcquisitionMs() {
+        return connectionAcquisitionMs;
+    }
 
-	public void setConnectionAcquisitionMs(long connectionAcquisitionMs) {
-		this.connectionAcquisitionMs = connectionAcquisitionMs;
-	}
+    public void setConnectionAcquisitionMs(long connectionAcquisitionMs) {
+        this.connectionAcquisitionMs = connectionAcquisitionMs;
+    }
 
-	public long getCommitMs() {
-		return commitMs;
-	}
+    public long getCommitMs() {
+        return commitMs;
+    }
 
-	public void setCommitMs(long commitMs) {
-		this.commitMs = commitMs;
-	}
+    public void setCommitMs(long commitMs) {
+        this.commitMs = commitMs;
+    }
 
-	public long getQueueDispatchMs() {
-		return queueDispatchMs;
-	}
+    public long getQueueDispatchMs() {
+        return queueDispatchMs;
+    }
 
-	public void setQueueDispatchMs(long queueDispatchMs) {
-		this.queueDispatchMs = queueDispatchMs;
-	}
+    public void setQueueDispatchMs(long queueDispatchMs) {
+        this.queueDispatchMs = queueDispatchMs;
+    }
 
-	public long getTotalMs() {
-		return connectionAcquisitionMs + commitMs + queueDispatchMs;
-	}
+    public long getTotalMs() {
+        return connectionAcquisitionMs + commitMs + queueDispatchMs;
+    }
 }

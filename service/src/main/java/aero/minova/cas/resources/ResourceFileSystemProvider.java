@@ -1,6 +1,6 @@
 package aero.minova.cas.resources;
 
-import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
+import static java.util.Arrays.asList;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,10 +14,11 @@ import java.nio.file.attribute.FileTime;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.*;
 
-import static java.util.Arrays.asList;
+import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
 
 public class ResourceFileSystemProvider extends FileSystemProvider {
-    public static ResourceFileSystemProvider FILE_SYSTEM_PROVIDER = new ResourceFileSystemProvider(ResourceFileSystemProvider.class.getClassLoader());
+    public static ResourceFileSystemProvider FILE_SYSTEM_PROVIDER =
+            new ResourceFileSystemProvider(ResourceFileSystemProvider.class.getClassLoader());
     public static final String SCHEME = "aero-minova-classloader-resource";
     private final ClassLoader classLoader;
     private final List<String> resourceList = new ArrayList<>();
@@ -25,12 +26,15 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
     public ResourceFileSystemProvider(ClassLoader classLoaderArg) {
         classLoader = classLoaderArg;
         try {
-            final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resources.txt").readAllBytes());
+            final var deployedResources = new String(getClass()
+                    .getResourceAsStream("/aero.minova.app.resources/deployed.resources.txt")
+                    .readAllBytes());
             for (final var resourceListPath : deployedResources.split("\n")) {
                 if (resourceListPath.isBlank()) {
                     continue;
                 }
-                final var resourceListStr = new String(getClass().getResourceAsStream(resourceListPath).readAllBytes());
+                final var resourceListStr = new String(
+                        getClass().getResourceAsStream(resourceListPath).readAllBytes());
                 for (final var resource : resourceListStr.split("\n")) {
                     if (resource.isBlank()) {
                         continue;
@@ -61,14 +65,16 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
     @Override
     public Path getPath(URI uri) {
         if (!uri.getScheme().equals(SCHEME)) {
-            throw new IllegalArgumentException("Expecting `" + SCHEME + "` scheme, but got `" + uri.getScheme() + "` instead.");
+            throw new IllegalArgumentException(
+                    "Expecting `" + SCHEME + "` scheme, but got `" + uri.getScheme() + "` instead.");
         }
         new ResourcePath(asList(uri.getPath().split("/")), null);
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
+    public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
+            throws IOException {
         if (path instanceof ResourcePath) {
             final var resourcePath = (ResourcePath) path;
             final var loadedResource = classLoader.getResourceAsStream(resourcePath.resourcePath());
@@ -77,7 +83,8 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
             }
             return new SeekableInMemoryByteChannel(loadedResource.readAllBytes());
         } else {
-            throw new UnsupportedOperationException("Only " + getClass().getName() + " are supported and not " + path.getClass().getName() + ".");
+            throw new UnsupportedOperationException("Only " + getClass().getName() + " are supported and not "
+                    + path.getClass().getName() + ".");
         }
     }
 
@@ -108,7 +115,8 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
             final List<Path> matchingResources = new ArrayList<>();
             for (final var resource : resourceList) {
                 if (resource.startsWith("/" + pathStr)) {
-                    if (resource.endsWith("/") && resource.substring(pathStr.length()).split("/").length < 3) {
+                    if (resource.endsWith("/")
+                            && resource.substring(pathStr.length()).split("/").length < 3) {
                         matchingResources.add(getFileSystem(null).getPath(resource));
                     } else if (resource.substring(pathStr.length()).split("/").length < 2) {
                         matchingResources.add(getFileSystem(null).getPath(resource));
@@ -122,15 +130,14 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter)
+            throws IOException {
         if (dir instanceof ResourcePath) {
             final var dirIterator = walk((ResourcePath) dir, 2).stream();
             return new DirectoryStream<>() {
 
                 @Override
-                public void close() throws IOException {
-
-                }
+                public void close() throws IOException {}
 
                 @Override
                 public Iterator<Path> iterator() {
@@ -192,7 +199,8 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
     }
 
     @Override
-    public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
+    public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options)
+            throws IOException {
         if (type.equals(BasicFileAttributes.class)) {
             return (A) new BasicFileAttributes() {
 
@@ -261,5 +269,4 @@ public class ResourceFileSystemProvider extends FileSystemProvider {
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
         throw new UnsupportedOperationException();
     }
-
 }

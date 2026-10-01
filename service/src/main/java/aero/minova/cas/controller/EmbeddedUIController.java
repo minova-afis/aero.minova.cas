@@ -1,6 +1,9 @@
 package aero.minova.cas.controller;
 
+import java.io.IOException;
+
 import jakarta.servlet.ServletException;
+
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
@@ -19,8 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
-
-import java.io.IOException;
 
 /**
  * Serves the embedded React UI JAR (ch.minova:gui.react) when it is present on
@@ -129,8 +130,6 @@ public class EmbeddedUIController implements WebMvcConfigurer {
         if (!index.exists()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_HTML)
-                .body(index);
+        return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(index);
     }
 }

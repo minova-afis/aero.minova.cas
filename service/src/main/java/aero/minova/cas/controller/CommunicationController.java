@@ -2,6 +2,15 @@ package aero.minova.cas.controller;
 
 import java.io.IOException;
 
+import jakarta.servlet.http.HttpServletResponse;
+
+import aero.minova.cas.CustomLogger;
+import aero.minova.cas.VersionUtil;
+import aero.minova.cas.api.domain.PingResponse;
+import aero.minova.cas.api.domain.Table;
+import aero.minova.cas.api.domain.VersionResponse;
+import aero.minova.cas.service.SecurityService;
+import aero.minova.cas.sql.SystemDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -12,97 +21,88 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import aero.minova.cas.CustomLogger;
-import aero.minova.cas.VersionUtil;
-import aero.minova.cas.api.domain.PingResponse;
-import aero.minova.cas.api.domain.Table;
-import aero.minova.cas.api.domain.VersionResponse;
-import aero.minova.cas.service.SecurityService;
-import aero.minova.cas.sql.SystemDatabase;
-import jakarta.servlet.http.HttpServletResponse;
-
 @RestController
 public class CommunicationController {
 
-	@Value("${server.servlet.context-path:}")
-	String homePath;
+    @Value("${server.servlet.context-path:}")
+    String homePath;
 
-	@Value("${aero.minova.cas.label:}")
-	String label;
+    @Value("${aero.minova.cas.label:}")
+    String label;
 
-	@Autowired
-	SqlProcedureController spc;
+    @Autowired
+    SqlProcedureController spc;
 
-	@Autowired
-	SecurityService securityService;
+    @Autowired
+    SecurityService securityService;
 
-	@Autowired
-	CustomLogger customLogger;
+    @Autowired
+    CustomLogger customLogger;
 
-	@Autowired
-	public SystemDatabase database;
+    @Autowired
+    public SystemDatabase database;
 
-	/**
-	 * Hiermit kann geprüft werden, ob die Kommunikation und die Anmeldung an den CAS funktioniert.
-	 *
-	 * @return PingResponse Diese Antwort signalisiert, dass es funktioniert hat.
-	 */
-	@GetMapping(value = "ping", produces = "application/json")
-	public PingResponse executePing() {
-		customLogger.logInfo("Received new ping from Client!");
-		return new PingResponse();
-	}
+    /**
+     * Hiermit kann geprüft werden, ob die Kommunikation und die Anmeldung an den CAS funktioniert.
+     *
+     * @return PingResponse Diese Antwort signalisiert, dass es funktioniert hat.
+     */
+    @GetMapping(value = "ping", produces = "application/json")
+    public PingResponse executePing() {
+        customLogger.logInfo("Received new ping from Client!");
+        return new PingResponse();
+    }
 
-	@PostMapping(value = "loadPrivileges")
-	public void loadPrivileges() throws Exception {
+    @PostMapping(value = "loadPrivileges")
+    public void loadPrivileges() throws Exception {
 
-		try {
-			securityService.loadAllPrivileges();
-		} catch (Exception e) {
-			customLogger.logError("Error while trying to load privileges!", e);
-			throw new RuntimeException(e);
-		}
-	}
+        try {
+            securityService.loadAllPrivileges();
+        } catch (Exception e) {
+            customLogger.logError("Error while trying to load privileges!", e);
+            throw new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Empfängt das Signal von der Web-Oberfläche und übersetzt es in die Setup-Table. Kehrt auf die Hauptseite zurück, wenn das Setup durchgelaufen ist.
-	 *
-	 * @throws Exception
-	 *             Wenn beim Setup ein Fehler auftritt, zum Beispiel, wenn eine Prozedur fehlerhaft war.
-	 */
-	@RequestMapping(value = "/setup", method = RequestMethod.POST)
-	public void setup(HttpServletResponse httpServletResponse) throws Exception {
-		Table setupTable = new Table();
-		setupTable.setName("setup");
-		boolean success = true;
-		try {
-			spc.executeProcedure(setupTable);
-		} catch (Exception e) {
-			success = false;
-		}
-		// Normalize: context-path "/" must not produce "//setupSuccess"
-		// (browser treats "//path" as a protocol-relative URL → "http://path").
-		String base = "/".equals(homePath) ? "" : homePath;
-		if (success) {
-			httpServletResponse.setHeader("Location", base + "/setupSuccess");
-			httpServletResponse.setStatus(302);
-		} else {
-			httpServletResponse.setHeader("Location", base + "/setupError");
-			httpServletResponse.setStatus(302);
-		}
-	}
+    /**
+     * Empfängt das Signal von der Web-Oberfläche und übersetzt es in die Setup-Table. Kehrt auf die Hauptseite zurück, wenn das Setup durchgelaufen ist.
+     *
+     * @throws Exception
+     *             Wenn beim Setup ein Fehler auftritt, zum Beispiel, wenn eine Prozedur fehlerhaft war.
+     */
+    @RequestMapping(value = "/setup", method = RequestMethod.POST)
+    public void setup(HttpServletResponse httpServletResponse) throws Exception {
+        Table setupTable = new Table();
+        setupTable.setName("setup");
+        boolean success = true;
+        try {
+            spc.executeProcedure(setupTable);
+        } catch (Exception e) {
+            success = false;
+        }
+        // Normalize: context-path "/" must not produce "//setupSuccess"
+        // (browser treats "//path" as a protocol-relative URL → "http://path").
+        String base = "/".equals(homePath) ? "" : homePath;
+        if (success) {
+            httpServletResponse.setHeader("Location", base + "/setupSuccess");
+            httpServletResponse.setStatus(302);
+        } else {
+            httpServletResponse.setHeader("Location", base + "/setupError");
+            httpServletResponse.setStatus(302);
+        }
+    }
 
-	/**
-	 * Hiermit kann die konfigurierte Bezeichnung des CAS abgerufen werden
-	 */
-	@GetMapping(value = "label", produces = "application/json")
-	public String getLabel() {
-		customLogger.logInfo("Received request for CAS Label");
-		return label;
-	}
+    /**
+     * Hiermit kann die konfigurierte Bezeichnung des CAS abgerufen werden
+     */
+    @GetMapping(value = "label", produces = "application/json")
+    public String getLabel() {
+        customLogger.logInfo("Received request for CAS Label");
+        return label;
+    }
 
-	@RequestMapping(value = "/version", produces = "application/json", method = RequestMethod.GET)
-	public ResponseEntity<VersionResponse> getVersion() throws IOException {
-		return new ResponseEntity<>(VersionUtil.getVersionResponse(), HttpStatusCode.valueOf(200));
-	}
+    @RequestMapping(value = "/version", produces = "application/json", method = RequestMethod.GET)
+    public ResponseEntity<VersionResponse> getVersion() throws IOException {
+        return new ResponseEntity<>(VersionUtil.getVersionResponse(), HttpStatusCode.valueOf(200));
+    }
 }

@@ -17,68 +17,70 @@ import org.junit.jupiter.api.io.TempDir;
  */
 class FilesServiceLegacyFallbackTest {
 
-	@TempDir
-	Path legacyRoot;
+    @TempDir
+    Path legacyRoot;
 
-	FilesService testSubject;
+    FilesService testSubject;
 
-	@BeforeEach
-	void setUp() throws IOException {
-		testSubject = new FilesService();
+    @BeforeEach
+    void setUp() throws IOException {
+        testSubject = new FilesService();
 
-		Files.createDirectories(legacyRoot.resolve("tables"));
-		Files.writeString(legacyRoot.resolve("tables/foo.table.xml"), "<table/>");
-		Files.createDirectories(legacyRoot.resolve("sql"));
-		Files.writeString(legacyRoot.resolve("sql/bar.sql"), "select 1");
-	}
+        Files.createDirectories(legacyRoot.resolve("tables"));
+        Files.writeString(legacyRoot.resolve("tables/foo.table.xml"), "<table/>");
+        Files.createDirectories(legacyRoot.resolve("sql"));
+        Files.writeString(legacyRoot.resolve("sql/bar.sql"), "select 1");
+    }
 
-	@DisplayName("Ohne konfigurierten Legacy-Pfad ist der Fallback deaktiviert")
-	@Test
-	void noFallbackConfigured() {
-		assertThat(testSubject.hasLegacyFallback()).isFalse();
-		assertThat(testSubject.resolveLegacyFile("/tables/foo.table.xml")).isEmpty();
-	}
+    @DisplayName("Ohne konfigurierten Legacy-Pfad ist der Fallback deaktiviert")
+    @Test
+    void noFallbackConfigured() {
+        assertThat(testSubject.hasLegacyFallback()).isFalse();
+        assertThat(testSubject.resolveLegacyFile("/tables/foo.table.xml")).isEmpty();
+    }
 
-	@DisplayName("Existierende Datei wird über den Legacy-Pfad gefunden")
-	@Test
-	void resolvesExistingFile() {
-		testSubject.setLegacySystemFilesPath(legacyRoot.toString());
+    @DisplayName("Existierende Datei wird über den Legacy-Pfad gefunden")
+    @Test
+    void resolvesExistingFile() {
+        testSubject.setLegacySystemFilesPath(legacyRoot.toString());
 
-		assertThat(testSubject.hasLegacyFallback()).isTrue();
-		assertThat(testSubject.resolveLegacyFile("/tables/foo.table.xml")).contains(legacyRoot.resolve("tables/foo.table.xml"));
-		// Auch ohne führenden Slash muss die Datei gefunden werden.
-		assertThat(testSubject.resolveLegacyFile("tables/foo.table.xml")).isPresent();
-	}
+        assertThat(testSubject.hasLegacyFallback()).isTrue();
+        assertThat(testSubject.resolveLegacyFile("/tables/foo.table.xml"))
+                .contains(legacyRoot.resolve("tables/foo.table.xml"));
+        // Auch ohne führenden Slash muss die Datei gefunden werden.
+        assertThat(testSubject.resolveLegacyFile("tables/foo.table.xml")).isPresent();
+    }
 
-	@DisplayName("Nicht existierende Datei wird nicht gefunden")
-	@Test
-	void missingFileIsEmpty() {
-		testSubject.setLegacySystemFilesPath(legacyRoot.toString());
+    @DisplayName("Nicht existierende Datei wird nicht gefunden")
+    @Test
+    void missingFileIsEmpty() {
+        testSubject.setLegacySystemFilesPath(legacyRoot.toString());
 
-		assertThat(testSubject.resolveLegacyFile("/tables/does-not-exist.table.xml")).isEmpty();
-	}
+        assertThat(testSubject.resolveLegacyFile("/tables/does-not-exist.table.xml"))
+                .isEmpty();
+    }
 
-	@DisplayName("Pfad-Escape aus dem Legacy-Verzeichnis wird verhindert")
-	@Test
-	void blocksPathEscape() {
-		testSubject.setLegacySystemFilesPath(legacyRoot.toString());
+    @DisplayName("Pfad-Escape aus dem Legacy-Verzeichnis wird verhindert")
+    @Test
+    void blocksPathEscape() {
+        testSubject.setLegacySystemFilesPath(legacyRoot.toString());
 
-		assertThat(testSubject.resolveLegacyFile("/../outside.txt")).isEmpty();
-	}
+        assertThat(testSubject.resolveLegacyFile("/../outside.txt")).isEmpty();
+    }
 
-	@DisplayName("listLegacyFiles listet alle Dateien unterhalb eines Präfixes")
-	@Test
-	void listsFilesUnderPrefix() throws Exception {
-		testSubject.setLegacySystemFilesPath(legacyRoot.toString());
+    @DisplayName("listLegacyFiles listet alle Dateien unterhalb eines Präfixes")
+    @Test
+    void listsFilesUnderPrefix() throws Exception {
+        testSubject.setLegacySystemFilesPath(legacyRoot.toString());
 
-		assertThat(testSubject.listLegacyFiles("/tables")).containsExactly(legacyRoot.resolve("tables/foo.table.xml"));
-	}
+        assertThat(testSubject.listLegacyFiles("/tables")).containsExactly(legacyRoot.resolve("tables/foo.table.xml"));
+    }
 
-	@DisplayName("listLegacyFiles liefert eine leere Liste für ein nicht existierendes Präfix")
-	@Test
-	void listReturnsEmptyForMissingPrefix() throws Exception {
-		testSubject.setLegacySystemFilesPath(legacyRoot.toString());
+    @DisplayName("listLegacyFiles liefert eine leere Liste für ein nicht existierendes Präfix")
+    @Test
+    void listReturnsEmptyForMissingPrefix() throws Exception {
+        testSubject.setLegacySystemFilesPath(legacyRoot.toString());
 
-		assertThat(testSubject.listLegacyFiles("/does-not-exist")).isEmpty();
-	}
+        assertThat(testSubject.listLegacyFiles("/does-not-exist")).isEmpty();
+    }
 }

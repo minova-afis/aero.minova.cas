@@ -1,10 +1,7 @@
 package aero.minova.cas.service.repository;
 
+import aero.minova.cas.service.model.UserPrivilege;
 import org.springframework.stereotype.Repository;
 
-import aero.minova.cas.service.model.UserPrivilege;
-
 @Repository
-public interface UserPrivilegeRepository extends DataEntityRepository<UserPrivilege> {
-
-}
+public interface UserPrivilegeRepository extends DataEntityRepository<UserPrivilege> {}

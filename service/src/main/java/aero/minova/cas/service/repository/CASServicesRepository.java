@@ -1,10 +1,7 @@
 package aero.minova.cas.service.repository;
 
+import aero.minova.cas.service.model.CASServices;
 import org.springframework.stereotype.Repository;
 
-import aero.minova.cas.service.model.CASServices;
-
 @Repository
-public interface CASServicesRepository extends DataEntityRepository<CASServices> {
-
-}
+public interface CASServicesRepository extends DataEntityRepository<CASServices> {}

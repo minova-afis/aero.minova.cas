@@ -1,19 +1,22 @@
 package aero.minova.cas.setup.xml.table;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.Objects;
 import java.util.Scanner;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import org.junit.jupiter.api.Test;
 
 public class TableTest {
     @Test
     public void testParsing() {
-        final String tFuellingType = new Scanner(Objects.requireNonNull(getClass()//
-                .getClassLoader()//
-                .getResourceAsStream("tFuellingType.table.xml")), "UTF-8")//
-                .useDelimiter("\\A")//
+        final String tFuellingType = new Scanner(
+                        Objects.requireNonNull(
+                                getClass() //
+                                        .getClassLoader() //
+                                        .getResourceAsStream("tFuellingType.table.xml")),
+                        "UTF-8") //
+                .useDelimiter("\\A") //
                 .next();
         final var testSubject = Table.parse(tFuellingType);
         assertThat(testSubject.getName()).isEqualTo("tFuellingType");
@@ -46,8 +49,10 @@ public class TableTest {
         assertThat(testSubject.getPrimarykey().getColumn().size()).isEqualTo(1);
         assertThat(testSubject.getForeignkey().size()).isEqualTo(2);
         assertThat(testSubject.getForeignkey().get(0).getColumn().size()).isEqualTo(1);
-        assertThat(testSubject.getForeignkey().get(0).getColumn().get(0).getName()).isEqualTo("ShipKey");
-        assertThat(testSubject.getForeignkey().get(0).getColumn().get(0).getRefid()).isEqualTo("VehicleKey");
+        assertThat(testSubject.getForeignkey().get(0).getColumn().get(0).getName())
+                .isEqualTo("ShipKey");
+        assertThat(testSubject.getForeignkey().get(0).getColumn().get(0).getRefid())
+                .isEqualTo("VehicleKey");
         assertThat(testSubject.getForeignkey().get(0).getColumn().size()).isEqualTo(1);
         assertThat(testSubject.getForeignkey().get(1).getRefid()).isEqualTo("ShiftClosingKey");
         assertThat(testSubject.getForeignkey().get(1).getTable()).isEqualTo("tShiftClosing");
@@ -60,6 +65,7 @@ public class TableTest {
         assertThat(testSubject.getValues().getColumn().get(5).getRefid()).isEqualTo("NightFuelling");
         assertThat(testSubject.getValues().getRow().size()).isEqualTo(12);
         assertThat(testSubject.getValues().getRow().get(11).getValue().size()).isEqualTo(7);
-        assertThat(testSubject.getValues().getRow().get(11).getValue().get(2).getContent()).isEqualTo("Ausgleichsbuchung");
+        assertThat(testSubject.getValues().getRow().get(11).getValue().get(2).getContent())
+                .isEqualTo("Ausgleichsbuchung");
     }
 }

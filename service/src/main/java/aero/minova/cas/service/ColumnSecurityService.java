@@ -1,10 +1,7 @@
 package aero.minova.cas.service;
 
+import aero.minova.cas.service.model.ColumnSecurity;
 import org.springframework.stereotype.Service;
 
-import aero.minova.cas.service.model.ColumnSecurity;
-
 @Service
-public class ColumnSecurityService extends BaseService<ColumnSecurity> {
-
-}
+public class ColumnSecurityService extends BaseService<ColumnSecurity> {}

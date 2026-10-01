@@ -6,5 +6,5 @@ import aero.minova.cas.service.model.Mdi;
 
 public interface MdiRepository extends DataEntityRepository<Mdi> {
 
-	public List<Mdi> findByMdiTypeKeyLongAndLastActionGreaterThan(int mdiTypeKeyLong, int lastAction);
+    public List<Mdi> findByMdiTypeKeyLongAndLastActionGreaterThan(int mdiTypeKeyLong, int lastAction);
 }

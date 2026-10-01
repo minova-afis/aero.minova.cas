@@ -1,18 +1,18 @@
 package aero.minova.cas.app.extension;
 
-import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
 import aero.minova.cas.service.model.ServiceProperties;
-import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ServicePropertiesExtension extends BaseExtension<ServiceProperties> {
 
-	@PostConstruct
-	void setPrefix() {
-		viewPrefix = "xvcas";
-		procedurePrefix = "xpcas";
-		tablePrefix = "xtcas";
-		super.basicSetup();
-	}
+    @PostConstruct
+    void setPrefix() {
+        viewPrefix = "xvcas";
+        procedurePrefix = "xpcas";
+        tablePrefix = "xtcas";
+        super.basicSetup();
+    }
 }

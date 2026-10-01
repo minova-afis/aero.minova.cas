@@ -1,5 +1,10 @@
 package aero.minova.cas.setup.xml.setup;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,19 +13,15 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
 @Setter
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JacksonXmlRootElement(localName = "setup")
 public class SetupType {
-    private final static XmlMapper XML_MAPPER = new XmlMapper();
+    private static final XmlMapper XML_MAPPER = new XmlMapper();
     private String name;
     List<TableschemaType> schema;
+
     @JsonProperty("sql-code")
     List<ScriptType> sqlCode;
 

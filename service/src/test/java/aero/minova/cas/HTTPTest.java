@@ -12,21 +12,26 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(classes = { CoreApplicationSystemApplication.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {CoreApplicationSystemApplication.class},
+        webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class HTTPTest {
 
-	@LocalServerPort
-	private int port;
+    @LocalServerPort
+    private int port;
 
-	@Test
-	void http1Test() throws IOException, InterruptedException {
+    @Test
+    void http1Test() throws IOException, InterruptedException {
 
-		java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder().build();
-		java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder().uri(URI.create("http://localhost:" + port + "/ping")).build();
-		java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+        java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder().build();
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/ping"))
+                .build();
+        java.net.http.HttpResponse<String> response =
+                client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
 
-		assertNotNull(response);
-		assertEquals(java.net.http.HttpClient.Version.HTTP_1_1, response.version());
-	}
+        assertNotNull(response);
+        assertEquals(java.net.http.HttpClient.Version.HTTP_1_1, response.version());
+    }
 }

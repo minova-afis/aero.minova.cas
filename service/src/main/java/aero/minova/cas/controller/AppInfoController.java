@@ -38,12 +38,11 @@ public class AppInfoController {
     @GetMapping(value = "/appinfo", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> appInfo() {
         return Map.of(
-            "name",        application,
-            "saveSupport", true,
-            "backend",     Map.of(
-                "type",    "CAS",
-                "version", applicationVersion
-            )
-        );
+                "name",
+                application,
+                "saveSupport",
+                true,
+                "backend",
+                Map.of("type", "CAS", "version", applicationVersion));
     }
 }

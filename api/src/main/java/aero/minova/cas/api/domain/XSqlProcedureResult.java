@@ -5,11 +5,11 @@ import lombok.Data;
 @Data
 public class XSqlProcedureResult {
 
-	public XSqlProcedureResult(String id, SqlProcedureResult resultSet) {
-		this.id = id;
-		this.resultSet = resultSet;
-	}
+    public XSqlProcedureResult(String id, SqlProcedureResult resultSet) {
+        this.id = id;
+        this.resultSet = resultSet;
+    }
 
-	private String id;
-	private SqlProcedureResult resultSet;
+    private String id;
+    private SqlProcedureResult resultSet;
 }

@@ -1,5 +1,7 @@
 package aero.minova.cas.resources;
 
+import static aero.minova.cas.resources.ResourceFileSystemProvider.FILE_SYSTEM_PROVIDER;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
@@ -7,8 +9,6 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import static aero.minova.cas.resources.ResourceFileSystemProvider.FILE_SYSTEM_PROVIDER;
 
 public class ResourceFileSystem extends FileSystem {
     private ClassLoader classLoader;
@@ -71,7 +71,6 @@ public class ResourceFileSystem extends FileSystem {
             }
         }
         return new ResourcePath(path, this);
-
     }
 
     @Override

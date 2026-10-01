@@ -23,29 +23,31 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 // later that ALSO self-registers its own repositories the way foundation.rest.auth's Grants layer does, add its
 // persistence package to the exclude pattern below too.
 @SpringBootApplication
-@ComponentScan({ "aero.minova", "com.minova", "ch.minova.foundation.rest" })
-@EntityScan({ "aero.minova", "com.minova", "ch.minova.foundation.rest" })
-@EnableJpaRepositories(value = { "aero.minova", "com.minova", "ch.minova.foundation.rest" },
-        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-                pattern = "ch\\.minova\\.foundation\\.rest\\.auth\\.grants\\.persistence\\..*"))
+@ComponentScan({"aero.minova", "com.minova", "ch.minova.foundation.rest"})
+@EntityScan({"aero.minova", "com.minova", "ch.minova.foundation.rest"})
+@EnableJpaRepositories(
+        value = {"aero.minova", "com.minova", "ch.minova.foundation.rest"},
+        excludeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.REGEX,
+                        pattern = "ch\\.minova\\.foundation\\.rest\\.auth\\.grants\\.persistence\\..*"))
 @Configuration
 @EnableScheduling
 public class CoreApplicationSystemApplication {
 
-	@Autowired
-	static CustomLogger logger;
+    @Autowired
+    static CustomLogger logger;
 
-	public static void main(String[] args) {
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-		SpringApplication.run(CoreApplicationSystemApplication.class, args);
+        SpringApplication.run(CoreApplicationSystemApplication.class, args);
 
-		try {
-			logger = new CustomLogger();
-			logger.logInfo(VersionUtil.getVersionString());
-		} catch (Exception e) {
-			logger.logError("Could not read CAS Version.", e);
-		}
-	}
-
+        try {
+            logger = new CustomLogger();
+            logger.logInfo(VersionUtil.getVersionString());
+        } catch (Exception e) {
+            logger.logError("Could not read CAS Version.", e);
+        }
+    }
 }

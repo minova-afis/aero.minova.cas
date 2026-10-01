@@ -10,33 +10,34 @@ import aero.minova.cas.service.mdi.Main;
 
 public class VersionUtil {
 
-	private VersionUtil() {}
+    private VersionUtil() {}
 
-	private static final Pattern VERSION_REGEX = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)[-.]?([A-Z]+)?");
+    private static final Pattern VERSION_REGEX = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)[-.]?([A-Z]+)?");
 
-	public static Properties getVersion() throws IOException {
-		Properties properties = new Properties();
-		properties.load(Main.class.getResourceAsStream("/pom.properties"));
-		return properties;
-	}
+    public static Properties getVersion() throws IOException {
+        Properties properties = new Properties();
+        properties.load(Main.class.getResourceAsStream("/pom.properties"));
+        return properties;
+    }
 
-	public static String getVersionString() throws IOException {
-		Properties properties = getVersion();
-		return properties.getProperty("groupId") + "." + properties.getProperty("artifactId") + "-" + properties.getProperty("version");
-	}
+    public static String getVersionString() throws IOException {
+        Properties properties = getVersion();
+        return properties.getProperty("groupId") + "." + properties.getProperty("artifactId") + "-"
+                + properties.getProperty("version");
+    }
 
-	public static VersionResponse getVersionResponse() throws IOException {
-		Properties properties = getVersion();
+    public static VersionResponse getVersionResponse() throws IOException {
+        Properties properties = getVersion();
 
-		Matcher matcher = VERSION_REGEX.matcher(properties.getProperty("version"));
-		matcher.matches();
+        Matcher matcher = VERSION_REGEX.matcher(properties.getProperty("version"));
+        matcher.matches();
 
-		return new VersionResponse(properties.getProperty("groupId"), //
-				properties.getProperty("artifactId"), //
-				Integer.valueOf(matcher.group(1)), //
-				Integer.valueOf(matcher.group(2)), //
-				Integer.valueOf(matcher.group(3)), //
-				matcher.group(4));
-	}
-
+        return new VersionResponse(
+                properties.getProperty("groupId"), //
+                properties.getProperty("artifactId"), //
+                Integer.valueOf(matcher.group(1)), //
+                Integer.valueOf(matcher.group(2)), //
+                Integer.valueOf(matcher.group(3)), //
+                matcher.group(4));
+    }
 }

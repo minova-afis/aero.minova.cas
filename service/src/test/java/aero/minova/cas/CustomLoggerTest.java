@@ -1,5 +1,7 @@
 package aero.minova.cas;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import aero.minova.cas.api.restapi.ClientRestAPI;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -9,21 +11,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @Slf4j
-@SpringBootTest(classes = { CustomLogger.class, ClientRestAPI.class, Gson.class }, properties = { "PROPERY_SAMPLE1=/opt/hostedtoolcache/CodeQL/2.16.0/x64/codeql/tools/linux64/${LIB}_${PLATFORM}_trace.so"})
+@SpringBootTest(
+        classes = {CustomLogger.class, ClientRestAPI.class, Gson.class},
+        properties = {
+            "PROPERY_SAMPLE1=/opt/hostedtoolcache/CodeQL/2.16.0/x64/codeql/tools/linux64/${LIB}_${PLATFORM}_trace.so"
+        })
 @ExtendWith(OutputCaptureExtension.class)
 class CustomLoggerTest {
-	/**
-	 * Hier wird getestet, dass eine Property mit Variablen nicht dazu führt, dass CAS abstürzt,
-	 * was in der Vergangenheit bspw. bei Code-QL-Workflows zu Problemen geführt hat.
-	 *
-	 * @param output
-	 */
-	@Test
-	void handleContextRefreshWithUnresolvableVariablesTest(CapturedOutput output) {
-		assertThat(output)
-				.contains("Property: PROPERY_SAMPLE1 not resolvable");
-	}
+    /**
+     * Hier wird getestet, dass eine Property mit Variablen nicht dazu führt, dass CAS abstürzt,
+     * was in der Vergangenheit bspw. bei Code-QL-Workflows zu Problemen geführt hat.
+     *
+     * @param output
+     */
+    @Test
+    void handleContextRefreshWithUnresolvableVariablesTest(CapturedOutput output) {
+        assertThat(output).contains("Property: PROPERY_SAMPLE1 not resolvable");
+    }
 }

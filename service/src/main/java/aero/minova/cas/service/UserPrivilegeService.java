@@ -1,10 +1,7 @@
 package aero.minova.cas.service;
 
+import aero.minova.cas.service.model.UserPrivilege;
 import org.springframework.stereotype.Service;
 
-import aero.minova.cas.service.model.UserPrivilege;
-
 @Service
-public class UserPrivilegeService extends BaseService<UserPrivilege> {
-
-}
+public class UserPrivilegeService extends BaseService<UserPrivilege> {}

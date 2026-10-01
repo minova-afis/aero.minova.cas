@@ -11,9 +11,11 @@ public class ColumnFloat {
     private boolean identity;
     private boolean nullable = true;
     private int decimals;
+
     public boolean getIdentity() {
         return identity;
     }
+
     public boolean getNullable() {
         return nullable;
     }

@@ -1,40 +1,39 @@
 package aero.minova.cas.app.extension;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-
-import com.google.gson.JsonElement;
+import jakarta.annotation.PostConstruct;
 
 import aero.minova.cas.api.domain.SqlProcedureResult;
 import aero.minova.cas.api.domain.Table;
 import aero.minova.cas.app.util.ResponseEntityUtil;
 import aero.minova.cas.app.util.TableUtil;
 import aero.minova.cas.service.model.Users;
-import jakarta.annotation.PostConstruct;
+import com.google.gson.JsonElement;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UsersExtension extends BaseExtension<Users> {
 
-	@PostConstruct
-	void setPrefix() {
-		viewPrefix = "xvcas";
-		procedurePrefix = "xpcas";
-		tablePrefix = "xtcas";
-		super.basicSetup();
-	}
+    @PostConstruct
+    void setPrefix() {
+        viewPrefix = "xvcas";
+        procedurePrefix = "xpcas";
+        tablePrefix = "xtcas";
+        super.basicSetup();
+    }
 
-	@Override
-	public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
-		Users findEntityById = service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
+    @Override
+    public ResponseEntity<SqlProcedureResult> read(Table inputTable) {
+        Users findEntityById =
+                service.findEntityById(inputTable.getValue("KeyLong", 0).getIntegerValue());
 
-		// Passwort soll nicht ausgelesen werden
-		findEntityById.setPassword(null);
+        // Passwort soll nicht ausgelesen werden
+        findEntityById.setPassword(null);
 
-		JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
-		Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
-		Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
-		logger.logger.info("Result: {}", resultTable);
-		return ResponseEntityUtil.createResponseEntity(resultTable, false);
-
-	}
+        JsonElement json = TABLE_CONVERSION_GSON.toJsonTree(findEntityById);
+        Table jsonTable = TABLE_CONVERSION_GSON.fromJson(json, Table.class);
+        Table resultTable = TableUtil.addDataTypeToTable(jsonTable, inputTable);
+        logger.logger.info("Result: {}", resultTable);
+        return ResponseEntityUtil.createResponseEntity(resultTable, false);
+    }
 }

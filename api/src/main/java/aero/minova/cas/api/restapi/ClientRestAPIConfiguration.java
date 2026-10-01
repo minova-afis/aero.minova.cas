@@ -13,17 +13,17 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class ClientRestAPIConfiguration {
 
-	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		// Alle Konfigurationen für das RestTemplate hier einfügen.
-		return builder.build();
-	}
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        // Alle Konfigurationen für das RestTemplate hier einfügen.
+        return builder.build();
+    }
 
-	@Bean
-	public Gson gson() {
-		return new GsonBuilder() //
-				.registerTypeAdapter(Value.class, new ValueSerializer()) //
-				.registerTypeAdapter(Value.class, new ValueDeserializer()) //
-				.create();
-	}
+    @Bean
+    public Gson gson() {
+        return new GsonBuilder() //
+                .registerTypeAdapter(Value.class, new ValueSerializer()) //
+                .registerTypeAdapter(Value.class, new ValueDeserializer()) //
+                .create();
+    }
 }

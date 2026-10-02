@@ -322,7 +322,7 @@
 			service/doc/adoc/extensions.adoc -->
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.8</version>
+            <version>0.2.12</version>
         </dependency>
 
         <dependency>

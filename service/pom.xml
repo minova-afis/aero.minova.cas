@@ -296,7 +296,7 @@
             <!--  must be on the classpath test coverage  -->
             <groupId>org.jacoco</groupId>
             <artifactId>org.jacoco.agent</artifactId>
-            <version>0.8.14</version>
+            <version>0.8.15</version>
             <classifier>runtime</classifier>
             <scope>test</scope>
         </dependency>

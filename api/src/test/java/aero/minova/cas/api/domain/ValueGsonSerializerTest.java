@@ -265,22 +265,4 @@ public class ValueGsonSerializerTest {
 		return value;
 	}
 
-	/*
-	private static class StubJsonSerializationContext implements JsonSerializationContext {
-
-		@Override
-		public JsonElement serialize(Object src) {
-		    throw new UnsupportedOperationException(
-		            "Nested serialization was not expected in this test"
-		    );
-		}
-		
-		@Override
-		public JsonElement serialize(Object src, java.lang.reflect.Type typeOfSrc) {
-		    throw new UnsupportedOperationException(
-		            "Nested serialization was not expected in this test"
-		    );
-		}
-	}
-	*/
 }

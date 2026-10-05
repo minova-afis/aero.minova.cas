@@ -72,7 +72,7 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>12.1.9</version>
+                <version>13.0.0</version>
             </plugin>
             <!-- Von aero.minova:maven.root (via spring.maven.root) geerbt: spotless-maven-plugin formatiert sonst bei
 			jedem "mvn verify"/"install" (bzw. jedem Goal, das die verify-Phase erreicht) automatisch den gesamten

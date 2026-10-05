@@ -13,11 +13,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 /*
- * Zum aktivieren des PerformanceLoggingFilter, den entsprechenden Logger in den application.properties 
- * auf DEBUG stellen. 
+ * --- ACTIVATE --- 
  * 
- * Beispiel: logging.level.aero.minova.cas.profiling.filter.PerformanceLoggingFilter=DEBUG
+ * To activate PerformanceLoggingFilter logging property must be set:
+ * 
+ * - application.properties -> logging.level.aero.minova.cas.profiling.filter.PerformanceLoggingFilter=DEBUG
  */
+
 @Slf4j
 @Component
 @Order(-1100)
@@ -25,7 +27,6 @@ public class PerformanceLoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-    	//System.out.println("PerformanceLoggingFilter is on: " + log.isDebugEnabled());
         return !log.isDebugEnabled();
     }
 

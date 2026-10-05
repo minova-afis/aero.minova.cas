@@ -8,6 +8,16 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import lombok.extern.slf4j.Slf4j;
 
+/*
+ * --- LOG --- 
+ * 
+ * To log ConverterPrinter logging property must be set:
+ * 
+ * - application.properties -> aero.minova.cas.profiling.helper.ConverterPrinter=DEBUG
+ *
+ */
+
+
 @Slf4j
 @Component
 public class ConverterPrinter implements ApplicationListener<ContextRefreshedEvent> {

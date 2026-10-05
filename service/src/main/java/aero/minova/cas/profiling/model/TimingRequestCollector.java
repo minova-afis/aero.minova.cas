@@ -1,13 +1,12 @@
 package aero.minova.cas.profiling.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /*
 For accumulating data across multiple aspects and reading it later in the filter,

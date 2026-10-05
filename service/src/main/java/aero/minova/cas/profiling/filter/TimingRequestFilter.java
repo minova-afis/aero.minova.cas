@@ -3,6 +3,7 @@ package aero.minova.cas.profiling.filter;
 import java.io.IOException;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -38,9 +39,20 @@ sidestepping any bean-creation-order issues entirely.
 I'd drop the direct injection in the example above and just keep the
  ObjectProvider variant — it's marginally more code but removes an entire class of startup-order bugs:
 */
+
+/*
+ * --- ACTIVATE --- 
+ * 
+ * To activate TimingRequestFilter logging property must be set:
+ * 
+ * - application.properties -> logging.level.aero.minova.cas.profiling.filter.TimingRequestFilter=DEBUG
+ *
+ */
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Order(0)
 //@Order(-1010) // Wrapped by: org.springframework.beans.factory.support.ScopeNotActiveException: Error creating bean with name 'scopedTarget.timingRequestCollector': Scope 'request' is not active for the current thread; consider defining a scoped proxy for this bean if you intend to refer to it from a singleton
 public class TimingRequestFilter extends OncePerRequestFilter {
 
@@ -48,7 +60,6 @@ public class TimingRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-    	//System.out.println("TimingRequestFilter is on: " + log.isDebugEnabled());
         return !log.isDebugEnabled();
     }
 

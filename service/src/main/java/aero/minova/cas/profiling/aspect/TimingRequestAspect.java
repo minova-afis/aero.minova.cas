@@ -3,6 +3,7 @@ package aero.minova.cas.profiling.aspect;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import aero.minova.cas.profiling.model.TimingRequestCollector;
@@ -14,8 +15,19 @@ Spring injects the request-scoped proxy here even though TimingAspect itself is 
 (which @RequestScope sets to TARGET_CLASS by default).
  */
 
+/*
+ * --- ACTIVATE --- 
+ * 
+ * To activate TimingRequestAspect property must be set:
+ * 
+ * - application.properties -> cas.aspect.TimingRequestAspect=true
+ * 
+ * The 'TimingRequestCollector' in RequestScope must be reachable. 
+ */
+
 @Aspect
 @Component
+@ConditionalOnProperty(name = "cas.aspect.TimingRequestAspect", havingValue = "true")
 @RequiredArgsConstructor
 public class TimingRequestAspect {
 

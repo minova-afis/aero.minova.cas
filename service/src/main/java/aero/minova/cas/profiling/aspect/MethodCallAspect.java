@@ -4,11 +4,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+/*
+ * --- ACTIVATE --- 
+ *  
+ * To activate MethodCallAspect both properties must be set:
+ * 
+ * - application.properties -> cas.aspect.MethodCallAspect=true
+ * - application.properties -> logging.level.aero.minova.cas.profiling.aspect.MethodCallAspect=DEBUG
+ * 
+ */
+
 @Slf4j
-//@Aspect
-//@Component
+@Aspect
+@Component
+@ConditionalOnProperty(name = "cas.aspect.MethodCallAspect", havingValue = "true")
 public class MethodCallAspect {
 
     @Before("execution(* aero.minova.cas.controller.*.*(..)) " +
@@ -18,7 +30,8 @@ public class MethodCallAspect {
     public void methodCall(JoinPoint joinPoint) throws Throwable {
     	
     	//System.out.println("MethodCallAspect " + joinPoint + " - " + joinPoint.getArgs());
-        log.debug("MethodCallAspect {}", joinPoint);
+    	long threadId = Thread.currentThread().threadId();
+        log.debug("MethodCallAspect --- {} --- {}", threadId, joinPoint);
     }
 
     /*

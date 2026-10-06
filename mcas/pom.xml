@@ -46,7 +46,7 @@
             <plugin>
                 <groupId>com.github.ferstl</groupId>
                 <artifactId>depgraph-maven-plugin</artifactId>
-                <version>4.0.3</version>
+                <version>4.0.5</version>
                 <executions>
                     <execution>
                         <id>generate-dependency-graph</id>

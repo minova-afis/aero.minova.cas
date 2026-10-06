@@ -245,7 +245,7 @@
 			bereitgestellt: service/doc/adoc/extensions.adoc -->
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>3.2.3</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <!-- Diese Abhängigkeit wird für Erweiterungen (z.B.

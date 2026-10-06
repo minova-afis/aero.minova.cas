@@ -47,6 +47,8 @@ I'd drop the direct injection in the example above and just keep the
  * 
  * - application.properties -> logging.level.aero.minova.cas.profiling.filter.TimingRequestFilter=DEBUG
  *
+ * if you missing values for Serializer or Deserializer check:
+ * - application.properties -> cas.aspect.TimingRequestAspect=true
  */
 
 @Slf4j
@@ -72,7 +74,7 @@ public class TimingRequestFilter extends OncePerRequestFilter {
 
         long startTimeInNanos = System.nanoTime();
         long threadId = Thread.currentThread().threadId();
-		log.debug("--- TimingRequestFilter Start      --- {} --- ", threadId);
+		log.debug("-- TimingRequestFilter Start      - {} - ", threadId);
 
         try {
             filterChain.doFilter(request, response);
@@ -81,14 +83,14 @@ public class TimingRequestFilter extends OncePerRequestFilter {
 	    	long durationTimeInMs =  durationTimeInNanos/1_000_000;
 
             var serializerCount = timingRequestCollector.getSerializerForValueCount();
-            var serializerDuration = timingRequestCollector.getSerializerForValueDuration();
+            var serializerDuration = Math.round(timingRequestCollector.getSerializerForValueDuration() * 10000.0) / 10000.0;	// 4-Nachkommastellen
             var deserializerCount = timingRequestCollector.getDeserializerForValueCount();
-            var deserializerDuration = timingRequestCollector.getDeserializerForValueDuration();
+            var deserializerDuration = Math.round(timingRequestCollector.getDeserializerForValueDuration() * 10000.0) / 10000.0; // 4-Nachkommastellen
 
 	    	String headerProfiling = response.getHeader("X-Profiling-Time");
 	    	String headerContentEncoding = response.getHeader("Content-Encoding") != null ? response.getHeader("Content-Encoding") : "";
 
-            log.debug("--- TimingRequestFilter End        --- {} --- (Duration Filter / Duration Controller): ({}ms / {}) {} - [{} {}]: Serializer ({} / {}ms) - Deserializer ({} / {}ms)",
+	    	log.debug("-- TimingRequestFilter End        - {} - (Duration Filter / X-Profiling-Time): ({}ms / {}) {} - [{} {}]: Serializer ({} / {}ms) - Deserializer ({} / {}ms)",
             		threadId,
             		durationTimeInMs,
             		headerProfiling,
@@ -99,7 +101,7 @@ public class TimingRequestFilter extends OncePerRequestFilter {
                     serializerDuration,
                     deserializerCount,
                     deserializerDuration);
-                        
+
         }
     }
 }

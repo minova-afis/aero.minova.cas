@@ -2,6 +2,7 @@ package aero.minova.cas.profiling.filter;
 
 import java.io.IOException;
 
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,11 +19,14 @@ import lombok.extern.slf4j.Slf4j;
  * To activate PerformanceLoggingFilter logging property must be set:
  * 
  * - application.properties -> logging.level.aero.minova.cas.profiling.filter.PerformanceLoggingFilter=DEBUG
+ * 
+ * INFO:
+ * To log filter with order use:  logging.level.web=DEBUG
  */
 
 @Slf4j
 @Component
-@Order(-1100)
+@Order(Ordered.HIGHEST_PRECEDENCE)	// Filter an den Anfang stellen.
 public class PerformanceLoggingFilter extends OncePerRequestFilter {
 
     @Override
@@ -38,7 +42,7 @@ public class PerformanceLoggingFilter extends OncePerRequestFilter {
     	long startTimeInNanos = System.nanoTime();
         long threadId = Thread.currentThread().threadId();
 
-		log.debug("--- PerformanceLoggingFilter Start --- {} ---", threadId);
+		log.debug("-- PerformanceLoggingFilter Start - {} -", threadId);
     	
     	try {
     		filterChain.doFilter(request, response);
@@ -49,7 +53,7 @@ public class PerformanceLoggingFilter extends OncePerRequestFilter {
 	    	String headerProfiling = response.getHeader("X-Profiling-Time");
 	    	String headerContentEncoding = response.getHeader("Content-Encoding") != null ? response.getHeader("Content-Encoding") : "";
 
-	    	log.debug("--- PerformanceLoggingFilter End   --- {} --- (Duration Filter / Duration Controller): ({}ms / {}) {}", threadId, durationTimeInMs, headerProfiling, headerContentEncoding);
+	    	log.debug("-- PerformanceLoggingFilter End   - {} - (Duration Filter / X-Profiling-Time): ({}ms / {}) {}", threadId, durationTimeInMs, headerProfiling, headerContentEncoding);
 	    	
 	    }
     }

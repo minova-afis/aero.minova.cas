@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * To log ConverterPrinter logging property must be set:
  * 
- * - application.properties -> aero.minova.cas.profiling.helper.ConverterPrinter=DEBUG
+ * - application.properties -> logging.level.aero.minova.cas.profiling.helper.ConverterPrinter=DEBUG
  *
  */
 

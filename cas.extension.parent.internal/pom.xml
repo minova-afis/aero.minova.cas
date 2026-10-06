@@ -4,14 +4,14 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.parent</artifactId>
-        <version>13.8.1-SNAPSHOT</version>
+        <version>13.8.1</version>
     </parent>
     <artifactId>cas.extension.parent.internal</artifactId>
     <packaging>pom</packaging>
     <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <tag>HEAD</tag>
+        <tag>v13.8.1</tag>
     </scm>
     <dependencies>
         <dependency>
@@ -56,7 +56,7 @@
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
-                <version>13.8.1-SNAPSHOT</version>
+                <version>13.8.1</version>
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>

@@ -12,8 +12,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Reiner Jackson-Deserializer für {@link Value} - ohne Gson-Abhängigkeit.
  *
@@ -23,9 +21,7 @@ import lombok.extern.slf4j.Slf4j;
  * </p>
  */
 
-@Slf4j
 public class ValueJacksonDeserializer extends JsonDeserializer<Value> {
-
 
 	public static final String SQL_IS_NULL = "null";
 	public static final String SQL_IS_NOT_NULL = "!null";

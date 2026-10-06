@@ -1,6 +1,5 @@
 package aero.minova.cas.service;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
@@ -12,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +75,14 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	@Autowired
 	ColumnSecurityRepository columnSecurityRepository;
 
-	private List<Integer> authorityKeys = Arrays.asList(1, 2, 3, 4, 5);
+	// Anders als z.B. xtcasMdiType (siehe MdiService#setupMdiTypes) gibt es für xtcasAuthorities/xtcasColumnSecurity
+	// keine über setup vordefinierten Werte, es handelt sich hier nur um Testdaten. Die KeyLongs werden daher von
+	// JPA generiert statt fest vorgegeben - vorher kollidierte KeyLong 1 silently mit der admin-Authority-Zeile aus
+	// createOrUpdateAdminUser (beide bekamen KeyLong 1, siehe deren merge()), und unter neueren Hibernate-Versionen
+	// schlägt eine feste, bereits vorgegebene ID auf einer IDENTITY-Spalte ohnehin fehl.
+	private int authKeyUser2;
+	private int authKeyUser3;
+	private List<Integer> authorityKeys;
 
 	@PostConstruct
 	void setupViewServiceTest() {
@@ -91,16 +97,49 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		privilege.setRowLevelSecurity(true);
 		luUserPrivilegeUserGroupService.save(privilege);
 
-		// Ein paar Daten erstellen
-		authoritiesRepository.save(new Authorities(1, "User1", "test", "user", Timestamp.valueOf("2023-06-18 00:00:00.0").toLocalDateTime(), 1));
-		authoritiesRepository.save(new Authorities(2, "User2", "TEST", "user", Timestamp.valueOf("2023-06-19 00:00:00.0").toLocalDateTime(), 2));
-		authoritiesRepository.save(new Authorities(3, "User3", "not test", "user", Timestamp.valueOf("2023-06-19 08:00:00.0").toLocalDateTime(), 1));
-		authoritiesRepository.save(new Authorities(4, "User4", "testtest", "user", Timestamp.valueOf("2023-06-19 16:00:00.0").toLocalDateTime(), 1));
-		authoritiesRepository.save(new Authorities(5, "User5", "te", null, Timestamp.valueOf("2023-06-20 08:00:00.0").toLocalDateTime(), -1));
+		// Ein paar Daten erstellen. setupViewServiceTest() läuft vor JEDEM Test erneut (JUnit erzeugt pro
+		// Testmethode eine neue Instanz, Spring feuert @PostConstruct bei jeder Instanziierung neu) - saveAuthority
+		// und saveColumnSecurity müssen daher idempotent sein, sonst würden sich die Testdaten mit jedem weiteren
+		// Test in der Klasse verdoppeln.
+		saveAuthority("User1", "test", "user", Timestamp.valueOf("2023-06-18 00:00:00.0").toLocalDateTime(), 1);
+		authKeyUser2 = saveAuthority("User2", "TEST", "user", Timestamp.valueOf("2023-06-19 00:00:00.0").toLocalDateTime(), 2);
+		authKeyUser3 = saveAuthority("User3", "not test", "user", Timestamp.valueOf("2023-06-19 08:00:00.0").toLocalDateTime(), 1);
+		saveAuthority("User4", "testtest", "user", Timestamp.valueOf("2023-06-19 16:00:00.0").toLocalDateTime(), 1);
+		saveAuthority("User5", "te", null, Timestamp.valueOf("2023-06-20 08:00:00.0").toLocalDateTime(), -1);
 
-		columnSecurityRepository.save(new ColumnSecurity(1, "cs1", "cs1", "cs1", null));
-		columnSecurityRepository.save(new ColumnSecurity(2, "cs2", "cs2", "cs2", "admin"));
-		columnSecurityRepository.save(new ColumnSecurity(3, "cs3", "cs3", "cs3", "niemand"));
+		// authorityKeys wird erst jetzt aus der tatsächlichen Tabelle gelesen, damit z.B. testLimit() unabhängig
+		// davon funktioniert, welche KeyLongs JPA konkret vergeben hat (inkl. der admin-Authority-Zeile).
+		authorityKeys = authoritiesRepository.findAll().stream().map(Authorities::getKeyLong).collect(toList());
+
+		saveColumnSecurity("cs1", "cs1", "cs1", null);
+		saveColumnSecurity("cs2", "cs2", "cs2", "admin");
+		saveColumnSecurity("cs3", "cs3", "cs3", "niemand");
+	}
+
+	private int saveAuthority(String username, String authority, String lastUser, LocalDateTime lastDate, int lastAction) {
+		List<Authorities> existing = authoritiesRepository.findByUsernameAndLastActionGreaterThan(username, Integer.MIN_VALUE);
+		if (!existing.isEmpty()) {
+			return existing.get(0).getKeyLong();
+		}
+		Authorities entity = new Authorities();
+		entity.setUsername(username);
+		entity.setAuthority(authority);
+		entity.setLastUser(lastUser);
+		entity.setLastDate(lastDate);
+		entity.setLastAction(lastAction);
+		return authoritiesRepository.save(entity).getKeyLong();
+	}
+
+	private void saveColumnSecurity(String keyText, String tableName, String columnName, String securityToken) {
+		if (!columnSecurityRepository.findByKeyTextAndLastActionGreaterThan(keyText, Integer.MIN_VALUE).isEmpty()) {
+			return;
+		}
+		ColumnSecurity entity = new ColumnSecurity();
+		entity.setKeyText(keyText);
+		entity.setTableName(tableName);
+		entity.setColumnName(columnName);
+		entity.setSecurityToken(securityToken);
+		columnSecurityRepository.save(entity);
 	}
 
 	@Test
@@ -129,13 +168,13 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 		indexView.setValue(new Value("test", null), "Authority", 0);
 		indexView.addRow(getEmptyRow(7));
 		indexView.setValue(new Value(true, null), Column.AND_FIELD_NAME, 1);
-		indexView.setValue(new Value(2, ">="), "KeyLong", 1);
+		indexView.setValue(new Value(authKeyUser2, ">="), "KeyLong", 1);
 
 		Table indexViewResult = viewController.getIndexView(indexView);
 		assertTrue(indexViewResult.getRows().size() >= 1);
 		for (Row r : indexViewResult.getRows()) {
 			assertTrue("test".equalsIgnoreCase(indexViewResult.getValue("Authority", r).getStringValue()));
-			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() >= 2);
+			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() >= authKeyUser2);
 		}
 	}
 
@@ -144,13 +183,13 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	void testAndOneRow() throws Exception {
 		Table indexView = getTableForRequest();
 		indexView.setValue(new Value("test", "~"), "Authority", 0);
-		indexView.setValue(new Value(2, ">="), "Keylong", 0);
+		indexView.setValue(new Value(authKeyUser2, ">="), "Keylong", 0);
 
 		Table indexViewResult = viewController.getIndexView(indexView);
 		assertTrue(indexViewResult.getRows().size() >= 1);
 		for (Row r : indexViewResult.getRows()) {
 			assertTrue("test".equalsIgnoreCase(indexViewResult.getValue("Authority", r).getStringValue()));
-			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() >= 2);
+			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() >= authKeyUser2);
 		}
 	}
 
@@ -345,59 +384,59 @@ public abstract class ViewServiceBaseTest<T extends ViewServiceInterface> extend
 	@DisplayName("Integer Operationen überprüfen")
 	void testIntOperations() throws Exception {
 		Table indexView = getTableForRequest();
-		indexView.setValue(new Value(3, "<"), "KeyLong", 0);
+		indexView.setValue(new Value(authKeyUser3, "<"), "KeyLong", 0);
 		Table indexViewResult = viewController.getIndexView(indexView);
 		assertFalse(indexViewResult.getRows().isEmpty());
 		for (Row r : indexViewResult.getRows()) {
-			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() < 3);
+			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() < authKeyUser3);
 		}
 
 		indexView = getTableForRequest();
-		indexView.setValue(new Value(3, "<="), "KeyLong", 0);
+		indexView.setValue(new Value(authKeyUser3, "<="), "KeyLong", 0);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertFalse(indexViewResult.getRows().isEmpty());
 		for (Row r : indexViewResult.getRows()) {
-			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() <= 3);
+			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() <= authKeyUser3);
 		}
 
 		indexView = getTableForRequest();
-		indexView.setValue(new Value(3, ">"), "KeyLong", 0);
+		indexView.setValue(new Value(authKeyUser3, ">"), "KeyLong", 0);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertFalse(indexViewResult.getRows().isEmpty());
 		for (Row r : indexViewResult.getRows()) {
-			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() > 3);
+			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() > authKeyUser3);
 		}
 
 		indexView = getTableForRequest();
-		indexView.setValue(new Value(3, ">="), "KeyLong", 0);
+		indexView.setValue(new Value(authKeyUser3, ">="), "KeyLong", 0);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertFalse(indexViewResult.getRows().isEmpty());
 		for (Row r : indexViewResult.getRows()) {
-			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() >= 3);
+			assertTrue(indexViewResult.getValue("KeyLong", r).getIntegerValue() >= authKeyUser3);
 		}
 
 		indexView = getTableForRequest();
-		indexView.setValue(new Value(3, "<>"), "KeyLong", 0);
+		indexView.setValue(new Value(authKeyUser3, "<>"), "KeyLong", 0);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertFalse(indexViewResult.getRows().isEmpty());
 		for (Row r : indexViewResult.getRows()) {
-			assertNotEquals(3, indexViewResult.getValue("KeyLong", r).getIntegerValue());
+			assertNotEquals(authKeyUser3, indexViewResult.getValue("KeyLong", r).getIntegerValue());
 		}
 
 		indexView = getTableForRequest();
-		indexView.setValue(new Value(3, "="), "KeyLong", 0);
+		indexView.setValue(new Value(authKeyUser3, "="), "KeyLong", 0);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertFalse(indexViewResult.getRows().isEmpty());
 		for (Row r : indexViewResult.getRows()) {
-			assertEquals(3, indexViewResult.getValue("KeyLong", r).getIntegerValue());
+			assertEquals(authKeyUser3, indexViewResult.getValue("KeyLong", r).getIntegerValue());
 		}
 
 		indexView = getTableForRequest();
-		indexView.setValue(new Value(3, null), "KeyLong", 0);
+		indexView.setValue(new Value(authKeyUser3, null), "KeyLong", 0);
 		indexViewResult = viewController.getIndexView(indexView);
 		assertFalse(indexViewResult.getRows().isEmpty());
 		for (Row r : indexViewResult.getRows()) {
-			assertEquals(3, indexViewResult.getValue("KeyLong", r).getIntegerValue());
+			assertEquals(authKeyUser3, indexViewResult.getValue("KeyLong", r).getIntegerValue());
 		}
 	}
 

@@ -21,3 +21,6 @@ service/logs/**
 
 */logs/*
 */Internal/*
+
+.claude/
+.vscode/

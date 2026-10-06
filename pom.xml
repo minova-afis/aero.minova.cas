@@ -1,28 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cas.parent</artifactId>
-    <version>13.7.3-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>aero.minova.cas</name>
 
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>spring.maven.root</artifactId>
-        <version>1.5.13</version>
+        <version>11.3.4</version>
         <relativePath />
     </parent>
-
-    <properties>
-        <sonar.dependencyCheck.jsonReportPath>target/dependency-check-report.json</sonar.dependencyCheck.jsonReportPath>
-        <sonar.dependencyCheck.htmlReportPath>target/dependency-check-report.html</sonar.dependencyCheck.htmlReportPath>
-    </properties>
-
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-        <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
+    <artifactId>cas.parent</artifactId>
+    <version>13.8.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>aero.minova.cas</name>
 
     <modules>
         <module>resource-plugin</module>
@@ -37,6 +26,17 @@
         <module>customer-build-project</module>
         <module>mcas</module>
     </modules>
+
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <developerConnection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <sonar.dependencyCheck.jsonReportPath>target/dependency-check-report.json</sonar.dependencyCheck.jsonReportPath>
+        <sonar.dependencyCheck.htmlReportPath>target/dependency-check-report.html</sonar.dependencyCheck.htmlReportPath>
+    </properties>
 
     <repositories>
         <repository>
@@ -59,7 +59,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -72,7 +72,21 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>12.1.9</version>
+                <version>13.0.0</version>
+            </plugin>
+            <!-- Von aero.minova:maven.root (via spring.maven.root) geerbt: spotless-maven-plugin formatiert sonst bei
+			jedem "mvn verify"/"install" (bzw. jedem Goal, das die verify-Phase erreicht) automatisch den gesamten
+			Java-Code neu (Palantir-Style), unabhängig davon, ob Dateien tatsächlich geändert wurden. Hier deaktiviert,
+			da dies sonst bei jedem Build zu großflächigen, ungewollten Whitespace-Diffs führt. -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>spotless-apply</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

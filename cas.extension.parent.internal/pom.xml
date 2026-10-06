@@ -1,13 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cas.extension.parent.internal</artifactId>
-    <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
-    <packaging>pom</packaging>
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.parent</artifactId>
-        <version>13.7.3-SNAPSHOT</version>
+        <version>13.8.2-SNAPSHOT</version>
     </parent>
+    <artifactId>cas.extension.parent.internal</artifactId>
+    <packaging>pom</packaging>
+    <description>Wird als Basis für Kundenprojekte und CAS-Erweiterungen verwendet..</description>
+    <scm>
+        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
+        <tag>HEAD</tag>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>aero.minova</groupId>
@@ -25,12 +30,12 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.21.0</version>
+            <version>2.22.0</version>
         </dependency>
         <dependency>
             <groupId>aero.minova</groupId>
             <artifactId>app.build</artifactId>
-            <version>12.2.0</version>
+            <version>12.2.1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -51,14 +56,14 @@
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
-                <version>13.7.3-SNAPSHOT</version>
+                <version>13.8.2-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>
-                        <phase>process-resources</phase>
                         <goals>
                             <goal>generate-resource-file</goal>
                         </goals>
+                        <phase>process-resources</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -68,10 +73,10 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${project.build.directory}/jar-dependencies</outputDirectory>
                         </configuration>
@@ -80,14 +85,14 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>copy-i18n</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/i18n</outputDirectory>
                             <resources>
@@ -102,10 +107,10 @@
                     </execution>
                     <execution>
                         <id>copy-files</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/files</outputDirectory>
                             <resources>
@@ -120,10 +125,10 @@
                     </execution>
                     <execution>
                         <id>copy-files-root</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/</outputDirectory>
                             <resources>
@@ -138,10 +143,10 @@
                     </execution>
                     <execution>
                         <id>copy-images</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/images</outputDirectory>
                             <resources>
@@ -157,10 +162,10 @@
 
                     <execution>
                         <id>copy-pdf</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/pdf</outputDirectory>
                             <resources>
@@ -175,10 +180,10 @@
                     </execution>
                     <execution>
                         <id>copy-plugins</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/plugins</outputDirectory>
                             <resources>
@@ -193,10 +198,10 @@
                     </execution>
                     <execution>
                         <id>copy-postgresql</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/postgresql</outputDirectory>
                             <resources>
@@ -211,10 +216,10 @@
                     </execution>
                     <execution>
                         <id>copy-reports</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/reports</outputDirectory>
                             <resources>
@@ -229,10 +234,10 @@
                     </execution>
                     <execution>
                         <id>copy-setup</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/setup</outputDirectory>
                             <resources>
@@ -247,10 +252,10 @@
                     </execution>
                     <execution>
                         <id>copy-sql</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/sql</outputDirectory>
                             <resources>
@@ -265,10 +270,10 @@
                     </execution>
                     <execution>
                         <id>copy-tables</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <outputDirectory>${basedir}/target/classes/tables</outputDirectory>
                             <resources>
@@ -301,10 +306,10 @@
                         <executions>
                             <execution>
                                 <id>unpack-build-files</id>
-                                <phase>generate-resources</phase>
                                 <goals>
                                     <goal>unpack-dependencies</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                                 <configuration>
                                     <includeGroupIds>aero.minova</includeGroupIds>
                                     <includeArtifactIds>app.build</includeArtifactIds>
@@ -314,10 +319,10 @@
                             </execution>
                             <execution>
                                 <id>unpack-dependencies-setup</id>
-                                <phase>generate-resources</phase>
                                 <goals>
                                     <goal>unpack-dependencies</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                                 <configuration>
                                     <useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
                                     <includeScope>compile</includeScope>
@@ -344,14 +349,14 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.5.0</version>
                         <executions>
                             <execution>
                                 <id>copy-forms</id>
-                                <phase>generate-resources</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                                 <configuration>
                                     <outputDirectory>${basedir}/target/generated-resources/forms</outputDirectory>
                                     <resources>
@@ -369,14 +374,14 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>xml-maven-plugin</artifactId>
-                        <version>1.2.0</version>
+                        <version>1.2.2</version>
                         <executions>
                             <execution>
                                 <id>transform-forms</id>
-                                <phase>process-resources</phase>
                                 <goals>
                                     <goal>transform</goal>
                                 </goals>
+                                <phase>process-resources</phase>
                                 <configuration>
                                     <transformationSets>
                                         <transformationSet>
@@ -420,10 +425,10 @@
                         <executions>
                             <execution>
                                 <id>unpack-build-files</id>
-                                <phase>generate-resources</phase>
                                 <goals>
                                     <goal>unpack-dependencies</goal>
                                 </goals>
+                                <phase>generate-resources</phase>
                                 <configuration>
                                     <includeGroupIds>aero.minova</includeGroupIds>
                                     <includeArtifactIds>app.build</includeArtifactIds>
@@ -437,8 +442,4 @@
             </build>
         </profile>
     </profiles>
-    <scm>
-        <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
-      <tag>HEAD</tag>
-  </scm>
 </project>

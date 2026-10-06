@@ -5,6 +5,14 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+## \[13.8.0\] - 2026-09-30
+- software.amazon.awssdk bom von 2.39.1 auf 2.55.6 aktualisieren
+- aero.minova:spring.maven.root von 1.5.13 auf 11.3.4 aktualisieren (dadurch: Spring Boot 3.2.4 → 3.5.16, Hibernate 6.4.4.Final → 6.6.53.Final, Spring Data JPA 3.2.4 → 3.5.13)
+- Weitere Abhängigkeiten-Updates
+
+
+## \[13.7.2\] - 2026-09-28
+
 - Profiling hinzufügen, kann über properties oder die Anfragen gesteuert werden
 
 ## \[13.7.0\] - 2026-09-07

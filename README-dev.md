@@ -4,14 +4,6 @@
 
 Maven `warnings` und entsprechende Lösungen
 
-```warning
-
-```
-
-```solution
-
-```
-
 ### pom.xml
 
 ```warning

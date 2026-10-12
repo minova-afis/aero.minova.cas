@@ -17,8 +17,8 @@
 
     <properties>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <java.version>17</java.version>
-        <maven.compiler.release>17</maven.compiler.release>
+        <!--<java.version>17</java.version>-->
+        <!--<maven.compiler.release>17</maven.compiler.release>-->
     </properties>
 
     <dependencies>

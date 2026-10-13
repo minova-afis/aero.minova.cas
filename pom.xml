@@ -47,6 +47,17 @@
     </repositories>
 
     <build>
+        <!-- Spring Boot Version explizit angeben um Maven Warnings zu vermeiden!! -->
+        <pluginManagement>
+    		<plugins>
+	            <plugin>
+	                <groupId>org.springframework.boot</groupId>
+	                <artifactId>spring-boot-maven-plugin</artifactId>
+	                <version>3.5.16</version>
+	            </plugin>
+    		</plugins>
+	    </pluginManagement>
+
         <!-- Define Maven Plugin Settings that should be inherited to ALL submodule POMs.
              (NOTE: individual POMs can override specific settings). -->
         <plugins>

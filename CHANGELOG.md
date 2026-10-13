@@ -5,6 +5,12 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+- Maven `warnings` bearbeitet. Siehe README-dev.md
+- PerformanceLoggingFilter - steht am Anfang der Filterkette (Zum aktivieren Property logging.level.aero.minova.cas.profiling.filter.PerformanceLoggingFilter=DEBUG setzen)
+- TimingRequestFilter in Verbindung mit TimingRequestAspect - Laufzeitmessung für Serializer/Deserializer (Zum aktivieren Properties logging.level.aero.minova.cas.profiling.filter.TimingRequestFilter=DEBUG und cas.aspect.TimingRequestAspect=true setzen)
+- ValueJacksonDeserializer und ValueJacksonSerializer. Verwendet ausschließlich Jackson (noch nicht im Value aktiviert!)
+- ValueGsonDeserializer und ValueGsonSerializer. Verwendet ausschließlich GSON (noch nicht aktiviert!).
+
 ## \[13.8.0\] - 2026-09-30
 - software.amazon.awssdk bom von 2.39.1 auf 2.55.6 aktualisieren
 - aero.minova:spring.maven.root von 1.5.13 auf 11.3.4 aktualisieren (dadurch: Spring Boot 3.2.4 → 3.5.16, Hibernate 6.4.4.Final → 6.6.53.Final, Spring Data JPA 3.2.4 → 3.5.13)

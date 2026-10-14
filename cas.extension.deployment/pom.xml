@@ -4,7 +4,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.parent</artifactId>
-        <version>13.8.2-SNAPSHOT</version>
+        <version>13.8.4-SNAPSHOT</version>
         <relativePath>../cas.extension.parent</relativePath>
     </parent>
     <artifactId>cas.extension.deployment</artifactId>
@@ -19,7 +19,7 @@
             <plugin>
                 <groupId>aero.minova</groupId>
                 <artifactId>cas.resource.maven.plugin</artifactId>
-                <version>13.8.2-SNAPSHOT</version>
+                <version>13.8.4-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-resource-file</id>

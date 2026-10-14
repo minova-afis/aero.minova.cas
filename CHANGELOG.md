@@ -5,6 +5,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+## \[13.8.3\] - 2026-10-14
+
 - spring.jpa.hibernate.ddl-auto per default auf none
 
 ## \[13.8.0\] - 2026-09-30

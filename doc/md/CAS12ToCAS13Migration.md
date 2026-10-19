@@ -103,6 +103,30 @@ command was unaffected. Confirmed against `aero.minova.travelexpenses`'s cloud (
 which hardcoded the old `-cp`/main-class form in its kustomize pod patch — switching to `-jar` fixed
 the boot failure.
 
+### Local Windows service (WinSW)
+
+A plain install (no Docker image) has no baked-in `LOADER_PATH`, so it must be set explicitly.
+With WinSW, add an `<env>` element to the service XML. This is the only setting that has to go
+into the XML — everything else from step 3 (`fat.jar.mode`, `legacy.system.files.path`, ...)
+belongs in `application.properties`. As in the cloud case above, an old `-cp`/main-class
+invocation in `<arguments>` must be changed to `-jar`.
+
+```xml
+<service>
+    <id>sis12cas</id>
+    <name>MINOVA TEST SIS12 CAS</name>
+    <executable>H:\Minova\java\jre21\bin\java</executable>
+    <env name="LOADER_PATH" value="H:\Minova\sis12cas\lib-legacy\"/>
+    <arguments>-Xmx512m -Xms256m -Djavax.net.ssl.trustStore=NUL -Djavax.net.ssl.trustStoreType=Windows-ROOT -jar lib/aero.minova.cas.jar</arguments>
+    <logmode>rotate</logmode>
+</service>
+```
+
+- `LOADER_PATH` points at the directory containing the old extension jars (the local equivalent
+  of `lib-legacy/`). The path above is a placeholder.
+- WinSW only reads the XML at install time: after editing, run `stop`, `uninstall`, `install`,
+  `start` (or `refresh` on newer WinSW versions).
+
 ## 4. Behavior changes to be aware of
 
 - **MD5/zip caches are no longer pre-built at startup.** CAS 12 pre-computed `.md5` files and

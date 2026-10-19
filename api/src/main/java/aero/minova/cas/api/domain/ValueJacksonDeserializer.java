@@ -14,6 +14,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Reiner Jackson-Deserializer für {@link Value} - ohne Gson-Abhängigkeit.
+ * 
+ * Wenn dieser Deserializer verwendet werden soll, muß im Value.jave die definition 
+ * mit '@JsonDeserialize(using = ValueJacksonDeserializer.class)'ersetzt werden
  *
  * <p>
  * Erwartet einen JSON-String im Format {@code "<typ>-<wert>"} bzw. {@code "f-<rule>-<typ>-<wert>"}

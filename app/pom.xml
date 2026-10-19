@@ -4,11 +4,11 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.parent.internal</artifactId>
-        <version>13.8.2-SNAPSHOT</version>
+        <version>13.8.4-SNAPSHOT</version>
         <relativePath>../cas.extension.parent.internal</relativePath>
     </parent>
     <artifactId>cas.app</artifactId>
-    <version>13.8.2-SNAPSHOT</version>
+    <version>13.8.4-SNAPSHOT</version>
     <scm>
         <connection>scm:git:https://github.com/minova-afis/aero.minova.cas.git</connection>
         <tag>v12.64.0</tag>

@@ -6,12 +6,12 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>cas.extension.deployment</artifactId>
-        <version>13.8.2-SNAPSHOT</version>
+        <version>13.8.4-SNAPSHOT</version>
         <relativePath>../cas.extension.deployment</relativePath>
     </parent>
 
     <artifactId>aero.minova.service.mcas</artifactId>
-    <version>13.8.2-SNAPSHOT</version>
+    <version>13.8.4-SNAPSHOT</version>
     <name>µCAS - Standalone CAS Service</name>
     <description>Standalone µCAS service with database-based file access.
         Auto-creates required directory structure for autonomous operation.</description>

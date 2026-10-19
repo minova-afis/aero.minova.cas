@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 /**
  * Reiner Jackson-Serializer für {@link Value} - ohne Gson-Abhängigkeit.
  *
+ * Wenn dieser Serializer verwendet werden soll, muß im Value.jave die definition 
+ * mit '@JsonSerialize(using = ValueJacksonSerializer.class)'ersetzt werden.
+ * 
  * <p>
  * Erzeugt einen JSON-String im Format {@code "<typ>-<wert>"} bzw. {@code "f-<rule>-<typ>-<wert>"}
  * (siehe {@link ValueDeserializer} für das Gegenstück).

@@ -1,4 +1,4 @@
-~~~~# Changelog
+# Changelog
 
 Alle wesentlichen Änderungen für dieses Projekt werden hier dokumentiert.
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).

@@ -5,6 +5,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+## \[13.8.4\] - 2026-10-20
+
 - Maven `warnings` bearbeitet. Siehe README-dev.md
 - PerformanceLoggingFilter - steht am Anfang der Filterkette (Zum aktivieren Property logging.level.aero.minova.cas.profiling.filter.PerformanceLoggingFilter=DEBUG setzen)
 - TimingRequestFilter in Verbindung mit TimingRequestAspect - Laufzeitmessung für Serializer/Deserializer (Zum aktivieren Properties logging.level.aero.minova.cas.profiling.filter.TimingRequestFilter=DEBUG und cas.aspect.TimingRequestAspect=true setzen)

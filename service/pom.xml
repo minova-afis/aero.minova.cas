@@ -27,6 +27,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.azure.spring</groupId>
+                <artifactId>spring-cloud-azure-dependencies</artifactId>
+                <version>7.4.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -323,14 +330,6 @@
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
             <version>0.2.12</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.azure.spring</groupId>
-            <artifactId>spring-cloud-azure-dependencies</artifactId>
-            <version>7.4.0</version>
-            <type>pom</type>
-            <scope>import</scope>
         </dependency>
     </dependencies>
 

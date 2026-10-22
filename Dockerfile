@@ -9,7 +9,22 @@ FROM eclipse-temurin:21-jre-alpine
 LABEL org.opencontainers.image.source=https://github.com/minova-afis/aero.minova.cas
 LABEL maintainer=service@minova.com
 
-COPY customer-build-project/target/aero.minova.cas.jar /opt/aero.minova.cas/lib/
+RUN addgroup -g 10000 -S cas && \
+    adduser -S cas -u 10000 -G cas
+
+RUN mkdir -p \
+      /opt/aero.minova.cas/lib \
+      /opt/aero.minova.cas/lib-legacy \
+      /var/lib/aero.minova.cas \
+      /var/tmp && \
+    chown -R 10000:10000 \
+      /opt/aero.minova.cas \
+      /var/lib/aero.minova.cas \
+      /var/tmp
+
+COPY --chown=10000:10000 \
+    customer-build-project/target/aero.minova.cas.jar \
+    /opt/aero.minova.cas/lib/
 
 ENV aero_minova_core_application_root_path='/'
 
@@ -20,8 +35,11 @@ ENV aero_minova_core_application_root_path='/'
 # dort verschachtelten application.properties wird zu diesem Zeitpunkt nicht gelesen. Existiert das
 # Verzeichnis nicht (Standardfall ohne Legacy-Extensions), wird es von PropertiesLauncher ignoriert.
 ENV LOADER_PATH=/opt/aero.minova.cas/lib-legacy/
+
+USER 10000:10000
+
 ENTRYPOINT ["/opt/java/openjdk/bin/java"]
-CMD ["-jar", "/opt/aero.minova.cas/lib/aero.minova.cas.jar"]
+CMD ["-Djava.io.tmpdir=/var/tmp", "-jar", "/opt/aero.minova.cas/lib/aero.minova.cas.jar"]
 
 VOLUME /var/lib/aero.minova.cas
 

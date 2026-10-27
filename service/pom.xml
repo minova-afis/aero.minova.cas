@@ -13,7 +13,7 @@
     <properties>
         <!-- Embedded React UI — bump to match the desired ch.minova:web.ui
 		release -->
-        <web.ui.version>1.24.4</web.ui.version>
+        <web.ui.version>1.24.5</web.ui.version>
     </properties>
     <dependencyManagement>
         <dependencies>

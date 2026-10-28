@@ -5,6 +5,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+## \[13.8.5\] - 2026-10-28
+
 - FilesController: Ist `ng.api.preferdbfiles=false`, werden Dateien aus der DB (`tFile`) nur noch als Fallback verwendet, wenn keine im CAS enthaltene Datei existiert (vorher wurde die DB immer zuerst gefragt). Aus der DB gelieferte `.xbs`-Dateien werden nun ebenfalls mit System.env/System.properties überschrieben (inkl. Hash). Zusätzlich Klammerung der Bedingung für übersetzte Dateien in `files/hash` korrigiert.
 
 ## \[13.8.4\] - 2026-10-20

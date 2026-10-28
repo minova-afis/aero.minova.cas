@@ -205,7 +205,7 @@ public class FilesController {
 		if (isDBFilesActive && isDBFilesPreferred) {
 			byte[] toRet = getFileFromTable(path, lang);
 			if (toRet != null)
-				return toRet;
+				return applyEnvToXBS(path, toRet);
 		}
 
 		// Zuerst prüfen, ob application.mdi aus Datenbank gelesen werden soll
@@ -218,23 +218,34 @@ public class FilesController {
 			}
 		}
 
-		// Are Files from DB active but not preferred compared to File System?
-		if (isDBFilesActive && !isDBFilesPreferred) {
-			byte[] toRet = getFileFromTable(path, lang);
-			if (toRet != null)
-				return toRet;
+		byte[] toRet;
+		try {
+			toRet = getIncludedFile(path);
+		} catch (Exception e) {
+			// Are Files from DB active but not preferred compared to File System? Then the DB is only a fallback for missing included files
+			if (isDBFilesActive && !isDBFilesPreferred) {
+				byte[] fromTable = getFileFromTable(path, lang);
+				if (fromTable != null)
+					return applyEnvToXBS(path, fromTable);
+			}
+			throw e;
 		}
 
-		// Even without tRegistry we want to have the ability to change XBS entries with System.env and System.properties
-		byte[] toRet = getIncludedFile(path);
-		if (path.toLowerCase().endsWith(".xbs") && toRet != null)
-			try {
-				toRet = NextGen.Registry.create().withXBS(new ByteArrayInputStream(toRet)).withEnv().getXBS();
-			} catch (Exception ex) {
-				customLogger.logError("Failed to auto-update XBS with ENV", ex);
-			}
+		return applyEnvToXBS(path, toRet);
+	}
 
-		return toRet;
+	/**
+	 * Even without tRegistry we want to have the ability to change XBS entries with System.env and System.properties. Other files are returned unchanged.
+	 */
+	private byte[] applyEnvToXBS(String path, byte[] content) {
+		if (content == null || !path.toLowerCase().endsWith(".xbs"))
+			return content;
+		try {
+			return NextGen.Registry.create().withXBS(new ByteArrayInputStream(content)).withEnv().getXBS();
+		} catch (Exception ex) {
+			customLogger.logError("Failed to auto-update XBS with ENV", ex);
+			return content;
+		}
 	}
 
 	/**
@@ -308,12 +319,7 @@ public class FilesController {
 
 		// Try tFiles first
 		if (isDBFilesActive && isDBFilesPreferred) {
-			// Translated files have different contents based on language
-			if (lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
-				byte[] content = getFileFromTable(path, lang);
-				return calculateMD5(content);
-			}
-			byte[] toRet = dbFileService.getMD5(path);
+			byte[] toRet = getHashFromTable(path, lang);
 			if (toRet != null)
 				return toRet;
 		}
@@ -326,19 +332,6 @@ public class FilesController {
 			} catch (Exception e) {
 				customLogger.logError("Mdi could not be read. It will be loaded from the system file path.", e);
 			}
-		}
-
-		// Are Files from DB active but not preferred compared to File System?
-		if (isDBFilesActive && !isDBFilesPreferred) {
-			// Translated files have different contents based on language
-			if (lang != null && path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi")) {
-				byte[] content = getFileFromTable(path, lang);
-				return calculateMD5(content);
-			}
-
-			byte[] toRet = dbFileService.getMD5(path);
-			if (toRet != null)
-				return toRet;
 		}
 
 		// Even in non-fatjar mode we want in-situ MD5 calculation for mdi and xbs -- as both may have dynamic content
@@ -370,8 +363,37 @@ public class FilesController {
 			md5FilePath = fileService.getMd5Folder().resolve(toBeResolved);
 		}
 
-		fileService.checkLegalPath(md5FilePath);
-		return readAllBytes(md5FilePath);
+		try {
+			fileService.checkLegalPath(md5FilePath);
+			return readAllBytes(md5FilePath);
+		} catch (Exception e) {
+			// Are Files from DB active but not preferred compared to File System? Then the DB is only a fallback for missing included files
+			if (isDBFilesActive && !isDBFilesPreferred) {
+				byte[] toRet = getHashFromTable(path, lang);
+				if (toRet != null)
+					return toRet;
+			}
+			throw e;
+		}
+	}
+
+	/**
+	 * MD5 of a file stored in the DB, or null if there is none.
+	 */
+	private byte[] getHashFromTable(String path, String lang) {
+		// XBS content is modified by ENV after reading, so the hash has to be calculated on the final content (hex, like the live calculation in getHash)
+		if (path.toLowerCase().endsWith(".xbs")) {
+			byte[] content = getFileFromTable(path, lang);
+			if (content == null)
+				return null;
+			byte[] md5 = calculateMD5(applyEnvToXBS(path, content));
+			return String.format("%0" + (md5.length * 2) + "x", new BigInteger(1, md5)).getBytes(StandardCharsets.UTF_8);
+		}
+		// Translated files have different contents based on language
+		if (lang != null && (path.toLowerCase().endsWith(".xml") || path.toLowerCase().endsWith(".mdi"))) {
+			return calculateMD5(getFileFromTable(path, lang));
+		}
+		return dbFileService.getMD5(path);
 	}
 
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })

@@ -5,6 +5,10 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+- Prozeduren: Zusätzlich zum Benutzernamen (`casUser`) legt das CAS nun die Authorities des Benutzers (AD-Gruppen, Memberships, Rollen) im SQL-Session-Context `casAuthorities` im Format `#a#b#c#` ab (SQL Server: `session_context(N'casAuthorities')`, PostgreSQL: `my.app_authorities`). Prozeduren können damit die Gruppenzugehörigkeit prüfen, ohne dass die Gruppen in der Datenbank nachgepflegt werden müssen.
+- RowLevelSecurity: Neuer Platzhalter `$user` in `xtcasUserGroup.SecurityToken`. Er steht für den Login-Namen des angemeldeten Benutzers und wirkt nur zusammen mit einem weiteren Token der Gruppe, den der Benutzer besitzt. Damit sieht jedes Mitglied einer (AD-)Gruppe seine eigenen Zeilen, ohne dass pro Benutzer eine Gruppe angelegt werden muss. Der Platzhalter wird nicht als Authority vergeben. Außerdem werden Hochkommas in den SecurityTokens beim Aufbau des Row-Level-Filters maskiert.
+- Doku: `RowLevelSecurity.md` ersetzt `rowlevelexample.adoc`, `security.md` ersetzt `security.adoc` (korrigiert und ergänzt).
+
 ## \[13.8.5\] - 2026-10-28
 
 - FilesController: Ist `ng.api.preferdbfiles=false`, werden Dateien aus der DB (`tFile`) nur noch als Fallback verwendet, wenn keine im CAS enthaltene Datei existiert (vorher wurde die DB immer zuerst gefragt). Aus der DB gelieferte `.xbs`-Dateien werden nun ebenfalls mit System.env/System.properties überschrieben (inkl. Hash). Zusätzlich Klammerung der Bedingung für übersetzte Dateien in `files/hash` korrigiert.

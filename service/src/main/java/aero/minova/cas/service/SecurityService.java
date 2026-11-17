@@ -36,6 +36,14 @@ import lombok.val;
 @Setter
 public class SecurityService {
 
+	/**
+	 * Platzhalter in {@code xtcasUserGroup.SecurityToken}: steht für den Login-Namen des jeweiligen Benutzers. Eine Gruppe mit dem SecurityToken
+	 * {@code #G_SIS_User#$user} sorgt dafür, dass jedes Mitglied von {@code G_SIS_User} (also wer den Token {@code G_SIS_User} besitzt) bei aktivierter
+	 * RowLevelSecurity die Zeilen mit seinem eigenen Login-Namen als SecurityToken sieht, ohne dass pro Benutzer eine eigene Gruppe angelegt werden muss.
+	 * Der Platzhalter wirkt nur zusammen mit mindestens einem weiteren Token der Gruppe, den der Benutzer besitzt (Gruppenmitgliedschaft).
+	 */
+	public static final String USER_PLACEHOLDER = "$user";
+
 	ViewService viewService;
 
 	@Autowired
@@ -124,6 +132,16 @@ public class SecurityService {
 			userPrivileges.addRow(tableNameAndUserToken);
 		}
 
+		// Gruppen mit dem Platzhalter $user: Token steht am Ende oder in der Mitte des Strings. Ob der Benutzer Mitglied der Gruppe ist, wird unten geprüft.
+		if (!allUserAuthorities.isEmpty()) {
+			for (String pattern : List.of("%#" + USER_PLACEHOLDER, "%#" + USER_PLACEHOLDER + "#%")) {
+				Row placeholderRow = new Row();
+				placeholderRow.setValues(asList(new Value(privilegeName, null), new Value(pattern, null), new Value("", null), new Value(false, null)));
+				userPrivileges.addRow(placeholderRow);
+			}
+		}
+		final String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+
 		// Hier bekommen wir Rows zurück, die in irgendeiner Weise unsere Tokens enthalten.
 		List<Row> queryResult = unsecurelyGetIndexView(userPrivileges).getRows();
 
@@ -134,7 +152,20 @@ public class SecurityService {
 					.map(String::new)//
 					.collect(Collectors.toList());
 
+			// Der Platzhalter $user gilt nur, wenn der Benutzer Mitglied der Gruppe ist, d.h. mindestens einen weiteren Token der Gruppe besitzt.
+			final boolean memberOfPlaceholderGroup = resultAuthorities.stream()//
+					.anyMatch(a -> a != null && !a.isBlank() && !USER_PLACEHOLDER.equalsIgnoreCase(a)
+							&& allUserAuthorities.contains(new SimpleGrantedAuthority(a)));
+
 			for (String authority : resultAuthorities) {
+				if (USER_PLACEHOLDER.equalsIgnoreCase(authority)) {
+					if (memberOfPlaceholderGroup && currentUser != null && !currentUser.isBlank()) {
+						Row newRow = new Row();
+						newRow.setValues(asList(r.getValues().get(0), new Value(currentUser, null), r.getValues().get(2)));
+						returnRows.add(newRow);
+					}
+					continue;
+				}
 				if (authority != null && !authority.isBlank() && allUserAuthorities.contains(new SimpleGrantedAuthority(authority))) {
 					r.getValues().set(1, new Value(authority, null));
 					Row newRow = new Row();
@@ -341,7 +372,7 @@ public class SecurityService {
 		if (!requestingRoles.isEmpty()) {
 			rowSec.append("\r\nor ( SecurityToken IN (");
 			for (String r : requestingRoles) {
-				rowSec.append("'").append(r.replace('#', ' ').trim()).append("',");
+				rowSec.append("'").append(r.replace('#', ' ').trim().replace("'", "''")).append("',");
 			}
 			rowSec.deleteCharAt(rowSec.length() - 1);
 			rowSec.append(") )");
@@ -473,7 +504,7 @@ public class SecurityService {
 
 			// Verschiedene Rollen/Gruppen können dieselbe Berechtigung haben, deshalb rausfiltern. Wir wollen keine Einträge doppelt haben.
 			for (String string : groupSecurityTokens) {
-				if (!userSecurityTokens.contains(string))
+				if (!USER_PLACEHOLDER.equalsIgnoreCase(string) && !userSecurityTokens.contains(string))
 					userSecurityTokens.add(string);
 			}
 		}

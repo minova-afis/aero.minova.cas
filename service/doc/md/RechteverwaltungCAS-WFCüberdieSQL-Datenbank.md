@@ -10,7 +10,7 @@ Es ist leider nicht möglich, in der Datenbank direkt Benutzer über SQL anzuleg
 
 ![Alt text](./images/SQL/SqlInsertCasUser.png)
 
-Als nächstes kann man nun in den SQL-Teil übergehen. Dafür kann man eine IDE seiner Wahl nehmen, es muss nur möglich sein, sich mit der entsprechenden Datenbank zu verbinden. Und so kann man nun eine Benutzergruppe anlegen. Diese kann beliebig heißen, benötigt werden ein **KeyText** und ein [**SecurityToken**](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#securitytoken). Beim **SecurityToken** ist es wichtig, dass ein **'#'** davor steht, wie hier zu sehen:
+Als nächstes kann man nun in den SQL-Teil übergehen. Dafür kann man eine IDE seiner Wahl nehmen, es muss nur möglich sein, sich mit der entsprechenden Datenbank zu verbinden. Und so kann man nun eine Benutzergruppe anlegen. Diese kann beliebig heißen, benötigt werden ein **KeyText** und ein [**SecurityToken**](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/md/security.md#securitytoken). Beim **SecurityToken** ist es wichtig, dass ein **'#'** davor steht, wie hier zu sehen:
 
 ![Alt text](./images/SQL/SqlInsertCasUserGroup.png)
 
@@ -22,6 +22,6 @@ Danach muss nur noch der jeweilige Benutzer zur Benutzergruppe hinzugefügt werd
 
 ![Alt text](./images/SQL/SqlInsertAuthority.png)
 
-Der letzte Schritt besteht darin, den Benutzergruppen Prozeduren zuzuweisen, die sie verwenden dürfen. Es ist sehr wichtig, dass überall die [**Rowlevelsecurity**](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#row-level-security) auf **0** gesetzt ist, außer bei **xpcasInitMdi**. Dort muss sie unbedingt auf  **1** gesetzt sein, da sonst für den jeweiligen Benutzer keine Masken angezeigt würden. In diesem Beispiel habe ich beim Select-Befehl den **KeyLong** – also den Hauptschlüssel der jeweiligen Prozedur – abgefragt und diesen dann beim Insert unten als **UserPrivilegeKey** verwendet. Der **UserGroupKey** ist der KeyLong der jeweiligen Benutzergruppe, die zuvor bereits erstellt wurde.
+Der letzte Schritt besteht darin, den Benutzergruppen Prozeduren zuzuweisen, die sie verwenden dürfen. Es ist sehr wichtig, dass überall die [**Rowlevelsecurity**](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/md/security.md#row-level-security) auf **0** gesetzt ist, außer bei **xpcasInitMdi**. Dort muss sie unbedingt auf  **1** gesetzt sein, da sonst für den jeweiligen Benutzer keine Masken angezeigt würden. In diesem Beispiel habe ich beim Select-Befehl den **KeyLong** – also den Hauptschlüssel der jeweiligen Prozedur – abgefragt und diesen dann beim Insert unten als **UserPrivilegeKey** verwendet. Der **UserGroupKey** ist der KeyLong der jeweiligen Benutzergruppe, die zuvor bereits erstellt wurde.
 
 ![Alt text](./images/SQL/SqlInsertPrivilege.png)

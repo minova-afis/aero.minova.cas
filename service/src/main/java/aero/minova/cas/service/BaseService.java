@@ -105,6 +105,32 @@ public abstract class BaseService<E extends DataEntity> {
 		return repository.findAllWithLastActionGreaterZero();
 	}
 
+	/**
+	 * Liefert die Authorities (AD-Gruppen, Memberships, Rollen) des angemeldeten Benutzers als String im Format <code>#a#b#c#</code>. Das Format entspricht
+	 * den SecurityTokens in der Datenbank, sodass SQL-Code mit <code>like '%#a#%'</code> prüfen kann.
+	 *
+	 * @param maxLength
+	 *            Maximale Länge des Strings. Längere Listen werden an einer Trennstelle abgeschnitten.
+	 * @return Leerer String <code>#</code>, wenn kein Benutzer angemeldet ist oder er keine Authorities hat.
+	 */
+	public static String getCurrentAuthorities(int maxLength) {
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		StringBuilder sb = new StringBuilder("#");
+		if (authentication != null) {
+			for (var authority : authentication.getAuthorities()) {
+				String name = authority.getAuthority() == null ? "" : authority.getAuthority().replace("#", "").trim();
+				if (name.isEmpty() || sb.indexOf("#" + name + "#") >= 0) {
+					continue;
+				}
+				if (sb.length() + name.length() + 1 > maxLength) {
+					break;
+				}
+				sb.append(name).append('#');
+			}
+		}
+		return sb.toString();
+	}
+
 	public static String getCurrentUser() {
 		return SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : "CAS_JPA";
 	}

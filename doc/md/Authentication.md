@@ -3,7 +3,7 @@
 This is the developer-facing reference for **how a CAS instance authenticates users** — every mode
 that exists today, plus the one that's planned — and a short orientation on how **access management**
 (who is allowed to do what) works on top of that. For the deep-dive mechanics of the privilege/
-row-level-security model, see [`service/doc/adoc/security.adoc`](../../service/doc/adoc/security.adoc)
+row-level-security model, see [`service/doc/md/security.md`](../../service/doc/md/security.md)
 and [`service/doc/adoc/nutzerverwaltung.adoc`](../../service/doc/adoc/nutzerverwaltung.adoc) (German) —
 this doc doesn't replace those, it's the property-focused "what do I actually set" companion, including
 the planned OIDC/Keycloak mode those don't cover yet.
@@ -161,8 +161,8 @@ Row-level and column-level security build on the same mechanism: `xtcasLuUserPri
 and `xtcasColumnSecurity` further restrict *which rows/columns* a matched privilege actually exposes.
 
 This is intentionally just an orientation, not the full mechanics — see:
-- [`security.adoc`](../../service/doc/adoc/security.adoc) — the full SecurityToken/row-level/column-level model
-- [`rowlevelexample.adoc`](../../service/doc/adoc/rowlevelexample.adoc) — a worked SQL example
+- [`security.md`](../../service/doc/md/security.md) — the full SecurityToken/row-level/column-level model
+- [`RowLevelSecurity.md`](RowLevelSecurity.md) — how row-level security works, with a worked SQL example
 - [`adGroupsToUserGroups.md`](../../service/doc/adoc/adGroupsToUserGroups.md) — wiring AD groups into this model
 - [`UserRights.md`](../../service/doc/md/UserRights.md) / [`RechteverwaltungCAS-WFCüberdieSQL-Datenbank.md`](../../service/doc/md/RechteverwaltungCAS-WFCüberdieSQL-Datenbank.md) — the WFC-UI and raw-SQL workflows for actually creating groups/privileges
 

@@ -450,6 +450,88 @@ class SecurityServiceTests {
 		assertThat(result.get(0).getValues().get(1).getStringValue()).isEqualTo(mockResult.get(2).getValues().get(1).getStringValue());
 	}
 
+	private Table groupRowResult(String groupTokens, boolean rowLevelSecurity) {
+		Table result = new Table();
+		result.addColumn(new Column("PrivilegeKeyText", DataType.STRING));
+		result.addColumn(new Column("SecurityToken", DataType.STRING));
+		result.addColumn(new Column("RowLevelSecurity", DataType.BOOLEAN));
+		Row row = new Row();
+		row.addValue(new Value("test", null));
+		row.addValue(new Value(groupTokens, null));
+		row.addValue(new Value(rowLevelSecurity, null));
+		result.addRow(row);
+		return result;
+	}
+
+	@DisplayName("Platzhalter $user: Mitglied der Gruppe erhält zusätzlich seinen Login-Namen als Token")
+	@WithMockUser(username = "janiak", authorities = { "G_SIS_User" })
+	@Test
+	void test_getPrivilegePermissionUserPlaceholderMember() {
+		Mockito.doReturn(groupRowResult("#G_SIS_User#$user", true)).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
+		Mockito.doNothing().when(spySecurityService).loadAllPrivileges();
+
+		List<Row> result = spySecurityService.getPrivilegePermissions("test");
+
+		assertThat(result).extracting(r -> r.getValues().get(1).getStringValue()).containsExactlyInAnyOrder("G_SIS_User", "janiak");
+		assertThat(result).allMatch(r -> Boolean.TRUE.equals(r.getValues().get(2).getBooleanValue()));
+	}
+
+	@DisplayName("Platzhalter $user: Kein Mitglied der Gruppe, der Platzhalter wirkt nicht")
+	@WithMockUser(username = "janiak", authorities = { "other" })
+	@Test
+	void test_getPrivilegePermissionUserPlaceholderNoMember() {
+		Mockito.doReturn(groupRowResult("#G_SIS_User#$user", true)).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
+		Mockito.doNothing().when(spySecurityService).loadAllPrivileges();
+
+		assertThat(spySecurityService.getPrivilegePermissions("test")).isEmpty();
+	}
+
+	@DisplayName("Platzhalter $user: Die Abfrage enthält Muster für Platzhalter am Ende und in der Mitte")
+	@WithMockUser(username = "janiak", authorities = { "G_SIS_User" })
+	@Test
+	void test_getPrivilegePermissionUserPlaceholderQuery() {
+		org.mockito.ArgumentCaptor<Table> captor = org.mockito.ArgumentCaptor.forClass(Table.class);
+		Mockito.doReturn(new Table()).when(spySecurityService).unsecurelyGetIndexView(captor.capture());
+		Mockito.doNothing().when(spySecurityService).loadAllPrivileges();
+
+		spySecurityService.getPrivilegePermissions("test");
+
+		assertThat(captor.getValue().getRows()).extracting(r -> r.getValues().get(1).getStringValue()).contains("%#$user", "%#$user#%");
+	}
+
+	@DisplayName("Platzhalter $user wird nicht als Authority an den Benutzer vergeben")
+	@Test
+	void test_loadUserGroupPrivilegesIgnoresPlaceholder() {
+		Mockito.doAnswer(inv -> groupRowResult2("G_SIS_User", "#G_SIS_User#$user")).when(spySecurityService).unsecurelyGetIndexView(Mockito.any());
+
+		List<String> tokens = new ArrayList<>(List.of("G_SIS_User"));
+		val authorities = spySecurityService.loadUserGroupPrivileges("janiak", tokens, new ArrayList<>());
+
+		assertThat(authorities).extracting(a -> a.getAuthority()).containsExactly("G_SIS_User");
+	}
+
+	private Table groupRowResult2(String keyText, String securityToken) {
+		Table result = new Table();
+		result.addColumn(new Column("KeyText", DataType.STRING));
+		result.addColumn(new Column("SecurityToken", DataType.STRING));
+		Row row = new Row();
+		row.addValue(new Value(keyText, null));
+		row.addValue(new Value(securityToken, null));
+		result.addRow(row);
+		return result;
+	}
+
+	@DisplayName("Row-Level-Security: Hochkommas in Tokens werden maskiert")
+	@Test
+	void test_rowLevelSecurityEscapesQuotes() {
+		Row row = new Row();
+		row.addValue(new Value("test", null));
+		row.addValue(new Value("o'brien", null));
+		row.addValue(new Value(true, null));
+
+		assertThat(SecurityService.rowLevelSecurity(true, List.of(row))).contains("'o''brien'");
+	}
+
 	@DisplayName("getPrivilegePermission-Rows überprüfen, aber es gibt keine UserGruppen")
 	@WithMockUser(username = "user", roles = {})
 	@Test

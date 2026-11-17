@@ -361,7 +361,7 @@ Das kann besonders bei Passwörtern ärgerlich werden.
 Die häufigste Exception. Tritt auf, wenn:
 
 * die aufrgerufene Prozedur/View/Tabelle nicht existiert. In diesem Fall wurde entweder Setup noch nicht ausgeführt oder die Prozedur/View/Tabelle, die man anfragt, war im Ordner rootPath/sql nicht enthalten.
-* der User, der die Anfrage schickt keine Berechtigung hat, diese auszuführen. In diesem Fall muss man prüfen, ob die UserGruppe in der Datenbank korrekt angelegt und wie xref:https://github.com/minova-afis/aero.minova.cas/blob/master/service/doc/adoc/security.adoc[hier] richtig verknüpft ist.
+* der User, der die Anfrage schickt keine Berechtigung hat, diese auszuführen. In diesem Fall muss man prüfen, ob die UserGruppe in der Datenbank korrekt angelegt und wie link:https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/md/security.md[hier] richtig verknüpft ist.
 
 ## IllegalArgumentException
 

@@ -61,7 +61,18 @@ public class ProcedureService {
 	SecurityService securityService;
 
 	/**
-	 * Speichert im SQL-Session-Context unter `casUser` den Nutzer, der die Abfrage tätigt.
+	 * Maximale Länge der Authorities im SQL-Session-Context. sp_set_session_context speichert einen sql_variant (max. 8000 Bytes = 4000 nvarchar-Zeichen).
+	 */
+	private static final int MAX_SESSION_AUTHORITIES_LENGTH = 4000;
+
+	/**
+	 * Speichert im SQL-Session-Context den Nutzer, der die Abfrage tätigt:
+	 * <ul>
+	 * <li>`casUser`: der Benutzername (SQL: <code>dbo.xfCasUser()</code>),</li>
+	 * <li>`casAuthorities`: die Authorities des Nutzers (AD-Gruppen, Memberships, Rollen) im Format <code>#a#b#c#</code> (SQL:
+	 * <code>session_context(N'casAuthorities')</code>). So können Prozeduren prüfen, ob der Nutzer z.B. Mitglied einer bestimmten AD-Gruppe ist, ohne dass die
+	 * Gruppe in der Datenbank nachgepflegt werden muss.</li>
+	 * </ul>
 	 *
 	 * @param connection
 	 *            Das ist die Session.
@@ -74,22 +85,31 @@ public class ProcedureService {
 		final SessionFactoryImpl sessionFactory = (SessionFactoryImpl) session.getSessionFactory();
 		final String dialect = sessionFactory.getJdbcServices().getDialect().toString();
 
-		CallableStatement userContextSetter;
+		String userSql;
+		String authoritiesSql;
 		if (dialect.contains(POSTGRESQLDIALECT)) {
-			userContextSetter = connection.prepareCall("SET my.app_user = ?;");
+			userSql = "SET my.app_user = ?;";
+			authoritiesSql = "SET my.app_authorities = ?;";
 		} else if (dialect.contains(H2DIALECT)) {
 			// Bei H2 Datenbank brauchen wir keinen Nutzer setzten, weil LastUser eh über die Java-Klassen gesetzt wird
 			return;
 		} else {
-			userContextSetter = connection.prepareCall("exec sys.sp_set_session_context N'casUser', ?;");
+			userSql = "exec sys.sp_set_session_context N'casUser', ?;";
+			authoritiesSql = "exec sys.sp_set_session_context N'casAuthorities', ?;";
 		}
+		setSessionValue(connection, userSql, BaseService.getCurrentUser());
+		setSessionValue(connection, authoritiesSql, BaseService.getCurrentAuthorities(MAX_SESSION_AUTHORITIES_LENGTH));
+	}
+
+	private void setSessionValue(Connection connection, String sql, String value) throws SQLException {
+		CallableStatement contextSetter = connection.prepareCall(sql);
 		try {
-			userContextSetter.setNString(1, BaseService.getCurrentUser());
-			userContextSetter.execute();
+			contextSetter.setNString(1, value);
+			contextSetter.execute();
 		} catch (Exception e) {
-			customLogger.logError("Error while trying to set user for procedures: ", e);
+			customLogger.logError("Error while trying to set user context for procedures: ", e);
 		} finally {
-			userContextSetter.close();
+			contextSetter.close();
 		}
 	}
 

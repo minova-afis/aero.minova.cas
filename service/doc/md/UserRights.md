@@ -44,7 +44,7 @@ _Token_ - Der Benutzertoken, mit dem die Rechte für unterschiedlich Prozesse ei
 ### Rechte zuweisen
 
 In der Benutzergruppe können den Gruppen Rechte auf Tabellen, Prozeduren oder Views zugewiesen werden. Dabei kann auch die 
-[Reihensicherung](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#tabellenzugriffserlaubnis:~:text=Methoden%20weiter%20gereicht.-,Row%2DLevel%2DSecurity,-Da%20jeder%20User) aktiviert werden.
+[Reihensicherung](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/md/security.md#row-level-security) aktiviert werden.
 
 <img src="./images/UserRights/image5.png" alt="Alt text" width="40%">
 
@@ -74,7 +74,7 @@ _Menu_ - Verweis aus ein existierendes Menu, damit diese Maske sich in dem Menu 
 
 _Position_ - Gibt an an welcher Stelle innerhalb des Unter- oder Hauptmenus dieser Eintrag eingetragen wird. Es können Fließkommawerte eingetragen werden. 
 
-_Security Token_ - Über die definierten [Security Tokens](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/adoc/security.adoc#securitytoken:~:text=vom%20CAS%20haben.-,SecurityToken,-Jeder%20User%20erh%C3%A4lt) aus der Benutzergruppe können Rechte eingetragen werden. Dafür ist es wichtg, dass die Gruppen denen nur bestimmte Menus angezeigt werden sollen immer ein gülteiger Token zugewiesen ist.
+_Security Token_ - Über die definierten [Security Tokens](https://github.com/minova-afis/aero.minova.cas/blob/main/service/doc/md/security.md#securitytoken:~:text=vom%20CAS%20haben.-,SecurityToken,-Jeder%20User%20erh%C3%A4lt) aus der Benutzergruppe können Rechte eingetragen werden. Dafür ist es wichtg, dass die Gruppen denen nur bestimmte Menus angezeigt werden sollen immer ein gülteiger Token zugewiesen ist.
 
 _MDI Type_ - Es gibt 3 unterschiedliche Typen: application (Oberstes Menupunkt, der Pro Anwendung einmal existiert), menu (Menupunkt, wie "CAS", "Stammdaten", .. um die Masken zu sortieren, from (Maske mit Funktion).
 

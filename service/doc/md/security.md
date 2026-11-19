@@ -154,7 +154,7 @@ insert into tJournal (
 	@ServiceProviderKey,
 	[...]
 	@UnitKey,
-	dbo.xfWorkingTimeSecurityToken()   -- Login-Name des Users (dbo.xfCasUser())
+	dbo.xfCasUser()   -- Login-Name des Users
 )
 ```
 

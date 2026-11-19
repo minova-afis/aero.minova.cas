@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
@@ -84,9 +86,20 @@ public class XSqlProcedureController {
 	public void registerExtension(String name, BiFunction<List<XTable>, Map<Table, List<SqlProcedureResult>>, List<XSqlProcedureResult>> ext) {
 		if (extensions.containsKey(name)) {
 			customLogger.logSetup("Cannot register two extensions with the same name: " + name);
+			customLogger.logError("Cannot register two x-procedure extensions with the same name: " + name);
 			throw new IllegalArgumentException(name);
 		}
 		extensions.put(name, ext);
+		customLogger.logExtensionRegistered("x-procedure", name);
+	}
+
+	/**
+	 * Protokolliert nach dem Start, welche x-procedure-Extensions registriert sind. Fehlt hier eine erwartete Extension, wurde ihr Jar nicht geladen oder ihre
+	 * Komponente nicht gestartet.
+	 */
+	@EventListener(ApplicationReadyEvent.class)
+	public void logRegisteredExtensions() {
+		customLogger.logExtension("Registered x-procedure extensions (" + extensions.size() + "): " + extensions.keySet());
 	}
 
 	/**

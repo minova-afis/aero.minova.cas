@@ -5,6 +5,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+- Logging: Beim Registrieren einer Extension (Prozedur, View, X-Prozedur) schreibt das CAS Art, Name, aufrufende Klasse und Jar in den Info-Log (Konsole und Datei) und in den Setup-Log. Nach dem Start steht dort je Art die Liste der registrierten Extensions, beim Setup die Liste der Extensions, deren Privilegien eingetragen werden. Doppelte Namen werden zusätzlich im Error-Log gemeldet. Bisher landeten diese Meldungen nur in der Datei `setup.log`.
+
 
 ## \[13.9.0\] - 2026-11-19
 - Prozeduren: Zusätzlich zum Benutzernamen (`casUser`) legt das CAS nun die Authorities des Benutzers (AD-Gruppen, Memberships, Rollen) im SQL-Session-Context `casAuthorities` im Format `#a#b#c#` ab (SQL Server: `session_context(N'casAuthorities')`, PostgreSQL: `my.app_authorities`). Prozeduren können damit die Gruppenzugehörigkeit prüfen, ohne dass die Gruppen in der Datenbank nachgepflegt werden müssen.

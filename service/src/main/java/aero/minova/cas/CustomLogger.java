@@ -97,6 +97,42 @@ public class CustomLogger {
 		setupLogger.info(CASUSER, logMessage);
 	}
 
+	/**
+	 * Protokolliert eine Meldung zu Extensions sowohl im Setup-Log als auch im Info-Log (Konsole und Datei). Der Setup-Log schreibt nur in eine Datei, die im
+	 * Container nicht in der Konsole erscheint.
+	 */
+	public void logExtension(String logMessage) {
+		setupLogger.info(CASUSER, logMessage);
+		infoLogger.info(CASUSER, logMessage);
+	}
+
+	/**
+	 * Protokolliert die Registrierung einer Extension mit Art, Name und der aufrufenden Klasse samt Fundort (Jar). So ist im Log zu sehen, welche Extension
+	 * aus welchem Jar geladen wurde.
+	 *
+	 * @param type
+	 *            Art der Extension, z.B. "procedure", "view", "x-procedure".
+	 * @param name
+	 *            Name, unter dem die Extension registriert wird.
+	 */
+	public void logExtensionRegistered(String type, String name) {
+		String origin = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(frames -> frames//
+				.map(StackWalker.StackFrame::getDeclaringClass)//
+				.filter(c -> c != CustomLogger.class && !c.getName().startsWith("aero.minova.cas.controller.Sql") && !c.getName().startsWith("aero.minova.cas.controller.XSql"))//
+				.findFirst())//
+				.map(c -> {
+					String location;
+					try {
+						var codeSource = c.getProtectionDomain().getCodeSource();
+						location = codeSource == null ? "unknown location" : String.valueOf(codeSource.getLocation());
+					} catch (RuntimeException e) {
+						location = "unknown location";
+					}
+					return c.getName() + " [" + location + "]";
+				}).orElse("unknown caller");
+		logExtension("Extension registered (" + type + "): " + name + " <- " + origin);
+	}
+
 	public void logQueueService(String logMessage) {
 		queueServiceLog.info(CASUSER, logMessage);
 	}

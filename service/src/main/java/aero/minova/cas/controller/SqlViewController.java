@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.api.domain.Column;
 import aero.minova.cas.api.domain.DataType;
@@ -66,9 +68,20 @@ public class SqlViewController {
 		if (extensions.containsKey(name)) {
 			String errorMessage = "Cannot register two extensions with the same name: " + name;
 			customLogger.logSetup(errorMessage);
+			customLogger.logError(errorMessage);
 			throw new IllegalArgumentException(errorMessage);
 		}
 		extensions.put(name, ext);
+		customLogger.logExtensionRegistered("view", name);
+	}
+
+	/**
+	 * Protokolliert nach dem Start, welche view-Extensions registriert sind. Fehlt hier eine erwartete Extension, wurde ihr Jar nicht geladen oder ihre
+	 * Komponente nicht gestartet.
+	 */
+	@EventListener(ApplicationReadyEvent.class)
+	public void logRegisteredExtensions() {
+		customLogger.logExtension("Registered view extensions (" + extensions.size() + "): " + extensions.keySet());
 	}
 
 	/**
@@ -76,6 +89,7 @@ public class SqlViewController {
 	 * werden die Extensions in die tVersion10-Tabelle eingetragen.
 	 */
 	public void setupExtensions() {
+		customLogger.logExtension("Setup: writing privileges for " + extensions.size() + " view extensions: " + extensions.keySet());
 		Table extensionSetupTable = new Table();
 		extensionSetupTable.setName("xpcasSetupInsertUserPrivilege");
 		extensionSetupTable.addColumn(new Column("KeyLong", DataType.INTEGER, OutputType.OUTPUT));

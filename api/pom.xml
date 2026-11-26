@@ -27,6 +27,17 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <!-- RestTemplateBuilder liegt seit Spring Boot 4 in spring-boot-restclient -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient</artifactId>
+        </dependency>
+        <dependency>
+            <!-- Spring Boot 4 nutzt standardmäßig Jackson 3 (tools.jackson). Der Code verwendet noch Jackson 2
+            (com.fasterxml.jackson); dieses Modul liefert Jackson 2 samt Boot-Integration. -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-jackson2</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>

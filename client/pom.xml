@@ -49,7 +49,7 @@
 									<overWrite>true</overWrite>
 									<groupId>org.springframework.security</groupId>
 									<artifactId>spring-security-crypto</artifactId>
-									<version>6.1.0</version>
+									<version>6.5.11</version>
 									<destFileName>spring-security-crypto.jar</destFileName>
 								</item>
 							</artifactItems>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>aero.minova</groupId>
         <artifactId>spring.maven.root</artifactId>
-        <version>11.3.5</version>
+        <version>12.0.0</version>
         <relativePath />
     </parent>
     <artifactId>cas.parent</artifactId>
@@ -45,6 +45,17 @@
             <url>https://maven.pkg.github.com/minova-afis/aero.minova.maven.root</url>
         </repository>
     </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- CVE-2023-5072 u.a.: Wird transitiv über ch.minova:assist.core -> ch.minova:appmodel in 20230618 eingebunden. -->
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20260814</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <!-- Spring Boot Version explizit angeben um Maven Warnings zu vermeiden!! -->

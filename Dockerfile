@@ -9,6 +9,9 @@ FROM eclipse-temurin:21-jre-alpine
 LABEL org.opencontainers.image.source=https://github.com/minova-afis/aero.minova.cas
 LABEL maintainer=service@minova.com
 
+# Sicherheitsupdates der Alpine-Pakete einspielen (z.B. libfontenc, CVE-2026-109908).
+RUN apk upgrade --no-cache
+
 RUN addgroup -g 10000 -S cas && \
     adduser -S cas -u 10000 -G cas
 

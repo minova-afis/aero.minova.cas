@@ -1,0 +1,1 @@
+/aero.minova.app.resources/test.resources.txt

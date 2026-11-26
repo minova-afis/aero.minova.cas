@@ -19,10 +19,15 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import aero.minova.cas.BaseTest;
 import aero.minova.cas.CustomLogger;
 import aero.minova.cas.service.FilesService;
+import ch.minova.foundation.rest.db.service.FileService;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 class FilesControllerTest extends BaseTest {
 	@Mock
 	private CustomLogger customLoggerMock;
+
+	@Mock
+	private FileService dbFileServiceMock;
 
 	@InjectMocks
 	private FilesController filesController;
@@ -222,5 +230,54 @@ class FilesControllerTest extends BaseTest {
 			}
 		}
 		return found;
+	}
+
+	@Test
+	void getZipDoesNotAskDbIfIncludedAndDbNotPreferred() throws Exception {
+		filesController.isDBFilesActive = true;
+		filesController.isDBFilesPreferred = false;
+		filesController.createZip(Paths.get("Shared Data/Program Files/AFIS"));
+
+		assertThat(filesController.getZip("Shared Data/Program Files/AFIS.zip")).isNotEmpty();
+		verify(dbFileServiceMock, never()).getFile(anyString());
+	}
+
+	@Test
+	void getZipFallsBackToDbIfNotIncluded() throws Exception {
+		filesController.isDBFilesActive = true;
+		filesController.isDBFilesPreferred = false;
+		byte[] fromDb = { 1, 2, 3 };
+		when(dbFileServiceMock.getFile("missing.zip")).thenReturn(fromDb);
+
+		assertThat(filesController.getZip("missing.zip")).isEqualTo(fromDb);
+	}
+
+	@Test
+	void getZipAsksDbFirstIfPreferred() throws Exception {
+		filesController.isDBFilesActive = true;
+		filesController.isDBFilesPreferred = true;
+		byte[] fromDb = { 1, 2, 3 };
+		when(dbFileServiceMock.getFile("Shared Data/Program Files/AFIS.zip")).thenReturn(fromDb);
+
+		assertThat(filesController.getZip("Shared Data/Program Files/AFIS.zip")).isEqualTo(fromDb);
+	}
+
+	@Test
+	void fatJarZipHashMatchesZipContentAndIsNotEmpty() throws Exception {
+		filesController.isFatJarMode = true;
+
+		byte[] zip = filesController.getFile("reports.zip", null);
+		java.util.List<String> entries = new java.util.ArrayList<>();
+		try (var zis = new java.util.zip.ZipInputStream(new java.io.ByteArrayInputStream(zip))) {
+			for (var e = zis.getNextEntry(); e != null; e = zis.getNextEntry()) {
+				entries.add(e.getName());
+			}
+		}
+		assertThat(entries).containsExactly("reports/a.txt");
+
+		// files/hash must be the hash of exactly the zip that files/read delivers (client compares it with the hash of the downloaded file)
+		byte[] md5 = java.security.MessageDigest.getInstance("MD5").digest(zip);
+		String expected = String.format("%032x", new java.math.BigInteger(1, md5));
+		assertThat(filesController.getHash("reports.zip", null)).isEqualTo(expected.getBytes(StandardCharsets.UTF_8));
 	}
 }

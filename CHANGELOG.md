@@ -6,6 +6,8 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ## \[UNRELEASED\] - XXXX-XX-XX
 
 - Logging: Beim Registrieren einer Extension (Prozedur, View, X-Prozedur) schreibt das CAS Art, Name, aufrufende Klasse und Jar in den Info-Log (Konsole und Datei) und in den Setup-Log. Nach dem Start steht dort je Art die Liste der registrierten Extensions, beim Setup die Liste der Extensions, deren Privilegien eingetragen werden. Doppelte Namen werden zusätzlich im Error-Log gemeldet. Bisher landeten diese Meldungen nur in der Datei `setup.log`.
+- FilesController: `files/hash` lieferte im Fat-Jar-Modus für Zips (z. B. `reports.zip`, `pdf.zip`) den Hash eines leeren Zips, weil der Pfad anders normalisiert wurde als bei `files/read`. Dadurch stimmte der Hash nie mit der heruntergeladenen Datei überein, und der Client lud das Zip bei jedem Öffnen einer Maske komplett neu. `files/read` und `files/hash` verwenden nun denselben Pfad und liefern denselben Inhalt.
+- FilesController: `files/zip` und `files/read` auf Zips fragen die DB (`tFile`) bei `ng.api.preferdbfiles=false` nur noch als Fallback, wenn kein im CAS enthaltenes Zip existiert (vorher wurde die DB bei aktivem `ng.api.dbfiles` immer zuerst gefragt, zwei Queries pro Zip). Ein im Fat-Jar nicht vorhandenes Zip wird nicht mehr als leeres Zip geliefert, sondern führt zum DB-Fallback bzw. zu einem Fehler.
 
 
 ## \[13.9.0\] - 2026-11-19

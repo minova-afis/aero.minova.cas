@@ -262,7 +262,7 @@ public class FilesController {
 				path = "/" + path;
 			}
 			if (path.endsWith(".zip")) {
-				return getZip(path.substring(0, path.length() - 4));
+				return getIncludedZip(path.substring(0, path.length() - 4));
 			}
 
 			// Abwärtskompatibilität zu CAS 12: Ist ein Legacy-Verzeichnis konfiguriert, hat es Vorrang vor dem Fat-Jar --
@@ -288,7 +288,7 @@ public class FilesController {
 		String extension = FilenameUtils.getExtension(path);
 		// Zur Abwärtskompatibilität Dateiendung überprüfen und, falls diese Zip ist, getZip aufrufen.
 		if (extension.equalsIgnoreCase("zip")) {
-			return getZip(path);
+			return getIncludedZip(path);
 		}
 		val inputPath = fileService.checkLegalPath(Paths.get(path));
 		customLogger.logUserRequest("files/read: " + path);
@@ -398,18 +398,40 @@ public class FilesController {
 
 	@RequestMapping(value = "files/zip", produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public @ResponseBody byte[] getZip(@RequestParam String path) throws Exception {
-		// Try tFiles first
-		if (isDBFilesActive) {
+		// Try tFiles first -- only if they are preferred
+		if (isDBFilesActive && isDBFilesPreferred) {
 			byte[] toRet = getFileFromTable(path, null);
 			if (toRet != null)
 				return toRet;
 		}
 
+		try {
+			return getIncludedZip(path);
+		} catch (Exception e) {
+			// Are Files from DB active but not preferred compared to File System? Then the DB is only a fallback for missing included zips
+			if (isDBFilesActive && !isDBFilesPreferred) {
+				byte[] fromTable = getFileFromTable(path, null);
+				if (fromTable != null)
+					return fromTable;
+			}
+			throw e;
+		}
+	}
+
+	/**
+	 * Get zip included in this CAS installation -- either generated from the jar resources or read from the file system. Never asks the DB.
+	 */
+	private byte[] getIncludedZip(String path) throws Exception {
 		if (isFatJarMode) {
-			final var pathStr = path.toString();
+			// files/read and files/hash may pass the name with or without ".zip" and with or without a leading "/" -- the resource lists contain
+			// "/<folder>/..." entries, so normalize to "/<folder>", otherwise nothing matches and an empty zip (with a wrong hash) is returned
+			if (path.endsWith(".zip")) {
+				path = path.substring(0, path.length() - 4);
+			}
 			if (!path.startsWith("/")) {
 				path = "/" + path;
 			}
+			final var pathStr = path;
 			final List<String> matchingResources = new ArrayList<>();
 			final var deployedResources = new String(getClass().getResourceAsStream("/aero.minova.app.resources/deployed.resources.txt").readAllBytes());
 			for (final var resourceListPath : deployedResources.split("\n")) {
@@ -429,6 +451,11 @@ public class FilesController {
 			// Abwärtskompatibilität zu CAS 12: zusätzlich alle Dateien aus dem alten system-files-Verzeichnis auf der Festplatte
 			// einsammeln (siehe doc/md/CAS12Compatibility.md).
 			final List<Path> legacyMatches = fileService.listLegacyFiles(pathStr);
+
+			// Nothing included -> signal "not found" (instead of an empty zip), so that the DB can be used as fallback
+			if (isDBFilesActive && matchingResources.isEmpty() && legacyMatches.isEmpty()) {
+				throw new IOException(pathStr + " zip not included in CAS build");
+			}
 
 			String resourcePathLog = null;
 			ZipEntry ze = null;

@@ -10,9 +10,13 @@ import java.io.FileInputStream;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -27,6 +31,9 @@ import aero.minova.cas.api.domain.Value;
 import aero.minova.cas.controller.SqlViewController;
 
 //benötigt, damit JUnit-Tests nicht abbrechen
+// Seit Spring Boot 4 werden @Mock-Felder in @SpringBootTest nicht mehr automatisch initialisiert.
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @SpringBootTest(classes = CoreApplicationSystemApplication.class, properties = { "application.runner.enabled=false" })
 class FilesServiceTest extends BaseTest {
 

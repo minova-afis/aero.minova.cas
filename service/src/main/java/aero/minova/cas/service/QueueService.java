@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -301,7 +300,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 				String credentials = pendingMessage.getCasService().getUsername() + ":" + pendingMessage.getCasService().getPassword();
 
 				HttpHeaders header = new HttpHeaders();
-				byte[] encodedAuth = Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false);
+				byte[] encodedAuth = java.util.Base64.getEncoder().encode(credentials.getBytes(StandardCharsets.UTF_8));
 				header.add("Authorization", "Basic " + encodedAuth);
 
 				request = new HttpEntity<>(message, header);
@@ -352,7 +351,7 @@ public class QueueService implements BiConsumer<Table, ResponseEntity<Object>> {
 		try {
 			// Zuerst einen Aufruf an die TokenUrl/ an den Token Server machen, um sich einen Token zu holen.
 			String credentials = service.getClientId() + ":" + service.getClientSecret();
-			String encodedAuth = new String(Base64.encodeBase64(credentials.getBytes(StandardCharsets.UTF_8), false));
+			String encodedAuth = new String(java.util.Base64.getEncoder().encode(credentials.getBytes(StandardCharsets.UTF_8)));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 			headers.add("Authorization", "Basic " + encodedAuth);

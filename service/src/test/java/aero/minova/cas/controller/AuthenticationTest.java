@@ -6,7 +6,7 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.data.ldap.AutoConfigureDataLdap;
+import org.springframework.boot.data.ldap.test.autoconfigure.AutoConfigureDataLdap;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.ldap.core.DirContextAdapter;

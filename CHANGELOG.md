@@ -5,6 +5,12 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## \[UNRELEASED\] - XXXX-XX-XX
 
+- **Breaking Change:** aero.minova:spring.maven.root von 11.3.5 auf 12.0.0 aktualisieren (dadurch: Spring Boot 3.5.16 → 4.2.0, Spring Framework 6.2.19 → 7.1.0, Spring Security 6.5.11 → 7.2.0, Tomcat 10.1.55 → 11.0.27, Hibernate 6 → 7). Behebt die bekannten CVEs in Spring (spring-webmvc), Tomcat, Netty, Jackson, httpcore5, PostgreSQL-JDBC und mssql-jdbc. Anleitung für Extensions: `SPRING-BOOT-4-UPDATE.md`.
+- Anpassungen an Spring Boot 4: `hibernate-jpamodelgen` heißt jetzt `hibernate-processor`, geänderte Packages (`EntityScan`, `TomcatServletWebServerFactory`, `RestTemplateBuilder`, `AutoConfigureDataLdap`), `org.apache.tomcat.util.codec.binary.Base64` durch `java.util.Base64` ersetzt. Bereits kompilierte Extensions, die diese Klassen verwenden, müssen neu gegen das CAS kompiliert werden.
+- Jackson 2 bleibt vorerst im Einsatz (neue Abhängigkeit `spring-boot-jackson2`), Spring Boot 4 verwendet standardmäßig Jackson 3. Die Migration auf Jackson 3 steht noch aus.
+- `org.json:json` wird auf 20260814 angehoben (kam bisher über `ch.minova:appmodel` in 20230618, CVE-2023-5072). `spring-security-crypto` im Client von 6.1.0 auf 6.5.11 (CVE-2025-22228).
+- Dockerfile: `apk upgrade` für Sicherheitsupdates der Alpine-Pakete (z. B. `libfontenc`).
+
 ## \[13.9.1\] - 2026-11-26
 
 - Logging: Beim Registrieren einer Extension (Prozedur, View, X-Prozedur) schreibt das CAS Art, Name, aufrufende Klasse und Jar in den Info-Log (Konsole und Datei) und in den Setup-Log. Nach dem Start steht dort je Art die Liste der registrierten Extensions, beim Setup die Liste der Extensions, deren Privilegien eingetragen werden. Doppelte Namen werden zusätzlich im Error-Log gemeldet. Bisher landeten diese Meldungen nur in der Datei `setup.log`.

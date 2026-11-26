@@ -6,6 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 CAS (Core Application System) is a Spring Boot-based REST API that provides a bridge between SQL databases, Java extensions, and a read-only file system. It serves as the backend infrastructure for Eclipse/WFC applications, essentially providing REST interfaces to SQL functionalities similar to legacy Ncore and Install-Tool systems.
 
+## Changelog
+
+Jede Änderung am Projekt (Feature, Bugfix, Abhängigkeits-Update, Breaking Change) benötigt einen Eintrag in `CHANGELOG.md`.
+- Eintrag unter `## [UNRELEASED] - XXXX-XX-XX` ergänzen (Format: Keep a Changelog, auf Deutsch, wie die bisherigen Einträge).
+- Breaking Changes (z. B. für Extensions) ausdrücklich als solche kennzeichnen.
+- Den Eintrag im selben Commit/PR wie die Änderung anlegen.
+
 ## Architecture
 
 This is a multi-module Maven project with the following key modules:
